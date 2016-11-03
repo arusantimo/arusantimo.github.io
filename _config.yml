@@ -1,31 +1,30 @@
-# Blog settings
-permalink: /blog/:title
+# Site settings
+title: *folio
+email: you@example.com
+description: > # this means to ignore newlines until "baseurl:"
+  A simple, whitespace, helvetica based portfolio theme.
+baseurl:  # the subpath of your site, e.g. /blog/
+url:  # the base hostname & protocol for your site
+twitter_username: twitter_username
+github_username:  github_username
 
+# Build settings
+markdown: kramdown
+highlighter: pygments
 
-# My variables
-name: Arusantimo
-description: Arusantimo Technology Blog
-google_verification: null
-paginate: 5
+# Pagination
+gems: [jekyll-paginate]
+paginate: 1
 paginate_path: "/blog/page:num/"
 
-# File management
-include: [".htaccess"]
-exclude: ["README.md", "LICENSE"]
+exclude: ["README.md"]
+
+collections:
+  portfolio:
+    output: true
+    permalink: /portfolio/:path/
+#   poetry:
+#     output: true
+#     permalink: /poetry/:path/
 
 
-# Sass
-sass:
-style: :compressed
-sass_dir: _sass
-
-
-# Markdown
-markdown: kramdown
-kramdown:
-input: GFM
-hard_wrap: false
-highlighter: rouge
-
-# Gems
-gems: [jekyll-paginate]
