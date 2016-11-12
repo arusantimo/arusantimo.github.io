@@ -2,37 +2,86 @@
   position:fixed;
   left:0px;
   top:0px;
-  height:56px;
   width:100%;
   z-index: 50;
   padding:10px 0;
+  background: #fff;
+  overflow: hidden;
+  // border-bottom: 1px solid #aaa;
+  box-shadow: 0px 0px 10px #ccc;
+  @media #{$over800} {
+    height:56px;
+    overflow: visible;
+    background: none;
+    box-shadow: 0px 0px 0px #ccc;
+  }
   h1 {
     font-size: 20px;
     display: inline-block;
-    position: fixed;
-    bottom: 15px;
+    position: relative;
     left: 15px;
+    @media #{$over800} {
+      position: fixed;
+      bottom: 15px;
+    }
     a {      
-      width: 150px;
+      width: 14px;
       display: inline-block;
+      @media #{$over800} {
+        width: 150px;
+      }
       img {
         width: 100%;
+        &.m {
+          display: block;
+        }
+        &.dt {
+          display: none;
+        }
+        @media #{$over800} {
+          &.m {
+            display: none;
+          }
+          &.dt {
+            display: block;
+          }
+        }
       }
     }
-  }  
+  }
+  .nav-toggle {
+    @media #{$over800} {
+      display: none;
+    }
+  }
   .site-nav {
-    float: right;
-    margin-right: 50px;
+    display: none;
+    @media #{$over800} {
+      display: block;
+      float: right;
+      margin-right: 50px;
+    }
     a {
       position: relative;
       top: 16px;
       color: $grey-color-middle;
-      font-size: 15px;
-      margin-left: 20px;
-      font-weight: 800;
+      font-size: 12px;
+      font-weight: 400;
       letter-spacing: 1px;
-      &:hover {
+      display: block;
+      margin-bottom: 30px;
+      text-align: right;
+      width: 92%;
+      @media #{$over800} {
+        margin-left: 20px;
+        text-align: left;
+        font-size: 15px;
+        font-weight: 800;
+        margin-bottom: 0px;
+        display: inline;
+        &:hover {
         top: 18px;
+        }  
       }
     }
   }
@@ -49,52 +98,63 @@
 .page-content {
   margin-top: 78px;
   padding-top: 30px;
-  min-height: 800px;
   position: relative;
+  min-height: 480px;
+  @media #{$over800} {
+    min-height: 800px;
+  }
   .titlehead {
-    font-weight: 600;
-    font-size: 30px;
-    letter-spacing: 2px;
-    display: inline-block;
-    color: #fff;
-    text-shadow: 0px 2px 10px #999;
+    @extend %title;
   }
   .post-list {
-    margin: 150px 0 70px;
+    margin: 50px 0;  
     overflow: hidden;
+    @media #{$over800} {
+      margin: 150px 0 70px;  
+    }
     li {
       list-style-type: none;
-      padding-bottom: 10px;
       border-bottom: 2px dashed #ececec;
-      margin-bottom: 20px;
+      padding-bottom: 5px;
+      margin-bottom: 5px; 
+      @media #{$over800} {
+        padding-bottom: 10px;
+        margin-bottom: 20px;  
+      }
       h3 {
         font-weight: 700;
         margin-bottom: 10px;
         a {
           position: relative;
-          font-size: 70px;
           display: block;
-          transition: all 0.5s ease 0s;
-          background: linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
+          background: -webkit-linear-gradient(45deg, #00DF6D 0%, #0084ff 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           left: 0px;
-          &:hover {
-            left: 20px;
-            &:after {
-              width: 80%;
-            }
-          }
-          &:after {
-            opacity: 0.3;
-            content: "";
-            display: block;
-            position: absolute;
-            height: 3px;
-            width: 0px;
-            bottom: -10px;
-            background: linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
+          font-size: 24px;
+          @media #{$over800} {
             transition: all 0.5s ease 0s;
+            font-size: 70px;
+            background: -webkit-linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);  
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            &:hover {
+              left: 20px;
+              &:after {
+                width: 80%;
+              }
+            }
+            &:after {
+              opacity: 0.3;
+              content: "";
+              display: block;
+              position: absolute;
+              height: 3px;
+              width: 0px;
+              bottom: -10px;
+              background: -webkit-linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
+              transition: all 0.5s ease 0s;
+            }
           }
         }
       }
@@ -125,6 +185,10 @@
   .btn {
     font-weight: 500;
     margin: 0 10px;
+    font-size: 12px;
+    @media #{$over800} {
+      font-size: 15px;
+    }
   }
   em, a {
     font-style: normal;
@@ -139,21 +203,15 @@
 .post-header {
   margin-bottom: $vertical-spacing-unit;
   .post-title {
-    font-weight: 600;
-    font-size: 30px;
-    letter-spacing: 2px;
-    display: block;
-    color: #fff;
-    text-shadow: 0px 2px 10px #999;
-    margin-bottom: 15px;
+    @extend %title;
   }
   .post-meta {
-    font-size: 22px;
+    font-size: 14px;
     letter-spacing: -1px;
     line-height: 1;
     margin-bottom: 10px;
     display: inline-block;
-    background: linear-gradient(450deg, #00DF6D 0%, #3ba0ff 100%);
+    background: -webkit-linear-gradient(450deg, #00DF6D 0%, #3ba0ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     @media #{$over800} {
@@ -165,48 +223,57 @@
   font-weight: 400;
   padding-bottom: 100px;
   h1 {
-    font-size: 42px;
+    font-size: 26px;
     font-weight: 500;
     color: $grey-color-dark;
+    margin-bottom: 15px;
     @media #{$over800} {
       font-size: 30px;
       margin-bottom: 25px;
     }
   }
   h2 {
-    font-size: 42px;
+    font-size: 22px;
     font-weight: 500;
     color: $grey-color-dark;
+    margin-bottom: 12px;
     @media #{$over800} {
       font-size: 28px;
       margin-bottom: 20px;
     }
   }
   h3 {
-    font-size: 30px;
+    font-size: 16px;
     font-weight: 500;
     color: $grey-color-dark;
+    margin-bottom: 10px;
     @media #{$over800} {
       font-size: 22px;
       margin-bottom: 15px;
     }
   }
   h4 {
-    font-size: 20px;
+    font-size: 15px;
     font-weight: 500;
     color: $grey-color-dark;
+    margin-bottom: 7px;
     @media #{$over800} {
       font-size: 18px;
       margin-bottom: 10px;
     }
   }
   p {
-    font-size: 16px;
+    font-size: 12px;
     color: $text-color;
-    margin-bottom: 15px;
+    margin-bottom: 7px;
     letter-spacing: 0.5px;
     font-weight: 300;
-    line-height: 28px;
+    line-height: 22px;
+    @media #{$over800} {
+      font-size: 16px;
+      margin-bottom: 15px;
+      line-height: 28px;
+    }
   }
   img {
     width: 100%;
@@ -229,26 +296,35 @@
     ul {
       margin-bottom: 100px;
     }
-    li {
-      font-size: 16px;
+    li { 
       list-style-type: none;
       margin-bottom: 10px;
       color: $grey-color-middle;
       a {
+        font-size: 12px;
         display: inline-block;
         margin-left: 15px;
+        @media #{$over800} {
+          font-size: 14px;
+        }
       }
     }
     .mgl_20 {
       margin-left: 40px;
       color: $grey-color-light;
-      font-size: 14px;
+      font-size: 11px;
+      @media #{$over800} {
+        font-size: 14px;
+      }
     }
   }
   li {
-    font-size: 16px;
+    font-size: 12px;
     list-style-type: none;
     margin-bottom: 20px;
+    @media #{$over800} {
+      font-size: 15px;
+    }
   }
   .block {
     width: 100%;

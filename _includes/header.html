@@ -1,5 +1,19 @@
 <header class="site-header">
-    <h1><a href="/about"><img src="/img/logo.jpg" alt="arusantimo"></a></h1>
+    <h1>
+    	<a href="{{ site.baseurl }}/">
+    		<img class="dt" src="/img/logo.jpg" alt="arusantimo"/>
+    		<img class="m" src="/img/m_logo.jpg" alt="arusantimo"/>
+    	</a>
+    </h1>
+    <div class="nav-toggle">
+		    <span></span>
+		</div>
+		<script type="text/javascript">
+		$('.nav-toggle').click(function() {
+			$(this).toggleClass('active');
+			$(".site-nav").slideToggle();
+		});
+		</script>
     <nav class="site-nav">
     		<a class="page-link" href="{{ site.baseurl }}/">블로그</a>
     		<a class="page-link" href="/about">소개</a>
