@@ -13,7 +13,7 @@
     bottom: 15px;
     left: 15px;
     a {      
-      width: 180px;
+      width: 150px;
       display: inline-block;
       img {
         width: 100%;
@@ -26,13 +26,12 @@
     a {
       position: relative;
       top: 16px;
-      color: $text-color;
+      color: $grey-color-middle;
       font-size: 15px;
       margin-left: 20px;
       font-weight: 800;
       letter-spacing: 1px;
       &:hover {
-        color:$theme-color;
         top: 18px;
       }
     }
@@ -44,32 +43,57 @@
   text-align: center;
   width:100%;
   font-size: 11px;
+  padding-bottom: 20px;
 }
 
 .page-content {
-  margin-top: 56px;
+  margin-top: 78px;
   padding-top: 30px;
   min-height: 800px;
+  position: relative;
   .titlehead {
-    text-align: center;
-    font-weight: 200;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: 2px;
+    display: inline-block;
+    color: #fff;
+    text-shadow: 0px 2px 10px #999;
   }
   .post-list {
     margin: 150px 0 70px;
     li {
       list-style-type: none;
-      padding-bottom: 60px;
+      padding-bottom: 10px;
+      border-bottom: 2px dashed #ececec;
+      margin-bottom: 20px;
       h3 {
         font-weight: 700;
-        margin-bottom: 30px;
+        margin-bottom: 10px;
         a {
           position: relative;
           font-size: 70px;
           display: block;
           transition: all 0.5s ease 0s;
+          background: linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           left: 0px;
           &:hover {
             left: 20px;
+            &:after {
+              width: 80%;
+            }
+          }
+          &:after {
+            opacity: 0.3;
+            content: "";
+            display: block;
+            position: absolute;
+            height: 3px;
+            width: 0px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
+            transition: all 0.5s ease 0s;
           }
         }
       }
@@ -114,32 +138,57 @@
 .post-header {
   margin-bottom: $vertical-spacing-unit;
   .post-title {
-    font-size: 42px;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: 2px;
+    display: block;
+    color: #fff;
+    text-shadow: 0px 2px 10px #999;
+    margin-bottom: 15px;
+  }
+  .post-meta {
+    font-size: 22px;
     letter-spacing: -1px;
     line-height: 1;
-    font-weight: 400;
     margin-bottom: 10px;
+    display: inline-block;
+    background: linear-gradient(450deg, #00DF6D 0%, #3ba0ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     @media #{$over800} {
-      font-size: 36px;
+      font-size: 22px;
     }
    }
 }
 .post-content {
   font-weight: 400;
+  padding-bottom: 100px;
+  h1 {
+    font-size: 42px;
+    font-weight: 500;
+    color: $grey-color-dark;
+    @media #{$over800} {
+      font-size: 30px;
+      margin-bottom: 25px;
+    }
+  }
   h2 {
     font-size: 42px;
+    color: $grey-color-dark;
     @media #{$over800} {
       font-size: 28px;
     }
   }
   h3 {
     font-size: 30px;
+    color: $grey-color-dark;
     @media #{$over800} {
       font-size: 22px;
     }
   }
   h4 {
     font-size: 20px;
+    color: $grey-color-dark;
     @media #{$over800} {
       font-size: 18px;
     }
@@ -147,6 +196,48 @@
   p {
     font-size: 16px;
     color: $text-color;
+    margin-bottom: 15px;
+  }
+  img {
+    width: 100%;
+    height: auto;
+  }
+  .strong {
+    color: $theme-color;
+    font-weight: 700;
+  }
+  .about {
+    text-align: center;
+    h1 {
+      border-top: 5px solid #0084ff;
+      text-align: left;
+      margin-left: 10px;
+      padding: 10px;
+      font-size: 25px;
+      display: inline-block;
+    }
+    ul {
+      margin-bottom: 100px;
+    }
+    li {
+      font-size: 16px;
+      list-style-type: none;
+      margin-bottom: 10px;
+      color: $grey-color-middle;
+      a {
+        display: inline-block;
+        margin-left: 15px;
+      }
+    }
+    .mgl_20 {
+      margin-left: 40px;
+      color: $grey-color-light;
+      font-size: 14px;
+    }
+  }
+  li {
+    font-size: 16px;
+    list-style-type: none;
     margin-bottom: 20px;
   }
 }

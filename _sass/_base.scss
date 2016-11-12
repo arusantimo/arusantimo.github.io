@@ -17,9 +17,8 @@ $small-font-size: 12px;
 $base-line-height: 1.5em;
 $horizontal-spacing-unit: 50px;
 $vertical-spacing-unit: 40px;
-$spacing-unit:     30px;
+$spacing-unit: 30px;
 $nav-height: 56px;
-$text-color:       #111;
 
 /* portfolio tinkering */
 $img_spacing: 5px; 
@@ -34,10 +33,11 @@ $blue: #2698BA;
 $green: #11D68B;
 $lime_green: #B7D12A;
 $purple: #B509AC;
-$grey-color-dark: #333; 
-$grey-color-light: #ddd;
-$text-color: #444;
-$background-color:#fdfdfd;
+$grey-color-dark: #333;
+$grey-color-middle: #999;
+$grey-color-light: #bbb;
+$text-color: #666;
+$background-color:#fff;
 $grey-color: #555;
 $brand-color:#2a7ae2;
 
@@ -57,7 +57,6 @@ $min720: "screen and (max-height : 720px)";
 body {
     font-family: $base-font-family;
     font-size: $base-font-size;
-    line-height: $base-line-height;
     font-weight: 100;
     color: $text-color;
     background-color: $background-color;
@@ -103,6 +102,7 @@ li {
     > ul,
     > ol {
          margin-bottom: 0;
+         list-style-type: none;
     }
 }
 
@@ -114,7 +114,6 @@ a {
     color: $text-color;
     text-decoration: none;
     &:hover {
-        color: $theme-color;
         text-decoration: none;
     }
 }
