@@ -6,7 +6,7 @@ permalink: /about/
 
 <img class="col one right" src="/img/aru.png">
 
-반갑습니다. 제 블로그에 와주셔서 감사합니다. 저는 현재 UI & FE 개발자로 일하고 있는 <span class="strong">Arusantiom</span> (본명: 이창규) 입니다.
+반갑습니다. 제 블로그에 와주셔서 감사합니다. 저는 현재 UI & FE 개발자로 일하고 있는 <span class="strong">Arusantimo</span> (본명: 이창규) 입니다.
 
 개발이외의 관심사는 강아지와 음악감상 영화관람입니다.
 
