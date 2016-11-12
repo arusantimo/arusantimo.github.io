@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  a post with images
+title:  ReactJs 컴포넌트 최적화 방법론
 date: 2015-05-15 21:01:00
 description: this is what included images could look like
 ---

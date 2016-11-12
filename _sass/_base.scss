@@ -10,12 +10,16 @@ dl, dd, ol, ul, figure {
 
 
 
-/** Variables **********************************************/
-$base-font-family:              Helvetica, sans-serif;
-$base-line-height:              1.5em;
-$horizontal-spacing-unit:       50px;
-$vertical-spacing-unit:         40px;
-$nav-height:                    56px;
+/** Variables */
+$base-font-family: 'Nanum Barun Gothic', Helvetica, Arial, sans-serif;
+$base-font-size:   16px;
+$small-font-size: 12px;
+$base-line-height: 1.5em;
+$horizontal-spacing-unit: 50px;
+$vertical-spacing-unit: 40px;
+$spacing-unit:     30px;
+$nav-height: 56px;
+$text-color:       #111;
 
 /* portfolio tinkering */
 $img_spacing: 5px; 
@@ -24,23 +28,28 @@ $caption_font_size: 12px;
 $caption_color: #aaa;
 
 /* COLORS  */
-$red:  #FF3636;
+$redorange:  #ff6631;
 $orange: #F29105;
 $blue: #2698BA;
 $green: #11D68B;
 $lime_green: #B7D12A;
 $purple: #B509AC;
+$grey-color-dark: #333; 
+$grey-color-light: #ddd;
+$text-color: #666;
+$background-color:#fdfdfd;
+$grey-color: #555;
+$brand-color:#2a7ae2;
 
+/* Set theme color */
+$theme-color: $redorange;
 
-$grey-color-dark: #333;   /* footer */
-$grey-color-light: #ddd;  /* navigation bar border */
-$text-color:     #666;
+/* media Query*/
+$over320: "screen and (min-width : 321px)";
+$over800: "screen and (min-width : 801px)";
 
-/* Set theme color *************************/
-$theme-color:   $red;
-
-
-/************************************************************/
+$min800: "screen and (max-height : 800px)";
+$min720: "screen and (max-height : 720px)";
 
 /**
  * Basic styling
@@ -72,18 +81,12 @@ ul, ol, dl, figure,
 
 
 hr{
-    /* Inset, by Dan Eden */
     border: 0;
     height: 0;
     border-top: 1px solid rgba(0, 0, 0, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-
 }
 
-
-/**
- * Figures
- */
 figure > img {
     display: block;
 }
@@ -92,11 +95,6 @@ figcaption {
     font-size: $small-font-size;
 }
 
-
-
-/**
- * Lists
- */
 ul, ol {
     margin-left: $horizontal-spacing-unit;
 }
@@ -108,27 +106,13 @@ li {
     }
 }
 
-
-
-/**
- * Headings
- */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 100;
 }
 
-
-/**
- * Links
- */
 a {
     color: $text-color;
     text-decoration: none;
-    /*
-    &:visited {
-        color: darken($brand-color, 15%); 
-    }
-    */
     &:hover {
         color: $theme-color;
         text-decoration: none;
@@ -144,28 +128,17 @@ article a {
     }
 }
 
-
-
-/**
- * Blockquotes
- */
 blockquote {
     color: $text-color;
     border-left: 10px solid $grey-color-light;
     padding-left: $horizontal-spacing-unit / 2;
     font-size: 18px;
     font-style: italic;
-
     > :last-child {
         margin-bottom: 0;
     }
 }
 
-
-
-/**
- * Code formatting
- */
 pre,
 code {
     font-size: 15px;
@@ -188,33 +161,18 @@ pre {
     }
 }
 
-
-
-/**
- * Wrapper
- */ 
-
 .wrapper {
-    max-width: -webkit-calc(800px - (#{$horizontal-spacing-unit} * 2));
-    max-width:         calc(800px - (#{$horizontal-spacing-unit} * 2));
+    width: 100%;
     margin-right: auto;
     margin-left: auto;
     padding-right: $horizontal-spacing-unit;
     padding-left: $horizontal-spacing-unit;
     @extend %clearfix;
-
-    @include media-query($on-laptop) {
-        max-width: -webkit-calc(800px - (#{$horizontal-spacing-unit}));
-        max-width:         calc(800px - (#{$horizontal-spacing-unit}));
-        padding-right: $spacing-unit / 2;
-        padding-left: $spacing-unit / 2;
+    @media #{$over800} {
+        width: 1024px;
     }
 }
 
-
-/**
- * Clearfix
- */
 %clearfix {
     &:before,
     &:after {
@@ -223,6 +181,3 @@ pre {
         clear: both;
     }
 }
-
-
-

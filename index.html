@@ -2,21 +2,25 @@
 layout: default
 ---
 
+<h2 class="titlehead">BLOG</h2>
+
 <ul class="post-list">
     {% for post in paginator.posts %}
       <li>
-        <h2><a class="post-title" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
-        <p class="post-meta">{{ post.date | date: '%B %-d, %Y — %H:%M' }}</p>
-        <p>{{ post.description }}</p>
+        <h3><a class="post-title" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
+        <div class="detailMeta">
+          <p class="post-meta">{{ post.date | date: '%B %-d, %Y — %H:%M' }}</p>
+          <p>{{ post.description }}</p>
+        </div>
       </li>
     {% endfor %}
 </ul>
 
 <div class="pagination">
   {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path }}" class="previous">Previous</a>
+    <a href="{{ paginator.previous_page_path }}" class="btn">Previous</a>
   {% else %}
-    <span class="previous">Previous</span>
+    <span class="btn none">Previous</span>
   {% endif %}
   {% for page in (1..paginator.total_pages) %}
     {% if page == paginator.page %}
@@ -28,8 +32,8 @@ layout: default
     {% endif %}
   {% endfor %}
   {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path }}" class="next">Next</a>
+    <a href="{{ paginator.next_page_path }}" class="btn">Next</a>
   {% else %}
-    <span class="next ">Next</span>
+    <span class="btn none">Next</span>
   {% endif %}
 </div>
