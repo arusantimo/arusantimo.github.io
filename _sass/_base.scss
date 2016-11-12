@@ -36,13 +36,13 @@ $lime_green: #B7D12A;
 $purple: #B509AC;
 $grey-color-dark: #333; 
 $grey-color-light: #ddd;
-$text-color: #666;
+$text-color: #444;
 $background-color:#fdfdfd;
 $grey-color: #555;
 $brand-color:#2a7ae2;
 
 /* Set theme color */
-$theme-color: $redorange;
+$theme-color: $blue;
 
 /* media Query*/
 $over320: "screen and (min-width : 321px)";
@@ -156,8 +156,8 @@ pre {
 
     > code {
         border: 0;
-        padding-right: 0;
-        padding-left: 0;
+        padding: 10px;
+        display: block;
     }
 }
 
