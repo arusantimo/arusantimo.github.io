@@ -61,6 +61,7 @@
   }
   .post-list {
     margin: 150px 0 70px;
+    overflow: hidden;
     li {
       list-style-type: none;
       padding-bottom: 10px;
@@ -174,29 +175,38 @@
   }
   h2 {
     font-size: 42px;
+    font-weight: 500;
     color: $grey-color-dark;
     @media #{$over800} {
       font-size: 28px;
+      margin-bottom: 20px;
     }
   }
   h3 {
     font-size: 30px;
+    font-weight: 500;
     color: $grey-color-dark;
     @media #{$over800} {
       font-size: 22px;
+      margin-bottom: 15px;
     }
   }
   h4 {
     font-size: 20px;
+    font-weight: 500;
     color: $grey-color-dark;
     @media #{$over800} {
       font-size: 18px;
+      margin-bottom: 10px;
     }
   }
   p {
     font-size: 16px;
     color: $text-color;
     margin-bottom: 15px;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+    line-height: 28px;
   }
   img {
     width: 100%;
@@ -239,5 +249,22 @@
     font-size: 16px;
     list-style-type: none;
     margin-bottom: 20px;
+  }
+  .block {
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 40px;
+    .left_align_img {
+      float: left;
+      width: 40%;
+    }
+    .right_align_text {
+      float: right;
+      width: 50%;
+      margin-left: 10%;
+    }
+  }
+  .small {
+    font-size: 12px;
   }
 }

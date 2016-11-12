@@ -29,6 +29,7 @@ permalink: /about/
 - 밸류시스템 FE <span class="mgl_20">2016.07~2016.08</span>
 - 아이로보 FE <span class="mgl_20">2016.05~2016.06</span>
 - PWS (프리더윌리증후군 관리 APP) <span class="mgl_20">2016.01~2016.03</span>
+- 팀웤 (엽무관리 APP) <span class="mgl_20">2015.10~2015.12</span>
 - 가그린 FE <span class="mgl_20">2015.05~2015.07</span>
 - TEMPO FE <span class="mgl_20">2014.10~2014.12</span>
 - 쉐보레 글로벌 리뉴얼 프로젝트 <span class="mgl_20">2013.09~2013.12</span>

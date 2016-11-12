@@ -36,7 +36,7 @@ $purple: #B509AC;
 $grey-color-dark: #333;
 $grey-color-middle: #999;
 $grey-color-light: #bbb;
-$text-color: #666;
+$text-color: #888;
 $background-color:#fff;
 $grey-color: #555;
 $brand-color:#2a7ae2;
@@ -142,7 +142,10 @@ pre,
 code {
     font-size: 15px;
     border-radius: 3px;
-    background-color: $grey-color-light;
+    background-color: #333;
+    line-height: 25px;
+    color: #eee;
+    letter-spacing: 1px;
 }
 
 code {
@@ -155,7 +158,7 @@ pre {
 
     > code {
         border: 0;
-        padding: 10px;
+        padding: 30px 20px;
         display: block;
     }
 }
@@ -168,7 +171,7 @@ pre {
     padding-left: $horizontal-spacing-unit;
     @extend %clearfix;
     @media #{$over800} {
-        width: 1024px;
+        width: 980px;
     }
 }
 

@@ -1,0 +1,88 @@
+---
+layout: post
+title: 웹폰트 경량화하여 사용하기
+date: 2016-11-11 23:10
+
+---
+# 웹폰트란 ??
+
+웹폰트는 웹브라우저가 폰트파일을 내려받아 CSS에서 읽고 그폰트에 맡게 웹사이트폰트들울 변경해 주는 것을 말합며 웹사이트를 제작함에 있어서 가장 중요한 요소중 하나라고 볼수 있습니다. 웹폰트를 사이트에서 적용시키는 방법도 여러가지가 존재합니다. 
+<br>
+<br>
+<br>
+#### 1) google font service를 이용한 CDN 링크방식
+
+{% highlight css %}
+@import url('http://fonts.googleapis.com/earlyaccess/nanumgothic.css'); 
+* {font-family:'Nanum Gothic';}
+{% endhighlight %}
+
+#### 2) 자신의 서버에서 폰트를 불러오기
+
+{% highlight css %}
+@font-face{font-family:'Nanum Gothic'; src:url('/fonts/NanumGothic.woff')}
+@font-face{font-family:'Nanum Gothic'; src:url('/fonts/NanumGothic.eot')} 
+* {font-family:'Nanum Gothic';}
+{% endhighlight %}
+
+#### 3) 자신의 브라우저에 최적화해서 폰트 불러오기 (2번에서 발전)
+
+{% highlight css %}
+font-family:"Nanum Gothic";
+    src:url('/fonts/NanumGothic.eot');
+    src:url('/fonts/NanumGothic.eot?#iefix') format('embedded-opentype'),
+    url('/fonts/NanumGothic.woff') format('woff'),
+    url('/fonts/NanumGothic.ttf') format('truetype');
+    url('/fonts/NanumGothic.svg#NanumGothic') format('svg')
+    src:local(※), url('/fonts/NanumGothic.woff') format('woff')
+{% endhighlight %}
+
+3번의 방법으로 하면 브라우저 환경에 따라 필요한 폰트만을 다운로드 받게 해줍니다. 브라우저 환경에 따라서 eot, woff, ttf 중 하나의 폰트파일을 받게되고 웹사이트에 적용하게 됩니다. 불필요한 파일을 받지 않음으로써 데이터의 부담은 줄고 모든 브라우저에 적용될 수 있는 최적의 코드입니다.
+<br>
+<br>
+<br>
+
+### 하지만...
+하지만 웹폰트의 용량은 왠만한 대용량 이미지 파일보다 커질수 밖에 없는게 현실입니다. 그래서 필요한 것이 폰트의 최적화 & 경량화 작업!. 폰트도 어떻게 보면 폰트의 모음 객체파일이고 필요없는 변수는 삭제하면 그만큼 용량은 작아 질수 있고 작업은 의외로 간단하고 결과또한 만족 스럽습니다.
+
+일단 먼저 경량화에 필요한 소프트웨어를 설치
+- <a href="http://opentype.jp/subsetfontmk.htm" target="_blank">서브셋 폰트 메이커</a>
+- <a href="http://opentype.jp/woffconv.htm" target="_blank">WOFF 컨버터</a>
+- <a href="http://eotfast.com/" target="_blank">EOT 컨버터 (eot파일이 export 되지 않았을시 설치)</a>
+
+설치가 마무리 되면 일단 서브셋 폰트를 실행
+<p class="block">
+    <img class="left_align_img" src="{{ site.baseurl }}/img/2016-11-11/font1.jpg" />
+    <span class="right_align_text">1. 버튼을 눌러 원하는 폰트를 가지고 온다.</span>
+    <span class="right_align_text">2. 버튼을 눌러 저장 경로를 지정한다.</span>
+    <span class="right_align_text">3. 버튼을 눌러 서브셋을 지정한다.<span class="small">(한글 
+    서브셋을 다운받아 import하는것이 좋다.)</span> </span>
+    <span class="right_align_text">5. 버튼을 눌러 컨버터 한다.</span>
+    <span class="right_align_text small">그림의 파란색 영역의 체크가 다 되었는지 확인다.</span>
+</p>
+<p class="block">
+    <img class="left_align_img" src="{{ site.baseurl }}/img/2016-11-11/font2.jpg" />
+   <span class="right_align_text">1. 저장할 폰트의 이름을 정한다.</span>
+   <span class="right_align_text">2. 버튼을 누루면 export된다.</span>
+</p>
+
+
+경량화되어 나온 폰트를 위의 방법대로 웹에서 import하는 것으로 끝
+<br>
+<br>
+<br>
+#### 이슈..
+폰트 제작시에 서브셋 설정에 오류가 있었을시 폰트가 깨지는 현상이 발생하며 ie8에서 특정 가중치가 동작하지 않는 문제도 발생되어 지고. 특수문자의 오류도 발생할수 있습니다.
+
+
+
+
+
+
+
+
+
+
+
+
+
