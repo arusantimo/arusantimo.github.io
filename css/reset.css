@@ -33,3 +33,58 @@ body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fiel
   padding: 0;
 font-family: 'Nanum Barun Gothic', Helvetica, sans-serif;
 }
+
+.nav-toggle {
+  position: absolute;
+  top: 23px;
+  right: 10px;
+  z-index: 999999;
+  padding: 10px 35px 16px 0;
+  cursor: pointer
+}
+
+.nav-toggle span,
+.nav-toggle span:before,
+.nav-toggle span:after {
+  content: "";
+  position: absolute;
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 1px;
+  border-color:white;
+  background: #999;
+  cursor: pointer;
+}
+
+.nav-toggle span:before {
+  top: -7px;
+}
+
+.nav-toggle span:after {
+  bottom: -7px;
+}
+
+.nav-toggle span,
+.nav-toggle span:before,
+.nav-toggle span:after {
+  transition: all 300ms ease-in-out;
+}
+
+.nav-toggle.active span {
+  background-color: transparent
+}
+
+.nav-toggle.active span:before,
+.nav-toggle.active span:after {
+  top: 0;
+}
+
+.nav-toggle.active span:before {
+  transform: rotate(45deg);
+}
+
+.nav-toggle.active span:after {
+  top: 10px;
+  transform: translatey(-10px)   rotate(-45deg);
+}
