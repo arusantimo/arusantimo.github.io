@@ -28,6 +28,9 @@
       width: 14px;
       display: inline-block;
       @media #{$over800} {
+        width: 90px;
+      }
+      @media #{$over1280} {
         width: 150px;
       }
       img {
