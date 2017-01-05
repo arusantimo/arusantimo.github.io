@@ -9,7 +9,7 @@ github_username:  arusnatimo
 
 # Build settings
 markdown: kramdown
-highlighter: pygments
+highlighter: rouge
 
 # Pagination
 gems: [jekyll-paginate]
