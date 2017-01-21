@@ -24,7 +24,7 @@
       position: fixed;
       bottom: 15px;
     }
-    a {      
+    a {
       width: 14px;
       display: inline-block;
       @media #{$over800} {
@@ -63,6 +63,7 @@
       display: block;
       float: right;
       margin-right: 50px;
+      margin-top: 30px;
     }
     a {
       position: relative;
@@ -76,12 +77,13 @@
       text-align: right;
       width: 92%;
       @media #{$over800} {
-        margin-left: 20px;
+        margin-bottom: 15px;
         text-align: left;
         font-size: 15px;
         font-weight: 800;
-        margin-bottom: 0px;
-        display: inline;  
+        &:hover {
+          color: $brand-color;
+        }
       }
     }
   }
@@ -107,19 +109,19 @@
     @extend %title;
   }
   .post-list {
-    margin: 50px 0;  
+    margin: 50px 0;
     overflow: hidden;
     @media #{$over800} {
-      margin: 150px 0 70px;  
+      margin: 150px 0 70px;
     }
     li {
       list-style-type: none;
       border-bottom: 2px dashed #ececec;
       padding-bottom: 5px;
-      margin-bottom: 5px; 
+      margin-bottom: 5px;
       @media #{$over800} {
         padding-bottom: 10px;
-        margin-bottom: 20px;  
+        margin-bottom: 20px;
       }
       h3 {
         font-weight: 700;
@@ -135,7 +137,7 @@
           @media #{$over800} {
             transition: all 0.5s ease 0s;
             font-size: 70px;
-            background: -webkit-linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);  
+            background: -webkit-linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             &:hover {
@@ -161,7 +163,7 @@
       &:hover {
       .detailMeta {
         display: block;
-        }  
+        }
       }
     }
     .detailMeta {
@@ -170,7 +172,7 @@
       .post-meta {
         font-size: $small-font-size;
         color: $text-color;
-        margin-bottom: 0px; 
+        margin-bottom: 0px;
       }
       .description {
         font-size: 17px;
@@ -296,7 +298,7 @@
     ul {
       margin-bottom: 100px;
     }
-    li { 
+    li {
       list-style-type: none;
       margin-bottom: 10px;
       color: $grey-color-middle;
