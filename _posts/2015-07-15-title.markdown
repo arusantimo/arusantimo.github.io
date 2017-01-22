@@ -2,7 +2,7 @@
 layout: post
 title: PopmotionJS 알아보기
 date: 2016-12-16 21:09:00
-published: true
+published: false
 description: DOM 애니메이션 라이브러리 popmotion 사용해 보기
 ---
 
