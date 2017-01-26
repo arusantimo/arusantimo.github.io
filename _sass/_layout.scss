@@ -79,8 +79,9 @@
       @media #{$over800} {
         margin-bottom: 15px;
         text-align: left;
-        font-size: 15px;
-        font-weight: 800;
+        font-size: 17px;
+        font-weight: 400;
+        color: #333;
         &:hover {
           color: $brand-color;
         }

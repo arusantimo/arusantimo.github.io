@@ -5,6 +5,8 @@ date:   2017-01-20 16:40:16
 description: vueJS 시작 하기
 ---
 
+Git repository : <a href="https://github.com/arusantimo/arusantimo-vue-portfolio">arusantimo-vue-portfolio</a>
+
 # vueJS 시작하는 이유
 
 요즘 vuejs에 관심이 쏠리고 있어 한번 사용해 보기로 마음 먹게 되었습니다.
@@ -44,19 +46,19 @@ test : 위 두 테스트를 실행한다.<br>
 lint : 소스코드에 대한 정적 테스트를 실핸한다.<br>
 위와 같이 설정 되어 있었습니다. 테스트 코드또한 작성되어 있다는게 너무 신선한 일이었습니다.
 
+<br>
 
+### 1-3 샘플 코드 구조
 .vue 라는 확장명에 템플릿과 css , js가 한번에 들어가 있었습니다.
-```
+```html
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
     <hello></hello>
   </div>
 </template>
 
 <script>
 import Hello from './components/Hello'
-
 export default {
   name: 'app',
   components: {
@@ -67,12 +69,50 @@ export default {
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }
 </style>
 ```
+저는 component제어부분과 template를 분리하는게 제 작업 스타일에 더 맞을 것 같아서 분리하기로 마음 먹었습니다.
+그렇게 하면 구조는 js, html 파일로 나눌수 있게 됩니다.
+<br>
+- js파일
+
+```js
+import Vue from 'vue';
+import './home.scss';
+import template from './home.html';
+
+export default Vue.extend({
+  template,
+});
+```
+- template파일
+
+```html
+<div>HOME</div>
+```
+
+<br>
+### 1-3 devDependencies 파일
+
+dependency 파일을 확인해 봤는데 처음 보는 모듈이 있어 검색해 봤습니다.
+우선 , <br><br>
+autoprefixer - 실제로 적용되지 않는 스타일에 자동으로 -ms-, -webkit-등의 태그들을 달아 준다.<br>
+chalk - 오류 코드에 스타이을 줘서 화려한 효과를 줄수 있다.<br>
+connect-history-api-fallback - 라우트에 제외등의 페이지를 리다이렉팅 시키는 로딩시키는 미들웨어<br>
+eventsource-polyfill - eventsource를 구버전 브라우저에서 사용할수 있게 해줌<br>
+extract-text-webpack-plugin - 빌드하게 되면 설정파일(css들)은 따로 분리되어 들어가게 해줌<br>
+friendly-errors-webpack-plugin - 빌드하고 오류코드를 시각화 시켜서 잘보여주게 도와준다.<br>
+http-proxy-middleware - 외부서버에 프록시하는 미들웨어<br>
+cross-env - os 환경 변수값을 설정하게 도와준다.<br>
+phantomjs-prebuilt - 웹엔진을 통해 웹브라우저를 컨트롤 하기 위한 도구<br>
+chromedriver - 크롬 브라우저를 컨트롤하기 위한 드라이버<br>
+cross-spawn - 동기로 빌드를 진행하기 위한 툴???<br>
+nightwatch - 나이트와치는 브라우저 기반의 테스트 프레임웍을 제공하는 오픈소스 프로젝트인 Selenium을 이용한 node.js 기반의 자동화 툴<br>
+selenium-server - 브라우저 테스트 프레임워크 셀레늄 서버<br>
+shelljs" - shell script 명령어 사용하게 해주는 라이브러리<br>
+
+다양한 dependency를 사용하고 있었습니다. 나중에 한번 제대로 파악하고 싶은 모듈도 있었습니다. 일단 기능상의 파악은 위와 같이 진행하고
+그다음으로 바로 build 디렉토리 쪽을 확인해 보도록 하겠습니다. 2주차 게속..
