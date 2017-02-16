@@ -1,9 +1,6 @@
 ---
 layout: default
 ---
-
-<h2 class="titlehead">블로그</h2>
-
 <ul class="post-list">
     {% for post in paginator.posts %}
       <li>
@@ -15,7 +12,6 @@ layout: default
       </li>
     {% endfor %}
 </ul>
-
 <div class="pagination">
   {% if paginator.previous_page %}
     <a href="{{ paginator.previous_page_path }}" class="btn">Previous</a>

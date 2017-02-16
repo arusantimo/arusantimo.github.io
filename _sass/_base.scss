@@ -21,7 +21,7 @@ $spacing-unit: 30px;
 $nav-height: 56px;
 
 /* portfolio tinkering */
-$img_spacing: 5px; 
+$img_spacing: 5px;
 $img_height: 275px;
 $caption_font_size: 12px;
 $caption_color: #aaa;
@@ -39,7 +39,7 @@ $grey-color-light: #bbb;
 $text-color: #333;
 $background-color:#fff;
 $grey-color: #555;
-$brand-color:#2a7ae2;
+$brand-color:#0084ff;
 
 /* Set theme color */
 $theme-color: $blue;
@@ -48,6 +48,7 @@ $theme-color: $blue;
 $over320: "screen and (min-width : 321px)";
 $over800: "screen and (min-width : 801px)";
 $over1280: "screen and (min-width : 1281px)";
+$over1600: "screen and (min-width : 1600px)";
 
 $min800: "screen and (max-height : 800px)";
 $min720: "screen and (max-height : 720px)";
@@ -64,8 +65,6 @@ body {
   -webkit-text-size-adjust: 100%;
   width: 100%;
 }
-
-
 
 /**
  * Set `margin-bottom` to maintain vertical rhythm
@@ -174,6 +173,12 @@ pre {
   @extend %clearfix;
   @media #{$over800} {
     width: 980px;
+  }
+  @media #{$over1280} {
+    width: 1200px;
+  }
+  @media #{$over1600} {
+    width: 1400px;
   }
 }
 

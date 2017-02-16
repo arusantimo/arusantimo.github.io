@@ -1,11 +1,14 @@
 ---
 layout: post
-title:  vueJS 시작 하기 - 1
+title:  vueJS 시작 하기 - 1 설치, 간단히 알아보기
 date:   2017-01-20 16:40:16
 description: vueJS 시작 하기 - 1 설치 및 sample 코드 기본 구조 파악
 ---
 
-Git repository : <a href="https://github.com/arusantimo/arusantimo-vue-portfolio">arusantimo-vue-portfolio</a>
+Git repository :
+<a href="https://github.com/arusantimo/arusantimo-vue-portfolio" target="_blank">
+  arusantimo-vue-portfolio
+</a>
 
 # vueJS 시작하는 이유
 
@@ -118,3 +121,5 @@ shelljs" - shell script 명령어 사용하게 해주는 라이브러리<br>
 
 다양한 dependency를 사용하고 있었습니다. 나중에 한번 제대로 파악하고 싶은 모듈도 있었습니다. 일단 기능상의 파악은 위와 같이 진행하고
 그다음으로 바로 build 디렉토리 쪽을 확인해 보도록 하겠습니다. 2주차 게속..
+
+<a href="https://arusantimo.github.io/2017/01/26/title.html">vueJS 시작 하기 - 2</a>

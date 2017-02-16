@@ -15,6 +15,29 @@
     background: none;
     box-shadow: 0px 0px 0px #ccc;
   }
+  .rect {
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    z-index: 100;
+    transform: rotate(45deg);
+    display: none;
+    &.bottom {
+      background: -webkit-linear-gradient(60deg, #ff8062 0%, #ffd200 100%);
+      bottom: -290px;
+      right: -290px;
+      opacity: 0.3;
+    }
+    &.top {
+      top: -205px;
+      left: -205px;
+      // border: 2px dashed #999;
+      opacity: 0.7;
+    }
+    @media #{$over800} {
+      display: block;
+    }
+  }
   h1 {
     font-size: 20px;
     display: inline-block;
@@ -61,12 +84,13 @@
     display: none;
     @media #{$over800} {
       display: block;
-      float: right;
-      margin-right: 50px;
-      margin-top: 30px;
+      float: left;
+      margin-left: 40px;
+      margin-top: 10px;
     }
     a {
       position: relative;
+      z-index: 200;
       top: 16px;
       color: $grey-color-middle;
       font-size: 12px;
@@ -77,14 +101,12 @@
       text-align: right;
       width: 92%;
       @media #{$over800} {
-        margin-bottom: 15px;
+        margin-bottom: 18px;
         text-align: left;
-        font-size: 17px;
-        font-weight: 400;
-        color: #333;
-        &:hover {
-          color: $brand-color;
-        }
+        font-size: 25px;
+        font-weight: 800;
+        color: #fff;
+        text-shadow: 0px 1px 8px rgba(0,0,0,0.7);
       }
     }
   }
@@ -95,7 +117,7 @@
   text-align: center;
   width:100%;
   font-size: 11px;
-  padding-bottom: 20px;
+  padding-bottom: 10px;
 }
 
 .page-content {
@@ -105,6 +127,7 @@
   min-height: 480px;
   @media #{$over800} {
     min-height: 800px;
+    margin-bottom: 50px;
   }
   .titlehead {
     @extend %title;
@@ -137,8 +160,9 @@
           font-size: 24px;
           @media #{$over800} {
             transition: all 0.5s ease 0s;
-            font-size: 70px;
+            font-size: 58px;
             background: -webkit-linear-gradient(45deg, #ff8062 0%, #ffd200 20%, #00DF6D 50%, #0084ff 100%);
+            // background: -webkit-linear-gradient(45deg, #00DF6D 0%, #0084ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             &:hover {
