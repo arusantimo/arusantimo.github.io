@@ -17,14 +17,20 @@
       '#1119bf',
       '#ea165c',
       '#fc3e1f',
-      '#ff8809',
+      '#fc34a0',
     ];
     $('#allwrap').css('min-height', window.innerHeight);
-    TweenMax.to($('#allwrap'), 8, {
+    TweenMax.to($('#allwrap'), 15, {
       backgroundColor: bgArray[Math.floor((Math.random() * 3))],
       delay: 1,
       repeat: -1,
       yoyo: true,
     });
+    // TweenMax.to($('body'), 8, {
+    //   textShadow: '2px 2px #001eff',
+    //   delay: 1,
+    //   repeat: -1,
+    //   yoyo: true,
+    // });
   </script>
 </html>
