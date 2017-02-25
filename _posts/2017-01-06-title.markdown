@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  Height css transition effect 
+title:  Height css transition effect
 date: 2017-01-01 12:01:00
-published: true
 tag: css
+category: cheatSheet
 ---
 
 # Height css transition effect 만들기

@@ -1,29 +1,29 @@
-# Site settings
-title: Arusantimo Blog
-email: ziziana0507@naver.com
-description: null
-baseurl: ''  
-url: https://arusantimo.github.io/
-twitter_username: null
-github_username:  arusnatimo
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
 
+# Site settings
+title: 나의
+email: ziziana0507@gmail.com
+description: 개인 블로그
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://arusantimo.github.io/" # the base hostname & protocol for your site
+github_username: Arusantimo
+gems: [jekyll-paginate, kramdown]
+paginate: 5
 # Build settings
 markdown: kramdown
-highlighter: rouge
-
-# Pagination
-gems: [jekyll-paginate]
-paginate: 5
-paginate_path: "/blog/page:num/"
-
-exclude: ["README.md"]
-
-collections:
-  portfolio:
-    output: true
-    permalink: /portfolio/:path/
-#   poetry:
+# collections:
+#   cheatSheet:
 #     output: true
-#     permalink: /poetry/:path/
-
-
+#     permalink: /cheatSheet/:path/
+links:
+  - title: 기록
+    url: /sdsd
+  - title: 의견
+    url: /series
+  - title: 수집물
+    url: /tags

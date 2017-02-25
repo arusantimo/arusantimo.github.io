@@ -3,6 +3,9 @@ layout: post
 title:  vueJS 시작 하기 - 1 설치, 간단히 알아보기
 date:   2017-01-20 16:40:16
 description: vueJS 시작 하기 - 1 설치 및 sample 코드 기본 구조 파악
+category: cheatSheet
+published: false
+tag: 프레임워크
 ---
 
 Git repository :

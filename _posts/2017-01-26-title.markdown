@@ -3,6 +3,9 @@ layout: post
 title:  vueJS 시작 하기 - 2 (feat, semver) 빌드 환경 분석
 date:   2017-01-25 16:40:16
 description: vueJS 시작 하기 - 2 sample 코드 기본 구조 파악 2
+category: cheatSheet
+published: false
+tag: 프레임워크
 ---
 
 Git repository : <a href="https://github.com/arusantimo/arusantimo-vue-portfolio">arusantimo-vue-portfolio</a>

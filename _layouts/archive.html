@@ -1,0 +1,27 @@
+---
+layout: page
+---
+{% for post in site.posts %}
+{% for cat in post.categories %}
+{% if cat == page.category %}
+<div class="post">
+    <div class="postTitle">
+      <a href="{{site.url}}{{site.baseurl}}{{post.url}}">{{post.title}}</a>
+    </div>
+    <div class="postExt">
+    {{ post.content | strip_html | truncatewords:9}}
+    </div>
+    <div class="postInfo">
+      <div  class="postDate">
+        <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ post.date | date: "%F" }}
+        </time>
+      </div>
+      <div class="postTag">
+        주제 : {{post.tag}}
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endfor %}
+{% endfor %}
