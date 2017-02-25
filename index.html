@@ -1,35 +1,83 @@
 ---
 layout: default
 ---
-<ul class="post-list">
-    {% for post in paginator.posts %}
-      <li>
-        <h3><a class="post-title" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h3>
-        <!-- <div class="detailMeta">
-          <p class="post-meta">{{ post.date | date: '%B %-d, %Y — %H:%M' }}</p>
-          <p class="description">{{ post.description }}</p>
-        </div> -->
-      </li>
-    {% endfor %}
-</ul>
-<div class="pagination">
-  {% if paginator.previous_page %}
-    <a href="{{ paginator.previous_page_path }}" class="btn">Previous</a>
-  {% else %}
-    <span class="btn none">Previous</span>
-  {% endif %}
-  {% for page in (1..paginator.total_pages) %}
-    {% if page == paginator.page %}
-      <em>{{ page }}</em>
-    {% elsif page == 1 %}
-      <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">{{ page }}</a>
-    {% else %}
-      <a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">{{ page }}</a>
-    {% endif %}
+<div class="home">
+  <div class="intro">
+    <div class="title">
+      <h2 id="title_1">나의 기록과 의견과 수집물들과</h2>
+      <h2 id="title_2">작업들을 남기는 공간.</h2>
+    </div>
+    <script>
+      TweenMax.to($('#title_2'), 4, {
+        css: {
+          opacity: 1,
+          transform: 'translateY(50px)',
+        },
+      });
+      TweenMax.to($('#title_1'), 3, {
+        css: {
+          opacity: 1,
+          transform: 'translateY(50px)',
+        },
+      });
+    </script>
+    <p>저는 코딩하는 사람입니다.</p>
+    <p>인터넷에서는 아루산티모(Arusantimo)라는 이름으로 활동중입니다.</p>
+    <p>제가 만든 작업물이</p>
+    <p>세상에 조금이나마 도움이 됐으면 하는</p>
+    <p>바램으로 일 하고 있습니다.</p>
+  </div>
+  {% for post in paginator.posts%}
+  <div class="post">
+    <div class="postTitle">
+      <a href="{{site.url}}{{site.baseurl}}{{post.url}}">{{post.title}}</a>
+    </div>
+    <div class="postExt">
+    {{ post.content | strip_html | truncatewords:9}}
+    </div>
+    <div class="postInfo">
+      <div  class="postDate">
+        날짜 :
+        <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
+          {{ post.date | date: "%F" }}
+        </time>
+      </div>
+      <div class="postTag">
+        주제 : {{post.tag}}
+      </div>
+    </div>
+  </div>
   {% endfor %}
-  {% if paginator.next_page %}
-    <a href="{{ paginator.next_page_path }}" class="btn">Next</a>
-  {% else %}
-    <span class="btn none">Next</span>
+  {% if paginator.total_pages > 1 %}
+    <nav class="pagination">
+      {% if paginator.previous_page %}
+        <a
+          class="paginationLink"
+          href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">
+          &laquo; 이전
+        </a>
+      {% endif %}
+    {% for page in (1..paginator.total_pages) %}
+      {% if page == paginator.page %}
+        <em class="paginationLink paginationLinkCurrent">{{ page }}</em>
+      {% elsif page == 1 %}
+        <a class="paginationLink" href="/">{{ page }}</a>
+      {% else %}
+        <a
+          class="paginationLink"
+          href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">
+          {{ page }}
+        </a>
+      {% endif %}
+    {% endfor %}
+    {% if paginator.next_page %}
+      <a
+        class="paginationLink"
+        href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}"
+      >
+        다음 &raquo;
+      </a>
+    {% endif %}
+    </nav>
   {% endif %}
 </div>

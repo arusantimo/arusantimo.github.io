@@ -1,3 +1,5 @@
-<footer class="site-footer">
-  	Arusantimo. All rights reserved.
+<footer>
+  {% if site.github_username %}
+    {% include icon-github.html username=site.github_username %}
+  {% endif %}
 </footer>

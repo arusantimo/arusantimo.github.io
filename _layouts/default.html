@@ -2,6 +2,7 @@
 <html>
   {% include head.html %}
   <body>
+    <div class="allWrap" id="allwrap">
     {% include header.html %}
     <div class="page-content">
       <div class="wrapper">
@@ -9,5 +10,21 @@
       </div>
     </div>
     {% include footer.html %}
+    </div>
   </body>
+  <script>
+    var bgArray = [
+      '#1119bf',
+      '#ea165c',
+      '#fc3e1f',
+      '#ff8809',
+    ];
+    $('#allwrap').css('min-height', window.innerHeight);
+    TweenMax.to($('#allwrap'), 8, {
+      backgroundColor: bgArray[Math.floor((Math.random() * 3))],
+      delay: 1,
+      repeat: -1,
+      yoyo: true,
+    });
+  </script>
 </html>

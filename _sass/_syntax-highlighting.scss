@@ -1,14 +1,16 @@
+
 /**
  * Syntax highlighting styles
  */
 .highlight {
     background: #fff;
-    overflow-x: auto;
     @extend %vertical-rhythm;
-
+    .highlighter-rouge & {
+      background: #000;
+    }
     .c     { color: #998; font-style: italic } // Comment
-    .err   { color: #afa;} // Error
-    .k     { font-weight: bold; color: #51ccff; } // Keyword
+    .err   { color: #a61717; } // Error
+    .k     { font-weight: bold } // Keyword
     .o     { font-weight: bold } // Operator
     .cm    { color: #998; font-style: italic } // Comment.Multiline
     .cp    { color: #999; font-weight: bold } // Comment.Preproc
@@ -27,7 +29,7 @@
     .gu    { color: #aaa } // Generic.Subheading
     .gt    { color: #a00 } // Generic.Traceback
     .kc    { font-weight: bold } // Keyword.Constant
-    .kd    { font-weight: bold; color: #69c; } // Keyword.Declaration
+    .kd    { font-weight: bold } // Keyword.Declaration
     .kp    { font-weight: bold } // Keyword.Pseudo
     .kr    { font-weight: bold } // Keyword.Reserved
     .kt    { color: #458; font-weight: bold } // Keyword.Type
@@ -41,7 +43,7 @@
     .ne    { color: #900; font-weight: bold } // Name.Exception
     .nf    { color: #900; font-weight: bold } // Name.Function
     .nn    { color: #555 } // Name.Namespace
-    .nt    { color: #9adc75 } // Name.Tag
+    .nt    { color: yellow; } // Name.Tag
     .nv    { color: #008080 } // Name.Variable
     .ow    { font-weight: bold } // Operator.Word
     .w     { color: #bbb } // Text.Whitespace
@@ -52,7 +54,7 @@
     .sb    { color: #d14 } // Literal.String.Backtick
     .sc    { color: #d14 } // Literal.String.Char
     .sd    { color: #d14 } // Literal.String.Doc
-    .s2    { color: #099 } // Literal.String.Double
+    .s2    { color: #d14 } // Literal.String.Double
     .se    { color: #d14 } // Literal.String.Escape
     .sh    { color: #d14 } // Literal.String.Heredoc
     .si    { color: #d14 } // Literal.String.Interpol
@@ -65,5 +67,4 @@
     .vg    { color: #008080 } // Name.Variable.Global
     .vi    { color: #008080 } // Name.Variable.Instance
     .il    { color: #099 } // Literal.Number.Integer.Long
-    .nx    { color: #69c}
 }
