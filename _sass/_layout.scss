@@ -9,7 +9,7 @@
     left: 50%;
     bottom: 0px;
     margin-left: -0.5px;
-    background: red; /* For browsers that do not support gradients */
+    background: #fff; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Safari 5.1 to 6.0 */
     background: -o-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Opera 11.1 to 12.0 */
     background: -moz-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Firefox 3.6 to 15 */
@@ -48,9 +48,15 @@
     position: relative;
     opacity: 0;
     top: -50px;
+    @include media-query($on-laptop) {
+      font-size: 1.3rem;
+    }
   }
   p {
     line-height: 2em;
+    @include media-query($on-laptop) {
+      font-size: 13px;
+    }
   }
 }
 .postInfo {
@@ -76,6 +82,44 @@
   @include media-query($on-laptop) {
     font-size: 1em;
     letter-spacing: 0;
+    text-align: center;
+    position: relative;
+    padding-bottom: 10px;
+    &:after {
+      content: "";
+      display: block;
+      width: 50%;
+      left: 50%;
+      margin-left: -25%;
+      height: 1px;
+      position: absolute;
+      bottom: 0px;
+      background: #fff; /* For browsers that do not support gradients */
+      background: -webkit-linear-gradient(
+        left,
+        rgba(255, 255, 255, 0.2) 0%,
+        #fff 50%,
+        rgba(255, 255, 255, 0.2) 100%
+      ); /* For Safari 5.1 to 6.0 */
+      background: -o-linear-gradient(
+        left,
+        rgba(255, 255, 255, 0.2) 0%,
+        #fff 50%,
+        rgba(255, 255, 255, 0.2) 100%
+      ); /* For Opera 11.1 to 12.0 */
+      background: -moz-linear-gradient(
+        left,
+        rgba(255, 255, 255, 0.2) 0%,
+        #fff 50%,
+        rgba(255, 255, 255, 0.2) 100%
+      ); /* For Firefox 3.6 to 15 */
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.2) 0%,
+        #fff 50%,
+        rgba(255, 255, 255, 0.2) 100%
+      ); /* Standard syntax */
+    }
   }
 }
 .postExt {
@@ -111,6 +155,9 @@
     position: fixed;
     bottom: 3%;
     left: 2%;
+    @include media-query($on-laptop) {
+      display: none;
+    }
   }
   .nav {
     float: left;
@@ -118,6 +165,7 @@
     @include media-query($on-laptop) {
       margin-left: 10px;
       margin-top: 12px;
+      float: right;
     }
     @extend %clearfix;
     li {
@@ -262,33 +310,33 @@ footer {
   p {
     font-size: 1rem;
     font-weight: 300;
-    line-height: 2em;
+    line-height: 1.6em;
     margin-bottom: 3em;
   }
   h1 {
     font-size: 34px;
-    margin-bottom: 3em;
+    margin: 5em 0 2em;
     @include media-query($on-laptop) {
       font-size: 30px;
     }
   }
   h2 {
     font-size: 32px;
-    margin-bottom: 3em;
+    margin: 5em 0 2em;
     @include media-query($on-laptop) {
       font-size: 28px;
     }
   }
   h3 {
     font-size: 26px;
-    margin-bottom: 3em;
+    margin: 5em 0 2em;
     @include media-query($on-laptop) {
       font-size: 22px;
     }
   }
   h4 {
     font-size: 20px;
-    margin-bottom: 3em;
+    margin: 5em 0 2em;
     @include media-query($on-laptop) {
       font-size: 18px;
     }
