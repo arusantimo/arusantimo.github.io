@@ -13,24 +13,52 @@
     </div>
   </body>
   <script>
+    $('#allwrap').css('min-height', window.innerHeight);
     var bgArray = [
       '#1119bf',
       '#ea165c',
       '#fc3e1f',
       '#fc34a0',
     ];
-    $('#allwrap').css('min-height', window.innerHeight);
-    TweenMax.to($('#allwrap'), 15, {
-      backgroundColor: bgArray[Math.floor((Math.random() * 3))],
-      delay: 1,
-      repeat: -1,
-      yoyo: true,
+    function bgAnimate() {
+      TweenMax.to($('#allwrap'), 15, {
+        backgroundColor: bgArray[Math.floor((Math.random() * 3))],
+        delay: 1,
+        repeat: -1,
+        yoyo: true,
+      });
+    }
+    function onoff() {
+      if (sessionStorage.mode === 'on' || sessionStorage.mode === undefined) {
+        $('.mode').html('꺼짐');
+        $('a, span').css('color','#fff');
+        $('#allwrap').css('color','#fff');
+        $('#allwrap').css('backgroundColor','#1119bf');
+        $('#allwrap').addClass('default');
+        bgAnimate();
+      } else {
+        $('#allwrap').addClass('care');
+        $('.mode').html('켜짐');
+        TweenMax.killTweensOf($('#allwrap'));
+        $('#allwrap').css('backgroundColor','#fff');
+        $('a, span').css('color','#000');
+        $('#allwrap').css('color','#000');
+
+      }
+    }
+    onoff();
+    $('.me').click(function(){
+      if(!sessionStorage.getItem("mode")) {
+        sessionStorage.setItem('mode', 'on');
+      }
+      if(sessionStorage.getItem("mode") === 'on') {
+        sessionStorage.setItem('mode', 'off');
+        onoff();
+      } else {
+        sessionStorage.setItem('mode', 'on');
+        onoff();
+      }
     });
-    // TweenMax.to($('body'), 8, {
-    //   textShadow: '2px 2px #001eff',
-    //   delay: 1,
-    //   repeat: -1,
-    //   yoyo: true,
-    // });
+
   </script>
 </html>

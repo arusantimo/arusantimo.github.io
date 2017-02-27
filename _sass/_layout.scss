@@ -20,7 +20,12 @@
 .allWrap {
   padding-top: 4em;
   box-sizing: border-box;
-  background-color: $background-color;
+  .default {
+    background-color: $background-color;
+  }
+  .care {
+    background-color: #fff;
+  }
   @include media-query($on-laptop) {
     padding-top: 2em;
   }
@@ -152,9 +157,11 @@
     }
   }
   .me {
+    cursor: pointer;
     position: fixed;
-    bottom: 3%;
-    left: 2%;
+    font-size: 14px;
+    top: 3%;
+    right: 2%;
     @include media-query($on-laptop) {
       display: none;
     }
