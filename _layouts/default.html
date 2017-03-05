@@ -31,7 +31,7 @@
     function onoff() {
       if (sessionStorage.mode === 'on' || sessionStorage.mode === undefined) {
         $('.mode').html('꺼짐');
-        $('a, span').css('color','#fff');
+        $('a').css('color','#fff');
         $('#allwrap').css('color','#fff');
         $('#allwrap').css('backgroundColor','#1119bf');
         $('#allwrap').addClass('default');
@@ -41,7 +41,7 @@
         $('.mode').html('켜짐');
         TweenMax.killTweensOf($('#allwrap'));
         $('#allwrap').css('backgroundColor','#fff');
-        $('a, span').css('color','#000');
+        $('a').css('color','#000');
         $('#allwrap').css('color','#000');
 
       }
