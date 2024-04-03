@@ -2,6 +2,6 @@
 layout: archive
 title: 기록
 permalink: /history/
-tagline: "나의 흔적을 남기고 기록하다. "
+tagline: "내가 경험했던 것"
 category: "history"
 ---

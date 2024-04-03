@@ -4,3 +4,4 @@ _site
 **.orig
 # OS X
 .DS_STORE
+.idea
