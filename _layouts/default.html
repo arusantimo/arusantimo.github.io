@@ -15,10 +15,10 @@
   <script>
     $('#allwrap').css('min-height', window.innerHeight);
     var bgArray = [
-      '#1119bf',
-      '#ea165c',
-      '#fc3e1f',
-      '#fc34a0',
+      '#1e225e',
+      '#612a3c',
+      '#194519',
+      '#45207d',
     ];
     function bgAnimate() {
       TweenMax.to($('#allwrap'), 15, {
@@ -33,16 +33,16 @@
         $('.mode').html('꺼짐');
         $('a').css('color','#fff');
         $('#allwrap').css('color','#fff');
-        $('#allwrap').css('backgroundColor','#1119bf');
+        $('#allwrap').css('backgroundColor','#1e225e');
         $('#allwrap').addClass('default');
         bgAnimate();
       } else {
         $('#allwrap').addClass('care');
         $('.mode').html('켜짐');
         TweenMax.killTweensOf($('#allwrap'));
-        $('#allwrap').css('backgroundColor','#fff');
-        $('a').css('color','#000');
-        $('#allwrap').css('color','#000');
+        $('#allwrap').css('backgroundColor','#292929');
+        $('a').css('color','#fff');
+        $('#allwrap').css('color','#ebebeb');
 
       }
     }
