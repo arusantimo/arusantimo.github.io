@@ -2,6 +2,10 @@ _site
 .sass-cache
 .jekyll-metadata
 **.orig
+
+.idea
+
 # OS X
 .DS_STORE
-.idea
+*/.DS_Store
+_posts/.DS_Store
