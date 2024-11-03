@@ -10,10 +10,22 @@
     bottom: 0px;
     margin-left: -0.5px;
     background: #fff; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* Standard syntax */
+    background: -webkit-linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* Standard syntax */
     // animation: title 20s ease-in 0.5s 1 alternate;
   }
 }
@@ -35,7 +47,7 @@
   font-size: 18px;
   padding-top: 3em;
 }
-.home{
+.home {
   padding-bottom: 5em;
 }
 .intro {
@@ -168,7 +180,7 @@
   }
   .nav {
     float: left;
-    margin-top:  10px;
+    margin-top: 10px;
     @include media-query($on-laptop) {
       margin-left: 10px;
       margin-top: 12px;
@@ -271,17 +283,29 @@ footer {
     bottom: 0px;
     margin-left: -0.5px;
     background: red; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(#fff ,rgba(255, 255, 255, 0.2)); /* Standard syntax */
+    background: -webkit-linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(
+      #fff,
+      rgba(255, 255, 255, 0.2)
+    ); /* Standard syntax */
     // animation: title 20s ease-in 0.5s 1 alternate;
   }
   @keyframes title {
-    0%   {
+    0% {
       height: 170px;
     }
-    50%   {
+    50% {
       height: 0px;
     }
     100% {
@@ -353,11 +377,11 @@ footer {
     box-shadow: 0px 5px 13px rgba(0, 0, 0, 0.4);
   }
   ul {
-    margin-top: 60px;
+    margin-top: 30px;
     margin-left: 0px;
     li {
       font-size: 13px;
-      margin: 50px 0;
+      margin: 5px 0;
       overflow: hidden;
     }
   }
@@ -384,30 +408,30 @@ footer {
 /**
  * Pagination
  */
- .pagination {
-   padding-top: 3.5em;
-   text-align: center;
- }
- .paginationLink {
-   opacity: 0.7;
-   border: 0;
-   display: inline-block;
-   padding: 5px;
-   text-decoration: none;
-   transition: color 200ms ease-out;
-   font-size: 14px;
-   &:hover,
-   &:active,
-   &:focus {
-     border: 0;
-     opacity: 1;
-   }
- }
- .paginationLinkCurrent {
-   font-style: normal;
-   font-size: 20px;
-   opacity: 1;
- }
+.pagination {
+  padding-top: 3.5em;
+  text-align: center;
+}
+.paginationLink {
+  opacity: 0.7;
+  border: 0;
+  display: inline-block;
+  padding: 5px;
+  text-decoration: none;
+  transition: color 200ms ease-out;
+  font-size: 14px;
+  &:hover,
+  &:active,
+  &:focus {
+    border: 0;
+    opacity: 1;
+  }
+}
+.paginationLinkCurrent {
+  font-style: normal;
+  font-size: 20px;
+  opacity: 1;
+}
 .postNavigation {
   align-items: center;
   display: flex;
