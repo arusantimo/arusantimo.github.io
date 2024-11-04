@@ -342,32 +342,32 @@ footer {
     font-size: 1rem;
     font-weight: 300;
     line-height: 1.6em;
-    margin-bottom: 3em;
+    margin-bottom: 0em;
   }
   h1 {
     font-size: 34px;
-    margin: 5em 0 2em;
+    margin: 4em 0 2em;
     @include media-query($on-laptop) {
       font-size: 30px;
     }
   }
   h2 {
     font-size: 32px;
-    margin: 5em 0 2em;
+    margin: 3em 0 2em;
     @include media-query($on-laptop) {
       font-size: 28px;
     }
   }
   h3 {
     font-size: 26px;
-    margin: 5em 0 2em;
+    margin: 2em 0 2em;
     @include media-query($on-laptop) {
       font-size: 22px;
     }
   }
   h4 {
     font-size: 20px;
-    margin: 5em 0 2em;
+    margin: 1em 0 1em;
     @include media-query($on-laptop) {
       font-size: 18px;
     }
