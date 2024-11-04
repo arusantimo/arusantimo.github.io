@@ -1,42 +1,88 @@
 @font-face {
-  font-family: 'Arita';
+  font-family: "Arita";
   font-style: normal;
   font-weight: 200;
   src: url(./font/AritaburiHL.eot);
-  src: url(./font/AritaburiHL.eot?#iefix) format('embedded-opentype'), url(./font/AritaburiHL.woff) format('woff'), url(./font/AritaburiHL.ttf) format('truetype');
+  src: url(./font/AritaburiHL.eot?#iefix) format("embedded-opentype"),
+    url(./font/AritaburiHL.woff) format("woff"),
+    url(./font/AritaburiHL.ttf) format("truetype");
 }
 @font-face {
-  font-family: 'Arita';
+  font-family: "Arita";
   font-style: normal;
   font-weight: 300;
   src: url(./font/AritaburiL.eot);
-  src: url(./font/AritaburiL.eot?#iefix) format('embedded-opentype'), url(./font/AritaburiL.woff) format('woff'), url(./font/AritaburiL.ttf) format('truetype');
+  src: url(./font/AritaburiL.eot?#iefix) format("embedded-opentype"),
+    url(./font/AritaburiL.woff) format("woff"),
+    url(./font/AritaburiL.ttf) format("truetype");
 }
 @font-face {
-  font-family: 'Arita';
+  font-family: "Arita";
   font-style: normal;
   font-weight: 400;
   src: url(./font/AritaburiM.eot);
-  src: url(./font/AritaburiM.eot?#iefix) format('embedded-opentype'), url(./font/AritaburiM.woff) format('woff'), url(./font/AritaburiM.ttf) format('truetype');
+  src: url(./font/AritaburiM.eot?#iefix) format("embedded-opentype"),
+    url(./font/AritaburiM.woff) format("woff"),
+    url(./font/AritaburiM.ttf) format("truetype");
 }
 @font-face {
-  font-family: 'Arita';
+  font-family: "Arita";
   font-style: normal;
   font-weight: 600;
   src: url(./font/AritaburiSB.eot);
-  src: url(./font/AritaburiSB.eot?#iefix) format('embedded-opentype'), url(./font/AritaburiSB.woff) format('woff'), url(./font/AritaburiSB.ttf) format('truetype');
+  src: url(./font/AritaburiSB.eot?#iefix) format("embedded-opentype"),
+    url(./font/AritaburiSB.woff) format("woff"),
+    url(./font/AritaburiSB.ttf) format("truetype");
 }
 @font-face {
-  font-family: 'Arita';
+  font-family: "Arita";
   font-style: normal;
   font-weight: 700;
   src: url(./font/AritaburiB.eot);
-  src: url(./font/AritaburiB.eot?#iefix) format('embedded-opentype'), url(./font/AritaburiB.woff) format('woff'), url(./font/AritaburiB.ttf) format('truetype');
+  src: url(./font/AritaburiB.eot?#iefix) format("embedded-opentype"),
+    url(./font/AritaburiB.woff) format("woff"),
+    url(./font/AritaburiB.ttf) format("truetype");
 }
-body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, textarea, p, blockquote, th, td, input, select, textarea, button {
+
+@font-face {
+  font-family: "BookkMyungjo-Bd";
+  src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Bd.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+textarea,
+p,
+blockquote,
+th,
+td,
+input,
+select,
+textarea,
+button {
   margin: 0;
   padding: 0;
-  font-family: 'Arita', 'Cormorant Garamond', serif;
+  font-family: "Arita", "Cormorant Garamond", serif;
 }
 body {
   background-color: #000;
