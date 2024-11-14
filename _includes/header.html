@@ -1,12 +1,9 @@
 <div class="wrapper header">
   <h1>
-    <a href="/index.html">
-      {{site.title}}
-    </a>
+    <a href="/index.html"> {{site.title}} </a>
   </h1>
   <ul class="nav">
-    {% for sitePage in site.pages %}
-    {% if sitePage.title %}
+    {% for sitePage in site.pages %} {% if sitePage.title %}
     <li>
       <a href="{{sitePage.url | prepend: site.baseurl }}">{{sitePage.title}}</a>
       {% if sitePage.title == "이야기" %}
@@ -17,8 +14,7 @@
       <span>과</span>
       {% endif %}
     </li>
-    {% endif %}
-    {% endfor %}
+    {% endif %} {% endfor %}
   </ul>
   <p class="me">시각배려모드 <span class="mode"></span></p>
 </div>
