@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>복리 투자 수익 계산 - Arusantimo Tools</title>
+    <title>자산 운용 시뮬레이터 - Arusantimo Tools</title>
     <style>
         * {
             margin: 0;
@@ -21,6 +21,7 @@
             --accent-primary: #00d9ff;
             --accent-secondary: #7c3aed;
             --accent-success: #10b981;
+            --accent-warning: #f59e0b;
             --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
         
@@ -35,25 +36,26 @@
         header {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
             border-bottom: 1px solid var(--border-color);
-            padding: 40px 20px;
-            text-align: center;
+            padding: 16px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 40px;
             border-radius: 16px;
         }
         
+        header button:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: scale(1.1);
+        }
+        
         header h1 {
-            font-size: 32px;
-            margin-bottom: 8px;
+            font-size: 18px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        }
-        
-        header p {
-            font-size: 14px;
-            color: var(--text-secondary);
         }
         
         .container {
@@ -82,21 +84,23 @@
         }
         
         .card h2 {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-primary);
             margin-bottom: 20px;
             font-weight: 700;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
         }
         
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
-        .input-group label {
+        .input-label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
         }
         
@@ -112,7 +116,7 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-primary);
             transition: all 0.3s ease;
         }
@@ -124,58 +128,93 @@
             box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
         }
         
-        .input-wrapper .unit {
-            font-size: 13px;
+        .unit {
+            font-size: 12px;
             color: var(--text-secondary);
             font-weight: 600;
-            min-width: 40px;
+            min-width: 50px;
         }
         
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 24px;
-        }
-        
-        .stat-box {
+        .stats-box {
             background: rgba(0, 217, 255, 0.05);
-            padding: 16px;
-            border-radius: 12px;
             border: 1px solid var(--border-color);
             border-left: 3px solid var(--accent-primary);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
         }
         
         .stat-label {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
         }
         
         .stat-value {
-            font-size: 22px;
+            font-size: 20px;
             color: var(--accent-primary);
             font-weight: 700;
             font-family: 'Monaco', 'Courier New', monospace;
         }
         
-        .stat-box.highlight {
-            border-left-color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.05);
-        }
-        
-        .stat-box.highlight .stat-value {
-            color: #ff6b6b;
-        }
-        
-        .stat-box.positive {
+        .stats-box.long-term {
             border-left-color: var(--accent-success);
-            background: rgba(16, 185, 129, 0.05);
         }
         
-        .stat-box.positive .stat-value {
+        .stats-box.long-term .stat-value {
             color: var(--accent-success);
+        }
+        
+        .stats-box.short-term {
+            border-left-color: var(--accent-warning);
+        }
+        
+        .stats-box.short-term .stat-value {
+            color: var(--accent-warning);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .allocation-display {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        
+        .allocation-bar {
+            display: flex;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 6px;
+            gap: 2px;
+            background: var(--border-color);
+        }
+        
+        .allocation-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .long-term-segment {
+            background: linear-gradient(90deg, var(--accent-success), #0d9488);
+        }
+        
+        .short-term-segment {
+            background: linear-gradient(90deg, var(--accent-warning), #dc2626);
         }
         
         .table-card {
@@ -223,7 +262,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
         }
         
         table thead {
@@ -232,7 +271,7 @@
         }
         
         table th {
-            padding: 12px;
+            padding: 10px;
             text-align: right;
             font-weight: 700;
             color: var(--text-primary);
@@ -241,7 +280,6 @@
         
         table th:first-child {
             text-align: left;
-            border-right: 1px solid var(--border-color);
         }
         
         table th:last-child {
@@ -249,7 +287,7 @@
         }
         
         table td {
-            padding: 12px;
+            padding: 10px;
             text-align: right;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-secondary);
@@ -260,7 +298,6 @@
             text-align: left;
             font-weight: 600;
             color: var(--text-primary);
-            border-right: 1px solid var(--border-color);
         }
         
         table td:last-child {
@@ -281,35 +318,6 @@
             font-weight: 600;
         }
         
-        .info-banner {
-            background: rgba(0, 217, 255, 0.08);
-            border-left: 3px solid var(--accent-primary);
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 24px;
-            font-size: 12px;
-            color: var(--accent-primary);
-            line-height: 1.6;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 60px;
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-        
-        footer a {
-            color: var(--accent-primary);
-            text-decoration: none;
-        }
-        
-        footer a:hover {
-            text-decoration: underline;
-        }
-        
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -319,35 +327,42 @@
                 grid-template-columns: 1fr;
             }
             
-            header h1 {
-                font-size: 24px;
+            header {
+                padding: 12px 20px;
             }
             
             table {
-                font-size: 12px;
+                font-size: 11px;
             }
             
             table th,
             table td {
-                padding: 10px;
+                padding: 8px;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>📊 복리 투자 수익 계산</h1>
-        <p>월별 누적 자산 및 필요 수익금 추적</p>
+        <h1>💰 자산 운용 시뮬레이터</h1>
+        <div style="display: flex; gap: 8px;">
+            <button id="saveConfigBtn" title="설정 저장" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease; color: var(--accent-success);">
+                💾
+            </button>
+            <button id="loadConfigBtn" title="설정 로드" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease; color: var(--accent-primary);">
+                📂
+            </button>
+        </div>
     </header>
     
     <div class="container">
         <div class="dashboard">
-            <!-- 입력 설정 카드 -->
+            <!-- 기본 설정 -->
             <div class="card">
-                <h2>투자 설정</h2>
+                <h2>⚙️ 기본 설정</h2>
                 
                 <div class="input-group">
-                    <label>초기 원금</label>
+                    <label class="input-label">초기 원금</label>
                     <div class="input-wrapper">
                         <input type="number" id="principal" value="500000000" min="0">
                         <span class="unit">원</span>
@@ -355,7 +370,15 @@
                 </div>
                 
                 <div class="input-group">
-                    <label>월 재투자 금액</label>
+                    <label class="input-label">월별 수익 목표</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="monthlyTargetRate" value="1" min="0" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">월 재투자 금액</label>
                     <div class="input-wrapper">
                         <input type="number" id="monthlyInvestment" value="5000000" min="0">
                         <span class="unit">원</span>
@@ -363,62 +386,64 @@
                 </div>
                 
                 <div class="input-group">
-                    <label>목표 월 수익률</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="monthlyRate" value="1" min="0" step="0.1">
-                        <span class="unit">%</span>
-                    </div>
-                </div>
-                
-                <div class="input-group">
-                    <label>시작 날짜</label>
+                    <label class="input-label">시작 날짜</label>
                     <div class="input-wrapper">
                         <input type="date" id="startDate" value="2026-01-01">
                     </div>
                 </div>
                 
                 <div class="input-group">
-                    <label>종료 날짜</label>
+                    <label class="input-label">종료 날짜</label>
                     <div class="input-wrapper">
                         <input type="date" id="endDate" value="2028-01-01">
                     </div>
                 </div>
             </div>
             
-            <!-- 요약 통계 카드 -->
+            <!-- 투자 비율 설정 -->
             <div class="card">
-                <h2>투자 요약</h2>
+                <h2>🎯 투자 비율 & 목표 설정</h2>
                 
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-label">최종 누적 자산</div>
-                        <div class="stat-value" id="finalAsset">-</div>
-                    </div>
-                    
-                    <div class="stat-box highlight">
-                        <div class="stat-label">총 재투자액</div>
-                        <div class="stat-value" id="totalInvested">-</div>
-                    </div>
-                    
-                    <div class="stat-box positive">
-                        <div class="stat-label">누적 수익금</div>
-                        <div class="stat-value" id="totalProfit">-</div>
-                    </div>
-                    
-                    <div class="stat-box">
-                        <div class="stat-label">수익률 (전체 기간)</div>
-                        <div class="stat-value" id="totalReturn">-</div>
+                <div class="input-group">
+                    <label class="input-label">장기 투자 비율</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="longTermRatio" value="60" min="0" max="100" step="1">
+                        <span class="unit">%</span>
                     </div>
                 </div>
                 
-                <div class="info-banner">
-                    💡 월별 필요 수익금은 누적 자산에 수익률을 곱하여 계산됩니다.
+                <div class="input-group">
+                    <label class="input-label">장기 투자 목표 (연)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="longTermAnnualTarget" value="10" min="0" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">단기 투자 비율</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="shortTermRatio" value="40" min="0" max="100" step="1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+                
+                <div class="allocation-display">
+                    <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 6px;">투자 비율 배분</div>
+                    <div class="allocation-bar">
+                        <div class="allocation-segment long-term-segment" id="longTermBar" style="width: 60%;">
+                            <span id="longTermText">60%</span>
+                        </div>
+                        <div class="allocation-segment short-term-segment" id="shortTermBar" style="width: 40%;">
+                            <span id="shortTermText">40%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- 월별 상세 테이블 -->
             <div class="card table-card">
-                <h2>월별 투자 수익 상세</h2>
+                <h2>📋 월별 투자 수익 상세</h2>
                 
                 <div class="tab-container">
                     <div class="tabs" id="yearTabs">
@@ -433,8 +458,10 @@
                                 <th>월차</th>
                                 <th>월별 기간</th>
                                 <th>월초 자산</th>
-                                <th>월 재투자</th>
-                                <th>필요 수익금</th>
+                                <th>필요 총 수익금</th>
+                                <th>필요 단기 수익금</th>
+                                <th>단기 누적 수익금</th>
+                                <th>장기투자 누적</th>
                                 <th>월말 자산</th>
                             </tr>
                         </thead>
@@ -446,10 +473,6 @@
             </div>
         </div>
     </div>
-    
-    <footer>
-        <p>Arusantimo Developer Tools © 2026 | <a href="/">홈페이지로 돌아가기</a></p>
-    </footer>
     
     <script>
         let allTableRows = [];
@@ -484,16 +507,25 @@
             const tableBody = document.getElementById('tableBody');
             const rows = yearGroups[year] || [];
             
-            tableBody.innerHTML = rows.map(row => `
-                <tr ${row.highlight ? 'class="highlight-row"' : ''}>
-                    <td>${row.month}</td>
-                    <td>${row.dateStr}</td>
-                    <td class="number">${formatNumber(row.assetBefore)}</td>
-                    <td class="number">${formatNumber(row.monthlyInv)}</td>
-                    <td class="number" style="color: var(--accent-success);">${formatNumber(row.profit)}</td>
-                    <td class="number">${formatNumber(row.assetAfter)}</td>
-                </tr>
-            `).join('');
+            tableBody.innerHTML = rows.map(row => {
+                // 장기투자 수익률 계산
+                const longTermROI = row.longTermPrincipal > 0 
+                    ? (((row.longTermAccumulated - row.longTermPrincipal) / row.longTermPrincipal) * 100).toFixed(2)
+                    : 0;
+                
+                return `
+                    <tr ${row.highlight ? 'class="highlight-row"' : ''}>
+                        <td>${row.month}</td>
+                        <td>${row.dateStr}</td>
+                        <td class="number">${formatNumber(row.assetBefore)}</td>
+                        <td class="number" style="color: var(--accent-success);">${formatNumber(row.profit)}</td>
+                        <td class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}</td>
+                        <td class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermCumulativeProfit)}</td>
+                        <td class="number">${formatNumber(row.longTermAccumulated)} <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span></td>
+                        <td class="number">${formatNumber(row.assetAfter)}</td>
+                    </tr>
+                `;
+            }).join('');
         }
         
         function createYearTabs() {
@@ -518,44 +550,99 @@
         function calculateAndDisplay() {
             const principal = parseFloat(document.getElementById('principal').value) || 0;
             const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value) || 0;
-            const monthlyRate = parseFloat(document.getElementById('monthlyRate').value) || 0;
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+            const longTermRatio = parseFloat(document.getElementById('longTermRatio').value) || 0;
+            const shortTermRatio = parseFloat(document.getElementById('shortTermRatio').value) || 0;
+            const monthlyTargetRate = parseFloat(document.getElementById('monthlyTargetRate').value) || 1; // 기본값 1%
+            const longTermAnnualTarget = parseFloat(document.getElementById('longTermAnnualTarget').value) || 10; // 기본값 10% (연)
+            
+            // 투자 비율 정규화
+            const totalRatio = longTermRatio + shortTermRatio;
+            const normalizedLongTerm = totalRatio > 0 ? (longTermRatio / totalRatio) : 0.5;
+            const normalizedShortTerm = totalRatio > 0 ? (shortTermRatio / totalRatio) : 0.5;
+            
+            // 초기 자산 분할
+            const longTermPrincipal = principal * normalizedLongTerm;
+            const shortTermPrincipal = principal * normalizedShortTerm;
             
             const months = getMonthsDifference(startDate, endDate);
-            const rate = monthlyRate / 100;
             
-            let currentAsset = principal;
-            let totalInvested = principal;
-            let totalProfit = 0;
+            // 월 수익 목표 비율 (전체 목표)
+            const targetMonthlyRate = monthlyTargetRate / 100;
+            
+            // 장기 투자 월 수익률 계산 (연 → 월)
+            const longTermMonthlyRate = (Math.pow(1 + longTermAnnualTarget / 100, 1 / 12) - 1);
+            
+            // 필요한 단기 투자 월 수익률 계산
+            // 전체 월 수익 = 장기 수익 + 단기 수익
+            // totalMonthlyProfit = longTermAccumulated * longTermMonthlyRate + shortTermAccumulated * shortTermMonthlyRate
+            // 간단하게: 필요 단기 수익률 = (전체 목표 - 장기 기여분) / 단기 비율
+            const totalMonthlyRequired = targetMonthlyRate;
+            const longTermContribution = normalizedLongTerm * longTermMonthlyRate;
+            const shortTermMonthlyRequired = (totalMonthlyRequired - longTermContribution) / normalizedShortTerm;
+            const shortTermMonthlyPercent = shortTermMonthlyRequired * 100;
+            
+            // 비율 시각화
+            document.getElementById('longTermBar').style.width = normalizedLongTerm * 100 + '%';
+            document.getElementById('longTermText').textContent = (normalizedLongTerm * 100).toFixed(0) + '%';
+            document.getElementById('shortTermBar').style.width = normalizedShortTerm * 100 + '%';
+            document.getElementById('shortTermText').textContent = (normalizedShortTerm * 100).toFixed(0) + '%';
+            
+            // 월별 테이블 생성
             allTableRows = [];
             yearGroups = {};
             
             const startObj = new Date(startDate);
+            let currentAsset = principal;
+            let longTermAccumulated = longTermPrincipal; // 장기투자 초기 원금
+            let shortTermCumulativeProfitTotal = 0; // 단기 누적 수익금
             
             for (let month = 1; month <= months; month++) {
-                const monthlyProfit = currentAsset * rate;
-                totalProfit += monthlyProfit;
-                
-                currentAsset += monthlyProfit;
-                currentAsset += monthlyInvestment;
-                totalInvested += monthlyInvestment;
-                
                 const currentDate = new Date(startObj);
                 currentDate.setMonth(currentDate.getMonth() + month - 1);
                 const year = currentDate.getFullYear();
                 
                 const dateStr = formatDate(currentDate.toISOString().split('T')[0]);
-                const isLastMonth = month === months;
+                
+                // 월초 자산 기준
+                const assetAtMonthStart = currentAsset;
+                
+                // 월초 기준으로 각 자산의 크기
+                const longTermAssetAtMonth = assetAtMonthStart * normalizedLongTerm;
+                const shortTermAssetAtMonth = assetAtMonthStart * normalizedShortTerm;
+                
+                // 장기 투자 필요 수익금 (월 수익률 기반)
+                const longTermMonthlyProfit = longTermAssetAtMonth * longTermMonthlyRate;
+                
+                // 단기 투자 필요 수익금 (계산된 월 수익률 기반)
+                const shortTermMonthlyProfit = shortTermAssetAtMonth * shortTermMonthlyRequired;
+                
+                // 단기 누적 수익금 누적
+                shortTermCumulativeProfitTotal += shortTermMonthlyProfit;
+                
+                // 전체 필요 수익금
+                const monthlyProfitDynamic = longTermMonthlyProfit + shortTermMonthlyProfit;
+                
+                // 장기투자 누적 = 기존 + 월 장기 재투자 + 월 장기 수익
+                const longTermInvest = (monthlyInvestment * normalizedLongTerm);
+                longTermAccumulated = longTermAccumulated + longTermInvest + longTermMonthlyProfit;
+                
+                // 월말 자산 = 월초 자산 + 월 재투자 + 월 필요 수익금
+                currentAsset = assetAtMonthStart + monthlyInvestment + monthlyProfitDynamic;
                 
                 const rowData = {
                     month: month,
                     dateStr: dateStr,
-                    assetBefore: currentAsset - monthlyProfit - monthlyInvestment,
-                    monthlyInv: monthlyInvestment,
-                    profit: monthlyProfit,
+                    assetBefore: assetAtMonthStart,
+                    monthlyInvest: monthlyInvestment,
+                    profit: monthlyProfitDynamic,
+                    shortTermProfit: shortTermMonthlyProfit,
+                    shortTermCumulativeProfit: shortTermCumulativeProfitTotal,
+                    longTermAccumulated: longTermAccumulated,
+                    longTermPrincipal: longTermPrincipal,
                     assetAfter: currentAsset,
-                    highlight: isLastMonth,
+                    highlight: month === months,
                     year: year
                 };
                 
@@ -567,24 +654,158 @@
                 yearGroups[year].push(rowData);
             }
             
-            const totalReturn = ((totalProfit / principal) * 100).toFixed(2);
-            
-            document.getElementById('finalAsset').textContent = formatNumber(currentAsset);
-            document.getElementById('totalInvested').textContent = formatNumber(totalInvested);
-            document.getElementById('totalProfit').textContent = formatNumber(totalProfit);
-            document.getElementById('totalReturn').textContent = `${totalReturn}%`;
+            // 비율 표시 업데이트
+            const ratioDisplayEl = document.getElementById('ratioDisplay');
+            if (ratioDisplayEl) {
+                ratioDisplayEl.textContent = (normalizedLongTerm * 100).toFixed(0) + '% / ' + (normalizedShortTerm * 100).toFixed(0) + '%';
+            }
             
             createYearTabs();
             const firstYear = Object.keys(yearGroups).sort((a, b) => a - b)[0];
             renderTableByYear(parseInt(firstYear));
         }
         
-        document.getElementById('principal').addEventListener('change', calculateAndDisplay);
-        document.getElementById('monthlyInvestment').addEventListener('change', calculateAndDisplay);
-        document.getElementById('monthlyRate').addEventListener('change', calculateAndDisplay);
-        document.getElementById('startDate').addEventListener('change', calculateAndDisplay);
-        document.getElementById('endDate').addEventListener('change', calculateAndDisplay);
+        // 로컬스토리지 키
+        const STORAGE_KEY = 'assetSimulatorConfig';
         
+        // 로컬스토리지에 저장
+        function saveToLocalStorage() {
+            const config = {
+                principal: document.getElementById('principal').value,
+                monthlyTargetRate: document.getElementById('monthlyTargetRate').value,
+                monthlyInvestment: document.getElementById('monthlyInvestment').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                longTermRatio: document.getElementById('longTermRatio').value,
+                longTermAnnualTarget: document.getElementById('longTermAnnualTarget').value,
+                shortTermRatio: document.getElementById('shortTermRatio').value
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+        }
+        
+        // 로컬스토리지에서 복원
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const config = JSON.parse(saved);
+                    document.getElementById('principal').value = config.principal || 500000000;
+                    document.getElementById('monthlyTargetRate').value = config.monthlyTargetRate || 1;
+                    document.getElementById('monthlyInvestment').value = config.monthlyInvestment || 5000000;
+                    document.getElementById('startDate').value = config.startDate || '2026-01-01';
+                    document.getElementById('endDate').value = config.endDate || '2028-01-01';
+                    document.getElementById('longTermRatio').value = config.longTermRatio || 60;
+                    document.getElementById('longTermAnnualTarget').value = config.longTermAnnualTarget || 10;
+                    document.getElementById('shortTermRatio').value = config.shortTermRatio || 40;
+                } catch (error) {
+                    console.error('로컬스토리지 복원 실패:', error);
+                }
+            }
+        }
+        
+        // 설정 저장 함수
+        function saveConfig() {
+            const config = {
+                principal: document.getElementById('principal').value,
+                monthlyTargetRate: document.getElementById('monthlyTargetRate').value,
+                monthlyInvestment: document.getElementById('monthlyInvestment').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                longTermRatio: document.getElementById('longTermRatio').value,
+                longTermAnnualTarget: document.getElementById('longTermAnnualTarget').value,
+                shortTermRatio: document.getElementById('shortTermRatio').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            const jsonString = JSON.stringify(config, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `자산운용설정_${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('설정이 저장되었습니다!');
+        }
+        
+        // 설정 로드 함수
+        function loadConfig() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const config = JSON.parse(event.target.result);
+                        
+                        // 입력값 복원
+                        document.getElementById('principal').value = config.principal;
+                        document.getElementById('monthlyTargetRate').value = config.monthlyTargetRate;
+                        document.getElementById('monthlyInvestment').value = config.monthlyInvestment;
+                        document.getElementById('startDate').value = config.startDate;
+                        document.getElementById('endDate').value = config.endDate;
+                        document.getElementById('longTermRatio').value = config.longTermRatio;
+                        document.getElementById('longTermAnnualTarget').value = config.longTermAnnualTarget;
+                        document.getElementById('shortTermRatio').value = config.shortTermRatio;
+                        
+                        // 계산 재실행
+                        calculateAndDisplay();
+                        
+                        alert('설정이 로드되었습니다!');
+                    } catch (error) {
+                        alert('파일을 읽을 수 없습니다. JSON 형식을 확인해주세요.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        // 버튼 이벤트 리스너
+        document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
+        document.getElementById('loadConfigBtn').addEventListener('click', loadConfig);
+        
+        // 입력값 변경 이벤트 리스너
+        document.getElementById('principal').addEventListener('change', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('monthlyTargetRate').addEventListener('input', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('monthlyInvestment').addEventListener('change', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('startDate').addEventListener('change', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('endDate').addEventListener('change', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('longTermRatio').addEventListener('input', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('shortTermRatio').addEventListener('input', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        document.getElementById('longTermAnnualTarget').addEventListener('input', () => {
+            saveToLocalStorage();
+            calculateAndDisplay();
+        });
+        
+        // 페이지 로드 시 로컬스토리지에서 복원
+        loadFromLocalStorage();
         calculateAndDisplay();
     </script>
 </body>
