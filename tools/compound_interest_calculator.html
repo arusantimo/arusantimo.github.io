@@ -109,10 +109,12 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
         }
-        
+
         .input-wrapper input {
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 0;
             padding: 10px 12px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
@@ -120,6 +122,10 @@
             font-size: 13px;
             color: var(--text-primary);
             transition: all 0.3s ease;
+        }
+
+        .input-wrapper .unit {
+            flex: 0 0 auto;
         }
         
         .input-wrapper input:focus {
@@ -134,6 +140,7 @@
             color: var(--text-secondary);
             font-weight: 600;
             min-width: 50px;
+            flex: 0 0 auto;
         }
         
         .stats-box {
@@ -435,7 +442,148 @@
                 font-size: 18px;
                 padding: 8px;
             }
+        }
+        
+        /* 중간 크기 대응 (481px ~ 675px) */
+        @media (min-width: 481px) and (max-width: 675px) {
+            body {
+                padding: 28px 12px;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            header {
+                padding: 12px 16px;
+                border-radius: 12px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .input-wrapper {
+                gap: 6px;
+            }
+
+            .input-wrapper input {
+                padding: 11px 10px;
+                font-size: 14px;
+            }
+
+            .unit {
+                min-width: 40px;
+            }
+
+            .allocation-bar {
+                height: 20px;
+            }
+
+            .tab {
+                padding: 10px 12px;
+            }
+
+            /* 테이블 가로 스크롤을 항상 가능하게 하여 화면에서 바로 스크롤하여 볼 수 있게 함 */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+                scroll-snap-type: x proximity;
+            }
+
+            table {
+                min-width: 760px;
+            }
+
+            /* 가로 스크롤바 스타일(선택적) */
+            .table-wrapper::-webkit-scrollbar {
+                height: 8px;
+            }
+            .table-wrapper::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.08);
+                border-radius: 4px;
+            }
         }        
+        
+        /* 600px 이하에서는 전체 레이아웃을 화면 너비에 맞춰 축소 */
+        @media (max-width: 600px) {
+            body {
+                padding: 16px 10px;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            header {
+                padding: 10px 12px;
+                border-radius: 12px;
+            }
+
+            header h1 {
+                font-size: 16px;
+            }
+
+            .card {
+                padding: 12px;
+                border-radius: 12px;
+            }
+
+            .input-wrapper {
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .input-wrapper input {
+                flex: 1 1 100%;
+                min-width: 0;
+                width: 100%;
+                padding: 10px 10px;
+                font-size: 14px;
+            }
+
+            .unit {
+                min-width: 36px;
+                flex: 0 0 auto;
+            }
+
+            .allocation-bar {
+                height: 18px;
+            }
+
+            .tab {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            /* 표는 화면에 맞춰 축소되도록 설정 (필요 시 가로 스크롤 허용) */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                width: 100%;
+                min-width: 0;
+                table-layout: fixed;
+                font-size: 12px;
+            }
+
+            table th,
+            table td {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: break-word;
+                text-align: left;
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>
