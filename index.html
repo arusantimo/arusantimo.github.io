@@ -1,78 +1,327 @@
----
-layout: default
----
-<div class="home">
-  <div class="intro">
-    <div class="title">
-      <h2 id="title_1">Arusantimo Dev Blog</h2>      
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arusantimo - Developer Tools & Utilities</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --accent: #51cf66;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --border: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #fafbfc 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        header h1 {
+            font-size: 48px;
+            margin-bottom: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        header p {
+            font-size: 18px;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: var(--text-dark);
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+        
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .card-icon {
+            font-size: 32px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        
+        .card-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .card-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-description {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            margin-top: auto;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: var(--bg-light);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .card-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-light);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        footer {
+            background: var(--text-dark);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 80px;
+        }
+        
+        footer p {
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-links a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 36px;
+            }
+            
+            header p {
+                font-size: 16px;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 24px;
+            }
+            
+            .footer-links {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🛠️ Arusantimo Tools</h1>
+        <p>프로페셔널 개발자를 위한 정적 도구 및 유틸리티 모음</p>
+    </header>
+    
+    <div class="container">
+        <h2 class="section-title">📊 금융 도구</h2>
+        <div class="tools-grid">
+            <!-- 복리 계산 도구 -->
+            <div class="tool-card">
+                <div class="card-header">
+                    <div class="card-icon">📈</div>
+                    <div>
+                        <div class="card-title">복리 투자 수익 계산</div>
+                        <div class="card-subtitle">Compound Interest Calculator</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p class="card-description">
+                        월별 재투자와 목표 수익률을 기반으로 복리 효과를 분석하는 고급 시뮬레이션 도구입니다. 년별 탭을 통해 체계적인 투자 현황을 추적할 수 있습니다.
+                    </p>
+                    <div class="card-tags">
+                        <span class="tag">복리계산</span>
+                        <span class="tag">투자분석</span>
+                        <span class="tag">시뮬레이션</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="tools/compound_interest_calculator.html" class="btn btn-primary">
+                        🔧 도구 열기
+                    </a>
+                    <a href="https://github.com/arusantimo/arusantimo.github.io" class="btn btn-secondary" target="_blank">
+                        📌 소스보기
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 추가 도구 영역 (향후 확장) -->
+        <h2 class="section-title">🔜 예정 도구</h2>
+        <div class="empty-state">
+            <p>더 많은 도구가 준비 중입니다.</p>
+            <p style="font-size: 14px;">새로운 도구를 추가할 예정입니다.</p>
+        </div>
     </div>
-    <script>
-      TweenMax.to($('#title_2'), 4, {
-        css: {
-          opacity: 1,
-          transform: 'translateY(50px)',
-        },
-      });
-      TweenMax.to($('#title_1'), 3, {
-        css: {
-          opacity: 1,
-          transform: 'translateY(50px)',
-        },
-      });
-    </script>
-    <p>Front-end Engineer 개인 아카이빙 목적의 블로그 입니다.</p>
-  </div>
-  {% for post in paginator.posts%}
-  <div class="post">
-    <div class="postTitle">
-      <a href="{{site.url}}{{site.baseurl}}{{post.url}}">{{post.title}}</a>
-    </div>
-    <div class="postExt">
-    {{ post.content | strip_html | truncatewords:9}}
-    </div>
-    <div class="postInfo">
-      <div  class="postDate">
-        날짜 :
-        <time datetime="{{ post.date | date_to_xmlschema }}" itemprop="datePublished">
-          {{ post.date | date: "%F" }}
-        </time>
-      </div>
-      <div class="postTag">
-        주제 : {{post.tag}}
-      </div>
-    </div>
-  </div>
-  {% endfor %}
-  {% if paginator.total_pages > 1 %}
-    <nav class="pagination">
-      {% if paginator.previous_page %}
-        <a
-          class="paginationLink"
-          href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">
-          &laquo; 이전
-        </a>
-      {% endif %}
-    {% for page in (1..paginator.total_pages) %}
-      {% if page == paginator.page %}
-        <em class="paginationLink paginationLinkCurrent">{{ page }}</em>
-      {% elsif page == 1 %}
-        <a class="paginationLink" href="/">{{ page }}</a>
-      {% else %}
-        <a
-          class="paginationLink"
-          href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}">
-          {{ page }}
-        </a>
-      {% endif %}
-    {% endfor %}
-    {% if paginator.next_page %}
-      <a
-        class="paginationLink"
-        href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}"
-      >
-        다음 &raquo;
-      </a>
-    {% endif %}
-    </nav>
-  {% endif %}
-</div>
+    
+    <footer>
+        <p><strong>Arusantimo Developer Tools</strong></p>
+        <p>개발자를 위한 프로페셔널 유틸리티 모음</p>
+        <div class="footer-links">
+            <a href="https://github.com/arusantimo" target="_blank">GitHub</a>
+            <a href="https://github.com/arusantimo/arusantimo.github.io" target="_blank">저장소</a>
+            <a href="mailto:arusantimo@github.com">Contact</a>
+        </div>
+        <p style="margin-top: 20px; font-size: 12px; opacity: 0.6;">© 2026 Arusantimo. All rights reserved.</p>
+    </footer>
+</body>
+</html>
