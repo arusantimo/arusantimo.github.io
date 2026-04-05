@@ -361,6 +361,32 @@ code {
   flex: 1;
 }
 
+/* ─── RESPONSIVE LAYOUT (mobile / tablet) ─── */
+@media (max-width: 1024px) {
+  .main { grid-template-columns: repeat(2, 1fr); }
+  .section.wide { grid-column: span 2; }
+  .section.full { grid-column: span 2; }
+  .cols3 { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 700px) {
+  .page-header { padding: 10px 12px; align-items: flex-start; }
+  .page-header h1 { font-size: 15px; }
+  .meta { justify-content: flex-start; gap: 8px; }
+  .top-banner { padding: 8px 12px; font-size: 12px; }
+  .main { grid-template-columns: 1fr; }
+  .section.wide, .section.full { grid-column: span 1; }
+  .cols3, .cols2 { grid-template-columns: 1fr; }
+  .section { padding: 10px 10px 12px; }
+  .row { flex-wrap: wrap; }
+  .row-key { min-width: 0; margin-right: 8px; }
+  .row-desc { flex-basis: 100%; margin-top: 4px; }
+  .kkey { min-width: 0; }
+  kbd { font-size: 11px; padding: 2px 6px; }
+  code { white-space: normal; word-break: break-word; }
+  .cols2 { gap: 12px; }
+}
+
 @media print {
   .top-banner, .print-btn { display: none; }
   .main { break-inside: avoid; }
