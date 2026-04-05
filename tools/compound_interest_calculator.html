@@ -61,6 +61,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
         
         .dashboard {
@@ -231,6 +232,30 @@
             gap: 0;
             overflow-x: auto;
         }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+        }
+
+        #saveConfigBtn { color: var(--accent-success); }
+        #loadConfigBtn { color: var(--accent-primary); }
         
         .tab {
             padding: 12px 20px;
@@ -330,6 +355,18 @@
             header {
                 padding: 12px 20px;
             }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .header-actions {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+            }
             
             table {
                 font-size: 11px;
@@ -340,18 +377,73 @@
                 padding: 8px;
             }
         }
+
+        /* 추가 모바일 최적화 (좁은 화면에서 컬럼 숨김, 터치영역 확장 등) */
+        @media (max-width: 480px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .input-wrapper input {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            .unit {
+                min-width: 36px;
+                font-size: 12px;
+            }
+
+            .tab {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .tabs {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .allocation-bar {
+                height: 18px;
+            }
+
+            .allocation-segment {
+                font-size: 10px;
+            }
+
+            /* 좁은 화면에서 덜 중요한 컬럼 숨기기 (월말/월초/기간은 유지) */
+            table th:nth-child(4), table td:nth-child(4),
+            table th:nth-child(5), table td:nth-child(5),
+            table th:nth-child(6), table td:nth-child(6),
+            table th:nth-child(7), table td:nth-child(7) {
+                display: none;
+            }
+
+            /* 버튼 터치타깃 확장 */
+            .icon-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 18px;
+                padding: 8px;
+            }
+        }        
     </style>
 </head>
 <body>
     <header>
         <h1>💰 자산 운용 시뮬레이터</h1>
-        <div style="display: flex; gap: 8px;">
-            <button id="saveConfigBtn" title="설정 저장" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease; color: var(--accent-success);">
-                💾
-            </button>
-            <button id="loadConfigBtn" title="설정 로드" style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease; color: var(--accent-primary);">
-                📂
-            </button>
+        <div class="header-actions">
+            <button id="saveConfigBtn" class="icon-btn" title="설정 저장">💾</button>
+            <button id="loadConfigBtn" class="icon-btn" title="설정 로드">📂</button>
         </div>
     </header>
     
