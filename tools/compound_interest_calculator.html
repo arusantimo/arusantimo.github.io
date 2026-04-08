@@ -30,18 +30,19 @@
             background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
             color: var(--text-primary);
             min-height: 100vh;
-            padding: 40px 20px;
+            padding: 20px 12px;
+            font-size: 13px;
         }
         
         header {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
             border-bottom: 1px solid var(--border-color);
-            padding: 16px 40px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 40px;
-            border-radius: 16px;
+            margin-bottom: 16px;
+            border-radius: 12px;
         }
         
         header button:hover {
@@ -50,7 +51,7 @@
         }
         
         header h1 {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
             -webkit-background-clip: text;
@@ -67,16 +68,16 @@
         .dashboard {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         
         .card {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 12px;
+            transition: all 0.2s ease;
         }
         
         .card:hover {
@@ -85,16 +86,16 @@
         }
         
         .card h2 {
-            font-size: 16px;
+            font-size: 14px;
             color: var(--text-primary);
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             font-weight: 700;
-            padding-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
         }
         
         .input-group {
-            margin-bottom: 16px;
+            margin-bottom: 10px;
         }
         
         .input-label {
@@ -107,7 +108,7 @@
         
         .input-wrapper {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             flex-wrap: wrap;
         }
@@ -115,13 +116,13 @@
         .input-wrapper input {
             flex: 1 1 auto;
             min-width: 0;
-            padding: 10px 12px;
+            padding: 8px 10px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-primary);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .input-wrapper .unit {
@@ -136,10 +137,10 @@
         }
         
         .unit {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
             font-weight: 600;
-            min-width: 50px;
+            min-width: 40px;
             flex: 0 0 auto;
         }
         
@@ -147,9 +148,9 @@
             background: rgba(0, 217, 255, 0.05);
             border: 1px solid var(--border-color);
             border-left: 3px solid var(--accent-primary);
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
         
         .stat-label {
@@ -160,7 +161,7 @@
         }
         
         .stat-value {
-            font-size: 20px;
+            font-size: 16px;
             color: var(--accent-primary);
             font-weight: 700;
             font-family: 'Monaco', 'Courier New', monospace;
@@ -185,22 +186,22 @@
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 16px;
+            gap: 8px;
+            margin-top: 12px;
         }
         
         .allocation-display {
             background: rgba(0, 217, 255, 0.05);
             border: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 8px;
             border-radius: 8px;
-            margin-top: 12px;
-            font-size: 12px;
+            margin-top: 8px;
+            font-size: 11px;
         }
         
         .allocation-bar {
             display: flex;
-            height: 24px;
+            height: 18px;
             border-radius: 12px;
             overflow: hidden;
             margin-top: 6px;
@@ -288,13 +289,13 @@
         
         .table-wrapper {
             overflow-x: auto;
-            margin-top: 16px;
+            margin-top: 12px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 11px;
         }
         
         table thead {
@@ -303,7 +304,7 @@
         }
         
         table th {
-            padding: 10px;
+            padding: 6px;
             text-align: right;
             font-weight: 700;
             color: var(--text-primary);
@@ -319,7 +320,7 @@
         }
         
         table td {
-            padding: 10px;
+            padding: 6px;
             text-align: right;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-secondary);
@@ -403,12 +404,13 @@
 
         .actual-input {
             width: 100%;
-            padding: 4px 6px;
+            padding: 4px 0px 4px 0;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 4px;
             color: var(--text-primary);
             font-size: 11px;
+            text-align: right;
             transition: border-color 0.2s;
         }
 
@@ -744,7 +746,7 @@
                                 <th>필요 총 수익금</th>
                                 <th>필요 단기 수익금</th>
                                 <th class="col-short-cumul" style="display:none;">단기 누적 수익금</th>
-                                <th>장기투자 누적</th>
+                                <th>필요 장기투자 누적(실제)</th>
                                 <th>예상 월말 목표 자산</th>
                             </tr>
                         </thead>
@@ -763,6 +765,7 @@
         let actualValues = {}; // { month: { shortTerm: number|null, longTermCumul: number|null } }
         let showShortCumul = false;
         let longTermPrincipalGlobal = 0;
+        let shortTermPrincipalGlobal = 0;
 
         function toggleShortCumul() {
             showShortCumul = !showShortCumul;
@@ -777,8 +780,8 @@
             const num = parseFloat(value);
             actualValues[month][field] = (value === '' || isNaN(num)) ? null : num;
             saveToLocalStorage();
-            const activeTab = document.querySelector('.tab.active');
-            if (activeTab) renderTableByYear(parseInt(activeTab.dataset.year));
+            // 실제값 입력 시 전체 계산을 다시 실행하여 이월 자산에 반영
+            calculateAndDisplay();
         }
         
         function formatNumber(num) {
@@ -822,8 +825,9 @@
                 // 실제 달성 수익 입력값 (없으면 목표값을 기본으로 사용)
                 const actualShort = actualValues[row.month]?.shortTerm ?? null;
                 const actualLongCumul = actualValues[row.month]?.longTermCumul ?? null;
-                const displayShort = actualShort !== null ? actualShort : Math.floor(row.shortTermProfit);
-                const displayLongCumul = actualLongCumul !== null ? actualLongCumul : Math.floor(row.longTermAccumulated);
+                // 입력 필드에 예측값을 자동으로 채우지 않음(실제값이 있을 때만 보여줌)
+                const displayShortInput = actualShort !== null ? actualShort : '';
+                const displayLongCumulInput = actualLongCumul !== null ? actualLongCumul : '';
 
                 // 달성율 계산 (항상 표시)
                 // longTermAccumulated = 이전누적 + 재투자금 + 수익 이므로, 수익만 비교하려면 재투자금 제외
@@ -832,32 +836,100 @@
                 const actualLongProfit = effectiveLongCumul - prevLongTermAccumulated - row.longTermInvest;
                 const actualTotalProfit = effectiveShort + actualLongProfit;
                 const rate = row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : 0;
+                // 만약 calculateAndDisplay에서 실제 종료자산을 계산해 두었다면 그것을 표시용으로 사용
+                const actualEndAssetDisplay = (row.actualEndAsset !== undefined && row.actualEndAsset !== null)
+                    ? row.actualEndAsset
+                    : (row.assetBefore + row.monthlyInvest + actualTotalProfit);
                 const rateColor = rate >= 100 ? 'var(--accent-success)' : rate >= 80 ? 'var(--accent-warning)' : '#ef4444';
                 const achievementHtml = ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>`;
 
+                // 실제 입력값 기준 단기 누적 수익금 계산 (1월차 ~ 현재월 합산)
+                let actualShortCumulative = 0;
+                for (let m = 1; m <= row.month; m++) {
+                    const r = allTableRows[m - 1];
+                    actualShortCumulative += actualValues[m]?.shortTerm ?? r.shortTermProfit;
+                }
+
                 const shortCumulStyle = showShortCumul ? '' : 'display:none;';
+
+                // 초기 투자금 + 단기 누적 합계
+                const shortInitPlusCumul = shortTermPrincipalGlobal + actualShortCumulative;
+                // A: 단기 목표 대비(실제 단기 수익 ÷ 필요 단기 수익)로 달성률 계산
+                const shortAchievePercent = row.shortTermProfit > 0 ? (effectiveShort / row.shortTermProfit) * 100 : 0;
+                const shortAchievePercentFixed = shortAchievePercent.toFixed(1);
+                const shortAchieveColor = shortAchievePercent >= 100 ? 'var(--accent-success)' : shortAchievePercent >= 80 ? 'var(--accent-warning)' : '#ef4444';
+
+                // 장기 필요 수익금(이번월)
+                const longTermRequiredProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
+                const longTermRequiredProfitDisplay = longTermRequiredProfit;
+                // 현재 수익률: 사용자가 '실제 장기 누적'을 입력한 경우, "이번월 필요 수익금" 대비 달성률로 계산
+                // - 분모가 0이거나 음수인 경우 0%로 처리
+                // - 음수 결과(목표보다 낮은 실적)는 0%로 클램프
+                let longTermCurrentRate = 0;
+                if (actualLongCumul !== null && !isNaN(Number(actualLongCumul))) {
+                    const actualLongCumulNum = Number(actualLongCumul);
+                    const actualLongProfitValue = actualLongCumulNum - prevLongTermAccumulated - row.longTermInvest;
+                    if (longTermRequiredProfit > 0) {
+                        longTermCurrentRate = (actualLongProfitValue / longTermRequiredProfit) * 100;
+                    } else {
+                        longTermCurrentRate = actualLongProfitValue > 0 ? 100 : 0;
+                    }
+                    if (longTermCurrentRate < 0) longTermCurrentRate = 0;
+                }
+                const longTermCurrentRateFixed = longTermCurrentRate.toFixed(1);
+                const longTermRateColor = longTermCurrentRate >= 100 ? 'var(--accent-success)' : longTermCurrentRate >= 80 ? 'var(--accent-warning)' : '#ef4444';
 
                 return `
                     <tr ${row.highlight ? 'class="highlight-row"' : ''}>
                         <td>${row.month}월차<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
-                        <td class="number">${formatNumber(row.assetBefore)}</td>
-                        <td class="number" style="color: var(--accent-success);">${formatNumber(row.profit)}</td>
+                        <td class="number">
+                            <span style="font-size:9px;">${formatNumber(actualEndAssetDisplay)}</span>
+                            <div style="margin-top:10px; color: var(--text-secondary); font-size:10px;">                                
+                                <span style="color:var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(row.assetBefore)}</span>
+                            </div>
+                        </td>
+                        <td class="number" style="color: var(--accent-success);">
+                            ${formatNumber(row.profit)}
+                            <div style="color: var(--text-secondary); font-size:11px; margin-top:6px;">
+                                (장)${formatNumber(row.profit - row.shortTermProfit)} + (단)${formatNumber(row.shortTermProfit)}
+                            </div>
+                        </td>
                         <td>
                             <div class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}</div>
                             <input type="number" class="actual-input" placeholder="실제 단기 수익"
-                                value="${displayShort}"
+                                value="${displayShortInput}"
                                 onchange="setActual(${row.month}, 'shortTerm', this.value)"
                                 style="margin-top:5px;">
                         </td>
-                        <td class="number col-short-cumul" style="${shortCumulStyle} color: var(--accent-warning);">${formatNumber(row.shortTermCumulativeProfit)}</td>
-                        <td>
-                            <div class="number">${formatNumber(row.longTermAccumulated)} <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span></div>
-                            <input type="number" class="actual-input" placeholder="실제 장기 누적"
-                                value="${displayLongCumul}"
-                                onchange="setActual(${row.month}, 'longTermCumul', this.value)"
-                                style="margin-top:5px;">
+                        <td class="col-short-cumul" style="${shortCumulStyle}">
+                            <div class="number" style="color: var(--accent-warning);">${formatNumber(actualShortCumulative)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 3px;">
+                                <span style="font-size:9px;">초기 투자금 + 누적</span><br>
+                                <span class="number" style="font-size:11px; color: var(--text-primary);">${formatNumber(shortInitPlusCumul)}</span>
+                                <span style="font-size:11px; color:${shortAchieveColor}; margin-left:6px;">(${shortAchievePercentFixed}%)</span>
+                            </div>
                         </td>
-                        <td class="number">${formatNumber(row.assetAfter)}${achievementHtml}</td>
+                        <td>
+                            <div class="number">${formatNumber(row.longTermAccumulated)} 
+                                <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span>                                
+                            </div>
+                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
+                                <input type="number" class="actual-input" placeholder="실제 장기 누적"
+                                    value="${displayLongCumulInput}"
+                                    onchange="setActual(${row.month}, 'longTermCumul', this.value)"
+                                    style="margin-top:5px;"
+                                >
+                                
+                                <span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;">(${longTermCurrentRateFixed}%)</span>
+                            </div>
+                        </td>
+                        <td class="number">
+                            <div>${formatNumber(row.assetAfter)}${achievementHtml}</div>
+                            <div style="color: var(--text-secondary); margin-top:6px;">
+                                <span style="font-size:9px;">실제 자산</span><br>
+                                <span style="color:var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('');
@@ -901,6 +973,7 @@
             const longTermPrincipal = principal * normalizedLongTerm;
             const shortTermPrincipal = principal * normalizedShortTerm;
             longTermPrincipalGlobal = longTermPrincipal;
+            shortTermPrincipalGlobal = shortTermPrincipal;
             
             const months = getMonthsDifference(startDate, endDate);
             
@@ -933,40 +1006,62 @@
             let currentAsset = principal;
             let longTermAccumulated = longTermPrincipal; // 장기투자 초기 원금
             let shortTermCumulativeProfitTotal = 0; // 단기 누적 수익금
-            
+            let carryAssetForNextMonth = null; // 이전달 실제 자산을 다음달 월초로 사용
+
             for (let month = 1; month <= months; month++) {
                 const currentDate = new Date(startObj);
                 currentDate.setMonth(currentDate.getMonth() + month - 1);
                 const year = currentDate.getFullYear();
-                
+
                 const dateStr = formatDate(currentDate.toISOString().split('T')[0]);
-                
-                // 월초 자산 기준
-                const assetAtMonthStart = currentAsset;
-                
+
+                // 월초 자산: 이전달에 실제값이 입력되었다면 그 실제값을 이월(우선 사용), 아니면 시뮬레이션 값 사용
+                const assetAtMonthStart = carryAssetForNextMonth !== null ? carryAssetForNextMonth : currentAsset;
+                // carry는 한달만 적용
+                carryAssetForNextMonth = null;
+
+                // 이전 장기 누적(계산용)
+                const prevLongTermAccumulated = longTermAccumulated;
+
                 // 월초 기준으로 각 자산의 크기
                 const longTermAssetAtMonth = assetAtMonthStart * normalizedLongTerm;
                 const shortTermAssetAtMonth = assetAtMonthStart * normalizedShortTerm;
-                
+
                 // 장기 투자 필요 수익금 (월 수익률 기반)
                 const longTermMonthlyProfit = longTermAssetAtMonth * longTermMonthlyRate;
-                
+
                 // 단기 투자 필요 수익금 (계산된 월 수익률 기반)
                 const shortTermMonthlyProfit = shortTermAssetAtMonth * shortTermMonthlyRequired;
-                
-                // 단기 누적 수익금 누적
-                shortTermCumulativeProfitTotal += shortTermMonthlyProfit;
-                
+
+                // 단기 누적 수익금 누적 (실제값이 있으면 실제 단기 수익을 사용)
+                const actualShortInput = actualValues[month]?.shortTerm ?? null;
+                const shortToAdd = (actualShortInput !== null && !isNaN(Number(actualShortInput))) ? Number(actualShortInput) : shortTermMonthlyProfit;
+                shortTermCumulativeProfitTotal += shortToAdd;
+
                 // 전체 필요 수익금
                 const monthlyProfitDynamic = longTermMonthlyProfit + shortTermMonthlyProfit;
-                
+
                 // 장기투자 누적 = 기존 + 월 장기 재투자 + 월 장기 수익
                 const longTermInvest = (monthlyInvestment * normalizedLongTerm);
                 longTermAccumulated = longTermAccumulated + longTermInvest + longTermMonthlyProfit;
-                
-                // 월말 자산 = 월초 자산 + 월 재투자 + 월 필요 수익금
+
+                // 월말 자산(시뮬레이션)
                 currentAsset = assetAtMonthStart + monthlyInvestment + monthlyProfitDynamic;
-                
+
+                // 실제 입력값이 있으면 이번달 실제 종료 자산을 계산하여 다음달 이월 자산으로 사용
+                const actualShort = actualValues[month]?.shortTerm ?? null;
+                const actualLongCumul = actualValues[month]?.longTermCumul ?? null;
+                const effectiveShort = actualShort !== null && !isNaN(Number(actualShort)) ? Number(actualShort) : shortTermMonthlyProfit;
+                const effectiveLongCumul = actualLongCumul !== null && !isNaN(Number(actualLongCumul)) ? Number(actualLongCumul) : longTermAccumulated;
+                const actualLongProfit = effectiveLongCumul - prevLongTermAccumulated - longTermInvest;
+                const actualTotalProfit = effectiveShort + actualLongProfit;
+                const actualEndAsset = assetAtMonthStart + monthlyInvestment + actualTotalProfit;
+
+                // 이전달 실제 입력(단기 또는 장기 누적)이 있으면 이 값을 다음달 시작 자산으로 사용
+                if ((actualShort !== null && !isNaN(Number(actualShort))) || (actualLongCumul !== null && !isNaN(Number(actualLongCumul)))) {
+                    carryAssetForNextMonth = actualEndAsset;
+                }
+
                 const rowData = {
                     month: month,
                     dateStr: dateStr,
@@ -979,12 +1074,13 @@
                     longTermAccumulated: longTermAccumulated,
                     longTermPrincipal: longTermPrincipal,
                     assetAfter: currentAsset,
+                    actualEndAsset: ((actualShort !== null && !isNaN(Number(actualShort))) || (actualLongCumul !== null && !isNaN(Number(actualLongCumul)))) ? actualEndAsset : null,
                     highlight: month === months,
                     year: year
                 };
-                
+
                 allTableRows.push(rowData);
-                
+
                 if (!yearGroups[year]) {
                     yearGroups[year] = [];
                 }
