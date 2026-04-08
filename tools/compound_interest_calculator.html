@@ -881,9 +881,18 @@
                 return `
                     <tr ${row.highlight ? 'class="highlight-row"' : ''}>
                         <td>${row.month}월차<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
-                        <td class="number">
-                            ${formatNumber(row.assetBefore)}
-                            ${idx > 0 ? `<div style="color: var(--text-secondary); font-size:10px; margin-top:4px;"><span style="color:var(--text-primary); font-family:'Monaco','Courier New',monospace; font-weight:700; font-size:11px;">${formatNumber(allTableRows[idx - 1].assetAfter)}</span></div>` : ''}
+                        <td>
+                            <div style="font-size:9px; color:var(--text-secondary); margin-bottom:2px;">목표</div>
+                            <div class="number">${formatNumber(idx === 0 ? row.assetBefore : allTableRows[idx - 1].assetAfter)}</div>
+                            ${(() => {
+                                if (idx === 0) return '';
+                                const prevMonth = allTableRows[idx - 1].month;
+                                const prevHasInput = actualValues[prevMonth]?.shortTerm != null || actualValues[prevMonth]?.longTermCumul != null;
+                                if (!prevHasInput) return '';
+                                const prevActualEndAsset = allTableRows[idx - 1].actualEndAsset;
+                                if (prevActualEndAsset == null) return '';
+                                return `<div style="font-size:9px; color:var(--text-secondary); margin-top:6px; margin-bottom:2px;">실제 이월</div><div class="number" style="color:var(--accent-primary);">${formatNumber(prevActualEndAsset)}</div>`;
+                            })()}
                         </td>
                         <td class="number" style="color: var(--accent-success);">
                             ${formatNumber(row.profit)}
