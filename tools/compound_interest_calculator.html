@@ -828,7 +828,14 @@
 
             tableBody.innerHTML = rows.map(row => {
                 const idx = row.month - 1;
+                // 시뮬레이션 기준 이전 장기 누적 (필요 수익금 계산용)
                 const prevLongTermAccumulated = idx === 0 ? longTermPrincipalGlobal : allTableRows[idx - 1].longTermAccumulated;
+                // 실제 입력 기준 이전 장기 누적 (실제 달성율 계산용 — 이전 달 실제값이 있으면 그것을 기준으로)
+                const prevActualLongAccum = idx === 0
+                    ? longTermPrincipalGlobal
+                    : (actualValues[allTableRows[idx - 1].month]?.longTermCumul != null
+                        ? Number(actualValues[allTableRows[idx - 1].month].longTermCumul)
+                        : allTableRows[idx - 1].longTermAccumulated);
 
                 // 장기투자 수익률 계산
                 const longTermROI = row.longTermPrincipal > 0
@@ -838,7 +845,6 @@
                 // 실제 달성 수익 입력값 (없으면 목표값을 기본으로 사용)
                 const actualShort = actualValues[row.month]?.shortTerm ?? null;
                 const actualLongCumul = actualValues[row.month]?.longTermCumul ?? null;
-                // 입력 필드에 예측값을 자동으로 채우지 않음(실제값이 있을 때만 보여줌)
                 const displayShortInput = actualShort !== null ? actualShort : '';
                 const displayLongCumulInput = actualLongCumul !== null ? actualLongCumul : '';
 
@@ -846,7 +852,8 @@
                 const hasActualInput = actualShort !== null || actualLongCumul !== null;
                 const effectiveShort = actualShort !== null ? actualShort : row.shortTermProfit;
                 const effectiveLongCumul = actualLongCumul !== null ? actualLongCumul : row.longTermAccumulated;
-                const actualLongProfit = effectiveLongCumul - prevLongTermAccumulated - row.longTermInvest;
+                // 실제 장기 수익 = 실제 누적 - 실제 이전 누적 - 재투자금
+                const actualLongProfit = effectiveLongCumul - prevActualLongAccum - row.longTermInvest;
                 const actualTotalProfit = effectiveShort + actualLongProfit;
                 const rate = hasActualInput && row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : null;
                 const actualEndAssetDisplay = hasActualInput
@@ -871,22 +878,15 @@
                 const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
                 const shortAchieveColor = shortAchievePercentFixed !== null && parseFloat(shortAchievePercentFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
-                // 장기 필요 수익금(이번월)
+                // 장기 필요 수익금(이번월) — 시뮬레이션 기준
                 const longTermRequiredProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
-                const longTermRequiredProfitDisplay = longTermRequiredProfit;
-                // 현재 수익률: 사용자가 '실제 장기 누적'을 입력한 경우, "이번월 필요 수익금" 대비 달성률로 계산
-                // - 분모가 0이거나 음수인 경우 0%로 처리
-                // - 음수 결과(목표보다 낮은 실적)는 0%로 클램프
+                // 장기 실제 달성률 — 목표 누적 대비 실제 누적 비율
                 let longTermCurrentRate = 0;
                 if (actualLongCumul !== null && !isNaN(Number(actualLongCumul))) {
                     const actualLongCumulNum = Number(actualLongCumul);
-                    const actualLongProfitValue = actualLongCumulNum - prevLongTermAccumulated - row.longTermInvest;
-                    if (longTermRequiredProfit > 0) {
-                        longTermCurrentRate = (actualLongProfitValue / longTermRequiredProfit) * 100;
-                    } else {
-                        longTermCurrentRate = actualLongProfitValue > 0 ? 100 : 0;
-                    }
-                    if (longTermCurrentRate < 0) longTermCurrentRate = 0;
+                    longTermCurrentRate = row.longTermAccumulated > 0
+                        ? (actualLongCumulNum / row.longTermAccumulated) * 100
+                        : 0;
                 }
                 const longTermCurrentRateFixed = actualLongCumul !== null ? longTermCurrentRate.toFixed(1) : null;
                 const longTermRateColor = longTermCurrentRateFixed !== null && parseFloat(longTermCurrentRateFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
