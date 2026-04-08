@@ -819,6 +819,21 @@
                 return (v !== null && v !== undefined) ? v : null;
             });
 
+            // 저축만 했을 때: 초기 원금 + 월 재투자 * 월차 (수익 없음)
+            const principal = allTableRows[0].assetBefore;
+            const monthlyInvest = allTableRows[0].monthlyInvest;
+            const savingsOnly = allTableRows.map(r => principal + monthlyInvest * r.month);
+
+            // 연 2.5% 적금 복리: 매월 이전 자산 * (1 + 월이율) + 월 재투자
+            const annualSavingsRate = 0.025;
+            const monthlySavingsRate = Math.pow(1 + annualSavingsRate, 1 / 12) - 1;
+            const savingsWithInterest = [];
+            let savingsAsset = principal;
+            for (const r of allTableRows) {
+                savingsAsset = savingsAsset * (1 + monthlySavingsRate) + monthlyInvest;
+                savingsWithInterest.push(savingsAsset);
+            }
+
             const fmt = v => {
                 if (v === null) return null;
                 if (Math.abs(v) >= 100000000) return (v / 100000000).toFixed(1) + '억';
@@ -851,6 +866,30 @@
                         borderWidth: 2,
                         fill: false,
                         spanGaps: false,
+                    },
+                    {
+                        label: '저축만 (수익 없음)',
+                        data: savingsOnly,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.06)',
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 4,
+                        borderWidth: 1.5,
+                        borderDash: [5, 4],
+                        fill: false,
+                    },
+                    {
+                        label: '적금 연 2.5%',
+                        data: savingsWithInterest,
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.06)',
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 4,
+                        borderWidth: 1.5,
+                        borderDash: [3, 3],
+                        fill: false,
                     }
                 ]
             };
