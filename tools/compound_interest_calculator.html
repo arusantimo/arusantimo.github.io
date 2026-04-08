@@ -721,6 +721,11 @@
                             <span id="shortTermText">40%</span>
                         </div>
                     </div>
+                    <div id="monthlyInvestmentSplit" style="margin-top:8px; font-size:11px; color:var(--text-secondary);">
+                        월 재투자: <span id="monthlyInvestmentTotal" class="number">-</span>원 — 
+                        <span id="longTermInvestAmount" class="number">-</span>원(장) + 
+                        <span id="shortTermInvestAmount" class="number">-</span>원(단)
+                    </div>
                 </div>
             </div>
             
@@ -728,7 +733,7 @@
             <div class="card table-card">
                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
                     <h2 style="margin-bottom:0; padding-bottom:0; border-bottom:none;">📋 월별 투자 수익 상세</h2>
-                    <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적 보기</button>
+                    <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적 숨기기</button>
                 </div>
 
                 <div class="tab-container">
@@ -745,7 +750,7 @@
                                 <th>월초 자산</th>
                                 <th>필요 총 수익금</th>
                                 <th>필요 단기 수익금</th>
-                                <th class="col-short-cumul" style="display:none;">단기 누적 수익금</th>
+                                <th class="col-short-cumul">단기 누적 수익금</th>
                                 <th>필요 장기투자 누적(실제)</th>
                                 <th>예상 월말 목표 자산</th>
                             </tr>
@@ -763,7 +768,7 @@
         let allTableRows = [];
         let yearGroups = {};
         let actualValues = {}; // { month: { shortTerm: number|null, longTermCumul: number|null } }
-        let showShortCumul = false;
+        let showShortCumul = true;
         let longTermPrincipalGlobal = 0;
         let shortTermPrincipalGlobal = 0;
 
@@ -839,7 +844,7 @@
                 const actualEndAssetDisplay = hasActualInput
                     ? (row.assetBefore + row.monthlyInvest + actualTotalProfit)
                     : null;
-                const rateColor = rate !== null && rate >= 100 ? 'var(--accent-primary)' : '#ef4444';
+                const rateColor = rate !== null && parseFloat(rate) >= 100 ? 'var(--accent-primary)' : '#ef4444';
                 const achievementHtml = rate !== null ? ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>` : '';
 
                 // 실제 입력값 기준 단기 누적 수익금 계산 (1월차 ~ 현재월 합산)
@@ -856,7 +861,7 @@
                 // 단기 달성률: 실제 단기 입력이 있을 때만 계산
                 const shortAchievePercent = (actualShort !== null && row.shortTermProfit > 0) ? (actualShort / row.shortTermProfit) * 100 : null;
                 const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
-                const shortAchieveColor = shortAchievePercent !== null && shortAchievePercent >= 100 ? 'var(--accent-primary)' : '#ef4444';
+                const shortAchieveColor = shortAchievePercentFixed !== null && parseFloat(shortAchievePercentFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 // 장기 필요 수익금(이번월)
                 const longTermRequiredProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
@@ -876,7 +881,7 @@
                     if (longTermCurrentRate < 0) longTermCurrentRate = 0;
                 }
                 const longTermCurrentRateFixed = actualLongCumul !== null ? longTermCurrentRate.toFixed(1) : null;
-                const longTermRateColor = longTermCurrentRate >= 100 ? 'var(--accent-primary)' : '#ef4444';
+                const longTermRateColor = longTermCurrentRateFixed !== null && parseFloat(longTermCurrentRateFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 return `
                     <tr ${row.highlight ? 'class="highlight-row"' : ''}>
@@ -1004,6 +1009,16 @@
             document.getElementById('longTermText').textContent = (normalizedLongTerm * 100).toFixed(0) + '%';
             document.getElementById('shortTermBar').style.width = normalizedShortTerm * 100 + '%';
             document.getElementById('shortTermText').textContent = (normalizedShortTerm * 100).toFixed(0) + '%';
+
+            // 월 재투자 금액 분배 업데이트
+            const longTermInvestAmount = monthlyInvestment * normalizedLongTerm;
+            const shortTermInvestAmount = monthlyInvestment * normalizedShortTerm;
+            const totalInvestEl = document.getElementById('monthlyInvestmentTotal');
+            const longInvestEl = document.getElementById('longTermInvestAmount');
+            const shortInvestEl = document.getElementById('shortTermInvestAmount');
+            if (totalInvestEl) totalInvestEl.textContent = formatNumber(monthlyInvestment);
+            if (longInvestEl) longInvestEl.textContent = formatNumber(longTermInvestAmount);
+            if (shortInvestEl) shortInvestEl.textContent = formatNumber(shortTermInvestAmount);
             
             // 월별 테이블 생성
             allTableRows = [];
