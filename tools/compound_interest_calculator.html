@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>자산 운용 시뮬레이터 - Arusantimo Tools</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <style>
         * {
             margin: 0;
@@ -765,14 +766,19 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <canvas id="profitChart" height="100"></canvas>
+                </div>
             </div>
         </div>
     </div>
-    
+
     <script>
         let allTableRows = [];
         let yearGroups = {};
         let actualValues = {}; // { month: { shortTerm: number|null, longTermCumul: number|null } }
+        let profitChartInstance = null;
         let showShortCumul = true;
         let longTermPrincipalGlobal = 0;
         let shortTermPrincipalGlobal = 0;
@@ -794,6 +800,111 @@
             calculateAndDisplay();
         }
         
+        function renderChart() {
+            const canvas = document.getElementById('profitChart');
+            if (!canvas || allTableRows.length === 0) return;
+
+            const labels = allTableRows.map(r => {
+                const d = new Date(document.getElementById('startDate').value);
+                d.setMonth(d.getMonth() + r.month - 1);
+                return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0');
+            });
+
+            // 목표 자산: 월말 예상 자산
+            const targetAssets = allTableRows.map(r => r.assetAfter);
+
+            // 실제 자산: 실제 입력값 기반, 없으면 null
+            const actualAssets = allTableRows.map(r => {
+                const v = r.actualEndAsset;
+                return (v !== null && v !== undefined) ? v : null;
+            });
+
+            const fmt = v => {
+                if (v === null) return null;
+                if (Math.abs(v) >= 100000000) return (v / 100000000).toFixed(1) + '억';
+                if (Math.abs(v) >= 10000) return (v / 10000).toFixed(0) + '만';
+                return v.toLocaleString('ko-KR');
+            };
+
+            const chartData = {
+                labels,
+                datasets: [
+                    {
+                        label: '목표 자산',
+                        data: targetAssets,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                        borderWidth: 2,
+                        fill: false,
+                    },
+                    {
+                        label: '실제 자산',
+                        data: actualAssets,
+                        borderColor: '#00d9ff',
+                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        borderWidth: 2,
+                        fill: false,
+                        spanGaps: false,
+                    }
+                ]
+            };
+
+            const chartOptions = {
+                responsive: true,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: {
+                        labels: { color: '#a0aec0', font: { size: 11 }, boxWidth: 14 }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(26,31,40,0.95)',
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#a0aec0',
+                        borderColor: '#2d3748',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: ctx => {
+                                if (ctx.parsed.y === null) return null;
+                                return ` ${ctx.dataset.label}: ${Math.floor(ctx.parsed.y).toLocaleString('ko-KR')}원`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#a0aec0', font: { size: 10 }, maxRotation: 45 },
+                        grid: { color: 'rgba(255,255,255,0.04)' }
+                    },
+                    y: {
+                        ticks: {
+                            color: '#a0aec0',
+                            font: { size: 10 },
+                            callback: v => fmt(v)
+                        },
+                        grid: { color: 'rgba(255,255,255,0.04)' }
+                    }
+                }
+            };
+
+            if (profitChartInstance) {
+                profitChartInstance.data = chartData;
+                profitChartInstance.update('none');
+                return;
+            }
+
+            profitChartInstance = new Chart(canvas, {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+        }
+
         function formatNumber(num) {
             if (num === null || num === undefined) return '-';
             return Math.floor(num).toLocaleString('ko-KR');
@@ -1136,6 +1247,7 @@
             
             const defaultYear = createYearTabs();
             renderTableByYear(defaultYear);
+            renderChart();
         }
         
         // 로컬스토리지 키
