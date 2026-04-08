@@ -826,10 +826,11 @@
                 const displayLongCumul = actualLongCumul !== null ? actualLongCumul : Math.floor(row.longTermAccumulated);
 
                 // 달성율 계산 (항상 표시)
+                // longTermAccumulated = 이전누적 + 재투자금 + 수익 이므로, 수익만 비교하려면 재투자금 제외
                 const effectiveShort = actualShort !== null ? actualShort : row.shortTermProfit;
                 const effectiveLongCumul = actualLongCumul !== null ? actualLongCumul : row.longTermAccumulated;
-                const actualLongDelta = effectiveLongCumul - prevLongTermAccumulated;
-                const actualTotalProfit = effectiveShort + actualLongDelta;
+                const actualLongProfit = effectiveLongCumul - prevLongTermAccumulated - row.longTermInvest;
+                const actualTotalProfit = effectiveShort + actualLongProfit;
                 const rate = row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : 0;
                 const rateColor = rate >= 100 ? 'var(--accent-success)' : rate >= 80 ? 'var(--accent-warning)' : '#ef4444';
                 const achievementHtml = ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>`;
@@ -971,6 +972,7 @@
                     dateStr: dateStr,
                     assetBefore: assetAtMonthStart,
                     monthlyInvest: monthlyInvestment,
+                    longTermInvest: longTermInvest,
                     profit: monthlyProfitDynamic,
                     shortTermProfit: shortTermMonthlyProfit,
                     shortTermCumulativeProfit: shortTermCumulativeProfitTotal,
