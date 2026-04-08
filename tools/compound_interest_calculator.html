@@ -385,6 +385,47 @@
             }
         }
 
+        .toggle-short-cumul-btn {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--accent-warning);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-short-cumul-btn:hover {
+            background: rgba(245, 158, 11, 0.2);
+        }
+
+        .actual-input {
+            width: 100%;
+            padding: 4px 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 11px;
+            transition: border-color 0.2s;
+        }
+
+        .actual-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .actual-input::placeholder {
+            color: var(--text-secondary);
+            font-size: 10px;
+        }
+
+        .actual-cell {
+            min-width: 100px;
+        }
+
         /* 추가 모바일 최적화 (좁은 화면에서 컬럼 숨김, 터치영역 확장 등) */
         @media (max-width: 480px) {
             body {
@@ -427,7 +468,7 @@
                 font-size: 10px;
             }
 
-            /* 좁은 화면에서 덜 중요한 컬럼 숨기기 (월말/월초/기간은 유지) */
+            /* 좁은 화면에서 덜 중요한 컬럼 숨기기 */
             table th:nth-child(4), table td:nth-child(4),
             table th:nth-child(5), table td:nth-child(5),
             table th:nth-child(6), table td:nth-child(6),
@@ -683,26 +724,28 @@
             
             <!-- 월별 상세 테이블 -->
             <div class="card table-card">
-                <h2>📋 월별 투자 수익 상세</h2>
-                
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+                    <h2 style="margin-bottom:0; padding-bottom:0; border-bottom:none;">📋 월별 투자 수익 상세</h2>
+                    <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적 보기</button>
+                </div>
+
                 <div class="tab-container">
                     <div class="tabs" id="yearTabs">
                         <!-- 동적으로 생성됨 -->
                     </div>
                 </div>
-                
+
                 <div class="table-wrapper">
                     <table>
                         <thead>
                             <tr>
-                                <th>월차</th>
-                                <th>월별 기간</th>
+                                <th>월차 (기간)</th>
                                 <th>월초 자산</th>
                                 <th>필요 총 수익금</th>
                                 <th>필요 단기 수익금</th>
-                                <th>단기 누적 수익금</th>
+                                <th class="col-short-cumul" style="display:none;">단기 누적 수익금</th>
                                 <th>장기투자 누적</th>
-                                <th>월말 자산</th>
+                                <th>예상 월말 목표 자산</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -717,6 +760,26 @@
     <script>
         let allTableRows = [];
         let yearGroups = {};
+        let actualValues = {}; // { month: { shortTerm: number|null, longTermCumul: number|null } }
+        let showShortCumul = false;
+        let longTermPrincipalGlobal = 0;
+
+        function toggleShortCumul() {
+            showShortCumul = !showShortCumul;
+            document.querySelectorAll('.col-short-cumul').forEach(el => {
+                el.style.display = showShortCumul ? '' : 'none';
+            });
+            document.getElementById('shortCumulToggleBtn').textContent = showShortCumul ? '단기누적 숨기기' : '단기누적 보기';
+        }
+
+        function setActual(month, field, value) {
+            if (!actualValues[month]) actualValues[month] = {};
+            const num = parseFloat(value);
+            actualValues[month][field] = (value === '' || isNaN(num)) ? null : num;
+            saveToLocalStorage();
+            const activeTab = document.querySelector('.tab.active');
+            if (activeTab) renderTableByYear(parseInt(activeTab.dataset.year));
+        }
         
         function formatNumber(num) {
             if (num === null || num === undefined) return '-';
@@ -746,23 +809,54 @@
         function renderTableByYear(year) {
             const tableBody = document.getElementById('tableBody');
             const rows = yearGroups[year] || [];
-            
+
             tableBody.innerHTML = rows.map(row => {
+                const idx = row.month - 1;
+                const prevLongTermAccumulated = idx === 0 ? longTermPrincipalGlobal : allTableRows[idx - 1].longTermAccumulated;
+
                 // 장기투자 수익률 계산
-                const longTermROI = row.longTermPrincipal > 0 
+                const longTermROI = row.longTermPrincipal > 0
                     ? (((row.longTermAccumulated - row.longTermPrincipal) / row.longTermPrincipal) * 100).toFixed(2)
                     : 0;
-                
+
+                // 실제 달성 수익 입력값 (없으면 목표값을 기본으로 사용)
+                const actualShort = actualValues[row.month]?.shortTerm ?? null;
+                const actualLongCumul = actualValues[row.month]?.longTermCumul ?? null;
+                const displayShort = actualShort !== null ? actualShort : Math.floor(row.shortTermProfit);
+                const displayLongCumul = actualLongCumul !== null ? actualLongCumul : Math.floor(row.longTermAccumulated);
+
+                // 달성율 계산 (항상 표시)
+                const effectiveShort = actualShort !== null ? actualShort : row.shortTermProfit;
+                const effectiveLongCumul = actualLongCumul !== null ? actualLongCumul : row.longTermAccumulated;
+                const actualLongDelta = effectiveLongCumul - prevLongTermAccumulated;
+                const actualTotalProfit = effectiveShort + actualLongDelta;
+                const rate = row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : 0;
+                const rateColor = rate >= 100 ? 'var(--accent-success)' : rate >= 80 ? 'var(--accent-warning)' : '#ef4444';
+                const achievementHtml = ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>`;
+
+                const shortCumulStyle = showShortCumul ? '' : 'display:none;';
+
                 return `
                     <tr ${row.highlight ? 'class="highlight-row"' : ''}>
-                        <td>${row.month}</td>
-                        <td>${row.dateStr}</td>
+                        <td>${row.month}월차<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
                         <td class="number">${formatNumber(row.assetBefore)}</td>
                         <td class="number" style="color: var(--accent-success);">${formatNumber(row.profit)}</td>
-                        <td class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}</td>
-                        <td class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermCumulativeProfit)}</td>
-                        <td class="number">${formatNumber(row.longTermAccumulated)} <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span></td>
-                        <td class="number">${formatNumber(row.assetAfter)}</td>
+                        <td>
+                            <div class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}</div>
+                            <input type="number" class="actual-input" placeholder="실제 단기 수익"
+                                value="${displayShort}"
+                                onchange="setActual(${row.month}, 'shortTerm', this.value)"
+                                style="margin-top:5px;">
+                        </td>
+                        <td class="number col-short-cumul" style="${shortCumulStyle} color: var(--accent-warning);">${formatNumber(row.shortTermCumulativeProfit)}</td>
+                        <td>
+                            <div class="number">${formatNumber(row.longTermAccumulated)} <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span></div>
+                            <input type="number" class="actual-input" placeholder="실제 장기 누적"
+                                value="${displayLongCumul}"
+                                onchange="setActual(${row.month}, 'longTermCumul', this.value)"
+                                style="margin-top:5px;">
+                        </td>
+                        <td class="number">${formatNumber(row.assetAfter)}${achievementHtml}</td>
                     </tr>
                 `;
             }).join('');
@@ -805,6 +899,7 @@
             // 초기 자산 분할
             const longTermPrincipal = principal * normalizedLongTerm;
             const shortTermPrincipal = principal * normalizedShortTerm;
+            longTermPrincipalGlobal = longTermPrincipal;
             
             const months = getMonthsDifference(startDate, endDate);
             
@@ -918,11 +1013,12 @@
                 endDate: document.getElementById('endDate').value,
                 longTermRatio: document.getElementById('longTermRatio').value,
                 longTermAnnualTarget: document.getElementById('longTermAnnualTarget').value,
-                shortTermRatio: document.getElementById('shortTermRatio').value
+                shortTermRatio: document.getElementById('shortTermRatio').value,
+                actualValues: actualValues
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
         }
-        
+
         // 로컬스토리지에서 복원
         function loadFromLocalStorage() {
             const saved = localStorage.getItem(STORAGE_KEY);
@@ -937,6 +1033,7 @@
                     document.getElementById('longTermRatio').value = config.longTermRatio || 60;
                     document.getElementById('longTermAnnualTarget').value = config.longTermAnnualTarget || 10;
                     document.getElementById('shortTermRatio').value = config.shortTermRatio || 40;
+                    if (config.actualValues) actualValues = config.actualValues;
                 } catch (error) {
                     console.error('로컬스토리지 복원 실패:', error);
                 }
@@ -954,6 +1051,7 @@
                 longTermRatio: document.getElementById('longTermRatio').value,
                 longTermAnnualTarget: document.getElementById('longTermAnnualTarget').value,
                 shortTermRatio: document.getElementById('shortTermRatio').value,
+                actualValues: actualValues,
                 timestamp: new Date().toISOString()
             };
             
@@ -992,7 +1090,8 @@
                         document.getElementById('longTermRatio').value = config.longTermRatio;
                         document.getElementById('longTermAnnualTarget').value = config.longTermAnnualTarget;
                         document.getElementById('shortTermRatio').value = config.shortTermRatio;
-                        
+                        if (config.actualValues) actualValues = config.actualValues;
+
                         // 계산 재실행
                         calculateAndDisplay();
                         
