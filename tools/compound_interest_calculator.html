@@ -840,7 +840,7 @@
                 const actualEndAssetDisplay = (row.actualEndAsset !== undefined && row.actualEndAsset !== null)
                     ? row.actualEndAsset
                     : (row.assetBefore + row.monthlyInvest + actualTotalProfit);
-                const rateColor = rate >= 100 ? 'var(--accent-success)' : rate >= 80 ? 'var(--accent-warning)' : '#ef4444';
+                const rateColor = rate >= 100 ? 'var(--accent-primary)' : '#ef4444';
                 const achievementHtml = ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>`;
 
                 // 실제 입력값 기준 단기 누적 수익금 계산 (1월차 ~ 현재월 합산)
@@ -857,7 +857,7 @@
                 // A: 단기 목표 대비(실제 단기 수익 ÷ 필요 단기 수익)로 달성률 계산
                 const shortAchievePercent = row.shortTermProfit > 0 ? (effectiveShort / row.shortTermProfit) * 100 : 0;
                 const shortAchievePercentFixed = shortAchievePercent.toFixed(1);
-                const shortAchieveColor = shortAchievePercent >= 100 ? 'var(--accent-success)' : shortAchievePercent >= 80 ? 'var(--accent-warning)' : '#ef4444';
+                const shortAchieveColor = shortAchievePercent >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 // 장기 필요 수익금(이번월)
                 const longTermRequiredProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
@@ -877,16 +877,14 @@
                     if (longTermCurrentRate < 0) longTermCurrentRate = 0;
                 }
                 const longTermCurrentRateFixed = longTermCurrentRate.toFixed(1);
-                const longTermRateColor = longTermCurrentRate >= 100 ? 'var(--accent-success)' : longTermCurrentRate >= 80 ? 'var(--accent-warning)' : '#ef4444';
+                const longTermRateColor = longTermCurrentRate >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 return `
                     <tr ${row.highlight ? 'class="highlight-row"' : ''}>
                         <td>${row.month}월차<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
                         <td class="number">
-                            <span style="font-size:9px;">${formatNumber(actualEndAssetDisplay)}</span>
-                            <div style="margin-top:10px; color: var(--text-secondary); font-size:10px;">                                
-                                <span style="color:var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(row.assetBefore)}</span>
-                            </div>
+                            ${formatNumber(row.assetBefore)}
+                            ${idx > 0 ? `<div style="color: var(--text-secondary); font-size:10px; margin-top:4px;"><span style="color:var(--text-primary); font-family:'Monaco','Courier New',monospace; font-weight:700; font-size:11px;">${formatNumber(allTableRows[idx - 1].assetAfter)}</span></div>` : ''}
                         </td>
                         <td class="number" style="color: var(--accent-success);">
                             ${formatNumber(row.profit)}
