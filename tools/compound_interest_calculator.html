@@ -829,19 +829,18 @@
                 const displayShortInput = actualShort !== null ? actualShort : '';
                 const displayLongCumulInput = actualLongCumul !== null ? actualLongCumul : '';
 
-                // 달성율 계산 (항상 표시)
-                // longTermAccumulated = 이전누적 + 재투자금 + 수익 이므로, 수익만 비교하려면 재투자금 제외
+                // 실제 입력값이 하나라도 있을 때만 달성율/실제자산 계산
+                const hasActualInput = actualShort !== null || actualLongCumul !== null;
                 const effectiveShort = actualShort !== null ? actualShort : row.shortTermProfit;
                 const effectiveLongCumul = actualLongCumul !== null ? actualLongCumul : row.longTermAccumulated;
                 const actualLongProfit = effectiveLongCumul - prevLongTermAccumulated - row.longTermInvest;
                 const actualTotalProfit = effectiveShort + actualLongProfit;
-                const rate = row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : 0;
-                // 만약 calculateAndDisplay에서 실제 종료자산을 계산해 두었다면 그것을 표시용으로 사용
-                const actualEndAssetDisplay = (row.actualEndAsset !== undefined && row.actualEndAsset !== null)
-                    ? row.actualEndAsset
-                    : (row.assetBefore + row.monthlyInvest + actualTotalProfit);
-                const rateColor = rate >= 100 ? 'var(--accent-primary)' : '#ef4444';
-                const achievementHtml = ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>`;
+                const rate = hasActualInput && row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : null;
+                const actualEndAssetDisplay = hasActualInput
+                    ? (row.assetBefore + row.monthlyInvest + actualTotalProfit)
+                    : null;
+                const rateColor = rate !== null && rate >= 100 ? 'var(--accent-primary)' : '#ef4444';
+                const achievementHtml = rate !== null ? ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>` : '';
 
                 // 실제 입력값 기준 단기 누적 수익금 계산 (1월차 ~ 현재월 합산)
                 let actualShortCumulative = 0;
@@ -854,10 +853,10 @@
 
                 // 초기 투자금 + 단기 누적 합계
                 const shortInitPlusCumul = shortTermPrincipalGlobal + actualShortCumulative;
-                // A: 단기 목표 대비(실제 단기 수익 ÷ 필요 단기 수익)로 달성률 계산
-                const shortAchievePercent = row.shortTermProfit > 0 ? (effectiveShort / row.shortTermProfit) * 100 : 0;
-                const shortAchievePercentFixed = shortAchievePercent.toFixed(1);
-                const shortAchieveColor = shortAchievePercent >= 100 ? 'var(--accent-primary)' : '#ef4444';
+                // 단기 달성률: 실제 단기 입력이 있을 때만 계산
+                const shortAchievePercent = (actualShort !== null && row.shortTermProfit > 0) ? (actualShort / row.shortTermProfit) * 100 : null;
+                const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
+                const shortAchieveColor = shortAchievePercent !== null && shortAchievePercent >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 // 장기 필요 수익금(이번월)
                 const longTermRequiredProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
@@ -876,7 +875,7 @@
                     }
                     if (longTermCurrentRate < 0) longTermCurrentRate = 0;
                 }
-                const longTermCurrentRateFixed = longTermCurrentRate.toFixed(1);
+                const longTermCurrentRateFixed = actualLongCumul !== null ? longTermCurrentRate.toFixed(1) : null;
                 const longTermRateColor = longTermCurrentRate >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 return `
@@ -904,7 +903,7 @@
                             <div style="color: var(--text-secondary); margin-top: 3px;">
                                 <span style="font-size:9px;">초기 투자금 + 누적</span><br>
                                 <span class="number" style="font-size:11px; color: var(--text-primary);">${formatNumber(shortInitPlusCumul)}</span>
-                                <span style="font-size:11px; color:${shortAchieveColor}; margin-left:6px;">(${shortAchievePercentFixed}%)</span>
+                                ${shortAchievePercentFixed !== null ? `<span style="font-size:11px; color:${shortAchieveColor}; margin-left:6px;">(${shortAchievePercentFixed}%)</span>` : ''}
                             </div>
                         </td>
                         <td>
@@ -918,15 +917,16 @@
                                     style="margin-top:5px;"
                                 >
                                 
-                                <span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;">(${longTermCurrentRateFixed}%)</span>
+                                ${longTermCurrentRateFixed !== null ? `<span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;">(${longTermCurrentRateFixed}%)</span>` : ''}
                             </div>
                         </td>
                         <td class="number">
                             <div>${formatNumber(row.assetAfter)}${achievementHtml}</div>
+                            ${actualEndAssetDisplay !== null ? `
                             <div style="color: var(--text-secondary); margin-top:6px;">
                                 <span style="font-size:9px;">실제 자산</span><br>
                                 <span style="color:var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
-                            </div>
+                            </div>` : ''}
                         </td>
                     </tr>
                 `;
