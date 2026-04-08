@@ -350,6 +350,11 @@
             background: rgba(16, 185, 129, 0.08);
             font-weight: 600;
         }
+
+        .current-month-row {
+            background: rgba(0, 217, 255, 0.07);
+            outline: 1px solid rgba(0, 217, 255, 0.25);
+        }
         
         @media (max-width: 768px) {
             .dashboard {
@@ -817,6 +822,9 @@
         function renderTableByYear(year) {
             const tableBody = document.getElementById('tableBody');
             const rows = yearGroups[year] || [];
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;
 
             tableBody.innerHTML = rows.map(row => {
                 const idx = row.month - 1;
@@ -883,9 +891,16 @@
                 const longTermCurrentRateFixed = actualLongCumul !== null ? longTermCurrentRate.toFixed(1) : null;
                 const longTermRateColor = longTermCurrentRateFixed !== null && parseFloat(longTermCurrentRateFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
+                const isCurrentMonth = row.year === currentYear && (() => {
+                    const d = new Date(document.getElementById('startDate').value);
+                    d.setMonth(d.getMonth() + row.month - 1);
+                    return d.getFullYear() === currentYear && (d.getMonth() + 1) === currentMonth;
+                })();
+                const rowClass = row.highlight ? 'highlight-row' : isCurrentMonth ? 'current-month-row' : '';
+
                 return `
-                    <tr ${row.highlight ? 'class="highlight-row"' : ''}>
-                        <td>${row.month}월차<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
+                    <tr ${rowClass ? `class="${rowClass}"` : ''}>
+                        <td>${row.month}월차${isCurrentMonth ? ' <span style="color:var(--accent-primary); font-size:10px;">◀ 현재</span>' : ''}<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
                         <td>
                             <div style="font-size:9px; color:var(--text-secondary); margin-bottom:2px;">목표</div>
                             <div class="number">${formatNumber(idx === 0 ? row.assetBefore : allTableRows[idx - 1].assetAfter)}</div>
@@ -950,13 +965,15 @@
         function createYearTabs() {
             const yearTabs = document.getElementById('yearTabs');
             const years = Object.keys(yearGroups).sort((a, b) => a - b);
-            
-            yearTabs.innerHTML = years.map((year, index) => `
-                <button class="tab ${index === 0 ? 'active' : ''}" data-year="${year}">
+            const currentYear = new Date().getFullYear();
+            const defaultYear = years.includes(String(currentYear)) ? currentYear : parseInt(years[0]);
+
+            yearTabs.innerHTML = years.map(year => `
+                <button class="tab ${parseInt(year) === defaultYear ? 'active' : ''}" data-year="${year}">
                     ${year}년
                 </button>
             `).join('');
-            
+
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', function() {
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -964,6 +981,8 @@
                     renderTableByYear(parseInt(this.dataset.year));
                 });
             });
+
+            return defaultYear;
         }
         
         function calculateAndDisplay() {
@@ -1115,9 +1134,8 @@
                 ratioDisplayEl.textContent = (normalizedLongTerm * 100).toFixed(0) + '% / ' + (normalizedShortTerm * 100).toFixed(0) + '%';
             }
             
-            createYearTabs();
-            const firstYear = Object.keys(yearGroups).sort((a, b) => a - b)[0];
-            renderTableByYear(parseInt(firstYear));
+            const defaultYear = createYearTabs();
+            renderTableByYear(defaultYear);
         }
         
         // 로컬스토리지 키
