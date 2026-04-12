@@ -667,7 +667,10 @@
                 </div>
                 
                 <div class="input-group">
-                    <label class="input-label">월 재투자 금액</label>
+                    <label class="input-label">
+                        월 재투자 금액
+                        <span style="font-size: 10px; color: var(--accent-primary); font-weight: normal; margin-left: 4px;">(매월 25일 입금)</span>
+                    </label>
                     <div class="input-wrapper">
                         <input type="number" id="monthlyInvestment" value="5000000" min="0">
                         <span class="unit">원</span>
@@ -737,9 +740,13 @@
             
             <!-- 월별 상세 테이블 -->
             <div class="card table-card">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
                     <h2 style="margin-bottom:0; padding-bottom:0; border-bottom:none;">📋 월별 투자 수익 상세</h2>
                     <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적 숨기기</button>
+                </div>
+                
+                <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 20px; padding: 10px; background: rgba(0, 217, 255, 0.05); border-radius: 8px; border: 1px solid rgba(0, 217, 255, 0.1); line-height: 1.5;">
+                    💡 <strong>결산 가이드:</strong> 재투자 금액은 <strong>매월 25일</strong>에 입금된다고 가정합니다. 따라서 추가된 투자금이 반영된 <strong>월말(말일 장 마감 후)</strong>에 <code>[실제 단기 수익]</code>과 <code>[실제 장기 누적]</code>을 입력하셔야 정확한 성과 추적이 가능합니다.
                 </div>
 
                 <div class="tab-container">
@@ -1028,18 +1035,22 @@
                 const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
                 const shortAchieveColor = shortAchievePercentFixed !== null && parseFloat(shortAchievePercentFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
-                // 장기 필요 수익금(이번월) — 시뮬레이션 기준
-                const longTermRequiredProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
-                // 장기 실제 달성률 — 목표 누적 대비 실제 누적 비율
-                let longTermCurrentRate = 0;
+                // 장기 실제 달성률 — 목표 수익(수익금) 대비 실제 수익 비율로 변경
+                let longTermProfitRate = null;
+                const longTermTargetProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
                 if (actualLongCumul !== null && !isNaN(Number(actualLongCumul))) {
                     const actualLongCumulNum = Number(actualLongCumul);
-                    longTermCurrentRate = row.longTermAccumulated > 0
-                        ? (actualLongCumulNum / row.longTermAccumulated) * 100
-                        : 0;
+                    // 실제 수익 = 현재 잔액 - 이전 잔액 - 재투자금
+                    const longTermActualProfit = actualLongCumulNum - prevActualLongAccum - row.longTermInvest;
+                    
+                    if (longTermTargetProfit > 0) {
+                        longTermProfitRate = (longTermActualProfit / longTermTargetProfit) * 100;
+                    } else {
+                        longTermProfitRate = longTermActualProfit >= 0 ? 100 : 0;
+                    }
                 }
-                const longTermCurrentRateFixed = actualLongCumul !== null ? longTermCurrentRate.toFixed(1) : null;
-                const longTermRateColor = longTermCurrentRateFixed !== null && parseFloat(longTermCurrentRateFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
+                const longTermRateDisplay = longTermProfitRate !== null ? longTermProfitRate.toFixed(1) : null;
+                const longTermRateColor = longTermRateDisplay !== null && parseFloat(longTermRateDisplay) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
                 const isCurrentMonth = row.year === currentYear && (() => {
                     const d = new Date(document.getElementById('startDate').value);
@@ -1090,13 +1101,13 @@
                                 <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span>                                
                             </div>
                             <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
-                                <input type="number" class="actual-input" placeholder="실제 장기 누적"
+                                <input type="number" class="actual-input" placeholder="실제 장기 잔액 총액"
                                     value="${displayLongCumulInput}"
                                     onchange="setActual(${row.month}, 'longTermCumul', this.value)"
                                     style="margin-top:5px;"
                                 >
                                 
-                                ${longTermCurrentRateFixed !== null ? `<span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;">(${longTermCurrentRateFixed}%)</span>` : ''}
+                                ${longTermRateDisplay !== null ? `<span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;" title="장기 수익 달성률">(${longTermRateDisplay}%)</span>` : ''}
                             </div>
                         </td>
                         <td class="number">
