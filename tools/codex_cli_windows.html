@@ -375,8 +375,8 @@ code {
     <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
   </div>
   <div class="meta">
-    <span class="meta-version">v0.118.0</span>
-    <span style="font-size:10px;color:var(--muted2);">2026-04-05</span>
+    <span class="meta-version">v0.120.0</span>
+    <span style="font-size:10px;color:var(--muted2);">2026-04-11</span>
     <button class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
   </div>
 </div>
@@ -384,16 +384,19 @@ code {
 <div class="changelog-wrap">
   <div class="changelog-toggle" id="clToggle" onclick="toggleCL()">
     <span class="arrow" id="clArrow">▶</span>
-    <span>📋 최근 변경사항 (v0.116.0–0.118.0)</span>
+    <span>📋 최근 변경사항 (v0.119.0–120.0)</span>
   </div>
   <div class="changelog-body" id="clBody">
     <ul>
-      <li><code>Codex CLI 0.118.0</code> — Windows sandbox 프록시 전용 네트워크 규칙 강화 (2026-03-31)</li>
-      <li><code>codex exec</code> — 프롬프트 + stdin 파이프 조합 지원 <span class="badge-new">NEW</span></li>
-      <li>단기 bearer token 기반 커스텀 모델 프로바이더 인증 갱신 지원 <span class="badge-new">NEW</span></li>
-      <li>플러그인 지원 도입: <code>.codex-plugin/plugin.json</code>, skills, MCP, app 매핑 번들화</li>
-      <li><code>GPT-5.4 mini</code> — 가벼운 탐색/서브에이전트용 고속 모델 추가</li>
-      <li>웹 검색 기본값이 <code>cached</code> 모드로 유지, 필요 시 <code>--search</code>로 live 전환</li>
+      <li><code>Codex 0.120.0</code> — Realtime V2 백그라운드 에이전트 진행상황 스트리밍 지원 (2026-04-11)</li>
+      <li>TUI 내 훅 활동 표시 개선 — 실행 중 / 완료 훅 분리 표시 <span class="badge-new">NEW</span></li>
+      <li>TUI 상태줄에 스레드 제목 포함 가능 (configurable status line)</li>
+      <li>Code-mode 도구 선언에 MCP <code>outputSchema</code> 말단 상세 정보 포함</li>
+      <li><code>/resume</code> 명령어로 TUI에서 ID 및 이름으로 세션 직접 이동 가능 (v0.119.0)</li>
+      <li>Realtime 음성 세션 v2 WebRTC 경로 기본 적용 (v0.119.0)</li>
+      <li>MCP Apps 서버: 리소스 읽기·보다 풍부한 툴 지원 (v0.119.0)</li>
+      <li>Windows 샌드박스 스플릿 파일시스템 정접 관련 버그 수정 (v0.120.0)</li>
+      <li>업그레이드: <code>npm i -g @openai/codex@latest</code></li>
     </ul>
   </div>
 </div>

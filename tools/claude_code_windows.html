@@ -399,7 +399,7 @@ code {
 <!-- TOP BANNER -->
 <div class="top-banner">
   <span class="win-badge">⊞ WINDOWS</span>
-  <span>Claude Code 치트시트 — Windows 단축키 버전 &nbsp;·&nbsp; v2.1.91 &nbsp;·&nbsp; 2026년 4월</span>
+  <span>Claude Code 치트시트 — Windows 단축키 버전 &nbsp;·&nbsp; v2.1.107 &nbsp;·&nbsp; 2026년 4월</span>
 </div>
 
 <!-- PAGE HEADER -->
@@ -410,9 +410,9 @@ code {
   </div>
   <div class="meta">
     <!-- ✏️ [1] 버전 번호 수정 -->
-    <span class="meta-version">v2.1.91</span>
+    <span class="meta-version">v2.1.107</span>
     <!-- ✏️ [2] 날짜 수정 (YYYY-MM-DD) -->
-    <span style="font-size:10px;color:var(--muted2);">2026-04-04</span>
+    <span style="font-size:10px;color:var(--muted2);">2026-04-14</span>
     <button class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
   </div>
 </div>
@@ -443,17 +443,23 @@ code {
   <div class="changelog-toggle" id="clToggle" onclick="toggleCL()">
     <span class="arrow" id="clArrow">▶</span>
     <!-- ✏️ [3] 버전 범위 레이블 수정 -->
-    <span>📋 최근 변경사항 (v2.1.89–91)</span>
+    <span>📋 최근 변경사항 (v2.1.92–107)</span>
   </div>
   <div class="changelog-body" id="clBody">
     <ul>
       <!-- ✏️ [4] 최신 항목을 여기 위쪽에 추가, 오래된 항목은 아래로 밀거나 삭제 -->
-      <li>MCP <code>maxResultSizeChars</code> 어노테이션 — 최대 500K 결과 (v2.1.91)</li>
-      <li><code>disableSkillShellExecution</code> 설정 추가 (v2.1.91)</li>
-      <li>Plugin <code>bin/</code> 실행 파일을 Bash에서 호출 가능 (v2.1.91)</li>
-      <li>Edit 도구: 짧은 <code>old_string</code> 앵커 → 토큰 절약 (v2.1.91)</li>
-      <li><code>/powerup</code> — 데모 포함 인터랙티브 기능 학습 (v2.1.90)</li>
-      <li>PreToolUse 훅에서 <code>"defer"</code> 권한 결정 지원 (v2.1.89)</li>
+      <li>긴 작업 중 thinking 힌트를 더 빠르게 표시 (v2.1.107)</li>
+      <li><code>EnterWorktree</code> 도구에 <code>path</code> 파라미터 추가 — 기존 워크트리로 전환 가능 (v2.1.105)</li>
+      <li>PreCompact 훅 지원 추가 — 컴팩션 차단 가능 (exit 2 또는 <code>{"decision":"block"}</code>) (v2.1.105)</li>
+      <li>플러그인 <code>monitors</code> manifest 키로 백그라운드 모니터 지원 (v2.1.105)</li>
+      <li><code>/proactive</code> 가 <code>/loop</code> 의 별칭으로 추가 (v2.1.105)</li>
+      <li><code>/team-onboarding</code> 명령어 추가 — 팀원 온보딩 가이드 생성 (v2.1.101)</li>
+      <li>OS CA 인증서 스토어 기본 신뢰 추가 — 엔터프라이즈 TLS 프록시 추가 설정 불필요 (v2.1.101)</li>
+      <li>기본 노력 수준이 API키·Bedrock·Vertex·Enterprise 사용자는 <code>medium</code>에서 <code>high</code>로 변경 (v2.1.94)</li>
+      <li>Amazon Bedrock Mantle 지원 (<code>CLAUDE_CODE_USE_MANTLE=1</code>) (v2.1.94)</li>
+      <li>대화형 Google Vertex AI 설정 마법사 추가 (v2.1.98)</li>
+      <li><code>/vim</code> 명령어 제거됨 — Vim 모드는 <code>/config</code> → Editor mode에서 설정 (v2.1.92)</li>
+      <li><code>/tag</code> 명령어 제거됨 (v2.1.92)</li>
       <!-- ✏️ [4] 여기까지 -->
     </ul>
   </div>
