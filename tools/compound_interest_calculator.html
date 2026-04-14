@@ -1136,10 +1136,10 @@
                         <td class="number">
                             <div>${formatNumber(row.assetAfter)}${achievementHtml}</div>
                             ${actualEndAssetDisplay !== null ? `
-                            <div style="color: var(--text-secondary); margin-top:6px;">
-                                <span style="font-size:9px;">실제 자산</span><br>
-                                <span style="color:var(--text-primary); font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
-                            </div>` : ''}
+                            <div style="margin-top:6px;">
+                                <span style="color:${actualEndAssetDisplay >= row.assetAfter ? 'var(--accent-primary)' : '#ef4444'}; font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
+                            </div>
+                            <div style="margin-top:8px; font-family: 'Monaco', 'Courier New', monospace; font-size:11px; color:var(--text-secondary);">${formatNumber(row.initialAssetAfter)}(초기 목표)</div>` : ''}
                         </td>
                     </tr>
                 `;
@@ -1234,6 +1234,7 @@
             let runningShortPrincipal = shortTermPrincipal; // 단기 누적 원금
             let shortTermCumulativeProfitTotal = 0; // 단기 누적 수익금
             let carryAssetForNextMonth = null; // 이전달 실제 자산을 다음달 월초로 사용
+            let cleanCurrentAsset = principal; // 초기 목표 순수 시뮬레이션용 (실제값 미반영)
 
             for (let month = 1; month <= months; month++) {
                 const currentDate = new Date(startObj);
@@ -1276,6 +1277,12 @@
                 // 월말 자산(시뮬레이션)
                 currentAsset = assetAtMonthStart + monthlyInvestment + monthlyProfitDynamic;
 
+                // 초기 목표 순수 시뮬레이션 (실제 입력값 미반영 — 비교용 기준값)
+                const cleanLongProfit = cleanCurrentAsset * normalizedLongTerm * longTermMonthlyRate;
+                const cleanShortProfit = cleanCurrentAsset * normalizedShortTerm * shortTermMonthlyRequired;
+                const initialAssetAfter = cleanCurrentAsset + monthlyInvestment + cleanLongProfit + cleanShortProfit;
+                cleanCurrentAsset = initialAssetAfter;
+
                 // 실제 입력값이 있으면 이번달 실제 종료 자산을 계산하여 다음달 이월 자산으로 사용
                 const actualShort = actualValues[month]?.shortTerm ?? null;
                 const actualLongCumul = actualValues[month]?.longTermCumul ?? null;
@@ -1303,6 +1310,7 @@
                     longTermAccumulated: longTermAccumulated,
                     longTermPrincipal: runningLongPrincipal,
                     assetAfter: currentAsset,
+                    initialAssetAfter: initialAssetAfter,
                     actualEndAsset: ((actualShort !== null && !isNaN(Number(actualShort))) || (actualLongCumul !== null && !isNaN(Number(actualLongCumul)))) ? actualEndAsset : null,
                     highlight: month === months,
                     year: year

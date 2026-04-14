@@ -1,45 +1,11 @@
-<!--
-=======================================================================
-  CLAUDE CODE 치트시트 — 업데이트 소스 참조
-=======================================================================
-
-  이 파일의 내용을 최신 버전으로 갱신할 때 아래 소스를 참고하세요.
-
-  ① [공식] Claude Code 문서 & 체인지로그
-      https://code.claude.com/docs/en/changelog
-      → 최신 릴리스 노트 (기능 추가·버그픽스·설정 변경) 1차 소스
-
-  ② [공식] GitHub CHANGELOG.md (가장 상세, 전 버전)
-      https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md
-      → 모든 버전의 상세 패치노트 (176+ 버전 기록)
-
-  ③ [공식] GitHub Releases 페이지
-      https://github.com/anthropics/claude-code/releases
-      → 버전별 태그, 릴리스 날짜 확인용
-
-  ④ [참고] 원본 치트시트 사이트 (이 파일의 기반)
-      https://cc.storyfox.cz/
-      → 이 파일을 클론한 원본, 자주 최신 내용으로 갱신됨
-
-  ⑤ [참고] Claude Code 비공식 정리 체인지로그
-      https://claudelog.com/claude-code-changelog/
-      https://claudefa.st/blog/guide/changelog
-
-  갱신 절차:
-    1. ①②를 열어 새 버전 내용 확인
-    2. 헤더의 버전·날짜 수정  (아래 ✏️ [1][2] 주석 위치)
-    3. 체인지로그 토글 목록 수정  (아래 ✏️ [3][4] 주석 위치)
-    4. 새 단축키·명령·플래그 등 본문 섹션 내용 업데이트
-
-=======================================================================
--->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Claude Code Cheat Sheet — Windows</title>
+<title>AI 치트시트 — Claude Code &amp; Codex CLI</title>
 <style>
+/* ─── BASE VARIABLES ─── */
 :root {
   --bg: #fafaf8;
   --surface: #ffffff;
@@ -48,19 +14,14 @@
   --text: #1a1a18;
   --muted: #6b6b65;
   --muted2: #9b9b93;
-  --accent: #d4500a;
-  --accent-bg: #fff4ef;
   --new-bg: #ecfdf5;
   --new-text: #059669;
   --new-border: #a7f3d0;
   --code-bg: #f4f4f0;
   --code-border: #deded8;
-  --section-icon: #d4500a;
   --kbd-bg: #f0f0ea;
   --kbd-border: #c8c8c0;
   --kbd-shadow: #a8a8a0;
-  --header-bg: #1a1a18;
-  --header-text: #fafaf8;
   --win-blue: #0078d4;
 }
 
@@ -76,8 +37,8 @@ body {
 
 /* ─── TOP BANNER ─── */
 .top-banner {
-  background: var(--header-bg);
-  color: var(--header-text);
+  background: #1a1a18;
+  color: #fafaf8;
   padding: 4px 16px;
   font-size: 11px;
   display: flex;
@@ -85,7 +46,6 @@ body {
   justify-content: center;
   gap: 8px;
 }
-.top-banner a { color: #93c5fd; text-decoration: none; }
 .win-badge {
   background: var(--win-blue);
   color: #fff;
@@ -96,9 +56,74 @@ body {
   letter-spacing: 0.5px;
 }
 
+/* ─── TAB BAR ─── */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 2px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 0;
+  padding: 0 8px;
+}
+.tab-btn {
+  padding: 7px 22px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.claude-tab.active { color: #d4500a; border-bottom-color: #d4500a; }
+.tab-btn.codex-tab.active  { color: #0f766e; border-bottom-color: #0f766e; }
+.tab-ver {
+  font-size: 9px;
+  font-weight: 400;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: var(--muted2);
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+}
+.tab-spacer { flex: 1; }
+.print-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--muted);
+  align-self: center;
+  margin-left: 4px;
+}
+.print-btn:hover { background: var(--code-bg); }
+
+/* ─── TAB PANES ─── */
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* ─── PER-PANE ACCENT COLORS ─── */
+.claude-pane { --accent: #d4500a; --accent-bg: #fff4ef; --section-icon: #d4500a; }
+.codex-pane  { --accent: #0f766e; --accent-bg: #ecfeff; --section-icon: #0f766e; }
+.claude-pane code { color: #c2410c; }
+.codex-pane  code { color: #0f766e; }
+
 /* ─── PAGE HEADER ─── */
 .page-header {
-  padding: 6px 16px 6px;
+  padding: 6px 16px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -130,19 +155,6 @@ body {
   font-size: 10px;
   color: var(--text);
 }
-.print-btn {
-  background: transparent;
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  padding: 2px 8px;
-  font-size: 11px;
-  cursor: pointer;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-.print-btn:hover { background: var(--code-bg); }
 
 /* ─── CHANGELOG TOGGLE ─── */
 .changelog-wrap {
@@ -160,7 +172,8 @@ body {
   color: var(--accent);
   font-weight: 600;
 }
-.changelog-toggle:hover { background: rgba(212,80,10,0.05); }
+.claude-pane .changelog-toggle:hover { background: rgba(212,80,10,0.05); }
+.codex-pane  .changelog-toggle:hover { background: rgba(15,118,110,0.06); }
 .changelog-toggle .arrow {
   font-size: 9px;
   transition: transform 0.2s;
@@ -175,7 +188,8 @@ body {
 }
 .changelog-body.open { display: block; }
 .changelog-body ul { padding-left: 14px; display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
-.changelog-body code { font-family: 'Cascadia Code','Consolas',monospace; font-size: 10px; background: rgba(212,80,10,0.08); padding: 0 3px; border-radius: 2px; color: var(--accent); }
+.claude-pane .changelog-body code { font-family: 'Cascadia Code','Consolas',monospace; font-size: 10px; background: rgba(212,80,10,0.08); padding: 0 3px; border-radius: 2px; color: var(--accent); }
+.codex-pane  .changelog-body code { font-family: 'Cascadia Code','Consolas',monospace; font-size: 10px; background: rgba(15,118,110,0.08); padding: 0 3px; border-radius: 2px; color: var(--accent); }
 
 /* ─── MAIN LAYOUT ─── */
 .main {
@@ -184,8 +198,6 @@ body {
   gap: 0;
   border-top: 1px solid var(--border);
 }
-
-/* ─── SECTION ─── */
 .section {
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -194,7 +206,6 @@ body {
 .section:last-child { border-right: none; }
 .section.wide { grid-column: span 2; }
 .section.full { grid-column: span 3; border-right: none; }
-
 .section-title {
   font-size: 10px;
   font-weight: 700;
@@ -208,8 +219,6 @@ body {
   padding-bottom: 5px;
   border-bottom: 1px solid var(--border);
 }
-
-/* ─── SUB GROUPS ─── */
 .group { margin-bottom: 8px; }
 .group:last-child { margin-bottom: 0; }
 .group-label {
@@ -220,8 +229,6 @@ body {
   color: var(--muted2);
   margin-bottom: 3px;
 }
-
-/* ─── ROWS ─── */
 .row {
   display: flex;
   align-items: baseline;
@@ -242,7 +249,18 @@ body {
   flex: 1;
 }
 
-/* ─── KBD KEYS ─── */
+/* ─── CODE ─── */
+code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 0px 4px;
+  white-space: nowrap;
+}
+
+/* ─── KBD ─── */
 kbd {
   display: inline-flex;
   align-items: center;
@@ -260,22 +278,7 @@ kbd {
   white-space: nowrap;
   line-height: 1.6;
 }
-kbd.wide { padding: 0px 7px; }
-kbd.win { background: #e8f4fd; border-color: #90caf9; border-bottom-color: #64b5f6; color: var(--win-blue); }
-
 .plus { font-size: 9px; color: var(--muted2); margin: 0 1px; }
-
-/* ─── CODE ─── */
-code {
-  font-family: 'Cascadia Code', 'Consolas', monospace;
-  font-size: 10px;
-  background: var(--code-bg);
-  border: 1px solid var(--code-border);
-  border-radius: 3px;
-  padding: 0px 4px;
-  color: #c2410c;
-  white-space: nowrap;
-}
 
 /* ─── BADGES ─── */
 .badge-new {
@@ -304,23 +307,6 @@ code {
   vertical-align: middle;
   margin-left: 2px;
 }
-
-/* ─── MULTI-COL INSIDE SECTION ─── */
-.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
-.cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 14px; }
-
-/* ─── PERMISSION MODE FOOTER ─── */
-.footer-modes {
-  border-top: 1px solid var(--border);
-  padding: 6px 16px;
-  font-size: 10.5px;
-  color: var(--muted);
-  line-height: 1.6;
-}
-.footer-modes strong { color: var(--text); }
-.footer-modes code { font-size: 9.5px; }
-
-/* ─── WIN OS BADGE INLINE ─── */
 .os-note {
   display: inline-flex;
   align-items: center;
@@ -334,7 +320,11 @@ code {
   margin-left: 3px;
 }
 
-/* ─── COMPACT KBD ROWS (keyboard section) ─── */
+/* ─── MULTI-COL ─── */
+.cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0 14px; }
+
+/* ─── KBD ROWS (Claude keyboard section) ─── */
 .krow {
   display: flex;
   align-items: baseline;
@@ -349,136 +339,117 @@ code {
   flex-shrink: 0;
   min-width: 86px;
 }
-.kkey kbd {
-  font-size: 9px;
-  padding: 0px 3px;
-  min-width: 16px;
-  line-height: 1.55;
-}
-.kdesc {
+.kkey kbd { font-size: 9px; padding: 0px 3px; min-width: 16px; line-height: 1.55; }
+.kdesc { font-size: 10.5px; color: var(--muted); flex: 1; }
+
+/* ─── FOOTER ─── */
+.footer-modes {
+  border-top: 1px solid var(--border);
+  padding: 6px 16px;
   font-size: 10.5px;
   color: var(--muted);
-  flex: 1;
+  line-height: 1.6;
 }
+.footer-modes strong { color: var(--text); }
+.footer-modes code { font-size: 9.5px; }
 
-/* ─── RESPONSIVE LAYOUT (mobile / tablet) ─── */
+/* ─── RESPONSIVE ─── */
 @media (max-width: 1024px) {
   .main { grid-template-columns: repeat(2, 1fr); }
   .section.wide { grid-column: span 2; }
   .section.full { grid-column: span 2; }
   .cols3 { grid-template-columns: 1fr 1fr; }
 }
-
 @media (max-width: 700px) {
-  .page-header { padding: 10px 12px; align-items: flex-start; }
-  .page-header h1 { font-size: 15px; }
-  .meta { justify-content: flex-start; gap: 8px; }
-  .top-banner { padding: 8px 12px; font-size: 12px; }
+  .tab-btn { padding: 6px 12px; font-size: 12px; }
   .main { grid-template-columns: 1fr; }
   .section.wide, .section.full { grid-column: span 1; }
   .cols3, .cols2 { grid-template-columns: 1fr; }
   .section { padding: 10px 10px 12px; }
-  .row { flex-wrap: wrap; }
-  .row-key { min-width: 0; margin-right: 8px; }
-  .row-desc { flex-basis: 100%; margin-top: 4px; }
-  .kkey { min-width: 0; }
-  kbd { font-size: 11px; padding: 2px 6px; }
-  code { white-space: normal; word-break: break-word; }
-  .cols2 { gap: 12px; }
 }
-
 @media print {
-  .top-banner, .print-btn { display: none; }
+  .top-banner, .tab-bar { display: none; }
+  .tab-pane { display: block !important; }
+  .tab-pane:not(.active) { display: none !important; }
   .main { break-inside: avoid; }
   .section { break-inside: avoid; }
 }
+
+/* ─── CUSTOM TOOLTIP ─── */
+.cl-tip { position: relative; cursor: default; }
+.cl-tip::after { content: ' ℹ'; font-size: 9px; color: var(--accent); opacity: 0.55; }
+#cl-tooltip {
+  display: none; position: fixed; z-index: 9999; max-width: 340px;
+  background: #1c1c1a; color: #e8e8e2; border: 1px solid #3a3a38;
+  border-radius: 7px; padding: 10px 13px; font-size: 11px; line-height: 1.55;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.4); pointer-events: none;
+}
+#cl-tooltip .tt-title { font-weight:700; font-size:12px; margin-bottom:5px; color:#fcd34d; }
+#cl-tooltip .tt-example {
+  margin-top:6px; background:#2a2a28; border-radius:4px; padding:5px 8px;
+  font-family:'Cascadia Code','Consolas',monospace; font-size:10px; color:#86efac; white-space:pre;
+}
+#cl-tooltip .tt-label { font-size:9px; color:#9ca3af; margin-top:5px; }
 </style>
 </head>
 <body>
 
-<!-- TOP BANNER -->
+<!-- SHARED TOP BANNER -->
 <div class="top-banner">
   <span class="win-badge">⊞ WINDOWS</span>
-  <span>Claude Code 치트시트 — Windows 단축키 버전 &nbsp;·&nbsp; v2.1.107 &nbsp;·&nbsp; 2026년 4월</span>
+  <span>AI 코딩 도구 치트시트 — Claude Code &amp; Codex CLI · Windows 기준</span>
 </div>
 
-<!-- PAGE HEADER -->
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn claude-tab active" data-tab="claude" onclick="switchTab('claude')">
+    🤖 Claude Code <span class="tab-ver">v2.1.107</span>
+  </button>
+  <button class="tab-btn codex-tab" data-tab="codex" onclick="switchTab('codex')">
+    ⬡ Codex CLI <span class="tab-ver">v0.120.0</span>
+  </button>
+  <div class="tab-spacer"></div>
+  <button class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  CLAUDE CODE PANE                             -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="tab-claude" class="tab-pane claude-pane active">
+
 <div class="page-header">
   <div style="display:flex;align-items:center;gap:10px;">
     <h1>Claude Code <span>Cheat Sheet</span></h1>
     <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
   </div>
   <div class="meta">
-    <!-- ✏️ [1] 버전 번호 수정 -->
     <span class="meta-version">v2.1.107</span>
-    <!-- ✏️ [2] 날짜 수정 (YYYY-MM-DD) -->
     <span style="font-size:10px;color:var(--muted2);">2026-04-14</span>
-    <button class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
   </div>
 </div>
 
-<!-- CHANGELOG TOGGLE -->
-<!--
-  ====================================================
-  ✏️  최근 변경사항 갱신 방법
-  ====================================================
-  1. 버전 번호 (헤더 meta-version):
-       아래 <span class="meta-version"> 안의 텍스트를 수정하세요.
-       예: v2.1.91 → v2.2.0
-
-  2. 날짜 (헤더 날짜):
-       아래 날짜 span 안의 텍스트를 수정하세요.
-       예: 2026-04-04 → 2026-05-01
-
-  3. 토글 버튼 버전 범위 레이블:
-       <span>📋 최근 변경사항 (v?.??.??–??) </span> 부분을 수정하세요.
-
-  4. 변경사항 목록 (<ul> 안):
-       - 최신 항목을 <li> 맨 위에 추가하세요.
-       - 오래된 항목은 아래로 밀거나 삭제하세요.
-       - 형식: <li><code>항목명</code> — 설명 (vX.X.XX)</li>
-  ====================================================
--->
 <div class="changelog-wrap">
-  <div class="changelog-toggle" id="clToggle" onclick="toggleCL()">
-    <span class="arrow" id="clArrow">▶</span>
-    <!-- ✏️ [3] 버전 범위 레이블 수정 -->
+  <div class="changelog-toggle" onclick="toggleCL(this)">
+    <span class="arrow">▶</span>
     <span>📋 최근 변경사항 (v2.1.92–107)</span>
   </div>
-  <div class="changelog-body" id="clBody">
+  <div class="changelog-body">
     <ul>
-      <!-- ✏️ [4] 최신 항목을 여기 위쪽에 추가, 오래된 항목은 아래로 밀거나 삭제 -->
-      <li>긴 작업 중 thinking 힌트를 더 빠르게 표시 (v2.1.107)</li>
-      <li><code>EnterWorktree</code> 도구에 <code>path</code> 파라미터 추가 — 기존 워크트리로 전환 가능 (v2.1.105)</li>
-      <li>PreCompact 훅 지원 추가 — 컴팩션 차단 가능 (exit 2 또는 <code>{"decision":"block"}</code>) (v2.1.105)</li>
-      <li>플러그인 <code>monitors</code> manifest 키로 백그라운드 모니터 지원 (v2.1.105)</li>
-      <li><code>/proactive</code> 가 <code>/loop</code> 의 별칭으로 추가 (v2.1.105)</li>
-      <li><code>/team-onboarding</code> 명령어 추가 — 팀원 온보딩 가이드 생성 (v2.1.101)</li>
-      <li>OS CA 인증서 스토어 기본 신뢰 추가 — 엔터프라이즈 TLS 프록시 추가 설정 불필요 (v2.1.101)</li>
-      <li>기본 노력 수준이 API키·Bedrock·Vertex·Enterprise 사용자는 <code>medium</code>에서 <code>high</code>로 변경 (v2.1.94)</li>
-      <li>Amazon Bedrock Mantle 지원 (<code>CLAUDE_CODE_USE_MANTLE=1</code>) (v2.1.94)</li>
-      <li>대화형 Google Vertex AI 설정 마법사 추가 (v2.1.98)</li>
-      <li><code>/vim</code> 명령어 제거됨 — Vim 모드는 <code>/config</code> → Editor mode에서 설정 (v2.1.92)</li>
-      <li><code>/tag</code> 명령어 제거됨 (v2.1.92)</li>
-      <!-- ✏️ [4] 여기까지 -->
+      <li class="cl-tip" data-tt-title="thinking 힌트 조기 표시 (v2.1.107)" data-tt-desc="확장 사고 중 긴 작업에서 상태 힌트가 훨씬 빠르게 나타납니다. 응답 대기 중 상태를 더 빨리 확인할 수 있습니다." data-tt-example="">긴 작업 중 thinking 힌트를 더 빠르게 표시 (v2.1.107)</li>
+      <li class="cl-tip" data-tt-title="EnterWorktree path 파라미터 (v2.1.105)" data-tt-desc="path 파라미터가 추가되어 새 워크트리 생성 없이 기존 워크트리로 바로 전환할 수 있습니다." data-tt-example="/worktree switch --path ./feature-branch"><code>EnterWorktree</code> 도구에 <code>path</code> 파라미터 추가 — 기존 워크트리로 전환 가능 (v2.1.105)</li>
+      <li class="cl-tip" data-tt-title="PreCompact 훅 지원 (v2.1.105)" data-tt-desc="컴팩션 직전에 훅을 실행합니다. exit 2 또는 JSON decision:block으로 컴팩션을 차단할 수 있습니다." data-tt-example="{&quot;hooks&quot;:{&quot;PreCompact&quot;:[{&quot;command&quot;:&quot;./check.sh&quot;}]}}">PreCompact 훅 지원 추가 — 컴팩션 차단 가능 (exit 2 또는 <code>{"decision":"block"}</code>) (v2.1.105)</li>
+      <li class="cl-tip" data-tt-title="플러그인 백그라운드 모니터 (v2.1.105)" data-tt-desc="manifest의 monitors 키로 세션 시작 시 백그라운드 스크립트를 자동 실행합니다. 파일 감시·알림에 활용합니다." data-tt-example="{&quot;monitors&quot;:[&quot;./monitor.sh&quot;]}">플러그인 <code>monitors</code> manifest 키로 백그라운드 모니터 지원 (v2.1.105)</li>
+      <li class="cl-tip" data-tt-title="/proactive 별칭 (v2.1.105)" data-tt-desc="/proactive 는 /loop 의 별칭입니다. 두 이름 모두 동일하게 동작합니다." data-tt-example="/proactive 5m check the deploy"><code>/proactive</code> 가 <code>/loop</code> 의 별칭으로 추가 (v2.1.105)</li>
+      <li class="cl-tip" data-tt-title="/team-onboarding (v2.1.101)" data-tt-desc="현재 프로젝트의 Claude Code 사용 패턴을 분석해 신규 팀원용 온보딩 가이드를 자동 생성합니다." data-tt-example="/team-onboarding"><code>/team-onboarding</code> 명령어 추가 — 팀원 온보딩 가이드 생성 (v2.1.101)</li>
+      <li class="cl-tip" data-tt-title="OS CA 인증서 기본 신뢰 (v2.1.101)" data-tt-desc="시스템에 설치된 CA 인증서를 자동 신뢰합니다. TLS 인터셉팅 프록시 환경에서도 별도 설정 없이 동작합니다." data-tt-example="CLAUDE_CODE_CERT_STORE=bundled claude">OS CA 인증서 스토어 기본 신뢰 추가 — 엔터프라이즈 TLS 프록시 추가 설정 불필요 (v2.1.101)</li>
+      <li class="cl-tip" data-tt-title="기본 effort high로 상향 (v2.1.94)" data-tt-desc="API키·Bedrock·Vertex·Team·Enterprise 사용자의 기본 effort가 medium → high로 변경됐습니다. /effort 명령으로 조정 가능합니다." data-tt-example="/effort medium  # 속도 우선&#10;/effort high    # 새 기본값">기본 노력 수준이 API키·Bedrock·Vertex·Enterprise 사용자는 <code>medium</code>에서 <code>high</code>로 변경 (v2.1.94)</li>
+      <li class="cl-tip" data-tt-title="/vim 제거 (v2.1.92)" data-tt-desc="/vim 명령어가 제거됐습니다. Vim 모드는 /config → Editor mode에서 설정합니다." data-tt-example="/config  # → Editor mode → Vim"><code>/vim</code> 명령어 제거됨 — Vim 모드는 <code>/config</code> → Editor mode에서 설정 (v2.1.92)</li>
     </ul>
   </div>
 </div>
-<script>
-function toggleCL() {
-  const body = document.getElementById('clBody');
-  const arrow = document.getElementById('clArrow');
-  const toggle = document.getElementById('clToggle');
-  const open = body.classList.toggle('open');
-  toggle.classList.toggle('open', open);
-  arrow.textContent = open ? '▼' : '▶';
-}
-</script>
 
-<!-- MAIN GRID -->
 <div class="main">
 
-  <!-- 🔧 스킬 & 에이전트 -->
   <div class="section">
     <div class="section-title">🔧 스킬 &amp; 에이전트</div>
     <div class="group">
@@ -509,7 +480,6 @@ function toggleCL() {
     </div>
   </div>
 
-  <!-- 🖥️ CLI & 플래그 -->
   <div class="section wide">
     <div class="section-title">🖥️ CLI &amp; 플래그</div>
     <div class="cols2">
@@ -532,7 +502,7 @@ function toggleCL() {
         </div>
         <div class="group">
           <div class="group-label">에이전트 프론트매터</div>
-          <div class="row"><div class="row-key"><code>permissionMode</code></div><div class="row-desc">default/acceptEdits/plan/dontAsk/bypass</div></div>
+          <div class="row"><div class="row-key"><code>permissionMode</code></div><div class="row-desc">default/acceptEdits/plan/bypass</div></div>
           <div class="row"><div class="row-key"><code>isolation: worktree</code></div><div class="row-desc">git 워크트리에서 실행</div></div>
           <div class="row"><div class="row-key"><code>memory:</code></div><div class="row-desc">user|project|local 영구 메모리</div></div>
           <div class="row"><div class="row-key"><code>background: true</code></div><div class="row-desc">백그라운드 태스크</div></div>
@@ -570,12 +540,9 @@ function toggleCL() {
     </div>
   </div>
 
-  <!-- ⌨️ 키보드 단축키 -->
   <div class="section" style="padding:14px 16px 16px;">
     <div class="section-title">⌨️ 키보드 단축키</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
-
-      <!-- 왼쪽 열 -->
       <div>
         <div class="group">
           <div class="group-label">일반 제어</div>
@@ -585,14 +552,11 @@ function toggleCL() {
           <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>O</kbd></div><div class="kdesc">상세 출력 전환</div></div>
           <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div><div class="kdesc">히스토리 검색</div></div>
           <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>G</kbd></div><div class="kdesc">프롬프트 편집기 열기</div></div>
-          <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>X</kbd><kbd>E</kbd></div><div class="kdesc">편집기 열기 (별칭)</div></div>
           <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>B</kbd></div><div class="kdesc">백그라운드 실행</div></div>
           <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>T</kbd></div><div class="kdesc">태스크 목록 전환</div></div>
           <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>V</kbd></div><div class="kdesc">이미지 붙여넣기</div></div>
-          <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>X</kbd><kbd>K</kbd></div><div class="kdesc">백그라운드 에이전트 종료</div></div>
           <div class="krow"><div class="kkey"><kbd>Esc</kbd><kbd>Esc</kbd></div><div class="kdesc">되감기 / 요약</div></div>
         </div>
-
         <div class="group">
           <div class="group-label">모드 전환</div>
           <div class="krow"><div class="kkey"><kbd>Shift</kbd><span class="plus">+</span><kbd>Tab</kbd></div><div class="kdesc">권한 모드 순환</div></div>
@@ -601,8 +565,6 @@ function toggleCL() {
           <div class="krow"><div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>O</kbd></div><div class="kdesc">빠른 모드 <span class="badge-new">NEW</span></div></div>
         </div>
       </div>
-
-      <!-- 오른쪽 열 -->
       <div>
         <div class="group">
           <div class="group-label">입력</div>
@@ -612,7 +574,6 @@ function toggleCL() {
           <div class="krow"><div class="kkey"><kbd>!</kbd></div><div class="kdesc">직접 Bash 실행</div></div>
           <div class="krow"><div class="kkey"><kbd>@</kbd></div><div class="kdesc">파일 자동완성</div></div>
         </div>
-
         <div class="group">
           <div class="group-label">세션 선택기</div>
           <div class="krow"><div class="kkey"><kbd>↑</kbd><kbd>↓</kbd></div><div class="kdesc">탐색</div></div>
@@ -620,23 +581,17 @@ function toggleCL() {
           <div class="krow"><div class="kkey"><kbd>P</kbd></div><div class="kdesc">미리보기</div></div>
           <div class="krow"><div class="kkey"><kbd>R</kbd></div><div class="kdesc">이름 변경</div></div>
           <div class="krow"><div class="kkey"><kbd>/</kbd></div><div class="kdesc">검색</div></div>
-          <div class="krow"><div class="kkey"><kbd>A</kbd></div><div class="kdesc">전체 프로젝트</div></div>
-          <div class="krow"><div class="kkey"><kbd>B</kbd></div><div class="kdesc">현재 브랜치</div></div>
         </div>
-
         <div class="group">
           <div class="group-label">트랜스크립트 (Ctrl+O)</div>
           <div class="krow"><div class="kkey"><kbd>/</kbd></div><div class="kdesc">검색</div></div>
           <div class="krow"><div class="kkey"><kbd>N</kbd> / <kbd>⇧N</kbd></div><div class="kdesc">다음/이전</div></div>
-          <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>E</kbd></div><div class="kdesc">전체 보기 전환</div></div>
           <div class="krow"><div class="kkey"><kbd>Q</kbd> / <kbd>Esc</kbd></div><div class="kdesc">종료</div></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- ⚡ 슬래시 명령어 -->
   <div class="section wide">
     <div class="section-title">⚡ 슬래시 명령어</div>
     <div class="cols3">
@@ -663,7 +618,7 @@ function toggleCL() {
           <div class="row"><div class="row-key"><code>/vim</code></div><div class="row-desc">Vim 모드 전환</div></div>
           <div class="row"><div class="row-key"><code>/theme</code></div><div class="row-desc">컬러 테마 변경</div></div>
           <div class="row"><div class="row-key"><code>/permissions</code></div><div class="row-desc">권한 보기/수정</div></div>
-          <div class="row"><div class="row-key"><code>/effort [level]</code></div><div class="row-desc">노력 수준 설정 (low/med/high/max/auto)</div></div>
+          <div class="row"><div class="row-key"><code>/effort [level]</code></div><div class="row-desc">노력 수준 설정 (low/med/high/max)</div></div>
           <div class="row"><div class="row-key"><code>/color [color]</code></div><div class="row-desc">프롬프트 바 색상 설정</div></div>
           <div class="row"><div class="row-key"><code>/keybindings</code></div><div class="row-desc">키보드 단축키 커스텀</div></div>
           <div class="row"><div class="row-key"><code>/terminal-setup</code></div><div class="row-desc">터미널 키바인딩 설정</div></div>
@@ -712,7 +667,6 @@ function toggleCL() {
     </div>
   </div>
 
-  <!-- 🔌 MCP 서버 -->
   <div class="section">
     <div class="section-title">🔌 MCP 서버</div>
     <div class="group">
@@ -725,7 +679,6 @@ function toggleCL() {
       <div class="group-label">스코프</div>
       <div class="row"><div class="row-key"><code>~/.claude.json</code></div><div class="row-desc">로컬 (본인만)</div></div>
       <div class="row"><div class="row-key"><code>.mcp.json</code></div><div class="row-desc">프로젝트 (VCS 공유)</div></div>
-      <div class="row"><div class="row-key"><code>~/.claude.json</code></div><div class="row-desc">사용자 (전체 프로젝트)</div></div>
     </div>
     <div class="group">
       <div class="group-label">관리</div>
@@ -733,15 +686,8 @@ function toggleCL() {
       <div class="row"><div class="row-key"><code>claude mcp list</code></div><div class="row-desc">전체 서버 목록</div></div>
       <div class="row"><div class="row-key"><code>claude mcp serve</code></div><div class="row-desc">CC를 MCP 서버로 실행</div></div>
     </div>
-    <div class="group">
-      <div class="group-label">추가 정보</div>
-      <div class="row"><div class="row-desc">Elicitation — 서버가 작업 중 입력 요청</div></div>
-      <div class="row"><div class="row-desc">도구 설명 + 서버 지침 2KB 제한</div></div>
-      <div class="row"><div class="row-desc"><code>maxResultSizeChars</code> <code>_meta</code>로 500K까지 <span class="badge-new">NEW</span></div></div>
-    </div>
   </div>
 
-  <!-- 🧠 워크플로 & 팁 -->
   <div class="section wide">
     <div class="section-title">🧠 워크플로 &amp; 팁</div>
     <div class="cols3">
@@ -755,42 +701,18 @@ function toggleCL() {
           <div class="group-label">Thinking &amp; Effort</div>
           <div class="row"><div class="row-key"><kbd>Alt</kbd><span class="plus">+</span><kbd>T</kbd></div><div class="row-desc">사고 모드 켜기/끄기</div></div>
           <div class="row"><div class="row-key"><code>ultrathink</code></div><div class="row-desc">해당 턴 최대 노력 모드</div></div>
-          <div class="row"><div class="row-key"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>O</kbd></div><div class="row-desc">사고 과정 보기 (verbose)</div></div>
           <div class="row"><div class="row-key"><code>/effort</code></div><div class="row-desc">○ low · ◐ medium · ● high · ★ max</div></div>
         </div>
         <div class="group">
-          <div class="group-label">Auto Mode Denied</div>
-          <div class="row"><div class="row-desc"><code>/permissions</code> → Recent &nbsp;<span class="badge-new">NEW</span></div></div>
-          <div class="row"><div class="row-desc">거부된 권한 재시도 (R)</div></div>
-        </div>
-      </div>
-      <div>
-        <div class="group">
           <div class="group-label">Git Worktrees</div>
           <div class="row"><div class="row-key"><code>--worktree name</code></div><div class="row-desc">기능별 격리 브랜치</div></div>
-          <div class="row"><div class="row-key"><code>isolation: worktree</code></div><div class="row-desc">에이전트 전용 워크트리</div></div>
           <div class="row"><div class="row-key"><code>sparsePaths</code></div><div class="row-desc">필요한 디렉터리만 체크아웃</div></div>
           <div class="row"><div class="row-key"><code>/batch</code></div><div class="row-desc">워크트리 자동 생성</div></div>
-        </div>
-        <div class="group">
-          <div class="group-label">Voice Mode</div>
-          <div class="row"><div class="row-key"><code>/voice</code></div><div class="row-desc">음성 입력 활성화</div></div>
-          <div class="row"><div class="row-key"><kbd>Space</kbd> (길게)</div><div class="row-desc">녹음 → 놓으면 전송</div></div>
-          <div class="row"><div class="row-desc">20개 언어 (EN, KO, ES, FR, DE…)</div></div>
-        </div>
-        <div class="group">
-          <div class="group-label">Context 관리</div>
-          <div class="row"><div class="row-key"><code>/context</code></div><div class="row-desc">사용량 + 최적화 팁</div></div>
-          <div class="row"><div class="row-key"><code>/compact [focus]</code></div><div class="row-desc">포커스 지정 압축</div></div>
-          <div class="row"><div class="row-desc">자동 압축 ~95% 시 <span class="badge-new">NEW</span></div></div>
-          <div class="row"><div class="row-desc">Opus 4.6 — 1M 컨텍스트 지원</div></div>
-          <div class="row"><div class="row-desc">CLAUDE.md 압축 후에도 유지!</div></div>
         </div>
       </div>
       <div>
         <div class="group">
           <div class="group-label">세션 파워 무브</div>
-          <div class="row"><div class="row-key"><code>claude -c</code></div><div class="row-desc">마지막 대화 이어가기</div></div>
           <div class="row"><div class="row-key"><code>claude -r "name"</code></div><div class="row-desc">이름으로 세션 재개</div></div>
           <div class="row"><div class="row-key"><code>/btw question</code></div><div class="row-desc">컨텍스트 비용 없는 사이드 질문</div></div>
         </div>
@@ -805,38 +727,24 @@ function toggleCL() {
           <div class="group-label">스케줄링 &amp; 원격</div>
           <div class="row"><div class="row-key"><code>/loop 5m msg</code></div><div class="row-desc">반복 작업 예약</div></div>
           <div class="row"><div class="row-key"><code>/rc</code></div><div class="row-desc">원격 제어</div></div>
-          <div class="row"><div class="row-key"><code>--remote</code></div><div class="row-desc">claude.ai 웹 세션 연결</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">📁 메모리 &amp; 파일</div>
+          <div class="row"><div class="row-key"><code>./CLAUDE.md</code></div><div class="row-desc">프로젝트 (팀 공유)</div></div>
+          <div class="row"><div class="row-key"><code>~/.claude/CLAUDE.md</code></div><div class="row-desc">개인 (전체 프로젝트)</div></div>
+          <div class="row"><div class="row-key"><code>/etc/claude-code/</code></div><div class="row-desc">조직 관리 (Managed)</div></div>
+          <div class="row"><div class="row-key"><code>.claude/rules/*.md</code></div><div class="row-desc">프로젝트 규칙</div></div>
+          <div class="row"><div class="row-key"><code>~/.claude/rules/*.md</code></div><div class="row-desc">사용자 규칙</div></div>
+          <div class="row"><div class="row-key"><code>paths:</code></div><div class="row-desc">프론트매터 경로별 규칙</div></div>
+          <div class="row"><div class="row-key"><code>@path/to/file</code></div><div class="row-desc">CLAUDE.md에서 파일 임포트</div></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 📁 메모리 & 파일 -->
-  <div class="section">
-    <div class="section-title">📁 메모리 &amp; 파일</div>
-    <div class="group">
-      <div class="group-label">CLAUDE.md 위치</div>
-      <div class="row"><div class="row-key"><code>./CLAUDE.md</code></div><div class="row-desc">프로젝트 (팀 공유)</div></div>
-      <div class="row"><div class="row-key"><code>~/.claude/CLAUDE.md</code></div><div class="row-desc">개인 (전체 프로젝트)</div></div>
-      <div class="row"><div class="row-key"><code>/etc/claude-code/</code></div><div class="row-desc">조직 관리 (Managed)</div></div>
-    </div>
-    <div class="group">
-      <div class="group-label">규칙 &amp; 임포트</div>
-      <div class="row"><div class="row-key"><code>.claude/rules/*.md</code></div><div class="row-desc">프로젝트 규칙</div></div>
-      <div class="row"><div class="row-key"><code>~/.claude/rules/*.md</code></div><div class="row-desc">사용자 규칙</div></div>
-      <div class="row"><div class="row-key"><code>paths:</code></div><div class="row-desc">프론트매터 경로별 규칙</div></div>
-      <div class="row"><div class="row-key"><code>@path/to/file</code></div><div class="row-desc">CLAUDE.md에서 파일 임포트</div></div>
-    </div>
-    <div class="group">
-      <div class="group-label">자동 메모리</div>
-      <div class="row"><div class="row-desc"><code>~/.claude/projects/&lt;proj&gt;/memory/</code></div></div>
-      <div class="row"><div class="row-desc">MEMORY.md + 주제별 파일 자동 로드</div></div>
-      <div class="row"><div class="row-desc">최대 25KB / 200줄</div></div>
-    </div>
-  </div>
-
-  <!-- ⚙️ 설정 & 환경변수 -->
-  <div class="section wide">
+  <div class="section full">
     <div class="section-title">⚙️ 설정 &amp; 환경 변수</div>
     <div class="cols2">
       <div>
@@ -847,14 +755,11 @@ function toggleCL() {
           <div class="row"><div class="row-key"><code>.claude/settings.local.json</code></div><div class="row-desc">로컬 전용</div></div>
           <div class="row"><div class="row-key"><code>~/.claude.json</code></div><div class="row-desc">OAuth, MCP, 상태</div></div>
           <div class="row"><div class="row-key"><code>.mcp.json</code></div><div class="row-desc">프로젝트 MCP 서버</div></div>
-          <div class="row"><div class="row-key"><code>managed-settings.d/</code></div><div class="row-desc">드롭인 정책 조각</div></div>
         </div>
         <div class="group">
           <div class="group-label">핵심 설정 항목</div>
           <div class="row"><div class="row-key"><code>modelOverrides</code></div><div class="row-desc">모델 피커 → 커스텀 ID 매핑</div></div>
-          <div class="row"><div class="row-key"><code>autoMemoryDirectory</code></div><div class="row-desc">커스텀 메모리 디렉터리</div></div>
           <div class="row"><div class="row-key"><code>worktree.sparsePaths</code></div><div class="row-desc">스파스 체크아웃 경로</div></div>
-          <div class="row"><div class="row-key"><code>sandbox.failIfUnavailable</code></div><div class="row-desc">샌드박스 없으면 종료</div></div>
           <div class="row"><div class="row-key"><code>hooks: if</code></div><div class="row-desc">조건부 훅 (권한 규칙 문법)</div></div>
           <div class="row"><div class="row-key"><code>PermissionDenied</code></div><div class="row-desc">자동 모드 거부 훅 <span class="badge-new">NEW</span></div></div>
           <div class="row"><div class="row-key"><code>showThinkingSummaries</code></div><div class="row-desc">사고 요약 표시 (기본 off) <span class="badge-new">NEW</span></div></div>
@@ -882,34 +787,319 @@ function toggleCL() {
     </div>
   </div>
 
+</div><!-- /main (claude) -->
 
-</div><!-- /main -->
-
-<!-- FOOTER: PERMISSION MODES -->
 <div class="footer-modes">
   <strong>권한 모드:</strong>
   &nbsp;<code>default</code> 프롬프트 표시
   &nbsp;·&nbsp;<code>acceptEdits</code> 편집 자동 수락
   &nbsp;·&nbsp;<code>plan</code> 읽기 전용
-  &nbsp;·&nbsp;<code>dontAsk</code> 허용 목록 외 거부
   &nbsp;·&nbsp;<code>bypassPermissions</code> 전체 생략
   &nbsp;·&nbsp;<code>--dangerously-skip-permissions</code> CLI 플래그
   <br><br>
-  <strong>핵심 환경 변수:</strong>
-  &nbsp;<code>ANTHROPIC_API_KEY</code>
-  &nbsp;·&nbsp;<code>ANTHROPIC_MODEL</code>
-  &nbsp;·&nbsp;<code>CLAUDE_CODE_EFFORT_LEVEL</code> (low/medium/high/max/auto)
-  &nbsp;·&nbsp;<code>MAX_THINKING_TOKENS</code> (0=off)
-  &nbsp;·&nbsp;<code>CLAUDE_CODE_MAX_OUTPUT_TOKENS</code> (기본 32K)
-  &nbsp;·&nbsp;<code>CLAUDE_CODE_DISABLE_CRON</code>
-  &nbsp;·&nbsp;<code>CLAUDE_CODE_SUBPROCESS_ENV_SCRUB</code> (크리덴셜 제거)
-  &nbsp;·&nbsp;<code>CLAUDE_STREAM_IDLE_TIMEOUT_MS</code> (기본 90s)
-  &nbsp;·&nbsp;<code>CLAUDE_CODE_NO_FLICKER</code> (대체 화면)
-  <br><br>
   <div style="text-align:center;font-size:11px;color:var(--muted2);margin-top:4px;">
-    원본 참고: <a href="https://cc.storyfox.cz/" style="color:var(--accent);text-decoration:none;">cc.storyfox.cz</a> &nbsp;·&nbsp; Windows 버전 재구성
+    공식 참고: Anthropic Claude Code Docs · GitHub CHANGELOG.md · cc.storyfox.cz
   </div>
 </div>
 
+</div><!-- /tab-claude -->
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  CODEX CLI PANE                               -->
+<!-- ══════════════════════════════════════════════ -->
+<div id="tab-codex" class="tab-pane codex-pane">
+
+<div class="page-header">
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <h1>OpenAI <span>Codex Cheat Sheet</span></h1>
+    <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
+  </div>
+  <div class="meta">
+    <span class="meta-version">v0.120.0</span>
+    <span style="font-size:10px;color:var(--muted2);">2026-04-11</span>
+  </div>
+</div>
+
+<div class="changelog-wrap">
+  <div class="changelog-toggle" onclick="toggleCL(this)">
+    <span class="arrow">▶</span>
+    <span>📋 최근 변경사항 (v0.119.0–120.0)</span>
+  </div>
+  <div class="changelog-body">
+    <ul>
+      <li class="cl-tip" data-tt-title="Realtime V2 에이전트 스트리밍 (v0.120.0)" data-tt-desc="백그라운드 에이전트 작업 진행 상황을 실시간으로 스트리밍합니다. 완료 전에도 중간 결과를 확인할 수 있습니다." data-tt-example=""><code>Codex 0.120.0</code> — Realtime V2 백그라운드 에이전트 진행상황 스트리밍 지원 (2026-04-11)</li>
+      <li class="cl-tip" data-tt-title="TUI 훅 활동 표시 개선 (v0.120.0)" data-tt-desc="실행 중인 훅과 완료된 훅이 분리 표시됩니다. 완료된 훅 출력은 유용한 경우에만 유지되어 화면이 깔끔해집니다." data-tt-example="">TUI 내 훅 활동 표시 개선 — 실행 중 / 완료 훅 분리 표시 <span class="badge-new">NEW</span></li>
+      <li class="cl-tip" data-tt-title="TUI 상태줄 스레드 제목 (v0.120.0)" data-tt-desc="config.toml의 status_line에서 {thread_title} 변수로 현재 세션 제목을 상태줄에 표시할 수 있습니다." data-tt-example="# config.toml&#10;[tui]&#10;status_line = &quot;{thread_title} | {model}&quot;">TUI 상태줄에 스레드 제목 포함 가능 (configurable status line)</li>
+      <li class="cl-tip" data-tt-title="/resume ID·이름 지정 (v0.119.0)" data-tt-desc="TUI 내 /resume에 세션 ID나 이름을 직접 전달해 해당 세션으로 즉시 이동합니다." data-tt-example="/resume my-project-session&#10;/resume abc123def456"><code>/resume</code> 명령어로 TUI에서 ID 및 이름으로 세션 직접 이동 가능 (v0.119.0)</li>
+      <li class="cl-tip" data-tt-title="Realtime 음성 v2 WebRTC 기본값 (v0.119.0)" data-tt-desc="음성 세션이 v2 WebRTC 경로를 기본으로 사용합니다." data-tt-example="# config.toml&#10;[voice]&#10;transport = 'webrtc'">Realtime 음성 세션 v2 WebRTC 경로 기본 적용 (v0.119.0)</li>
+      <li class="cl-tip" data-tt-title="MCP Apps 리소스·툴 강화 (v0.119.0)" data-tt-desc="MCP 서버에서 리소스 읽기, 도구 메타데이터, 파일 파라미터 업로드 등을 지원합니다." data-tt-example="codex mcp add myserver -- http://localhost:8080">MCP Apps 서버: 리소스 읽기·보다 풍부한 툴 지원 (v0.119.0)</li>
+      <li class="cl-tip" data-tt-title="Windows 샌드박스 버그 수정 (v0.120.0)" data-tt-desc="Windows elevated 샌드박스에서 스플릿 파일시스템 정책과 심볼릭 링크가 있는 writable root 처리가 수정됐습니다." data-tt-example="">Windows 샌드박스 스플릿 파일시스템 관련 버그 수정 (v0.120.0)</li>
+      <li class="cl-tip" data-tt-title="Codex CLI 업그레이드" data-tt-desc="npm으로 전역 설치된 Codex CLI를 최신 버전으로 업그레이드합니다." data-tt-example="npm i -g @openai/codex@latest&#10;codex --version">업그레이드: <code>npm i -g @openai/codex@latest</code></li>
+    </ul>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="section wide">
+    <div class="section-title">🖥️ CLI &amp; 플래그</div>
+    <div class="cols2">
+      <div>
+        <div class="group">
+          <div class="group-label">핵심 명령</div>
+          <div class="row"><div class="row-key"><code>codex</code></div><div class="row-desc">대화형 TUI</div></div>
+          <div class="row"><div class="row-key"><code>codex exec "prompt"</code></div><div class="row-desc">비대화형 실행</div></div>
+          <div class="row"><div class="row-key"><code>codex exec resume --last</code></div><div class="row-desc">마지막 exec 세션 이어가기</div></div>
+          <div class="row"><div class="row-key"><code>codex resume --last</code></div><div class="row-desc">대화형 세션 재개</div></div>
+          <div class="row"><div class="row-key"><code>codex fork --last</code></div><div class="row-desc">최근 세션 포크</div></div>
+          <div class="row"><div class="row-key"><code>codex apply TASK_ID</code></div><div class="row-desc">Cloud task diff 로컬 적용</div></div>
+          <div class="row"><div class="row-key"><code>codex cloud list --json</code></div><div class="row-desc">최근 Cloud task 조회</div></div>
+          <div class="row"><div class="row-key"><code>codex mcp list</code></div><div class="row-desc">MCP 서버 목록</div></div>
+          <div class="row"><div class="row-key"><code>codex features list</code></div><div class="row-desc">기능 플래그 확인</div></div>
+          <div class="row"><div class="row-key"><code>codex completion powershell</code></div><div class="row-desc">PowerShell completion 생성</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">전역 플래그</div>
+          <div class="row"><div class="row-key"><code>--model</code></div><div class="row-desc">모델 강제 지정 (예: <code>gpt-5.4</code>)</div></div>
+          <div class="row"><div class="row-key"><code>--sandbox</code></div><div class="row-desc"><code>read-only</code> | <code>workspace-write</code></div></div>
+          <div class="row"><div class="row-key"><code>--ask-for-approval</code></div><div class="row-desc"><code>untrusted</code> | <code>on-request</code> | <code>never</code></div></div>
+          <div class="row"><div class="row-key"><code>--full-auto</code></div><div class="row-desc">Auto 프리셋</div></div>
+          <div class="row"><div class="row-key"><code>--yolo</code></div><div class="row-desc">승인/샌드박스 우회 <span class="badge-warn">위험</span></div></div>
+          <div class="row"><div class="row-key"><code>--search</code></div><div class="row-desc">웹 검색 live 모드 전환</div></div>
+          <div class="row"><div class="row-key"><code>--add-dir</code></div><div class="row-desc">추가 디렉터리 쓰기 권한</div></div>
+          <div class="row"><div class="row-key"><code>-c key=value</code></div><div class="row-desc">1회성 config override</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">exec / 자동화</div>
+          <div class="row"><div class="row-key"><code>codex exec -</code></div><div class="row-desc">stdin에서 프롬프트 읽기</div></div>
+          <div class="row"><div class="row-key"><code>cat spec.md | codex exec "Implement this"</code></div><div class="row-desc">프롬프트 + stdin 병행</div></div>
+          <div class="row"><div class="row-key"><code>--json</code></div><div class="row-desc">JSONL 이벤트 출력</div></div>
+          <div class="row"><div class="row-key"><code>--output-last-message out.txt</code></div><div class="row-desc">최종 응답 파일 저장</div></div>
+          <div class="row"><div class="row-key"><code>--output-schema schema.json</code></div><div class="row-desc">구조화 출력 검증</div></div>
+          <div class="row"><div class="row-key"><code>--skip-git-repo-check</code></div><div class="row-desc">Git 저장소 외부 실행 허용</div></div>
+          <div class="row"><div class="row-key"><code>--ephemeral</code></div><div class="row-desc">세션 상태를 디스크에 남기지 않음</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">MCP / App / Cloud</div>
+          <div class="row"><div class="row-key"><code>codex mcp add name -- url</code></div><div class="row-desc">stdio 또는 HTTP MCP 등록</div></div>
+          <div class="row"><div class="row-key"><code>codex mcp login name</code></div><div class="row-desc">OAuth형 MCP 로그인</div></div>
+          <div class="row"><div class="row-key"><code>codex mcp-server</code></div><div class="row-desc">Codex 자체를 MCP 서버로 실행</div></div>
+          <div class="row"><div class="row-key"><code>codex cloud exec --env ENV_ID</code></div><div class="row-desc">Cloud task 직접 제출</div></div>
+          <div class="row"><div class="row-key"><code>codex app</code></div><div class="row-desc">데스크톱 앱 실행</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">⚡ 슬래시 명령어</div>
+    <div class="group">
+      <div class="group-label">세션 제어</div>
+      <div class="row"><div class="row-key"><code>/clear</code></div><div class="row-desc">화면과 대화 초기화</div></div>
+      <div class="row"><div class="row-key"><code>/new</code></div><div class="row-desc">새 대화 시작</div></div>
+      <div class="row"><div class="row-key"><code>/resume</code></div><div class="row-desc">저장된 대화 재개</div></div>
+      <div class="row"><div class="row-key"><code>/fork</code></div><div class="row-desc">현재 대화 분기</div></div>
+      <div class="row"><div class="row-key"><code>/compact</code></div><div class="row-desc">컨텍스트 절약</div></div>
+      <div class="row"><div class="row-key"><code>/copy</code></div><div class="row-desc">마지막 응답 복사</div></div>
+      <div class="row"><div class="row-key"><code>/status</code></div><div class="row-desc">모델/권한/토큰 확인</div></div>
+      <div class="row"><div class="row-key"><code>/debug-config</code></div><div class="row-desc">config 레이어 진단</div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">작업 흐름</div>
+      <div class="row"><div class="row-key"><code>/plan</code></div><div class="row-desc">계획 모드 전환</div></div>
+      <div class="row"><div class="row-key"><code>/diff</code></div><div class="row-desc">Git diff 검토</div></div>
+      <div class="row"><div class="row-key"><code>/review</code></div><div class="row-desc">작업 트리 리뷰</div></div>
+      <div class="row"><div class="row-key"><code>/mention</code></div><div class="row-desc">파일/폴더 첨부</div></div>
+      <div class="row"><div class="row-key"><code>/agent</code></div><div class="row-desc">에이전트 스레드 전환</div></div>
+      <div class="row"><div class="row-key"><code>/ps</code></div><div class="row-desc">백그라운드 터미널 상태</div></div>
+      <div class="row"><div class="row-key"><code>/mcp</code></div><div class="row-desc">MCP 도구 목록</div></div>
+      <div class="row"><div class="row-key"><code>/apps</code></div><div class="row-desc">앱/커넥터 삽입</div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">설정 전환</div>
+      <div class="row"><div class="row-key"><code>/model</code></div><div class="row-desc">모델 및 추론 수준 변경</div></div>
+      <div class="row"><div class="row-key"><code>/fast</code></div><div class="row-desc">Fast mode on/off/status</div></div>
+      <div class="row"><div class="row-key"><code>/permissions</code></div><div class="row-desc">승인 정책 변경</div></div>
+      <div class="row"><div class="row-key"><code>/personality</code></div><div class="row-desc">friendly / pragmatic / none</div></div>
+      <div class="row"><div class="row-key"><code>/experimental</code></div><div class="row-desc">실험 기능 토글</div></div>
+      <div class="row"><div class="row-key"><code>/statusline</code></div><div class="row-desc">하단 상태줄 항목 구성</div></div>
+      <div class="row"><div class="row-key"><code>/logout</code></div><div class="row-desc">로그아웃</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🔐 보안 &amp; 샌드박스</div>
+    <div class="group">
+      <div class="group-label">추천 조합</div>
+      <div class="row"><div class="row-key"><code>--sandbox read-only -a on-request</code></div><div class="row-desc">안전한 브라우징/질의응답</div></div>
+      <div class="row"><div class="row-key"><code>--sandbox workspace-write -a untrusted</code></div><div class="row-desc">파일 편집 허용, 위험 명령 승인</div></div>
+      <div class="row"><div class="row-key"><code>--full-auto</code></div><div class="row-desc">로컬 자동화 프리셋</div></div>
+      <div class="row"><div class="row-key"><code>--yolo</code></div><div class="row-desc">완전 우회, 격리 환경에서만 <span class="badge-warn">위험</span></div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">네트워크 / 보호 경로</div>
+      <div class="row"><div class="row-key"><code>[sandbox_workspace_write]</code></div><div class="row-desc">세부 샌드박스 설정</div></div>
+      <div class="row"><div class="row-key"><code>web_search = "cached"</code></div><div class="row-desc">기본 검색 캐시 모드</div></div>
+      <div class="row"><div class="row-key"><code>web_search = "live"</code></div><div class="row-desc">실시간 검색 또는 <code>--search</code></div></div>
+    </div>
+  </div>
+
+  <div class="section wide">
+    <div class="section-title">⚙️ 설정 &amp; 파일</div>
+    <div class="cols2">
+      <div>
+        <div class="group">
+          <div class="group-label">주요 파일 위치</div>
+          <div class="row"><div class="row-key"><code>~/.codex/config.toml</code></div><div class="row-desc">사용자 기본 설정</div></div>
+          <div class="row"><div class="row-key"><code>.codex/config.toml</code></div><div class="row-desc">프로젝트별 설정</div></div>
+          <div class="row"><div class="row-key"><code>~/.codex/auth.json</code></div><div class="row-desc">파일 기반 인증 캐시</div></div>
+          <div class="row"><div class="row-key"><code>AGENTS.md</code></div><div class="row-desc">리포지토리 작업 지침</div></div>
+          <div class="row"><div class="row-key"><code>~/.codex/skills</code></div><div class="row-desc">사용자 스킬</div></div>
+          <div class="row"><div class="row-key"><code>.codex/skills</code></div><div class="row-desc">프로젝트 스킬</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">자주 바꾸는 옵션</div>
+          <div class="row"><div class="row-key"><code>model = "gpt-5.4"</code></div><div class="row-desc">기본 모델</div></div>
+          <div class="row"><div class="row-key"><code>approval_policy = "on-request"</code></div><div class="row-desc">승인 정책</div></div>
+          <div class="row"><div class="row-key"><code>sandbox_mode = "workspace-write"</code></div><div class="row-desc">샌드박스 정책</div></div>
+          <div class="row"><div class="row-key"><code>model_reasoning_effort = "high"</code></div><div class="row-desc">추론 강도</div></div>
+          <div class="row"><div class="row-key"><code>personality = "friendly"</code></div><div class="row-desc">응답 스타일</div></div>
+          <div class="row"><div class="row-key"><code>log_dir = "./.codex-log"</code></div><div class="row-desc">로그 저장 경로</div></div>
+          <div class="row"><div class="row-key"><code>cli_auth_credentials_store = "keyring"</code></div><div class="row-desc">인증 저장소</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">기능 플래그</div>
+          <div class="row"><div class="row-key"><code>[features]</code></div><div class="row-desc">옵션 기능 on/off</div></div>
+          <div class="row"><div class="row-key"><code>fast_mode = true</code></div><div class="row-desc">Fast mode</div></div>
+          <div class="row"><div class="row-key"><code>multi_agent = true</code></div><div class="row-desc">서브에이전트 협업</div></div>
+          <div class="row"><div class="row-key"><code>shell_snapshot = true</code></div><div class="row-desc">반복 명령 가속</div></div>
+          <div class="row"><div class="row-key"><code>smart_approvals = false</code></div><div class="row-desc">실험 기능</div></div>
+          <div class="row"><div class="row-key"><code>codex_hooks = false</code></div><div class="row-desc">훅 엔진 <span class="badge-new">실험</span></div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">플러그인 · MCP</div>
+          <div class="row"><div class="row-key"><code>.codex-plugin/plugin.json</code></div><div class="row-desc">플러그인 manifest</div></div>
+          <div class="row"><div class="row-key"><code>skills/</code></div><div class="row-desc">패키징된 스킬</div></div>
+          <div class="row"><div class="row-key"><code>.mcp.json</code></div><div class="row-desc">MCP 매핑</div></div>
+          <div class="row"><div class="row-key"><code>.app.json</code></div><div class="row-desc">App/connector 매핑</div></div>
+          <div class="row"><div class="row-key"><code>~/.codex/plugins/</code></div><div class="row-desc">사용자 스코프 플러그인</div></div>
+          <div class="row"><div class="row-key"><code>./plugins/</code></div><div class="row-desc">로컬 플러그인 디렉터리</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">⊞ Windows &amp; WSL</div>
+    <div class="group">
+      <div class="group-label">Windows 설정</div>
+      <div class="row"><div class="row-key"><code>[windows]</code></div><div class="row-desc">Windows 전용 섹션</div></div>
+      <div class="row"><div class="row-key"><code>sandbox = "elevated"</code></div><div class="row-desc">높은 권한 샌드박스 (권장)</div></div>
+      <div class="row"><div class="row-key"><code>sandbox = "unelevated"</code></div><div class="row-desc">일반 권한 대안</div></div>
+      <div class="row"><div class="row-key"><code>/sandbox-add-read-dir C:\path</code></div><div class="row-desc">Windows 읽기 경로 추가</div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">WSL 사용</div>
+      <div class="row"><div class="row-key"><code>wsl --install</code></div><div class="row-desc">WSL 설치</div></div>
+      <div class="row"><div class="row-key"><code>code .</code></div><div class="row-desc">WSL 터미널에서 VS Code 열기</div></div>
+      <div class="row"><div class="row-key"><code>npm i -g @openai/codex</code></div><div class="row-desc">WSL 안에서 Codex 설치</div></div>
+      <div class="row"><div class="row-key"><code>chatgpt.runCodexInWindowsSubsystemForLinux</code></div><div class="row-desc">VS Code WSL 설정</div></div>
+    </div>
+  </div>
+
+  <div class="section full">
+    <div class="section-title">🧠 모델 · 워크플로 · 빠른 시작</div>
+    <div class="cols3">
+      <div>
+        <div class="group">
+          <div class="group-label">모델 선택</div>
+          <div class="row"><div class="row-key"><code>gpt-5.4</code></div><div class="row-desc">대부분의 전문 작업용 기본 선택</div></div>
+          <div class="row"><div class="row-key"><code>gpt-5.4-mini</code></div><div class="row-desc">빠른 탐색, 경량 서브에이전트</div></div>
+          <div class="row"><div class="row-key"><code>gpt-5.3-codex-spark</code></div><div class="row-desc">실시간/초저지연 연구 프리뷰</div></div>
+          <div class="row"><div class="row-key"><code>codex --model gpt-5.4-mini</code></div><div class="row-desc">CLI에서 즉시 전환</div></div>
+          <div class="row"><div class="row-key"><code>/model</code></div><div class="row-desc">세션 중 모델 전환</div></div>
+          <div class="row"><div class="row-key"><code>/fast on</code></div><div class="row-desc">GPT-5.4 계열 빠른 경로</div></div>
+          <div class="row"><div class="row-key"><code>/fast status</code></div><div class="row-desc">현재 상태 확인</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">Cloud / 비동기</div>
+          <div class="row"><div class="row-key"><code>codex cloud exec --attempts 3</code></div><div class="row-desc">best-of-N 스타일 시도</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">권장 워크플로</div>
+          <div class="row"><div class="row-desc">1. 깨끗한 Git 상태에서 시작</div></div>
+          <div class="row"><div class="row-desc">2. <code>/plan</code> 또는 read-only로 먼저 방향 확인</div></div>
+          <div class="row"><div class="row-desc">3. Auto 또는 workspace-write로 구현</div></div>
+          <div class="row"><div class="row-desc">4. <code>/diff</code> 와 <code>/review</code> 로 검토</div></div>
+          <div class="row"><div class="row-desc">5. 테스트 후 커밋/PR 생성</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">운영 팁</div>
+          <div class="row"><div class="row-desc">API 키 자동화보다 로컬 사용은 ChatGPT 로그인 권장</div></div>
+          <div class="row"><div class="row-desc">원격/헤드리스 환경은 <code>--device-auth</code> 우선 검토</div></div>
+          <div class="row"><div class="row-desc">프로젝트 규칙은 <code>AGENTS.md</code> 와 <code>.codex/</code> 에 모음</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">설치 &amp; 로그인</div>
+          <div class="row"><div class="row-key"><code>npm i -g @openai/codex</code></div><div class="row-desc">Codex CLI 전역 설치</div></div>
+          <div class="row"><div class="row-key"><code>brew install --cask codex</code></div><div class="row-desc">macOS 대안 설치</div></div>
+          <div class="row"><div class="row-key"><code>npm i -g @openai/codex@latest</code></div><div class="row-desc">최신 버전 업그레이드</div></div>
+          <div class="row"><div class="row-key"><code>codex login</code></div><div class="row-desc">기본 브라우저 OAuth 로그인</div></div>
+          <div class="row"><div class="row-key"><code>codex login --device-auth</code></div><div class="row-desc">헤드리스/원격 장치용</div></div>
+          <div class="row"><div class="row-key"><code>printenv OPENAI_API_KEY | codex login --with-api-key</code></div><div class="row-desc">API 키 인증</div></div>
+          <div class="row"><div class="row-key"><code>codex login status</code></div><div class="row-desc">인증 상태 확인</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main (codex) -->
+
+<div class="footer-modes">
+  <strong>핵심 설정:</strong>
+  &nbsp;<code>model</code>
+  &nbsp;·&nbsp;<code>approval_policy</code>
+  &nbsp;·&nbsp;<code>sandbox_mode</code>
+  &nbsp;·&nbsp;<code>web_search</code>
+  &nbsp;·&nbsp;<code>model_reasoning_effort</code>
+  &nbsp;·&nbsp;<code>personality</code>
+  &nbsp;·&nbsp;<code>cli_auth_credentials_store</code>
+  <br><br>
+  <div style="text-align:center;font-size:11px;color:var(--muted2);margin-top:4px;">
+    공식 참고: OpenAI Developers Codex Docs · openai/codex GitHub · Codex Changelog
+  </div>
+</div>
+
+</div><!-- /tab-codex -->
+
+<script src="cheatsheet.js"></script>
+<script src="tooltips_claude.js"></script>
+<script src="tooltips_codex.js"></script>
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelector('[data-tab="' + tab + '"]').classList.add('active');
+  location.hash = tab === 'claude' ? '' : tab;
+}
+
+// URL hash support
+(function() {
+  if (location.hash === '#codex') switchTab('codex');
+})();
+
+// Scoped tooltip apply (sync, data pre-loaded via script tag)
+applyTooltips(window.CLAUDE_TIPS, document.getElementById('tab-claude'));
+applyTooltips(window.CODEX_TIPS, document.getElementById('tab-codex'));
+</script>
 </body>
 </html>
