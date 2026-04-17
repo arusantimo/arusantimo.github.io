@@ -753,6 +753,88 @@ kbd {
   </div>
 
   <div class="section full">
+    <div class="section-title">🪝 훅 (Hooks)</div>
+    <div class="cols3">
+      <div>
+        <div class="group">
+          <div class="group-label">훅 이벤트</div>
+          <div class="row"><div class="row-key"><code>PreToolCall</code></div><div class="row-desc">도구 실행 전 — exit 2로 차단 가능</div></div>
+          <div class="row"><div class="row-key"><code>PostToolCall</code></div><div class="row-desc">도구 실행 후 — 결과 처리·로그</div></div>
+          <div class="row"><div class="row-key"><code>PreCompact</code></div><div class="row-desc">컴팩션 직전 — exit 2로 차단 가능</div></div>
+          <div class="row"><div class="row-key"><code>Stop</code></div><div class="row-desc">응답 완료 시 — 후처리</div></div>
+          <div class="row"><div class="row-key"><code>Notification</code></div><div class="row-desc">알림 발생 시</div></div>
+          <div class="row"><div class="row-key"><code>PermissionDenied</code></div><div class="row-desc">권한 거부 시 — 자동화 처리</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">훅 파일 위치</div>
+          <div class="row"><div class="row-key"><code>~/.claude/settings.json</code></div><div class="row-desc">사용자 전체 적용</div></div>
+          <div class="row"><div class="row-key"><code>.claude/settings.json</code></div><div class="row-desc">프로젝트 공유</div></div>
+          <div class="row"><div class="row-key"><code>.claude/settings.local.json</code></div><div class="row-desc">로컬 전용</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">관리</div>
+          <div class="row"><div class="row-key"><code>/hooks</code></div><div class="row-desc">인터랙티브 훅 관리 UI</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">종료 코드 (Exit Code)</div>
+          <div class="row"><div class="row-key"><code>exit 0</code></div><div class="row-desc">성공 — 정상 진행</div></div>
+          <div class="row"><div class="row-key"><code>exit 2</code></div><div class="row-desc">차단 — 도구·컴팩션 실행 중단</div></div>
+          <div class="row"><div class="row-key">기타 exit</div><div class="row-desc">비차단 오류 — 진행은 허용</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">JSON 응답 (stdout)</div>
+          <div class="row"><div class="row-key"><code>{"decision":"block"}</code></div><div class="row-desc">실행 차단 (exit 2 대체 가능)</div></div>
+          <div class="row"><div class="row-key"><code>{"decision":"allow"}</code></div><div class="row-desc">실행 허용</div></div>
+          <div class="row"><div class="row-key"><code>{"reason":"..."}</code></div><div class="row-desc">Claude에게 전달할 차단 이유</div></div>
+          <div class="row"><div class="row-key"><code>{"stopReason":"..."}</code></div><div class="row-desc">Stop 훅 — 종료 이유 전달</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">조건부 훅 (if 필드)</div>
+          <div class="row"><div class="row-key"><code>tool_name</code></div><div class="row-desc">특정 도구만 적용</div></div>
+          <div class="row"><div class="row-key"><code>command_contains</code></div><div class="row-desc">Bash 명령 내용으로 필터</div></div>
+          <div class="row"><div class="row-key"><code>"defer"</code></div><div class="row-desc">헤드리스 일시정지 → 나중에 재개</div></div>
+        </div>
+        <div class="group">
+          <div class="group-label">환경 변수 (훅 내부 주입)</div>
+          <div class="row"><div class="row-key"><code>CLAUDE_TOOL_NAME</code></div><div class="row-desc">실행 도구 이름</div></div>
+          <div class="row"><div class="row-key"><code>CLAUDE_TOOL_INPUT</code></div><div class="row-desc">도구 입력 (JSON)</div></div>
+          <div class="row"><div class="row-key"><code>CLAUDE_TOOL_RESPONSE</code></div><div class="row-desc">도구 응답 (PostToolCall)</div></div>
+          <div class="row"><div class="row-key"><code>CLAUDE_SESSION_ID</code></div><div class="row-desc">현재 세션 ID</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="group">
+          <div class="group-label">설정 구조 예시</div>
+          <div class="row" style="display:block">
+            <code style="white-space:pre;font-size:9px;display:block;padding:6px 8px;line-height:1.5;border-radius:4px">{
+  "hooks": {
+    "PreToolCall": [{
+      "if": {"tool_name": "Bash"},
+      "command": "./audit.sh"
+    }],
+    "PostToolCall": [{
+      "command": "echo done >> log.txt"
+    }],
+    "PreCompact": [{
+      "command": "./save-summary.sh"
+    }],
+    "Stop": [{
+      "command": "notify.sh"
+    }],
+    "PermissionDenied": [{
+      "command": "./handle-deny.sh"
+    }]
+  }
+}</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section full">
     <div class="section-title">⚙️ 설정 &amp; 환경 변수</div>
     <div class="cols2">
       <div>
@@ -1017,6 +1099,45 @@ kbd {
       <div class="row"><div class="row-key"><code>code .</code></div><div class="row-desc">WSL 터미널에서 VS Code 열기</div></div>
       <div class="row"><div class="row-key"><code>npm i -g @openai/codex</code></div><div class="row-desc">WSL 안에서 Codex 설치</div></div>
       <div class="row"><div class="row-key"><code>chatgpt.runCodexInWindowsSubsystemForLinux</code></div><div class="row-desc">VS Code WSL 설정</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">⌨️ TUI 단축키</div>
+    <div class="group">
+      <div class="group-label">제어</div>
+      <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>C</kbd></div><div class="kdesc">실행 중단</div></div>
+      <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>D</kbd></div><div class="kdesc">종료</div></div>
+      <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div><div class="kdesc">히스토리 역방향 검색 <span class="badge-new">NEW</span></div></div>
+      <div class="krow"><div class="kkey"><kbd>Enter</kbd></div><div class="kdesc">전송</div></div>
+      <div class="krow"><div class="kkey"><kbd>Shift</kbd><span class="plus">+</span><kbd>Enter</kbd></div><div class="kdesc">줄바꿈</div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">입력</div>
+      <div class="krow"><div class="kkey"><kbd>/</kbd></div><div class="kdesc">슬래시 명령어</div></div>
+      <div class="krow"><div class="kkey"><kbd>↑</kbd> <kbd>↓</kbd></div><div class="kdesc">히스토리 탐색</div></div>
+      <div class="krow"><div class="kkey"><kbd>@</kbd></div><div class="kdesc">파일/폴더 멘션</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🗄️ 메모리 시스템</div>
+    <div class="group">
+      <div class="group-label">TUI 제어 <span class="badge-new">NEW</span></div>
+      <div class="row"><div class="row-key">모드 전환</div><div class="row-desc">TUI 메뉴에서 on / off / auto</div></div>
+      <div class="row"><div class="row-key">메모리 리셋</div><div class="row-desc">현재 메모리 내용 초기화</div></div>
+      <div class="row"><div class="row-key">메모리 삭제</div><div class="row-desc">메모리 영구 삭제</div></div>
+      <div class="row"><div class="row-key">확장 정리</div><div class="row-desc">오래된 항목 압축</div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">실험 기능 (features)</div>
+      <div class="row"><div class="row-key"><code>codex_hooks = false</code></div><div class="row-desc">훅 엔진 활성화 (opt-in)</div></div>
+      <div class="row"><div class="row-key"><code>smart_approvals = false</code></div><div class="row-desc">스마트 승인 실험 기능</div></div>
+    </div>
+    <div class="group">
+      <div class="group-label">컨텍스트 파일</div>
+      <div class="row"><div class="row-key"><code>AGENTS.md</code></div><div class="row-desc">리포지토리 작업 지침 (공유)</div></div>
+      <div class="row"><div class="row-key"><code>.codex/instructions.md</code></div><div class="row-desc">프로젝트 지침 (비공유 가능)</div></div>
     </div>
   </div>
 
