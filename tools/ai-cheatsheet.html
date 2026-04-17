@@ -436,7 +436,8 @@ kbd {
   <div class="changelog-body">
     <ul>
       <li class="cl-tip" data-tt-title="claude-opus-4.7 auto 모드 수정 (v2.1.112)" data-tt-desc="auto 모드에서 claude-opus-4-7이 일시적으로 사용 불가하다는 오류가 수정됐습니다." data-tt-example="">auto 모드에서 <code>claude-opus-4-7</code> 일시 사용 불가 오류 수정 (v2.1.112) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="/ultrareview 명령어 (v2.1.111)" data-tt-desc="병렬 멀티에이전트 분석으로 클라우드에서 종합 코드 리뷰를 실행합니다. PR 번호를 지정하면 GitHub PR을 바로 리뷰합니다." data-tt-example="/ultrareview&#10;/ultrareview 42  # PR 번호 지정"><code>/ultrareview</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 코드 리뷰 (v2.1.111) <span class="badge-new">NEW</span></li>
+      <li class="cl-tip" data-tt-title="/ultrareview 명령어 (v2.1.111)" data-tt-desc="병렬 멀티에이전트 분석으로 클라우드에서 종합 코드 리뷰를 실행합니다. PR 번호를 지정하면 GitHub PR을 바로 리뷰합니다." data-tt-example=""><code>/ultrareview</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 코드 리뷰 (v2.1.111) <span class="badge-new">NEW</span></li>
+      <li class="cl-tip" data-tt-title="/ultraplan 명령어 (v2.1.111)" data-tt-desc="로컬 터미널과 분리하여 클라우드에서 병렬 멀티에이전트 플래닝을 실행합니다. 웹 UI에서 검토 및 실시간 수정이 가능하며 완료 후 로컬로 텔레포트할 수 있습니다." data-tt-example="/ultraplan &quot;플랫폼 리팩토링 계획 수립&quot;"><code>/ultraplan</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 플래닝 (v2.1.111) <span class="badge-new">NEW</span></li>
       <li class="cl-tip" data-tt-title="xhigh effort 레벨 (v2.1.111)" data-tt-desc="Opus 4.7 전용 xhigh effort가 추가됩니다. high와 max 사이에 위치하며 /effort, --effort, 모델 피커에서 선택할 수 있습니다. 다른 모델은 high로 폴백됩니다." data-tt-example="/effort xhigh">Opus 4.7 전용 <code>xhigh</code> effort 레벨 추가 — high↔max 사이 (v2.1.111) <span class="badge-new">NEW</span></li>
       <li class="cl-tip" data-tt-title="/less-permission-prompts 스킬 (v2.1.111)" data-tt-desc="트랜스크립트를 분석해 자주 쓰이는 읽기 전용 Bash·MCP 도구 호출을 파악하고, .claude/settings.json에 추가할 allowlist를 자동 제안합니다." data-tt-example="/less-permission-prompts"><code>/less-permission-prompts</code> 스킬 추가 — allowlist 자동 제안 (v2.1.111) <span class="badge-new">NEW</span></li>
       <li class="cl-tip" data-tt-title="/effort 인터랙티브 슬라이더 (v2.1.111)" data-tt-desc="/effort를 인자 없이 사용하면 화살표 키로 레벨을 선택하고 Enter로 확인하는 인터랙티브 슬라이더가 열립니다." data-tt-example="/effort"><code>/effort</code> 인자 없이 실행 시 인터랙티브 슬라이더 표시 (v2.1.111) <span class="badge-new">NEW</span></li>
@@ -458,6 +459,7 @@ kbd {
       <div class="group-label">내장 스킬</div>
       <div class="row"><div class="row-key"><code>/simplify</code></div><div class="row-desc">코드 리뷰 (병렬 에이전트 3개)</div></div>
       <div class="row"><div class="row-key"><code>/ultrareview</code></div><div class="row-desc">종합 코드 리뷰 (클라우드 병렬) <span class="badge-new">NEW</span></div></div>
+      <div class="row"><div class="row-key"><code>/ultraplan</code></div><div class="row-desc">클라우드 병렬 플래닝 (분리 실행) <span class="badge-new">NEW</span></div></div>
       <div class="row"><div class="row-key"><code>/batch</code></div><div class="row-desc">대규모 병렬 변경 (5-30 워크트리)</div></div>
       <div class="row"><div class="row-key"><code>/debug [desc]</code></div><div class="row-desc">디버그 로그로 문제 해결</div></div>
       <div class="row"><div class="row-key"><code>/loop [interval]</code></div><div class="row-desc">반복 예약 작업</div></div>
@@ -650,6 +652,7 @@ kbd {
           <div class="row"><div class="row-key"><code>/doctor</code></div><div class="row-desc">설치 상태 진단</div></div>
           <div class="row"><div class="row-key"><code>/pr-comments [PR]</code></div><div class="row-desc">GitHub PR 코멘트 가져오기</div></div>
           <div class="row"><div class="row-key"><code>/ultrareview</code></div><div class="row-desc">멀티에이전트 코드 리뷰 <span class="badge-new">NEW</span></div></div>
+          <div class="row"><div class="row-key"><code>/ultraplan</code></div><div class="row-desc">멀티에이전트 클라우드 플래닝 <span class="badge-new">NEW</span></div></div>
         </div>
       </div>
       <div>
@@ -705,6 +708,7 @@ kbd {
           <div class="group-label">Thinking &amp; Effort</div>
           <div class="row"><div class="row-key"><kbd>Alt</kbd><span class="plus">+</span><kbd>T</kbd></div><div class="row-desc">사고 모드 켜기/끄기</div></div>
           <div class="row"><div class="row-key"><code>ultrathink</code></div><div class="row-desc">해당 턴 최대 노력 모드</div></div>
+          <div class="row"><div class="row-key"><code>ultraplan</code></div><div class="row-desc">키워드로 클라우드 플래닝 트리거 <span class="badge-new">NEW</span></div></div>
           <div class="row"><div class="row-key"><code>/effort</code></div><div class="row-desc">○ low · ◐ medium · ● high · ★ max</div></div>
         </div>
         <div class="group">
