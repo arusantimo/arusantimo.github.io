@@ -490,8 +490,8 @@ window.CLAUDE_TIPS = {
     "example": "/security-review"
   },
   "/help": {
-    "title": "/help — 도움말",
-    "desc": "사용 가능한 명령어 목록과 도움말을 표시합니다. 단축키, 슬래시 명령어, 주요 기능을 확인할 수 있습니다.",
+    "title": "/help — 최신 명령어 및 전체 가이드",
+    "desc": "현재 버전에서 사용 가능한 모든 명령어 목록과 상세 도움말을 표시합니다. 공식 문서에 아직 반영되지 않은 최신 기능이나 변경사항을 CLI 내에서 즉시 확인하는 가장 정확한 방법입니다.",
     "example": "/help"
   },
   "/feedback": {
@@ -638,6 +638,218 @@ window.CLAUDE_TIPS = {
     "title": "@path/to/file — CLAUDE.md 파일 임포트",
     "desc": "CLAUDE.md에서 다른 파일을 임포트해 컨텍스트에 포함합니다. 공통 규칙을 별도 파일로 관리하고 여러 CLAUDE.md에서 재사용합니다.",
     "example": "@./docs/architecture.md\n@~/.claude/common-rules.md"
+  },
+  // ─── HOOKS ───
+  "SessionStart": {
+    "title": "SessionStart — 세션 시작·재개 시",
+    "desc": "새로운 대화 세션이 시작되거나 기존 세션이 재개될 때 실행됩니다. 초기 권한 설정이나 환경 구성, 환영 메시지 출력 등에 활용합니다.",
+    "example": "{\"hooks\": {\"SessionStart\": [{\"command\": \"echo 'Welcome!'\"}]}}"
+  },
+  "UserPromptSubmit": {
+    "title": "UserPromptSubmit — 프롬프트 제출 시",
+    "desc": "사용자가 프롬프트를 제출한 직후, AI에게 전달되기 전에 실행됩니다. CLAUDE_PROMPT 변수로 입력을 검증하고 exit 2로 차단할 수 있습니다.",
+    "example": "if (process.env.CLAUDE_PROMPT.includes('secret')) process.exit(2);"
+  },
+  "PreToolUse": {
+    "title": "PreToolUse — 도구 실행 직전",
+    "desc": "Claude가 특정 도구(Edit, Bash 등)를 사용하기 직전에 호출됩니다. exit 2 또는 {\"decision\":\"block\"}을 통해 도구 실행을 막을 수 있습니다.",
+    "example": "{\"hooks\": {\"PreToolUse\": [{\"command\": \"check-auth.sh\", \"if\": \"tool_name === 'Bash'\"}]}}"
+  },
+  "PostToolUse": {
+    "title": "PostToolUse — 도구 실행 직후",
+    "desc": "도구 실행 결과가 Claude에게 전달되기 전에 실행됩니다. CLAUDE_TOOL_RESPONSE를 가공하거나 실행 로그를 남기는 데 유용합니다.",
+    "example": "echo $CLAUDE_TOOL_RESPONSE >> tool_execution.log"
+  },
+  "PostToolUseFailure": {
+    "title": "PostToolUseFailure — 도구 실행 실패 시",
+    "desc": "도구 실행 중 에러가 발생했을 때 호출됩니다. CLAUDE_ERROR 변수에 저장된 에러 메시지를 바탕으로 복구 명령을 시도할 수 있습니다.",
+    "example": "if (process.env.CLAUDE_ERROR.includes('ECONNREFUSED')) restart_server();"
+  },
+  "PreCompact": {
+    "title": "PreCompact — 컨텍스트 압축 직전",
+    "desc": "대화 내용이 한도에 도달해 요약(Compaction)이 일어나기 전에 실행됩니다. 중요 데이터 손실을 방지하기 위해 exit 2로 차단할 수 있습니다.",
+    "example": "// 가급적 차단하지 않는 것이 좋으나 특정 상황에서 유용\n{\"decision\":\"block\"}"
+  },
+  "Stop": {
+    "title": "Stop — 응답 완료 시",
+    "desc": "Claude가 모든 작업을 마치고 다시 입력 대기 상태가 되었을 때 실행됩니다. 작업 완료 알림을 보내거나 대화 요약을 내보낼 때 사용합니다.",
+    "example": "notify-send \"Claude finished the task!\""
+  },
+  "StopFailure": {
+    "title": "StopFailure — 비정상 종료 시",
+    "desc": "API 오류나 네트워크 중단 등으로 세션이 비정상적으로 끝날 때 실행됩니다. 세션 상태를 백업하거나 자동 재시도를 구성할 수 있습니다.",
+    "example": "cp .claude/sessions/last.json ./backups/"
+  },
+  "PermissionRequest": {
+    "title": "PermissionRequest — 권한 요청 시",
+    "desc": "Claude가 파일 쓰기 등의 권한을 요청해 사용자 승인 창이 뜨기 직전에 실행됩니다. 특정 명령을 자동으로 승인하도록 구성 가능합니다.",
+    "example": "{\"decision\": \"allow\", \"reason\": \"safe command\"}"
+  },
+  "PermissionDenied": {
+    "title": "PermissionDenied — 권한 거부 시",
+    "desc": "사용자 또는 훅에 의해 권한 요청이 거부되었을 때 실행됩니다. 거부 로그 기록이나 대체 작업 안내를 위해 사용합니다.",
+    "example": "echo \"Permission denied for $CLAUDE_TOOL_NAME\""
+  },
+  "Elicitation": {
+    "title": "Elicitation — 추가 입력 요청 시",
+    "desc": "MCP 서버가 사용자에게 추가 정보(비동기 입력 등)를 요구할 때 실행됩니다. 자동 응답 시스템 연동에 활용됩니다.",
+    "example": "{\"hooks\": {\"Elicitation\": [...]}}"
+  },
+  "ElicitationResult": {
+    "title": "ElicitationResult — 추가 입력 결과 전송 시",
+    "desc": "Elicitation에 대한 사용자의 응답이 전송되기 직전에 실행됩니다. 응답 데이터를 검증하거나 수정할 수 있습니다.",
+    "example": "{\"hooks\": {\"ElicitationResult\": [...]}}"
+  },
+  "Notification": {
+    "title": "Notification — 알림 발생 시",
+    "desc": "Claude Code 내부 알림(Task 완료, 업데이트 등) 발생 시 실행됩니다. 시스템 알림이나 슬랙 연동 등으로 확장할 수 있습니다.",
+    "example": "echo $CLAUDE_NOTIF_DATA | jq ."
+  },
+  // ─── ENV VARS ───
+  "CLAUDE_PROMPT": {
+    "title": "CLAUDE_PROMPT",
+    "desc": "UserPromptSubmit 훅에서 사용자가 입력한 현재 프롬프트 텍스트를 담고 있습니다.",
+    "example": "echo \"Current prompt: $CLAUDE_PROMPT\""
+  },
+  "CLAUDE_TOOL_NAME": {
+    "title": "CLAUDE_TOOL_NAME",
+    "desc": "현재 실행 중이거나 실행하려는 도구의 이름(예: Bash, Edit, Read)입니다.",
+    "example": "if [ \"$CLAUDE_TOOL_NAME\" == \"Bash\" ]; then ... fi"
+  },
+  "CLAUDE_TOOL_INPUT": {
+    "title": "CLAUDE_TOOL_INPUT",
+    "desc": "도구에 전달된 입력 파라미터(JSON 형식)입니다.",
+    "example": "echo $CLAUDE_TOOL_INPUT | jq ."
+  },
+  "CLAUDE_TOOL_RESPONSE": {
+    "title": "CLAUDE_TOOL_RESPONSE",
+    "desc": "PostToolUse 훅에서 사용 가능한 도구의 실행 결과 텍스트입니다.",
+    "example": "echo \"Output size: ${#CLAUDE_TOOL_RESPONSE}\""
+  },
+  "CLAUDE_STOP_REASON": {
+    "title": "CLAUDE_STOP_REASON",
+    "desc": "Stop 훅에서 제공되는 종료 이유입니다. (success, failure, error, interrupt)",
+    "example": "if [ \"$CLAUDE_STOP_REASON\" == \"success\" ]; then ... fi"
+  },
+  "CLAUDE_ERROR": {
+    "title": "CLAUDE_ERROR",
+    "desc": "오류 발생 시 전달되는 상세 에러 메시지입니다.",
+    "example": "echo \"Error details: $CLAUDE_ERROR\""
+  },
+  "CLAUDE_SESSION_ID": {
+    "title": "CLAUDE_SESSION_ID",
+    "desc": "현재 세션의 고유 식별자(UUID)입니다.",
+    "example": "echo \"Current session: $CLAUDE_SESSION_ID\""
+  },
+  "CLAUDE_NOTIF_TYPE": {
+    "title": "CLAUDE_NOTIF_TYPE",
+    "desc": "Notification 훅에서 전달되는 알림의 종류입니다.",
+    "example": "echo \"Notice type: $CLAUDE_NOTIF_TYPE\""
+  },
+  "CLAUDE_NOTIF_DATA": {
+    "title": "CLAUDE_NOTIF_DATA",
+    "desc": "Notification 훅에서 전달되는 알림의 세부 정보(JSON)입니다.",
+    "example": "echo $CLAUDE_NOTIF_DATA | jq ."
+  },
+  "claude agents": {
+    "title": "claude agents — 서브에이전트 목록",
+    "desc": "현재 구성된 모든 서브에이전트의 목록과 상태를 표시합니다. 서브에이전트 구성 확인 및 디버깅 시 사용합니다.",
+    "example": "claude agents"
+  },
+  "--teleport": {
+    "title": "--teleport — 웹 세션 터미널 동기화",
+    "desc": "claude.ai 웹 UI에서 진행하던 세션을 로컬 터미널로 실시간 텔레포트하여 작업을 이어갑니다. 웹의 지능과 로컬의 도구를 결합하는 가장 강력한 방법입니다.",
+    "example": "claude --teleport"
+  },
+  "--fork-session": {
+    "title": "--fork-session — 세션 분기 시작",
+    "desc": "기존 세션을 재개(--resume)할 때 원본을 유지하고 새로운 세션 ID로 분기하여 시작합니다. 기존 작업 흐름을 보존하면서 새로운 시도를 할 때 유용합니다.",
+    "example": "claude -r auth-refactor --fork-session"
+  },
+  "--maintenance": {
+    "title": "--maintenance — 훅 기반 유지보수",
+    "desc": "세션 시작 시 Setup 훅 중 'maintenance' 트리거가 설정된 명령만 선택적으로 실행합니다. 환경 재구성이나 정기 점검 시 사용합니다.",
+    "example": "claude --maintenance"
+  },
+  "--tmux": {
+    "title": "--tmux — Worktree 전용 세션 격리",
+    "desc": "Git 워크트리 격리(-w) 사용 시, 해당 작업 전용 tmux 세션을 자동으로 생성하고 연결합니다. 터미널 환경까지 완벽하게 분리된 개발 환경을 제공합니다.",
+    "example": "claude -w feature-xyz --tmux"
+  },
+  "/recap": {
+    "title": "/recap — 작업 복귀 요약",
+    "desc": "일정 시간 자리를 비웠거나 세션이 중단된 후 돌아왔을 때, 마지막으로 수행한 작업과 현재 상태를 요약하여 보고받습니다. 컨텍스트 복구에 최적회된 기능입니다.",
+    "example": "/recap"
+  },
+  "/focus": {
+    "title": "/focus — 포커스 뷰 전환",
+    "desc": "TUI의 fullscreen 모드에서 대화에만 집중할 수 있도록 사이드바나 부가 정보를 숨기고 프롬프트와 트랜스크립트를 강조하는 뷰로 전환합니다.",
+    "example": "/focus"
+  },
+  "/review [PR]": {
+    "title": "/review — 로컬 코드 검토",
+    "desc": "지정한 GitHub PR 번호 또는 현재 브랜치의 변경사항을 로컬 에이전트가 검토합니다. /ultrareview와 달리 로컬 Sonnet 모델이 빠르게 분석합니다.",
+    "example": "/review\n/review 42"
+  },
+  "/ide": {
+    "title": "/ide — IDE 통합 진단",
+    "desc": "현재 VS Code 또는 Cursor 등 IDE와의 통신 상태와 익스텐션 활성화 여부를 점검합니다. IDE 도구 사용이 원활하지 않을 때 실행하세요.",
+    "example": "/ide"
+  },
+  "/tui fullscreen": {
+    "title": "/tui fullscreen — 전체화면 모드",
+    "desc": "깜박임(Flicker) 없는 전체화면 TUI 렌더링으로 전환합니다. 전용 버퍼를 사용해 터미널 환경에서도 웹 앱과 같은 부드러운 UI를 제공합니다.",
+    "example": "/tui fullscreen"
+  },
+  "Setup": {
+    "title": "Setup 훅 — 프로젝트 진입 시",
+    "desc": "저장소에 처음 진입(init)하거나 주기적 유지보수(maintenance) 시점에 가장 먼저 실행되는 훅입니다. 프로젝트 지침 로드나 환경 변수 검증 등에 사용됩니다.",
+    "example": "{\"hooks\": {\"Setup\": [{\"command\": \"./check-env.sh\"}]}}"
+  },
+  "SessionEnd": {
+    "title": "SessionEnd 훅 — 세션 종료 시",
+    "desc": "clear, logout, exit 등으로 세션이 완전히 끝날 때 실행됩니다. 사용된 임시 워크트리 정리, 토큰 사용량 최종 집계, 분석 리포트 생성 등에 적합합니다.",
+    "example": "{\"hooks\": {\"SessionEnd\": [{\"command\": \"cat cost.txt\"}]}}"
+  },
+  "SubagentStart / Stop": {
+    "title": "Subagent 훅 — 에이전트 라이프사이클",
+    "desc": "/batch나 parallel 작업 시 서브에이전트가 생성되거나 성공적으로 작업을 마쳤을 때 호출됩니다. 멀티 에이전트 작업 모니터링에 활용됩니다.",
+    "example": "{\"hooks\": {\"SubagentStop\": [...]}}"
+  },
+  "ConfigChange": {
+    "title": "ConfigChange 훅 — 설정 변경 감지",
+    "desc": "settings.json이나 .mcp.json 등 주요 설정 파일의 변경이 감지되는 즉시 실행됩니다. 실시간 설정 동기화 및 검증에 사용합니다.",
+    "example": "{\"hooks\": {\"ConfigChange\": [...]}}"
+  },
+  "FileChanged": {
+    "title": "FileChanged 훅 — 파일 변경 감지",
+    "desc": "프로젝트 내 특정 파일이 외부 요인(IDE 편집 등)에 의해 수정되었을 때 실행됩니다. 변경 사항을 실시간으로 분석하여 컨텍스트에 반영할 수 있습니다.",
+    "example": "{\"hashMode\": \"content\", \"hooks\": [...]}"
+  },
+  "MAX_THINKING_TOKENS": {
+    "title": "MAX_THINKING_TOKENS 환경 변수",
+    "desc": "Thinking 모드 사용 시 할당할 최대 토큰 예산을 설정합니다. 0으로 설정하면 Thinking 기능이 비활성화됩니다. (기본값: 10,000)",
+    "example": "export MAX_THINKING_TOKENS=20000"
+  },
+  "CLAUDE_CODE_DEBUG_LOGS_DIR": {
+    "title": "CLAUDE_CODE_DEBUG_LOGS_DIR",
+    "desc": "상세한 디버그 로그가 저장될 위치를 지정합니다. 기본적으로 /tmp 하위나 설정된 캐시 경로에 저장되나, 분석 편의를 위해 고정 경로로 지정 가능합니다.",
+    "example": "export CLAUDE_CODE_DEBUG_LOGS_DIR=./logs"
+  },
+  "MCP_TIMEOUT": {
+    "title": "MCP_TIMEOUT",
+    "desc": "MCP 서버가 명령에 응답하거나 초기화될 때까지 기다리는 최대 시간(ms)입니다. 원격 서버 응답이 느릴 경우 상향 조절합니다. (기본: 5000)",
+    "example": "export MCP_TIMEOUT=15000"
+  },
+  ".claude/commands/": {
+    "title": ".claude/commands/ — 프로젝트 커스텀 명령어",
+    "desc": "현재 프로젝트에서만 사용 가능한 커스텀 슬래시 명령어들을 정의합니다. 쉘 스크립트나 마크다운 지침 파일을 추가하면 /project:name 형식으로 호출 가능합니다.",
+    "example": ".claude/commands/fix-bugs.md"
+  },
+  "~/.claude/commands/": {
+    "title": "~/.claude/commands/ — 전역 커스텀 명령어",
+    "desc": "모든 프로젝트에서 공통으로 사용할 수 있는 사용자 정의 슬래시 명령어를 정의합니다. 반복되는 복잡한 작업(PR 생성, 로그 분석 등)을 자동화하기 좋습니다.",
+    "example": "~/.claude/commands/pr-review.sh"
   }
 }
 ;

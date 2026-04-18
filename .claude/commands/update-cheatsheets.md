@@ -14,6 +14,7 @@ description: Claude Code와 Codex CLI 치트시트를 최신 버전으로 자동
 **Claude Code:**
 - https://github.com/anthropics/claude-code/releases (최신 stable 태그 확인)
 - https://code.claude.com/docs/en/changelog (릴리스 날짜·기능 목록)
+- **로컬 확인**: `claude` 실행 후 `/help`를 입력하여 문서에 반영되지 않은 최신 명령어 목록 확인
 
 **Codex CLI:**
 - https://github.com/openai/codex/releases (Latest 태그 확인, Pre-release 제외)
