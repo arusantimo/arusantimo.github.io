@@ -24,20 +24,40 @@ window.CODEX_TIPS = {
     "desc": "마지막 세션의 상태를 유지하면서 새 분기 세션을 시작합니다. 원본 세션을 변경하지 않고 다른 방향으로 실험합니다.",
     "example": "codex fork --last"
   },
-  "codex apply TASK_ID": {
+  "codex apply ID": {
     "title": "codex apply — 클라우드 결과 적용",
     "desc": "codex cloud exec 또는 codex exec --async에서 생성된 태스크 결과를 로컬 워크스페이스에 적용합니다.",
     "example": "codex apply task_abc123"
+  },
+  "codex -i image.png": {
+    "title": "codex -i — 이미지 입력 (멀티모달)",
+    "desc": "스크린샷, 디자인 시안 등의 이미지를 입력으로 전달합니다. 이미지를 분석하여 코드를 생성하거나 UI를 구현할 때 사용합니다.",
+    "example": "codex -i screenshot.png \"이 디자인대로 Tailwind CSS로 구현해줘\""
+  },
+  "codex mcp list": {
+    "title": "codex mcp list — MCP 서버 목록",
+    "desc": "현재 설정된 모든 MCP 서버의 목록과 상태를 표시합니다. 연결된 도구와 리소스를 확인합니다.",
+    "example": "codex mcp list"
+  },
+  "Ctrl+L": {
+    "title": "Ctrl+L — 화면 초기화",
+    "desc": "TUI 화면을 깨끗하게 지우고 다시 그립니다. 화면이 깨지거나 복잡해졌을 때 사용합니다.",
+    "example": "Ctrl + L"
+  },
+  "Ctrl+G": {
+    "title": "Ctrl+G — 편집기 열기",
+    "desc": "현재 입력 중인 프롬프트를 기본으로 설정된 외부 텍스트 편집기(VS Code, Vim 등)에서 엽니다.",
+    "example": "Ctrl + G"
+  },
+  "Esc Esc": {
+    "title": "Esc Esc — 되감기 / 요약",
+    "desc": "현재 작업을 중단하고 요약하거나, 이전 체크포인트 상태로 안전하게 되돌립니다.",
+    "example": "Esc Esc (연속 입력)"
   },
   "codex cloud list --json": {
     "title": "codex cloud list — 클라우드 태스크 목록",
     "desc": "클라우드에서 실행 중이거나 완료된 태스크 목록을 표시합니다. --json 옵션으로 JSON 형식으로 출력합니다.",
     "example": "codex cloud list\ncodex cloud list --json"
-  },
-  "codex mcp list": {
-    "title": "codex mcp list — MCP 서버 목록",
-    "desc": "설정된 모든 MCP 서버와 상태를 표시합니다. 서버 이름, 연결 방식, 도구 수를 확인합니다.",
-    "example": "codex mcp list"
   },
   "codex features list": {
     "title": "codex features list — 기능 플래그 목록",
@@ -58,6 +78,11 @@ window.CODEX_TIPS = {
     "title": "--sandbox — 샌드박스 모드",
     "desc": "파일 시스템 접근 제한 수준을 설정합니다. read-only(읽기 전용), workspace-write(작업공간 쓰기 가능). 기본값은 workspace-write입니다.",
     "example": "codex --sandbox read-only\ncodex --sandbox workspace-write"
+  },
+  "--sandbox danger-full-access": {
+    "title": "--sandbox danger-full-access — 완전 무제한",
+    "desc": "샌드박스 격리를 완전히 해제하고 모든 시스템 자원에 접근합니다. 관리자 권한 작업이나 격리된 전용 머신에서만 사용하십시오. ⚠️ 매우 위험",
+    "example": "codex --sandbox danger-full-access"
   },
   "--ask-for-approval": {
     "title": "--ask-for-approval — 승인 정책",
@@ -293,6 +318,11 @@ window.CODEX_TIPS = {
     "title": "AGENTS.md — AI 에이전트 설명서",
     "desc": "프로젝트 루트에 위치하며 AI 에이전트(Codex, Claude 등)가 읽을 수 있는 설명서입니다. 빌드 명령, 코딩 규칙, 아키텍처를 기록합니다.",
     "example": "# AGENTS.md\n## Build\nnpm run build\n\n## Coding Style\n- TypeScript strict mode"
+  },
+  ".codex/instructions.md": {
+    "title": ".codex/instructions.md — 프로젝트 지침",
+    "desc": "Codex 전용 프로젝트 지침 파일입니다. AGENTS.md와 유사하나 Codex의 특정 동작 방식이나 스킬 활용법을 정의하는 데 사용됩니다.",
+    "example": "# .codex/instructions.md\n현재 프로젝트에서는 helper 스킬을 적극 활용해줘."
   },
   "~/.codex/skills": {
     "title": "~/.codex/skills — 사용자 전역 스킬",

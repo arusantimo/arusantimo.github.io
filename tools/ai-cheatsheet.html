@@ -555,19 +555,19 @@ kbd {
       <div>
         <div class="group">
           <div class="group-label">일반 제어</div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>C</kbd></div><div class="kdesc">입력/생성 취소</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>D</kbd></div><div class="kdesc">세션 종료</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>L</kbd></div><div class="kdesc">입력 초기화 + 화면 다시그리기</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>O</kbd></div><div class="kdesc">트랜스크립트 뷰어 토글</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>U</kbd></div><div class="kdesc">전체 입력 버퍼 지우기</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>Y</kbd></div><div class="kdesc">지운 입력 복원</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>R</kbd></div><div class="kdesc">히스토리 검색</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>G</kbd></div><div class="kdesc">프롬프트 편집기 열기</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>B</kbd></div><div class="kdesc">백그라운드 실행</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl+X</code> <code>Ctrl+K</code></div><div class="kdesc">모든 백그라운드 에이전트 중지</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>T</kbd></div><div class="kdesc">태스크 목록 전환</div></div>
-          <div class="row cl-tip"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>V</kbd></div><div class="kdesc">이미지 붙여넣기</div></div>
-          <div class="row cl-tip"><div class="row-key"><kbd>Esc</kbd><kbd>Esc</kbd></div><div class="kdesc">되감기 / 요약</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+C — 입력 취소" data-tt-desc="현재 입력 중인 텍스트를 모두 지우거나, 실행 중인 AI의 응답 생성을 강제로 중단합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>C</kbd></div><div class="kdesc">입력/생성 취소</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+D — 세션 종료" data-tt-desc="현재 작업을 저장하고 세션을 종료합니다. 터미널의 EOF 명령과 동일하게 동작합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>D</kbd></div><div class="kdesc">세션 종료</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+L — 화면 다시그리기" data-tt-desc="화면의 모든 내용을 지우고 프롬프트를 맨 위로 올립니다. TUI 렌더링이 깨졌을 때 유용합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>L</kbd></div><div class="kdesc">입력 초기화 + 화면 다시그리기</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+O — 트랜스크립트 뷰어" data-tt-desc="실행된 도구의 상세 입출력 로그(트랜스크립트)를 볼 수 있는 데이터 뷰어를 토글합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>O</kbd></div><div class="kdesc">트랜스크립트 뷰어 토글</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+U — 버퍼 지우기" data-tt-desc="입력 창에 작성된 모든 내용을 한 번에 지웁니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>U</kbd></div><div class="kdesc">전체 입력 버퍼 지우기</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+Y — 삭제 복원" data-tt-desc="Ctrl+U 등으로 지운 텍스트를 다시 불러옵니다. (Yank)"><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>Y</kbd></div><div class="kdesc">지운 입력 복원</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="이전 세션에서 입력했던 프롬프트 기록을 역방향으로 검색합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>R</kbd></div><div class="kdesc">히스토리 검색</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+G — 편집기 열기" data-tt-desc="시스템 기본 에디터(VS Code 등)를 열어 긴 프롬프트나 코드를 자유롭게 편집합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>G</kbd></div><div class="kdesc">프롬프트 편집기 열기</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+B — 백그라운드 전환" data-tt-desc="현재 실행 중인 작업을 백그라운드로 돌리고 다른 명령을 입력할 수 있게 합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>B</kbd></div><div class="kdesc">백그라운드 실행</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+X Ctrl+K — 에이전트 중지" data-tt-desc="실행 중인 모든 백그라운드 에이전트와 서브태스크를 즉시 강제 중지합니다."><div class="row-key"><code>Ctrl+X</code> <code>Ctrl+K</code></div><div class="kdesc">모든 백그라운드 에이전트 중지</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+T — 작업 목록" data-tt-desc="현재 진행 중이거나 대기 중인 모든 태스크 목록 창을 엽니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>T</kbd></div><div class="kdesc">태스크 목록 전환</div></div>
+          <div class="row cl-tip" data-tt-title="Ctrl+V — 이미지 첨부" data-tt-desc="클립보드의 이미지를 현재 프롬프트에 즉시 첨부합니다."><div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>V</kbd></div><div class="kdesc">이미지 붙여넣기</div></div>
+          <div class="row cl-tip" data-tt-title="Esc Esc — 요약 및 되감기" data-tt-desc="현재 진행 과정을 중단하고 요약하거나, 최근 체크포인트로 되돌립니다."><div class="row-key"><kbd>Esc</kbd><kbd>Esc</kbd></div><div class="kdesc">되감기 / 요약</div></div>
         </div>
         <div class="group">
           <div class="group-label">모드 전환</div>
@@ -994,19 +994,21 @@ kbd {
       <div>
         <div class="group">
           <div class="group-label">exec / 자동화</div>
-          <div class="row"><div class="row-key"><code>codex exec -</code></div><div class="row-desc">stdin에서 프롬프트 읽기</div></div>
-          <div class="row"><div class="row-key"><code>cat spec.md | codex exec "Implement this"</code></div><div class="row-desc">프롬프트 + stdin 병행</div></div>
-          <div class="row"><div class="row-key"><code>--json</code></div><div class="row-desc">JSONL 이벤트 출력</div></div>
-          <div class="row"><div class="row-key"><code>--output-last-message out.txt</code></div><div class="row-desc">최종 응답 파일 저장</div></div>
-          <div class="row"><div class="row-key"><code>--output-schema schema.json</code></div><div class="row-desc">구조화 출력 검증</div></div>
-          <div class="row"><div class="row-key"><code>--skip-git-repo-check</code></div><div class="row-desc">Git 저장소 외부 실행 허용</div></div>
-          <div class="row"><div class="row-key"><code>--ephemeral</code></div><div class="row-desc">세션 상태를 디스크에 남기지 않음</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex apply ID</code></div><div class="row-desc">태스크/클라우드 결과 적용</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex exec -</code></div><div class="row-desc">stdin(표준입력) 처리</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex -i image.png</code></div><div class="row-desc">멀티모달 이미지 입력 지원 <span class="badge-new">NEW</span></div></div>
+          <div class="row cl-tip"><div class="row-key"><code>cat spec.md | codex exec "Implement this"</code></div><div class="row-desc">프롬프트 + stdin 병행</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>--json</code></div><div class="row-desc">JSONL 이벤트 출력</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>--output-last-message out.txt</code></div><div class="row-desc">최종 응답 파일 저장</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>--output-schema schema.json</code></div><div class="row-desc">구조화 출력 검증</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>--skip-git-repo-check</code></div><div class="row-desc">Git 저장소 외부 실행 허용</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>--ephemeral</code></div><div class="row-desc">세션 상태를 디스크에 남기지 않음</div></div>
         </div>
         <div class="group">
-          <div class="group-label">MCP / App / Cloud</div>
-          <div class="row"><div class="row-key"><code>codex mcp add name -- url</code></div><div class="row-desc">stdio 또는 HTTP MCP 등록</div></div>
-          <div class="row"><div class="row-key"><code>codex mcp login name</code></div><div class="row-desc">OAuth형 MCP 로그인</div></div>
-          <div class="row"><div class="row-key"><code>codex mcp-server</code></div><div class="row-desc">Codex 자체를 MCP 서버로 실행</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex mcp list</code></div><div class="row-desc">MCP 서버 목록 확인</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex mcp add name -- url</code></div><div class="row-desc">stdio 또는 HTTP MCP 등록</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex mcp login name</code></div><div class="row-desc">OAuth형 MCP 로그인</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>codex mcp-server</code></div><div class="row-desc">Codex 자체를 MCP 서버로 실행</div></div>
           <div class="row"><div class="row-key"><code>codex cloud exec --env ENV_ID</code></div><div class="row-desc">Cloud task 직접 제출</div></div>
           <div class="row"><div class="row-key"><code>codex app</code></div><div class="row-desc">데스크톱 앱 실행</div></div>
         </div>
@@ -1054,16 +1056,17 @@ kbd {
     <div class="section-title">🔐 보안 &amp; 샌드박스</div>
     <div class="group">
       <div class="group-label">추천 조합</div>
-      <div class="row"><div class="row-key"><code>--sandbox read-only -a on-request</code></div><div class="row-desc">안전한 브라우징/질의응답</div></div>
-      <div class="row"><div class="row-key"><code>--sandbox workspace-write -a untrusted</code></div><div class="row-desc">파일 편집 허용, 위험 명령 승인</div></div>
-      <div class="row"><div class="row-key"><code>--full-auto</code></div><div class="row-desc">로컬 자동화 프리셋</div></div>
-      <div class="row"><div class="row-key"><code>--yolo</code></div><div class="row-desc">완전 우회, 격리 환경에서만 <span class="badge-warn">위험</span></div></div>
+      <div class="row cl-tip"><div class="row-key"><code>--sandbox read-only -a on-request</code></div><div class="row-desc">안전한 브라우징/질의응답</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>--sandbox workspace-write -a untrusted</code></div><div class="row-desc">파일 편집 허용, 위험 명령 승인</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>--sandbox danger-full-access</code></div><div class="row-desc">완전 무제한 샌드박스 <span class="badge-warn">위험</span></div></div>
+      <div class="row cl-tip"><div class="row-key"><code>--full-auto</code></div><div class="row-desc">로컬 자동화 프리셋</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>--yolo</code></div><div class="row-desc">완전 우회, 격리 환경에서만 <span class="badge-warn">위험</span></div></div>
     </div>
     <div class="group">
       <div class="group-label">네트워크 / 보호 경로</div>
-      <div class="row"><div class="row-key"><code>[sandbox_workspace_write]</code></div><div class="row-desc">세부 샌드박스 설정</div></div>
-      <div class="row"><div class="row-key"><code>web_search = "cached"</code></div><div class="row-desc">기본 검색 캐시 모드</div></div>
-      <div class="row"><div class="row-key"><code>web_search = "live"</code></div><div class="row-desc">실시간 검색 또는 <code>--search</code></div></div>
+      <div class="row cl-tip"><div class="row-key"><code>[sandbox_workspace_write]</code></div><div class="row-desc">세부 샌드박스 설정</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>web_search = "cached"</code></div><div class="row-desc">기본 검색 캐시 모드</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>web_search = "live"</code></div><div class="row-desc">실시간 검색 또는 <code>--search</code></div></div>
     </div>
   </div>
 
@@ -1137,11 +1140,14 @@ kbd {
     <div class="section-title">⌨️ TUI 단축키</div>
     <div class="group">
       <div class="group-label">제어</div>
-      <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>C</kbd></div><div class="kdesc">실행 중단</div></div>
-      <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>D</kbd></div><div class="kdesc">종료</div></div>
-      <div class="krow"><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div><div class="kdesc">히스토리 역방향 검색 <span class="badge-new">NEW</span></div></div>
-      <div class="krow"><div class="kkey"><kbd>Enter</kbd></div><div class="kdesc">전송</div></div>
-      <div class="krow"><div class="kkey"><kbd>Shift</kbd><span class="plus">+</span><kbd>Enter</kbd></div><div class="kdesc">줄바꿈</div></div>
+      <div class="krow cl-tip" data-tt-title="Ctrl+C — 중단" data-tt-desc="실행 중인 명령을 강제 중단합니다."><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>C</kbd></div><div class="kdesc">실행 중단</div></div>
+      <div class="krow cl-tip" data-tt-title="Ctrl+D — 종료" data-tt-desc="세션을 안전하게 종료합니다."><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>D</kbd></div><div class="kdesc">종료</div></div>
+      <div class="krow cl-tip" data-tt-title="Ctrl+L — 화면 초기화" data-tt-desc="터미널 화면을 비우고 다시 그립니다."><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>L</kbd></div><div class="kdesc">화면 초기화</div></div>
+      <div class="krow cl-tip" data-tt-title="Ctrl+G — 전문 편집" data-tt-desc="외부 편집기에서 프롬프트를 작성합니다."><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>G</kbd></div><div class="kdesc">편집기 열기</div></div>
+      <div class="krow cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="과거 입력 기록을 검색합니다."><div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div><div class="kdesc">히스토리 역방향 검색 <span class="badge-new">NEW</span></div></div>
+      <div class="krow cl-tip" data-tt-title="Enter — 전송" data-tt-desc="프롬프트를 전송합니다."><div class="kkey"><kbd>Enter</kbd></div><div class="kdesc">전송</div></div>
+      <div class="krow cl-tip" data-tt-title="Shift+Enter — 새 줄" data-tt-desc="전송하지 않고 다음 줄로 이동합니다."><div class="kkey"><kbd>Shift</kbd><span class="plus">+</span><kbd>Enter</kbd></div><div class="kdesc">줄바꿈</div></div>
+      <div class="krow cl-tip" data-tt-title="Esc Esc — 되감기" data-tt-desc="상태 요약 또는 작업 되감기를 수행합니다."><div class="kkey"><kbd>Esc</kbd><kbd>Esc</kbd></div><div class="kdesc">되감기 / 요약</div></div>
     </div>
     <div class="group">
       <div class="group-label">입력</div>
@@ -1167,8 +1173,8 @@ kbd {
     </div>
     <div class="group">
       <div class="group-label">컨텍스트 파일</div>
-      <div class="row"><div class="row-key"><code>AGENTS.md</code></div><div class="row-desc">리포지토리 작업 지침 (공유)</div></div>
-      <div class="row"><div class="row-key"><code>.codex/instructions.md</code></div><div class="row-desc">프로젝트 지침 (비공유 가능)</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>AGENTS.md</code></div><div class="row-desc">리포지토리 작업 지침 (공유)</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>.codex/instructions.md</code></div><div class="row-desc">프로젝트 지침 (비공유 가능)</div></div>
     </div>
   </div>
 
