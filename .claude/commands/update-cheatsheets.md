@@ -2,8 +2,10 @@
 description: Claude Code와 Codex CLI 치트시트를 최신 버전으로 자동 업데이트합니다
 ---
 
-다음 통합 치트시트 파일을 최신 버전으로 업데이트해주세요:
-- `tools/ai-cheatsheet.html` — Claude Code 탭(`.claude-pane`)과 Codex CLI 탭(`.codex-pane`) 모두 포함
+다음 통합 치트시트 파일들을 최신 버전으로 업데이트해주세요:
+- `tools/ai-cheatsheet.html` — 상단 탭 버튼의 버전 업데이트
+- `tools/claude-content.js` — Claude Code 콘텐츠 영역
+- `tools/codex-content.js` — Codex CLI 콘텐츠 영역
 
 ## 단계별 작업
 
@@ -21,28 +23,29 @@ description: Claude Code와 Codex CLI 치트시트를 최신 버전으로 자동
 
 ### 2단계: 현재 버전 확인
 
-`tools/ai-cheatsheet.html`에서 아래 두 탭의 `<span class="meta-version">` 태그 안의 버전을 읽어 업스트림 버전과 비교하세요.
+아래 파일들에서 `<span class="meta-version">` 태그 안의 버전을 읽어 업스트림 버전과 비교하세요.
 
-- Claude Code 탭: `#tab-claude` 영역 내 `<span class="meta-version">`
-- Codex CLI 탭: `#tab-codex` 영역 내 `<span class="meta-version">`
+- Claude Code: `tools/claude-content.js` 내 `<span class="meta-version">`
+- Codex CLI: `tools/codex-content.js` 내 `<span class="meta-version">`
 
 ### 3단계: 변경사항이 있을 경우 업데이트
 
-업스트림 버전이 더 새로우면 각 탭에서 아래 항목을 수정하세요. 이때 기존에 붙어있던 구버전의 `NEW` 뱃지들을 모두 제거하는 과정이 포함되어야 합니다.
+업스트림 버전이 더 새로우면 각 파일에서 아래 항목을 수정하세요. 이때 기존에 붙어있던 구버전의 `NEW` 뱃지들을 모두 제거하는 과정이 포함되어야 합니다.
 
-**Claude Code 탭 (`#tab-claude`) 수정 위치:**
-1. 탭 버튼: `<button class="tab-btn claude-tab" ...>🤖 Claude Code <span class="tab-ver">vX.X.XXX</span>` 버전
-2. `<span class="meta-version">` 버전 번호
-3. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
-4. changelog-toggle span: `📋 최근 변경사항 (vX.X.XXX)` — 최신 버전만 표시하도록 레이블 수정
-5. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-claude" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
+**`tools/ai-cheatsheet.html` 수정 위치:**
+1. 탭 버튼 영역 내 `<span class="tab-ver">vX.X.XXX</span>` 버전 업데이트 (Claude 및 Codex)
 
-**Codex CLI 탭 (`#tab-codex`) 수정 위치:**
-1. 탭 버튼: `<button class="tab-btn codex-tab" ...>⬡ Codex CLI <span class="tab-ver">vX.X.X</span>` 버전
-2. `<span class="meta-version">` 버전 번호
-3. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
-4. changelog-toggle span: `📋 최근 변경사항 (v0.xxx.x)` — 최신 버전만 표시하도록 레이블 수정
-5. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-codex" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
+**`tools/claude-content.js` 수정 위치:**
+1. `<span class="meta-version">` 버전 번호
+2. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
+3. changelog-toggle span: `📋 최근 변경사항 (vX.X.XXX)` — 최신 버전만 표시하도록 레이블 수정
+4. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-claude" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
+
+**`tools/codex-content.js` 수정 위치:**
+1. `<span class="meta-version">` 버전 번호
+2. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
+3. changelog-toggle span: `📋 최근 변경사항 (vX.X.X)` — 최신 버전만 표시하도록 레이블 수정
+4. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-codex" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
 
 ### 4단계: 툴팁 JS 파일 업데이트
 
