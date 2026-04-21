@@ -34,15 +34,15 @@ description: Claude Code와 Codex CLI 치트시트를 최신 버전으로 자동
 1. 탭 버튼: `<button class="tab-btn claude-tab" ...>🤖 Claude Code <span class="tab-ver">vX.X.XXX</span>` 버전
 2. `<span class="meta-version">` 버전 번호
 3. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
-4. changelog-toggle span: `📋 최근 변경사항 (vA.B.CC–XXX)` 범위 레이블
-5. `<ul>` 안 `<li>` 목록 — 기존 항목 위에 신규 항목 삽입, 오래된 항목 정리 (`<span class="badge-new">NEW</span>` 뱃지 부여)
+4. changelog-toggle span: `📋 최근 변경사항 (vX.X.XXX)` — 최신 버전만 표시하도록 레이블 수정
+5. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-claude" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
 
 **Codex CLI 탭 (`#tab-codex`) 수정 위치:**
 1. 탭 버튼: `<button class="tab-btn codex-tab" ...>⬡ Codex CLI <span class="tab-ver">vX.X.X</span>` 버전
 2. `<span class="meta-version">` 버전 번호
 3. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
-4. changelog-toggle span: `📋 최근 변경사항 (v0.xxx–xxx)` 범위 레이블
-5. `<ul>` 안 `<li>` 목록 — 기존 항목 위에 신규 항목 삽입, 오래된 항목 정리 (`<span class="badge-new">NEW</span>` 뱃지 부여)
+4. changelog-toggle span: `📋 최근 변경사항 (v0.xxx.x)` — 최신 버전만 표시하도록 레이블 수정
+5. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-codex" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
 
 ### 4단계: 툴팁 JS 파일 업데이트
 
@@ -85,7 +85,10 @@ window.CODEX_TIPS  = { "키": { "title": "...", "desc": "...", "example": "..." 
    - **메인 참조 테이블**: 신규 명령어, 플래그, 설정 키 등이 메인 테이블 본문에 반영될 때 설명 옆에 `NEW` 뱃지를 추가하여 시인성을 높입니다.
 2. **이전 뱃지 제거**:
    - 업데이트를 시작할 때, 이전 버전에 붙어 있던 **모든** `NEW` 뱃지를 제거합니다. 파일 전체에서 `badge-new`를 검색하여 새로 업데이트할 항목 외에는 남지 않도록 합니다.
-3. **특수 기능/실험적 기능**:
+3. **히스토리 보존 (중요)**:
+   - 새로운 변경 사항을 추가할 때 기존에 있던 항목들을 삭제하지 마십시오.
+   - 가장 최근 버전의 변경 사항만 상단 `<ul>`에 남기고, 이전 버전의 항목들은 `<div class="history-container">` 영역 내부에 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 이동시키십시오. 이를 통해 전체 히스토리가 체계적으로 보존되도록 합니다.
+4. **특수 기능/실험적 기능**:
    - 정식 기능이 아닌 실험적인 기능은 `<span class="badge-new">실험</span>` 또는 단순히 `(실험)` 텍스트를 병기하여 구분합니다.
 
 ### 8단계: 완료 보고

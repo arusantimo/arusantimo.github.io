@@ -390,6 +390,67 @@ kbd {
   font-family:'Cascadia Code','Consolas',monospace; font-size:10px; color:#86efac; white-space:pre;
 }
 #cl-tooltip .tt-label { font-size:9px; color:#9ca3af; margin-top:5px; }
+
+/* ─── HISTORY STYLES ─── */
+.hist-divider {
+  margin: 10px 0 5px;
+  padding: 4px 8px;
+  background: var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.hist-divider:hover { background: var(--border2); color: var(--text); }
+.history-container {
+  display: none;
+  border-left: 2px solid var(--border);
+  margin-left: 8px !important;
+  opacity: 0.9;
+  flex-direction: column;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+.history-container.open { display: flex; }
+.ver-group {
+  margin: 5px 0;
+  padding: 0 5px;
+}
+.ver-group summary {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+.ver-group summary::before {
+  content: '▶';
+  font-size: 8px;
+  margin-right: 6px;
+  transition: transform 0.2s;
+}
+.ver-group[open] summary::before {
+  transform: rotate(90deg);
+}
+.ver-group summary:hover {
+  background: var(--border);
+  color: var(--text);
+}
+.ver-group ul {
+  margin-top: 4px !important;
+  padding-left: 15px !important;
+}
+.hist-arrow { transition: transform 0.2s; }
+.hist-divider.open .hist-arrow { transform: rotate(180deg); }
 </style>
 </head>
 <body>
@@ -403,10 +464,10 @@ kbd {
 <!-- TAB BAR -->
 <div class="tab-bar">
   <button class="tab-btn claude-tab active" data-tab="claude" onclick="switchTab('claude')">
-    🤖 Claude Code <span class="tab-ver">v2.1.112</span>
+    🤖 Claude Code <span class="tab-ver">v2.1.116</span>
   </button>
   <button class="tab-btn codex-tab" data-tab="codex" onclick="switchTab('codex')">
-    ⬡ Codex CLI <span class="tab-ver">v0.121.0</span>
+    ⬡ Codex CLI <span class="tab-ver">v0.122.0</span>
   </button>
   <div class="tab-spacer"></div>
   <button class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
@@ -423,31 +484,84 @@ kbd {
     <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
   </div>
   <div class="meta">
-    <span class="meta-version">v2.1.112</span>
-    <span style="font-size:10px;color:var(--muted2);">2026-04-17</span>
+    <span class="meta-version">v2.1.116</span>
+    <span style="font-size:10px;color:var(--muted2);">2026-04-21</span>
   </div>
 </div>
 
 <div class="changelog-wrap">
   <div class="changelog-toggle" onclick="toggleCL(this)">
     <span class="arrow">▶</span>
-    <span>📋 최근 변경사항 (v2.1.92–112)</span>
+    <span>📋 최근 변경사항 (v2.1.116)</span>
   </div>
   <div class="changelog-body">
     <ul>
-      <li class="cl-tip" data-tt-title="claude-opus-4.7 auto 모드 수정 (v2.1.112)" data-tt-desc="auto 모드에서 claude-opus-4-7이 일시적으로 사용 불가하다는 오류가 수정됐습니다." data-tt-example="">auto 모드에서 <code>claude-opus-4-7</code> 일시 사용 불가 오류 수정 (v2.1.112) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="/ultrareview 명령어 (v2.1.111)" data-tt-desc="병렬 멀티에이전트 분석으로 클라우드에서 종합 코드 리뷰를 실행합니다. PR 번호를 지정하면 GitHub PR을 바로 리뷰합니다." data-tt-example=""><code>/ultrareview</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 코드 리뷰 (v2.1.111) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="/ultraplan 명령어 (v2.1.111)" data-tt-desc="로컬 터미널과 분리하여 클라우드에서 병렬 멀티에이전트 플래닝을 실행합니다. 웹 UI에서 검토 및 실시간 수정이 가능하며 완료 후 로컬로 텔레포트할 수 있습니다." data-tt-example="/ultraplan &quot;플랫폼 리팩토링 계획 수립&quot;"><code>/ultraplan</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 플래닝 (v2.1.111) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="xhigh effort 레벨 (v2.1.111)" data-tt-desc="Opus 4.7 전용 xhigh effort가 추가됩니다. high와 max 사이에 위치하며 /effort, --effort, 모델 피커에서 선택할 수 있습니다. 다른 모델은 high로 폴백됩니다." data-tt-example="/effort xhigh">Opus 4.7 전용 <code>xhigh</code> effort 레벨 추가 — high↔max 사이 (v2.1.111) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="/less-permission-prompts 스킬 (v2.1.111)" data-tt-desc="트랜스크립트를 분석해 자주 쓰이는 읽기 전용 Bash·MCP 도구 호출을 파악하고, .claude/settings.json에 추가할 allowlist를 자동 제안합니다." data-tt-example="/less-permission-prompts"><code>/less-permission-prompts</code> 스킬 추가 — allowlist 자동 제안 (v2.1.111) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="/effort 인터랙티브 슬라이더 (v2.1.111)" data-tt-desc="/effort를 인자 없이 사용하면 화살표 키로 레벨을 선택하고 Enter로 확인하는 인터랙티브 슬라이더가 열립니다." data-tt-example="/effort"><code>/effort</code> 인자 없이 실행 시 인터랙티브 슬라이더 표시 (v2.1.111) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="/tui fullscreen (v2.1.110)" data-tt-desc="/tui fullscreen 명령으로 동일 대화를 유지한 채 깜박임 없는 전체화면 렌더링으로 전환합니다. tui 설정으로도 기본값 지정 가능합니다." data-tt-example="/tui fullscreen"><code>/tui fullscreen</code> 명령 추가 — 깜박임 없는 전체화면 TUI 전환 (v2.1.110) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="thinking 힌트 조기 표시 (v2.1.107)" data-tt-desc="확장 사고 중 긴 작업에서 상태 힌트가 훨씬 빠르게 나타납니다. 응답 대기 중 상태를 더 빨리 확인할 수 있습니다." data-tt-example="">긴 작업 중 thinking 힌트를 더 빠르게 표시 (v2.1.107)</li>
-      <li class="cl-tip" data-tt-title="PreCompact 훅 지원 (v2.1.105)" data-tt-desc="컴팩션 직전에 훅을 실행합니다. exit 2 또는 JSON decision:block으로 컴팩션을 차단할 수 있습니다." data-tt-example="{&quot;hooks&quot;:{&quot;PreCompact&quot;:[{&quot;command&quot;:&quot;./check.sh&quot;}]}}">PreCompact 훅 지원 추가 — 컴팩션 차단 가능 (exit 2 또는 <code>{"decision":"block"}</code>) (v2.1.105)</li>
-      <li class="cl-tip" data-tt-title="/team-onboarding (v2.1.101)" data-tt-desc="현재 프로젝트의 Claude Code 사용 패턴을 분석해 신규 팀원용 온보딩 가이드를 자동 생성합니다." data-tt-example="/team-onboarding"><code>/team-onboarding</code> 명령어 추가 — 팀원 온보딩 가이드 생성 (v2.1.101)</li>
-      <li class="cl-tip" data-tt-title="기본 effort high로 상향 (v2.1.94)" data-tt-desc="API키·Bedrock·Vertex·Team·Enterprise 사용자의 기본 effort가 medium → high로 변경됐습니다. /effort 명령으로 조정 가능합니다." data-tt-example="/effort medium  # 속도 우선&#10;/effort high    # 새 기본값">기본 노력 수준이 API키·Bedrock·Vertex·Enterprise 사용자는 <code>medium</code>에서 <code>high</code>로 변경 (v2.1.94)</li>
-      <li class="cl-tip" data-tt-title="/vim 제거 (v2.1.92)" data-tt-desc="/vim 명령어가 제거됐습니다. Vim 모드는 /config → Editor mode에서 설정합니다." data-tt-example="/config  # → Editor mode → Vim"><code>/vim</code> 명령어 제거됨 — Vim 모드는 <code>/config</code> → Editor mode에서 설정 (v2.1.92)</li>
+      <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트" data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다." data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입 <span class="badge-new">NEW</span></li>
     </ul>
+    
+    <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span></div>
+    <div id="hist-claude" class="history-container">
+      
+      <details class="ver-group">
+        <summary>v2.1.112</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="claude-opus-4.7 auto 모드 수정 (v2.1.112)" data-tt-desc="auto 모드에서 claude-opus-4-7이 일시적으로 사용 불가하다는 오류가 수정됐습니다." data-tt-example="">auto 모드에서 <code>claude-opus-4-7</code> 일시 사용 불가 오류 수정</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.111</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="/ultrareview 명령어 (v2.1.111)" data-tt-desc="병렬 멀티에이전트 분석으로 클라우드에서 종합 코드 리뷰를 실행합니다. PR 번호를 지정하면 GitHub PR을 바로 리뷰합니다." data-tt-example=""><code>/ultrareview</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 코드 리뷰</li>
+          <li class="cl-tip" data-tt-title="/ultraplan 명령어 (v2.1.111)" data-tt-desc="로컬 터미널과 분리하여 클라우드에서 병렬 멀티에이전트 플래닝을 실행합니다. 웹 UI에서 검토 및 실시간 수정이 가능하며 완료 후 로컬로 텔레포트할 수 있습니다." data-tt-example="/ultraplan &quot;플랫폼 리팩토링 계획 수립&quot;"><code>/ultraplan</code> 명령어 추가 — 클라우드 병렬 멀티에이전트 플래닝</li>
+          <li class="cl-tip" data-tt-title="xhigh effort 레벨 (v2.1.111)" data-tt-desc="Opus 4.7 전용 xhigh effort가 추가됩니다. high와 max 사이에 위치하며 /effort, --effort, 모델 피커에서 선택할 수 있습니다. 다른 모델은 high로 폴백됩니다." data-tt-example="/effort xhigh">Opus 4.7 전용 <code>xhigh</code> effort 레벨 추가</li>
+          <li class="cl-tip" data-tt-title="/less-permission-prompts 스킬 (v2.1.111)" data-tt-desc="트랜스크립트를 분석해 자주 쓰이는 읽기 전용 Bash·MCP 도구 호출을 파악하고, .claude/settings.json에 추가할 allowlist를 자동 제안합니다." data-tt-example="/less-permission-prompts"><code>/less-permission-prompts</code> 스킬 추가 — allowlist 자동 제안</li>
+          <li class="cl-tip" data-tt-title="/effort 인터랙티브 슬라이더 (v2.1.111)" data-tt-desc="/effort를 인자 없이 사용하면 화살표 키로 레벨을 선택하고 Enter로 확인하는 인터랙티브 슬라이더가 열립니다." data-tt-example="/effort"><code>/effort</code> 인자 없이 실행 시 인터랙티브 슬라이더 표시</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.110</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="/tui fullscreen (v2.1.110)" data-tt-desc="/tui fullscreen 명령으로 동일 대화를 유지한 채 깜박임 없는 전체화면 렌더링으로 전환합니다. tui 설정으로도 기본값 지정 가능합니다." data-tt-example="/tui fullscreen"><code>/tui fullscreen</code> 명령 추가 — 깜박임 없는 전체화면 TUI 전환</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.107</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="thinking 힌트 조기 표시 (v2.1.107)" data-tt-desc="확장 사고 중 긴 작업에서 상태 힌트가 훨씬 빠르게 나타납니다. 응답 대기 중 상태를 더 빨리 확인할 수 있습니다." data-tt-example="">긴 작업 중 thinking 힌트를 더 빠르게 표시</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.105</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="PreCompact 훅 지원 (v2.1.105)" data-tt-desc="컴팩션 직전에 훅을 실행합니다. exit 2 또는 JSON decision:block으로 컴팩션을 차단할 수 있습니다." data-tt-example="{&quot;hooks&quot;:{&quot;PreCompact&quot;:[{&quot;command&quot;:&quot;./check.sh&quot;}]}}">PreCompact 훅 지원 추가 — 컴팩션 차단 가능 (exit 2 또는 <code>{"decision":"block"}</code>)</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.101</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="/team-onboarding (v2.1.101)" data-tt-desc="현재 프로젝트의 Claude Code 사용 패턴을 분석해 신규 팀원용 온보딩 가이드를 자동 생성합니다." data-tt-example="/team-onboarding"><code>/team-onboarding</code> 명령어 추가 — 팀원 온보딩 가이드 생성</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.94</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="기본 effort high로 상향 (v2.1.94)" data-tt-desc="API키·Bedrock·Vertex·Team·Enterprise 사용자의 기본 effort가 medium → high로 변경됐습니다. /effort 명령으로 조정 가능합니다." data-tt-example="/effort medium  # 속도 우선&#10;/effort high    # 새 기본값">기본 노력 수준이 API키·Bedrock·Vertex·Enterprise 사용자는 <code>medium</code>에서 <code>high</code>로 변경</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v2.1.92</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="/vim 제거 (v2.1.92)" data-tt-desc="/vim 명령어가 제거됐습니다. Vim 모드는 /config → Editor mode에서 설정합니다." data-tt-example="/config  # → Editor mode → Vim"><code>/vim</code> 명령어 제거됨 — Vim 모드는 <code>/config</code> → Editor mode에서 설정</li>
+        </ul>
+      </details>
+    </div>
   </div>
 </div>
 
@@ -725,7 +839,7 @@ kbd {
         <div class="group">
           <div class="group-label">Git Worktrees</div>
           <div class="row"><div class="row-key"><code>--worktree name</code></div><div class="row-desc">기능별 격리 브랜치</div></div>
-          <div class="row"><div class="row-key"><code>sparsePaths</code></div><div class="row-desc">필요한 디렉터리만 체크아웃</div></div>
+          <div class="row"><div class="row-key"><code>sparsePaths</code></div><div class="row-desc">필요한 디럭터리만 체크아웃</div></div>
           <div class="row"><div class="row-key"><code>/batch</code></div><div class="row-desc">워크트리 자동 생성</div></div>
         </div>
       </div>
@@ -886,6 +1000,7 @@ kbd {
           <div class="row"><div class="row-key"><code>showThinkingSummaries</code></div><div class="row-desc">사고 요약 표시 (기본 off)</div></div>
           <div class="row"><div class="row-key"><code>hooks: "defer"</code></div><div class="row-desc">헤드리스 일시정지 → 나중에 재개</div></div>
           <div class="row"><div class="row-key"><code>disableSkillShellExec</code></div><div class="row-desc">스킬/플러그인 !`cmd` 차단</div></div>
+          <div class="row cl-tip"><div class="row-key"><code>sandbox.network.deniedDomains</code></div><div class="row-desc">네트워크 차단 도메인 설정 <span class="badge-new">NEW</span></div></div>
         </div>
       </div>
       <div>
@@ -936,27 +1051,61 @@ kbd {
     <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
   </div>
   <div class="meta">
-    <span class="meta-version">v0.121.0</span>
-    <span style="font-size:10px;color:var(--muted2);">2026-04-17</span>
+    <span class="meta-version">v0.122.0</span>
+    <span style="font-size:10px;color:var(--muted2);">2026-04-21</span>
   </div>
 </div>
 
 <div class="changelog-wrap">
   <div class="changelog-toggle" onclick="toggleCL(this)">
     <span class="arrow">▶</span>
-    <span>📋 최근 변경사항 (v0.119.0–121.0)</span>
+    <span>📋 최근 변경사항 (v0.122.0)</span>
   </div>
   <div class="changelog-body">
     <ul>
-      <li class="cl-tip" data-tt-title="codex marketplace add (v0.121.0)" data-tt-desc="GitHub, git URL, 로컬 디렉터리, marketplace.json URL에서 플러그인 마켓플레이스를 설치할 수 있습니다." data-tt-example="codex marketplace add https://github.com/org/marketplace"><code>codex marketplace add</code> 명령 추가 — GitHub·git·로컬 마켓플레이스 설치 (v0.121.0) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="TUI 히스토리 검색 Ctrl+R (v0.121.0)" data-tt-desc="TUI 프롬프트에서 Ctrl+R로 이전 명령 히스토리를 역방향 검색할 수 있습니다. 슬래시 명령어도 로컬 히스토리에 저장됩니다." data-tt-example="">TUI 입력창에서 <code>Ctrl+R</code> 역방향 히스토리 검색 지원 (v0.121.0) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="메모리 모드 TUI 제어 (v0.121.0)" data-tt-desc="TUI와 app-server에서 메모리 모드 전환, 메모리 리셋·삭제, 메모리 확장 정리 등을 직접 제어할 수 있습니다." data-tt-example="">TUI/app-server에서 메모리 모드·리셋·삭제 직접 제어 가능 (v0.121.0) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="MCP 병렬 호출 opt-in (v0.121.0)" data-tt-desc="MCP Apps에서 tool call 지원 확장: 네임스페이스 등록, 병렬 호출 opt-in, 샌드박스 상태 메타데이터 전달 등이 추가됐습니다." data-tt-example="">MCP Apps 기능 확장 — 네임스페이스 등록, 병렬 호출 opt-in, 샌드박스 메타데이터 (v0.121.0) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="보안 devcontainer 프로파일 (v0.121.0)" data-tt-desc="bubblewrap을 지원하는 보안 devcontainer 프로파일이 추가됐습니다. macOS 샌드박스에서 Unix 소켓 허용 목록도 지원합니다." data-tt-example="">bubblewrap 지원 보안 devcontainer 프로파일 추가; macOS 샌드박스 Unix 소켓 허용 목록 (v0.121.0) <span class="badge-new">NEW</span></li>
-      <li class="cl-tip" data-tt-title="Realtime V2 에이전트 스트리밍 (v0.120.0)" data-tt-desc="백그라운드 에이전트 작업 진행 상황을 실시간으로 스트리밍합니다. 완료 전에도 중간 결과를 확인할 수 있습니다." data-tt-example="">Realtime V2 백그라운드 에이전트 진행상황 스트리밍 지원 (v0.120.0)</li>
-      <li class="cl-tip" data-tt-title="/resume ID·이름 지정 (v0.119.0)" data-tt-desc="TUI 내 /resume에 세션 ID나 이름을 직접 전달해 해당 세션으로 즉시 이동합니다." data-tt-example="/resume my-project-session&#10;/resume abc123def456"><code>/resume</code> 명령어로 TUI에서 ID 및 이름으로 세션 직접 이동 가능 (v0.119.0)</li>
-      <li class="cl-tip" data-tt-title="Codex CLI 업그레이드" data-tt-desc="npm으로 전역 설치된 Codex CLI를 최신 버전으로 업그레이드합니다." data-tt-example="npm i -g @openai/codex@latest&#10;codex --version">업그레이드: <code>npm i -g @openai/codex@latest</code></li>
+      <li class="cl-tip" data-tt-title="v0.122.0 업데이트" data-tt-desc="/side(사이드 대화창), !(실행 중 셸 명령 대기열) 추가. codex app 명령으로 데스크톱 앱을 관리하며, Plan Mode(격리 작업 공간)와 deny-read(보안 정책) 기능이 도입되었습니다." data-tt-example="">v0.122.0 업데이트 — <code>/side</code>, <code>!</code>, <code>codex app</code> 명령 추가 및 <code>Plan Mode</code> 도입 <span class="badge-new">NEW</span></li>
     </ul>
+
+    <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span></div>
+    <div id="hist-codex" class="history-container">
+      
+      <details class="ver-group">
+        <summary>v0.121.0</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="codex marketplace add (v0.121.0)" data-tt-desc="GitHub, git URL, 로컬 디렉터리, marketplace.json URL에서 플러그인 마켓플레이스를 설치할 수 있습니다." data-tt-example="codex marketplace add https://github.com/org/marketplace"><code>codex marketplace add</code> 명령 추가 — GitHub·git·로컬 마켓플레이스 설치</li>
+          <li class="cl-tip" data-tt-title="TUI 히스토리 검색 Ctrl+R (v0.121.0)" data-tt-desc="TUI 프롬프트에서 Ctrl+R로 이전 명령 히스토리를 역방향 검색할 수 있습니다. 슬래시 명령어도 로컬 히스토리에 저장됩니다." data-tt-example="">TUI 입력창에서 <code>Ctrl+R</code> 역방향 히스토리 검색 지원</li>
+          <li class="cl-tip" data-tt-title="메모리 모드 TUI 제어 (v0.121.0)" data-tt-desc="TUI와 app-server에서 메모리 모드 전환, 메모리 리셋·삭제, 메모리 확장 정리 등을 직접 제어할 수 있습니다." data-tt-example="">TUI/app-server에서 메모리 모드·리셋·삭제 직접 제어 가능</li>
+          <li class="cl-tip" data-tt-title="MCP 병렬 호출 opt-in (v0.121.0)" data-tt-desc="MCP Apps에서 tool call 지원 확장: 네임스페이스 등록, 병렬 호출 opt-in, 샌드박스 상태 메타데이터 전달 등이 추가됐습니다." data-tt-example="">MCP Apps 기능 확장 — 네임스페이스 등록, 병렬 호출 opt-in</li>
+          <li class="cl-tip" data-tt-title="보안 devcontainer 프로파일 (v0.121.0)" data-tt-desc="bubblewrap을 지원하는 보안 devcontainer 프로파일이 추가됐습니다. macOS 샌드박스에서 Unix 소켓 허용 목록도 지원합니다." data-tt-example="">bubblewrap 지원 보안 devcontainer 프로파일 추가</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v0.120.0</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="Realtime V2 에이전트 스트리밍 (v0.120.0)" data-tt-desc="백그라운드 에이전트 작업 진행 상황을 실시간으로 스트리밍합니다. 완료 전에도 중간 결과를 확인할 수 있습니다." data-tt-example="">Realtime V2 백그라운드 에이전트 진행상황 스트리밍 지원</li>
+          <li class="cl-tip" data-tt-title="TUI 훅 활동 표시 개선 (v0.120.0)" data-tt-desc="실행 중인 훅과 완료된 훅이 분리 표시됩니다. 완료된 훅 출력은 유용한 경우에만 유지되어 화면이 깔끔해집니다." data-tt-example="">TUI 내 훅 활동 표시 개선 — 실행 중 / 완료 훅 분리 표시</li>
+          <li class="cl-tip" data-tt-title="TUI 상태줄 스레드 제목 (v0.120.0)" data-tt-desc="config.toml의 status_line에서 {thread_title} 변수로 현재 세션 제목을 상태줄에 표시할 수 있습니다." data-tt-example="# config.toml&#10;[tui]&#10;status_line = &quot;{thread_title} | {model}&quot;">TUI 상태줄에 스레드 제목 포함 가능</li>
+          <li class="cl-tip" data-tt-title="Windows 샌드박스 버그 수정 (v0.120.0)" data-tt-desc="Windows elevated 샌드박스에서 스플릿 파일시스템 정책과 심볼릭 링크가 있는 writable root 처리가 수정됐습니다." data-tt-example="">Windows 샌드박스 스플릿 파일시스템 관련 버그 수정</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>v0.119.0</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="/resume ID·이름 지정 (v0.119.0)" data-tt-desc="TUI 내 /resume에 세션 ID나 이름을 직접 전달해 해당 세션으로 즉시 이동합니다." data-tt-example="/resume my-project-session&#10;/resume abc123def456"><code>/resume</code> 명령어로 TUI에서 ID 및 이름으로 세션 직접 이동 가능</li>
+          <li class="cl-tip" data-tt-title="Realtime 음성 v2 WebRTC 기본값 (v0.119.0)" data-tt-desc="음성 세션이 v2 WebRTC 경로를 기본으로 사용합니다." data-tt-example="# config.toml&#10;[voice]&#10;transport = 'webrtc'">Realtime 음성 세션 v2 WebRTC 경로 기본 적용</li>
+          <li class="cl-tip" data-tt-title="MCP Apps 리소스·툴 강화 (v0.119.0)" data-tt-desc="MCP 서버에서 리소스 읽기, 도구 메타데이터, 파일 파라미터 업로드 등을 지원합니다." data-tt-example="codex mcp add myserver -- http://localhost:8080">MCP Apps 서버: 리소스 읽기·보다 풍부한 툴 지원</li>
+        </ul>
+      </details>
+
+      <details class="ver-group">
+        <summary>유지보수</summary>
+        <ul>
+          <li class="cl-tip" data-tt-title="Codex CLI 업그레이드" data-tt-desc="npm으로 전역 설치된 Codex CLI를 최신 버전으로 업그레이드합니다." data-tt-example="npm i -g @openai/codex@latest&#10;codex --version">업그레이드: <code>npm i -g @openai/codex@latest</code></li>
+        </ul>
+      </details>
+    </div>
   </div>
 </div>
 
@@ -1028,6 +1177,8 @@ kbd {
       <div class="row"><div class="row-key"><code>/copy</code></div><div class="row-desc">마지막 응답 복사</div></div>
       <div class="row"><div class="row-key"><code>/status</code></div><div class="row-desc">모델/권한/토큰 확인</div></div>
       <div class="row"><div class="row-key"><code>/debug-config</code></div><div class="row-desc">config 레이어 진단</div></div>
+      <div class="row cl-tip"><div class="row-key"><code>/side</code></div><div class="row-desc">사이드 대화창 열기 <span class="badge-new">NEW</span></div></div>
+      <div class="row cl-tip"><div class="row-key"><code>!</code></div><div class="row-desc">셸 명령 대기열 입력 <span class="badge-new">NEW</span></div></div>
     </div>
     <div class="group">
       <div class="group-label">작업 흐름</div>
@@ -1067,6 +1218,8 @@ kbd {
       <div class="row cl-tip"><div class="row-key"><code>[sandbox_workspace_write]</code></div><div class="row-desc">세부 샌드박스 설정</div></div>
       <div class="row cl-tip"><div class="row-key"><code>web_search = "cached"</code></div><div class="row-desc">기본 검색 캐시 모드</div></div>
       <div class="row cl-tip"><div class="row-key"><code>web_search = "live"</code></div><div class="row-desc">실시간 검색 또는 <code>--search</code></div></div>
+      <div class="row cl-tip"><div class="row-key"><code>deny-read</code></div><div class="row-desc">파일 읽기 명시적 차단 규칙 <span class="badge-new">NEW</span></div></div>
+      <div class="row cl-tip"><div class="row-key"><code>Plan Mode</code></div><div class="row-desc">격리된 작업 공간 제공 <span class="badge-new">NEW</span></div></div>
     </div>
   </div>
 
@@ -1267,6 +1420,13 @@ function switchTab(tab) {
 // Scoped tooltip apply (sync, data pre-loaded via script tag)
 applyTooltips(window.CLAUDE_TIPS, document.getElementById('tab-claude'));
 applyTooltips(window.CODEX_TIPS, document.getElementById('tab-codex'));
+
+function toggleHist(type) {
+  const list = document.getElementById('hist-' + type);
+  const divider = list.previousElementSibling;
+  list.classList.toggle('open');
+  divider.classList.toggle('open');
+}
 </script>
 </body>
 </html>

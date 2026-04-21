@@ -6,7 +6,7 @@ window.CODEX_TIPS = {
   },
   "codex exec \"prompt\"": {
     "title": "codex exec — 헤드리스 태스크 실행",
-    "desc": "대화형 TUI 없이 단일 태스크를 실행하고 결과를 출력합니다. CI/CD 파이프라인, 스크립트 에서 사용합니다.",
+    "desc": "대화형 TUI 없이 단일 태스크를 실행하고 결과를 출력합니다. 사용자 설정(rules/config)을 무시하고 독립된 환경에서 실행할 수도 있습니다.",
     "example": "codex exec \"auth.ts의 버그를 찾아 수정해\"\ncodex exec \"README를 한국어로 번역해\""
   },
   "codex exec resume --last": {
@@ -558,6 +558,31 @@ window.CODEX_TIPS = {
     "title": "web_search = \"live\" — 실시간 웹 검색",
     "desc": "샌드박스 모드에서 실시간 웹 검색을 허용합니다. 최신 정보가 필요하지만 네트워크 접근이 허용된 환경에서 사용합니다.",
     "example": "[sandbox_workspace_write]\nweb_search = \"live\""
+  },
+  "/side": {
+    "title": "/side — 사이드 대화창",
+    "desc": "TUI 모드에서 빠른 Q&A를 위해 화면 측면에 별도의 대화창을 엽니다. 메인 작업 흐름을 방해하지 않고 질문할 수 있습니다.",
+    "example": "/side \"이 함수 사용법 알려줘\""
+  },
+  "!": {
+    "title": "! — 셸 명령 대기열 입력",
+    "desc": "작업 실행 중에도 대기열에 셸 명령을 직접 입력하여 실행을 예약할 수 있습니다.",
+    "example": "!ls -la"
+  },
+  "codex app": {
+    "title": "codex app — 데스크톱 앱 관리",
+    "desc": "Codex 데스크탑 앱(Windows/Mac)을 설치하고 관리합니다. 터미널 외부에서도 Codex 기능을 활용할 수 있게 해줍니다.",
+    "example": "codex app"
+  },
+  "Plan Mode": {
+    "title": "Plan Mode — 작업 공간 격리",
+    "desc": "구현에 집중할 수 있는 별도의 작업 공간(Context)을 제공하여 복잡한 태스크를 체계적으로 관리합니다.",
+    "example": "Plan Mode 활성화 후 작업 수행"
+  },
+  "deny-read": {
+    "title": "deny-read — 보안 정책 강화",
+    "desc": "특정 파일이나 디렉터리에 대한 읽기 접근을 명시적으로 차단하는 글로브(glob) 정책입니다. 샌드박스 보안을 더욱 강화합니다.",
+    "example": "deny-read = [\"env.*\", \"secrets/*\"]"
   }
 }
 ;

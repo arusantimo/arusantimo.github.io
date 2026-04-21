@@ -16,7 +16,7 @@ window.CLAUDE_TIPS = {
   },
   "/loop [interval]": {
     "title": "/loop — 반복 예약 작업",
-    "desc": "지정한 간격(예: 5m, 1h)마다 프롬프트·슬래시 명령을 자동 실행합니다. Cron 스케줄링 도구를 내부적으로 사용합니다. /proactive 가 별칭입니다.",
+    "desc": "지정한 간격(예: 5m, 1h)마다 프롬프트·슬래시 명령을 자동 실행합니다. /proactive가 별칭입니다. 대기 중 Esc 키를 눌러 대기 중인 wakeups를 취소할 수 있습니다.",
     "example": "/loop 5m check the deploy\n/loop 1h /simplify"
   },
   "/claude-api": {
@@ -376,7 +376,7 @@ window.CLAUDE_TIPS = {
   },
   "/terminal-setup": {
     "title": "/terminal-setup — 터미널 키바인딩 설정",
-    "desc": "현재 사용 중인 터미널(iTerm2, Ghostty, Kitty, WezTerm, Warp 등)에 최적화된 키바인딩을 설정합니다.",
+    "desc": "현재 사용 중인 터미널(iTerm2, Ghostty, Kitty, WezTerm, Warp 등)에 최적화된 키바인딩을 설정합니다. VS Code 등 에디터의 스크롤 감도 설정 기능이 포함되어 있습니다.",
     "example": "/terminal-setup"
   },
   "/init": {
@@ -483,6 +483,11 @@ window.CLAUDE_TIPS = {
     "title": "/schedule — 클라우드 예약 작업",
     "desc": "Claude Code Cloud에서 정기적으로 실행될 작업을 예약합니다. 코드 점검, 자동화 태스크 등에 활용합니다.",
     "example": "/schedule"
+  },
+  "/ultrareview": {
+    "title": "/ultrareview — 멀티에이전트 코드 리뷰",
+    "desc": "병렬 멀티에이전트 분석으로 클라우드에서 종합 코드 리뷰를 실행합니다. 병렬 체크 및 diffstat 표시 도입으로 속도와 가독성이 향상되었습니다.",
+    "example": "/ultrareview\n/ultrareview 123  # PR 리뷰"
   },
   "/security-review": {
     "title": "/security-review — 변경사항 보안 분석",
@@ -798,8 +803,13 @@ window.CLAUDE_TIPS = {
   },
   "/tui fullscreen": {
     "title": "/tui fullscreen — 전체화면 모드",
-    "desc": "깜박임(Flicker) 없는 전체화면 TUI 렌더링으로 전환합니다. 전용 버퍼를 사용해 터미널 환경에서도 웹 앱과 같은 부드러운 UI를 제공합니다.",
+    "desc": "깜박임 없는 전체화면 TUI 렌더링으로 전환합니다. 대화 흐름을 유지하면서 더 넓은 작업 공간을 제공합니다.",
     "example": "/tui fullscreen"
+  },
+  "sandbox.network.deniedDomains": {
+    "title": "deniedDomains — 네트워크 접근 제한",
+    "desc": "특정 도메인에 대한 네트워크 접근을 명시적으로 차단합니다. 보안 강화를 위해 .claude/settings.json에서 설정합니다.",
+    "example": "{\"sandbox\": {\"network\": {\"deniedDomains\": [\"example.com\"]}}}"
   },
   "Setup": {
     "title": "Setup 훅 — 프로젝트 진입 시",
