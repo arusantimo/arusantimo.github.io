@@ -837,8 +837,8 @@
                 return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0');
             });
 
-            // 목표 자산: 월말 예상 자산
-            const targetAssets = allTableRows.map(r => r.assetAfter);
+            // 목표 자산: 초기 목표 자산
+            const targetAssets = allTableRows.map(r => r.initialAssetAfter);
 
             // 실제 자산: 실제 입력값 기반, 없으면 null
             const actualAssets = allTableRows.map(r => {
@@ -872,7 +872,7 @@
                 labels,
                 datasets: [
                     {
-                        label: '목표 자산',
+                        label: '초기 목표 자산',
                         data: targetAssets,
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.08)',
