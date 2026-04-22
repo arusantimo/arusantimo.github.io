@@ -1,0 +1,694 @@
+/* ─── BASE VARIABLES ─── */
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --border: #e5e5e0;
+  --border2: #d4d4cc;
+  --text: #1a1a18;
+  --muted: #6b6b65;
+  --muted2: #9b9b93;
+  --new-bg: #ecfdf5;
+  --new-text: #059669;
+  --new-border: #a7f3d0;
+  --code-bg: #f4f4f0;
+  --code-border: #deded8;
+  --kbd-bg: #f0f0ea;
+  --kbd-border: #c8c8c0;
+  --kbd-shadow: #a8a8a0;
+  --win-blue: #0078d4;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ─── TOP BANNER ─── */
+.top-banner {
+  background: #1a1a18;
+  color: #fafaf8;
+  padding: 4px 16px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.win-badge {
+  background: var(--win-blue);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+}
+
+/* ─── TAB BAR ─── */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 2px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 0;
+  padding: 0 8px;
+}
+
+.tab-btn {
+  padding: 7px 22px;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tab-btn:hover {
+  color: var(--text);
+}
+
+.tab-btn.claude-tab.active {
+  color: #d4500a;
+  border-bottom-color: #d4500a;
+}
+
+.tab-btn.codex-tab.active {
+  color: #0f766e;
+  border-bottom-color: #0f766e;
+}
+
+.tab-ver {
+  font-size: 9px;
+  font-weight: 400;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 0 4px;
+  color: var(--muted2);
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+}
+
+.tab-spacer {
+  flex: 1;
+}
+
+.print-btn {
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--muted);
+  align-self: center;
+  margin-left: 4px;
+}
+
+.print-btn:hover {
+  background: var(--code-bg);
+}
+
+/* ─── TAB PANES ─── */
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* ─── PER-PANE ACCENT COLORS ─── */
+.claude-pane {
+  --accent: #d4500a;
+  --accent-bg: #fff4ef;
+  --section-icon: #d4500a;
+}
+
+.codex-pane {
+  --accent: #0f766e;
+  --accent-bg: #ecfeff;
+  --section-icon: #0f766e;
+}
+
+.claude-pane code {
+  color: #c2410c;
+}
+
+.codex-pane code {
+  color: #0f766e;
+}
+
+/* ─── PAGE HEADER ─── */
+.page-header {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text);
+}
+
+.page-header h1 span {
+  color: var(--accent);
+}
+
+.meta {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meta-version {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  color: var(--text);
+}
+
+/* ─── CHANGELOG TOGGLE ─── */
+.changelog-wrap {
+  border-bottom: 1px solid var(--border);
+  background: var(--accent-bg);
+}
+
+.changelog-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 16px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.claude-pane .changelog-toggle:hover {
+  background: rgba(212, 80, 10, 0.05);
+}
+
+.codex-pane .changelog-toggle:hover {
+  background: rgba(15, 118, 110, 0.06);
+}
+
+.changelog-toggle .arrow {
+  font-size: 9px;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.changelog-toggle.open .arrow {
+  transform: rotate(90deg);
+}
+
+.changelog-body {
+  display: none;
+  padding: 0 16px 8px;
+  font-size: 11px;
+  color: var(--text);
+}
+
+.changelog-body.open {
+  display: block;
+}
+
+.changelog-body ul {
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--muted);
+}
+
+.claude-pane .changelog-body code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: rgba(212, 80, 10, 0.08);
+  padding: 0 3px;
+  border-radius: 2px;
+  color: var(--accent);
+}
+
+.codex-pane .changelog-body code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: rgba(15, 118, 110, 0.08);
+  padding: 0 3px;
+  border-radius: 2px;
+  color: var(--accent);
+}
+
+/* ─── MAIN LAYOUT ─── */
+.main {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--border);
+}
+
+.section {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px 12px;
+}
+
+.section:last-child {
+  border-right: none;
+}
+
+.section.wide {
+  grid-column: span 2;
+}
+
+.section.full {
+  grid-column: span 3;
+  border-right: none;
+}
+
+.section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--section-icon);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border);
+}
+
+.group {
+  margin-bottom: 8px;
+}
+
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.group-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted2);
+  margin-bottom: 3px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 1.5px 0;
+  line-height: 1.35;
+}
+
+.row-key {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.row-desc {
+  font-size: 12px;
+  color: var(--muted);
+  flex: 1;
+}
+
+/* ─── CODE ─── */
+code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 3px;
+  padding: 0px 4px;
+  white-space: nowrap;
+}
+
+/* ─── KBD ─── */
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 9.5px;
+  font-weight: 600;
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-bottom: 2px solid var(--kbd-shadow);
+  border-radius: 3px;
+  padding: 0px 5px;
+  min-width: 20px;
+  color: var(--text);
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+.plus {
+  font-size: 9px;
+  color: var(--muted2);
+  margin: 0 1px;
+}
+
+/* ─── BADGES ─── */
+.badge-new {
+  display: inline-flex;
+  align-items: center;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: var(--new-bg);
+  color: var(--new-text);
+  border: 1px solid var(--new-border);
+  border-radius: 3px;
+  padding: 0px 4px;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+.badge-warn {
+  display: inline-flex;
+  font-size: 8px;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 3px;
+  padding: 0px 4px;
+  vertical-align: middle;
+  margin-left: 2px;
+}
+
+.os-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  color: var(--win-blue);
+  background: #e8f4fd;
+  border: 1px solid #90caf9;
+  border-radius: 3px;
+  padding: 0px 5px;
+  margin-left: 3px;
+}
+
+/* ─── MULTI-COL ─── */
+.cols2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.cols3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0 14px;
+}
+
+/* ─── KBD ROWS (Claude keyboard section) ─── */
+.krow {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 1px 0;
+  line-height: 1.3;
+}
+
+.kkey {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  min-width: 86px;
+}
+
+.kkey kbd {
+  font-size: 9px;
+  padding: 0px 3px;
+  min-width: 16px;
+  line-height: 1.55;
+}
+
+.kdesc {
+  font-size: 10.5px;
+  color: var(--muted);
+  flex: 1;
+}
+
+/* ─── FOOTER ─── */
+.footer-modes {
+  border-top: 1px solid var(--border);
+  padding: 6px 16px;
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.footer-modes strong {
+  color: var(--text);
+}
+
+.footer-modes code {
+  font-size: 9.5px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .main {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section.wide {
+    grid-column: span 2;
+  }
+
+  .section.full {
+    grid-column: span 2;
+  }
+
+  .cols3 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .tab-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .section.wide,
+  .section.full {
+    grid-column: span 1;
+  }
+
+  .cols3,
+  .cols2 {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: 10px 10px 12px;
+  }
+}
+
+@media print {
+
+  .top-banner,
+  .tab-bar {
+    display: none;
+  }
+
+  .tab-pane {
+    display: block !important;
+  }
+
+  .tab-pane:not(.active) {
+    display: none !important;
+  }
+
+  .main {
+    break-inside: avoid;
+  }
+
+  .section {
+    break-inside: avoid;
+  }
+}
+
+/* ─── CUSTOM TOOLTIP ─── */
+.cl-tip {
+  position: relative;
+  cursor: default;
+}
+
+.cl-tip::after {
+  content: ' ℹ';
+  font-size: 9px;
+  color: var(--accent);
+  opacity: 0.55;
+}
+
+#cl-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  max-width: 340px;
+  background: #1c1c1a;
+  color: #e8e8e2;
+  border: 1px solid #3a3a38;
+  border-radius: 7px;
+  padding: 10px 13px;
+  font-size: 11px;
+  line-height: 1.55;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+#cl-tooltip .tt-title {
+  font-weight: 700;
+  font-size: 12px;
+  margin-bottom: 5px;
+  color: #fcd34d;
+}
+
+#cl-tooltip .tt-example {
+  margin-top: 6px;
+  background: #2a2a28;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  color: #86efac;
+  white-space: pre;
+}
+
+#cl-tooltip .tt-label {
+  font-size: 9px;
+  color: #9ca3af;
+  margin-top: 5px;
+}
+
+/* ─── HISTORY STYLES ─── */
+.hist-divider {
+  margin: 10px 0 5px;
+  padding: 4px 8px;
+  background: var(--border);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hist-divider:hover {
+  background: var(--border2);
+  color: var(--text);
+}
+
+.history-container {
+  display: none;
+  border-left: 2px solid var(--border);
+  margin-left: 8px !important;
+  opacity: 0.9;
+  flex-direction: column;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.history-container.open {
+  display: flex;
+}
+
+.ver-group {
+  margin: 5px 0;
+  padding: 0 5px;
+}
+
+.ver-group summary {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.ver-group summary::before {
+  content: '▶';
+  font-size: 8px;
+  margin-right: 6px;
+  transition: transform 0.2s;
+}
+
+.ver-group[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.ver-group summary:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.ver-group ul {
+  margin-top: 4px !important;
+  padding-left: 15px !important;
+}
+
+.hist-arrow {
+  transition: transform 0.2s;
+}
+
+.hist-divider.open .hist-arrow {
+  transform: rotate(180deg);
+}

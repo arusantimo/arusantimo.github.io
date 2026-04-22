@@ -1,0 +1,7 @@
+{
+    "antigravity.missionControl.viewLocation": "panel",
+    "antigravity.usage.showInStatusBar": true,
+    "antigravity.usage.trackComputeTime": true,
+    "antigravity.telemetry.enabled": true,
+    "antigravity.agentManager.autoOpen": true
+}
