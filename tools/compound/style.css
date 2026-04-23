@@ -1,0 +1,637 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #0f1419;
+    --bg-secondary: #1a1f28;
+    --bg-tertiary: #232a38;
+    --border-color: #2d3748;
+    --text-primary: #e2e8f0;
+    --text-secondary: #a0aec0;
+    --accent-primary: #00d9ff;
+    --accent-secondary: #7c3aed;
+    --accent-success: #10b981;
+    --accent-warning: #f59e0b;
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 20px 12px;
+    font-size: 13px;
+}
+
+header {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    border-radius: 12px;
+}
+
+header button:hover {
+    background: rgba(0, 217, 255, 0.1);
+    transform: scale(1.1);
+}
+
+header h1 {
+    font-size: 16px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    border-color: var(--accent-primary);
+    box-shadow: 0 20px 40px rgba(0, 217, 255, 0.1);
+}
+
+.card h2 {
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-weight: 700;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.input-group {
+    margin-bottom: 10px;
+}
+
+.input-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.input-wrapper input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.input-wrapper .unit {
+    flex: 0 0 auto;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: rgba(0, 217, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+}
+
+.unit {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    min-width: 40px;
+    flex: 0 0 auto;
+}
+
+.stats-box {
+    background: rgba(0, 217, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent-primary);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.stat-value {
+    font-size: 16px;
+    color: var(--accent-primary);
+    font-weight: 700;
+    font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.stats-box.long-term {
+    border-left-color: var(--accent-success);
+}
+
+.stats-box.long-term .stat-value {
+    color: var(--accent-success);
+}
+
+.stats-box.short-term {
+    border-left-color: var(--accent-warning);
+}
+
+.stats-box.short-term .stat-value {
+    color: var(--accent-warning);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.allocation-display {
+    background: rgba(0, 217, 255, 0.05);
+    border: 1px solid var(--border-color);
+    padding: 8px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 11px;
+}
+
+.allocation-bar {
+    display: flex;
+    height: 18px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 6px;
+    gap: 2px;
+    background: var(--border-color);
+}
+
+.allocation-segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+}
+
+.long-term-segment {
+    background: linear-gradient(90deg, var(--accent-success), #0d9488);
+}
+
+.short-term-segment {
+    background: linear-gradient(90deg, var(--accent-warning), #dc2626);
+}
+
+.table-card {
+    grid-column: 1 / -1;
+}
+
+.tab-container {
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+}
+
+#saveConfigBtn {
+    color: var(--accent-success);
+}
+
+#loadConfigBtn {
+    color: var(--accent-primary);
+}
+
+.tab {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.tab:hover {
+    color: var(--accent-primary);
+}
+
+.tab.active {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+table thead {
+    background: rgba(0, 217, 255, 0.05);
+    border-bottom: 1px solid var(--border-color);
+}
+
+table th {
+    padding: 6px;
+    text-align: right;
+    font-weight: 700;
+    color: var(--text-primary);
+    border-right: 1px solid var(--border-color);
+}
+
+table th:first-child {
+    text-align: left;
+}
+
+table th:last-child {
+    border-right: none;
+}
+
+table td {
+    padding: 6px;
+    text-align: right;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border-color);
+}
+
+table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+table td:last-child {
+    border-right: none;
+}
+
+table tbody tr:hover {
+    background: rgba(0, 217, 255, 0.05);
+}
+
+.number {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-weight: 600;
+}
+
+.highlight-row {
+    background: rgba(16, 185, 129, 0.08);
+    font-weight: 600;
+}
+
+.current-month-row {
+    background: rgba(0, 217, 255, 0.07);
+    outline: 1px solid rgba(0, 217, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    header {
+        padding: 12px 20px;
+    }
+
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .header-actions {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    table {
+        font-size: 11px;
+    }
+
+    table th,
+    table td {
+        padding: 8px;
+    }
+}
+
+.toggle-short-cumul-btn {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: var(--accent-warning);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.toggle-short-cumul-btn:hover {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+.actual-input {
+    width: 100%;
+    padding: 4px 0px 4px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 11px;
+    text-align: right;
+    transition: border-color 0.2s;
+}
+
+.actual-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.actual-input::placeholder {
+    color: var(--text-secondary);
+    font-size: 10px;
+}
+
+.actual-cell {
+    min-width: 100px;
+}
+
+/* 추가 모바일 최적화 (좁은 화면에서 컬럼 숨김, 터치영역 확장 등) */
+@media (max-width: 480px) {
+    body {
+        padding: 16px 12px;
+    }
+
+    .container {
+        padding: 0 12px;
+    }
+
+    .card {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .input-wrapper input {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .unit {
+        min-width: 36px;
+        font-size: 12px;
+    }
+
+    .tab {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .tabs {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .allocation-bar {
+        height: 18px;
+    }
+
+    .allocation-segment {
+        font-size: 10px;
+    }
+
+    /* 좁은 화면에서 덜 중요한 컬럼 숨기기 */
+    table th:nth-child(4),
+    table td:nth-child(4),
+    table th:nth-child(5),
+    table td:nth-child(5),
+    table th:nth-child(6),
+    table td:nth-child(6),
+    table th:nth-child(7),
+    table td:nth-child(7) {
+        display: none;
+    }
+
+    /* 버튼 터치타깃 확장 */
+    .icon-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+        padding: 8px;
+    }
+}
+
+/* 중간 크기 대응 (481px ~ 675px) */
+@media (min-width: 481px) and (max-width: 675px) {
+    body {
+        padding: 28px 12px;
+    }
+
+    .container {
+        padding: 0 12px;
+    }
+
+    header {
+        padding: 12px 16px;
+        border-radius: 12px;
+    }
+
+    .card {
+        padding: 18px;
+    }
+
+    .input-wrapper {
+        gap: 6px;
+    }
+
+    .input-wrapper input {
+        padding: 11px 10px;
+        font-size: 14px;
+    }
+
+    .unit {
+        min-width: 40px;
+    }
+
+    .allocation-bar {
+        height: 20px;
+    }
+
+    .tab {
+        padding: 10px 12px;
+    }
+
+    /* 테이블 가로 스크롤을 항상 가능하게 하여 화면에서 바로 스크롤하여 볼 수 있게 함 */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        scroll-snap-type: x proximity;
+    }
+
+    table {
+        min-width: 760px;
+    }
+
+    /* 가로 스크롤바 스타일(선택적) */
+    .table-wrapper::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 4px;
+    }
+}
+
+/* 600px 이하에서는 전체 레이아웃을 화면 너비에 맞춰 축소 */
+@media (max-width: 600px) {
+    body {
+        padding: 16px 10px;
+    }
+
+    .container {
+        padding: 0 10px;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    header {
+        padding: 10px 12px;
+        border-radius: 12px;
+    }
+
+    header h1 {
+        font-size: 16px;
+    }
+
+    .card {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .input-wrapper {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .input-wrapper input {
+        flex: 1 1 100%;
+        min-width: 0;
+        width: 100%;
+        padding: 10px 10px;
+        font-size: 14px;
+    }
+
+    .unit {
+        min-width: 36px;
+        flex: 0 0 auto;
+    }
+
+    .allocation-bar {
+        height: 18px;
+    }
+
+    .tab {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+
+    /* 표는 화면에 맞춰 축소되도록 설정 (필요 시 가로 스크롤 허용) */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        width: 100%;
+        min-width: 0;
+        table-layout: fixed;
+        font-size: 12px;
+    }
+
+    table th,
+    table td {
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        text-align: left;
+        padding: 8px;
+    }
+}

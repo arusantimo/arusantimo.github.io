@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자산 운용 시뮬레이터 - Arusantimo Tools</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <header>
+        <h1>💰 자산 운용 시뮬레이터</h1>
+        <div class="header-actions">
+            <button id="saveConfigBtn" class="icon-btn" title="설정 저장">💾</button>
+            <button id="loadConfigBtn" class="icon-btn" title="설정 로드">📂</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <!-- 기본 설정 -->
+            <div class="card">
+                <h2>⚙️ 기본 설정</h2>
+
+                <div class="input-group">
+                    <label class="input-label">초기 원금</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="principal" value="500000000" min="0">
+                        <span class="unit">원</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">연간 수익 목표</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="annualTargetRate" value="12" min="0" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">
+                        월 재투자 금액
+                        <span
+                            style="font-size: 10px; color: var(--accent-primary); font-weight: normal; margin-left: 4px;">(매월
+                            25일 입금)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="number" id="monthlyInvestment" value="5000000" min="0">
+                        <span class="unit">원</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">시작 날짜</label>
+                    <div class="input-wrapper">
+                        <input type="date" id="startDate" value="2026-01-01">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">종료 날짜</label>
+                    <div class="input-wrapper">
+                        <input type="date" id="endDate" value="2028-01-01">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 투자 비율 설정 -->
+            <div class="card">
+                <h2>🎯 투자 비율 & 목표 설정</h2>
+
+                <div class="input-group">
+                    <label class="input-label">장기 투자 비율</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="longTermRatio" value="60" min="0" max="100" step="1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">장기 투자 목표 (연)</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="longTermAnnualTarget" value="10" min="0" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">단기 투자 비율</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="shortTermRatio" value="40" min="0" max="100" step="1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+
+                <div class="allocation-display">
+                    <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 6px;">투자 비율 배분</div>
+                    <div class="allocation-bar">
+                        <div class="allocation-segment long-term-segment" id="longTermBar" style="width: 60%;">
+                            <span id="longTermText">60%</span>
+                        </div>
+                        <div class="allocation-segment short-term-segment" id="shortTermBar" style="width: 40%;">
+                            <span id="shortTermText">40%</span>
+                        </div>
+                    </div>
+                    <div id="monthlyInvestmentSplit"
+                        style="margin-top:8px; font-size:11px; color:var(--text-secondary);">
+                        월 재투자: <span id="monthlyInvestmentTotal" class="number">-</span>원 —
+                        <span id="longTermInvestAmount" class="number">-</span>원(장) +
+                        <span id="shortTermInvestAmount" class="number">-</span>원(단)
+                    </div>
+                </div>
+            </div>
+
+            <!-- 월별 상세 테이블 -->
+            <div class="card table-card">
+                <div
+                    style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
+                    <h2 style="margin-bottom:0; padding-bottom:0; border-bottom:none;">📋 월별 투자 수익 상세</h2>
+                    <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적
+                        숨기기</button>
+                </div>
+
+                <div
+                    style="font-size: 11px; color: var(--text-secondary); margin-bottom: 20px; padding: 10px; background: rgba(0, 217, 255, 0.05); border-radius: 8px; border: 1px solid rgba(0, 217, 255, 0.1); line-height: 1.5;">
+                    💡 <strong>결산 가이드:</strong> 재투자 금액은 <strong>매월 25일</strong>에 입금된다고 가정합니다. 따라서 추가된 투자금이 반영된
+                    <strong>월말(말일 장 마감 후)</strong>에 <code>[실제 단기 수익]</code>과 <code>[실제 장기 누적]</code>을 입력하셔야 정확한 성과 추적이
+                    가능합니다.
+                </div>
+
+                <div class="tab-container">
+                    <div class="tabs" id="yearTabs">
+                        <!-- 동적으로 생성됨 -->
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>월차 (기간)</th>
+                                <th>월초 자산</th>
+                                <th>필요 총 수익금</th>
+                                <th>필요 단기 수익금</th>
+                                <th class="col-short-cumul">단기 누적 수익금</th>
+                                <th>필요 장기투자 누적(실제)</th>
+                                <th>예상 월말 목표 자산</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- 동적으로 생성됨 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <canvas id="profitChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
