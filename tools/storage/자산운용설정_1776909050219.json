@@ -1,0 +1,17 @@
+{
+  "principal": "514000000",
+  "monthlyTargetRate": "1",
+  "monthlyInvestment": "5000000",
+  "startDate": "2026-04-01",
+  "endDate": "2036-04-01",
+  "longTermRatio": "57.64",
+  "longTermAnnualTarget": "4",
+  "shortTermRatio": "42.36",
+  "actualValues": {
+    "1": {
+      "shortTerm": 8526000,
+      "longTermCumul": 303846000
+    }
+  },
+  "timestamp": "2026-04-23T01:50:50.218Z"
+}
