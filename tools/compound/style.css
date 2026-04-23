@@ -635,3 +635,85 @@ table tbody tr:hover {
         padding: 8px;
     }
 }
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    width: 90%;
+    max-width: 900px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.setting-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 4px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.setting-btn:hover {
+    opacity: 1;
+}
+
+/* Table Tooltip Styles */
+.table-tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.table-tooltip-content {
+    visibility: hidden;
+    position: absolute;
+    z-index: 100;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 10px;
+    background-color: rgba(26, 31, 40, 0.98);
+    color: var(--text-primary);
+    text-align: left;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    font-size: 11px;
+    line-height: 1.5;
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+.table-tooltip-container:hover .table-tooltip-content {
+    visibility: visible;
+    opacity: 1;
+}
+
+.table-tooltip-content::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent var(--border-color) transparent transparent;
+}

@@ -1,10 +1,23 @@
 let allTableRows = [];
 let yearGroups = {};
 let actualValues = {}; // { month: { shortTerm: number|null, longTermCumul: number|null } }
+let monthSettingsOverrides = {}; // { month: { annualTargetRate, monthlyInvestment, longTermRatio, shortTermRatio, longTermAnnualTarget } }
 let profitChartInstance = null;
 let showShortCumul = true;
 let longTermPrincipalGlobal = 0;
 let shortTermPrincipalGlobal = 0;
+
+let globalSettings = {
+    principal: 500000000,
+    annualTargetRate: 12,
+    monthlyInvestment: 5000000,
+    startDate: '2026-01-01',
+    endDate: '2028-01-01',
+    longTermRatio: 60,
+    longTermAnnualTarget: 10,
+    shortTermRatio: 40
+};
+let currentSettingsTab = 0; // 0 = global
 
 function toggleShortCumul() {
     showShortCumul = !showShortCumul;
@@ -28,7 +41,7 @@ function renderChart() {
     if (!canvas || allTableRows.length === 0) return;
 
     const labels = allTableRows.map(r => {
-        const d = new Date(document.getElementById('startDate').value);
+        const d = new Date(globalSettings.startDate);
         d.setMonth(d.getMonth() + r.month - 1);
         return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0');
     });
@@ -269,15 +282,36 @@ function renderTableByYear(year) {
         const longTermRateColor = longTermRateDisplay !== null && parseFloat(longTermRateDisplay) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
         const isCurrentMonth = row.year === currentYear && (() => {
-            const d = new Date(document.getElementById('startDate').value);
+            const d = new Date(globalSettings.startDate);
             d.setMonth(d.getMonth() + row.month - 1);
             return d.getFullYear() === currentYear && (d.getMonth() + 1) === currentMonth;
         })();
         const rowClass = row.highlight ? 'highlight-row' : isCurrentMonth ? 'current-month-row' : '';
 
+        const override = monthSettingsOverrides[row.month];
+
         return `
             <tr ${rowClass ? `class="${rowClass}"` : ''}>
-                <td>${row.month}월차${isCurrentMonth ? ' <span style="color:var(--accent-primary); font-size:10px;">◀ 현재</span>' : ''}<br><span style="color:var(--text-secondary); font-size:10px;">${row.dateStr}</span></td>
+                <td>
+                    <div style="display:flex; align-items:center;">
+                        <button class="setting-btn" onclick="openMonthSettings(${row.month})" title="${row.month}월차부터 설정 변경">⚙️</button>
+                        <span style="font-weight:700;">${row.month}월차${isCurrentMonth ? ' <span style="color:var(--accent-primary); font-size:10px;">◀ 현재</span>' : ''}</span>
+                        ${override ? `
+                        <div class="table-tooltip-container">
+                            <span style="color:var(--accent-warning); font-size:10px; margin-left:4px; font-weight:normal; cursor:help;">(수정됨)</span>
+                            <div class="table-tooltip-content">
+                                <span style="color:var(--accent-warning); font-weight:600;">[적용된 새 설정]</span><br>
+                                연 수익: ${override.annualTargetRate}%<br>
+                                월 재투자: ${formatNumber(override.monthlyInvestment)}원<br>
+                                ${override.additionalSeed ? `<span style="color:var(--accent-primary);">+ 추가 시드: ${formatNumber(override.additionalSeed)}원</span><br>` : ''}
+                                장기: ${override.longTermRatio}% (목표 연 ${override.longTermAnnualTarget}%)<br>
+                                단기: ${override.shortTermRatio}%
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div style="color:var(--text-secondary); font-size:10px; margin-left: 22px; margin-top: 2px;">${row.dateStr}</div>
+                </td>
                 <td>
                     <div style="font-size:9px; color:var(--text-secondary); margin-bottom:2px;">목표</div>
                     <div class="number">${formatNumber(idx === 0 ? row.assetBefore : allTableRows[idx - 1].assetAfter)}</div>
@@ -366,14 +400,14 @@ function createYearTabs() {
 }
 
 function calculateAndDisplay() {
-    const principal = parseFloat(document.getElementById('principal').value) || 0;
-    const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value) || 0;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const longTermRatio = parseFloat(document.getElementById('longTermRatio').value) || 0;
-    const shortTermRatio = parseFloat(document.getElementById('shortTermRatio').value) || 0;
-    const annualTargetRate = parseFloat(document.getElementById('annualTargetRate').value) || 12; // 기본값 12% (연)
-    const longTermAnnualTarget = parseFloat(document.getElementById('longTermAnnualTarget').value) || 10; // 기본값 10% (연)
+    const principal = parseFloat(globalSettings.principal) || 0;
+    const monthlyInvestment = parseFloat(globalSettings.monthlyInvestment) || 0;
+    const startDate = globalSettings.startDate;
+    const endDate = globalSettings.endDate;
+    const longTermRatio = parseFloat(globalSettings.longTermRatio) || 0;
+    const shortTermRatio = parseFloat(globalSettings.shortTermRatio) || 0;
+    const annualTargetRate = parseFloat(globalSettings.annualTargetRate) || 12; // 기본값 12% (연)
+    const longTermAnnualTarget = parseFloat(globalSettings.longTermAnnualTarget) || 10; // 기본값 10% (연)
 
     // 투자 비율 정규화
     const totalRatio = longTermRatio + shortTermRatio;
@@ -388,22 +422,20 @@ function calculateAndDisplay() {
 
     const months = getMonthsDifference(startDate, endDate);
 
-    // 월 수익 목표 비율 (전체 목표): 연 수익률을 월 복리 수익률로 변환
-    const targetMonthlyRate = Math.pow(1 + annualTargetRate / 100, 1 / 12) - 1;
+    // 글로벌 설정 초기화
+    let currentSettings = {
+        annualTargetRate: annualTargetRate,
+        monthlyInvestment: monthlyInvestment,
+        longTermRatio: longTermRatio,
+        shortTermRatio: shortTermRatio,
+        longTermAnnualTarget: longTermAnnualTarget
+    };
+
+    // 현재의 글로벌 설정에 따른 비율 표시 시각화
+    document.getElementById('longTermBar').style.width = normalizedLongTerm * 100 + '%';
 
     // 장기 투자 월 수익률 계산 (연 → 월)
-    const longTermMonthlyRate = (Math.pow(1 + longTermAnnualTarget / 100, 1 / 12) - 1);
-
-    // 필요한 단기 투자 월 수익률 계산
-    // 전체 월 수익 = 장기 수익 + 단기 수익
-    // totalMonthlyProfit = longTermAccumulated * longTermMonthlyRate + shortTermAccumulated * shortTermMonthlyRate
-    // 간단하게: 필요 단기 수익률 = (전체 목표 - 장기 기여분) / 단기 비율
-    const totalMonthlyRequired = targetMonthlyRate;
-    const longTermContribution = normalizedLongTerm * longTermMonthlyRate;
-    const shortTermMonthlyRequired = (totalMonthlyRequired - longTermContribution) / normalizedShortTerm;
-    const shortTermMonthlyPercent = shortTermMonthlyRequired * 100;
-
-    // 비율 시각화
+    // 현재 설정에 따른 비율 시각화 (초기)
     document.getElementById('longTermBar').style.width = normalizedLongTerm * 100 + '%';
     document.getElementById('longTermText').textContent = (normalizedLongTerm * 100).toFixed(0) + '%';
     document.getElementById('shortTermBar').style.width = normalizedShortTerm * 100 + '%';
@@ -436,8 +468,24 @@ function calculateAndDisplay() {
         const currentDate = new Date(startObj);
         currentDate.setMonth(currentDate.getMonth() + month - 1);
         const year = currentDate.getFullYear();
-
         const dateStr = formatDate(currentDate.toISOString().split('T')[0]);
+
+        // 현재 월에 덮어쓰기 설정이 있으면 적용 (additionalSeed는 이월되지 않음)
+        let currentAdditionalSeed = 0;
+        if (monthSettingsOverrides[month]) {
+            const { additionalSeed, ...persistentSettings } = monthSettingsOverrides[month];
+            Object.assign(currentSettings, persistentSettings);
+            currentAdditionalSeed = additionalSeed || 0;
+        }
+
+        const totalRatio = currentSettings.longTermRatio + currentSettings.shortTermRatio;
+        const currentNormalizedLongTerm = totalRatio > 0 ? (currentSettings.longTermRatio / totalRatio) : 0.5;
+        const currentNormalizedShortTerm = totalRatio > 0 ? (currentSettings.shortTermRatio / totalRatio) : 0.5;
+        const targetMonthlyRate = Math.pow(1 + currentSettings.annualTargetRate / 100, 1 / 12) - 1;
+        const longTermMonthlyRate = (Math.pow(1 + currentSettings.longTermAnnualTarget / 100, 1 / 12) - 1);
+        const longTermContribution = currentNormalizedLongTerm * longTermMonthlyRate;
+        const shortTermMonthlyRequired = (targetMonthlyRate - longTermContribution) / currentNormalizedShortTerm;
+        const currentMonthlyInvestment = currentSettings.monthlyInvestment;
 
         // 월초 자산: 이전달에 실제값이 입력되었다면 그 실제값을 이월(우선 사용), 아니면 시뮬레이션 값 사용
         const assetAtMonthStart = carryAssetForNextMonth !== null ? carryAssetForNextMonth : currentAsset;
@@ -448,8 +496,8 @@ function calculateAndDisplay() {
         const prevLongTermAccumulated = longTermAccumulated;
 
         // 월초 기준으로 각 자산의 크기
-        const longTermAssetAtMonth = assetAtMonthStart * normalizedLongTerm;
-        const shortTermAssetAtMonth = assetAtMonthStart * normalizedShortTerm;
+        const longTermAssetAtMonth = assetAtMonthStart * currentNormalizedLongTerm;
+        const shortTermAssetAtMonth = assetAtMonthStart * currentNormalizedShortTerm;
 
         // 장기 투자 필요 수익금 (월 수익률 기반)
         const longTermMonthlyProfit = longTermAssetAtMonth * longTermMonthlyRate;
@@ -465,18 +513,18 @@ function calculateAndDisplay() {
         // 전체 필요 수익금
         const monthlyProfitDynamic = longTermMonthlyProfit + shortTermMonthlyProfit;
 
-        // 장기투자 누적 = 기존 + 월 장기 재투자 + 월 장기 수익
-        const longTermInvest = (monthlyInvestment * normalizedLongTerm);
-        const shortTermInvest = (monthlyInvestment * normalizedShortTerm);
+        // 장기투자 누적 = 기존 + 월 장기 재투자 + 추가 시드(장기) + 월 장기 수익
+        const longTermInvest = (currentMonthlyInvestment * currentNormalizedLongTerm) + (currentAdditionalSeed * currentNormalizedLongTerm);
+        const shortTermInvest = (currentMonthlyInvestment * currentNormalizedShortTerm) + (currentAdditionalSeed * currentNormalizedShortTerm);
         longTermAccumulated = longTermAccumulated + longTermInvest + longTermMonthlyProfit;
 
         // 월말 자산(시뮬레이션)
-        currentAsset = assetAtMonthStart + monthlyInvestment + monthlyProfitDynamic;
+        currentAsset = assetAtMonthStart + currentMonthlyInvestment + currentAdditionalSeed + monthlyProfitDynamic;
 
         // 초기 목표 순수 시뮬레이션 (실제 입력값 미반영 — 비교용 기준값)
-        const cleanLongProfit = cleanCurrentAsset * normalizedLongTerm * longTermMonthlyRate;
-        const cleanShortProfit = cleanCurrentAsset * normalizedShortTerm * shortTermMonthlyRequired;
-        const initialAssetAfter = cleanCurrentAsset + monthlyInvestment + cleanLongProfit + cleanShortProfit;
+        const cleanLongProfit = cleanCurrentAsset * currentNormalizedLongTerm * longTermMonthlyRate;
+        const cleanShortProfit = cleanCurrentAsset * currentNormalizedShortTerm * shortTermMonthlyRequired;
+        const initialAssetAfter = cleanCurrentAsset + currentMonthlyInvestment + currentAdditionalSeed + cleanLongProfit + cleanShortProfit;
         cleanCurrentAsset = initialAssetAfter;
 
         // 실제 입력값이 있으면 이번달 실제 종료 자산을 계산하여 다음달 이월 자산으로 사용
@@ -486,7 +534,7 @@ function calculateAndDisplay() {
         const effectiveLongCumul = actualLongCumul !== null && !isNaN(Number(actualLongCumul)) ? Number(actualLongCumul) : longTermAccumulated;
         const actualLongProfit = effectiveLongCumul - prevLongTermAccumulated - longTermInvest;
         const actualTotalProfit = effectiveShort + actualLongProfit;
-        const actualEndAsset = assetAtMonthStart + monthlyInvestment + actualTotalProfit;
+        const actualEndAsset = assetAtMonthStart + currentMonthlyInvestment + currentAdditionalSeed + actualTotalProfit;
 
         // 이전달 실제 입력(단기 또는 장기 누적)이 있으면 이 값을 다음달 시작 자산으로 사용
         if ((actualShort !== null && !isNaN(Number(actualShort))) || (actualLongCumul !== null && !isNaN(Number(actualLongCumul)))) {
@@ -497,7 +545,7 @@ function calculateAndDisplay() {
             month: month,
             dateStr: dateStr,
             assetBefore: assetAtMonthStart,
-            monthlyInvest: monthlyInvestment,
+            monthlyInvest: currentMonthlyInvestment + currentAdditionalSeed,
             longTermInvest: longTermInvest,
             profit: monthlyProfitDynamic,
             shortTermProfit: shortTermMonthlyProfit,
@@ -541,15 +589,16 @@ const STORAGE_KEY = 'assetSimulatorConfig';
 // 로컬스토리지에 저장
 function saveToLocalStorage() {
     const config = {
-        principal: document.getElementById('principal').value,
-        annualTargetRate: document.getElementById('annualTargetRate').value,
-        monthlyInvestment: document.getElementById('monthlyInvestment').value,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value,
-        longTermRatio: document.getElementById('longTermRatio').value,
-        longTermAnnualTarget: document.getElementById('longTermAnnualTarget').value,
-        shortTermRatio: document.getElementById('shortTermRatio').value,
-        actualValues: actualValues
+        principal: globalSettings.principal,
+        annualTargetRate: globalSettings.annualTargetRate,
+        monthlyInvestment: globalSettings.monthlyInvestment,
+        startDate: globalSettings.startDate,
+        endDate: globalSettings.endDate,
+        longTermRatio: globalSettings.longTermRatio,
+        longTermAnnualTarget: globalSettings.longTermAnnualTarget,
+        shortTermRatio: globalSettings.shortTermRatio,
+        actualValues: actualValues,
+        monthSettingsOverrides: monthSettingsOverrides
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
 }
@@ -560,15 +609,16 @@ function loadFromLocalStorage() {
     if (saved) {
         try {
             const config = JSON.parse(saved);
-            document.getElementById('principal').value = config.principal || 500000000;
-            document.getElementById('annualTargetRate').value = config.annualTargetRate || 12;
-            document.getElementById('monthlyInvestment').value = config.monthlyInvestment || 5000000;
-            document.getElementById('startDate').value = config.startDate || '2026-01-01';
-            document.getElementById('endDate').value = config.endDate || '2028-01-01';
-            document.getElementById('longTermRatio').value = config.longTermRatio || 60;
-            document.getElementById('longTermAnnualTarget').value = config.longTermAnnualTarget || 10;
-            document.getElementById('shortTermRatio').value = config.shortTermRatio || 40;
+            globalSettings.principal = config.principal || 500000000;
+            globalSettings.annualTargetRate = config.annualTargetRate || 12;
+            globalSettings.monthlyInvestment = config.monthlyInvestment || 5000000;
+            globalSettings.startDate = config.startDate || '2026-01-01';
+            globalSettings.endDate = config.endDate || '2028-01-01';
+            globalSettings.longTermRatio = config.longTermRatio || 60;
+            globalSettings.longTermAnnualTarget = config.longTermAnnualTarget || 10;
+            globalSettings.shortTermRatio = config.shortTermRatio || 40;
             if (config.actualValues) actualValues = config.actualValues;
+            if (config.monthSettingsOverrides) monthSettingsOverrides = config.monthSettingsOverrides;
         } catch (error) {
             console.error('로컬스토리지 복원 실패:', error);
         }
@@ -578,15 +628,16 @@ function loadFromLocalStorage() {
 // 설정 저장 함수
 function saveConfig() {
     const config = {
-        principal: document.getElementById('principal').value,
-        annualTargetRate: document.getElementById('annualTargetRate').value,
-        monthlyInvestment: document.getElementById('monthlyInvestment').value,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value,
-        longTermRatio: document.getElementById('longTermRatio').value,
-        longTermAnnualTarget: document.getElementById('longTermAnnualTarget').value,
-        shortTermRatio: document.getElementById('shortTermRatio').value,
+        principal: globalSettings.principal,
+        annualTargetRate: globalSettings.annualTargetRate,
+        monthlyInvestment: globalSettings.monthlyInvestment,
+        startDate: globalSettings.startDate,
+        endDate: globalSettings.endDate,
+        longTermRatio: globalSettings.longTermRatio,
+        longTermAnnualTarget: globalSettings.longTermAnnualTarget,
+        shortTermRatio: globalSettings.shortTermRatio,
         actualValues: actualValues,
+        monthSettingsOverrides: monthSettingsOverrides,
         timestamp: new Date().toISOString()
     };
 
@@ -617,16 +668,18 @@ function loadConfig() {
                 const config = JSON.parse(event.target.result);
 
                 // 입력값 복원
-                document.getElementById('principal').value = config.principal;
-                document.getElementById('annualTargetRate').value = config.annualTargetRate;
-                document.getElementById('monthlyInvestment').value = config.monthlyInvestment;
-                document.getElementById('startDate').value = config.startDate;
-                document.getElementById('endDate').value = config.endDate;
-                document.getElementById('longTermRatio').value = config.longTermRatio;
-                document.getElementById('longTermAnnualTarget').value = config.longTermAnnualTarget;
-                document.getElementById('shortTermRatio').value = config.shortTermRatio;
+                globalSettings.principal = config.principal;
+                globalSettings.annualTargetRate = config.annualTargetRate;
+                globalSettings.monthlyInvestment = config.monthlyInvestment;
+                globalSettings.startDate = config.startDate;
+                globalSettings.endDate = config.endDate;
+                globalSettings.longTermRatio = config.longTermRatio;
+                globalSettings.longTermAnnualTarget = config.longTermAnnualTarget;
+                globalSettings.shortTermRatio = config.shortTermRatio;
                 if (config.actualValues) actualValues = config.actualValues;
+                if (config.monthSettingsOverrides) monthSettingsOverrides = config.monthSettingsOverrides;
 
+                selectSettingTab(0);
                 // 계산 재실행
                 calculateAndDisplay();
 
@@ -644,40 +697,185 @@ function loadConfig() {
 document.getElementById('saveConfigBtn').addEventListener('click', saveConfig);
 document.getElementById('loadConfigBtn').addEventListener('click', loadConfig);
 
-// 입력값 변경 이벤트 리스너
-document.getElementById('principal').addEventListener('change', () => {
+// 입력값 변경 이벤트 리스너 핸들러
+function handleSettingInput(field, value, isNumber = true) {
+    let val = isNumber ? parseFloat(value) : value;
+    if (isNumber && isNaN(val)) val = 0;
+
+    if (currentSettingsTab === 0) {
+        globalSettings[field] = val;
+    } else {
+        if (!monthSettingsOverrides[currentSettingsTab]) {
+            monthSettingsOverrides[currentSettingsTab] = {};
+        }
+        if (['annualTargetRate', 'monthlyInvestment', 'longTermRatio', 'shortTermRatio', 'longTermAnnualTarget', 'additionalSeed'].includes(field)) {
+            monthSettingsOverrides[currentSettingsTab][field] = val;
+        }
+    }
     saveToLocalStorage();
     calculateAndDisplay();
-});
-document.getElementById('annualTargetRate').addEventListener('input', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
-document.getElementById('monthlyInvestment').addEventListener('change', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
-document.getElementById('startDate').addEventListener('change', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
-document.getElementById('endDate').addEventListener('change', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
-document.getElementById('longTermRatio').addEventListener('input', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
-document.getElementById('shortTermRatio').addEventListener('input', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
-document.getElementById('longTermAnnualTarget').addEventListener('input', () => {
-    saveToLocalStorage();
-    calculateAndDisplay();
-});
+}
+
+document.getElementById('principal').addEventListener('change', (e) => handleSettingInput('principal', e.target.value));
+document.getElementById('annualTargetRate').addEventListener('input', (e) => handleSettingInput('annualTargetRate', e.target.value));
+document.getElementById('monthlyInvestment').addEventListener('change', (e) => handleSettingInput('monthlyInvestment', e.target.value));
+document.getElementById('startDate').addEventListener('change', (e) => handleSettingInput('startDate', e.target.value, false));
+document.getElementById('endDate').addEventListener('change', (e) => handleSettingInput('endDate', e.target.value, false));
+document.getElementById('longTermRatio').addEventListener('input', (e) => handleSettingInput('longTermRatio', e.target.value));
+document.getElementById('shortTermRatio').addEventListener('input', (e) => handleSettingInput('shortTermRatio', e.target.value));
+document.getElementById('longTermAnnualTarget').addEventListener('input', (e) => handleSettingInput('longTermAnnualTarget', e.target.value));
+document.getElementById('additionalSeed').addEventListener('change', (e) => handleSettingInput('additionalSeed', e.target.value));
+
+// 설정 탭 관련 함수
+function renderSettingsTabs() {
+    const tabsContainer = document.getElementById('globalSettingsTabs');
+    if (!tabsContainer) return;
+    
+    const overridesKeys = Object.keys(monthSettingsOverrides).map(Number).sort((a,b)=>a-b);
+    let html = `<button class="tab ${currentSettingsTab === 0 ? 'active' : ''}" onclick="selectSettingTab(0)">초기</button>`;
+    
+    overridesKeys.forEach(month => {
+        const startObj = new Date(globalSettings.startDate);
+        startObj.setMonth(startObj.getMonth() + month - 1);
+        const dateStr = startObj.getFullYear() + '.' + String(startObj.getMonth() + 1).padStart(2, '0');
+        
+        html += `<button class="tab ${currentSettingsTab === month ? 'active' : ''}" onclick="selectSettingTab(${month})">${dateStr}</button>`;
+    });
+    
+    tabsContainer.innerHTML = html;
+}
+
+function selectSettingTab(month) {
+    currentSettingsTab = month;
+    renderSettingsTabs();
+    
+    const pGroup = document.getElementById('principalGroup');
+    const pInput = document.getElementById('principal');
+    const seedGroup = document.getElementById('additionalSeedGroup');
+    const seedInput = document.getElementById('additionalSeed');
+    const sInput = document.getElementById('startDate');
+    const eInput = document.getElementById('endDate');
+
+    if (month === 0) {
+        document.getElementById('annualTargetRate').value = globalSettings.annualTargetRate;
+        document.getElementById('monthlyInvestment').value = globalSettings.monthlyInvestment;
+        document.getElementById('longTermRatio').value = globalSettings.longTermRatio;
+        document.getElementById('shortTermRatio').value = globalSettings.shortTermRatio;
+        document.getElementById('longTermAnnualTarget').value = globalSettings.longTermAnnualTarget;
+        
+        pGroup.style.display = 'block';
+        seedGroup.style.display = 'none';
+        
+        pInput.value = globalSettings.principal || 500000000;
+        sInput.value = globalSettings.startDate;
+        eInput.value = globalSettings.endDate;
+        sInput.disabled = false;
+        eInput.disabled = false;
+    } else {
+        const override = monthSettingsOverrides[month];
+        if(override) {
+            document.getElementById('annualTargetRate').value = override.annualTargetRate;
+            document.getElementById('monthlyInvestment').value = override.monthlyInvestment;
+            document.getElementById('longTermRatio').value = override.longTermRatio;
+            document.getElementById('shortTermRatio').value = override.shortTermRatio;
+            document.getElementById('longTermAnnualTarget').value = override.longTermAnnualTarget;
+        }
+        
+        pGroup.style.display = 'none';
+        seedGroup.style.display = 'block';
+        seedInput.value = override?.additionalSeed || '';
+        
+        sInput.value = '';
+        eInput.value = '';
+        sInput.disabled = true;
+        eInput.disabled = true;
+    }
+}
 
 // 페이지 로드 시 로컬스토리지에서 복원
 loadFromLocalStorage();
+selectSettingTab(0);
 calculateAndDisplay();
+
+// 모달 관련 함수
+let currentEditingMonth = null;
+
+function openMonthSettings(month) {
+    currentEditingMonth = month;
+    const modal = document.getElementById('monthSettingsModal');
+    document.getElementById('modalMonthText').innerText = `${month}월차`;
+
+    if (monthSettingsOverrides[month]) {
+        document.getElementById('modalMonthTitle').innerHTML = `${month}월차 설정 변경 <span style="font-size:12px; color:var(--accent-warning); font-weight:normal;">(수정됨)</span>`;
+    } else {
+        document.getElementById('modalMonthTitle').innerHTML = `${month}월차 설정 변경`;
+    }
+
+    // Retrieve settings effective at this month if override exists, otherwise get global/previous overrides
+    let effective = {
+        annualTargetRate: parseFloat(document.getElementById('annualTargetRate').value) || 12,
+        monthlyInvestment: parseFloat(document.getElementById('monthlyInvestment').value) || 0,
+        longTermRatio: parseFloat(document.getElementById('longTermRatio').value) || 0,
+        shortTermRatio: parseFloat(document.getElementById('shortTermRatio').value) || 0,
+        longTermAnnualTarget: parseFloat(document.getElementById('longTermAnnualTarget').value) || 10
+    };
+    
+    for (let i = 1; i <= month; i++) {
+        if (monthSettingsOverrides[i]) {
+            Object.assign(effective, monthSettingsOverrides[i]);
+        }
+    }
+
+    document.getElementById('modalAnnualTargetRate').value = effective.annualTargetRate;
+    document.getElementById('modalMonthlyInvestment').value = effective.monthlyInvestment;
+    document.getElementById('modalLongTermRatio').value = effective.longTermRatio;
+    document.getElementById('modalShortTermRatio').value = effective.shortTermRatio;
+    document.getElementById('modalLongTermAnnualTarget').value = effective.longTermAnnualTarget;
+    document.getElementById('modalAdditionalSeed').value = monthSettingsOverrides[month]?.additionalSeed || '';
+    
+    modal.style.display = 'flex';
+}
+
+function closeMonthSettings() {
+    document.getElementById('monthSettingsModal').style.display = 'none';
+    currentEditingMonth = null;
+}
+
+function saveMonthSettings() {
+    if (!currentEditingMonth) return;
+    
+    const settings = {
+        annualTargetRate: parseFloat(document.getElementById('modalAnnualTargetRate').value),
+        monthlyInvestment: parseFloat(document.getElementById('modalMonthlyInvestment').value),
+        longTermRatio: parseFloat(document.getElementById('modalLongTermRatio').value),
+        shortTermRatio: parseFloat(document.getElementById('modalShortTermRatio').value),
+        longTermAnnualTarget: parseFloat(document.getElementById('modalLongTermAnnualTarget').value)
+    };
+    
+    const additionalSeedVal = parseFloat(document.getElementById('modalAdditionalSeed').value);
+    if (!isNaN(additionalSeedVal) && additionalSeedVal > 0) {
+        settings.additionalSeed = additionalSeedVal;
+    }
+    
+    monthSettingsOverrides[currentEditingMonth] = settings;
+    saveToLocalStorage();
+    renderSettingsTabs();
+    calculateAndDisplay();
+    closeMonthSettings();
+}
+
+function clearMonthSettings() {
+    if (!currentEditingMonth) return;
+    delete monthSettingsOverrides[currentEditingMonth];
+    saveToLocalStorage();
+    
+    // 만약 지운 월차가 현재 선택된 탭이라면 전역 탭으로 이동
+    if (currentSettingsTab === currentEditingMonth) {
+        selectSettingTab(0);
+    } else {
+        renderSettingsTabs();
+    }
+    
+    calculateAndDisplay();
+    closeMonthSettings();
+}
