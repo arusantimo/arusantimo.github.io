@@ -32,6 +32,24 @@ const claudeContent = `
         <div id="hist-claude" class="history-container">
 
           <details class="ver-group">
+            <summary>v2.1.118</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.118 업데이트"
+                data-tt-desc="Vim visual mode(v/V) 지원 추가, /cost와 /stats가 /usage로 통합되었습니다. /theme으로 커스텀 테마를 관리할 수 있으며, DISABLE_UPDATES 환경변수가 추가되었습니다."
+                data-tt-example="">v2.1.118 업데이트 — Vim visual mode, <code>/usage</code> 통합, 테마 관리, 업데이트 차단 변수 등</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.1.117</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.117 업데이트"
+                data-tt-desc="/resume 시 대규모 세션 요약 후 재개 기능 제공, /model 선택 영구 저장. macOS/Linux에서 네이티브 bfs/ugrep 내장으로 빠른 검색, Opus/Sonnet 4.6 Pro 기본 effort가 high로 상향."
+                data-tt-example="">v2.1.117 업데이트 — 세션 요약 재개, 모델 선택 유지, 검색 고속화 등</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
             <summary>v2.1.116</summary>
             <ul>
               <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
@@ -603,7 +621,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/cost</code></div>
-                <div class="row-desc">토큰 사용량 통계</div>
+                <div class="row-desc">비용 통계 (→ /usage 통합)</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/context</code></div>
@@ -642,7 +660,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/theme</code></div>
-                <div class="row-desc">컬러 테마 변경</div>
+                <div class="row-desc">컬러 테마 생성/관리 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/permissions</code></div>
@@ -759,7 +777,7 @@ const claudeContent = `
               <div class="group-label">특수 (계속)</div>
               <div class="row">
                 <div class="row-key"><code>/stats</code></div>
-                <div class="row-desc">사용량 스트릭 &amp; 설정</div>
+                <div class="row-desc">스트릭 (→ /usage 통합)</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/insights</code></div>
@@ -779,7 +797,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/usage</code></div>
-                <div class="row-desc">플랜 한도 &amp; 상태</div>
+                <div class="row-desc">플랜 상태, 사용량 &amp; 통계 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/schedule</code></div>

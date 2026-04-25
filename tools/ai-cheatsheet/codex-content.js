@@ -42,6 +42,24 @@ const codexContent = `
           </details>
 
           <details class="ver-group">
+            <summary>v0.124.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.124.0 업데이트"
+                data-tt-desc="TUI에서 Alt+, 와 Alt+. 로 추론(reasoning) 수준을 빠르게 조절할 수 있습니다. Amazon Bedrock(OpenAI 호환) 모델 제공자가 정식 지원되며, 훅(Hooks) 기능이 안정화되었습니다."
+                data-tt-example="">v0.124.0 업데이트 — TUI 추론 레벨 단축키, Bedrock 정식 지원 및 Hooks 안정화</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v0.123.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.123.0 업데이트"
+                data-tt-desc="Amazon Bedrock 모델 제공자 내장 지원, /mcp verbose 상세 진단 명령 추가. 실시간 핸드오프 기능이 개선되어 백그라운드 에이전트가 트랜스크립트 델타를 수신합니다."
+                data-tt-example="">v0.123.0 업데이트 — <code>amazon-bedrock</code> 모델 내장, <code>/mcp verbose</code> 상세 진단 추가</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
             <summary>v0.121.0</summary>
             <ul>
               <li class="cl-tip" data-tt-title="codex marketplace add (v0.121.0)"
@@ -339,8 +357,8 @@ const codexContent = `
             <div class="row-desc">백그라운드 터미널 상태</div>
           </div>
           <div class="row">
-            <div class="row-key"><code>/mcp</code></div>
-            <div class="row-desc">MCP 도구 목록</div>
+            <div class="row-key"><code>/mcp [verbose]</code></div>
+            <div class="row-desc">MCP 도구 목록 및 상세 진단 <span class="badge-new">NEW</span></div>
           </div>
           <div class="row">
             <div class="row-key"><code>/apps</code></div>
@@ -618,6 +636,10 @@ const codexContent = `
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>G</kbd></div>
             <div class="kdesc">편집기 열기</div>
           </div>
+          <div class="krow cl-tip" data-tt-title="Alt+, / Alt+. — 추론 조절" data-tt-desc="모델의 추론(reasoning) 강도를 임시로 낮추거나 높입니다.">
+            <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>,</kbd> / <kbd>.</kbd></div>
+            <div class="kdesc">추론 강도 조절 <span class="badge-new">NEW</span></div>
+          </div>
           <div class="krow cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="과거 입력 기록을 검색합니다.">
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div>
             <div class="kdesc">히스토리 역방향 검색</div>
@@ -714,6 +736,10 @@ const codexContent = `
               <div class="row">
                 <div class="row-key"><code>gpt-5.3-codex-spark</code></div>
                 <div class="row-desc">실시간/초저지연 연구 프리뷰</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>amazon-bedrock</code></div>
+                <div class="row-desc">AWS 연동 모델 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>codex --model gpt-5.4-mini</code></div>
