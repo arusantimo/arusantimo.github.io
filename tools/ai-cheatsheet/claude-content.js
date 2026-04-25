@@ -9,27 +9,36 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.116</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-21</span>
+        <span class="meta-version">v2.1.119</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-04-23</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.116)</span>
+        <span>📋 최근 변경사항 (v2.1.119)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
-            data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다."
-            data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입 <span
+          <li class="cl-tip" data-tt-title="v2.1.119 주요 업데이트"
+            data-tt-desc="CLAUDE_CODE_HIDE_CWD 환경변수로 작업 디렉토리 숨김 기능 추가. --from-pr에서 GitLab, Bitbucket, GitHub Enterprise URL 지원. /config 설정이 ~/.claude/settings.json에 영구 저장되도록 개선."
+            data-tt-example="">v2.1.119 업데이트 — 환경변수 추가, PR 지원 확대 및 설정 저장소 분리 <span
               class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.116</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
+                data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다."
+                data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.112</summary>
@@ -135,11 +144,11 @@ const claudeContent = `
           </div>
           <div class="row">
             <div class="row-key"><code>/ultrareview</code></div>
-            <div class="row-desc">종합 코드 리뷰 (클라우드 병렬) <span class="badge-new">NEW</span></div>
+            <div class="row-desc">종합 코드 리뷰 (클라우드 병렬)</div>
           </div>
           <div class="row">
             <div class="row-key"><code>/ultraplan</code></div>
-            <div class="row-desc">클라우드 병렬 플래닝 (분리 실행) <span class="badge-new">NEW</span></div>
+            <div class="row-desc">클라우드 병렬 플래닝 (분리 실행)</div>
           </div>
           <div class="row">
             <div class="row-key"><code>/batch</code></div>
@@ -369,7 +378,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--effort</code></div>
-                <div class="row-desc">low/medium/high/xhigh/max <span class="badge-new">NEW</span></div>
+                <div class="row-desc">low/medium/high/xhigh/max</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--teleport</code></div>
@@ -492,7 +501,7 @@ const claudeContent = `
               </div>
               <div class="krow">
                 <div class="kkey"><code>/tui</code></div>
-                <div class="kdesc">TUI 전체화면 전환 <span class="badge-new">NEW</span></div>
+                <div class="kdesc">TUI 전체화면 전환</div>
               </div>
             </div>
           </div>
@@ -641,7 +650,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/effort [level]</code></div>
-                <div class="row-desc">노력 수준 (xhigh 추가) <span class="badge-new">NEW</span></div>
+                <div class="row-desc">노력 수준 (xhigh 추가)</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/color [color]</code></div>
@@ -737,11 +746,11 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/ultrareview</code></div>
-                <div class="row-desc">멀티에이전트 코드 리뷰 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">멀티에이전트 코드 리뷰</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/ultraplan</code></div>
-                <div class="row-desc">멀티에이전트 클라우드 플래닝 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">멀티에이전트 클라우드 플래닝</div>
               </div>
             </div>
           </div>
@@ -794,7 +803,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/tui fullscreen</code></div>
-                <div class="row-desc">전체화면 TUI <span class="badge-new">NEW</span></div>
+                <div class="row-desc">전체화면 TUI</div>
               </div>
             </div>
           </div>

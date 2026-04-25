@@ -9,27 +9,37 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.122.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-21</span>
+        <span class="meta-version">v0.125.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-04-24</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.122.0)</span>
+        <span>📋 최근 변경사항 (v0.125.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v0.122.0 업데이트"
-            data-tt-desc="/side(사이드 대화창), !(실행 중 셸 명령 대기열) 추가. codex app 명령으로 데스크톱 앱을 관리하며, Plan Mode(격리 작업 공간)와 deny-read(보안 정책) 기능이 도입되었습니다."
-            data-tt-example="">v0.122.0 업데이트 — <code>/side</code>, <code>!</code>, <code>codex app</code> 명령 추가 및
-            <code>Plan Mode</code> 도입 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v0.125.0 주요 업데이트"
+            data-tt-desc="Unix 소켓 전송 및 원격 스레드 지원, 원격 마켓플레이스 플러그인 설치 가능, 권한 프로필 유지 관리 개선, 모델 디스커버리 권한 변경(AWS/Bedrock 포함) 및 exec --json 사용 시 추론 토큰(reasoning-token) 사용량 보고가 추가되었습니다."
+            data-tt-example="">v0.125.0 업데이트 — Unix 소켓/원격 플러그인 지원, 권한 관리 개선 및 추론 토큰 보고 추가 <span
+              class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.122.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.122.0 업데이트"
+                data-tt-desc="/side(사이드 대화창), !(실행 중 셸 명령 대기열) 추가. codex app 명령으로 데스크톱 앱을 관리하며, Plan Mode(격리 작업 공간)와 deny-read(보안 정책) 기능이 도입되었습니다."
+                data-tt-example="">v0.122.0 업데이트 — <code>/side</code>, <code>!</code>, <code>codex app</code> 명령 추가 및
+                <code>Plan Mode</code> 도입</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.121.0</summary>
@@ -200,7 +210,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>codex -i image.png</code></div>
-                <div class="row-desc">멀티모달 이미지 입력 지원 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">멀티모달 이미지 입력 지원</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>cat spec.md | codex exec "Implement this"</code></div>
@@ -208,7 +218,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--json</code></div>
-                <div class="row-desc">JSONL 이벤트 출력</div>
+                <div class="row-desc">JSONL 이벤트 출력 (추론 토큰 보고) <span class="badge-new">NEW</span></div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--output-last-message out.txt</code></div>
@@ -295,11 +305,11 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/side</code></div>
-            <div class="row-desc">사이드 대화창 열기 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">사이드 대화창 열기</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>!</code></div>
-            <div class="row-desc">셸 명령 대기열 입력 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">셸 명령 대기열 입력</div>
           </div>
         </div>
         <div class="group">
@@ -411,11 +421,11 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>deny-read</code></div>
-            <div class="row-desc">파일 읽기 명시적 차단 규칙 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">파일 읽기 명시적 차단 규칙</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>Plan Mode</code></div>
-            <div class="row-desc">격리된 작업 공간 제공 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">격리된 작업 공간 제공</div>
           </div>
         </div>
       </div>
@@ -531,7 +541,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>marketplace add</code></div>
-                <div class="row-desc">마켓플레이스 설치 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">마켓플레이스 원격 설치 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>~/.codex/plugins/</code></div>
@@ -610,7 +620,7 @@ const codexContent = `
           </div>
           <div class="krow cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="과거 입력 기록을 검색합니다.">
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div>
-            <div class="kdesc">히스토리 역방향 검색 <span class="badge-new">NEW</span></div>
+            <div class="kdesc">히스토리 역방향 검색</div>
           </div>
           <div class="krow cl-tip" data-tt-title="Enter — 전송" data-tt-desc="프롬프트를 전송합니다.">
             <div class="kkey"><kbd>Enter</kbd></div>
@@ -645,7 +655,7 @@ const codexContent = `
       <div class="section">
         <div class="section-title">🗄️ 메모리 시스템</div>
         <div class="group">
-          <div class="group-label">TUI 제어 <span class="badge-new">NEW</span></div>
+          <div class="group-label">TUI 제어</div>
           <div class="row">
             <div class="row-key">모드 전환</div>
             <div class="row-desc">TUI 메뉴에서 on / off / auto</div>
