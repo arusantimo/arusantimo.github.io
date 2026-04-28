@@ -9,27 +9,59 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.116</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-21</span>
+        <span class="meta-version">v2.1.121</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-04-28</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.116)</span>
+        <span>📋 최근 변경사항 (v2.1.121)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
-            data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다."
-            data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입 <span
-              class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="alwaysLoad MCP 서버 설정 (v2.1.121)"
+            data-tt-desc="MCP 서버 config에 alwaysLoad 옵션 추가. true로 설정하면 해당 서버의 모든 도구가 tool-search 지연 없이 항상 사용 가능합니다."
+            data-tt-example="{&quot;alwaysLoad&quot;: true}"><code>alwaysLoad</code> MCP 서버 옵션 추가 — 도구 항상 로드 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude plugin prune (v2.1.121)"
+            data-tt-desc="고아 상태의 자동 설치 플러그인 의존성을 제거합니다. plugin uninstall --prune은 연쇄적으로 제거합니다."
+            data-tt-example="claude plugin prune"><code>claude plugin prune</code> 명령 추가 — 고아 플러그인 의존성 정리 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/skills 필터 검색 (v2.1.121)"
+            data-tt-desc="/skills 명령어에 타이핑으로 필터링하는 검색창이 추가됐습니다. 긴 스킬 목록에서 스크롤 없이 원하는 스킬을 찾을 수 있습니다."
+            data-tt-example="/skills"><code>/skills</code> 타이핑 필터 검색창 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="PostToolUse 훅 출력 교체 (v2.1.121)"
+            data-tt-desc="PostToolUse 훅이 hookSpecificOutput.updatedToolOutput을 통해 모든 도구의 출력을 교체할 수 있습니다 (이전에는 MCP 전용)."
+            data-tt-example="">PostToolUse 훅으로 모든 도구 출력 교체 가능 (<code>hookSpecificOutput.updatedToolOutput</code>) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="prUrlTemplate 설정 (v2.1.119)"
+            data-tt-desc="footer PR 뱃지를 github.com 대신 커스텀 코드 리뷰 URL로 연결하는 prUrlTemplate 설정이 추가됐습니다."
+            data-tt-example=""><code>prUrlTemplate</code> 설정 추가 — 커스텀 PR 링크 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_CODE_HIDE_CWD 환경변수 (v2.1.119)"
+            data-tt-desc="시작 로고에서 현재 작업 디렉터리를 숨기는 환경변수가 추가됐습니다."
+            data-tt-example="export CLAUDE_CODE_HIDE_CWD=1"><code>CLAUDE_CODE_HIDE_CWD</code> 환경변수 추가 — 시작 로고 CWD 숨김 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="--from-pr GitLab/Bitbucket 지원 (v2.1.119)"
+            data-tt-desc="--from-pr가 GitHub Enterprise뿐 아니라 GitLab MR, Bitbucket PR URL도 지원합니다."
+            data-tt-example="claude --from-pr https://gitlab.com/.../merge_requests/1"><code>--from-pr</code>에 GitLab MR, Bitbucket PR, GitHub Enterprise 지원 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/config 설정 영구 저장 (v2.1.119)"
+            data-tt-desc="/config 설정(테마, 에디터 모드, verbose 등)이 이제 ~/.claude/settings.json에 저장되고 프로젝트/로컬/정책 우선순위에 참여합니다."
+            data-tt-example="/config"><code>/config</code> 설정이 <code>~/.claude/settings.json</code>에 영구 저장됨 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Vertex AI X.509 인증 (v2.1.121)"
+            data-tt-desc="Vertex AI에서 X.509 인증서 기반 Workload Identity Federation(mTLS ADC)을 지원합니다."
+            data-tt-example="">Vertex AI: X.509 인증서 기반 Workload Identity Federation 지원 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.113~v2.1.116</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
+                data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다."
+                data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.112</summary>
@@ -135,11 +167,11 @@ const claudeContent = `
           </div>
           <div class="row">
             <div class="row-key"><code>/ultrareview</code></div>
-            <div class="row-desc">종합 코드 리뷰 (클라우드 병렬) <span class="badge-new">NEW</span></div>
+            <div class="row-desc">종합 코드 리뷰 (클라우드 병렬)</div>
           </div>
           <div class="row">
             <div class="row-key"><code>/ultraplan</code></div>
-            <div class="row-desc">클라우드 병렬 플래닝 (분리 실행) <span class="badge-new">NEW</span></div>
+            <div class="row-desc">클라우드 병렬 플래닝 (분리 실행)</div>
           </div>
           <div class="row">
             <div class="row-key"><code>/batch</code></div>
@@ -369,7 +401,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--effort</code></div>
-                <div class="row-desc">low/medium/high/xhigh/max <span class="badge-new">NEW</span></div>
+                <div class="row-desc">low/medium/high/xhigh/max</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--teleport</code></div>
@@ -492,7 +524,7 @@ const claudeContent = `
               </div>
               <div class="krow">
                 <div class="kkey"><code>/tui</code></div>
-                <div class="kdesc">TUI 전체화면 전환 <span class="badge-new">NEW</span></div>
+                <div class="kdesc">TUI 전체화면 전환</div>
               </div>
             </div>
           </div>
@@ -641,7 +673,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/effort [level]</code></div>
-                <div class="row-desc">노력 수준 (xhigh 추가) <span class="badge-new">NEW</span></div>
+                <div class="row-desc">노력 수준 (xhigh 추가)</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/color [color]</code></div>
@@ -737,11 +769,11 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/ultrareview</code></div>
-                <div class="row-desc">멀티에이전트 코드 리뷰 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">멀티에이전트 코드 리뷰</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/ultraplan</code></div>
-                <div class="row-desc">멀티에이전트 클라우드 플래닝 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">멀티에이전트 클라우드 플래닝</div>
               </div>
             </div>
           </div>
@@ -794,7 +826,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/tui fullscreen</code></div>
-                <div class="row-desc">전체화면 TUI <span class="badge-new">NEW</span></div>
+                <div class="row-desc">전체화면 TUI</div>
               </div>
             </div>
           </div>

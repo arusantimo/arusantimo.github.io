@@ -9,27 +9,47 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.122.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-21</span>
+        <span class="meta-version">v0.125.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-04-28</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.122.0)</span>
+        <span>📋 최근 변경사항 (v0.125.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v0.122.0 업데이트"
-            data-tt-desc="/side(사이드 대화창), !(실행 중 셸 명령 대기열) 추가. codex app 명령으로 데스크톱 앱을 관리하며, Plan Mode(격리 작업 공간)와 deny-read(보안 정책) 기능이 도입되었습니다."
-            data-tt-example="">v0.122.0 업데이트 — <code>/side</code>, <code>!</code>, <code>codex app</code> 명령 추가 및
-            <code>Plan Mode</code> 도입 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex exec --json reasoning-token 사용량 (v0.125.0)"
+            data-tt-desc="codex exec --json 실행 시 reasoning-token 사용량을 JSON 출력에 포함하여 프로그래밍 방식으로 토큰 소비량을 추적할 수 있습니다."
+            data-tt-example="codex exec --json 'Fix the bug'"><code>codex exec --json</code> — reasoning-token 사용량 보고 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Unix socket transport 지원 (v0.125.0)"
+            data-tt-desc="app-server 연동 시 Unix socket transport를 사용할 수 있습니다. 페이지네이션 지원 resume/fork, sticky 환경, 원격 스레드 config/store 연결도 포함됩니다."
+            data-tt-example="">app-server: Unix socket transport 지원 및 resume/fork 페이지네이션 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Permission profiles round-trip (v0.125.0)"
+            data-tt-desc="권한 프로파일이 TUI 세션, 사용자 턴, MCP 샌드박스 상태, 셸 에스컬레이션, app-server API 간에 일관되게 전달됩니다."
+            data-tt-example="">Permission profiles가 TUI·MCP·셸에스컬레이션·app-server 간 일관 적용 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="app-server 플러그인 원격 설치 (v0.125.0)"
+            data-tt-desc="app-server에서 원격 플러그인을 설치하고 설정된 마켓플레이스를 업그레이드할 수 있습니다."
+            data-tt-example="">app-server: 원격 플러그인 설치 및 마켓플레이스 업그레이드 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="AWS/Bedrock 계정 상태 노출 (v0.125.0)"
+            data-tt-desc="모델 프로바이더가 모델 검색을 직접 관리하며, AWS/Bedrock 계정 상태가 app 클라이언트에 노출됩니다."
+            data-tt-example="">모델 프로바이더 자체 model discovery 및 AWS/Bedrock 계정 상태 노출 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.122.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.122.0 업데이트"
+                data-tt-desc="/side(사이드 대화창), !(실행 중 쉘 명령 대기열) 추가. codex app 명령으로 데스크탑 앱을 관리하며, Plan Mode(격리 작업 공간)와 deny-read(보안 정책) 기능이 도입되었습니다."
+                data-tt-example="">v0.122.0 업데이트 — <code>/side</code>, <code>!</code>, <code>codex app</code> 명령 추가 및 <code>Plan Mode</code> 도입</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.121.0</summary>
@@ -200,7 +220,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>codex -i image.png</code></div>
-                <div class="row-desc">멀티모달 이미지 입력 지원 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">멀티모달 이미지 입력 지원</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>cat spec.md | codex exec "Implement this"</code></div>
@@ -295,11 +315,11 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/side</code></div>
-            <div class="row-desc">사이드 대화창 열기 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">사이드 대화창 열기</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>!</code></div>
-            <div class="row-desc">셸 명령 대기열 입력 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">셸 명령 대기열 입력</div>
           </div>
         </div>
         <div class="group">
@@ -411,11 +431,11 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>deny-read</code></div>
-            <div class="row-desc">파일 읽기 명시적 차단 규칙 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">파일 읽기 명시적 차단 규칙</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>Plan Mode</code></div>
-            <div class="row-desc">격리된 작업 공간 제공 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">격리된 작업 공간 제공</div>
           </div>
         </div>
       </div>
@@ -531,7 +551,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>marketplace add</code></div>
-                <div class="row-desc">마켓플레이스 설치 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">마켓플레이스 설치</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>~/.codex/plugins/</code></div>
@@ -610,7 +630,7 @@ const codexContent = `
           </div>
           <div class="krow cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="과거 입력 기록을 검색합니다.">
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div>
-            <div class="kdesc">히스토리 역방향 검색 <span class="badge-new">NEW</span></div>
+            <div class="kdesc">히스토리 역방향 검색</div>
           </div>
           <div class="krow cl-tip" data-tt-title="Enter — 전송" data-tt-desc="프롬프트를 전송합니다.">
             <div class="kkey"><kbd>Enter</kbd></div>
@@ -645,7 +665,7 @@ const codexContent = `
       <div class="section">
         <div class="section-title">🗄️ 메모리 시스템</div>
         <div class="group">
-          <div class="group-label">TUI 제어 <span class="badge-new">NEW</span></div>
+          <div class="group-label">메모리 TUI 제어</div>
           <div class="row">
             <div class="row-key">모드 전환</div>
             <div class="row-desc">TUI 메뉴에서 on / off / auto</div>
