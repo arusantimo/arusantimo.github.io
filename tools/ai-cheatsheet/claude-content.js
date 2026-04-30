@@ -9,27 +9,35 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.119</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-23</span>
+        <span class="meta-version">v2.1.123</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-04-30</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.119)</span>
+        <span>📋 최근 변경사항 (v2.1.123)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v2.1.119 주요 업데이트"
-            data-tt-desc="CLAUDE_CODE_HIDE_CWD 환경변수로 작업 디렉토리 숨김 기능 추가. --from-pr에서 GitLab, Bitbucket, GitHub Enterprise URL 지원. /config 설정이 ~/.claude/settings.json에 영구 저장되도록 개선."
-            data-tt-example="">v2.1.119 업데이트 — 환경변수 추가, PR 지원 확대 및 설정 저장소 분리 <span
-              class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v2.1.120~v2.1.123 주요 업데이트"
+            data-tt-desc="Windows PowerShell 대체 지원, CI/CD용 비대화형 claude ultrareview 지원, 스킬 내 \${CLAUDE_EFFORT} 환경변수 참조 추가, MCP alwaysLoad 옵션 및 claude plugin prune 명령어 도입 등 다양한 기능이 개선되었습니다."
+            data-tt-example="">v2.1.120~v2.1.123 업데이트 — 비대화형 <code>ultrareview</code>, <code>plugin prune</code>, <code>\${CLAUDE_EFFORT}</code> 지원 및 Windows PowerShell 연동 강화 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.119</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.119 주요 업데이트"
+                data-tt-desc="CLAUDE_CODE_HIDE_CWD 환경변수로 작업 디렉토리 숨김 기능 추가. --from-pr에서 GitLab, Bitbucket, GitHub Enterprise URL 지원. /config 설정이 ~/.claude/settings.json에 영구 저장되도록 개선."
+                data-tt-example="">v2.1.119 업데이트 — 환경변수 추가, PR 지원 확대 및 설정 저장소 분리</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.118</summary>
@@ -225,6 +233,10 @@ const claudeContent = `
           <div class="row">
             <div class="row-key"><code>$ARGUMENTS</code></div>
             <div class="row-desc">사용자 입력 플레이스홀더</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>\${CLAUDE_EFFORT}</code></div>
+            <div class="row-desc">현재 노력 수준 <span class="badge-new">NEW</span></div>
           </div>
           <div class="row">
             <div class="row-key"><code>\${CLAUDE_SKILL_DIR}</code></div>
@@ -660,7 +672,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/theme</code></div>
-                <div class="row-desc">컬러 테마 생성/관리 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">컬러 테마 생성/관리</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/permissions</code></div>
@@ -797,7 +809,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/usage</code></div>
-                <div class="row-desc">플랜 상태, 사용량 &amp; 통계 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">플랜 상태, 사용량 &amp; 통계</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/schedule</code></div>
@@ -900,7 +912,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>ultraplan</code></div>
-                <div class="row-desc">키워드로 클라우드 플래닝 트리거 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">키워드로 클라우드 플래닝 트리거</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/effort</code></div>
@@ -1296,7 +1308,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>sandbox.network.deniedDomains</code></div>
-                <div class="row-desc">네트워크 차단 도메인 설정 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">네트워크 차단 도메인 설정</div>
               </div>
             </div>
           </div>
