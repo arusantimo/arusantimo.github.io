@@ -314,7 +314,7 @@ function renderTableByYear(year) {
                                 <span style="color:var(--accent-warning); font-weight:600;">[적용된 새 설정]</span><br>
                                 연 수익: ${override.annualTargetRate}%<br>
                                 월 재투자: ${formatNumber(override.monthlyInvestment)}원<br>
-                                ${override.additionalSeed ? `<span style="color:var(--accent-primary);">+ 추가 시드: ${formatNumber(override.additionalSeed)}원</span><br>` : ''}
+                                ${override.additionalSeed ? `<span style="color:var(--accent-primary);">시드 증감: ${formatNumber(override.additionalSeed)}원</span><br>` : ''}
                                 장기: ${override.longTermRatio}% (목표 연 ${override.longTermAnnualTarget}%)<br>
                                 단기: ${override.shortTermRatio}%
                             </div>
@@ -886,7 +886,7 @@ function saveMonthSettings() {
     };
 
     const additionalSeedVal = parseFloat(document.getElementById('modalAdditionalSeed').value);
-    if (!isNaN(additionalSeedVal) && additionalSeedVal > 0) {
+    if (!isNaN(additionalSeedVal) && additionalSeedVal !== 0) {
         settings.additionalSeed = additionalSeedVal;
     }
 
