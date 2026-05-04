@@ -251,15 +251,25 @@ function renderTableByYear(year) {
 
         // 실제 입력값 기준 단기 누적 수익금 계산 (1월차 ~ 현재월 합산)
         let actualShortCumulative = 0;
+        let prevActualShortCumulative = 0;
+        let prevTargetShortCumulative = 0;
         for (let m = 1; m <= row.month; m++) {
             const r = allTableRows[m - 1];
             actualShortCumulative += actualValues[m]?.shortTerm ?? r.shortTermProfit;
+            if (m < row.month) {
+                prevActualShortCumulative += actualValues[m]?.shortTerm ?? r.shortTermProfit;
+                prevTargetShortCumulative += r.shortTermProfit;
+            }
         }
 
         const shortCumulStyle = showShortCumul ? '' : 'display:none;';
 
         // 초기 투자금 + 단기 누적 합계
         const shortInitPlusCumul = shortTermPrincipalGlobal + actualShortCumulative;
+
+        // 이전달 실질 단기 누적 수익금 & 목표 누적 수익금 계산 (초기 투자금 + 누적)
+        const prevActualShortInitPlusCumul = row.month === 1 ? shortTermPrincipalGlobal : (shortTermPrincipalGlobal + prevActualShortCumulative);
+        const prevTargetShortInitPlusCumul = row.month === 1 ? shortTermPrincipalGlobal : (shortTermPrincipalGlobal + prevTargetShortCumulative);
         // 단기 달성률: 실제 단기 입력이 있을 때만 계산
         const shortAchievePercent = (actualShort !== null && row.shortTermProfit > 0) ? (actualShort / row.shortTermProfit) * 100 : null;
         const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
@@ -317,14 +327,14 @@ function renderTableByYear(year) {
                     <div style="font-size:9px; color:var(--text-secondary); margin-bottom:2px;">목표</div>
                     <div class="number">${formatNumber(idx === 0 ? row.assetBefore : allTableRows[idx - 1].assetAfter)}</div>
                     ${(() => {
-                        if (idx === 0) return '';
-                        const prevMonth = allTableRows[idx - 1].month;
-                        const prevHasInput = actualValues[prevMonth]?.shortTerm != null || actualValues[prevMonth]?.longTermCumul != null;
-                        if (!prevHasInput) return '';
-                        const prevActualEndAsset = allTableRows[idx - 1].actualEndAsset;
-                        if (prevActualEndAsset == null) return '';
-                        return `<div style="font-size:9px; color:var(--text-secondary); margin-top:6px; margin-bottom:2px;">실제 이월</div><div class="number" style="color:var(--accent-primary);">${formatNumber(prevActualEndAsset)}</div>`;
-                    })()}
+                if (idx === 0) return '';
+                const prevMonth = allTableRows[idx - 1].month;
+                const prevHasInput = actualValues[prevMonth]?.shortTerm != null || actualValues[prevMonth]?.longTermCumul != null;
+                if (!prevHasInput) return '';
+                const prevActualEndAsset = allTableRows[idx - 1].actualEndAsset;
+                if (prevActualEndAsset == null) return '';
+                return `<div style="font-size:9px; color:var(--text-secondary); margin-top:6px; margin-bottom:2px;">실제 이월</div><div class="number" style="color:var(--accent-primary);">${formatNumber(prevActualEndAsset)}</div>`;
+            })()}
                 </td>
                 <td class="number" style="color: var(--accent-success);">
                     ${formatNumber(row.profit)}
@@ -333,8 +343,9 @@ function renderTableByYear(year) {
                     </div>
                 </td>
                 <td>
-                    <div class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}
-                        <span style="color: var(--text-secondary); font-size: 9px; font-weight: normal; margin-left: 4px;">(${formatNumber(row.shortTermPrincipal)})</span>
+                    <div class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}</div>
+                    <div style="font-size: 9px; margin-top: 4px; color: var(--text-secondary);">
+                        <span style="color: #00d9ff;">${formatNumber(prevActualShortInitPlusCumul)}</span> / ${formatNumber(prevTargetShortInitPlusCumul)}
                     </div>
                     <input type="number" class="actual-input" placeholder="실제 단기 수익"
                         value="${displayShortInput}"
@@ -550,6 +561,7 @@ function calculateAndDisplay() {
             longTermInvest: longTermInvest,
             profit: monthlyProfitDynamic,
             shortTermProfit: shortTermMonthlyProfit,
+            shortTermAssetAtMonth: shortTermAssetAtMonth,
             shortTermPrincipal: runningShortPrincipal,
             shortTermCumulativeProfit: shortTermCumulativeProfitTotal,
             longTermAccumulated: longTermAccumulated,
@@ -731,25 +743,45 @@ document.getElementById('additionalSeed').addEventListener('change', (e) => hand
 function renderSettingsTabs() {
     const tabsContainer = document.getElementById('globalSettingsTabs');
     if (!tabsContainer) return;
-    
-    const overridesKeys = Object.keys(monthSettingsOverrides).map(Number).sort((a,b)=>a-b);
+
+    const overridesKeys = Object.keys(monthSettingsOverrides).map(Number).sort((a, b) => a - b);
     let html = `<button class="tab ${currentSettingsTab === 0 ? 'active' : ''}" onclick="selectSettingTab(0)">초기</button>`;
-    
+
     overridesKeys.forEach(month => {
         const startObj = new Date(globalSettings.startDate);
         startObj.setMonth(startObj.getMonth() + month - 1);
         const dateStr = startObj.getFullYear() + '.' + String(startObj.getMonth() + 1).padStart(2, '0');
-        
-        html += `<button class="tab ${currentSettingsTab === month ? 'active' : ''}" onclick="selectSettingTab(${month})">${dateStr}</button>`;
+
+        html += `
+        <div class="tab ${currentSettingsTab === month ? 'active' : ''}" style="display:inline-flex; align-items:center; gap:8px; padding-right:12px;">
+            <span onclick="selectSettingTab(${month})" style="cursor:pointer; height:100%; display:flex; align-items:center;">${dateStr}</span>
+            <button onclick="deleteSettingTab(${month}, event)" style="background:none; border:none; color:rgba(239, 68, 68, 0.7); font-size:10px; cursor:pointer; padding:4px;" title="탭 삭제">❌</button>
+        </div>`;
     });
-    
+
     tabsContainer.innerHTML = html;
+}
+
+function deleteSettingTab(month, event) {
+    if (event) event.stopPropagation();
+    if (!confirm(`${month}월차 설정을 정말 삭제하시겠습니까?`)) return;
+
+    delete monthSettingsOverrides[month];
+    saveToLocalStorage();
+
+    if (currentSettingsTab === month) {
+        selectSettingTab(0);
+    } else {
+        renderSettingsTabs();
+    }
+
+    calculateAndDisplay();
 }
 
 function selectSettingTab(month) {
     currentSettingsTab = month;
     renderSettingsTabs();
-    
+
     const pGroup = document.getElementById('principalGroup');
     const pInput = document.getElementById('principal');
     const seedGroup = document.getElementById('additionalSeedGroup');
@@ -763,10 +795,10 @@ function selectSettingTab(month) {
         document.getElementById('longTermRatio').value = globalSettings.longTermRatio;
         document.getElementById('shortTermRatio').value = globalSettings.shortTermRatio;
         document.getElementById('longTermAnnualTarget').value = globalSettings.longTermAnnualTarget;
-        
+
         pGroup.style.display = 'block';
         seedGroup.style.display = 'none';
-        
+
         pInput.value = globalSettings.principal || 500000000;
         sInput.value = globalSettings.startDate;
         eInput.value = globalSettings.endDate;
@@ -774,18 +806,18 @@ function selectSettingTab(month) {
         eInput.disabled = false;
     } else {
         const override = monthSettingsOverrides[month];
-        if(override) {
+        if (override) {
             document.getElementById('annualTargetRate').value = override.annualTargetRate;
             document.getElementById('monthlyInvestment').value = override.monthlyInvestment;
             document.getElementById('longTermRatio').value = override.longTermRatio;
             document.getElementById('shortTermRatio').value = override.shortTermRatio;
             document.getElementById('longTermAnnualTarget').value = override.longTermAnnualTarget;
         }
-        
+
         pGroup.style.display = 'none';
         seedGroup.style.display = 'block';
         seedInput.value = override?.additionalSeed || '';
-        
+
         sInput.value = '';
         eInput.value = '';
         sInput.disabled = true;
@@ -820,7 +852,7 @@ function openMonthSettings(month) {
         shortTermRatio: parseFloat(document.getElementById('shortTermRatio').value) || 0,
         longTermAnnualTarget: parseFloat(document.getElementById('longTermAnnualTarget').value) || 10
     };
-    
+
     for (let i = 1; i <= month; i++) {
         if (monthSettingsOverrides[i]) {
             Object.assign(effective, monthSettingsOverrides[i]);
@@ -833,7 +865,7 @@ function openMonthSettings(month) {
     document.getElementById('modalShortTermRatio').value = effective.shortTermRatio;
     document.getElementById('modalLongTermAnnualTarget').value = effective.longTermAnnualTarget;
     document.getElementById('modalAdditionalSeed').value = monthSettingsOverrides[month]?.additionalSeed || '';
-    
+
     modal.style.display = 'flex';
 }
 
@@ -844,7 +876,7 @@ function closeMonthSettings() {
 
 function saveMonthSettings() {
     if (!currentEditingMonth) return;
-    
+
     const settings = {
         annualTargetRate: parseFloat(document.getElementById('modalAnnualTargetRate').value),
         monthlyInvestment: parseFloat(document.getElementById('modalMonthlyInvestment').value),
@@ -852,12 +884,12 @@ function saveMonthSettings() {
         shortTermRatio: parseFloat(document.getElementById('modalShortTermRatio').value),
         longTermAnnualTarget: parseFloat(document.getElementById('modalLongTermAnnualTarget').value)
     };
-    
+
     const additionalSeedVal = parseFloat(document.getElementById('modalAdditionalSeed').value);
     if (!isNaN(additionalSeedVal) && additionalSeedVal > 0) {
         settings.additionalSeed = additionalSeedVal;
     }
-    
+
     monthSettingsOverrides[currentEditingMonth] = settings;
     saveToLocalStorage();
     renderSettingsTabs();
@@ -869,14 +901,14 @@ function clearMonthSettings() {
     if (!currentEditingMonth) return;
     delete monthSettingsOverrides[currentEditingMonth];
     saveToLocalStorage();
-    
+
     // 만약 지운 월차가 현재 선택된 탭이라면 전역 탭으로 이동
     if (currentSettingsTab === currentEditingMonth) {
         selectSettingTab(0);
     } else {
         renderSettingsTabs();
     }
-    
+
     calculateAndDisplay();
     closeMonthSettings();
 }
