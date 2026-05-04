@@ -504,7 +504,11 @@ function calculateAndDisplay() {
         // carry는 한달만 적용
         carryAssetForNextMonth = null;
 
-        // 이전 장기 누적(계산용)
+        // 이전 장기 누적(계산용): 이전달에 실제 입력값이 있으면 이월
+        const prevActualLongCumulInput = month > 1 ? actualValues[month - 1]?.longTermCumul ?? null : null;
+        if (prevActualLongCumulInput !== null && !isNaN(Number(prevActualLongCumulInput))) {
+            longTermAccumulated = Number(prevActualLongCumulInput);
+        }
         const prevLongTermAccumulated = longTermAccumulated;
 
         // 월초 기준으로 각 자산의 크기
