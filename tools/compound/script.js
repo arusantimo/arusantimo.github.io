@@ -192,7 +192,8 @@ function getMonthsDifference(startDate, endDate) {
     let months = 0;
     let current = new Date(start);
 
-    while (current < end) {
+    // 무한 루프 및 과도한 메모리 사용 방지 (최대 100년 = 1200개월 제한)
+    while (current < end && months < 1200) {
         months++;
         current.setMonth(current.getMonth() + 1);
     }
