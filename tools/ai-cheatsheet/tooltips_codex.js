@@ -583,6 +583,11 @@ window.CODEX_TIPS = {
     "title": "deny-read — 보안 정책 강화",
     "desc": "특정 파일이나 디렉터리에 대한 읽기 접근을 명시적으로 차단하는 글로브(glob) 정책입니다. 샌드박스 보안을 더욱 강화합니다.",
     "example": "deny-read = [\"env.*\", \"secrets/*\"]"
+  },
+  "/goal": {
+    "title": "/goal — 장기 목표 워크플로",
+    "desc": "app-server API와 연동하여 영구적으로 유지되는 장기 목표(goal)를 관리합니다. 일시정지, 재개, 초기화 등 TUI 컨트롤을 지원합니다.",
+    "example": "/goal\n/goal pause\n/goal resume"
   }
 }
 ;

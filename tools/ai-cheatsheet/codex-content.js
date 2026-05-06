@@ -9,27 +9,35 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.125.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-24</span>
+        <span class="meta-version">v0.128.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-06</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.125.0)</span>
+        <span>📋 최근 변경사항 (v0.128.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v0.125.0 주요 업데이트"
-            data-tt-desc="Unix 소켓 전송 및 원격 스레드 지원, 원격 마켓플레이스 플러그인 설치 가능, 권한 프로필 유지 관리 개선, 모델 디스커버리 권한 변경(AWS/Bedrock 포함) 및 exec --json 사용 시 추론 토큰(reasoning-token) 사용량 보고가 추가되었습니다."
-            data-tt-example="">v0.125.0 업데이트 — Unix 소켓/원격 플러그인 지원, 권한 관리 개선 및 추론 토큰 보고 추가 <span
-              class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v0.126.0~v0.128.0 주요 업데이트"
+            data-tt-desc="persisted /goal 워크플로 도입, codex update 명령어, TUI 키맵 커스텀, 확장된 권한 프로필, 플러그인 원격 설치/제거 기능, 그리고 외부 에이전트 세션 임포트 기능 등 대규모 기능 확장이 이루어졌습니다."
+            data-tt-example="">v0.126.0~v0.128.0 업데이트 — <code>/goal</code> 워크플로, <code>codex update</code>, 권한 프로필 확장 및 외부 세션 임포트 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.125.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.125.0 주요 업데이트"
+                data-tt-desc="Unix 소켓 전송 및 원격 스레드 지원, 원격 마켓플레이스 플러그인 설치 가능, 권한 프로필 유지 관리 개선, 모델 디스커버리 권한 변경(AWS/Bedrock 포함) 및 exec --json 사용 시 추론 토큰(reasoning-token) 사용량 보고가 추가되었습니다."
+                data-tt-example="">v0.125.0 업데이트 — Unix 소켓/원격 플러그인 지원, 권한 관리 개선 및 추론 토큰 보고 추가</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.122.0</summary>
@@ -178,6 +186,10 @@ const codexContent = `
                 <div class="row-key"><code>codex completion powershell</code></div>
                 <div class="row-desc">PowerShell completion 생성</div>
               </div>
+              <div class="row">
+                <div class="row-key"><code>codex update</code></div>
+                <div class="row-desc">최신 버전으로 업데이트 <span class="badge-new">NEW</span></div>
+              </div>
             </div>
             <div class="group">
               <div class="group-label">전역 플래그</div>
@@ -236,7 +248,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--json</code></div>
-                <div class="row-desc">JSONL 이벤트 출력 (추론 토큰 보고) <span class="badge-new">NEW</span></div>
+                <div class="row-desc">JSONL 이벤트 출력 (추론 토큰 보고)</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--output-last-message out.txt</code></div>
@@ -329,6 +341,10 @@ const codexContent = `
             <div class="row-key"><code>!</code></div>
             <div class="row-desc">셸 명령 대기열 입력</div>
           </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/goal</code></div>
+            <div class="row-desc">장기 목표(goal) 워크플로 관리 <span class="badge-new">NEW</span></div>
+          </div>
         </div>
         <div class="group">
           <div class="group-label">작업 흐름</div>
@@ -358,7 +374,7 @@ const codexContent = `
           </div>
           <div class="row">
             <div class="row-key"><code>/mcp [verbose]</code></div>
-            <div class="row-desc">MCP 도구 목록 및 상세 진단 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">MCP 도구 목록 및 상세 진단</div>
           </div>
           <div class="row">
             <div class="row-key"><code>/apps</code></div>
@@ -559,7 +575,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>marketplace add</code></div>
-                <div class="row-desc">마켓플레이스 원격 설치 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">마켓플레이스 원격 설치</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>~/.codex/plugins/</code></div>
@@ -638,7 +654,7 @@ const codexContent = `
           </div>
           <div class="krow cl-tip" data-tt-title="Alt+, / Alt+. — 추론 조절" data-tt-desc="모델의 추론(reasoning) 강도를 임시로 낮추거나 높입니다.">
             <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>,</kbd> / <kbd>.</kbd></div>
-            <div class="kdesc">추론 강도 조절 <span class="badge-new">NEW</span></div>
+            <div class="kdesc">추론 강도 조절</div>
           </div>
           <div class="krow cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="과거 입력 기록을 검색합니다.">
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div>
@@ -739,7 +755,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>amazon-bedrock</code></div>
-                <div class="row-desc">AWS 연동 모델 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">AWS 연동 모델</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>codex --model gpt-5.4-mini</code></div>

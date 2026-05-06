@@ -9,26 +9,35 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.123</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-30</span>
+        <span class="meta-version">v2.1.129</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-06</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.123)</span>
+        <span>📋 최근 변경사항 (v2.1.129)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v2.1.120~v2.1.123 주요 업데이트"
-            data-tt-desc="Windows PowerShell 대체 지원, CI/CD용 비대화형 claude ultrareview 지원, 스킬 내 \${CLAUDE_EFFORT} 환경변수 참조 추가, MCP alwaysLoad 옵션 및 claude plugin prune 명령어 도입 등 다양한 기능이 개선되었습니다."
-            data-tt-example="">v2.1.120~v2.1.123 업데이트 — 비대화형 <code>ultrareview</code>, <code>plugin prune</code>, <code>\${CLAUDE_EFFORT}</code> 지원 및 Windows PowerShell 연동 강화 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v2.1.124~v2.1.129 주요 업데이트"
+            data-tt-desc="claude project purge 명령어 추가로 프로젝트 데이터 일괄 삭제를 지원하며, --plugin-url 및 .zip 형태의 플러그인 로드가 가능해졌습니다. /model 선택기에서 API 게이트웨이 모델 조회가 가능해지고 다양한 버그가 수정되었습니다."
+            data-tt-example="">v2.1.124~v2.1.129 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code> ZIP 로드 지원 및 게이트웨이 모델 조회 추가 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.123</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.120~v2.1.123 주요 업데이트"
+                data-tt-desc="Windows PowerShell 대체 지원, CI/CD용 비대화형 claude ultrareview 지원, 스킬 내 \${CLAUDE_EFFORT} 환경변수 참조 추가, MCP alwaysLoad 옵션 및 claude plugin prune 명령어 도입 등 다양한 기능이 개선되었습니다."
+                data-tt-example="">v2.1.120~v2.1.123 업데이트 — 비대화형 <code>ultrareview</code>, <code>plugin prune</code>, <code>\${CLAUDE_EFFORT}</code> 지원 및 Windows PowerShell 연동 강화</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.119</summary>
@@ -236,7 +245,7 @@ const claudeContent = `
           </div>
           <div class="row">
             <div class="row-key"><code>\${CLAUDE_EFFORT}</code></div>
-            <div class="row-desc">현재 노력 수준 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">현재 노력 수준</div>
           </div>
           <div class="row">
             <div class="row-key"><code>\${CLAUDE_SKILL_DIR}</code></div>
@@ -282,6 +291,10 @@ const claudeContent = `
               <div class="row">
                 <div class="row-key"><code>claude update</code></div>
                 <div class="row-desc">업데이트</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude project purge</code></div>
+                <div class="row-desc">프로젝트 데이터 삭제 <span class="badge-new">NEW</span></div>
               </div>
             </div>
             <div class="group">
@@ -361,6 +374,10 @@ const claudeContent = `
               <div class="row">
                 <div class="row-key"><code>--add-dir</code></div>
                 <div class="row-desc">작업 디렉터리 추가</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--plugin-url</code></div>
+                <div class="row-desc">원격 ZIP 플러그인 로드 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>--agent</code></div>
