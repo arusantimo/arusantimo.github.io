@@ -246,6 +246,18 @@ function renderTableByYear(year) {
         const actualEndAssetDisplay = hasActualInput
             ? (row.assetBefore + row.monthlyInvest + actualTotalProfit)
             : null;
+
+        // 초기 투자 금액 대비 수익률 계산 (누적 수익금 / 초기 투자 원금)
+        let initialPrincipalROI = null;
+        if (actualEndAssetDisplay !== null) {
+            const totalInvestedPrincipal = row.longTermPrincipal + row.shortTermPrincipal + row.monthlyInvest;
+            const cumulativeProfit = actualEndAssetDisplay - totalInvestedPrincipal;
+            const initialPrincipal = longTermPrincipalGlobal + shortTermPrincipalGlobal;
+            if (initialPrincipal > 0) {
+                initialPrincipalROI = ((cumulativeProfit / initialPrincipal) * 100).toFixed(1);
+            }
+        }
+
         const rateColor = rate !== null && parseFloat(rate) >= 100 ? 'var(--accent-primary)' : '#ef4444';
         const achievementHtml = rate !== null ? ` <span style="color:${rateColor}; font-size:11px;">(${rate}%)</span>` : '';
 
@@ -264,12 +276,21 @@ function renderTableByYear(year) {
 
         const shortCumulStyle = showShortCumul ? '' : 'display:none;';
 
-        // 초기 투자금 + 단기 누적 합계
-        const shortInitPlusCumul = shortTermPrincipalGlobal + actualShortCumulative;
+        // 현재 달 기준 단기 누적 원금 (월초 단기 누적 원금 + 이번달 단기 재투자금)
+        const currentShortTermPrincipal = row.shortTermPrincipal + (row.monthlyInvest - row.longTermInvest);
 
-        // 이전달 실질 단기 누적 수익금 & 목표 누적 수익금 계산 (초기 투자금 + 누적)
-        const prevActualShortInitPlusCumul = row.month === 1 ? shortTermPrincipalGlobal : (shortTermPrincipalGlobal + prevActualShortCumulative);
-        const prevTargetShortInitPlusCumul = row.month === 1 ? shortTermPrincipalGlobal : (shortTermPrincipalGlobal + prevTargetShortCumulative);
+        // 누적 단기 원금 + 단기 누적 수익금
+        const shortInitPlusCumul = currentShortTermPrincipal + actualShortCumulative;
+
+        // 월 단기 재투자 금액
+        const currentShortTermInvest = row.monthlyInvest - row.longTermInvest;
+
+        // 누적원금 + 누적수익에서 이번 달 단기 재투자 금액을 뺀 금액
+        const shortInitPlusCumulMinusMonthlyInvest = shortInitPlusCumul - currentShortTermInvest;
+
+        // 이전달 실질 단기 자산 총액 & 목표 단기 자산 총액 계산 (이전달까지의 누적 단기 원금 + 누적 수익금)
+        const prevActualShortInitPlusCumul = row.shortTermPrincipal + prevActualShortCumulative;
+        const prevTargetShortInitPlusCumul = row.shortTermPrincipal + prevTargetShortCumulative;
         // 단기 달성률: 실제 단기 입력이 있을 때만 계산
         const shortAchievePercent = (actualShort !== null && row.shortTermProfit > 0) ? (actualShort / row.shortTermProfit) * 100 : null;
         const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
@@ -355,9 +376,10 @@ function renderTableByYear(year) {
                 <td class="col-short-cumul" style="${shortCumulStyle}">
                     <div class="number" style="color: var(--accent-warning);">${formatNumber(actualShortCumulative)}</div>
                     <div style="color: var(--text-secondary); margin-top: 3px;">
-                        <span style="font-size:9px;">초기 투자금 + 누적</span><br>
+                        <span style="font-size:9px;">누적 원금 + 누적 수익</span><br>
                         <span class="number" style="font-size:11px; color: var(--text-primary);">${formatNumber(shortInitPlusCumul)}</span>
                         ${shortAchievePercentFixed !== null ? `<span style="font-size:11px; color:${shortAchieveColor}; margin-left:6px;">(${shortAchievePercentFixed}%)</span>` : ''}
+                        <div style="font-size:9px; color:var(--text-secondary); margin-top:2px;">(월 재투자 차감: ${formatNumber(shortInitPlusCumulMinusMonthlyInvest)})</div>
                     </div>
                 </td>
                 <td>
@@ -380,6 +402,7 @@ function renderTableByYear(year) {
                     ${actualEndAssetDisplay !== null ? `
                     <div style="margin-top:6px;">
                         <span style="color:${actualEndAssetDisplay >= row.assetAfter ? 'var(--accent-primary)' : '#ef4444'}; font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
+                        ${initialPrincipalROI !== null ? `<span style="font-size:10px; color:${parseFloat(initialPrincipalROI) >= 0 ? 'var(--accent-success)' : '#ef4444'}; margin-left:4px;" title="초기 투자 원금 대비 총 수익률">(${parseFloat(initialPrincipalROI) > 0 ? '+' : ''}${initialPrincipalROI}%)</span>` : ''}
                     </div>
                     <div style="margin-top:2px; font-family: 'Monaco', 'Courier New', monospace; font-size:9px; color:var(--text-secondary);">${formatNumber(row.initialAssetAfter)}(초기 목표)</div>` : ''}
                 </td>
