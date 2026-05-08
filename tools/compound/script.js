@@ -403,8 +403,8 @@ function renderTableByYear(year) {
                     <div style="margin-top:6px;">
                         <span style="color:${actualEndAssetDisplay >= row.assetAfter ? 'var(--accent-primary)' : '#ef4444'}; font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
                         ${initialPrincipalROI !== null ? `<span style="font-size:10px; color:${parseFloat(initialPrincipalROI) >= 0 ? 'var(--accent-success)' : '#ef4444'}; margin-left:4px;" title="초기 투자 원금 대비 총 수익률">(${parseFloat(initialPrincipalROI) > 0 ? '+' : ''}${initialPrincipalROI}%)</span>` : ''}
-                    </div>
-                    <div style="margin-top:2px; font-family: 'Monaco', 'Courier New', monospace; font-size:9px; color:var(--text-secondary);">${formatNumber(row.initialAssetAfter)}(초기 목표)</div>` : ''}
+                    </div>` : ''}
+                    <div style="margin-top:2px; font-family: 'Monaco', 'Courier New', monospace; font-size:9px; color:var(--text-secondary);">${formatNumber(row.initialAssetAfter)}(초기 목표)</div>
                 </td>
             </tr>
         `;
