@@ -431,6 +431,8 @@ function createYearTabs() {
         });
     });
 
+    setTimeout(updateYearTabsScrollButtons, 50);
+
     return defaultYear;
 }
 
@@ -939,3 +941,42 @@ function clearMonthSettings() {
     calculateAndDisplay();
     closeMonthSettings();
 }
+
+function scrollYearTabs(direction) {
+    const tabs = document.getElementById('yearTabs');
+    const scrollAmount = 200; // 탭 스크롤 이동량
+    if (tabs) {
+        tabs.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+}
+
+function updateYearTabsScrollButtons() {
+    const tabs = document.getElementById('yearTabs');
+    const leftBtn = document.getElementById('yearTabsLeftBtn');
+    const rightBtn = document.getElementById('yearTabsRightBtn');
+    
+    if (!tabs || !leftBtn || !rightBtn) return;
+    
+    // 스크롤이 필요한지 확인 (컨텐츠 전체 너비가 컨테이너 너비보다 큰 경우)
+    if (tabs.scrollWidth > tabs.clientWidth) {
+        // 스크롤 위치에 따라 화살표 표시/숨김
+        if (tabs.scrollLeft > 0) {
+            leftBtn.style.display = 'flex';
+        } else {
+            leftBtn.style.display = 'none';
+        }
+        
+        // 브라우저 소수점 픽셀 차이 고려 (-1px)
+        if (tabs.scrollLeft + tabs.clientWidth >= tabs.scrollWidth - 1) {
+            rightBtn.style.display = 'none';
+        } else {
+            rightBtn.style.display = 'flex';
+        }
+    } else {
+        leftBtn.style.display = 'none';
+        rightBtn.style.display = 'none';
+    }
+}
+
+window.addEventListener('resize', updateYearTabsScrollButtons);
+
