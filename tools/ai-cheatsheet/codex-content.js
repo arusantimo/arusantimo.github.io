@@ -21,21 +21,9 @@ const codexContent = `
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="codex remote-control 명령 (v0.130.0)"
-            data-tt-desc="헤드리스 원격 제어 앱 서버를 시작하는 더 간단한 진입점 명령 codex remote-control이 추가됐습니다."
-            data-tt-example="codex remote-control"><code>codex remote-control</code> 명령 추가 — 헤드리스 원격 제어 시작 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="AWS 콘솔 로그인 Bedrock 인증 (v0.130.0)"
-            data-tt-desc="Bedrock 인증에서 aws login 프로파일의 AWS 콘솔 로그인 자격증명을 사용할 수 있습니다."
-            data-tt-example=""><code>aws login</code> 프로파일로 Bedrock 인증 지원 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="app-server 스레드 페이지네이션 (v0.130.0)"
-            data-tt-desc="app-server 클라이언트가 unloaded, summary, full 뷰로 대형 스레드를 페이지 단위로 조회할 수 있습니다."
-            data-tt-example="">app-server 클라이언트 스레드 페이지네이션 API 추가 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="플러그인 공유 메타데이터 (v0.130.0)"
-            data-tt-desc="플러그인 상세 화면에 번들된 훅이 표시되며, 플러그인 공유 시 링크 메타데이터와 검색 가능성 제어가 포함됩니다."
-            data-tt-example="">플러그인 상세 화면에 훅 표시 및 공유 메타데이터/검색 가능성 노출 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="view_image 멀티 환경 지원 (v0.130.0)"
-            data-tt-desc="view_image가 멀티 환경 세션에서 선택된 환경을 통해 파일을 해석합니다."
-            data-tt-example=""><code>view_image</code> 멀티 환경 세션 파일 해석 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v0.126.0~v0.130.0 주요 업데이트"
+            data-tt-desc="persisted /goal 워크플로 도입, codex update 명령어, TUI 키맵 커스텀, 확장된 권한 프로필, 플러그인 원격 설치/제거 기능, 그리고 외부 에이전트 세션 임포트 기능 등 대규모 기능 확장이 이루어졌습니다."
+            data-tt-example="">v0.126.0~v0.130.0 업데이트 — <code>/goal</code> 워크플로, <code>codex update</code>, 권한 프로필 확장 및 외부 세션 임포트 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
@@ -43,15 +31,41 @@ const codexContent = `
         <div id="hist-codex" class="history-container">
 
           <details class="ver-group">
-            <summary>v0.125.0~v0.129.0</summary>
+            <summary>v0.125.0</summary>
             <ul>
-              <li class="cl-tip" data-tt-title="v0.125.0~v0.129.0 주요 업데이트"
-                data-tt-desc="codex exec --json reasoning-token 사용량 보고, Unix socket transport, Permission profiles round-trip, app-server 원격 플러그인 설치, AWS/Bedrock 계정 상태 노출(v0.125.0). /resume ID·이름 지정, Realtime V2 스트리밍, TUI 상태줄 스레드 제목, MCP Apps 강화(v0.119~0.124)."
-                data-tt-example="">v0.125.0~v0.129.0 업데이트 — <code>codex exec --json</code> reasoning-token 보고, Unix socket, Permission profiles, 원격 플러그인 설치 등</li>
+              <li class="cl-tip" data-tt-title="v0.125.0 주요 업데이트"
+                data-tt-desc="Unix 소켓 전송 및 원격 스레드 지원, 원격 마켓플레이스 플러그인 설치 가능, 권한 프로필 유지 관리 개선, 모델 디스커버리 권한 변경(AWS/Bedrock 포함) 및 exec --json 사용 시 추론 토큰(reasoning-token) 사용량 보고가 추가되었습니다."
+                data-tt-example="">v0.125.0 업데이트 — Unix 소켓/원격 플러그인 지원, 권한 관리 개선 및 추론 토큰 보고 추가</li>
             </ul>
           </details>
 
+          <details class="ver-group">
+            <summary>v0.122.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.122.0 업데이트"
+                data-tt-desc="/side(사이드 대화창), !(실행 중 셸 명령 대기열) 추가. codex app 명령으로 데스크톱 앱을 관리하며, Plan Mode(격리 작업 공간)와 deny-read(보안 정책) 기능이 도입되었습니다."
+                data-tt-example="">v0.122.0 업데이트 — <code>/side</code>, <code>!</code>, <code>codex app</code> 명령 추가 및
+                <code>Plan Mode</code> 도입</li>
+            </ul>
+          </details>
 
+          <details class="ver-group">
+            <summary>v0.124.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.124.0 업데이트"
+                data-tt-desc="TUI에서 Alt+, 와 Alt+. 로 추론(reasoning) 수준을 빠르게 조절할 수 있습니다. Amazon Bedrock(OpenAI 호환) 모델 제공자가 정식 지원되며, 훅(Hooks) 기능이 안정화되었습니다."
+                data-tt-example="">v0.124.0 업데이트 — TUI 추론 레벨 단축키, Bedrock 정식 지원 및 Hooks 안정화</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v0.123.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.123.0 업데이트"
+                data-tt-desc="Amazon Bedrock 모델 제공자 내장 지원, /mcp verbose 상세 진단 명령 추가. 실시간 핸드오프 기능이 개선되어 백그라운드 에이전트가 트랜스크립트 델타를 수신합니다."
+                data-tt-example="">v0.123.0 업데이트 — <code>amazon-bedrock</code> 모델 내장, <code>/mcp verbose</code> 상세 진단 추가</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.121.0</summary>
@@ -172,6 +186,10 @@ const codexContent = `
                 <div class="row-key"><code>codex completion powershell</code></div>
                 <div class="row-desc">PowerShell completion 생성</div>
               </div>
+              <div class="row">
+                <div class="row-key"><code>codex update</code></div>
+                <div class="row-desc">최신 버전으로 업데이트 <span class="badge-new">NEW</span></div>
+              </div>
             </div>
             <div class="group">
               <div class="group-label">전역 플래그</div>
@@ -230,7 +248,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--json</code></div>
-                <div class="row-desc">JSONL 이벤트 출력</div>
+                <div class="row-desc">JSONL 이벤트 출력 (추론 토큰 보고)</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--output-last-message out.txt</code></div>
@@ -323,6 +341,10 @@ const codexContent = `
             <div class="row-key"><code>!</code></div>
             <div class="row-desc">셸 명령 대기열 입력</div>
           </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/goal</code></div>
+            <div class="row-desc">장기 목표(goal) 워크플로 관리 <span class="badge-new">NEW</span></div>
+          </div>
         </div>
         <div class="group">
           <div class="group-label">작업 흐름</div>
@@ -351,8 +373,8 @@ const codexContent = `
             <div class="row-desc">백그라운드 터미널 상태</div>
           </div>
           <div class="row">
-            <div class="row-key"><code>/mcp</code></div>
-            <div class="row-desc">MCP 도구 목록</div>
+            <div class="row-key"><code>/mcp [verbose]</code></div>
+            <div class="row-desc">MCP 도구 목록 및 상세 진단</div>
           </div>
           <div class="row">
             <div class="row-key"><code>/apps</code></div>
@@ -553,7 +575,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>marketplace add</code></div>
-                <div class="row-desc">마켓플레이스 설치</div>
+                <div class="row-desc">마켓플레이스 원격 설치</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>~/.codex/plugins/</code></div>
@@ -630,6 +652,10 @@ const codexContent = `
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>G</kbd></div>
             <div class="kdesc">편집기 열기</div>
           </div>
+          <div class="krow cl-tip" data-tt-title="Alt+, / Alt+. — 추론 조절" data-tt-desc="모델의 추론(reasoning) 강도를 임시로 낮추거나 높입니다.">
+            <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>,</kbd> / <kbd>.</kbd></div>
+            <div class="kdesc">추론 강도 조절</div>
+          </div>
           <div class="krow cl-tip" data-tt-title="Ctrl+R — 히스토리 검색" data-tt-desc="과거 입력 기록을 검색합니다.">
             <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>R</kbd></div>
             <div class="kdesc">히스토리 역방향 검색</div>
@@ -667,7 +693,7 @@ const codexContent = `
       <div class="section">
         <div class="section-title">🗄️ 메모리 시스템</div>
         <div class="group">
-          <div class="group-label">메모리 TUI 제어</div>
+          <div class="group-label">TUI 제어</div>
           <div class="row">
             <div class="row-key">모드 전환</div>
             <div class="row-desc">TUI 메뉴에서 on / off / auto</div>
@@ -726,6 +752,10 @@ const codexContent = `
               <div class="row">
                 <div class="row-key"><code>gpt-5.3-codex-spark</code></div>
                 <div class="row-desc">실시간/초저지연 연구 프리뷰</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>amazon-bedrock</code></div>
+                <div class="row-desc">AWS 연동 모델</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>codex --model gpt-5.4-mini</code></div>

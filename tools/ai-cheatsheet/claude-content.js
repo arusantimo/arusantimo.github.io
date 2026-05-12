@@ -46,15 +46,58 @@ const claudeContent = `
         <div id="hist-claude" class="history-container">
 
           <details class="ver-group">
-            <summary>v2.1.119~v2.1.136</summary>
+            <summary>v2.1.124~v2.1.136</summary>
             <ul>
-              <li class="cl-tip" data-tt-title="v2.1.119~v2.1.136 주요 업데이트"
-                data-tt-desc="alwaysLoad MCP 옵션, claude plugin prune, /skills 필터 검색, PostToolUse 훅 출력 교체, prUrlTemplate, CLAUDE_CODE_HIDE_CWD, --from-pr GitLab/Bitbucket 지원, /config 영구 저장, Vertex AI X.509 인증(v2.1.119~121). settings.autoMode.hard_deny, worktree.baseRef, CLAUDE_CODE_ENABLE_FEEDBACK_SURVEY_FOR_OTEL, 훅 effort 지원(v2.1.122~136)."
-                data-tt-example="">v2.1.119~v2.1.136 업데이트 — <code>alwaysLoad</code>, <code>claude plugin prune</code>, <code>worktree.baseRef</code>, <code>settings.autoMode.hard_deny</code> 등</li>
+              <li class="cl-tip" data-tt-title="v2.1.124~v2.1.136 주요 업데이트"
+                data-tt-desc="claude project purge 명령 추가, --plugin-url ZIP 로드 지원, API 게이트웨이 모델 조회(v2.1.124~129). settings.autoMode.hard_deny, worktree.baseRef(fresh|head), 훅 effort.level/CLAUDE_EFFORT 지원(v2.1.130~136)."
+                data-tt-example="">v2.1.124~v2.1.136 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code>, <code>worktree.baseRef</code>, 훅 effort 지원 등</li>
             </ul>
           </details>
 
+          <details class="ver-group">
+            <summary>v2.1.123</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.120~v2.1.123 주요 업데이트"
+                data-tt-desc="Windows PowerShell 대체 지원, CI/CD용 비대화형 claude ultrareview 지원, 스킬 내 \${CLAUDE_EFFORT} 환경변수 참조 추가, MCP alwaysLoad 옵션 및 claude plugin prune 명령어 도입 등 다양한 기능이 개선되었습니다."
+                data-tt-example="">v2.1.120~v2.1.123 업데이트 — 비대화형 <code>ultrareview</code>, <code>plugin prune</code>, <code>\${CLAUDE_EFFORT}</code> 지원 및 Windows PowerShell 연동 강화</li>
+            </ul>
+          </details>
 
+          <details class="ver-group">
+            <summary>v2.1.119</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.119 주요 업데이트"
+                data-tt-desc="CLAUDE_CODE_HIDE_CWD 환경변수로 작업 디렉토리 숨김 기능 추가. --from-pr에서 GitLab, Bitbucket, GitHub Enterprise URL 지원. /config 설정이 ~/.claude/settings.json에 영구 저장되도록 개선."
+                data-tt-example="">v2.1.119 업데이트 — 환경변수 추가, PR 지원 확대 및 설정 저장소 분리</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.1.118</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.118 업데이트"
+                data-tt-desc="Vim visual mode(v/V) 지원 추가, /cost와 /stats가 /usage로 통합되었습니다. /theme으로 커스텀 테마를 관리할 수 있으며, DISABLE_UPDATES 환경변수가 추가되었습니다."
+                data-tt-example="">v2.1.118 업데이트 — Vim visual mode, <code>/usage</code> 통합, 테마 관리, 업데이트 차단 변수 등</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.1.117</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.117 업데이트"
+                data-tt-desc="/resume 시 대규모 세션 요약 후 재개 기능 제공, /model 선택 영구 저장. macOS/Linux에서 네이티브 bfs/ugrep 내장으로 빠른 검색, Opus/Sonnet 4.6 Pro 기본 effort가 high로 상향."
+                data-tt-example="">v2.1.117 업데이트 — 세션 요약 재개, 모델 선택 유지, 검색 고속화 등</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.1.116</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
+                data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다."
+                data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.112</summary>
@@ -225,6 +268,10 @@ const claudeContent = `
             <div class="row-desc">사용자 입력 플레이스홀더</div>
           </div>
           <div class="row">
+            <div class="row-key"><code>\${CLAUDE_EFFORT}</code></div>
+            <div class="row-desc">현재 노력 수준</div>
+          </div>
+          <div class="row">
             <div class="row-key"><code>\${CLAUDE_SKILL_DIR}</code></div>
             <div class="row-desc">스킬 자신의 디렉터리</div>
           </div>
@@ -268,6 +315,10 @@ const claudeContent = `
               <div class="row">
                 <div class="row-key"><code>claude update</code></div>
                 <div class="row-desc">업데이트</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude project purge</code></div>
+                <div class="row-desc">프로젝트 데이터 삭제 <span class="badge-new">NEW</span></div>
               </div>
             </div>
             <div class="group">
@@ -347,6 +398,10 @@ const claudeContent = `
               <div class="row">
                 <div class="row-key"><code>--add-dir</code></div>
                 <div class="row-desc">작업 디렉터리 추가</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--plugin-url</code></div>
+                <div class="row-desc">원격 ZIP 플러그인 로드 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>--agent</code></div>
@@ -619,7 +674,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/cost</code></div>
-                <div class="row-desc">토큰 사용량 통계</div>
+                <div class="row-desc">비용 통계 (→ /usage 통합)</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/context</code></div>
@@ -658,7 +713,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/theme</code></div>
-                <div class="row-desc">컬러 테마 변경</div>
+                <div class="row-desc">컬러 테마 생성/관리</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/permissions</code></div>
@@ -775,7 +830,7 @@ const claudeContent = `
               <div class="group-label">특수 (계속)</div>
               <div class="row">
                 <div class="row-key"><code>/stats</code></div>
-                <div class="row-desc">사용량 스트릭 &amp; 설정</div>
+                <div class="row-desc">스트릭 (→ /usage 통합)</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/insights</code></div>
@@ -795,7 +850,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>/usage</code></div>
-                <div class="row-desc">플랜 한도 &amp; 상태</div>
+                <div class="row-desc">플랜 상태, 사용량 &amp; 통계</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/schedule</code></div>
@@ -898,7 +953,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>ultraplan</code></div>
-                <div class="row-desc">키워드로 클라우드 플래닝 트리거 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">키워드로 클라우드 플래닝 트리거</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/effort</code></div>
@@ -1294,7 +1349,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>sandbox.network.deniedDomains</code></div>
-                <div class="row-desc">네트워크 차단 도메인 설정 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">네트워크 차단 도메인 설정</div>
               </div>
             </div>
           </div>
