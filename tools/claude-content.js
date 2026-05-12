@@ -9,45 +9,36 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.121</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-04-28</span>
+        <span class="meta-version">v2.1.139</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-12</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.121)</span>
+        <span>📋 최근 변경사항 (v2.1.139)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="alwaysLoad MCP 서버 설정 (v2.1.121)"
-            data-tt-desc="MCP 서버 config에 alwaysLoad 옵션 추가. true로 설정하면 해당 서버의 모든 도구가 tool-search 지연 없이 항상 사용 가능합니다."
-            data-tt-example="{&quot;alwaysLoad&quot;: true}"><code>alwaysLoad</code> MCP 서버 옵션 추가 — 도구 항상 로드 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="claude plugin prune (v2.1.121)"
-            data-tt-desc="고아 상태의 자동 설치 플러그인 의존성을 제거합니다. plugin uninstall --prune은 연쇄적으로 제거합니다."
-            data-tt-example="claude plugin prune"><code>claude plugin prune</code> 명령 추가 — 고아 플러그인 의존성 정리 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/skills 필터 검색 (v2.1.121)"
-            data-tt-desc="/skills 명령어에 타이핑으로 필터링하는 검색창이 추가됐습니다. 긴 스킬 목록에서 스크롤 없이 원하는 스킬을 찾을 수 있습니다."
-            data-tt-example="/skills"><code>/skills</code> 타이핑 필터 검색창 추가 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="PostToolUse 훅 출력 교체 (v2.1.121)"
-            data-tt-desc="PostToolUse 훅이 hookSpecificOutput.updatedToolOutput을 통해 모든 도구의 출력을 교체할 수 있습니다 (이전에는 MCP 전용)."
-            data-tt-example="">PostToolUse 훅으로 모든 도구 출력 교체 가능 (<code>hookSpecificOutput.updatedToolOutput</code>) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="prUrlTemplate 설정 (v2.1.119)"
-            data-tt-desc="footer PR 뱃지를 github.com 대신 커스텀 코드 리뷰 URL로 연결하는 prUrlTemplate 설정이 추가됐습니다."
-            data-tt-example=""><code>prUrlTemplate</code> 설정 추가 — 커스텀 PR 링크 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="CLAUDE_CODE_HIDE_CWD 환경변수 (v2.1.119)"
-            data-tt-desc="시작 로고에서 현재 작업 디렉터리를 숨기는 환경변수가 추가됐습니다."
-            data-tt-example="export CLAUDE_CODE_HIDE_CWD=1"><code>CLAUDE_CODE_HIDE_CWD</code> 환경변수 추가 — 시작 로고 CWD 숨김 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="--from-pr GitLab/Bitbucket 지원 (v2.1.119)"
-            data-tt-desc="--from-pr가 GitHub Enterprise뿐 아니라 GitLab MR, Bitbucket PR URL도 지원합니다."
-            data-tt-example="claude --from-pr https://gitlab.com/.../merge_requests/1"><code>--from-pr</code>에 GitLab MR, Bitbucket PR, GitHub Enterprise 지원 추가 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/config 설정 영구 저장 (v2.1.119)"
-            data-tt-desc="/config 설정(테마, 에디터 모드, verbose 등)이 이제 ~/.claude/settings.json에 저장되고 프로젝트/로컬/정책 우선순위에 참여합니다."
-            data-tt-example="/config"><code>/config</code> 설정이 <code>~/.claude/settings.json</code>에 영구 저장됨 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Vertex AI X.509 인증 (v2.1.121)"
-            data-tt-desc="Vertex AI에서 X.509 인증서 기반 Workload Identity Federation(mTLS ADC)을 지원합니다."
-            data-tt-example="">Vertex AI: X.509 인증서 기반 Workload Identity Federation 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude agents 에이전트 뷰 (v2.1.139)"
+            data-tt-desc="Research Preview: 모든 Claude Code 세션 목록(실행 중, 대기 중, 완료)을 하나의 리스트로 볼 수 있는 에이전트 뷰. claude agents 명령으로 시작합니다."
+            data-tt-example="claude agents"><code>claude agents</code> 에이전트 뷰 추가 (Research Preview) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/goal 명령어 (v2.1.139)"
+            data-tt-desc="완료 조건을 설정하면 Claude가 조건 충족까지 여러 턴에 걸쳐 작업을 계속합니다. 대화형, -p, Remote Control에서 작동하며 전경판널로 경과/턴/토큰을 실시간 표시합니다."
+            data-tt-example="/goal"><code>/goal</code> 명령어 추가 — 완료 조건 설정 및 자동 진행 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/scroll-speed 명령어 (v2.1.139)"
+            data-tt-desc="마우스 휠 스크롤 속도를 라이브 프리뷰로 조정할 수 있는 슬래시 명령어 추가."
+            data-tt-example="/scroll-speed"><code>/scroll-speed</code> 명령어 추가 — 스크롤 속도 조정 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="hook continueOnBlock 옵션 (v2.1.139)"
+            data-tt-desc="PostToolUse 훅에 continueOnBlock: true를 설정하면, 훅이 거부 이유를 Claude에 피드백하고 턴을 계속 진행합니다."
+            data-tt-example=""><code>continueOnBlock</code> 훅 옵션 추가 (PostToolUse) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_PROJECT_DIR 환경변수 (v2.1.139)"
+            data-tt-desc="MCP stdio 서버가 CLAUDE_PROJECT_DIR 환경변수를 수신하며, 플러그인 설정에서 ${CLAUDE_PROJECT_DIR}를 참조할 수 있습니다."
+            data-tt-example="${CLAUDE_PROJECT_DIR}"><code>CLAUDE_PROJECT_DIR</code> MCP stdio 서버 환경변수 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="에이전트 ID 헤더 (v2.1.139)"
+            data-tt-desc="서브에이전트의 API 요청에 x-claude-code-agent-id / x-claude-code-parent-agent-id 헤더가 포함되며, OTEL 스팬에도 agent_id / parent_agent_id 속성이 포함됩니다."
+            data-tt-example=""><code>x-claude-code-agent-id</code> / <code>x-claude-code-parent-agent-id</code> 서브에이전트 API 헤더 추가 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
@@ -55,13 +46,15 @@ const claudeContent = `
         <div id="hist-claude" class="history-container">
 
           <details class="ver-group">
-            <summary>v2.1.113~v2.1.116</summary>
+            <summary>v2.1.119~v2.1.136</summary>
             <ul>
-              <li class="cl-tip" data-tt-title="v2.1.113~v2.1.116 업데이트"
-                data-tt-desc="sandbox.network.deniedDomains 설정 추가, Ctrl+A/E, Ctrl+Backspace(Win) 단축키 지원. /ultrareview는 이제 병렬 체크 및 diffstat을 표시합니다. 네이티브 바이너리로 실행 방식이 최적화되었습니다."
-                data-tt-example="">v2.1.113~v2.1.116 업데이트 — <code>deniedDomains</code> 설정, 신규 단축키 및 네이티브 바이너리 도입</li>
+              <li class="cl-tip" data-tt-title="v2.1.119~v2.1.136 주요 업데이트"
+                data-tt-desc="alwaysLoad MCP 옵션, claude plugin prune, /skills 필터 검색, PostToolUse 훅 출력 교체, prUrlTemplate, CLAUDE_CODE_HIDE_CWD, --from-pr GitLab/Bitbucket 지원, /config 영구 저장, Vertex AI X.509 인증(v2.1.119~121). settings.autoMode.hard_deny, worktree.baseRef, CLAUDE_CODE_ENABLE_FEEDBACK_SURVEY_FOR_OTEL, 훅 effort 지원(v2.1.122~136)."
+                data-tt-example="">v2.1.119~v2.1.136 업데이트 — <code>alwaysLoad</code>, <code>claude plugin prune</code>, <code>worktree.baseRef</code>, <code>settings.autoMode.hard_deny</code> 등</li>
             </ul>
           </details>
+
+
 
           <details class="ver-group">
             <summary>v2.1.112</summary>
