@@ -34,8 +34,8 @@ const claudeContent = `
             data-tt-desc="PostToolUse 훅에 continueOnBlock: true를 설정하면, 훅이 거부 이유를 Claude에 피드백하고 턴을 계속 진행합니다."
             data-tt-example=""><code>continueOnBlock</code> 훅 옵션 추가 (PostToolUse) <span class="badge-new">NEW</span></li>
           <li class="cl-tip" data-tt-title="CLAUDE_PROJECT_DIR 환경변수 (v2.1.139)"
-            data-tt-desc="MCP stdio 서버가 CLAUDE_PROJECT_DIR 환경변수를 수신하며, 플러그인 설정에서 ${CLAUDE_PROJECT_DIR}를 참조할 수 있습니다."
-            data-tt-example="${CLAUDE_PROJECT_DIR}"><code>CLAUDE_PROJECT_DIR</code> MCP stdio 서버 환경변수 지원 <span class="badge-new">NEW</span></li>
+            data-tt-desc="MCP stdio 서버가 CLAUDE_PROJECT_DIR 환경변수를 수신하며, 플러그인 설정에서 \${CLAUDE_PROJECT_DIR}를 참조할 수 있습니다."
+            data-tt-example="\${CLAUDE_PROJECT_DIR}"><code>CLAUDE_PROJECT_DIR</code> MCP stdio 서버 환경변수 지원 <span class="badge-new">NEW</span></li>
           <li class="cl-tip" data-tt-title="에이전트 ID 헤더 (v2.1.139)"
             data-tt-desc="서브에이전트의 API 요청에 x-claude-code-agent-id / x-claude-code-parent-agent-id 헤더가 포함되며, OTEL 스팬에도 agent_id / parent_agent_id 속성이 포함됩니다."
             data-tt-example=""><code>x-claude-code-agent-id</code> / <code>x-claude-code-parent-agent-id</code> 서브에이전트 API 헤더 추가 <span class="badge-new">NEW</span></li>
