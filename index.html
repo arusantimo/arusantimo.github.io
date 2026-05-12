@@ -69,7 +69,7 @@
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 100%;
             margin: 0 auto;
             padding: 50px 20px;
         }
@@ -99,20 +99,22 @@
         
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 32px;
+            grid-template-columns: repeat(auto-fill, 220px);
+            gap: 20px;
             margin-bottom: 80px;
         }
         
         .tool-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 12px;
             overflow: hidden;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
             position: relative;
+            width: 220px;
+            min-height: 200px;
         }
         
         .tool-card::before {
@@ -133,57 +135,80 @@
         
         .card-header {
             background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
-            padding: 32px 24px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             border-bottom: 1px solid var(--border-color);
         }
         
         .card-icon {
-            font-size: 40px;
-            width: 60px;
-            height: 60px;
+            font-size: 13px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(124, 58, 237, 0.1));
-            border-radius: 12px;
+            border-radius: 4px;
             border: 1px solid var(--border-color);
         }
         
+        .card-category {
+            font-size: 10px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-finance {
+            color: var(--accent-success);
+        }
+
+        .category-ai {
+            color: var(--accent-secondary);
+        }
+
+        .category-extension {
+            color: #3b82f6;
+        }
+
         .card-title {
-            font-size: 18px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--text-primary);
+            line-height: 1.3;
         }
         
         .card-subtitle {
-            font-size: 13px;
+            font-size: 11px;
             color: var(--text-secondary);
             margin-top: 4px;
             font-weight: 500;
+            line-height: 1.3;
         }
         
         .card-content {
-            padding: 24px;
+            padding: 12px 16px;
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
         
         .card-description {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 20px;
-            line-height: 1.7;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            word-break: keep-all;
         }
         
         .card-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
+            gap: 4px;
             margin-top: auto;
         }
         
@@ -191,9 +216,9 @@
             display: inline-block;
             background: var(--bg-tertiary);
             color: var(--accent-primary);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 600;
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
@@ -205,27 +230,26 @@
         }
         
         .card-footer {
-            padding: 16px 24px;
+            padding: 8px 12px;
             border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 12px;
+            gap: 6px;
+            justify-content: flex-end;
         }
         
         .btn {
-            flex: 1;
-            padding: 12px 16px;
+            padding: 4px 10px;
             border: none;
-            border-radius: 8px;
-            font-size: 13px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-decoration: none;
             text-align: center;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
             border: 1px solid transparent;
         }
         
@@ -336,13 +360,14 @@
     </header>
     
     <div class="container">
-        <h2 class="section-title">💰 금융 도구</h2>
+        <h2 class="section-title">🛠️ 도구 목록</h2>
         <div class="tools-grid">
             <!-- 복리 계산 도구 -->
-            <div class="tool-card">
+            <div class="tool-card" style="border-top: 3px solid var(--accent-success);">
                 <div class="card-header">
                     <div class="card-icon">📊</div>
                     <div>
+                        <div class="card-category category-finance">금융 도구</div>
                         <div class="card-title">투자 계획 시뮬레이터</div>
                         <div class="card-subtitle">Investment Planning Simulator</div>
                     </div>
@@ -358,22 +383,21 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="tools/compound/index.html" class="btn btn-primary">
-                        🔧 도구 열기
+                    <a href="tools/compound/index.html" class="btn btn-primary" title="도구 열기">
+                        열기
                     </a>
-                    <a href="https://github.com/arusantimo/arusantimo.github.io" class="btn btn-secondary" target="_blank">
-                        📌 소스
+                    <a href="https://github.com/arusantimo/arusantimo.github.io" class="btn btn-secondary" target="_blank" title="소스">
+                        소스
                     </a>
                 </div>
             </div>
-        </div>
 
-        <h2 class="section-title">🤖 AI 도구</h2>
-        <div class="tools-grid">
-            <div class="tool-card" style="border-top: 3px solid #7c3aed;">
+            <!-- AI 도구 -->
+            <div class="tool-card" style="border-top: 3px solid var(--accent-secondary);">
                 <div class="card-header">
                     <div class="card-icon">📋</div>
                     <div>
+                        <div class="card-category category-ai">AI 도구</div>
                         <div class="card-title">AI 통합 치트시트</div>
                         <div class="card-subtitle">Claude Code + Codex CLI — 탭 전환</div>
                     </div>
@@ -390,22 +414,47 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="tools/ai-cheatsheet/index.html" class="btn btn-primary">
-                        📋 통합 보기
+                    <a href="tools/ai-cheatsheet/index.html" class="btn btn-primary" title="통합 보기">
+                        보기
                     </a>
-                    <a href="tools/ai-cheatsheet/index.html#codex" class="btn btn-secondary" target="_blank">
-                        ⬡ Codex 탭
+                    <a href="tools/ai-cheatsheet/index.html#codex" class="btn btn-secondary" target="_blank" title="Codex 탭">
+                        Codex 탭
+                    </a>
+                </div>
+            </div>
+
+            <!-- 브라우저 익스텐션 -->
+            <div class="tool-card" style="border-top: 3px solid #3b82f6;">
+                <div class="card-header">
+                    <div class="card-icon">🍪</div>
+                    <div>
+                        <div class="card-category category-extension">확장프로그램</div>
+                        <div class="card-title">Cookie Exporter</div>
+                        <div class="card-subtitle">Browser Extension</div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p class="card-description">
+                        클릭 한 번으로 현재 사이트의 쿠키를 쉽게 추출하고 관리할 수 있는 브라우저 확장 프로그램입니다.
+                    </p>
+                    <div class="card-tags">
+                        <span class="tag">Chrome</span>
+                        <span class="tag">Edge</span>
+                        <span class="tag">유틸리티</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="tools/cookie-exporter/cookie-exporter.zip" class="btn btn-primary" title="ZIP 다운로드" download>
+                        다운로드
+                    </a>
+                    <a href="https://github.com/arusantimo/arusantimo.github.io/tree/main/tools/cookie-exporter" class="btn btn-secondary" target="_blank" title="소스">
+                        소스
                     </a>
                 </div>
             </div>
         </div>
         
-        <!-- 추가 도구 영역 -->
-        <h2 class="section-title">🔜 예정 도구</h2>
-        <div class="empty-state">
-            <p>새로운 도구가 준비 중입니다.</p>
-            <p style="font-size: 14px; color: var(--text-secondary);">기대해주세요.</p>
-        </div>
+
     </div>
     
     <footer>
