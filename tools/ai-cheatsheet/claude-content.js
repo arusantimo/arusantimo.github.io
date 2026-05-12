@@ -21,9 +21,27 @@ const claudeContent = `
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v2.1.131~v2.1.139 주요 업데이트"
+          <li class="cl-tip" data-tt-title="claude agents 에이전트 뷰 (v2.1.139)"
+            data-tt-desc="Research Preview: 모든 Claude Code 세션 목록(실행 중, 대기 중, 완료)을 하나의 리스트로 볼 수 있는 에이전트 뷰. claude agents 명령으로 시작합니다."
+            data-tt-example="claude agents"><code>claude agents</code> 에이전트 뷰 추가 (Research Preview) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/goal 명령어 (v2.1.139)"
+            data-tt-desc="완료 조건을 설정하면 Claude가 조건 충족까지 여러 턴에 걸쳐 작업을 계속합니다. 대화형, -p, Remote Control에서 작동하며 전경판널로 경과/턴/토큰을 실시간 표시합니다."
+            data-tt-example="/goal"><code>/goal</code> 명령어 추가 — 완료 조건 설정 및 자동 진행 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/scroll-speed 명령어 (v2.1.139)"
+            data-tt-desc="마우스 휠 스크롤 속도를 라이브 프리뷰로 조정할 수 있는 슬래시 명령어 추가."
+            data-tt-example="/scroll-speed"><code>/scroll-speed</code> 명령어 추가 — 스크롤 속도 조정 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="hook continueOnBlock 옵션 (v2.1.139)"
+            data-tt-desc="PostToolUse 훅에 continueOnBlock: true를 설정하면, 훅이 거부 이유를 Claude에 피드백하고 턴을 계속 진행합니다."
+            data-tt-example=""><code>continueOnBlock</code> 훅 옵션 추가 (PostToolUse) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_PROJECT_DIR 환경변수 (v2.1.139)"
+            data-tt-desc="MCP stdio 서버가 CLAUDE_PROJECT_DIR 환경변수를 수신하며, 플러그인 설정에서 ${CLAUDE_PROJECT_DIR}를 참조할 수 있습니다."
+            data-tt-example="${CLAUDE_PROJECT_DIR}"><code>CLAUDE_PROJECT_DIR</code> MCP stdio 서버 환경변수 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="에이전트 ID 헤더 (v2.1.139)"
+            data-tt-desc="서브에이전트의 API 요청에 x-claude-code-agent-id / x-claude-code-parent-agent-id 헤더가 포함되며, OTEL 스팬에도 agent_id / parent_agent_id 속성이 포함됩니다."
+            data-tt-example=""><code>x-claude-code-agent-id</code> / <code>x-claude-code-parent-agent-id</code> 서브에이전트 API 헤더 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v2.1.131~v2.1.139 주요 설정 업데이트"
             data-tt-desc="worktree.baseRef 및 sandbox.bwrapPath 등 신규 설정 추가. Hooks에서 $CLAUDE_EFFORT 참조 가능. CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN 환경변수로 네이티브 스크롤백 지원 및 TUI 시각적 일관성 대폭 개선."
-            data-tt-example="">v2.1.131~v2.1.139 업데이트 — <code>worktree.baseRef</code>, <code>$CLAUDE_EFFORT</code> 훅 참조, TUI 개선 및 버그 수정 <span class="badge-new">NEW</span></li>
+            data-tt-example="">v2.1.131~v2.1.139 주요 설정 업데이트 — <code>worktree.baseRef</code>, <code>$CLAUDE_EFFORT</code>, <code>CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN</code> 추가 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
@@ -31,11 +49,11 @@ const claudeContent = `
         <div id="hist-claude" class="history-container">
 
           <details class="ver-group">
-            <summary>v2.1.129</summary>
+            <summary>v2.1.124~v2.1.136</summary>
             <ul>
-              <li class="cl-tip" data-tt-title="v2.1.124~v2.1.129 주요 업데이트"
-                data-tt-desc="claude project purge 명령어 추가로 프로젝트 데이터 일괄 삭제를 지원하며, --plugin-url 및 .zip 형태의 플러그인 로드가 가능해졌습니다. /model 선택기에서 API 게이트웨이 모델 조회가 가능해지고 다양한 버그가 수정되었습니다."
-                data-tt-example="">v2.1.124~v2.1.129 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code> ZIP 로드 지원 및 게이트웨이 모델 조회 추가</li>
+              <li class="cl-tip" data-tt-title="v2.1.124~v2.1.136 주요 업데이트"
+                data-tt-desc="claude project purge 명령 추가, --plugin-url ZIP 로드 지원, API 게이트웨이 모델 조회(v2.1.124~129). settings.autoMode.hard_deny, worktree.baseRef(fresh|head), 훅 effort.level/CLAUDE_EFFORT 지원(v2.1.130~136)."
+                data-tt-example="">v2.1.124~v2.1.136 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code>, <code>worktree.baseRef</code>, 훅 effort 지원 등</li>
             </ul>
           </details>
 
