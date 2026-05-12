@@ -164,6 +164,11 @@ window.CODEX_TIPS = {
     "desc": "Codex CLI 자체를 MCP 서버로 실행합니다. 다른 MCP 클라이언트에서 Codex를 도구로 연결할 수 있습니다.",
     "example": "codex mcp-server\ncodex mcp-server --stdio"
   },
+  "codex remote-control": {
+    "title": "codex remote-control — 헤드리스 원격 제어용 서버",
+    "desc": "헤드리스 원격 제어용 app-server를 시작합니다. 다른 환경(UI나 에이전트 등)에서 백그라운드의 Codex를 원격 제어할 수 있습니다.",
+    "example": "codex remote-control"
+  },
   "codex cloud exec --env ENV_ID": {
     "title": "codex cloud exec — 클라우드 환경에서 실행",
     "desc": "비동기적으로 클라우드 환경에서 태스크를 실행합니다. --env 로 환경 ID(개인/팀 클라우드 리소스)를 지정합니다.",

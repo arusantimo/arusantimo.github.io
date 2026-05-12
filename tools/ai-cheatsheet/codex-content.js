@@ -9,26 +9,35 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.128.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-06</span>
+        <span class="meta-version">v0.130.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-12</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.128.0)</span>
+        <span>📋 최근 변경사항 (v0.130.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v0.126.0~v0.128.0 주요 업데이트"
-            data-tt-desc="persisted /goal 워크플로 도입, codex update 명령어, TUI 키맵 커스텀, 확장된 권한 프로필, 플러그인 원격 설치/제거 기능, 그리고 외부 에이전트 세션 임포트 기능 등 대규모 기능 확장이 이루어졌습니다."
-            data-tt-example="">v0.126.0~v0.128.0 업데이트 — <code>/goal</code> 워크플로, <code>codex update</code>, 권한 프로필 확장 및 외부 세션 임포트 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v0.129.0~v0.130.0 주요 업데이트"
+            data-tt-desc="codex remote-control 커맨드가 추가되어 헤드리스 원격 제어가 쉬워졌습니다. 플러그인 공유 시 메타데이터와 디스커버빌리티 제어가 가능해졌으며, Bedrock 인증 시 aws login 프로필을 지원합니다. 그 외 Windows 샌드박스 설정 및 스레드 성능이 개선되었습니다."
+            data-tt-example="">v0.129.0~v0.130.0 업데이트 — <code>codex remote-control</code> 추가, Bedrock aws login 지원 및 플러그인 공유 기능 강화 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.128.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.126.0~v0.128.0 주요 업데이트"
+                data-tt-desc="persisted /goal 워크플로 도입, codex update 명령어, TUI 키맵 커스텀, 확장된 권한 프로필, 플러그인 원격 설치/제거 기능, 그리고 외부 에이전트 세션 임포트 기능 등 대규모 기능 확장이 이루어졌습니다."
+                data-tt-example="">v0.126.0~v0.128.0 업데이트 — <code>/goal</code> 워크플로, <code>codex update</code>, 권한 프로필 확장 및 외부 세션 임포트</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.125.0</summary>
@@ -188,7 +197,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>codex update</code></div>
-                <div class="row-desc">최신 버전으로 업데이트 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">최신 버전으로 업데이트</div>
               </div>
             </div>
             <div class="group">
@@ -284,6 +293,10 @@ const codexContent = `
                 <div class="row-key"><code>codex mcp-server</code></div>
                 <div class="row-desc">Codex 자체를 MCP 서버로 실행</div>
               </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>codex remote-control</code></div>
+                <div class="row-desc">헤드리스 원격 제어용 서버 시작 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>codex cloud exec --env ENV_ID</code></div>
                 <div class="row-desc">Cloud task 직접 제출</div>
@@ -343,7 +356,7 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/goal</code></div>
-            <div class="row-desc">장기 목표(goal) 워크플로 관리 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">장기 목표(goal) 워크플로 관리</div>
           </div>
         </div>
         <div class="group">

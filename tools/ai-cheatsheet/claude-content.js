@@ -9,26 +9,35 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.129</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-06</span>
+        <span class="meta-version">v2.1.139</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-12</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.129)</span>
+        <span>📋 최근 변경사항 (v2.1.139)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v2.1.124~v2.1.129 주요 업데이트"
-            data-tt-desc="claude project purge 명령어 추가로 프로젝트 데이터 일괄 삭제를 지원하며, --plugin-url 및 .zip 형태의 플러그인 로드가 가능해졌습니다. /model 선택기에서 API 게이트웨이 모델 조회가 가능해지고 다양한 버그가 수정되었습니다."
-            data-tt-example="">v2.1.124~v2.1.129 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code> ZIP 로드 지원 및 게이트웨이 모델 조회 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="v2.1.131~v2.1.139 주요 업데이트"
+            data-tt-desc="worktree.baseRef 및 sandbox.bwrapPath 등 신규 설정 추가. Hooks에서 $CLAUDE_EFFORT 참조 가능. CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN 환경변수로 네이티브 스크롤백 지원 및 TUI 시각적 일관성 대폭 개선."
+            data-tt-example="">v2.1.131~v2.1.139 업데이트 — <code>worktree.baseRef</code>, <code>$CLAUDE_EFFORT</code> 훅 참조, TUI 개선 및 버그 수정 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.129</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v2.1.124~v2.1.129 주요 업데이트"
+                data-tt-desc="claude project purge 명령어 추가로 프로젝트 데이터 일괄 삭제를 지원하며, --plugin-url 및 .zip 형태의 플러그인 로드가 가능해졌습니다. /model 선택기에서 API 게이트웨이 모델 조회가 가능해지고 다양한 버그가 수정되었습니다."
+                data-tt-example="">v2.1.124~v2.1.129 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code> ZIP 로드 지원 및 게이트웨이 모델 조회 추가</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.123</summary>
@@ -294,7 +303,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>claude project purge</code></div>
-                <div class="row-desc">프로젝트 데이터 삭제 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">프로젝트 데이터 삭제</div>
               </div>
             </div>
             <div class="group">
@@ -377,7 +386,7 @@ const claudeContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>--plugin-url</code></div>
-                <div class="row-desc">원격 ZIP 플러그인 로드 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">원격 ZIP 플러그인 로드</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>--agent</code></div>
@@ -1233,6 +1242,10 @@ const claudeContent = `
                 <div class="row-key"><code>CLAUDE_SESSION_ID</code></div>
                 <div class="row-desc">현재 세션 ID</div>
               </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>CLAUDE_EFFORT</code></div>
+                <div class="row-desc">에이전트 노력 수준 <span class="badge-new">NEW</span></div>
+              </div>
             </div>
           </div>
           <div>
@@ -1302,6 +1315,14 @@ const claudeContent = `
               <div class="row">
                 <div class="row-key"><code>worktree.sparsePaths</code></div>
                 <div class="row-desc">스파스 체크아웃 경로</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>worktree.baseRef</code></div>
+                <div class="row-desc">워크트리 분기 기준 브랜치 <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>sandbox.bwrapPath</code></div>
+                <div class="row-desc">bwrap/socat 경로 지정 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>hooks: if</code></div>
@@ -1379,6 +1400,10 @@ const claudeContent = `
               <div class="row">
                 <div class="row-key"><code>CLAUDE_CODE_DISABLE_CRON</code></div>
                 <div class="row-desc">크론 비활성화</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN</code></div>
+                <div class="row-desc">네이티브 스크롤백 지원 <span class="badge-new">NEW</span></div>
               </div>
             </div>
           </div>

@@ -569,6 +569,16 @@ window.CLAUDE_TIPS = {
     "desc": "대규모 모노레포에서 --worktree 사용 시 필요한 디렉터리만 체크아웃합니다. settings.json의 worktree.sparsePaths 키에 정의합니다.",
     "example": "# settings.json\n{\n  \"worktree\": {\n    \"sparsePaths\": [\"packages/auth\", \"packages/api\"]\n  }\n}"
   },
+  "worktree.baseRef": {
+    "title": "worktree.baseRef — 워크트리 기준 브랜치",
+    "desc": "워크트리 생성 시 분기할 기준 브랜치를 설정합니다. 'fresh'(기본값, 현재 브랜치) 또는 'head'(HEAD 커밋 기준)를 지정할 수 있습니다.",
+    "example": "{\n  \"worktree\": {\n    \"baseRef\": \"head\"\n  }\n}"
+  },
+  "sandbox.bwrapPath": {
+    "title": "sandbox.bwrapPath — 샌드박스 경로 지정",
+    "desc": "리눅스 샌드박스 실행에 필요한 bwrap 및 socat 실행 파일의 경로를 명시적으로 지정할 수 있습니다.",
+    "example": "{\n  \"sandbox\": {\n    \"bwrapPath\": \"/usr/bin/bwrap\",\n    \"socatPath\": \"/usr/bin/socat\"\n  }\n}"
+  },
   "claude -r \"name\"": {
     "title": "claude -r \"이름\" — 이름으로 세션 재개",
     "desc": "/rename으로 지정한 이름으로 세션을 재개합니다. --resume과 동일합니다.",
@@ -746,6 +756,11 @@ window.CLAUDE_TIPS = {
     "desc": "현재 세션의 고유 식별자(UUID)입니다.",
     "example": "echo \"Current session: $CLAUDE_SESSION_ID\""
   },
+  "CLAUDE_EFFORT": {
+    "title": "CLAUDE_EFFORT",
+    "desc": "현재 훅이나 에이전트 실행에 설정된 노력 수준(low/medium/high/max)입니다.",
+    "example": "if [ \"$CLAUDE_EFFORT\" == \"max\" ]; then ... fi"
+  },
   "CLAUDE_NOTIF_TYPE": {
     "title": "CLAUDE_NOTIF_TYPE",
     "desc": "Notification 훅에서 전달되는 알림의 종류입니다.",
@@ -860,6 +875,11 @@ window.CLAUDE_TIPS = {
     "title": "~/.claude/commands/ — 전역 커스텀 명령어",
     "desc": "모든 프로젝트에서 공통으로 사용할 수 있는 사용자 정의 슬래시 명령어를 정의합니다. 반복되는 복잡한 작업(PR 생성, 로그 분석 등)을 자동화하기 좋습니다.",
     "example": "~/.claude/commands/pr-review.sh"
+  },
+  "CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN": {
+    "title": "CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN",
+    "desc": "TUI 렌더링 시 대체 화면(alternate screen) 모드를 비활성화하여, 터미널 네이티브 스크롤백 버퍼를 보존합니다.",
+    "example": "export CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN=1\nclaude"
   }
 }
 ;
