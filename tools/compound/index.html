@@ -139,8 +139,9 @@
                 <div
                     style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-color);">
                     <h2 style="margin-bottom:0; padding-bottom:0; border-bottom:none;">📋 월별 투자 수익 상세</h2>
-                    <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적
-                        숨기기</button>
+                    <div style="display:flex; gap:8px;">
+                        <button id="shortCumulToggleBtn" class="toggle-short-cumul-btn" onclick="toggleShortCumul()">단기누적 숨기기</button>
+                    </div>
                 </div>
 
                 <div
@@ -180,6 +181,9 @@
                 </div>
 
                 <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+                        <button id="chartViewToggleBtn" class="toggle-chart-view-btn" onclick="toggleChartView()">오늘까지 보기</button>
+                    </div>
                     <canvas id="profitChart" height="100"></canvas>
                 </div>
             </div>

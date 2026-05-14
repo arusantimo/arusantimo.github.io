@@ -4,6 +4,7 @@ let actualValues = {}; // { month: { shortTerm: number|null, longTermCumul: numb
 let monthSettingsOverrides = {}; // { month: { annualTargetRate, monthlyInvestment, longTermRatio, shortTermRatio, longTermAnnualTarget } }
 let profitChartInstance = null;
 let showShortCumul = true;
+let chartViewMode = 'all'; // 'all' or 'toDate'
 let longTermPrincipalGlobal = 0;
 let shortTermPrincipalGlobal = 0;
 
@@ -27,6 +28,12 @@ function toggleShortCumul() {
     document.getElementById('shortCumulToggleBtn').textContent = showShortCumul ? '단기누적 숨기기' : '단기누적 보기';
 }
 
+function toggleChartView() {
+    chartViewMode = chartViewMode === 'all' ? 'toDate' : 'all';
+    document.getElementById('chartViewToggleBtn').textContent = chartViewMode === 'all' ? '오늘까지 보기' : '전체 보기';
+    renderChart();
+}
+
 function setActual(month, field, value) {
     if (!actualValues[month]) actualValues[month] = {};
     const num = parseFloat(value);
@@ -40,17 +47,33 @@ function renderChart() {
     const canvas = document.getElementById('profitChart');
     if (!canvas || allTableRows.length === 0) return;
 
-    const labels = allTableRows.map(r => {
+    // 보기 모드에 따른 데이터 필터링
+    let filteredRows = allTableRows;
+    if (chartViewMode === 'toDate') {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1;
+        
+        filteredRows = allTableRows.filter(r => {
+            const d = new Date(globalSettings.startDate);
+            d.setMonth(d.getMonth() + r.month - 1);
+            const rowYear = d.getFullYear();
+            const rowMonth = d.getMonth() + 1;
+            return rowYear < currentYear || (rowYear === currentYear && rowMonth <= currentMonth);
+        });
+    }
+
+    const labels = filteredRows.map(r => {
         const d = new Date(globalSettings.startDate);
         d.setMonth(d.getMonth() + r.month - 1);
         return d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0');
     });
 
     // 목표 자산: 초기 목표 자산
-    const targetAssets = allTableRows.map(r => r.initialAssetAfter);
+    const targetAssets = filteredRows.map(r => r.initialAssetAfter);
 
     // 실제 자산: 실제 입력값 기반, 없으면 null
-    const actualAssets = allTableRows.map(r => {
+    const actualAssets = filteredRows.map(r => {
         const v = r.actualEndAsset;
         return (v !== null && v !== undefined) ? v : null;
     });
@@ -58,17 +81,26 @@ function renderChart() {
     // 저축만 했을 때: 초기 원금 + 월 재투자 * 월차 (수익 없음)
     const principal = allTableRows[0].assetBefore;
     const monthlyInvest = allTableRows[0].monthlyInvest;
-    const savingsOnly = allTableRows.map(r => principal + monthlyInvest * r.month);
+    const savingsOnly = filteredRows.map(r => principal + monthlyInvest * r.month);
 
     // 연 2.5% 적금 복리: 매월 이전 자산 * (1 + 월이율) + 월 재투자
     const annualSavingsRate = 0.025;
     const monthlySavingsRate = Math.pow(1 + annualSavingsRate, 1 / 12) - 1;
     const savingsWithInterest = [];
     let savingsAsset = principal;
+    
+    // 전체 데이터를 기준으로 계산하되, 필터링된 범위만 추출
+    const fullSavingsWithInterest = [];
+    let runningSavingsAsset = principal;
     for (const r of allTableRows) {
-        savingsAsset = savingsAsset * (1 + monthlySavingsRate) + monthlyInvest;
-        savingsWithInterest.push(savingsAsset);
+        runningSavingsAsset = runningSavingsAsset * (1 + monthlySavingsRate) + monthlyInvest;
+        fullSavingsWithInterest.push(runningSavingsAsset);
     }
+    
+    // filteredRows의 인덱스에 해당하는 값만 추출
+    filteredRows.forEach(r => {
+        savingsWithInterest.push(fullSavingsWithInterest[r.month - 1]);
+    });
 
     const fmt = v => {
         if (v === null) return null;
@@ -80,17 +112,6 @@ function renderChart() {
     const chartData = {
         labels,
         datasets: [
-            {
-                label: '초기 목표 자산',
-                data: targetAssets,
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                tension: 0.3,
-                pointRadius: 2,
-                pointHoverRadius: 5,
-                borderWidth: 2,
-                fill: false,
-            },
             {
                 label: '실제 자산',
                 data: actualAssets,
@@ -104,15 +125,14 @@ function renderChart() {
                 spanGaps: false,
             },
             {
-                label: '저축만 (수익 없음)',
-                data: savingsOnly,
-                borderColor: '#ef4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.06)',
+                label: '초기 목표 자산',
+                data: targetAssets,
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.08)',
                 tension: 0.3,
                 pointRadius: 2,
-                pointHoverRadius: 4,
-                borderWidth: 1.5,
-                borderDash: [5, 4],
+                pointHoverRadius: 5,
+                borderWidth: 2,
                 fill: false,
             },
             {
@@ -125,6 +145,18 @@ function renderChart() {
                 pointHoverRadius: 4,
                 borderWidth: 1.5,
                 borderDash: [3, 3],
+                fill: false,
+            },
+            {
+                label: '저축만 (수익 없음)',
+                data: savingsOnly,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.06)',
+                tension: 0.3,
+                pointRadius: 2,
+                pointHoverRadius: 4,
+                borderWidth: 1.5,
+                borderDash: [5, 4],
                 fill: false,
             }
         ]
@@ -146,7 +178,17 @@ function renderChart() {
                 callbacks: {
                     label: ctx => {
                         if (ctx.parsed.y === null) return null;
-                        return ` ${ctx.dataset.label}: ${Math.floor(ctx.parsed.y).toLocaleString('ko-KR')}원`;
+                        const value = ctx.parsed.y;
+                        const savingsOnlyDataset = ctx.chart.data.datasets.find(d => d.label === '저축만 (수익 없음)');
+                        const savingsOnlyValue = savingsOnlyDataset ? savingsOnlyDataset.data[ctx.dataIndex] : null;
+                        
+                        let diffStr = '';
+                        if (ctx.dataset.label !== '저축만 (수익 없음)' && savingsOnlyValue && savingsOnlyValue > 0) {
+                            const diffPercent = ((value - savingsOnlyValue) / savingsOnlyValue) * 100;
+                            diffStr = ` (${diffPercent >= 0 ? '+' : ''}${diffPercent.toFixed(1)}%)`;
+                        }
+                        
+                        return ` ${ctx.dataset.label}: ${Math.floor(value).toLocaleString('ko-KR')}원${diffStr}`;
                     }
                 }
             }
