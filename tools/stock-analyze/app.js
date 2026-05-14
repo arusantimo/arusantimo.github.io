@@ -1,4 +1,4 @@
-// CORS Proxy to bypass Naver's block (여러 개의 프록시 서버를 두어 안정성을 높임)
+﻿// CORS Proxy to bypass Naver's block (여러 개의 프록시 서버를 두어 안정성을 높임)
 const PROXIES = [
   'https://api.allorigins.win/raw?url=',
   'https://api.codetabs.com/v1/proxy?quest=',
@@ -211,83 +211,51 @@ async function analyzeStock(stock, isBefore0908) {
   
   for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
     try {
-      // Fetch Naver Finance directly using proxy
-      const url = encodeURIComponent(`https://finance.naver.com/item/main.naver?code=${stock.code}`);
-      const proxyUrl = PROXIES[(attempt - 1) % PROXIES.length]; // 시도 횟수에 따라 다른 프록시 서버 사용
-      const res = await fetch(proxyUrl + url);
+      // CORS 우회 프록시 선택 (attempt 순서에 따라 교체)
+      const proxy = PROXIES[(attempt - 1) % PROXIES.length];
 
-      if (!res.ok) throw new Error(`Proxy error or Naver blocked (Status: ${res.status})`);
+      // ── 네이버 모바일 API: /basic (현재가, 등락률) ──
+      const basicUrl = `https://m.stock.naver.com/api/stock/${stock.code}/basic`;
+      const basicRes = await fetch(proxy + encodeURIComponent(basicUrl));
+      if (!basicRes.ok) throw new Error(`basic API error (${basicRes.status})`);
+      const basicJson = await basicRes.json();
 
-      const html = await res.text();
+      // closePrice 는 문자열 "394,500" 형태
+      const parseNum = s => parseInt(String(s).replace(/,/g, '')) || 0;
+      const parseFloat2 = s => parseFloat(String(s).replace(/,/g, '').replace('%', '')) || 0;
 
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
+      const currentPrice = parseNum(basicJson.closePrice ?? basicJson.stockPrice ?? 0);
+      const chgRateRaw   = parseFloat2(basicJson.fluctuationsRatio ?? basicJson.changeRate ?? 0);
 
-      // ── 현재가: .no_today 안의 첫 번째 span.blind ──
-      let currentPrice = 0;
-      const todayBlind = doc.querySelector('.no_today .blind');
-      if (todayBlind) {
-        currentPrice = parseInt(todayBlind.textContent.replace(/,/g, '')) || 0;
-      }
+      // ── 네이버 모바일 API: /integration (전일종가, 시가) ──
+      const intUrl = `https://m.stock.naver.com/api/stock/${stock.code}/integration`;
+      const intRes = await fetch(proxy + encodeURIComponent(intUrl));
+      if (!intRes.ok) throw new Error(`integration API error (${intRes.status})`);
+      const intJson = await intRes.json();
 
-      // ── table.no_info 기반 시세 추출 ──
-      // 행 구조: 1행=[전일,고가], 2행=[시가,저가], 3행=[거래량,...]
-      let prevClose = 0;
-      let openPrice = 0;
+      // totalInfos = [{code, key, value}, ...] 배열 구조
+      const findInfo = code => (intJson.totalInfos ?? []).find(i => i.code === code);
+      const prevClose = parseNum(findInfo('lastClosePrice')?.value ?? 0) || currentPrice;
+      const openPrice = parseNum(findInfo('openPrice')?.value ?? 0);
 
-      const noInfoRows = doc.querySelectorAll('table.no_info tr');
-      if (noInfoRows.length >= 2) {
-        // 전일: 1행 1열 span.blind
-        const prevBlind = noInfoRows[0].querySelector('td:first-child span.blind');
-        if (prevBlind) prevClose = parseInt(prevBlind.textContent.replace(/,/g, '')) || 0;
+      // ── 등락률: API 값 우선, 없으면 직접 계산 ──
+      const chgRate = chgRateRaw !== 0 ? chgRateRaw
+        : (prevClose > 0 ? ((currentPrice - prevClose) / prevClose) * 100 : 0);
 
-        // 시가: 2행 1열 span.blind
-        const openBlind = noInfoRows[1].querySelector('td:first-child span.blind');
-        if (openBlind) openPrice = parseInt(openBlind.textContent.replace(/,/g, '')) || 0;
-      }
+      // ── 체결강도: 네이버 모든 API 미제공 ──
+      const strength = null;
 
-      // fallback: th 텍스트 탐색 (table.no_info 파싱 실패 시)
-      if (!prevClose || !openPrice) {
-        const thList = Array.from(doc.querySelectorAll('th'));
-        for (let th of thList) {
-          const label = th.textContent.trim();
-          const td = th.nextElementSibling;
-          if (!td) continue;
-          const blind = td.querySelector('span.blind');
-          const raw = blind ? blind.textContent : td.textContent;
-          const num = parseInt(raw.replace(/,/g, '')) || 0;
-          if (!prevClose && label.includes('전일')) prevClose = num;
-          if (!openPrice && label.includes('시가')) openPrice = num;
-        }
-      }
+      // ── 이동평균선 계산: dealTrendInfos (최근 5영업일 종가) ──
+      // dealTrendInfos[0] = 어제, [1] = 그제 ... (최신순 정렬)
+      const deals = intJson.dealTrendInfos ?? [];
+      const pastPrices = deals.map(d => parseNum(d.closePrice ?? 0)).filter(p => p > 0);
+      // 5일 MA: 어제 포함 5일 종가 평균 (오늘 현재가는 제외, 순수 이동평균)
+      const ma5 = pastPrices.length >= 5
+        ? Math.round(pastPrices.slice(0, 5).reduce((a, b) => a + b, 0) / 5)
+        : 0;
 
-      // 전일종가도 없으면 현재가로 대체
-      if (!prevClose && currentPrice) prevClose = currentPrice;
-
-      // ── 등락률 계산 ──
-      let chgRate = 0;
-      if (prevClose > 0) {
-        chgRate = ((currentPrice - prevClose) / prevClose) * 100;
-      }
-
-      // ── 체결강도: #_strength ID 우선, fallback th 탐색 ──
-      let strength = 0;
-      const strengthEl = doc.querySelector('#_strength');
-      if (strengthEl) {
-        strength = parseFloat(strengthEl.textContent.replace(/,/g, '').replace('%', '')) || 0;
-      }
-      if (!strength) {
-        const thList2 = Array.from(doc.querySelectorAll('th'));
-        const thStr = thList2.find(th => th.textContent.includes('체결강도'));
-        if (thStr && thStr.nextElementSibling) {
-          const blind = thStr.nextElementSibling.querySelector('span.blind');
-          const raw = blind ? blind.textContent : thStr.nextElementSibling.textContent;
-          strength = parseFloat(raw.replace(/,/g, '').replace('%', '')) || 0;
-        }
-      }
-
-      const data = { currentPrice, prevClose, openPrice, chgRate, strength };
-      log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%)`);
+      const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5 };
+      log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원)`);
 
       applyRules(stock, data, isBefore0908);
       return; // 성공 시 루프 종료
@@ -431,26 +399,39 @@ function buildIndicators(stock, data, isBefore0908) {
         });
       }
 
-      // [손절] 이동평균선 하탈 — 시가 대비 -2% 이하 근사
-      if (data.openPrice > 0 && data.currentPrice > 0) {
-        const dropFromOpen = ((data.currentPrice - data.openPrice) / data.openPrice) * 100;
-        const isBelowMA = dropFromOpen <= -2;
+      // [손절] 이동평균선 하탈 — 5일선 우선, 없으면 시가 근사
+      if (data.ma5 > 0 && data.currentPrice > 0) {
+        const dropFromMA5 = ((data.currentPrice - data.ma5) / data.ma5) * 100;
+        const isBelowMA5  = dropFromMA5 <= -2;
         indicators.push({
-          title: '[손절] 이동평균선 하탈',
-          criterion: '이동평균선(5/10/20일선)을 종가·익일 시가 기준 -2% 이상 하탈 시 손절을 권장합니다.\n(근사: 시가 대비 현재가 -2% 이하 하락 시 MA 이탈 의심)\n기준: (현재가 - 시가) / 시가 ≤ -2%',
+          title: '[손절] 5일 이동평균선 하탈',
+          criterion: '5일 이동평균선 기준 -2% 이상 하탈 시 손절을 권장합니다.\n(최근 5영업일 종가 평균 사용)\n기준: (현재가 - 5일MA) / 5일MA <= -2%',
+          status: isBelowMA5 ? 'triggered' : 'clear',
+          result: isBelowMA5
+            ? `5일선(${data.ma5.toLocaleString()}원) 하탈 ${dropFromMA5.toFixed(2)}% — 손절 고려`
+            : `5일선(${data.ma5.toLocaleString()}원) 위에서 유지 (${dropFromMA5.toFixed(2)}%)`,
+          value: `(${data.currentPrice.toLocaleString()} - ${data.ma5.toLocaleString()}) / ${data.ma5.toLocaleString()} = ${dropFromMA5.toFixed(2)}% (기준: <= -2%)`
+        });
+        if (isBelowMA5) decision = 'sell';
+      } else if (data.openPrice > 0 && data.currentPrice > 0) {
+        const dropFromOpen = ((data.currentPrice - data.openPrice) / data.openPrice) * 100;
+        const isBelowMA    = dropFromOpen <= -2;
+        indicators.push({
+          title: '[손절] 이동평균선 하탈 (근사)',
+          criterion: '5일선 데이터 미계산 — 시가 대비 -2% 이하 하락으로 MA 이탈을 근사합니다.\n기준: (현재가 - 시가) / 시가 <= -2%',
           status: isBelowMA ? 'triggered' : 'clear',
           result: isBelowMA
-            ? `시가 대비 ${dropFromOpen.toFixed(2)}% 하탈 — 이동평균선 이탈 의심 (손절 고려)`
-            : `시가 대비 ${dropFromOpen.toFixed(2)}% — 이동평균선 위에서 유지`,
-          value: `(${data.currentPrice.toLocaleString()} - ${data.openPrice.toLocaleString()}) / ${data.openPrice.toLocaleString()} = ${dropFromOpen.toFixed(2)}% (기준: ≤ -2%)`
+            ? `시가 대비 ${dropFromOpen.toFixed(2)}% 하탈 — MA 이탈 의심 (손절 고려)`
+            : `시가 대비 ${dropFromOpen.toFixed(2)}% — MA 위에서 유지`,
+          value: `(${data.currentPrice.toLocaleString()} - ${data.openPrice.toLocaleString()}) / ${data.openPrice.toLocaleString()} = ${dropFromOpen.toFixed(2)}% (기준: <= -2%)`
         });
         if (isBelowMA) decision = 'sell';
       } else {
         indicators.push({
           title: '[손절] 이동평균선 하탈',
-          criterion: '이동평균선(5/10/20일선)을 -2% 이상 하탈 시 손절을 권장합니다.',
+          criterion: '이동평균선(5일선)을 -2% 이상 하탈 시 손절을 권장합니다.',
           status: 'unknown',
-          result: '시가 또는 현재가 데이터 없음 — 확인 불가'
+          result: '가격 데이터 없음 — 확인 불가'
         });
       }
 
