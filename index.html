@@ -69,7 +69,7 @@
         }
         
         .container {
-            max-width: 100%;
+            max-width: 1500px;
             margin: 0 auto;
             padding: 50px 20px;
         }
@@ -77,11 +77,14 @@
         .section-title {
             font-size: 14px;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             color: var(--text-primary);
             padding-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
-            display: inline-block;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
             position: relative;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -99,9 +102,13 @@
         
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, 220px);
+            grid-template-columns: repeat(auto-fit, 220px);
+            justify-content: center;
             gap: 20px;
             margin-bottom: 80px;
+            max-width: 1420px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
         .tool-card {
@@ -324,6 +331,62 @@
             margin-bottom: 20px;
         }
         
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 6px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .filter-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+        
+        .filter-btn.active[data-filter="all"] {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: transparent;
+        }
+
+        .filter-btn.active[data-filter="finance"] {
+            background: var(--accent-success);
+            color: var(--bg-primary);
+            border-color: transparent;
+        }
+
+        .filter-btn.active[data-filter="ai"] {
+            background: var(--accent-secondary);
+            color: white;
+            border-color: transparent;
+        }
+
+        .filter-btn.active[data-filter="extension"] {
+            background: #3b82f6;
+            color: white;
+            border-color: transparent;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         @media (max-width: 768px) {
             header {
                 padding: 12px 20px;
@@ -361,9 +424,17 @@
     
     <div class="container">
         <h2 class="section-title">🛠️ 도구 목록</h2>
+        
+        <div class="filter-container">
+            <button class="filter-btn active" data-filter="all">전체</button>
+            <button class="filter-btn" data-filter="finance">금융 도구</button>
+            <button class="filter-btn" data-filter="ai">AI 도구</button>
+            <button class="filter-btn" data-filter="extension">확장프로그램</button>
+        </div>
+
         <div class="tools-grid">
             <!-- 복리 계산 도구 -->
-            <div class="tool-card" style="border-top: 3px solid var(--accent-success);">
+            <div class="tool-card" data-category="finance" style="border-top: 3px solid var(--accent-success);">
                 <div class="card-header">
                     <div class="card-icon">📊</div>
                     <div>
@@ -393,7 +464,7 @@
             </div>
 
             <!-- 주식 분석 도구 -->
-            <div class="tool-card" style="border-top: 3px solid #ff4d4d;">
+            <div class="tool-card" data-category="finance" style="border-top: 3px solid #ff4d4d;">
                 <div class="card-header">
                     <div class="card-icon">📈</div>
                     <div>
@@ -423,7 +494,7 @@
             </div>
 
             <!-- AI 도구 -->
-            <div class="tool-card" style="border-top: 3px solid var(--accent-secondary);">
+            <div class="tool-card" data-category="ai" style="border-top: 3px solid var(--accent-secondary);">
                 <div class="card-header">
                     <div class="card-icon">📋</div>
                     <div>
@@ -454,7 +525,7 @@
             </div>
 
             <!-- 브라우저 익스텐션 -->
-            <div class="tool-card" style="border-top: 3px solid #3b82f6;">
+            <div class="tool-card" data-category="extension" style="border-top: 3px solid #3b82f6;">
                 <div class="card-header">
                     <div class="card-icon">🍪</div>
                     <div>
@@ -497,5 +568,27 @@
         </div>
         <p style="margin-top: 24px; font-size: 12px; opacity: 0.5;">© 2026 Arusantimo. All rights reserved.</p>
     </footer>
+
+    <script>
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.filter;
+                
+                // Update active state
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Filter cards
+                document.querySelectorAll('.tool-card').forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'flex';
+                        card.style.animation = 'fadeIn 0.4s ease forwards';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
