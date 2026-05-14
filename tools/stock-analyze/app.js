@@ -223,50 +223,67 @@ async function analyzeStock(stock, isBefore0908) {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
 
-      // Extract Price
-      const todayArea = doc.querySelector('.no_today .blind');
-      const currentPrice = todayArea ? parseInt(todayArea.textContent.replace(/,/g, '')) : 0;
+      // ── 현재가: .no_today 안의 첫 번째 span.blind ──
+      let currentPrice = 0;
+      const todayBlind = doc.querySelector('.no_today .blind');
+      if (todayBlind) {
+        currentPrice = parseInt(todayBlind.textContent.replace(/,/g, '')) || 0;
+      }
 
-      // Extract Previous Close (which acts as Buy Price)
+      // ── table.no_info 기반 시세 추출 ──
+      // 행 구조: 1행=[전일,고가], 2행=[시가,저가], 3행=[거래량,...]
       let prevClose = 0;
-      const thList = Array.from(doc.querySelectorAll('th'));
-      for (let th of thList) {
-        if (th.textContent.includes('전일')) {
+      let openPrice = 0;
+
+      const noInfoRows = doc.querySelectorAll('table.no_info tr');
+      if (noInfoRows.length >= 2) {
+        // 전일: 1행 1열 span.blind
+        const prevBlind = noInfoRows[0].querySelector('td:first-child span.blind');
+        if (prevBlind) prevClose = parseInt(prevBlind.textContent.replace(/,/g, '')) || 0;
+
+        // 시가: 2행 1열 span.blind
+        const openBlind = noInfoRows[1].querySelector('td:first-child span.blind');
+        if (openBlind) openPrice = parseInt(openBlind.textContent.replace(/,/g, '')) || 0;
+      }
+
+      // fallback: th 텍스트 탐색 (table.no_info 파싱 실패 시)
+      if (!prevClose || !openPrice) {
+        const thList = Array.from(doc.querySelectorAll('th'));
+        for (let th of thList) {
+          const label = th.textContent.trim();
           const td = th.nextElementSibling;
-          if (td) {
-            const match = td.textContent.match(/[\d,]+/);
-            if (match) prevClose = parseInt(match[0].replace(/,/g, ''));
-          }
-          break;
+          if (!td) continue;
+          const blind = td.querySelector('span.blind');
+          const raw = blind ? blind.textContent : td.textContent;
+          const num = parseInt(raw.replace(/,/g, '')) || 0;
+          if (!prevClose && label.includes('전일')) prevClose = num;
+          if (!openPrice && label.includes('시가')) openPrice = num;
         }
       }
+
+      // 전일종가도 없으면 현재가로 대체
       if (!prevClose && currentPrice) prevClose = currentPrice;
 
-      // Extract Open Price
-      let openPrice = 0;
-      for (let th of thList) {
-        if (th.textContent.includes('시가')) {
-          const td = th.nextElementSibling;
-          if (td) {
-            const match = td.textContent.match(/[\d,]+/);
-            if (match) openPrice = parseInt(match[0].replace(/,/g, ''));
-          }
-          break;
-        }
-      }
-
-      // Extract Change Rate
+      // ── 등락률 계산 ──
       let chgRate = 0;
       if (prevClose > 0) {
         chgRate = ((currentPrice - prevClose) / prevClose) * 100;
       }
 
-      // Extract Execution Strength (체결강도)
+      // ── 체결강도: #_strength ID 우선, fallback th 탐색 ──
       let strength = 0;
-      const thStrength = thList.find(th => th.textContent.includes('체결강도'));
-      if (thStrength) {
-        const td = thStrength.nextElementSibling;
-        if (td) strength = parseFloat(td.textContent.replace(/,/g, '').replace('%', ''));
+      const strengthEl = doc.querySelector('#_strength');
+      if (strengthEl) {
+        strength = parseFloat(strengthEl.textContent.replace(/,/g, '').replace('%', '')) || 0;
+      }
+      if (!strength) {
+        const thList2 = Array.from(doc.querySelectorAll('th'));
+        const thStr = thList2.find(th => th.textContent.includes('체결강도'));
+        if (thStr && thStr.nextElementSibling) {
+          const blind = thStr.nextElementSibling.querySelector('span.blind');
+          const raw = blind ? blind.textContent : thStr.nextElementSibling.textContent;
+          strength = parseFloat(raw.replace(/,/g, '').replace('%', '')) || 0;
+        }
       }
 
       const data = { currentPrice, prevClose, openPrice, chgRate, strength };
@@ -312,7 +329,8 @@ function buildIndicators(stock, data, isBefore0908) {
         status: openRecovered ? 'clear' : 'triggered',
         result: openRecovered
           ? `시초가 대비 양호 (현재가 ${data.currentPrice.toLocaleString()} ≥ 시가 ${data.openPrice.toLocaleString()})`
-          : `시초가 미회복 · 손절/경계 (현재가 ${data.currentPrice.toLocaleString()} < 시가 ${data.openPrice.toLocaleString()})`
+          : `시초가 미회복 · 손절/경계 (현재가 ${data.currentPrice.toLocaleString()} < 시가 ${data.openPrice.toLocaleString()})`,
+        value: `현재가 ${data.currentPrice.toLocaleString()} ${openRecovered ? '≥' : '<'} 시가 ${data.openPrice.toLocaleString()}`
       });
       if (!openRecovered) decision = 'caution';
 
@@ -324,7 +342,8 @@ function buildIndicators(stock, data, isBefore0908) {
         status: belowPrevClose ? 'triggered' : 'clear',
         result: belowPrevClose
           ? `전일종가 이탈! 즉각 손절 (현재가 ${data.currentPrice.toLocaleString()} < 전일종가 ${data.prevClose.toLocaleString()})`
-          : `전일종가 위에서 유지 중 (현재가 ${data.currentPrice.toLocaleString()} ≥ 전일종가 ${data.prevClose.toLocaleString()})`
+          : `전일종가 위에서 유지 중 (현재가 ${data.currentPrice.toLocaleString()} ≥ 전일종가 ${data.prevClose.toLocaleString()})`,
+        value: `현재가 ${data.currentPrice.toLocaleString()} / 전일종가 ${data.prevClose.toLocaleString()} / 차이 ${(data.currentPrice - data.prevClose).toLocaleString()}원`
       });
       if (belowPrevClose) decision = 'sell';
 
@@ -345,7 +364,8 @@ function buildIndicators(stock, data, isBefore0908) {
           status: weakStrength ? 'triggered' : 'clear',
           result: weakStrength
             ? `체결강도 ${data.strength.toFixed(2)}% — 메이저 설거지 가능성 (전량 익절/매도)`
-            : `체결강도 ${data.strength.toFixed(2)}% — 매수세 양호 (홀딩 대기)`
+            : `체결강도 ${data.strength.toFixed(2)}% — 매수세 양호 (홀딩 대기)`,
+          value: `체결강도 ${data.strength.toFixed(2)}% (기준: 100%)`
         });
         if (weakStrength) decision = 'sell';
       } else {
@@ -398,7 +418,8 @@ function buildIndicators(stock, data, isBefore0908) {
           status: isGapDown ? 'triggered' : 'clear',
           result: isGapDown
             ? `개파락 발생 (갭 ${gapRate.toFixed(2)}%) — 즉각 손절`
-            : `갭 정상 (${gapRate.toFixed(2)}%) — 개파락 없음`
+            : `갭 정상 (${gapRate.toFixed(2)}%) — 개파락 없음`,
+          value: `(${data.openPrice.toLocaleString()} - ${data.prevClose.toLocaleString()}) / ${data.prevClose.toLocaleString()} = ${gapRate.toFixed(2)}% (기준: ≤ -3%)`
         });
         if (isGapDown) decision = 'sell';
       } else {
@@ -420,7 +441,8 @@ function buildIndicators(stock, data, isBefore0908) {
           status: isBelowMA ? 'triggered' : 'clear',
           result: isBelowMA
             ? `시가 대비 ${dropFromOpen.toFixed(2)}% 하탈 — 이동평균선 이탈 의심 (손절 고려)`
-            : `시가 대비 ${dropFromOpen.toFixed(2)}% — 이동평균선 위에서 유지`
+            : `시가 대비 ${dropFromOpen.toFixed(2)}% — 이동평균선 위에서 유지`,
+          value: `(${data.currentPrice.toLocaleString()} - ${data.openPrice.toLocaleString()}) / ${data.openPrice.toLocaleString()} = ${dropFromOpen.toFixed(2)}% (기준: ≤ -2%)`
         });
         if (isBelowMA) decision = 'sell';
       } else {
@@ -441,7 +463,8 @@ function buildIndicators(stock, data, isBefore0908) {
           status: weakStr ? 'triggered' : 'clear',
           result: weakStr
             ? `체결강도 ${data.strength.toFixed(2)}% — 대규모 매도 전환 의심 (손절 고려)`
-            : `체결강도 ${data.strength.toFixed(2)}% — 정상 범위`
+            : `체결강도 ${data.strength.toFixed(2)}% — 정상 범위`,
+          value: `체결강도 ${data.strength.toFixed(2)}% (기준: < 80%)`
         });
         if (weakStr) decision = 'sell';
       } else {
@@ -467,7 +490,8 @@ function buildIndicators(stock, data, isBefore0908) {
           title: '[매도] 상승세 둔화 / 저항 구간',
           criterion: '전일 음봉의 중간값이나 5일 이동평균선에 닿으면서 상승세가 둔화될 때 매도/익절을 고려합니다.\n기준: -1.5% < 등락률 < +1.5%',
           status: mStatus,
-          result: mResult
+          result: mResult,
+          value: `등락률 = (${data.currentPrice.toLocaleString()} - ${data.prevClose.toLocaleString()}) / ${data.prevClose.toLocaleString()} = ${data.chgRate.toFixed(2)}% (기준: -1.5% ~ +1.5%)`
         });
         if (isStagnant && decision !== 'sell') decision = 'caution';
       } else {
@@ -606,6 +630,7 @@ function openModal(code) {
                 <div class="modal-ind-title">${ind.title}</div>
                 <div class="modal-ind-criterion">${criterionLines}</div>
                 <div class="modal-ind-result">→ ${ind.result}</div>
+                ${ind.value ? `<div class="modal-ind-value">📐 ${ind.value}</div>` : ''}
               </div>
             </div>
           `;
