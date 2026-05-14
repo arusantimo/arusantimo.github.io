@@ -1171,7 +1171,7 @@ async function fetchNotionData() {
   }
 
   const notionId = matchId[0];
-  const apiUrl = `https://notion-api.splitbee.io/v1/page/${notionId}`;
+  const notionApiBase = `https://notion-api.splitbee.io/v1/page/${notionId}`;
   localStorage.setItem('savedNotionUrl', urlInput);
 
   log(`노션(Notion) 공용 페이지(${notionId.substring(0, 6)}...) 파싱 중입니다...`);
@@ -1180,9 +1180,19 @@ async function fetchNotionData() {
   btn.innerHTML = '<span>⏳</span> 파싱 중...';
 
   try {
-    const res = await fetch(apiUrl);
-    if (!res.ok) throw new Error('Notion API fetch failed');
-    const data = await res.json();
+    let data = null;
+    for (let i = 0; i < PROXIES.length + 1; i++) {
+      try {
+        const url = i === 0 ? notionApiBase : PROXIES[i - 1] + encodeURIComponent(notionApiBase);
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        data = await res.json();
+        break;
+      } catch (e) {
+        if (i < PROXIES.length) continue;
+        throw new Error('Notion API fetch failed (all proxies exhausted)');
+      }
+    }
     const sourceText = buildSourceTextFromNotion(data);
     notionSnapshot = parseNotionSnapshotFromText(sourceText);
     rebuildSellStocksFromSnapshot();
