@@ -3,5 +3,11 @@
     "antigravity.usage.showInStatusBar": true,
     "antigravity.usage.trackComputeTime": true,
     "antigravity.telemetry.enabled": true,
-    "antigravity.agentManager.autoOpen": true
+    "antigravity.agentManager.autoOpen": true,
+    "chat.tools.terminal.autoApprove": {
+        "/^Set-Location \"c:\\\\Users\\\\USER\\\\git\\\\arusantimo\\.github\\.io\\\\tools\\\\stock-analyze\"; python -m http\\.server 8011$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }
