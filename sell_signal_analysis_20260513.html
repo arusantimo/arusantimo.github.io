@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>매도 시그널 분석기</title>
+  <style>
+    :root {
+      --bg-primary: #0f1419;
+      --bg-secondary: #1a1f28;
+      --bg-tertiary: #232a38;
+      --border-color: #2d3748;
+      --border-danger: #ef4444;
+      --border-warning: #f59e0b;
+      --border-success: #10b981;
+      --text-primary: #e2e8f0;
+      --text-secondary: #a0aec0;
+      --text-tertiary: #718096;
+      --text-danger: #ef4444;
+      /* UP color in Korea */
+      --text-warning: #f59e0b;
+      --text-success: #10b981;
+      --text-info: #60a5fa;
+      /* DOWN color in Korea */
+      --accent-primary: #00d9ff;
+      --accent-secondary: #7c3aed;
+      --bg-danger-light: rgba(239, 68, 68, 0.1);
+      --bg-warning-light: rgba(245, 158, 11, 0.1);
+      --bg-success-light: rgba(16, 185, 129, 0.1);
+      --bg-info-light: rgba(59, 130, 246, 0.1);
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .panel {
+      background: rgba(26, 31, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: var(--bg-primary);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-tertiary);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      height: 32px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .input-group input {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      font-weight: 600;
+    }
+
+    /* Style time input specifically for webkit to keep text white */
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.5;
+      cursor: pointer;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 32px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .scard {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-lg);
+      padding: 20px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .scard:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .scard.sell {
+      border-color: var(--border-danger);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+    }
+
+    .scard.caution {
+      border-color: var(--border-warning);
+    }
+
+    .scard.hold {
+      border-color: var(--border-success);
+    }
+
+    .scard-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .scard-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+
+    .scard-code {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-sell {
+      background: var(--bg-danger-light);
+      color: var(--text-danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .badge-caution {
+      background: var(--bg-warning-light);
+      color: var(--text-warning);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+    }
+
+    .badge-hold {
+      background: var(--bg-success-light);
+      color: var(--text-success);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .badge-pending {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .chg.up {
+      color: var(--text-danger);
+    }
+
+    .chg.dn {
+      color: var(--text-info);
+    }
+
+    .chg.nt {
+      color: var(--text-secondary);
+    }
+
+    .meta {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+      background: var(--bg-secondary);
+      padding: 6px 10px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .indicators {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ind-item {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+      background: rgba(0, 0, 0, 0.1);
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .ind-item.triggered {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2px solid var(--border-danger);
+    }
+
+    .ind-item.triggered::before {
+      content: '🚨';
+      font-size: 14px;
+    }
+
+    .ind-item.clear {
+      border-left: 2px solid var(--border-success);
+    }
+
+    .ind-item.clear::before {
+      content: '✅';
+      font-size: 14px;
+    }
+
+    .ind-item.unknown {
+      border-left: 2px solid var(--border-color);
+    }
+
+    .ind-item.unknown::before {
+      content: '➖';
+      font-size: 14px;
+    }
+
+    .log-box {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: 'Consolas', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      height: 120px;
+      overflow-y: auto;
+      margin-top: 20px;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .log-box div {
+      margin-bottom: 6px;
+      line-height: 1.4;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      padding-bottom: 4px;
+    }
+
+    .log-box span.time {
+      color: var(--text-tertiary);
+      margin-right: 8px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="panel">
+      <div class="header-title">📈 매도 시그널 자동 분석기</div>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+        노션의 추천 종목(눌림목, 수급 매집형)을 클릭 한 번으로 불러오고,<br>가상 시간 설정에 따라 실시간 네이버 증권 데이터를 분석하여 <b>매도 및 손절 시그널</b>을 제공합니다.
+      </p>
+
+      <div class="controls" style="flex-direction: column; align-items: stretch; gap: 16px;">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <div class="input-group" style="flex: 1; min-width: 150px;">
+            <input type="text" id="notion-url" placeholder="노션 페이지 주소 또는 ID를 입력하세요"
+              style="width: 100%; min-width: 200px;">
+          </div>
+          <button id="btn-fetch-notion" class="btn btn-secondary" style="white-space: nowrap; height: 32px;">
+            불러오기
+          </button>
+        </div>
+
+
+        <div
+          style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; justify-content: flex-end;">
+          <div id="current-time-display" style="font-size: 12px; color: var(--text-tertiary);"></div>
+          <button id="btn-analyze" class="btn btn-primary" style="height: 32px;" disabled>
+            <span>⚡</span> 분석 시작
+          </button>
+        </div>
+      </div>
+
+      <div id="log-output" class="log-box">
+        <div style="color:var(--text-tertiary);border:none">시스템이 대기 중입니다. '노션 데이터 불러오기'를 클릭하세요.</div>
+      </div>
+    </div>
+
+    <!-- 눌림목 베팅 -->
+    <div class="section-title" style="justify-content: space-between; align-items: flex-end; flex-wrap: wrap;">
+      <div style="margin-bottom: 4px;">📉 눌림목 종가베팅 <span
+          style="font-size: 12px; font-weight: normal; color: var(--text-tertiary);">(9:08 이후 매도/손절 분석)</span></div>
+      <div style="display: flex; gap: 8px; align-items: center; font-weight: normal; margin-bottom: 4px;">
+        <input type="text" id="pullback-name" placeholder="종목명"
+          style="width: 100px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <input type="text" id="pullback-code" placeholder="코드(6자리)" maxlength="6"
+          style="width: 80px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <button id="btn-add-pullback" class="btn btn-secondary"
+          style="padding: 6px 12px; font-size: 12px; height: 28px;">➕ 추가</button>
+      </div>
+    </div>
+    <div id="list-pullback" class="stock-grid">
+      <div
+        style="font-size: 14px; color: var(--text-tertiary); padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+        종목 데이터가 없습니다.</div>
+    </div>
+
+    <!-- 수급 매집형 베팅 -->
+    <div class="section-title" style="justify-content: space-between; align-items: flex-end; flex-wrap: wrap;">
+      <div style="margin-bottom: 4px;">🔥 수급 매집형 종가베팅 <span
+          style="font-size: 12px; font-weight: normal; color: var(--text-tertiary);">(9:08 이전 손절, 이후 모두 분석)</span></div>
+      <div style="display: flex; gap: 8px; align-items: center; font-weight: normal; margin-bottom: 4px;">
+        <input type="text" id="momentum-name" placeholder="종목명"
+          style="width: 100px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <input type="text" id="momentum-code" placeholder="코드(6자리)" maxlength="6"
+          style="width: 80px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <button id="btn-add-momentum" class="btn btn-secondary"
+          style="padding: 6px 12px; font-size: 12px; height: 28px;">➕ 추가</button>
+      </div>
+    </div>
+    <div id="list-momentum" class="stock-grid">
+      <div
+        style="font-size: 14px; color: var(--text-tertiary); padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+        종목 데이터가 없습니다.</div>
+    </div>
+
+  </div>
+
+  <script>
+    // CORS Proxy to bypass Naver's block (여러 개의 프록시 서버를 두어 안정성을 높임)
+    const PROXIES = [
+      'https://api.allorigins.win/raw?url=',
+      'https://api.codetabs.com/v1/proxy?quest=',
+      'https://corsproxy.io/?'
+    ];
+
+    let stocks = {
+      pullback: [], // 눌림목
+      momentum: []  // 수급매집형
+    };
+
+    function log(msg) {
+      const out = document.getElementById('log-output');
+      const timeStr = new Date().toLocaleTimeString('en-US', { hour12: false });
+      out.innerHTML += `<div><span class="time">[${timeStr}]</span> ${msg}</div>`;
+      out.scrollTop = out.scrollHeight;
+    }
+
+    // 1. 노션 데이터 불러오기
+    async function fetchNotionData() {
+      const urlInput = document.getElementById('notion-url').value;
+      const matchId = urlInput.replace(/-/g, '').match(/[a-f0-9]{32}/i);
+      if (!matchId) {
+        alert('유효한 노션 주소 또는 페이지 ID를 입력해주세요.');
+        return;
+      }
+      const notionId = matchId[0];
+      const apiUrl = `https://notion-api.splitbee.io/v1/page/${notionId}`;
+
+      // 성공적으로 형식을 통과한 URL을 로컬 스토리지에 저장
+      localStorage.setItem('savedNotionUrl', urlInput);
+
+      log(`노션(Notion) 공용 페이지(${notionId.substring(0, 6)}...) 파싱 중입니다...`);
+      const btn = document.getElementById('btn-fetch-notion');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span> 파싱 중...';
+
+      try {
+        const res = await fetch(apiUrl);
+        if (!res.ok) throw new Error("Notion API fetch failed");
+        const data = await res.json();
+
+        // 기존 데이터 초기화
+        stocks.pullback = [];
+        stocks.momentum = [];
+
+        let currentSection = '';
+
+        Object.values(data).forEach(blockWrapper => {
+          if (!blockWrapper.value || !blockWrapper.value.value) return;
+          const block = blockWrapper.value.value;
+          if (!block || !block.properties || !block.properties.title) return;
+
+          const titleText = block.properties.title.map(t => t[0]).join('');
+
+          if (titleText.includes('눌림목 종가베팅 추천 종목')) {
+            currentSection = 'pullback';
+          } else if (titleText.includes('수급 매집형 종가베팅 추천 종목')) {
+            currentSection = 'momentum';
+          } else if (block.type === 'bulleted_list' && currentSection) {
+            const match = titleText.match(/([가-힣A-Za-z0-9]+)\s*\((\d{6})\)/);
+            if (match) {
+              const stockObj = {
+                name: match[1],
+                code: match[2],
+                type: currentSection
+              };
+              if (!stocks[currentSection].find(s => s.code === stockObj.code)) {
+                stocks[currentSection].push(stockObj);
+              }
+            }
+          }
+        });
+
+        log(`성공적으로 불러왔습니다. (눌림목: ${stocks.pullback.length}개, 수급매집형: ${stocks.momentum.length}개)`);
+        renderStockCards();
+
+        if (stocks.pullback.length > 0 || stocks.momentum.length > 0) {
+          document.getElementById('btn-analyze').disabled = false;
+        }
+      } catch (e) {
+        log('<span style="color:var(--text-danger)">오류: 노션 데이터를 파싱하는 데 실패했습니다. 올바른 공개 페이지인지 확인해주세요.</span>');
+        console.error(e);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '불러오기';
+      }
+    }
+
+    document.getElementById('btn-fetch-notion').addEventListener('click', fetchNotionData);
+
+    // 수동 추가 로직 헬퍼 함수
+    function handleManualAdd(type, nameInputId, codeInputId) {
+      const name = document.getElementById(nameInputId).value.trim();
+      const code = document.getElementById(codeInputId).value.trim();
+
+      if (!name || !code) {
+        alert('종목명과 종목코드(6자리)를 모두 입력해주세요.');
+        return;
+      }
+      if (!/^\d{6}$/.test(code)) {
+        alert('종목코드는 6자리 숫자여야 합니다.');
+        return;
+      }
+
+      if (!stocks[type].find(s => s.code === code)) {
+        stocks[type].push({ name, code, type });
+        renderStockCards();
+        document.getElementById('btn-analyze').disabled = false;
+        log(`▶ 수동 추가: ${name} (${code}) -> ${type === 'pullback' ? '눌림목 베팅' : '수급 매집형'}`);
+
+        document.getElementById(nameInputId).value = '';
+        document.getElementById(codeInputId).value = '';
+        document.getElementById(nameInputId).focus();
+      } else {
+        alert('이미 추가된 종목입니다.');
+      }
+    }
+
+    document.getElementById('btn-add-pullback').addEventListener('click', () => handleManualAdd('pullback', 'pullback-name', 'pullback-code'));
+    document.getElementById('btn-add-momentum').addEventListener('click', () => handleManualAdd('momentum', 'momentum-name', 'momentum-code'));
+
+    function renderStockCards() {
+      const renderGroup = (arr, containerId) => {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        if (arr.length === 0) {
+          container.innerHTML = '<div style="font-size: 14px; color: var(--text-tertiary); padding: 20px; background: var(--bg-secondary); border-radius: 8px;">추출된 종목이 없습니다.</div>';
+          return;
+        }
+        arr.forEach(s => {
+          container.innerHTML += `
+                    <div class="scard" id="card-${s.code}">
+                        <div class="scard-head">
+                            <div><div class="scard-name">${s.name}</div><div class="scard-code">${s.code}</div></div>
+                            <span class="badge badge-pending" id="badge-${s.code}">대기 중</span>
+                        </div>
+                        <div class="price-row" id="price-row-${s.code}">
+                            <span class="price" style="font-size:16px;color:var(--text-tertiary);font-weight:500;">분석 전</span>
+                        </div>
+                        <div class="meta" id="meta-${s.code}">
+                            매수가(전일종가): 확인 전
+                        </div>
+                        <div class="indicators" id="ind-${s.code}">
+                            <div class="ind-item unknown">상단에서 '분석 시작' 버튼을 눌러주세요.</div>
+                        </div>
+                    </div>
+                `;
+        });
+      };
+
+      renderGroup(stocks.pullback, 'list-pullback');
+      renderGroup(stocks.momentum, 'list-momentum');
+    }
+
+    // 현재 시각 표시 업데이트
+    function updateCurrentTime() {
+      const now = new Date();
+      const hh = now.getHours().toString().padStart(2, '0');
+      const mm = now.getMinutes().toString().padStart(2, '0');
+      const ss = now.getSeconds().toString().padStart(2, '0');
+      const totalMins = now.getHours() * 60 + now.getMinutes();
+      const isBefore = totalMins < (9 * 60 + 8);
+      const label = isBefore ? '9:08 이전 (수급 매집형 손절 점검)' : '9:08 이후 (전체 매도/손절 분석)';
+      const el = document.getElementById('current-time-display');
+      if (el) el.innerHTML = `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; 적용 로직: <strong style="color:${isBefore ? 'var(--text-warning)' : 'var(--text-success)'}">${label}</strong>`;
+    }
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+
+    // 2. 분석 시작
+    document.getElementById('btn-analyze').addEventListener('click', async () => {
+      const now = new Date();
+      const totalMins = now.getHours() * 60 + now.getMinutes();
+      const isBefore0908 = totalMins < (9 * 60 + 8);
+      const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+
+      const btn = document.getElementById('btn-analyze');
+      btn.disabled = true;
+      btn.innerHTML = '<span>⚡</span> 분석 진행 중...';
+
+      log(`▶ [현재 시각: ${timeStr}] 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
+
+      const allStocks = [...stocks.pullback, ...stocks.momentum];
+
+      for (let s of allStocks) {
+        await analyzeStock(s, isBefore0908);
+        // 안정적인 수집을 위해 종목 간 대기 시간을 1.5초로 증가
+        await new Promise(r => setTimeout(r, 1500));
+      }
+
+      log('✅ 모든 종목의 시그널 분석이 완료되었습니다.');
+      btn.disabled = false;
+      btn.innerHTML = '<span>⚡</span> 다시 분석하기';
+    });
+
+    async function analyzeStock(stock, isBefore0908) {
+      log(`- [${stock.name}] 네이버 증권 데이터 파싱 중...`);
+      const maxRetries = 2; // 최대 2회 재시도 (총 3번 시도)
+      
+      for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+        try {
+          // Fetch Naver Finance directly using proxy
+          const url = encodeURIComponent(`https://finance.naver.com/item/main.naver?code=${stock.code}`);
+          const proxyUrl = PROXIES[(attempt - 1) % PROXIES.length]; // 시도 횟수에 따라 다른 프록시 서버 사용
+          const res = await fetch(proxyUrl + url);
+
+          if (!res.ok) throw new Error(`Proxy error or Naver blocked (Status: ${res.status})`);
+
+          const html = await res.text();
+
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          // Extract Price
+          const todayArea = doc.querySelector('.no_today .blind');
+          const currentPrice = todayArea ? parseInt(todayArea.textContent.replace(/,/g, '')) : 0;
+
+          // Extract Previous Close (which acts as Buy Price)
+          let prevClose = 0;
+          const thList = Array.from(doc.querySelectorAll('th'));
+          for (let th of thList) {
+            if (th.textContent.includes('전일')) {
+              const td = th.nextElementSibling;
+              if (td) {
+                const match = td.textContent.match(/[\d,]+/);
+                if (match) prevClose = parseInt(match[0].replace(/,/g, ''));
+              }
+              break;
+            }
+          }
+          if (!prevClose && currentPrice) prevClose = currentPrice;
+
+          // Extract Open Price
+          let openPrice = 0;
+          for (let th of thList) {
+            if (th.textContent.includes('시가')) {
+              const td = th.nextElementSibling;
+              if (td) {
+                const match = td.textContent.match(/[\d,]+/);
+                if (match) openPrice = parseInt(match[0].replace(/,/g, ''));
+              }
+              break;
+            }
+          }
+
+          // Extract Change Rate
+          let chgRate = 0;
+          if (prevClose > 0) {
+            chgRate = ((currentPrice - prevClose) / prevClose) * 100;
+          }
+
+          // Extract Execution Strength (체결강도)
+          let strength = 0;
+          const thStrength = thList.find(th => th.textContent.includes('체결강도'));
+          if (thStrength) {
+            const td = thStrength.nextElementSibling;
+            if (td) strength = parseFloat(td.textContent.replace(/,/g, '').replace('%', ''));
+          }
+
+          const data = { currentPrice, prevClose, openPrice, chgRate, strength };
+          log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%)`);
+
+          applyRules(stock, data, isBefore0908);
+          return; // 성공 시 루프 종료
+
+        } catch (e) {
+          if (attempt <= maxRetries) {
+            log(`<span style="color:var(--text-warning)">- [${stock.name}] 통신 지연 (${attempt}회 실패). 다른 우회 서버로 재시도합니다...</span>`);
+            await new Promise(r => setTimeout(r, 2000)); // 다음 시도 전 2초 대기
+          } else {
+            log(`<span style="color:var(--text-danger)">- [${stock.name}] 데이터 수집 최종 실패</span>`);
+            console.error(e);
+            updateCardError(stock.code);
+          }
+        }
+      }
+    }
+
+    function applyRules(stock, data, isBefore0908) {
+      const card = document.getElementById(`card-${stock.code}`);
+      const priceRow = document.getElementById(`price-row-${stock.code}`);
+      const meta = document.getElementById(`meta-${stock.code}`);
+      const indBox = document.getElementById(`ind-${stock.code}`);
+      const badge = document.getElementById(`badge-${stock.code}`);
+
+      // 1. Update UI Elements
+      const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
+      const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
+      const absChg = Math.abs(data.chgRate).toFixed(2);
+
+      priceRow.innerHTML = `
+            <span class="price">${data.currentPrice.toLocaleString()}원</span>
+            <span class="chg ${chgClass}" style="font-size:14px; font-weight:700">${chgPrefix}${absChg}%</span>
+        `;
+      meta.innerHTML = `
+            <span style="opacity:0.7">매수가(전일가):</span> <strong>${data.prevClose.toLocaleString()}원</strong> &nbsp;|&nbsp; 
+            <span style="opacity:0.7">시가:</span> <strong>${data.openPrice.toLocaleString()}원</strong> &nbsp;|&nbsp; 
+            <span style="opacity:0.7">체결강도:</span> <strong>${data.strength ? data.strength.toFixed(2) + '%' : '-'}</strong>
+        `;
+
+      let html = '';
+      let decision = 'hold'; // 'hold', 'caution', 'sell'
+
+      // 2. Rule Engine
+      if (stock.type === 'momentum') {
+        // --- 수급 매집형 로직 ---
+        if (isBefore0908) {
+          // [9:08 이전]: 손절 케이스만 판단
+          html += `<div class="ind-item unknown">9:08 이전 판단 로직 활성화 (손절 점검)</div>`;
+
+          // 시초가 강하게 회복 못함 (시가 대비 현재가 하락)
+          if (data.currentPrice < data.openPrice) {
+            html += `<div class="ind-item triggered">시초가 대비 하락 중 (손절/경계)</div>`;
+            decision = 'caution';
+          } else {
+            html += `<div class="ind-item clear">시초가 대비 양호 흐름 유지</div>`;
+          }
+
+          // 매수가(전일종가) 이탈
+          if (data.currentPrice < data.prevClose) {
+            html += `<div class="ind-item triggered">전일 종가(매수가) 하향 이탈! (즉각 손절 권장)</div>`;
+            decision = 'sell';
+          }
+        } else {
+          // [9:08 이후]: 매도 + 손절 모두 판단
+          html += `<div class="ind-item unknown">9:08 이후 판단 로직 활성화</div>`;
+
+          // 체결강도 100% 미만 -> 매도(익절)
+          if (data.strength && data.strength < 100) {
+            html += `<div class="ind-item triggered">체결강도 100% 미만 (${data.strength}%) - 메이저 설거지 가능성 (전량 익절/매도)</div>`;
+            decision = 'sell';
+          } else if (data.strength && data.strength >= 100) {
+            html += `<div class="ind-item clear">체결강도 100% 초과 (${data.strength}%) - 외국인 매수세 양호 (홀딩 대기)</div>`;
+          }
+
+          // 매수가 하향 이탈 -> 손절
+          if (data.currentPrice < data.prevClose) {
+            html += `<div class="ind-item triggered">전일 종가(매수가) 하향 이탈! (즉각 손절 권장)</div>`;
+            decision = 'sell';
+          }
+        }
+      } else if (stock.type === 'pullback') {
+        // --- 눌림목 베팅 로직 ---
+        if (isBefore0908) {
+          html += `<div class="ind-item unknown">눌림목 베팅은 9:08 이후에 분석을 권장합니다.</div>`;
+          decision = 'hold';
+        } else {
+          // 개파락 여부 (-3% 이하)
+          const gapRate = ((data.openPrice - data.prevClose) / data.prevClose) * 100;
+          if (gapRate <= -3) {
+            html += `<div class="ind-item triggered">개파락 발생 (${gapRate.toFixed(2)}%) - 전일 종가 대비 -3% 이하 (즉각 손절)</div>`;
+            decision = 'sell';
+          } else {
+            html += `<div class="ind-item clear">시가 흐름 양호 (개파락 없음)</div>`;
+          }
+
+          // 상승세 둔화 여부 (등락률 정체 구간 추정)
+          if (data.chgRate > -1.5 && data.chgRate < 1.5) {
+            html += `<div class="ind-item triggered">상승세 둔화/보합 정체 - 5일선/음봉 중간값 저항 (매도/익절 고려)</div>`;
+            if (decision !== 'sell') decision = 'caution';
+          } else if (data.chgRate >= 1.5) {
+            html += `<div class="ind-item clear">강한 상승세 유지 중 (+1.5% 이상)</div>`;
+          }
+
+          // 대량 매도 전환 의심 (체결강도 낮음)
+          if (data.strength && data.strength < 80) {
+            html += `<div class="ind-item triggered">체결강도 극히 저조 (${data.strength}%) - 대규모 매도 전환 의심 (손절 고려)</div>`;
+            decision = 'sell';
+          }
+        }
+      }
+
+      indBox.innerHTML = html;
+
+      // Apply visual states
+      card.className = 'scard ' + decision;
+      if (decision === 'sell') {
+        badge.className = 'badge badge-sell';
+        badge.innerText = '매도/손절';
+      } else if (decision === 'caution') {
+        badge.className = 'badge badge-caution';
+        badge.innerText = '주의/익절 검토';
+      } else {
+        badge.className = 'badge badge-hold';
+        badge.innerText = '홀딩/양호';
+      }
+    }
+
+    function updateCardError(code) {
+      const card = document.getElementById(`card-${code}`);
+      const indBox = document.getElementById(`ind-${code}`);
+      const badge = document.getElementById(`badge-${code}`);
+
+      card.className = 'scard';
+      badge.className = 'badge badge-pending';
+      badge.innerText = '통신 오류';
+      indBox.innerHTML = `<div class="ind-item unknown">네이버 증권 데이터를 가져오는 데 실패했습니다.<br>잠시 후 다시 시도해주세요.</div>`;
+    }
+
+    // 페이지 로드 시 로컬 스토리지에서 노션 주소 복원 및 자동 불러오기
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUrl = localStorage.getItem('savedNotionUrl');
+      if (savedUrl) {
+        document.getElementById('notion-url').value = savedUrl;
+        fetchNotionData();
+      }
+    });
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>종가 베팅 매도 시그널 분석기</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="panel">
+      <div class="header-title">📈 종가 베팅 매도 시그널 분석기</div>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+        노션의 추천 종목(눌림목, 수급 매집형)을 클릭 한 번으로 불러오고,<br>가상 시간 설정에 따라 실시간 네이버 증권 데이터를 분석하여 <b>매도 및 손절 시그널</b>을 제공합니다.
+      </p>
+
+      <div class="controls" style="flex-direction: column; align-items: stretch; gap: 16px;">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <div class="input-group" style="flex: 1; min-width: 150px;">
+            <input type="text" id="notion-url" placeholder="노션 페이지 주소 또는 ID를 입력하세요"
+              style="width: 100%; min-width: 200px;">
+          </div>
+          <button id="btn-fetch-notion" class="btn btn-secondary" style="white-space: nowrap; height: 32px;">
+            불러오기
+          </button>
+        </div>
+
+
+        <div
+          style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 8px; justify-content: flex-end;">
+          <div id="current-time-display" style="font-size: 12px; color: var(--text-tertiary);"></div>
+          <button id="btn-analyze" class="btn btn-primary" style="height: 32px;" disabled>
+            <span>⚡</span> 분석 시작
+          </button>
+        </div>
+      </div>
+
+      <div id="log-output" class="log-box">
+        <div style="color:var(--text-tertiary);border:none">시스템이 대기 중입니다. '노션 데이터 불러오기'를 클릭하세요.</div>
+      </div>
+    </div>
+
+    <!-- 눌림목 베팅 -->
+    <div class="section-title" style="justify-content: space-between; align-items: flex-end; flex-wrap: wrap;">
+      <div style="margin-bottom: 4px;">📉 눌림목 종가베팅 <span
+          style="font-size: 12px; font-weight: normal; color: var(--text-tertiary);">(9:08 이후 매도/손절 분석)</span></div>
+      <div style="display: flex; gap: 8px; align-items: center; font-weight: normal; margin-bottom: 4px;">
+        <input type="text" id="pullback-name" placeholder="종목명"
+          style="width: 100px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <input type="text" id="pullback-code" placeholder="코드(6자리)" maxlength="6"
+          style="width: 80px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <button id="btn-add-pullback" class="btn btn-secondary"
+          style="padding: 6px 12px; font-size: 12px; height: 28px;">➕ 추가</button>
+      </div>
+    </div>
+    <div id="list-pullback" class="stock-grid">
+      <div
+        style="font-size: 14px; color: var(--text-tertiary); padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+        종목 데이터가 없습니다.</div>
+    </div>
+
+    <!-- 수급 매집형 베팅 -->
+    <div class="section-title" style="justify-content: space-between; align-items: flex-end; flex-wrap: wrap;">
+      <div style="margin-bottom: 4px;">🔥 수급 매집형 종가베팅 <span
+          style="font-size: 12px; font-weight: normal; color: var(--text-tertiary);">(9:08 이전 손절, 이후 모두 분석)</span></div>
+      <div style="display: flex; gap: 8px; align-items: center; font-weight: normal; margin-bottom: 4px;">
+        <input type="text" id="momentum-name" placeholder="종목명"
+          style="width: 100px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <input type="text" id="momentum-code" placeholder="코드(6자리)" maxlength="6"
+          style="width: 80px; padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-primary); font-size: 12px; outline: none;">
+        <button id="btn-add-momentum" class="btn btn-secondary"
+          style="padding: 6px 12px; font-size: 12px; height: 28px;">➕ 추가</button>
+      </div>
+    </div>
+    <div id="list-momentum" class="stock-grid">
+      <div
+        style="font-size: 14px; color: var(--text-tertiary); padding: 20px; background: var(--bg-secondary); border-radius: 8px;">
+        종목 데이터가 없습니다.</div>
+    </div>
+
+  </div>
+
+  <!-- 종목 상세 분석 모달 -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal" id="detail-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name" id="modal-name"></div>
+          <div class="modal-stock-sub">
+            <span id="modal-code"></span>
+            <span id="modal-type"></span>
+          </div>
+        </div>
+        <button class="modal-close" id="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
