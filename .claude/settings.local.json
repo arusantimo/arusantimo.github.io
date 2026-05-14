@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:finance.naver.com)",
+      "WebFetch(domain:stock.naver.com)",
+      "Skill(agent-browser)",
+      "Skill(agent-browser:*)",
+      "Bash(npx -y http-server -p 8899 --cors -c-1)",
+      "Bash(agent-browser open *)",
+      "Bash(agent-browser snapshot *)"
+    ]
+  }
+}

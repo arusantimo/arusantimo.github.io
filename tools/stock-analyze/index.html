@@ -48,7 +48,7 @@
     </div>
 
     <section class="tab-panel active" data-tab-panel="buy">
-      <div class="section-title">🧭 시장 레짐 체크</div>
+      <div class="section-title">🧭 시장 레짐 체크 <button id="btn-regime-report" class="btn btn-secondary small regime-report-btn" title="레짐 판단 근거 보고서">📋</button></div>
       <div id="buy-regime-summary"></div>
 
       <div class="section-title">📊 눌림목 종가베팅</div>
@@ -59,6 +59,13 @@
     </section>
 
     <section class="tab-panel" data-tab-panel="sell">
+      <div class="section-title split-title">
+        <div>🔄 스윙 보유 종목 <span class="section-help">D+1 스윙 전환 평가 · 실시간 손익 추적</span></div>
+      </div>
+      <div id="list-swing" class="stock-grid">
+        <div class="empty-state">스윙 보유 종목이 없습니다.</div>
+      </div>
+
       <div class="section-title split-title">
         <div>📊 눌림목 종가베팅 <span class="section-help">9:08 이후 매도/손절 분석</span></div>
         <div class="inline-inputs">
@@ -98,6 +105,19 @@
         <button class="modal-close" id="modal-close-btn">✕</button>
       </div>
       <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="regime-report-overlay" class="modal-overlay">
+    <div class="modal" id="regime-report-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name">📋 시장 레짐 판단 보고서</div>
+          <div class="modal-stock-sub"><span>현재 레짐 결정 근거 및 전략 우선순위</span></div>
+        </div>
+        <button class="modal-close" id="regime-report-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="regime-report-body"></div>
     </div>
   </div>
 

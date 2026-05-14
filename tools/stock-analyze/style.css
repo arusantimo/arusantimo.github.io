@@ -13,11 +13,13 @@
   --text-warning: #f59e0b;
   --text-success: #10b981;
   --text-info: #60a5fa;
+  --text-refresh: #7dd3fc;
   --accent-primary: #00d9ff;
   --accent-secondary: #7c3aed;
   --bg-danger-light: rgba(239, 68, 68, 0.1);
   --bg-warning-light: rgba(245, 158, 11, 0.1);
   --bg-success-light: rgba(16, 185, 129, 0.1);
+  --bg-refresh-light: rgba(125, 211, 252, 0.12);
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
 }
@@ -118,7 +120,7 @@ body {
 }
 
 .is-hidden {
-  display: none;
+  display: none !important;
 }
 
 .btn {
@@ -348,9 +350,70 @@ body {
 }
 
 .regime-stat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 11px;
   color: var(--text-tertiary);
   margin-bottom: 6px;
+}
+
+.regime-help {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.regime-help-trigger {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  background: rgba(96, 165, 250, 0.12);
+  color: var(--text-info);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  padding: 0;
+}
+
+.regime-help-trigger:focus-visible {
+  outline: 2px solid rgba(96, 165, 250, 0.55);
+  outline-offset: 2px;
+}
+
+.regime-help-tooltip {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  max-width: 260px;
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  background: rgba(15, 20, 25, 0.96);
+  border: 1px solid rgba(96, 165, 250, 0.22);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+  color: var(--text-primary);
+  font-size: 11px;
+  line-height: 1.55;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.regime-help:hover .regime-help-tooltip,
+.regime-help:focus-within .regime-help-tooltip,
+.regime-help.is-open .regime-help-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .regime-stat-value {
@@ -420,6 +483,10 @@ body {
 }
 
 .buy-card-scorebox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
   text-align: right;
 }
 
@@ -432,7 +499,6 @@ body {
 .buy-grade {
   font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 4px;
 }
 
 .buy-card-status {
@@ -445,6 +511,16 @@ body {
   font-size: 12px;
   font-weight: 700;
   margin-bottom: 12px;
+}
+
+.buy-changed {
+  color: var(--text-refresh) !important;
+}
+
+.buy-card-status.buy-changed,
+.buy-live-pill.buy-changed {
+  background: var(--bg-refresh-light);
+  border: 1px solid rgba(125, 211, 252, 0.28);
 }
 
 .buy-card-tags {
@@ -474,6 +550,24 @@ body {
   color: var(--text-secondary);
   line-height: 1.6;
   min-height: 64px;
+}
+
+.buy-live-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.buy-live-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .buy-card-footer {
@@ -712,7 +806,7 @@ body {
 .modal.buy-detail-mode {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .guide-modal {
@@ -788,10 +882,9 @@ body {
 }
 
 .buy-modal-layout {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  min-height: 0;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 .buy-modal-fixed {
@@ -819,8 +912,6 @@ body {
 }
 
 .buy-modal-scroll {
-  min-height: 0;
-  overflow-y: auto;
   padding: 18px 24px 24px;
   display: flex;
   flex-direction: column;
@@ -845,6 +936,10 @@ body {
   margin-top: 6px;
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.buy-live-meta-modal {
+  margin-top: 12px;
 }
 
 .modal-price-bar .price-big {
@@ -1035,6 +1130,113 @@ body {
 .modal-verdict.sell { background: rgba(239, 68, 68, 0.1); color: var(--text-danger); border: 1px solid rgba(239,68,68,0.25); }
 .modal-verdict.caution { background: rgba(245, 158, 11, 0.1); color: var(--text-warning); border: 1px solid rgba(245,158,11,0.25); }
 .modal-verdict.hold { background: rgba(16, 185, 129, 0.1); color: var(--text-success); border: 1px solid rgba(16,185,129,0.25); }
+
+.regime-report-btn {
+  padding: 4px 8px;
+  font-size: 14px;
+  line-height: 1;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.scard-plan {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+}
+
+.plan-prices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.plan-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+.plan-tag.target {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--text-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.plan-tag.stop {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--text-danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.plan-tag.swing {
+  background: rgba(96, 165, 250, 0.1);
+  color: var(--text-info);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+}
+
+.plan-entry {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.scard-plan-empty {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: 6px 0;
+  margin-top: 6px;
+}
+
+.modal-triggered-rule {
+  margin: 12px 0;
+}
+
+.modal-triggered-rule .modal-ind-card.triggered {
+  border-left: 3px solid var(--text-danger);
+}
+
+.compact-table {
+  font-size: 12px;
+}
+
+.compact-table th,
+.compact-table td {
+  padding: 7px 10px;
+}
+
+.badge-swing {
+  background: rgba(96, 165, 250, 0.15);
+  color: var(--text-info);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+}
+
+.swing-card {
+  border-left: 3px solid rgba(96, 165, 250, 0.5);
+}
+
+.swing-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.swing-meta-item {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(96, 165, 250, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+}
 
 @media (max-width: 900px) {
   .action-row {
