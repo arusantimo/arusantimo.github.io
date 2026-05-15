@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://m.stock.naver.com/api/stocks/up?menu=KOSPI&sosok=0&pageSize=1&page=1\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stocks/down?menu=KOSPI&sosok=0&pageSize=1&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/index/KOSPI/price?pageSize=10&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stocks/marketValue?menu=KOSPI&sosok=0&pageSize=30&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stocks/trade?menu=KOSPI&sosok=0&pageSize=30&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/index/KOSPI/price?pageSize=60&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stocks/volume?menu=KOSPI&sosok=0&pageSize=30&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/005930/integration\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/066570/integration\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/066570/price?pageSize=60&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/005930/price?pageSize=60&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/028260/integration\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/028260/price?pageSize=30&page=1\")",
+      "Bash(curl -s https://m.stock.naver.com/api/stock/__TRACKED_VAR__/integration)",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stocks/up?menu=KOSPI&sosok=0&pageSize=20&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/454910/integration\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/454910/price?pageSize=30&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/005930/price?pageSize=10&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/000660/price?pageSize=60&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/028260/price?pageSize=60&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/000660/integration\")",
+      "Bash(curl -s 'https://m.stock.naver.com/api/stock/__TRACKED_VAR__/price?pageSize=30&page=1')",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/079550/price?pageSize=10&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/012450/price?pageSize=10&page=1\")",
+      "Bash(curl -s \"https://m.stock.naver.com/api/stock/079550/price?pageSize=25&page=1\")"
+    ]
+  }
+}
