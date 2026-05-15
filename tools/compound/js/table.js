@@ -162,6 +162,11 @@
                             data-tooltip="이번 달 말 기준 실제 장기 투자 계좌의 총 잔액을 입력하세요.">
                         ${longTermRateText !== null ? `<span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;" data-tooltip="이번 달 장기 투자 목표 수익 대비 실제 수익의 달성률입니다.">(${longTermRateText}%)</span>` : ''}
                     </div>
+                    ${hasNumericValue(actualLongCumul) ? `
+                    <div style="margin-top:4px; text-align:right; font-size:10px; color:${longTermRateColor};" data-tooltip="이번 달 실제 장기 투자 수익금 (월 재투자 금액 제외)">
+                        금월 수익: ${formatNumber(actualLongProfit)}원
+                    </div>
+                    ` : ''}
                 </td>
                 <td class="number">
                     <div data-tooltip="이번 달 목표 수익 달성 시의 예상 총 자산입니다.">${formatNumber(row.assetAfter)}${achievementHtml}</div>
