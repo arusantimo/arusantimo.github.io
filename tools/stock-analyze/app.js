@@ -84,6 +84,30 @@ const RULE_GUIDE = {
         { code: 'C2', condition: '몸통이 전체 캔들의 70% 이상 + 윗꼬리 ≤ 몸통의 30%', source: '네이버 증권' },
         { code: 'C3', condition: '매수호가 잔량 : 매도호가 잔량 ≥ 1.2 : 1', source: '토스 증권' }
       ]
+    },
+    reversal: {
+      filters: [
+        { code: 'F1', condition: '거래대금 당일 30위 이내' },
+        { code: 'F2', condition: '시가총액 30조원 이상 (대형주 한정)' },
+        { code: 'F3', condition: '실적발표 D-2, 분할/합병/배당락 D-5 이내 제외' },
+        { code: 'F4', condition: '동일 종목 본 전략 진입 후 5거래일 이내 재진입 금지' }
+      ],
+      gates: [
+        { code: 'G1', condition: '직전 1개월 누적 상승률 ≥ +30% (주도주 자격)', source: '네이버 일봉' },
+        { code: 'G2', condition: '직전 단기 고점(20거래일 최고종가) 대비 -7% ~ -20% 하락 구간', source: '네이버 일봉' },
+        { code: 'G3', condition: '종가 > 60MA (장기 추세 베이스 유지)', source: '네이버 일봉' },
+        { code: 'G4', condition: '직전 5거래일 내 일봉 -5% 이상 급락 1회 이상 발생', source: '네이버 일봉' },
+        { code: 'G5', condition: '안정화 캔들 패턴 (G5-a 양봉 / G5-b 긴아래꼬리 / G5-c 도지)', source: '네이버 일봉' }
+      ],
+      scores: [
+        { code: 'S1', condition: '외국인 OR 기관 당일 순매수 전환 (전일 대비 부호 반전)', source: '네이버 증권' },
+        { code: 'S2', condition: '토스 분당 체결강도 장중 마지막 1시간 평균 ≥ 100% + 당일 평균 ≥ 90%', source: '토스 증권' },
+        { code: 'P1', condition: '종가 > 20MA (중기 지지선 사수)', source: '네이버 증권' },
+        { code: 'P2', condition: '종가 위치가 당일 고가-저가 레인지 상단 50% 이상', source: '네이버 증권' },
+        { code: 'C1', condition: '당일 거래량 5일 평균의 200% 이상 (셀링 클라이맥스 확인)', source: '네이버 증권' },
+        { code: 'C2', condition: '토스 호가창 매수잔량 : 매도잔량 ≥ 1:1 (매수세 균형 회복)', source: '토스 증권' },
+        { code: 'C3', condition: '장 마감 직전 30분봉이 양봉 또는 종가 ≥ 30분봉 시가', source: '네이버·토스' }
+      ]
     }
   }
 };
@@ -98,6 +122,11 @@ const STRATEGY_META = {
     label: '🔥 수급 매집형 종가베팅 TOP',
     shortLabel: '수급 매집형',
     noun: '수급 매집형'
+  },
+  reversal: {
+    label: '🔻 주도주 급락 반등',
+    shortLabel: '급락 반등',
+    noun: '급락 반등 매매'
   },
   swing: {
     label: '🔄 스윙 보유',
