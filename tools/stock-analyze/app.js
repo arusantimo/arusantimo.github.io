@@ -495,17 +495,20 @@ function parseNotionSnapshotFromText(sourceText) {
       continue;
     }
 
-    if (currentSection === 'swing' && /^[-*]/.test(line)) {
-      const swingLine = line.replace(/^[-*]\s*/, '').replace(/^\*\*|\*\*$/g, '').trim();
-      const swingMatch = swingLine.match(/^(.+?)\((\d{6})\)\s+(\d+\.\d+)\s+종가\s+([\d,]+)원?\s+(.+)$/);
-      if (swingMatch) {
-        snapshot.swingEntries.push({
-          name: swingMatch[1].trim(),
-          code: swingMatch[2],
-          buyDate: swingMatch[3],
-          entryPrice: parseInt(swingMatch[4].replace(/,/g, ''), 10),
-          status: swingMatch[5].trim()
-        });
+    if (currentSection === 'swing' && /^[>\s]*[-*]/.test(line)) {
+      const swingLine = line.replace(/^[>\s]*[-*]\s*/, '').replace(/\*\*/g, '').trim();
+      const codeMatch = swingLine.match(/^(.+?)\((\d{6})\)\s+(.+)$/);
+      if (codeMatch) {
+        const name = codeMatch[1].trim();
+        const code = codeMatch[2];
+        const rest = codeMatch[3];
+        const dateMatch = rest.match(/(\d+\.\d+)/);
+        const priceMatch = rest.match(/([\d,]+)\s*원/);
+        const buyDate = dateMatch ? dateMatch[1] : '';
+        const entryPrice = priceMatch ? parseInt(priceMatch[1].replace(/,/g, ''), 10) : 0;
+        const statusMatch = rest.match(/원\s*(.+)$/);
+        const status = statusMatch ? statusMatch[1].trim() : '';
+        snapshot.swingEntries.push({ name, code, buyDate, entryPrice, status });
       }
       index += 1;
       continue;
@@ -1181,10 +1184,12 @@ async function fetchNotionData() {
 
   try {
     let data = null;
+    const cacheBuster = `_t=${Date.now()}`;
+    const notionUrlFresh = notionApiBase + (notionApiBase.includes('?') ? '&' : '?') + cacheBuster;
     for (let i = 0; i < PROXIES.length + 1; i++) {
       try {
-        const url = i === 0 ? notionApiBase : PROXIES[i - 1] + encodeURIComponent(notionApiBase);
-        const res = await fetch(url);
+        const url = i === 0 ? notionUrlFresh : PROXIES[i - 1] + encodeURIComponent(notionUrlFresh);
+        const res = await fetch(url, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         data = await res.json();
         break;
@@ -1331,6 +1336,8 @@ async function analyzeStock(stock, isBefore0908) {
       const deals = intJson.dealTrendInfos ?? [];
       const pastPrices = deals.map(deal => parseNum(deal.closePrice ?? 0)).filter(price => price > 0);
       const pastVolumes = deals.map(deal => parseNum(deal.accumulatedTradingVolume ?? deal.tradingVolume ?? 0)).filter(v => v > 0);
+      const pastLows = deals.map(deal => parseNum(deal.lowPrice ?? 0)).filter(p => p > 0);
+      const pastHighs = deals.map(deal => parseNum(deal.highPrice ?? 0)).filter(p => p > 0);
       const todayVolume = parseNum(findInfo('accumulatedTradingVolume')?.value ?? 0);
 
       const ma5 = pastPrices.length >= 5
@@ -1345,11 +1352,17 @@ async function analyzeStock(stock, isBefore0908) {
       const volMa5 = pastVolumes.length >= 5
         ? Math.round(pastVolumes.slice(0, 5).reduce((acc, v) => acc + v, 0) / 5)
         : 0;
+      const low5d = pastLows.length >= 5 ? Math.min(...pastLows.slice(0, 5)) : 0;
+      const high20d = pastHighs.length >= 20 ? Math.max(...pastHighs.slice(0, 20)) : 0;
+      const ma5Prev = pastPrices.length >= 6
+        ? Math.round(pastPrices.slice(1, 6).reduce((acc, price) => acc + price, 0) / 5)
+        : 0;
+      const ma5Direction = ma5 > 0 && ma5Prev > 0 ? (ma5 > ma5Prev ? 'up' : ma5 < ma5Prev ? 'down' : 'flat') : 'unknown';
 
       const foreignNet = parseNum(findInfo('foreignNetBuyingVolume')?.value ?? 0);
       const institutionNet = parseNum(findInfo('organNetBuyingVolume')?.value ?? 0);
 
-      const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet };
+      const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction };
       log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원)`);
       applyRules(stock, data, isBefore0908);
       return;
@@ -1519,6 +1532,126 @@ function evaluateTradeStage(data, targets, prevClose) {
   return { stage: 'underwater', label: '⚠️ 평가손 구간', detail: `진입가 대비 ${gainRate.toFixed(1)}% — 손절선 확인 필요`, gainRate };
 }
 
+function buildSwingLossManagement(data, entryPrice, gainRate, volRatio) {
+  const scores = [];
+
+  // S1: 종가 vs 20MA
+  const s1Pass = data.ma20 > 0 && data.currentPrice >= data.ma20;
+  scores.push({
+    code: 'S1', title: '종가 vs 20MA',
+    criterion: '현재가가 20MA 위에 있으면 중기 추세 유지',
+    pass: s1Pass,
+    result: data.ma20 > 0
+      ? (s1Pass ? `현재가 ${data.currentPrice.toLocaleString()} ≥ 20MA ${data.ma20.toLocaleString()} — 추세 유지` : `현재가 ${data.currentPrice.toLocaleString()} < 20MA ${data.ma20.toLocaleString()} — 추세 이탈`)
+      : '20MA 미산출'
+  });
+
+  // S2: 5MA 방향
+  const s2Pass = data.ma5Direction === 'up' || data.ma5Direction === 'flat';
+  scores.push({
+    code: 'S2', title: '5MA 방향',
+    criterion: '5MA 우상향 또는 횡보 시 단기 모멘텀 유지',
+    pass: s2Pass,
+    result: data.ma5Direction === 'up' ? '5MA 우상향 — 모멘텀 유지'
+      : data.ma5Direction === 'flat' ? '5MA 횡보 — 중립'
+      : data.ma5Direction === 'down' ? '5MA 하락 — 모멘텀 약화'
+      : '5MA 방향 미산출'
+  });
+
+  // S3: 거래량 vs 5일 평균
+  const s3Pass = volRatio !== null && volRatio >= 70;
+  scores.push({
+    code: 'S3', title: '거래량 유지',
+    criterion: '당일 거래량 ≥ 5일 평균의 70% — 시장 관심 유지',
+    pass: s3Pass,
+    result: volRatio !== null
+      ? (s3Pass ? `거래량 ${volRatio.toFixed(0)}% (≥70%) — 관심 유지` : `거래량 ${volRatio.toFixed(0)}% (<70%) — 관심 이탈 위험`)
+      : '거래량 데이터 미산출'
+  });
+
+  // S4: 외인+기관 수급
+  const bothSelling = data.foreignNet < 0 && data.institutionNet < 0;
+  const s4Pass = !bothSelling;
+  scores.push({
+    code: 'S4', title: '수급 (외인+기관)',
+    criterion: '외인+기관 동시 순매도가 아니면 수급 지지',
+    pass: s4Pass,
+    result: s4Pass
+      ? `외국인 ${data.foreignNet.toLocaleString()}주 / 기관 ${data.institutionNet.toLocaleString()}주 — 수급 유지`
+      : `외국인 ${data.foreignNet.toLocaleString()}주 / 기관 ${data.institutionNet.toLocaleString()}주 — 동시 순매도`
+  });
+
+  // S5: 체결강도 (네이버에서 가져올 수 없으면 중립 처리)
+  const s5Pass = data.strength === null ? true : data.strength >= 90;
+  scores.push({
+    code: 'S5', title: '체결강도',
+    criterion: '체결강도 ≥ 90% — 매수세 건재',
+    pass: s5Pass,
+    result: data.strength !== null
+      ? (s5Pass ? `체결강도 ${data.strength.toFixed(1)}% (≥90%) — 매수세 건재` : `체결강도 ${data.strength.toFixed(1)}% (<90%) — 매수세 약화`)
+      : '체결강도 미수집 (토스 확인 필요) — 중립 처리'
+  });
+
+  // S6: 지지선 잔존 (5일 저점 대비 버퍼)
+  const hasLowSupport = data.low5d > 0 && data.currentPrice >= data.low5d;
+  const s6Pass = hasLowSupport;
+  scores.push({
+    code: 'S6', title: '지지선 잔존',
+    criterion: '현재가 ≥ 최근 5일 저점 — 하방 지지 확인',
+    pass: s6Pass,
+    result: data.low5d > 0
+      ? (s6Pass ? `현재가 ${data.currentPrice.toLocaleString()} ≥ 5일 저점 ${data.low5d.toLocaleString()} — 지지 건재` : `현재가 ${data.currentPrice.toLocaleString()} < 5일 저점 ${data.low5d.toLocaleString()} — 신저점 이탈`)
+      : '일별 저가 데이터 미산출'
+  });
+
+  const totalScore = scores.filter(s => s.pass).length;
+
+  // 손실 구간 분류
+  let lossLevel, verdict;
+  if (gainRate <= -5) {
+    lossLevel = 'danger';
+    verdict = '⛔ 즉시 청산 (위험 손실 -5% 초과)';
+  } else if (gainRate <= -3) {
+    lossLevel = 'warning';
+    if (totalScore >= 6) verdict = '🟡 관찰 보유 (익일 종가 미회복 시 청산)';
+    else verdict = '🔴 전량 손절 권고';
+  } else if (gainRate < 0) {
+    lossLevel = 'mild';
+    if (totalScore >= 5) verdict = '🟢 홀드 — 지지 건재';
+    else if (totalScore >= 3) verdict = '🟡 비중 축소 50% 권고';
+    else verdict = '🔴 전량 손절 권고';
+  } else {
+    lossLevel = 'profit';
+    verdict = '🟢 수익 구간 — 트레일링 운용';
+  }
+
+  // 동적 가격 산출
+  const stopFromMa20 = data.ma20 > 0 ? data.ma20 : 0;
+  const stopFrom5pct = Math.round(entryPrice * 0.95);
+  const stopFromLow5d = data.low5d > 0 ? data.low5d : 0;
+  const maxStopPrice = Math.max(stopFromMa20, stopFrom5pct, stopFromLow5d);
+  const maxStopRate = entryPrice > 0 ? ((maxStopPrice - entryPrice) / entryPrice) * 100 : 0;
+
+  const stopFrom2pct = Math.round(data.currentPrice * 0.98);
+  const stopFromMa5 = data.ma5 > 0 ? data.ma5 : 0;
+  const recommendedStopPrice = Math.max(stopFrom2pct, stopFromMa5);
+
+  const recoveryTarget = Math.round(entryPrice * 1.01);
+  const reboundTarget = data.high20d > 0 ? Math.round(data.high20d * 0.8) : Math.round(entryPrice * 1.03);
+
+  return {
+    scores,
+    totalScore,
+    lossLevel,
+    verdict,
+    maxStopPrice,
+    maxStopRate,
+    recommendedStopPrice,
+    recoveryTarget,
+    reboundTarget
+  };
+}
+
 function buildIndicators(stock, data, isBefore0908) {
   const indicators = [];
   let decision = 'hold';
@@ -1533,14 +1666,13 @@ function buildIndicators(stock, data, isBefore0908) {
   if (stock.type === 'swing') {
     indicators.push({
       title: '분석 유형',
-      criterion: 'v3.4 스윙 운용 규칙: 거부조건(R1~R4) → 강제 청산 트리거 → 일반 매도 단계',
+      criterion: 'v3.4 스윙 운용 규칙: 거부조건(R1~R4) → 강제 청산 트리거 → 손실 관리 판정 → 일반 매도 단계',
       status: 'unknown',
       result: `스윙 보유 (매수일 ${stock.buyDate || '—'}, 매수가 ${entryPrice.toLocaleString()}원, 수익률 ${gainRate >= 0 ? '+' : ''}${gainRate.toFixed(2)}%)`
     });
 
     const rejections = [];
 
-    // R1: 20MA 이탈 종가
     const r1Triggered = data.ma20 > 0 && data.currentPrice < data.ma20;
     rejections.push({
       code: 'R1', title: '20MA 이탈 종가',
@@ -1551,7 +1683,6 @@ function buildIndicators(stock, data, isBefore0908) {
         : '20MA 미산출 (데이터 부족)'
     });
 
-    // R2: 거래량 5일 평균의 50% 이하
     const volRatio = data.volMa5 > 0 && data.todayVolume > 0 ? (data.todayVolume / data.volMa5) * 100 : null;
     const r2Triggered = volRatio !== null && volRatio < 50;
     rejections.push({
@@ -1563,7 +1694,6 @@ function buildIndicators(stock, data, isBefore0908) {
         : '거래량 데이터 미산출'
     });
 
-    // R3: 외국인 + 기관 동시 순매도
     const r3Triggered = data.foreignNet < 0 && data.institutionNet < 0;
     const r3Checkable = data.foreignNet !== 0 || data.institutionNet !== 0;
     rejections.push({
@@ -1575,15 +1705,14 @@ function buildIndicators(stock, data, isBefore0908) {
         : '수급 데이터 미확인'
     });
 
-    // R4: 종가 < 진입가 -4% (수급매집형 기준, 눌림목은 -3%)
-    const stopRate = -4;
+    const stopRate = -5;
     const r4Triggered = gainRate < stopRate;
     rejections.push({
       code: 'R4', title: `진입가 대비 ${stopRate}% 이탈`,
-      criterion: `종가 < 진입가 ${stopRate}% → 즉시 손절`,
+      criterion: `종가 < 진입가 ${stopRate}% → 즉시 손절 (위험 손실 구간)`,
       triggered: r4Triggered,
       result: r4Triggered
-        ? `진입가 대비 ${gainRate.toFixed(2)}% → 손절 기준 도달`
+        ? `진입가 대비 ${gainRate.toFixed(2)}% → 위험 손실, 즉시 청산`
         : `진입가 대비 ${gainRate >= 0 ? '+' : ''}${gainRate.toFixed(2)}% — 유지`
     });
 
@@ -1601,12 +1730,10 @@ function buildIndicators(stock, data, isBefore0908) {
       decision = 'sell';
       actionStage = 'reject';
       triggeredRule = triggeredRejections[0];
-      return { indicators, decision, actionStage, triggeredRule, targets, gainRate };
+      const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio);
+      return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement };
     }
 
-    // 3중 강제 청산 트리거
-    // 가격 트리거: 20MA 이탈 (이미 R1에서 체크, 미도달 시 이 지점 도달)
-    // 추세 트리거: 60MA 이탈
     const below60ma = data.ma60 > 0 && data.currentPrice < data.ma60;
     if (below60ma) {
       indicators.push({
@@ -1618,7 +1745,8 @@ function buildIndicators(stock, data, isBefore0908) {
       decision = 'sell';
       actionStage = 'reject';
       triggeredRule = { code: '60MA', title: '60MA 이탈 강제 청산', triggered: true };
-      return { indicators, decision, actionStage, triggeredRule, targets, gainRate };
+      const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio);
+      return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement };
     }
     if (data.ma60 > 0) {
       indicators.push({
@@ -1629,39 +1757,72 @@ function buildIndicators(stock, data, isBefore0908) {
       });
     }
 
-    // 일반 매도 단계 판정
-    const below5ma = data.ma5 > 0 && data.currentPrice < data.ma5;
-    if (below5ma) {
-      indicators.push({
-        title: '5MA 이탈 (2차 트레일링)',
-        criterion: '5MA 이탈 시 40% 추가 정리 구간',
-        status: 'triggered',
-        result: `현재가 ${data.currentPrice.toLocaleString()} < 5MA ${data.ma5.toLocaleString()} → 40% 추가 정리 권고`
+    // 손실 관리 판정 (손실 구간일 때 적용)
+    const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio);
+
+    if (gainRate < 0) {
+      lossManagement.scores.forEach(s => {
+        indicators.push({
+          title: `[${s.code}] ${s.title}`,
+          criterion: s.criterion,
+          status: s.pass ? 'clear' : 'triggered',
+          result: s.result
+        });
       });
-      decision = 'caution';
-      actionStage = 'partial_exit';
-    } else if (gainRate >= 3) {
+
       indicators.push({
-        title: '스윙 수익 구간',
-        criterion: '진입가 대비 +3% 이상 도달 시 1차 트레일링 익절 검토 (30% 정리)',
-        status: 'clear',
-        result: `진입가 대비 +${gainRate.toFixed(2)}% — 1차 트레일링 익절 구간 (첫 음봉 OR +3% 추가 시 30% 정리)`
+        title: '손실 관리 종합 판정',
+        criterion: `6점 만점 기준: 5~6 홀드 / 3~4 비중 축소 / 1~2 전량 손절 / 0 즉시 청산`,
+        status: lossManagement.totalScore >= 5 ? 'clear' : lossManagement.totalScore >= 3 ? 'unknown' : 'triggered',
+        result: `${lossManagement.totalScore}/6점 → ${lossManagement.verdict}`
       });
-      decision = 'hold';
-      actionStage = 'swing';
+
+      if (lossManagement.totalScore <= 2) {
+        decision = 'sell';
+        actionStage = 'loss_cut';
+      } else if (lossManagement.totalScore <= 4) {
+        decision = 'caution';
+        actionStage = 'partial_exit';
+      } else {
+        decision = 'hold';
+        actionStage = 'swing';
+      }
     } else {
-      indicators.push({
-        title: '스윙 보유 상태',
-        criterion: '거부조건·강제청산 미해당, 추세 유지 중',
-        status: 'clear',
-        result: `진입가 대비 ${gainRate >= 0 ? '+' : ''}${gainRate.toFixed(2)}% — 홀딩 유지`
-      });
-      decision = 'hold';
-      actionStage = 'swing';
+      // 수익 구간: 기존 트레일링 로직
+      const below5ma = data.ma5 > 0 && data.currentPrice < data.ma5;
+      if (below5ma) {
+        indicators.push({
+          title: '5MA 이탈 (2차 트레일링)',
+          criterion: '5MA 이탈 시 40% 추가 정리 구간',
+          status: 'triggered',
+          result: `현재가 ${data.currentPrice.toLocaleString()} < 5MA ${data.ma5.toLocaleString()} → 40% 추가 정리 권고`
+        });
+        decision = 'caution';
+        actionStage = 'partial_exit';
+      } else if (gainRate >= 3) {
+        indicators.push({
+          title: '스윙 수익 구간',
+          criterion: '진입가 대비 +3% 이상 도달 시 1차 트레일링 익절 검토 (30% 정리)',
+          status: 'clear',
+          result: `진입가 대비 +${gainRate.toFixed(2)}% — 1차 트레일링 익절 구간 (첫 음봉 OR +3% 추가 시 30% 정리)`
+        });
+        decision = 'hold';
+        actionStage = 'swing';
+      } else {
+        indicators.push({
+          title: '스윙 보유 상태',
+          criterion: '거부조건·강제청산 미해당, 추세 유지 중',
+          status: 'clear',
+          result: `진입가 대비 +${gainRate.toFixed(2)}% — 홀딩 유지`
+        });
+        decision = 'hold';
+        actionStage = 'swing';
+      }
     }
 
     // 추세 요약
-    if (data.ma5 > 0 && data.ma20 > 0 && !below5ma) {
+    const below5maFinal = data.ma5 > 0 && data.currentPrice < data.ma5;
+    if (data.ma5 > 0 && data.ma20 > 0 && !below5maFinal) {
       const trendOk = data.currentPrice > data.ma5 && data.currentPrice > data.ma20;
       indicators.push({
         title: '이평선 배치',
@@ -1673,7 +1834,15 @@ function buildIndicators(stock, data, isBefore0908) {
       });
     }
 
-    return { indicators, decision, actionStage, triggeredRule, targets, gainRate };
+    // 동적 가격 라인 (손절가/목표가)
+    indicators.push({
+      title: '동적 가격 라인',
+      criterion: '최대 손절가: MAX(20MA 이탈가, 진입가×0.95, 5일 저점) | 권장 손절가: 현재가 -2% 또는 5MA 이탈가',
+      status: 'unknown',
+      result: `최대손절 ${lossManagement.maxStopPrice.toLocaleString()}원 (${lossManagement.maxStopRate >= 0 ? '+' : ''}${lossManagement.maxStopRate.toFixed(1)}%) | 권장손절 ${lossManagement.recommendedStopPrice.toLocaleString()}원 | 반등목표 ${lossManagement.recoveryTarget.toLocaleString()}원`
+    });
+
+    return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement };
   }
 
   if (stock.type === 'pullback' && isBefore0908) {
@@ -1763,7 +1932,8 @@ function buildIndicators(stock, data, isBefore0908) {
 function getActionBadge(decision, actionStage) {
   const badges = {
     reject: { cls: 'badge-sell', text: '🛑 즉시 손절' },
-    partial_exit: { cls: 'badge-caution', text: '🔔 50% 정리' },
+    loss_cut: { cls: 'badge-sell', text: '🔴 손절 권고' },
+    partial_exit: { cls: 'badge-caution', text: '🟡 비중 축소' },
     premarket: { cls: 'badge-caution', text: '🌅 프리마켓 익절' },
     openPhase: { cls: 'badge-caution', text: '🔔 장초반 익절' },
     intraday1: { cls: 'badge-caution', text: '📈 1차 익절' },
@@ -1806,20 +1976,29 @@ function applyRules(stock, data, isBefore0908) {
     <span style="opacity:0.7">체결강도:</span> <strong>${data.strength ? `${data.strength.toFixed(2)}%` : '-'}</strong>
   `;
 
-  const { indicators, decision, actionStage, triggeredRule, targets, gainRate } = buildIndicators(stock, data, isBefore0908);
+  const { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement } = buildIndicators(stock, data, isBefore0908);
 
   const visibleIndicators = indicators.filter(ind => ind.status !== 'unknown');
   const displayIndicators = visibleIndicators.length > 0 ? visibleIndicators : indicators;
-  indBox.innerHTML = displayIndicators
+
+  let cardIndicatorHtml = displayIndicators
     .map(indicator => `<div class="ind-item ${indicator.status}">${indicator.title}: ${indicator.result}</div>`)
     .join('');
+
+  if (stock.type === 'swing' && lossManagement && gainRate < 0) {
+    cardIndicatorHtml += `<div class="ind-item ${lossManagement.totalScore >= 5 ? 'clear' : lossManagement.totalScore >= 3 ? 'unknown' : 'triggered'}" style="margin-top:4px;font-weight:700">
+      손실 관리: ${lossManagement.verdict} | 최대손절 ${lossManagement.maxStopPrice.toLocaleString()}원 | 권장손절 ${lossManagement.recommendedStopPrice.toLocaleString()}원
+    </div>`;
+  }
+
+  indBox.innerHTML = cardIndicatorHtml;
 
   card.className = `scard ${decision}`;
   const badgeInfo = getActionBadge(decision, actionStage);
   badge.className = `badge ${badgeInfo.cls}`;
   badge.innerText = badgeInfo.text;
 
-  stockDetailMap[stock.code] = { mode: 'sell', stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, isBefore0908 };
+  stockDetailMap[stock.code] = { mode: 'sell', stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908 };
   const newCard = card.cloneNode(true);
   card.parentNode.replaceChild(newCard, card);
   newCard.addEventListener('click', () => openModal(stock.code, 'sell'));
@@ -1984,7 +2163,7 @@ function openModal(code, mode = 'sell') {
     `;
   } else {
     detailModal.classList.remove('buy-detail-mode');
-    const { stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, isBefore0908 } = detail;
+    const { stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908 } = detail;
     document.getElementById('modal-name').textContent = stock.name;
     document.getElementById('modal-code').textContent = stock.code;
     document.getElementById('modal-type').textContent = stock.type === 'swing' ? '🔄 스윙 보유' : stock.type === 'pullback' ? '📊 눌림목 종가베팅' : '🔥 수급 매집형 종가베팅';
@@ -1992,7 +2171,7 @@ function openModal(code, mode = 'sell') {
     const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
     const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
     const absChg = Math.abs(data.chgRate).toFixed(2);
-    const entryPrice = targets?.entryPrice || data.prevClose;
+    const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
 
     const badgeInfo = getActionBadge(decision, actionStage);
     const verdictCls = decision === 'sell' ? 'sell' : decision === 'caution' ? 'caution' : 'hold';
@@ -2009,10 +2188,52 @@ function openModal(code, mode = 'sell') {
           <div class="modal-ind-icon">🛑</div>
           <div class="modal-ind-content">
             <div class="modal-ind-title">[${escapeHtml(triggeredRule.code)}] ${escapeHtml(triggeredRule.title)}</div>
-            <div class="modal-ind-criterion">${triggeredRule.criterion.split('\n').map(l => `<span>${escapeHtml(l)}</span>`).join('<br>')}</div>
-            <div class="modal-ind-result">→ ${escapeHtml(triggeredRule.result)}</div>
+            <div class="modal-ind-criterion">${triggeredRule.criterion ? triggeredRule.criterion.split('\n').map(l => `<span>${escapeHtml(l)}</span>`).join('<br>') : ''}</div>
+            <div class="modal-ind-result">→ ${escapeHtml(triggeredRule.result || '')}</div>
             ${triggeredRule.value ? `<div class="modal-ind-value">📐 ${escapeHtml(triggeredRule.value)}</div>` : ''}
           </div>
+        </div>
+      </div>
+    ` : '';
+
+    const lossManagementHtml = (stock.type === 'swing' && lossManagement) ? `
+      <div class="loss-management-panel">
+        <div class="modal-section-label">📉 손실 관리 판정</div>
+        <div class="loss-verdict ${lossManagement.lossLevel}">
+          <div class="loss-verdict-score">${lossManagement.totalScore} / 6</div>
+          <div class="loss-verdict-text">${lossManagement.verdict}</div>
+        </div>
+        <div class="loss-prices">
+          <div class="loss-price-item danger">
+            <span class="loss-price-label">최대 손절가</span>
+            <span class="loss-price-value">${lossManagement.maxStopPrice.toLocaleString()}원</span>
+            <span class="loss-price-rate">(${lossManagement.maxStopRate >= 0 ? '+' : ''}${lossManagement.maxStopRate.toFixed(1)}%)</span>
+          </div>
+          <div class="loss-price-item warning">
+            <span class="loss-price-label">권장 손절가</span>
+            <span class="loss-price-value">${lossManagement.recommendedStopPrice.toLocaleString()}원</span>
+            <span class="loss-price-rate">(현재가 -2% 또는 5MA)</span>
+          </div>
+          <div class="loss-price-item recovery">
+            <span class="loss-price-label">회복 목표가</span>
+            <span class="loss-price-value">${lossManagement.recoveryTarget.toLocaleString()}원</span>
+            <span class="loss-price-rate">(진입가 +1%)</span>
+          </div>
+          <div class="loss-price-item target">
+            <span class="loss-price-label">반등 익절가</span>
+            <span class="loss-price-value">${lossManagement.reboundTarget.toLocaleString()}원</span>
+            <span class="loss-price-rate">(20일 고점 80%)</span>
+          </div>
+        </div>
+        <div class="loss-score-grid">
+          ${lossManagement.scores.map(s => `
+            <div class="loss-score-item ${s.pass ? 'pass' : 'fail'}">
+              <span class="loss-score-icon">${s.pass ? '✅' : '❌'}</span>
+              <span class="loss-score-code">${s.code}</span>
+              <span class="loss-score-title">${escapeHtml(s.title)}</span>
+              <span class="loss-score-result">${escapeHtml(s.result)}</span>
+            </div>
+          `).join('')}
         </div>
       </div>
     ` : '';
@@ -2044,6 +2265,7 @@ function openModal(code, mode = 'sell') {
       <div class="modal-verdict ${verdictCls}">${badgeInfo.text}</div>
 
       ${triggeredRuleHtml}
+      ${lossManagementHtml}
 
       <div>
         <div class="modal-section-label">매매 전략 (노션)</div>

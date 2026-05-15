@@ -1306,3 +1306,130 @@ body {
     text-align: left;
   }
 }
+
+/* Loss Management Panel */
+.loss-management-panel {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.loss-verdict {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--border-radius-md);
+  margin-bottom: 12px;
+}
+
+.loss-verdict.danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--border-danger);
+}
+
+.loss-verdict.warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid var(--border-warning);
+}
+
+.loss-verdict.mild {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid var(--border-warning);
+}
+
+.loss-verdict.profit {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid var(--border-success);
+}
+
+.loss-verdict-score {
+  font-size: 24px;
+  font-weight: 800;
+  min-width: 60px;
+}
+
+.loss-verdict.danger .loss-verdict-score { color: var(--text-danger); }
+.loss-verdict.warning .loss-verdict-score { color: var(--text-warning); }
+.loss-verdict.mild .loss-verdict-score { color: var(--text-warning); }
+.loss-verdict.profit .loss-verdict-score { color: var(--text-success); }
+
+.loss-verdict-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.loss-prices {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.loss-price-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.loss-price-item.danger { border-left: 3px solid var(--text-danger); }
+.loss-price-item.warning { border-left: 3px solid var(--text-warning); }
+.loss-price-item.recovery { border-left: 3px solid var(--text-info); }
+.loss-price-item.target { border-left: 3px solid var(--text-success); }
+
+.loss-price-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.loss-price-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.loss-price-item.danger .loss-price-value { color: var(--text-danger); }
+.loss-price-item.warning .loss-price-value { color: var(--text-warning); }
+.loss-price-item.recovery .loss-price-value { color: var(--text-info); }
+.loss-price-item.target .loss-price-value { color: var(--text-success); }
+
+.loss-price-rate {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.loss-score-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.loss-score-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.loss-score-item.pass { border-left: 3px solid var(--text-success); }
+.loss-score-item.fail { border-left: 3px solid var(--text-danger); }
+
+.loss-score-icon { font-size: 14px; flex-shrink: 0; }
+.loss-score-code { font-weight: 700; color: var(--text-secondary); min-width: 24px; }
+.loss-score-title { font-weight: 600; color: var(--text-primary); min-width: 80px; }
+.loss-score-result { color: var(--text-secondary); flex: 1; }
+
+@media (max-width: 600px) {
+  .loss-prices { grid-template-columns: 1fr; }
+}
