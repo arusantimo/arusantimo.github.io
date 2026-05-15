@@ -32,11 +32,17 @@ const RULE_GUIDE = {
       momentum: '관망'
     }
   ],
-  grades: [
+  trendGrades: [
     { grade: 'S', score: '9.0 ~ 10점', meaning: '레짐 무관 진입 가능' },
     { grade: 'A', score: '7.5 ~ 8.9점', meaning: '강세장·순환매장·박스권 진입 가능' },
     { grade: 'B', score: '6.0 ~ 7.4점', meaning: '매매 단계 노출, 진입 보류, 익일 재평가' },
     { grade: 'C', score: '6.0점 미만', meaning: '출력 목록에서 제외' }
+  ],
+  reversalGrades: [
+    { grade: 'S', score: '8.5 ~ 10점', meaning: '최우선 진입' },
+    { grade: 'A', score: '7.0 ~ 8.4점', meaning: '진입 가능' },
+    { grade: 'B', score: '5.5 ~ 6.9점', meaning: '익일 재평가 (당일 진입 금지)' },
+    { grade: 'C', score: '5.5점 미만', meaning: '출력 제외' }
   ],
   permissions: [
     { regime: '강세장', s: '✅ 100% 진입', a: '✅ 100% 진입', b: '👀 모니터링' },
@@ -44,10 +50,36 @@ const RULE_GUIDE = {
     { regime: '박스권', s: '✅ 70% 진입', a: '✅ 70% 진입', b: '👀 모니터링' },
     { regime: '약세장', s: '✅ 50% 진입', a: '❌ 매매금지', b: '👀 모니터링' }
   ],
-  vkospiAdjustments: [
+  trendVkospiAdjustments: [
     { range: '< 20', rule: '보정 없음' },
     { range: '20 ~ 30', rule: '원점수 × 0.9' },
     { range: '> 30', rule: '원점수 × 0.8' }
+  ],
+  reversalVkospiAdjustments: [
+    { range: '< 20', rule: '원점수 × 0.8' },
+    { range: '20 ~ 30', rule: '원점수 × 1.0' },
+    { range: '> 30', rule: '원점수 × 0.9' }
+  ],
+  gapGrades: [
+    { grade: 'G-A', label: '갭업 우호', score: '+7.0 이상', outlook: '익일 갭업 +1.5% 이상 기대', color: '🟢' },
+    { grade: 'G-B', label: '갭업 중립', score: '+2.0 ~ +6.9', outlook: '갭업 +0.5~+1.5% 또는 보합', color: '🔵' },
+    { grade: 'G-C', label: '갭 불안정', score: '-2.9 ~ +1.9', outlook: '보합 또는 소폭 갭다운 가능', color: '🟡' },
+    { grade: 'G-D', label: '갭다운 주의', score: '-7.9 ~ -3.0', outlook: '갭다운 -0.5~-2.0% 경계', color: '🟠' },
+    { grade: 'G-E', label: '갭다운 경고', score: '-8.0 미만', outlook: '갭다운 -2.0% 이상 위험', color: '🔴' }
+  ],
+  gapEntryAdjustments: [
+    { grade: 'G-A', trend: '✅ 100% 진입', reversal: '✅ 100% 진입', note: '익일 프리마켓 갭업 익절 최적 환경' },
+    { grade: 'G-B', trend: '✅ 100% 진입', reversal: '✅ 80% 진입', note: '기본 운용' },
+    { grade: 'G-C', trend: '✅ 70% 진입', reversal: '⚠️ 50% 진입', note: '포지션 축소. 손절폭 동일 유지' },
+    { grade: 'G-D', trend: '⚠️ S등급 50% 진입만 허용', reversal: '❌ 진입 보류', note: 'A·B등급 당일 진입 금지' },
+    { grade: 'G-E', trend: '❌ 전 등급 진입 금지', reversal: '❌ 진입 금지', note: '당일 종가베팅 전면 보류' }
+  ],
+  gapSellAdjustments: [
+    { grade: 'G-A', premarket: '기본 조건 유지', stopLoss: '기본 손절폭 유지', swing: '적극 허용' },
+    { grade: 'G-B', premarket: '기본 조건 유지', stopLoss: '기본 유지', swing: '허용' },
+    { grade: 'G-C', premarket: '프리마켓 갭업 기준 -0.5%p 하향', stopLoss: '손절폭 -0.5%p 축소', swing: '조건부 허용' },
+    { grade: 'G-D', premarket: '프리마켓 첫 가격 즉시 50% 정리', stopLoss: '손절폭 -1%p 축소', swing: '금지' },
+    { grade: 'G-E', premarket: '진입 없음 — 해당 없음', stopLoss: '해당 없음', swing: '금지' }
   ],
   strategies: {
     pullback: {
@@ -139,13 +171,153 @@ const REGIME_LABEL_GUIDE = {
   '레짐': '현재 시장 환경 4분류입니다. 강세장·순환매장·박스권·약세장 여부에 따라 매수 가능 등급과 전략 우선순위가 달라집니다.',
   'KOSPI': '코스피 지수의 현재 수준과 등락률입니다. 시장 전체 방향성과 강도를 확인할 때 사용합니다.',
   'VKOSPI': '코스피 변동성 지수입니다. 수치가 높을수록 시장 불안이 크며 매수 점수 보정이 더 보수적으로 적용됩니다.',
+  '진입 전략': '현재 레짐에서 어떤 전략이 메인인지, 어떤 전략이 서브인지, 어떤 전략을 보류해야 하는지 요약한 항목입니다.',
   '60일선': '코스피 60일 이동평균선의 방향입니다. 중기 추세가 우상향인지 횡보인지 하락인지 판단합니다.',
   '20일선': '코스피 20일 이동평균선의 방향입니다. 단기 추세 방향과 강세장 조건 판정에 사용됩니다.',
   '최종 보정': 'VKOSPI 수준에 따라 원점수에 곱해지는 최종 보정값입니다. 시장이 불안할수록 점수가 낮아집니다.',
   '스윙 전환': '현 레짐에서 종베→스윙 전환 허용 정도입니다. 적극/조건부/제한/금지 4단계로 구분됩니다.',
+  '스윙 전환 활성도': '현 레짐에서 종베→스윙 전환을 얼마나 허용하는지 보여주는 항목입니다. 적극/조건부/제한/금지로 해석합니다.',
   '시가베팅': '현 레짐에서 시가베팅 활성 여부입니다. 강세장·순환매장에서만 활성화됩니다.',
+  '역추세 트랙': '전략 ③ 주도주 급락 반등 매매의 활성 여부입니다. 약세장에서는 비활성, 강세장·박스권 중심으로 제한적으로 사용합니다.',
+  '갭 스코어': '미국 시장과 환율을 반영해 익일 갭 방향을 점수화한 항목입니다. 낮을수록 다음 날 갭다운 위험이 크다고 봅니다.',
+  '갭 조정': '갭 스코어에 따라 당일 진입 비중과 익일 매도 전략을 어떻게 조정하는지 요약한 항목입니다.',
+  '등락주': '당일 상승 종목 수, 하락 종목 수, 상한가 수를 요약한 내부 체력 지표입니다. 지수와 별개로 시장 폭을 판단할 때 사용합니다.',
+  '시장 맥락': '당일 레짐 판정에 영향을 준 핵심 뉴스, 수급 변화, 급락·급등 이벤트를 한 줄로 요약한 항목입니다.',
   '특이 사항': '당일 시장에서 매매 판단에 영향을 줄 수 있는 이벤트, 수급 변화, 옵션만기 같은 참고 메모입니다.'
 };
+
+function normalizeRegimeGuideKey(value) {
+  const normalized = sanitizeText(value)
+    .replace(/\*/g, '')
+    .replace(/[📡📊🔥📰🚨⚠️✅⛔🧊🔄💱↕️]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (normalized === '시장 레짐' || normalized === '레짐') return '레짐';
+  if (normalized.includes('진입 전략')) return '진입 전략';
+  if (normalized.includes('스윙 전환 활성도')) return '스윙 전환 활성도';
+  if (normalized === '스윙 전환') return '스윙 전환';
+  if (normalized.includes('시가베팅')) return '시가베팅';
+  if (normalized.includes('역추세 트랙')) return '역추세 트랙';
+  if (normalized.includes('갭 스코어')) return '갭 스코어';
+  if (normalized.includes('갭 조정')) return '갭 조정';
+  if (normalized.includes('KOSPI 60MA') || normalized.includes('60일선')) return '60일선';
+  if (normalized.includes('KOSPI 20MA') || normalized.includes('20일선')) return '20일선';
+  if (normalized.includes('등락주')) return '등락주';
+  if (normalized.includes('시장 맥락')) return '시장 맥락';
+  return normalized;
+}
+
+function getRegimeGuideText(item) {
+  return REGIME_LABEL_GUIDE[normalizeRegimeGuideKey(item)] || '';
+}
+
+function getRegimeInlineHelp(row) {
+  const key = normalizeRegimeGuideKey(row.item);
+  if (key === '갭 스코어') {
+    return '기본 점수에 중요도를 곱한 뒤 모두 더한 최종 점수입니다. 낮을수록 다음 날 갭다운 위험을 더 크게 봅니다.';
+  }
+  if (key === '갭 조정') {
+    return '갭 스코어 결과를 바탕으로 진입 비중과 익일 매도 기준을 어떻게 바꿀지 정리한 항목입니다.';
+  }
+  return '';
+}
+
+function stripMarkdownText(value) {
+  return sanitizeText(value).replace(/\*\*/g, '').trim();
+}
+
+function createEmptyGapScore() {
+  return {
+    rows: [],
+    totalScore: '',
+    grade: '',
+    entryAdjustment: '',
+    sellAdjustment: '',
+    swingAdjustment: '',
+    note: ''
+  };
+}
+
+function parseGapScoreRows(rows, gapScore) {
+  rows.slice(1).forEach(row => {
+    const cells = row.map(stripMarkdownText);
+    const label = normalizeHeading(cells[0] || '');
+    if (!label) return;
+
+    if (label.includes('합산')) {
+      gapScore.totalScore = cells[cells.length - 1] || '';
+      return;
+    }
+
+    gapScore.rows.push({
+      indicator: cells[0] || '',
+      actualValue: cells[1] || '',
+      baseScore: cells[2] || '',
+      weight: cells[3] || '',
+      formula: cells.length >= 6 ? (cells[4] || '') : '',
+      weightedScore: cells.length >= 6 ? (cells[5] || '') : (cells[4] || '')
+    });
+  });
+}
+
+function renderGapScoreSummary() {
+  const gapScore = notionSnapshot.gapScore;
+  if (!gapScore.rows.length && !gapScore.totalScore && !gapScore.grade) return '';
+
+  return `
+    <div class="gap-score-panel">
+      <div class="gap-score-head">
+        <div>
+          <div class="gap-score-title">📡 익일 갭 예측 스코어</div>
+          <div class="gap-score-caption">기본 점수에 중요도를 곱해 반영 점수를 만들고, 그 합계로 다음 날 갭 위험을 판단합니다.</div>
+        </div>
+        ${gapScore.grade ? `<button type="button" class="gap-score-grade gap-score-grade-trigger" aria-label="갭 등급 기준 보기">갭 등급: ${escapeHtml(gapScore.grade)}</button>` : ''}
+      </div>
+      <table class="guide-table compact-table gap-score-table">
+        <thead>
+          <tr>
+            <th>지표</th>
+            <th>실측값</th>
+            <th>기본 점수</th>
+            <th>중요도</th>
+            <th>계산식</th>
+            <th>반영 점수</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${gapScore.rows.map(row => `
+            <tr>
+              <td>${escapeHtml(row.indicator)}</td>
+              <td>${escapeHtml(row.actualValue)}</td>
+              <td>${escapeHtml(row.baseScore)}</td>
+              <td>${escapeHtml(row.weight)}</td>
+              <td>${escapeHtml(row.formula || `${row.baseScore} ${row.weight}`.trim())}</td>
+              <td><strong>${escapeHtml(row.weightedScore)}</strong></td>
+            </tr>
+          `).join('')}
+          ${gapScore.totalScore ? `
+            <tr class="gap-score-total-row">
+              <td colspan="5">반영 점수 합계</td>
+              <td><strong>${escapeHtml(gapScore.totalScore)}</strong></td>
+            </tr>
+          ` : ''}
+        </tbody>
+      </table>
+      <div class="gap-score-meta">
+        ${gapScore.entryAdjustment ? `<div class="gap-score-meta-item"><strong>진입 조정</strong><span>${escapeHtml(gapScore.entryAdjustment)}</span></div>` : ''}
+        ${gapScore.sellAdjustment ? `<div class="gap-score-meta-item"><strong>매도 조정</strong><span>${escapeHtml(gapScore.sellAdjustment)}</span></div>` : ''}
+        ${gapScore.swingAdjustment ? `<div class="gap-score-meta-item"><strong>스윙 전환</strong><span>${escapeHtml(gapScore.swingAdjustment)}</span></div>` : ''}
+        ${gapScore.note ? `<div class="gap-score-meta-item"><strong>특이사항</strong><span>${escapeHtml(gapScore.note)}</span></div>` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function getGapGradeCode(value) {
+  const match = sanitizeText(value).match(/G-[A-E]/);
+  return match ? match[0] : '';
+}
 
 let activeTab = 'buy';
 let stocks = {
@@ -156,6 +328,7 @@ let stocks = {
 let notionSnapshot = createEmptySnapshot();
 const stockDetailMap = {};
 let currentModalState = { code: null, mode: null };
+let isRegimeSummaryCollapsed = false;
 
 function syncBodyScrollLock() {
   const hasOpenModal = document.querySelector('.modal-overlay.open');
@@ -165,9 +338,12 @@ function syncBodyScrollLock() {
 function createEmptySnapshot() {
   return {
     regimeTable: [],
+    regimeEvidence: [],
     regimeAlert: '',
+    gapScore: createEmptyGapScore(),
     pullbackEntries: [],
     momentumEntries: [],
+    reversalEntries: [],
     swingEntries: [],
     sourceText: ''
   };
@@ -426,11 +602,19 @@ function buildSourceTextFromNotion(data) {
       lines.push('## 시장 레짐 요약');
       return;
     }
+    if (heading.includes('갭 예측 스코어') || heading.includes('갭 스코어')) {
+      lines.push('## 익일 갭 예측 스코어');
+      return;
+    }
     if (heading.includes('눌림목') && heading.includes('종가베팅')) {
       lines.push(`## ${heading}`);
       return;
     }
     if (heading.includes('수급') && heading.includes('종가베팅')) {
+      lines.push(`## ${heading}`);
+      return;
+    }
+    if (heading.includes('급락 반등') || heading.includes('전략 ③')) {
       lines.push(`## ${heading}`);
       return;
     }
@@ -468,22 +652,29 @@ function parseNotionSnapshotFromText(sourceText) {
   while (index < lines.length) {
     const line = lines[index];
 
-    if (line.startsWith('## ')) {
+    const headingMatch = line.match(/^#{2,3}\s*(.+)$/);
+    if (headingMatch) {
       currentEntry = null;
-      const heading = normalizeHeading(line.replace(/^##\s*/, ''));
-      if (heading.includes('시장 레짐') || heading.includes('레짐 판정') || heading.includes('레짐 요약')) {
-        currentSection = 'regime';
-      } else if (heading.includes('스윙') && heading.includes('전환') && heading.includes('평가')) {
-        currentSection = 'swing';
-      } else if (heading.includes('눌림목') && heading.includes('종가베팅')) {
-        currentSection = 'pullback';
-      } else if (heading.includes('수급') && heading.includes('종가베팅')) {
-        currentSection = 'momentum';
-      } else {
-        currentSection = 'other';
+      const heading = normalizeHeading(headingMatch[1]);
+      if (!/^\d+위\./.test(heading)) {
+        if (heading.includes('시장 레짐') || heading.includes('레짐 판정') || heading.includes('레짐 요약')) {
+          currentSection = 'regime';
+        } else if (heading.includes('익일 갭 예측 스코어') || heading.includes('갭 예측 스코어') || heading.includes('갭 스코어')) {
+          currentSection = 'gap';
+        } else if (heading.includes('스윙') && heading.includes('전환') && heading.includes('평가')) {
+          currentSection = 'swing';
+        } else if (heading.includes('눌림목') && heading.includes('종가베팅')) {
+          currentSection = 'pullback';
+        } else if (heading.includes('수급') && heading.includes('종가베팅')) {
+          currentSection = 'momentum';
+        } else if (heading.includes('급락 반등') || heading.includes('전략 ③')) {
+          currentSection = 'reversal';
+        } else {
+          currentSection = 'other';
+        }
+        index += 1;
+        continue;
       }
-      index += 1;
-      continue;
     }
 
     if (currentSection === 'regime' && /^\|/.test(line)) {
@@ -494,7 +685,11 @@ function parseNotionSnapshotFromText(sourceText) {
         if (colCount === 2) {
           parsed = rows.slice(1).map(row => ({ item: row[0] || '', value: row[1] || '' }));
         } else if (colCount >= 3) {
-          parsed = rows.slice(1).map(row => ({ item: row[1] || row[0] || '', value: row[2] || row[1] || '' }));
+          snapshot.regimeEvidence.push(...rows.slice(1).map(row => ({
+            item: stripMarkdownText(row[0] || ''),
+            value: stripMarkdownText(row[1] || ''),
+            verdict: stripMarkdownText(row[2] || '')
+          })).filter(row => row.item || row.value || row.verdict));
         }
         parsed.forEach(entry => {
           const existing = snapshot.regimeTable.find(r => r.item === entry.item);
@@ -507,6 +702,30 @@ function parseNotionSnapshotFromText(sourceText) {
 
     if (currentSection === 'regime' && line.startsWith('>')) {
       snapshot.regimeAlert = line.replace(/^>\s*/, '').trim();
+      index += 1;
+      continue;
+    }
+
+    if (currentSection === 'gap' && /^\|/.test(line)) {
+      const { rows, nextIndex } = parseMarkdownTable(lines, index);
+      if (rows.length > 1) parseGapScoreRows(rows, snapshot.gapScore);
+      index = nextIndex;
+      continue;
+    }
+
+    if (currentSection === 'gap') {
+      const plainLine = stripMarkdownText(line);
+      if (plainLine.startsWith('갭 등급:')) {
+        snapshot.gapScore.grade = plainLine.replace(/^갭 등급:\s*/, '').trim();
+      } else if (plainLine.startsWith('진입 조정:')) {
+        snapshot.gapScore.entryAdjustment = plainLine.replace(/^진입 조정:\s*/, '').trim();
+      } else if (plainLine.startsWith('매도 조정:')) {
+        snapshot.gapScore.sellAdjustment = plainLine.replace(/^매도 조정:\s*/, '').trim();
+      } else if (plainLine.startsWith('스윙 전환:')) {
+        snapshot.gapScore.swingAdjustment = plainLine.replace(/^스윙 전환:\s*/, '').trim();
+      } else if (plainLine.startsWith('특이사항:')) {
+        snapshot.gapScore.note = plainLine.replace(/^특이사항:\s*/, '').trim();
+      }
       index += 1;
       continue;
     }
@@ -548,7 +767,7 @@ function parseNotionSnapshotFromText(sourceText) {
       continue;
     }
 
-    if ((currentSection === 'pullback' || currentSection === 'momentum') && line.startsWith('### ')) {
+    if ((currentSection === 'pullback' || currentSection === 'momentum' || currentSection === 'reversal') && line.startsWith('### ')) {
       currentEntry = parseStockHeader(line.replace(/^###\s*/, '').trim(), currentSection);
       if (currentEntry) snapshot[`${currentSection}Entries`].push(currentEntry);
       index += 1;
@@ -602,11 +821,11 @@ function rebuildSellStocksFromSnapshot() {
 }
 
 function getEntryByCode(code) {
-  return [...notionSnapshot.pullbackEntries, ...notionSnapshot.momentumEntries].find(entry => entry.code === code);
+  return [...notionSnapshot.pullbackEntries, ...notionSnapshot.momentumEntries, ...notionSnapshot.reversalEntries].find(entry => entry.code === code);
 }
 
 function getAllBuyEntries() {
-  return [...notionSnapshot.pullbackEntries, ...notionSnapshot.momentumEntries];
+  return [...notionSnapshot.pullbackEntries, ...notionSnapshot.momentumEntries, ...notionSnapshot.reversalEntries];
 }
 
 function summarizeGateStatus(entry) {
@@ -616,7 +835,14 @@ function summarizeGateStatus(entry) {
   return { passed, warned, blocked, total: entry.gates.length };
 }
 
-function getBuyGradeFromScore(score) {
+function getBuyGradeFromScore(score, strategy = 'pullback') {
+  if (strategy === 'reversal') {
+    if (score >= 8.5) return 'S';
+    if (score >= 7.0) return 'A';
+    if (score >= 5.5) return 'B';
+    return 'C';
+  }
+
   if (score >= 9) return 'S';
   if (score >= 7.5) return 'A';
   if (score >= 6) return 'B';
@@ -708,7 +934,7 @@ async function refreshBuyEntry(code, options = {}) {
         ? ((targetPrice - currentPrice) / currentPrice) * 100
         : null;
       const score = clamp(recommMean * 2, 0, 10);
-      const grade = getBuyGradeFromScore(score);
+      const grade = getBuyGradeFromScore(score, entry.strategy);
 
       entry.liveRefresh = {
         recommMean,
@@ -754,30 +980,52 @@ function renderRegimeSummary() {
   const container = document.getElementById('buy-regime-summary');
   if (!container) return;
 
-  if (!notionSnapshot.regimeTable.length) {
+  const hasDetailedGapScore = notionSnapshot.gapScore.rows.length > 0;
+  const summaryRows = notionSnapshot.regimeTable.filter(row => {
+    if (!hasDetailedGapScore) return true;
+    const key = normalizeRegimeGuideKey(row.item);
+    return key !== '갭 스코어' && key !== '갭 조정';
+  });
+
+  if (!summaryRows.length && !hasDetailedGapScore) {
     container.innerHTML = '<div class="empty-state">노션에서 시장 레짐 요약을 불러오면 여기에 표시됩니다.</div>';
     return;
   }
 
   container.innerHTML = `
+    ${summaryRows.length ? `
     <div class="regime-summary-grid">
-      ${notionSnapshot.regimeTable.map(row => `
+      ${summaryRows.map(row => `
+        ${(() => {
+          const guideText = getRegimeGuideText(row.item);
+          const inlineHelp = getRegimeInlineHelp(row);
+          return `
         <div class="regime-stat-card">
           <div class="regime-stat-label">
             <span>${escapeHtml(row.item)}</span>
-            ${REGIME_LABEL_GUIDE[row.item] ? `
+            ${guideText ? `
               <span class="regime-help">
                 <button type="button" class="regime-help-trigger" aria-label="${escapeHtml(`${row.item} 설명 보기`)}">?</button>
-                <span class="regime-help-tooltip" role="tooltip">${escapeHtml(REGIME_LABEL_GUIDE[row.item])}</span>
+                <span class="regime-help-tooltip" role="tooltip">${escapeHtml(guideText)}</span>
               </span>
             ` : ''}
           </div>
           <div class="regime-stat-value">${escapeHtml(row.value)}</div>
+          ${inlineHelp ? `<div class="regime-stat-note">${escapeHtml(inlineHelp)}</div>` : ''}
         </div>
+      `;
+        })()}
       `).join('')}
     </div>
+    ` : ''}
+    ${renderGapScoreSummary()}
     ${notionSnapshot.regimeAlert ? `<div class="regime-alert">${escapeHtml(notionSnapshot.regimeAlert)}</div>` : ''}
   `;
+
+  const gapGradeTrigger = container.querySelector('.gap-score-grade-trigger');
+  if (gapGradeTrigger) {
+    gapGradeTrigger.addEventListener('click', openGapGuideModal);
+  }
 
   container.querySelectorAll('.regime-help').forEach(help => {
     const tooltip = help.querySelector('.regime-help-tooltip');
@@ -820,10 +1068,18 @@ function renderGuideTables() {
   `;
 
   document.getElementById('guide-grade-table').innerHTML = `
+    <div class="guide-subtitle">추세 추종 전략 (눌림목·수급매집형)</div>
     <table class="guide-table">
       <thead><tr><th>등급</th><th>점수</th><th>의미</th></tr></thead>
       <tbody>
-        ${RULE_GUIDE.grades.map(row => `<tr><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.score)}</td><td>${escapeHtml(row.meaning)}</td></tr>`).join('')}
+        ${RULE_GUIDE.trendGrades.map(row => `<tr><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.score)}</td><td>${escapeHtml(row.meaning)}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="guide-subtitle">역추세 전략 (전략 ③)</div>
+    <table class="guide-table">
+      <thead><tr><th>등급</th><th>점수</th><th>의미</th></tr></thead>
+      <tbody>
+        ${RULE_GUIDE.reversalGrades.map(row => `<tr><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.score)}</td><td>${escapeHtml(row.meaning)}</td></tr>`).join('')}
       </tbody>
     </table>
   `;
@@ -838,10 +1094,18 @@ function renderGuideTables() {
   `;
 
   document.getElementById('guide-adjust-table').innerHTML = `
+    <div class="guide-subtitle">추세 추종 전략</div>
     <table class="guide-table">
       <thead><tr><th>VKOSPI</th><th>최종 점수 보정</th></tr></thead>
       <tbody>
-        ${RULE_GUIDE.vkospiAdjustments.map(row => `<tr><td>${escapeHtml(row.range)}</td><td>${escapeHtml(row.rule)}</td></tr>`).join('')}
+        ${RULE_GUIDE.trendVkospiAdjustments.map(row => `<tr><td>${escapeHtml(row.range)}</td><td>${escapeHtml(row.rule)}</td></tr>`).join('')}
+      </tbody>
+    </table>
+    <div class="guide-subtitle">역추세 전략 (전략 ③)</div>
+    <table class="guide-table">
+      <thead><tr><th>VKOSPI</th><th>최종 점수 보정</th></tr></thead>
+      <tbody>
+        ${RULE_GUIDE.reversalVkospiAdjustments.map(row => `<tr><td>${escapeHtml(row.range)}</td><td>${escapeHtml(row.rule)}</td></tr>`).join('')}
       </tbody>
     </table>
   `;
@@ -1009,10 +1273,12 @@ function renderBuyStockCards() {
 
   renderGroup(notionSnapshot.pullbackEntries, 'buy-list-pullback');
   renderGroup(notionSnapshot.momentumEntries, 'buy-list-momentum');
+  renderGroup(notionSnapshot.reversalEntries, 'buy-list-reversal');
 }
 
 function renderAll() {
   renderRegimeSummary();
+  updateRegimeHeader();
   renderGuideTables();
   renderBuyStockCards();
   renderSellStockCards();
@@ -1110,6 +1376,51 @@ function closeGuideModal() {
   syncBodyScrollLock();
 }
 
+function openGapGuideModal() {
+  const body = document.getElementById('gap-guide-body');
+  const currentGrade = getGapGradeCode(notionSnapshot.gapScore.grade);
+  body.innerHTML = `
+    <div class="guide-grid guide-grid-modal">
+      <div class="guide-panel">
+        <div class="guide-title">갭 등급 기준</div>
+        <table class="guide-table">
+          <thead><tr><th>등급</th><th>합산 점수</th><th>갭 방향 예측</th></tr></thead>
+          <tbody>
+            ${RULE_GUIDE.gapGrades.map(row => `<tr class="${row.grade === currentGrade ? 'guide-active-row' : ''}"><td>${escapeHtml(`${row.color} ${row.grade} (${row.label})`)}</td><td>${escapeHtml(row.score)}</td><td>${escapeHtml(row.outlook)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="guide-panel">
+        <div class="guide-title">진입 조정</div>
+        <table class="guide-table">
+          <thead><tr><th>등급</th><th>추세 추종</th><th>역추세</th><th>비고</th></tr></thead>
+          <tbody>
+            ${RULE_GUIDE.gapEntryAdjustments.map(row => `<tr class="${row.grade === currentGrade ? 'guide-active-row' : ''}"><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.trend)}</td><td>${escapeHtml(row.reversal)}</td><td>${escapeHtml(row.note)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="guide-panel">
+        <div class="guide-title">익일 매도 조정</div>
+        <table class="guide-table">
+          <thead><tr><th>등급</th><th>프리마켓 익절</th><th>손절 조정</th><th>스윙 전환</th></tr></thead>
+          <tbody>
+            ${RULE_GUIDE.gapSellAdjustments.map(row => `<tr class="${row.grade === currentGrade ? 'guide-active-row' : ''}"><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.premarket)}</td><td>${escapeHtml(row.stopLoss)}</td><td>${escapeHtml(row.swing)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="gap-guide-note">현재 보고서의 갭 등급은 <strong>${escapeHtml(notionSnapshot.gapScore.grade || '미확인')}</strong> 입니다. 갭 등급은 종목 선정 기준을 완화하지 않고, 포지션 크기와 익일 매도 기준만 조정합니다.</div>
+  `;
+
+  document.getElementById('gap-guide-modal-overlay').classList.add('open');
+  syncBodyScrollLock();
+}
+
+function closeGapGuideModal() {
+  document.getElementById('gap-guide-modal-overlay').classList.remove('open');
+  syncBodyScrollLock();
+}
+
 function detectCurrentRegime() {
   const table = notionSnapshot.regimeTable;
   if (!table.length) return null;
@@ -1127,10 +1438,63 @@ function detectCurrentRegime() {
   };
 }
 
+function getRegimeReportSummaryRows() {
+  return notionSnapshot.regimeTable.filter(row => row.item && row.value && !('verdict' in row));
+}
+
+function getVerdictTone(value) {
+  const text = sanitizeText(value);
+  if (!text) return 'unknown';
+  if (/[✅🟢]|확정|우호|허용|활성/.test(text)) return 'clear';
+  if (/[❌🔴⛔]|약세|금지|비활성|경고/.test(text)) return 'triggered';
+  return 'unknown';
+}
+
+function getRegimeBadgeMeta(regimeValue) {
+  const regime = sanitizeText(regimeValue);
+  if (!regime) return { label: '미확인', tone: 'unknown' };
+  if (regime.includes('강세장')) return { label: '강세장', tone: 'bull' };
+  if (regime.includes('순환매장')) return { label: '순환매장', tone: 'rotation' };
+  if (regime.includes('박스권')) return { label: '박스권', tone: 'range' };
+  if (regime.includes('약세장')) return { label: '약세장', tone: 'bear' };
+  return { label: regime, tone: 'unknown' };
+}
+
+function updateRegimeHeader() {
+  const toggleButton = document.getElementById('btn-regime-toggle');
+  const summary = document.getElementById('buy-regime-summary');
+  const badge = document.getElementById('regime-current-badge');
+  const info = detectCurrentRegime();
+  const meta = getRegimeBadgeMeta(info?.regime || '');
+
+  if (toggleButton) {
+    toggleButton.textContent = isRegimeSummaryCollapsed ? '+' : '-';
+    toggleButton.setAttribute('aria-expanded', String(!isRegimeSummaryCollapsed));
+    toggleButton.setAttribute('title', isRegimeSummaryCollapsed ? '시장 레짐 펼치기' : '시장 레짐 접기');
+  }
+
+  if (summary) {
+    summary.classList.toggle('is-collapsed', isRegimeSummaryCollapsed);
+  }
+
+  if (badge) {
+    badge.textContent = meta.label;
+    badge.className = `regime-current-badge ${meta.tone}`;
+  }
+}
+
+function toggleRegimeSummary() {
+  isRegimeSummaryCollapsed = !isRegimeSummaryCollapsed;
+  updateRegimeHeader();
+}
+
   syncBodyScrollLock();
 function openRegimeReport() {
   const info = detectCurrentRegime();
   const body = document.getElementById('regime-report-body');
+  const summaryRows = getRegimeReportSummaryRows();
+  const evidenceRows = notionSnapshot.regimeEvidence;
+  const gapScore = notionSnapshot.gapScore;
 
   syncBodyScrollLock();
   if (!info) {
@@ -1149,16 +1513,44 @@ function openRegimeReport() {
       <div class="modal-section-label">현재 레짐 판정</div>
       <div class="modal-verdict hold" style="font-size:16px;margin-bottom:16px">${escapeHtml(info.regime || '미확인')}</div>
 
-      <div class="modal-section-label">판정 데이터</div>
-      <table class="guide-table" style="margin-bottom:16px">
-        <tbody>
-          <tr><td style="width:100px;color:var(--text-tertiary)">KOSPI</td><td><strong>${escapeHtml(info.kospi)}</strong></td></tr>
-          <tr><td style="color:var(--text-tertiary)">VKOSPI</td><td><strong>${escapeHtml(info.vkospi)}</strong></td></tr>
-          <tr><td style="color:var(--text-tertiary)">60일선</td><td><strong>${escapeHtml(info.ma60)}</strong></td></tr>
-          <tr><td style="color:var(--text-tertiary)">20일선</td><td><strong>${escapeHtml(info.ma20)}</strong></td></tr>
-          <tr><td style="color:var(--text-tertiary)">최종 보정</td><td><strong>${escapeHtml(info.correction)}</strong></td></tr>
-        </tbody>
-      </table>
+      ${summaryRows.length ? `
+        <div class="modal-section-label">레짐 요약 항목</div>
+        <table class="guide-table" style="margin-bottom:16px">
+          <tbody>
+            ${summaryRows.map(row => `<tr><td style="width:140px;color:var(--text-tertiary)">${escapeHtml(row.item)}</td><td><strong>${escapeHtml(row.value)}</strong></td></tr>`).join('')}
+          </tbody>
+        </table>
+      ` : ''}
+
+      ${evidenceRows.length ? `
+        <div class="modal-section-label">실제 판정 근거</div>
+        <table class="guide-table" style="margin-bottom:16px">
+          <thead><tr><th>지표</th><th>확인값</th><th>판정</th></tr></thead>
+          <tbody>
+            ${evidenceRows.map(row => `<tr><td>${escapeHtml(row.item)}</td><td>${escapeHtml(row.value)}</td><td><span class="report-verdict ${getVerdictTone(row.verdict)}">${escapeHtml(row.verdict || '—')}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      ` : ''}
+
+      ${gapScore.rows.length ? `
+        <div class="modal-section-label">갭 예측 스코어 근거</div>
+        <table class="guide-table compact-table" style="margin-bottom:12px">
+          <thead><tr><th>지표</th><th>실측값</th><th>기본 점수</th><th>중요도</th><th>계산식</th><th>반영 점수</th></tr></thead>
+          <tbody>
+            ${gapScore.rows.map(row => `<tr><td>${escapeHtml(row.indicator)}</td><td>${escapeHtml(row.actualValue)}</td><td>${escapeHtml(row.baseScore)}</td><td>${escapeHtml(row.weight)}</td><td>${escapeHtml(row.formula || `${row.baseScore} ${row.weight}`.trim())}</td><td><strong>${escapeHtml(row.weightedScore)}</strong></td></tr>`).join('')}
+            ${gapScore.totalScore ? `<tr><td colspan="5">반영 점수 합계</td><td><strong>${escapeHtml(gapScore.totalScore)}</strong></td></tr>` : ''}
+          </tbody>
+        </table>
+        <table class="guide-table" style="margin-bottom:16px">
+          <tbody>
+            ${gapScore.grade ? `<tr><td style="width:140px;color:var(--text-tertiary)">갭 등급</td><td><strong>${escapeHtml(gapScore.grade)}</strong></td></tr>` : ''}
+            ${gapScore.entryAdjustment ? `<tr><td style="color:var(--text-tertiary)">진입 조정</td><td><strong>${escapeHtml(gapScore.entryAdjustment)}</strong></td></tr>` : ''}
+            ${gapScore.sellAdjustment ? `<tr><td style="color:var(--text-tertiary)">매도 조정</td><td><strong>${escapeHtml(gapScore.sellAdjustment)}</strong></td></tr>` : ''}
+            ${gapScore.swingAdjustment ? `<tr><td style="color:var(--text-tertiary)">스윙 전환</td><td><strong>${escapeHtml(gapScore.swingAdjustment)}</strong></td></tr>` : ''}
+            ${gapScore.note ? `<tr><td style="color:var(--text-tertiary)">특이사항</td><td><strong>${escapeHtml(gapScore.note)}</strong></td></tr>` : ''}
+          </tbody>
+        </table>
+      ` : ''}
 
       <div class="modal-section-label">레짐 판정 순서 (위→아래 순차, 첫 일치 확정)</div>
       <div class="modal-ind-list">
@@ -2388,6 +2780,11 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('guide-modal-overlay').addEventListener('click', event => {
     if (event.target === document.getElementById('guide-modal-overlay')) closeGuideModal();
   });
+  document.getElementById('gap-guide-modal-close-btn').addEventListener('click', closeGapGuideModal);
+  document.getElementById('gap-guide-modal-overlay').addEventListener('click', event => {
+    if (event.target === document.getElementById('gap-guide-modal-overlay')) closeGapGuideModal();
+  });
+  document.getElementById('btn-regime-toggle').addEventListener('click', toggleRegimeSummary);
   document.getElementById('btn-regime-report').addEventListener('click', openRegimeReport);
   document.getElementById('regime-report-close-btn').addEventListener('click', closeRegimeReport);
   document.getElementById('regime-report-overlay').addEventListener('click', event => {
@@ -2397,6 +2794,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (event.key === 'Escape') {
       closeModal();
       closeGuideModal();
+      closeGapGuideModal();
       closeRegimeReport();
     }
   });

@@ -13,7 +13,7 @@
     <div class="panel">
       <div class="header-title">📈 종가 베팅 매수/매도 분석기</div>
       <p class="header-copy">
-        하나의 노션 공용 페이지에서 눌림목과 수급 매집형 후보를 불러오고,<br>
+        하나의 노션 공용 페이지에서 눌림목, 수급 매집형, 급락 반등 후보를 불러오고,<br>
         매수 탭에서는 노션 기준 점수와 일치 항목을 확인하고, 매도 탭에서는 실시간 네이버 분석을 이어서 볼 수 있습니다.
       </p>
 
@@ -31,9 +31,6 @@
             <button class="tab-button" data-tab="sell">매도 분석기</button>
           </div>
           <div class="action-meta">
-            <button id="btn-buy-guide" class="btn btn-secondary">
-              매수 등급 기준
-            </button>
             <div id="current-time-display" class="current-time-display"></div>
             <button id="btn-analyze" class="btn btn-primary" disabled>
               <span>⚡</span> 분석 시작
@@ -48,7 +45,19 @@
     </div>
 
     <section class="tab-panel active" data-tab-panel="buy">
-      <div class="section-title">🧭 시장 레짐 체크 <button id="btn-regime-report" class="btn btn-secondary small regime-report-btn" title="레짐 판단 근거 보고서">📋</button></div>
+      <div class="section-title section-title-collapsible">
+        <div class="section-title-main">
+          <button id="btn-regime-toggle" type="button" class="section-toggle" aria-expanded="true" aria-controls="buy-regime-summary" title="시장 레짐 접기">-</button>
+          <span>🧭 시장 레짐 체크</span>
+          <span id="regime-current-badge" class="regime-current-badge unknown">미확인</span>
+        </div>
+        <div class="section-title-actions">
+          <button id="btn-buy-guide" class="btn btn-secondary small">
+            매수 등급 기준
+          </button>
+          <button id="btn-regime-report" class="btn btn-secondary small regime-report-btn" title="레짐 판단 근거 보고서">📋</button>
+        </div>
+      </div>
       <div id="buy-regime-summary"></div>
 
       <div class="section-title">📊 눌림목 종가베팅</div>
@@ -136,7 +145,7 @@
         <div class="modal-header-info">
           <div class="modal-stock-name">매수 등급 기준</div>
           <div class="modal-stock-sub">
-            <span>시장 레짐, 등급, 매매 가능 여부, VKOSPI 보정</span>
+            <span>시장 레짐, 전략별 등급, 매매 가능 여부, VKOSPI 보정</span>
           </div>
         </div>
         <button class="modal-close" id="guide-modal-close-btn">✕</button>
@@ -161,6 +170,21 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="gap-guide-modal-overlay" class="modal-overlay">
+    <div class="modal guide-modal" id="gap-guide-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name">갭 등급 기준</div>
+          <div class="modal-stock-sub">
+            <span>합산 점수, 진입 조정, 익일 매도 조정 기준</span>
+          </div>
+        </div>
+        <button class="modal-close" id="gap-guide-modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="gap-guide-body"></div>
     </div>
   </div>
 
