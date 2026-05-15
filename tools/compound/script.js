@@ -371,7 +371,7 @@ function renderTableByYear(year) {
 
         return `
             <tr ${rowClass ? `class="${rowClass}"` : ''}>
-                <td>
+                <td data-tooltip="${row.month}월차 투자 기간 및 설정 상태입니다.">
                     <div style="display:flex; align-items:center;">
                         <button class="setting-btn" onclick="openMonthSettings(${row.month})" title="${row.month}월차부터 설정 변경">⚙️</button>
                         <span style="font-weight:700;">${row.month}월차${isCurrentMonth ? ' <span style="color:var(--accent-primary); font-size:10px;">◀ 현재</span>' : ''}</span>
@@ -393,7 +393,7 @@ function renderTableByYear(year) {
                 </td>
                 <td>
                     <div style="font-size:9px; color:var(--text-secondary); margin-bottom:2px;">목표</div>
-                    <div class="number">${formatNumber(idx === 0 ? row.assetBefore : allTableRows[idx - 1].assetAfter)}</div>
+                    <div class="number" data-tooltip="이번 달 시작 시점의 시뮬레이션상 목표 자산입니다.">${formatNumber(idx === 0 ? row.assetBefore : allTableRows[idx - 1].assetAfter)}</div>
                     ${(() => {
                 if (idx === 0) return '';
                 const prevMonth = allTableRows[idx - 1].month;
@@ -401,57 +401,62 @@ function renderTableByYear(year) {
                 if (!prevHasInput) return '';
                 const prevActualEndAsset = allTableRows[idx - 1].actualEndAsset;
                 if (prevActualEndAsset == null) return '';
-                return `<div style="font-size:9px; color:var(--text-secondary); margin-top:6px; margin-bottom:2px;">실제 이월</div><div class="number" style="color:var(--accent-primary);">${formatNumber(prevActualEndAsset)}</div>`;
+                return `
+                    <div style="font-size:9px; color:var(--text-secondary); margin-top:6px; margin-bottom:2px;">실제 이월</div>
+                    <div class="number" style="color:var(--accent-primary);" data-tooltip="지난달 실제 종료 자산이 이번 달로 이월된 금액입니다.">${formatNumber(prevActualEndAsset)}</div>
+                `;
             })()}
                 </td>
                 <td class="number" style="color: var(--accent-success);">
-                    ${formatNumber(row.profit)}
-                    <div style="color: var(--text-secondary); font-size:11px; margin-top:6px;">
+                    <div data-tooltip="연 목표 수익률 달성을 위해 이번 달에 벌어야 하는 총 목표 수익금입니다.">${formatNumber(row.profit)}</div>
+                    <div style="color: var(--text-secondary); font-size:11px; margin-top:6px;" data-tooltip="장기 및 단기 자산별로 배분된 목표 수익금의 합계입니다.">
                         (장)${formatNumber(row.profit - row.shortTermProfit)} + (단)${formatNumber(row.shortTermProfit)}
                     </div>
                 </td>
                 <td>
-                    <div class="number" style="color: var(--accent-warning);">${formatNumber(row.shortTermProfit)}</div>
-                    <div style="font-size: 9px; margin-top: 4px; color: var(--text-secondary);">
+                    <div class="number" style="color: var(--accent-warning);" data-tooltip="이번 달 단기 투자 목표 수익금입니다.">${formatNumber(row.shortTermProfit)}</div>
+                    <div style="font-size: 9px; margin-top: 4px; color: var(--text-secondary);" data-tooltip="현재까지의 단기 자산 총액 / 목표 단기 자산 총액 비율입니다.">
                         <span style="color: #00d9ff;">${formatNumber(prevActualShortInitPlusCumul)}</span> / ${formatNumber(prevTargetShortInitPlusCumul)}
                     </div>
                     <input type="number" class="actual-input" placeholder="실제 단기 수익"
                         value="${displayShortInput}"
                         onchange="setActual(${row.month}, 'shortTerm', this.value)"
-                        style="margin-top:5px;">
+                        style="margin-top:5px;"
+                        data-tooltip="이번 달 실제 발생한 단기 투자 수익을 입력하세요.">
                 </td>
                 <td class="col-short-cumul" style="${shortCumulStyle}">
-                    <div class="number" style="color: var(--accent-warning);">${formatNumber(actualShortCumulative)}</div>
+                    <div class="number" style="color: var(--accent-warning);" data-tooltip="투자 시작일부터 현재까지의 단기 투자 순수익 합계입니다.">${formatNumber(actualShortCumulative)}</div>
                     <div style="color: var(--text-secondary); margin-top: 3px;">
                         <span style="font-size:9px;">누적 원금 + 누적 수익</span><br>
-                        <span class="number" style="font-size:11px; color: var(--text-primary);">${formatNumber(shortInitPlusCumul)}</span>
-                        ${shortAchievePercentFixed !== null ? `<span style="font-size:11px; color:${shortAchieveColor}; margin-left:6px;">(${shortAchievePercentFixed}%)</span>` : ''}
-                        <div style="font-size:9px; color:var(--text-secondary); margin-top:2px;">(월 재투자 차감: ${formatNumber(shortInitPlusCumulMinusMonthlyInvest)})</div>
+                        <span class="number" style="font-size:11px; color: var(--text-primary);" data-tooltip="단기 투자에 투입된 총 원금과 누적 수익을 합친 현재 자산 가치입니다.">${formatNumber(shortInitPlusCumul)}</span>
+                        ${shortAchievePercentFixed !== null ? `<span style="font-size:11px; color:${shortAchieveColor}; margin-left:6px;" data-tooltip="단기 자산 목표 대비 현재 자산의 달성률입니다.">(${shortAchievePercentFixed}%)</span>` : ''}
+                        <div style="font-size:9px; color:var(--text-secondary); margin-top:2px;" data-tooltip="단기 수익금에서 월 재투자금으로 차감된 금액을 제외한 실제 잔액입니다.">(월 재투자 차감: ${formatNumber(shortInitPlusCumulMinusMonthlyInvest)})</div>
                     </div>
                 </td>
                 <td>
-                    <div class="number">${formatNumber(row.longTermAccumulated)} 
-                        <span style="color: var(--text-secondary); font-size: 9px; font-weight: normal; margin-left: 4px;">(${formatNumber(row.longTermPrincipal)})</span>
-                        <span style="color: var(--accent-success); font-size: 11px;">(+${longTermROI}%)</span>                                
+                    <div class="number">
+                        <span data-tooltip="장기 투자 목표 달성을 위해 이번 달 말에 계좌에 있어야 할 목표 잔액(수익 포함)입니다.">${formatNumber(row.longTermAccumulated)}</span>
+                        <span style="color: var(--text-secondary); font-size: 9px; font-weight: normal; margin-left: 4px;" data-tooltip="지금까지 장기 투자에 투입된 총 원금(재투자 포함)입니다.">(${formatNumber(row.longTermPrincipal)})</span>
+                        <span style="color: var(--accent-success); font-size: 11px;" data-tooltip="장기 투자 시뮬레이션상 기대 수익률입니다.">(+${longTermROI}%)</span>                                
                     </div>
                     <div style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
                         <input type="number" class="actual-input" placeholder="실제 장기 잔액 총액"
                             value="${displayLongCumulInput}"
                             onchange="setActual(${row.month}, 'longTermCumul', this.value)"
                             style="margin-top:5px;"
+                            data-tooltip="이번 달 말 기준 실제 장기 투자 계좌의 총 잔액을 입력하세요."
                         >
-                        
-                        ${longTermRateDisplay !== null ? `<span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;" title="장기 수익 달성률">(${longTermRateDisplay}%)</span>` : ''}
+                        ${longTermRateDisplay !== null ? `<span style="color:${longTermRateColor}; margin-top:6px; margin-left:6px; font-size:10px;" data-tooltip="이번 달 장기 투자 목표 수익 대비 실제 수익의 달성률입니다.">(${longTermRateDisplay}%)</span>` : ''}
                     </div>
                 </td>
                 <td class="number">
-                    <div>${formatNumber(row.assetAfter)}${achievementHtml}</div>
+                    <div data-tooltip="이번 달 목표 수익 달성 시의 예상 총 자산입니다.">${formatNumber(row.assetAfter)}${achievementHtml}</div>
                     ${actualEndAssetDisplay !== null ? `
                     <div style="margin-top:6px;">
-                        <span style="color:${actualEndAssetDisplay >= row.assetAfter ? 'var(--accent-primary)' : '#ef4444'}; font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;">${formatNumber(actualEndAssetDisplay)}</span>
-                        ${initialPrincipalROI !== null ? `<span style="font-size:10px; color:${parseFloat(initialPrincipalROI) >= 0 ? 'var(--accent-success)' : '#ef4444'}; margin-left:4px;" title="초기 투자 원금 대비 총 수익률">(${parseFloat(initialPrincipalROI) > 0 ? '+' : ''}${initialPrincipalROI}%)</span>` : ''}
+                        <span style="color:${actualEndAssetDisplay >= row.assetAfter ? 'var(--accent-primary)' : '#ef4444'}; font-family: 'Monaco', 'Courier New', monospace; font-weight:700; font-size:12px;" data-tooltip="이번 달 실제 단기/장기 성과가 반영된 최종 종료 자산입니다.">${formatNumber(actualEndAssetDisplay)}</span>
+                        ${initialPrincipalROI !== null ? `<span style="font-size:10px; color:${parseFloat(initialPrincipalROI) >= 0 ? 'var(--accent-success)' : '#ef4444'}; margin-left:4px;" data-tooltip="초기 투자 원금 대비 전체 자산의 총 수익률(ROI)입니다.">(${parseFloat(initialPrincipalROI) > 0 ? '+' : ''}${initialPrincipalROI}%)</span>` : ''}
                     </div>` : ''}
-                    <div style="margin-top:2px; font-family: 'Monaco', 'Courier New', monospace; font-size:9px; color:var(--text-secondary);">${formatNumber(row.initialAssetAfter)}(초기 목표)</div>
+                    <div style="margin-top:2px; font-family: 'Monaco', 'Courier New', monospace; font-size:9px; color:var(--text-secondary);" data-tooltip="실제 입력을 배제한, 맨 처음 시뮬레이션에서 계획했던 목표 자산입니다.">${formatNumber(row.initialAssetAfter)}(초기 목표)</div>
                 </td>
             </tr>
         `;
@@ -670,6 +675,62 @@ function calculateAndDisplay() {
     const defaultYear = createYearTabs();
     renderTableByYear(defaultYear);
     renderChart();
+}
+
+// 커스텀 툴팁 시스템 초기화
+function initCustomTooltip() {
+    if (window.customTooltipInitialized) return;
+    window.customTooltipInitialized = true;
+
+    let tooltip = document.getElementById('custom-tooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'custom-tooltip';
+        document.body.appendChild(tooltip);
+    }
+
+    document.addEventListener('mouseover', (e) => {
+        const target = e.target.closest('[data-tooltip]');
+        if (target) {
+            tooltip.textContent = target.getAttribute('data-tooltip');
+            tooltip.classList.add('visible');
+            updateTooltipPosition(e);
+        }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (tooltip.classList.contains('visible')) {
+            updateTooltipPosition(e);
+        }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        const target = e.target.closest('[data-tooltip]');
+        if (target) {
+            tooltip.classList.remove('visible');
+        }
+    });
+
+    function updateTooltipPosition(e) {
+        const gap = 15;
+        let x = e.clientX + gap;
+        let y = e.clientY + gap;
+
+        // 툴팁 너비/높이 계산을 위해 임시로 가시화 (opacity 0인 상태)
+        const tooltipWidth = tooltip.offsetWidth || 200;
+        const tooltipHeight = tooltip.offsetHeight || 50;
+
+        // 화면 경계 체크
+        if (x + tooltipWidth > window.innerWidth) {
+            x = e.clientX - tooltipWidth - gap;
+        }
+        if (y + tooltipHeight > window.innerHeight) {
+            y = e.clientY - tooltipHeight - gap;
+        }
+
+        tooltip.style.left = x + 'px';
+        tooltip.style.top = y + 'px';
+    }
 }
 
 // 로컬스토리지 키
@@ -904,6 +965,7 @@ function selectSettingTab(month) {
 // 페이지 로드 시 로컬스토리지에서 복원
 loadFromLocalStorage();
 selectSettingTab(0);
+initCustomTooltip(); // 툴팁 시스템 초기화
 calculateAndDisplay();
 
 // 모달 관련 함수

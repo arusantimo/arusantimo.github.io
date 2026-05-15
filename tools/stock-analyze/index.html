@@ -61,6 +61,12 @@
     <section class="tab-panel" data-tab-panel="sell">
       <div class="section-title split-title">
         <div>🔄 스윙 보유 종목 <span class="section-help">D+1 스윙 전환 평가 · 실시간 손익 추적</span></div>
+        <div class="inline-inputs">
+          <input type="text" id="swing-name" placeholder="종목명">
+          <input type="text" id="swing-code" placeholder="코드(6자리)" maxlength="6">
+          <input type="text" id="swing-entry-price" placeholder="매수가" style="width:80px">
+          <button id="btn-add-swing" class="btn btn-secondary small">➕ 추가</button>
+        </div>
       </div>
       <div id="list-swing" class="stock-grid">
         <div class="empty-state">스윙 보유 종목이 없습니다.</div>

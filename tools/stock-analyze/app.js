@@ -1258,6 +1258,23 @@ function handleManualAdd(type, nameInputId, codeInputId) {
 
 document.getElementById('btn-add-pullback').addEventListener('click', () => handleManualAdd('pullback', 'pullback-name', 'pullback-code'));
 document.getElementById('btn-add-momentum').addEventListener('click', () => handleManualAdd('momentum', 'momentum-name', 'momentum-code'));
+document.getElementById('btn-add-swing').addEventListener('click', () => {
+  const name = document.getElementById('swing-name').value.trim();
+  const code = document.getElementById('swing-code').value.trim();
+  const entryPriceRaw = document.getElementById('swing-entry-price').value.trim();
+  if (!name || !code) { alert('종목명과 종목코드(6자리)를 모두 입력해주세요.'); return; }
+  if (!/^\d{6}$/.test(code)) { alert('종목코드는 6자리 숫자여야 합니다.'); return; }
+  const entryPrice = parseInt(entryPriceRaw.replace(/,/g, ''), 10) || 0;
+  if (!stocks.swing.find(s => s.code === code)) {
+    stocks.swing.push({ name, code, type: 'swing', strategy: 'swing', buyDate: '', entryPrice, status: '보유중', manual: true, source: 'manual' });
+    renderSellStockCards();
+    updateAnalyzeButtonState();
+    log(`▶ 수동 추가: ${name} (${code}) -> 스윙 보유 (매수가 ${entryPrice.toLocaleString()}원)`);
+    document.getElementById('swing-name').value = '';
+    document.getElementById('swing-code').value = '';
+    document.getElementById('swing-entry-price').value = '';
+  } else { alert('이미 추가된 종목입니다.'); }
+});
 document.getElementById('btn-buy-guide').addEventListener('click', openGuideModal);
 
 document.querySelectorAll('.tab-button').forEach(button => {

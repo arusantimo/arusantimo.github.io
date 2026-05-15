@@ -980,3 +980,39 @@ table tbody tr:hover {
     border-style: solid;
     border-color: transparent var(--border-color) transparent transparent;
 }
+/* 전역 커스텀 툴팁 스타일 */
+#custom-tooltip {
+    position: fixed;
+    display: none;
+    background: rgba(15, 23, 42, 0.95);
+    color: #f8fafc;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    z-index: 10000;
+    max-width: 250px;
+    border: 1px solid rgba(0, 217, 255, 0.2);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    opacity: 0;
+}
+
+#custom-tooltip.visible {
+    display: block;
+    opacity: 1;
+}
+
+/* 툴팁 대상 하이라이팅 스타일 */
+[data-tooltip] {
+    transition: all 0.2s ease;
+    cursor: help;
+    border-radius: 4px;
+}
+
+[data-tooltip]:hover {
+    background: rgba(0, 217, 255, 0.08) !important;
+    box-shadow: 0 0 0 1px rgba(0, 217, 255, 0.3);
+}
