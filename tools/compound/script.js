@@ -338,18 +338,23 @@ function renderTableByYear(year) {
         const shortAchievePercentFixed = shortAchievePercent !== null ? shortAchievePercent.toFixed(1) : null;
         const shortAchieveColor = shortAchievePercentFixed !== null && parseFloat(shortAchievePercentFixed) >= 100 ? 'var(--accent-primary)' : '#ef4444';
 
-        // 장기 실제 달성률 — 목표 수익(수익금) 대비 실제 수익 비율로 변경
+        // 장기 실제 달성률 — 목표 수익(수익금) 대비 실제 수익 비율
         let longTermProfitRate = null;
-        const longTermTargetProfit = row.longTermAccumulated - prevLongTermAccumulated - row.longTermInvest;
+        // 이번 달 장기 목표 수익 = 전체 목표 수익 - 단기 목표 수익
+        const longTermTargetProfit = row.profit - row.shortTermProfit;
+
         if (actualLongCumul !== null && !isNaN(Number(actualLongCumul))) {
             const actualLongCumulNum = Number(actualLongCumul);
-            // 실제 수익 = 현재 잔액 - 이전 잔액 - 재투자금
+            // 실제 수익 = 현재 잔액 - 이전 잔액 - 이번달 재투자금
             const longTermActualProfit = actualLongCumulNum - prevActualLongAccum - row.longTermInvest;
 
             if (longTermTargetProfit > 0) {
                 longTermProfitRate = (longTermActualProfit / longTermTargetProfit) * 100;
-            } else {
+            } else if (longTermTargetProfit === 0) {
                 longTermProfitRate = longTermActualProfit >= 0 ? 100 : 0;
+            } else {
+                // 목표가 마이너스인 특수 케이스 (손실 방어 목표 등)
+                longTermProfitRate = longTermActualProfit >= longTermTargetProfit ? 100 : 0;
             }
         }
         const longTermRateDisplay = longTermProfitRate !== null ? longTermProfitRate.toFixed(1) : null;
@@ -1019,6 +1024,124 @@ function updateYearTabsScrollButtons() {
         rightBtn.style.display = 'none';
     }
 }
+
+// 투자 성과 보고서 저장 관련 함수
+async function savePerformanceReport() {
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+
+    // 현재 달에 해당하는 데이터 찾기
+    const currentIndex = allTableRows.findIndex(r => {
+        const d = new Date(globalSettings.startDate);
+        d.setMonth(d.getMonth() + r.month - 1);
+        return d.getFullYear() === currentYear && (d.getMonth() + 1) === currentMonth;
+    });
+
+    const reportRow = currentIndex !== -1 ? allTableRows[currentIndex] : allTableRows[allTableRows.length - 1];
+    if (!reportRow) return;
+
+    // --- 1. 이번 달 수익 및 목표 비교 계산 ---
+    const actualShort = actualValues[reportRow.month]?.shortTerm ?? reportRow.shortTermProfit;
+    const targetShort = reportRow.shortTermProfit;
+    
+    // 장기 실제 수익 계산
+    const actualLongCumul = actualValues[reportRow.month]?.longTermCumul ?? reportRow.longTermAccumulated;
+    const prevLongActual = reportRow.month > 1 
+        ? (actualValues[allTableRows[reportRow.month - 2].month]?.longTermCumul ?? allTableRows[reportRow.month - 2].longTermAccumulated)
+        : longTermPrincipalGlobal;
+    const actualLongProfit = actualLongCumul - prevLongActual - reportRow.longTermInvest;
+    const targetLongProfit = reportRow.profit - reportRow.shortTermProfit;
+
+    // --- 2. 누적 성과 비교 데이터 ---
+    const actualTotalAsset = (actualValues[reportRow.month]?.shortTerm !== null || actualValues[reportRow.month]?.longTermCumul !== null)
+        ? reportRow.actualEndAsset 
+        : reportRow.assetAfter;
+    
+    const targetAsset = reportRow.initialAssetAfter;
+    
+    // 저축액 (연 2.5% 복리) 계산
+    const principal = allTableRows[0].assetBefore;
+    const monthlyInvest = allTableRows[0].monthlyInvest;
+    const annualSavingsRate = 0.025;
+    const monthlySavingsRate = Math.pow(1 + annualSavingsRate, 1 / 12) - 1;
+    let savingsVal = principal;
+    for (let i = 0; i < reportRow.month; i++) {
+        savingsVal = savingsVal * (1 + monthlySavingsRate) + monthlyInvest;
+    }
+
+    // 초기 투자 원금
+    const initialPrincipal = longTermPrincipalGlobal + shortTermPrincipalGlobal;
+    const totalInvested = initialPrincipal + (reportRow.month * globalSettings.monthlyInvestment);
+    const growthPercent = (((actualTotalAsset - totalInvested) / initialPrincipal) * 100).toFixed(1);
+
+    // --- 3. UI 업데이트 ---
+    // 제목 및 날짜
+    const reportMonth = reportRow.dateStr.split(' ')[1].replace('월', '');
+    document.getElementById('report-main-title').textContent = `${reportMonth}월 성과 보고서`;
+    document.getElementById('report-date').textContent = reportRow.dateStr;
+    
+    const now = new Date();
+    const timestampStr = `추출일: ${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById('report-timestamp').textContent = timestampStr;
+
+    // 자산 및 수익
+    const monthTotalProfit = actualShort + actualLongProfit;
+    document.getElementById('report-total-asset').textContent = formatNumber(actualTotalAsset) + '원';
+    document.getElementById('report-month-total-profit').textContent = `금월 수익 합계: +${formatNumber(monthTotalProfit)}원`;
+    
+    document.getElementById('report-short-profit').textContent = formatNumber(actualShort) + '원';
+    document.getElementById('report-long-profit').textContent = formatNumber(actualLongProfit) + '원';
+    
+    document.getElementById('report-short-target').textContent = `목표: ${formatNumber(targetShort)}원`;
+    document.getElementById('report-long-target').textContent = `목표: ${formatNumber(targetLongProfit)}원`;
+
+    // 배수 계산 및 표시
+    const shortMult = targetShort > 0 ? (actualShort / targetShort).toFixed(1) : (actualShort >= 0 ? '1.0' : '0.0');
+    const longMult = targetLongProfit > 0 ? (actualLongProfit / targetLongProfit).toFixed(1) : (actualLongProfit >= 0 ? '1.0' : '0.0');
+    
+    document.getElementById('report-short-mult').textContent = `${shortMult}배 달성`;
+    document.getElementById('report-long-mult').textContent = `${longMult}배 달성`;
+
+    // 비교 바 및 상태 업데이트
+    const maxVal = Math.max(actualTotalAsset, targetAsset, savingsVal);
+    
+    document.getElementById('comp-actual-val').textContent = formatNumber(actualTotalAsset) + '원';
+    document.getElementById('comp-actual-bar').style.width = (actualTotalAsset / maxVal * 100) + '%';
+    
+    document.getElementById('comp-target-val').textContent = formatNumber(targetAsset) + '원';
+    const targetAchievement = ((actualTotalAsset / targetAsset) * 100).toFixed(1);
+    document.getElementById('comp-target-status').textContent = `${targetAchievement}%`;
+    document.getElementById('comp-target-bar').style.width = (targetAsset / maxVal * 100) + '%';
+
+    document.getElementById('comp-savings-val').textContent = formatNumber(savingsVal) + '원';
+    const savingsDiffPercent = (((actualTotalAsset - savingsVal) / savingsVal) * 100).toFixed(1);
+    document.getElementById('comp-savings-status').textContent = `${savingsDiffPercent >= 0 ? '+' : ''}${savingsDiffPercent}%`;
+    document.getElementById('comp-savings-bar').style.width = (savingsVal / maxVal * 100) + '%';
+
+    document.getElementById('report-total-growth-percent').textContent = (growthPercent >= 0 ? '+' : '') + growthPercent + '%';
+
+    // --- 4. 캡처 및 다운로드 ---
+    const captureArea = document.getElementById('monthly-report-template');
+    try {
+        const canvas = await html2canvas(captureArea, {
+            backgroundColor: '#0f172a',
+            scale: 2,
+            logging: false
+        });
+        
+        const link = document.createElement('a');
+        link.download = `투자보고서_${reportRow.dateStr.replace(' ', '')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    } catch (err) {
+        console.error('보고서 생성 실패:', err);
+        alert('보고서 이미지 생성 중 오류가 발생했습니다.');
+    }
+}
+
+// 버튼 이벤트 바인딩
+document.getElementById('saveReportBtn')?.addEventListener('click', savePerformanceReport);
 
 window.addEventListener('resize', updateYearTabsScrollButtons);
 

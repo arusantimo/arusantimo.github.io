@@ -35,7 +35,7 @@ const RULE_GUIDE = {
   grades: [
     { grade: 'S', score: '9.0 ~ 10점', meaning: '레짐 무관 진입 가능' },
     { grade: 'A', score: '7.5 ~ 8.9점', meaning: '강세장·순환매장·박스권 진입 가능' },
-    { grade: 'B', score: '6.0 ~ 7.4점', meaning: '매매 금지, 익일 재평가' },
+    { grade: 'B', score: '6.0 ~ 7.4점', meaning: '매매 단계 노출, 진입 보류, 익일 재평가' },
     { grade: 'C', score: '6.0점 미만', meaning: '출력 목록에서 제외' }
   ],
   permissions: [
@@ -127,6 +127,11 @@ let stocks = {
 let notionSnapshot = createEmptySnapshot();
 const stockDetailMap = {};
 let currentModalState = { code: null, mode: null };
+
+function syncBodyScrollLock() {
+  const hasOpenModal = document.querySelector('.modal-overlay.open');
+  document.body.classList.toggle('modal-scroll-locked', Boolean(hasOpenModal));
+}
 
 function createEmptySnapshot() {
   return {
@@ -1068,10 +1073,12 @@ function updateTabUI() {
 
 function openGuideModal() {
   document.getElementById('guide-modal-overlay').classList.add('open');
+  syncBodyScrollLock();
 }
 
 function closeGuideModal() {
   document.getElementById('guide-modal-overlay').classList.remove('open');
+  syncBodyScrollLock();
 }
 
 function detectCurrentRegime() {
@@ -1091,10 +1098,12 @@ function detectCurrentRegime() {
   };
 }
 
+  syncBodyScrollLock();
 function openRegimeReport() {
   const info = detectCurrentRegime();
   const body = document.getElementById('regime-report-body');
 
+  syncBodyScrollLock();
   if (!info) {
     body.innerHTML = '<div class="empty-state">노션에서 시장 레짐 데이터를 불러온 뒤 다시 시도하세요.</div>';
     document.getElementById('regime-report-overlay').classList.add('open');
@@ -1323,22 +1332,27 @@ async function analyzeStock(stock, isBefore0908) {
       const currentPrice = parseNum(basicJson.closePrice ?? basicJson.stockPrice ?? 0);
       const chgRateRaw = parseFloat2(basicJson.fluctuationsRatio ?? basicJson.changeRate ?? 0);
 
-      const intUrl = `https://m.stock.naver.com/api/stock/${stock.code}/integration`;
-      const intRes = await fetch(proxy + encodeURIComponent(intUrl));
+      const [intRes, priceRes] = await Promise.all([
+        fetch(proxy + encodeURIComponent(`https://m.stock.naver.com/api/stock/${stock.code}/integration`)),
+        fetch(proxy + encodeURIComponent(`https://m.stock.naver.com/api/stock/${stock.code}/price?pageSize=60&page=1`))
+      ]);
       if (!intRes.ok) throw new Error(`integration API error (${intRes.status})`);
+      if (!priceRes.ok) throw new Error(`price API error (${priceRes.status})`);
       const intJson = await intRes.json();
+      const priceJson = await priceRes.json();
 
       const findInfo = code => (intJson.totalInfos ?? []).find(info => info.code === code);
       const prevClose = parseNum(findInfo('lastClosePrice')?.value ?? 0) || currentPrice;
       const openPrice = parseNum(findInfo('openPrice')?.value ?? 0);
       const chgRate = chgRateRaw !== 0 ? chgRateRaw : (prevClose > 0 ? ((currentPrice - prevClose) / prevClose) * 100 : 0);
       const strength = null;
-      const deals = intJson.dealTrendInfos ?? [];
-      const pastPrices = deals.map(deal => parseNum(deal.closePrice ?? 0)).filter(price => price > 0);
-      const pastVolumes = deals.map(deal => parseNum(deal.accumulatedTradingVolume ?? deal.tradingVolume ?? 0)).filter(v => v > 0);
-      const pastLows = deals.map(deal => parseNum(deal.lowPrice ?? 0)).filter(p => p > 0);
-      const pastHighs = deals.map(deal => parseNum(deal.highPrice ?? 0)).filter(p => p > 0);
       const todayVolume = parseNum(findInfo('accumulatedTradingVolume')?.value ?? 0);
+
+      const priceHistory = Array.isArray(priceJson) ? priceJson : [];
+      const pastPrices = priceHistory.map(d => parseNum(d.closePrice)).filter(p => p > 0);
+      const pastVolumes = priceHistory.map(d => parseNum(d.accumulatedTradingVolume)).filter(v => v > 0);
+      const pastLows = priceHistory.map(d => parseNum(d.lowPrice)).filter(p => p > 0);
+      const pastHighs = priceHistory.map(d => parseNum(d.highPrice)).filter(p => p > 0);
 
       const ma5 = pastPrices.length >= 5
         ? Math.round(pastPrices.slice(0, 5).reduce((acc, price) => acc + price, 0) / 5)
@@ -1359,11 +1373,13 @@ async function analyzeStock(stock, isBefore0908) {
         : 0;
       const ma5Direction = ma5 > 0 && ma5Prev > 0 ? (ma5 > ma5Prev ? 'up' : ma5 < ma5Prev ? 'down' : 'flat') : 'unknown';
 
-      const foreignNet = parseNum(findInfo('foreignNetBuyingVolume')?.value ?? 0);
-      const institutionNet = parseNum(findInfo('organNetBuyingVolume')?.value ?? 0);
+      const deals = intJson.dealTrendInfos ?? [];
+      const todayDeal = deals.length > 0 ? deals[0] : {};
+      const foreignNet = parseNum(todayDeal.foreignerPureBuyQuant ?? 0);
+      const institutionNet = parseNum(todayDeal.organPureBuyQuant ?? 0);
 
       const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction };
-      log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원)`);
+      log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원, 20MA: ${ma20.toLocaleString()}원, 외인: ${foreignNet.toLocaleString()}주)`);
       applyRules(stock, data, isBefore0908);
       return;
     } catch (error) {
@@ -2297,11 +2313,13 @@ function openModal(code, mode = 'sell') {
   }
 
   document.getElementById('modal-overlay').classList.add('open');
+  syncBodyScrollLock();
 }
 
 function closeModal() {
   currentModalState = { code: null, mode: null };
   document.getElementById('modal-overlay').classList.remove('open');
+  syncBodyScrollLock();
 }
 
 window.addEventListener('DOMContentLoaded', () => {

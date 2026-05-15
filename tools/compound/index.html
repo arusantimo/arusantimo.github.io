@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>자산 운용 시뮬레이터 - Arusantimo Tools</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,6 +14,7 @@
     <header>
         <h1>💰 자산 운용 시뮬레이터</h1>
         <div class="header-actions">
+            <button id="saveReportBtn" class="icon-btn" title="투자 성과 보고서 생성 (이미지)">📋</button>
             <button id="saveConfigBtn" class="icon-btn" title="설정 저장">💾</button>
             <button id="loadConfigBtn" class="icon-btn" title="설정 로드">📂</button>
         </div>
@@ -266,6 +268,90 @@
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button onclick="saveMonthSettings()" style="flex:1; padding:10px; background:var(--accent-primary); color:var(--bg-dark); border:none; border-radius:6px; cursor:pointer; font-weight:bold; color: #000;">저장</button>
                 <button onclick="clearMonthSettings()" style="flex:1; padding:10px; background:rgba(239, 68, 68, 0.2); border:1px solid #ef4444; color:#ef4444; border-radius:6px; cursor:pointer; font-weight:bold;">설정 초기화 (기본값)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 캡처용 숨김 컨테이너 -->
+    <div id="capture-area" style="position: fixed; left: -9999px; top: 0; width: 500px; padding: 30px; background: #0f172a; color: #f8fafc; font-family: 'Inter', -apple-system, sans-serif;">
+        <!-- 성과 리포트 템플릿 -->
+        <div id="monthly-report-template" class="report-card">
+            <div class="report-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                    <div id="report-main-title" class="report-title">0월 성과 보고서</div>
+                    <div id="report-timestamp" style="font-size: 9px; color: rgba(255, 255, 255, 0.3); font-weight: 500; margin-top: 6px;">추출일: 2026.05.15</div>
+                </div>
+                <div id="report-date" class="report-subtitle">2026년 05월</div>
+            </div>
+
+            <div class="report-section">
+                <div class="section-title">📊 자산 현황</div>
+                <div class="main-stats">
+                    <div class="stat-box large">
+                        <div class="label">최종 운용 자산</div>
+                        <div id="report-total-asset" class="value">0원</div>
+                        <div id="report-month-total-profit" class="total-profit-tag">금월 수익 합계: +0원</div>
+                    </div>
+                </div>
+                <div class="sub-stats-grid">
+                    <div class="stat-box">
+                        <div class="label">단기 투자 수익</div>
+                        <div id="report-short-profit" class="value">0원</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                            <div id="report-short-target" class="target-tag">목표: 0원</div>
+                            <div id="report-short-mult" class="mult-tag">0.0배</div>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="label">장기 투자 수익</div>
+                        <div id="report-long-profit" class="value">0원</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                            <div id="report-long-target" class="target-tag">목표: 0원</div>
+                            <div id="report-long-mult" class="mult-tag">0.0배</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-section" style="margin-bottom: 24px;">
+                <div class="section-title">📈 누적 성과 지표</div>
+                <div class="comparison-list">
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <div class="comp-label">현재 총 자산</div>
+                            <div id="comp-actual-val" class="comp-value">0원</div>
+                        </div>
+                        <div class="comp-bar-container"><div id="comp-actual-bar" class="comp-bar actual"></div></div>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <div class="comp-label">초기 목표 대비 성과</div>
+                            <div class="comp-value-group">
+                                <span id="comp-target-val" class="comp-sub-value">0원</span>
+                                <span id="comp-target-status" class="comp-main-value">0%</span>
+                            </div>
+                        </div>
+                        <div class="comp-bar-container"><div id="comp-target-bar" class="comp-bar target"></div></div>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
+                            <div class="comp-label">일반 저축 대비 성과</div>
+                            <div class="comp-value-group">
+                                <span id="comp-savings-val" class="comp-sub-value">0원</span>
+                                <span id="comp-savings-status" class="comp-main-value">+0%</span>
+                            </div>
+                        </div>
+                        <div class="comp-bar-container"><div id="comp-savings-bar" class="comp-bar savings"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-summary">
+                원금 대비 <span id="report-total-growth-percent" class="highlight">0%</span> 성장 중
+            </div>
+
+            <div class="report-footer">
+                <div class="footer-text">GENERATED BY ARUSANTIMO ASSET</div>
             </div>
         </div>
     </div>
