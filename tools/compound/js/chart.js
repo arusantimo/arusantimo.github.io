@@ -142,7 +142,8 @@
                                 diffText = ` (${diffPercent >= 0 ? '+' : ''}${diffPercent.toFixed(1)}%)`;
                             }
 
-                            return ` ${context.dataset.label}: ${Math.floor(value).toLocaleString('ko-KR')}원${diffText}`;
+                            const koValue = app.utils.formatKoreanCurrency(value);
+                            return ` ${context.dataset.label}: ${Math.floor(value).toLocaleString('ko-KR')}원 (${koValue})${diffText}`;
                         }
                     }
                 }

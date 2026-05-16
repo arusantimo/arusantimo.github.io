@@ -25,9 +25,19 @@
         const longInvestEl = document.getElementById('longTermInvestAmount');
         const shortInvestEl = document.getElementById('shortTermInvestAmount');
 
-        if (totalInvestEl) totalInvestEl.textContent = Math.floor(monthlyInvestment).toLocaleString('ko-KR');
-        if (longInvestEl) longInvestEl.textContent = Math.floor(longTermInvestAmount).toLocaleString('ko-KR');
-        if (shortInvestEl) shortInvestEl.textContent = Math.floor(shortTermInvestAmount).toLocaleString('ko-KR');
+        const { formatKoreanCurrency } = app.utils;
+        if (totalInvestEl) {
+            totalInvestEl.textContent = Math.floor(monthlyInvestment).toLocaleString('ko-KR');
+            totalInvestEl.setAttribute('data-tooltip', formatKoreanCurrency(monthlyInvestment));
+        }
+        if (longInvestEl) {
+            longInvestEl.textContent = Math.floor(longTermInvestAmount).toLocaleString('ko-KR');
+            longInvestEl.setAttribute('data-tooltip', `장기 투자 배분액 (${formatKoreanCurrency(longTermInvestAmount)})`);
+        }
+        if (shortInvestEl) {
+            shortInvestEl.textContent = Math.floor(shortTermInvestAmount).toLocaleString('ko-KR');
+            shortInvestEl.setAttribute('data-tooltip', `단기 투자 배분액 (${formatKoreanCurrency(shortTermInvestAmount)})`);
+        }
     }
 
     function calculateAndDisplay(state, { createYearTabs, renderTableByYear, renderChart }) {
