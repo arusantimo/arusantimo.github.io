@@ -30,6 +30,7 @@
     }
 
     async function savePerformanceReport(state) {
+        const { formatNumber, getMonthDate, hasNumericValue, formatKoreanCurrency } = app.utils;
         const reportRow = findReportRow(state);
         if (!reportRow) return;
 
@@ -54,9 +55,12 @@
         const savingsValue = getSavingsValue(reportRow, state.allTableRows);
 
         const initialPrincipal = state.longTermPrincipalGlobal + state.shortTermPrincipalGlobal;
-        const totalInvested = initialPrincipal + (reportRow.month * state.globalSettings.monthlyInvestment);
-        const growthPercent = initialPrincipal > 0
-            ? (((actualTotalAsset - totalInvested) / initialPrincipal) * 100).toFixed(1)
+        const totalInvested = initialPrincipal + state.allTableRows
+            .slice(0, reportRow.month)
+            .reduce((sum, row) => sum + row.monthlyInvest, 0);
+        const accumulatedProfit = actualTotalAsset - totalInvested;
+        const growthPercent = totalInvested > 0
+            ? (((actualTotalAsset - totalInvested) / totalInvested) * 100).toFixed(1)
             : '0.0';
 
         const reportMonth = reportRow.dateStr.split(' ')[1].replace('월', '');
@@ -69,9 +73,14 @@
 
         const monthTotalProfit = actualShort + actualLongProfit;
         document.getElementById('report-total-asset').textContent = `${formatNumber(actualTotalAsset)}원`;
+        document.getElementById('report-total-asset-ko').textContent = formatKoreanCurrency(actualTotalAsset);
         document.getElementById('report-month-total-profit').textContent = `금월 수익 합계: +${formatNumber(monthTotalProfit)}원`;
+        
         document.getElementById('report-short-profit').textContent = `${formatNumber(actualShort)}원`;
+        document.getElementById('report-short-profit-ko').textContent = formatKoreanCurrency(actualShort);
         document.getElementById('report-long-profit').textContent = `${formatNumber(actualLongProfit)}원`;
+        document.getElementById('report-long-profit-ko').textContent = formatKoreanCurrency(actualLongProfit);
+        
         document.getElementById('report-short-target').textContent = `목표: ${formatNumber(targetShort)}원`;
         document.getElementById('report-long-target').textContent = `목표: ${formatNumber(targetLongProfit)}원`;
 
@@ -85,11 +94,22 @@
         const savingsDiffPercent = (((actualTotalAsset - savingsValue) / savingsValue) * 100).toFixed(1);
 
         document.getElementById('comp-actual-val').textContent = `${formatNumber(actualTotalAsset)}원`;
+        document.getElementById('comp-actual-val-ko').textContent = formatKoreanCurrency(actualTotalAsset);
         document.getElementById('comp-actual-bar').style.width = `${(actualTotalAsset / maxValue) * 100}%`;
+        
+        // 누적 투자 수익 표시
+        document.getElementById('report-passed-months').textContent = `(${reportRow.month}개월)`;
+        document.getElementById('comp-acc-profit-val').textContent = `${accumulatedProfit >= 0 ? '+' : ''}${formatNumber(accumulatedProfit)}원`;
+        document.getElementById('comp-acc-profit-val-ko').textContent = formatKoreanCurrency(accumulatedProfit);
+        document.getElementById('comp-acc-profit-bar').style.width = `${Math.max(0, (accumulatedProfit / maxValue) * 100)}%`;
+
         document.getElementById('comp-target-val').textContent = `${formatNumber(targetAsset)}원`;
+        document.getElementById('comp-target-val-ko').textContent = formatKoreanCurrency(targetAsset);
         document.getElementById('comp-target-status').textContent = `${targetAchievement}%`;
         document.getElementById('comp-target-bar').style.width = `${(targetAsset / maxValue) * 100}%`;
+        
         document.getElementById('comp-savings-val').textContent = `${formatNumber(savingsValue)}원`;
+        document.getElementById('comp-savings-val-ko').textContent = formatKoreanCurrency(savingsValue);
         document.getElementById('comp-savings-status').textContent = `${savingsDiffPercent >= 0 ? '+' : ''}${savingsDiffPercent}%`;
         document.getElementById('comp-savings-bar').style.width = `${(savingsValue / maxValue) * 100}%`;
         document.getElementById('report-total-growth-percent').textContent = `${growthPercent >= 0 ? '+' : ''}${growthPercent}%`;

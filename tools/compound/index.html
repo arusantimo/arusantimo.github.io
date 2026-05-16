@@ -289,14 +289,20 @@
                 <div class="main-stats">
                     <div class="stat-box large">
                         <div class="label">최종 운용 자산</div>
-                        <div id="report-total-asset" class="value">0원</div>
+                        <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                            <div id="report-total-asset" class="value">0원</div>
+                            <div id="report-total-asset-ko" style="font-size: 11px; color: var(--text-secondary); font-weight: 500;"></div>
+                        </div>
                         <div id="report-month-total-profit" class="total-profit-tag">금월 수익 합계: +0원</div>
                     </div>
                 </div>
                 <div class="sub-stats-grid">
                     <div class="stat-box">
                         <div class="label">단기 투자 수익</div>
-                        <div id="report-short-profit" class="value">0원</div>
+                        <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;">
+                            <div id="report-short-profit" class="value" style="font-size: 16px;">0원</div>
+                            <div id="report-short-profit-ko" style="font-size: 9px; color: var(--text-secondary);"></div>
+                        </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
                             <div id="report-short-target" class="target-tag">목표: 0원</div>
                             <div id="report-short-mult" class="mult-tag">0.0배</div>
@@ -304,7 +310,10 @@
                     </div>
                     <div class="stat-box">
                         <div class="label">장기 투자 수익</div>
-                        <div id="report-long-profit" class="value">0원</div>
+                        <div style="display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;">
+                            <div id="report-long-profit" class="value" style="font-size: 16px;">0원</div>
+                            <div id="report-long-profit-ko" style="font-size: 9px; color: var(--text-secondary);"></div>
+                        </div>
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
                             <div id="report-long-target" class="target-tag">목표: 0원</div>
                             <div id="report-long-mult" class="mult-tag">0.0배</div>
@@ -319,14 +328,28 @@
                     <div class="comp-item">
                         <div class="comp-info">
                             <div class="comp-label">현재 총 자산</div>
-                            <div id="comp-actual-val" class="comp-value">0원</div>
+                            <div style="display: flex; align-items: baseline; gap: 6px;">
+                                <div id="comp-actual-val" class="comp-value">0원</div>
+                                <div id="comp-actual-val-ko" style="font-size: 9px; color: var(--text-secondary); font-weight: normal;"></div>
+                            </div>
                         </div>
                         <div class="comp-bar-container"><div id="comp-actual-bar" class="comp-bar actual"></div></div>
                     </div>
                     <div class="comp-item">
                         <div class="comp-info">
+                            <div class="comp-label">누적 투자 수익 <span id="report-passed-months" style="font-size: 9px; opacity: 0.6; margin-left: 4px;">(0개월)</span></div>
+                            <div style="display: flex; align-items: baseline; gap: 6px;">
+                                <div id="comp-acc-profit-val" class="comp-value" style="color: var(--accent-success);">0원</div>
+                                <div id="comp-acc-profit-val-ko" style="font-size: 9px; color: var(--accent-success); opacity: 0.8; font-weight: normal;"></div>
+                            </div>
+                        </div>
+                        <div class="comp-bar-container"><div id="comp-acc-profit-bar" class="comp-bar success" style="background: linear-gradient(90deg, var(--accent-success), #0d9488);"></div></div>
+                    </div>
+                    <div class="comp-item">
+                        <div class="comp-info">
                             <div class="comp-label">초기 목표 대비 성과</div>
                             <div class="comp-value-group">
+                                <span id="comp-target-val-ko" style="font-size: 9px; color: var(--text-secondary); margin-right: 2px;"></span>
                                 <span id="comp-target-val" class="comp-sub-value">0원</span>
                                 <span id="comp-target-status" class="comp-main-value">0%</span>
                             </div>
@@ -337,6 +360,7 @@
                         <div class="comp-info">
                             <div class="comp-label">일반 저축 대비 성과</div>
                             <div class="comp-value-group">
+                                <span id="comp-savings-val-ko" style="font-size: 9px; color: var(--text-secondary); margin-right: 2px;"></span>
                                 <span id="comp-savings-val" class="comp-sub-value">0원</span>
                                 <span id="comp-savings-status" class="comp-main-value">+0%</span>
                             </div>
