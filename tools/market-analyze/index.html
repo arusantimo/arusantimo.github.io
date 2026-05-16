@@ -208,73 +208,146 @@
                     
                     <!-- Actionable Banner -->
                     <div id="actionable-guide-card" class="mb-6 p-4 rounded-lg bg-indigo-900/40 border-2 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                        <h3 id="actionable-title" class="text-lg font-bold mb-2 flex items-center text-indigo-400">
+                        <h3 id="actionable-title" class="text-base font-bold mb-2 flex items-center text-indigo-400">
                             <svg class="w-6 h-6 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
                             [긴급] 즉시 실행 액션 가이드
                         </h3>
-                        <p id="actionable-guide-text" class="text-indigo-100 text-sm md:text-base font-bold leading-relaxed">
+                        <p id="actionable-guide-text" class="text-indigo-100 text-xs md:text-sm font-bold leading-relaxed">
                             데이터 동기화 대기 중...
                         </p>
                     </div>
 
-                    <h3 class="text-md font-bold mb-4 text-emerald-400 flex items-center border-b border-slate-700 pb-3">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        Quant v3.6 및 장기 투자 포트폴리오 연동 평가
+                    <h3 class="text-md font-bold mb-4 text-emerald-400 flex items-center justify-between border-b border-slate-700 pb-3">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            통합 포트폴리오 비중 최적화 가이드
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="btn-portfolio-export" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded border border-slate-600 transition-colors">설정 저장</button>
+                            <button id="btn-portfolio-import" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded border border-slate-600 transition-colors">불러오기</button>
+                            <input type="file" id="file-portfolio-import" class="hidden" accept=".json">
+                        </div>
                     </h3>
 
-                    <div class="space-y-4">
-                        <!-- 수비 (Core) 레이어 -->
-                        <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                            <h4 class="text-sm font-semibold text-slate-300 mb-3 flex items-center">🛡️ 수비 (Core) 계좌 운영 평가</h4>
-                            <div class="space-y-3">
-                                <div class="flex flex-col md:flex-row md:items-center justify-between text-xs pb-3 border-b border-slate-700/50">
-                                    <div class="w-full md:w-1/3 mb-1 md:mb-0">
-                                        <span class="text-slate-200 font-bold block">ISA (중개형)</span>
-                                        <span class="text-slate-500">채권혼합형 펀드 (세제혜택 한도)</span>
-                                    </div>
-                                    <span id="eval-isa" class="w-full md:w-2/3 text-left md:text-right font-medium text-slate-400">데이터 대기 중...</span>
-                                </div>
-                                <div class="flex flex-col md:flex-row md:items-center justify-between text-xs pb-3 border-b border-slate-700/50">
-                                    <div class="w-full md:w-1/3 mb-1 md:mb-0">
-                                        <span class="text-slate-200 font-bold block">IRP</span>
-                                        <span class="text-slate-500">안정형 포트폴리오 (퇴직 전 유지)</span>
-                                    </div>
-                                    <span id="eval-irp" class="w-full md:w-2/3 text-left md:text-right font-medium text-slate-400">데이터 대기 중...</span>
-                                </div>
-                                <div class="flex flex-col md:flex-row md:items-center justify-between text-xs pb-1">
-                                    <div class="w-full md:w-1/3 mb-1 md:mb-0">
-                                        <span class="text-slate-200 font-bold block">CMA / 현금</span>
-                                        <span class="text-slate-500">기본 비중 10~20% 항시 유지</span>
-                                    </div>
-                                    <span id="eval-cma" class="w-full md:w-2/3 text-left md:text-right font-medium text-slate-400">데이터 대기 중...</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="space-y-6">
+                        <!-- 통합 테이블 가이드 -->
+                        <div class="overflow-x-auto bg-slate-900/50 rounded-lg border border-slate-700">
+                            <table class="w-full text-[11px] md:text-xs text-left border-collapse">
+                                <thead>
+                                    <tr class="text-slate-500 border-b border-slate-700 bg-slate-800/50">
+                                        <th class="py-3 px-3">계좌/전략</th>
+                                        <th class="py-3 px-3">현재 현금 비중 (%)</th>
+                                        <th class="py-3 px-3">마켓 사이클 권고 대응</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="portfolio-guide-body" class="text-slate-300">
+                                    <!-- 장기 투자 섹션 -->
+                                    <tr class="bg-slate-800/30">
+                                        <td colspan="3" class="py-2 px-3 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">🏔️ 장기 투자 포트폴리오 (Core & Satellite)</td>
+                                    </tr>
+                                    <!-- ISA -->
+                                    <tr class="border-b border-slate-800/50">
+                                        <td class="py-4 px-3">
+                                            <span class="text-slate-100 font-bold block">ISA (중개형)</span>
+                                            <span class="text-[10px] text-slate-500">채권혼합형 (Core)</span>
+                                        </td>
+                                        <td class="py-4 px-3">
+                                            <div class="flex flex-col items-center gap-1">
+                                                <span class="text-[9px] text-slate-500 mb-1">공격 자산 비중</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[8px] text-slate-600">방어</span>
+                                                    <input type="range" min="0" max="100" data-key="isa" data-field="aggressiveRatio" class="portfolio-input w-24 accent-rose-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                    <span class="text-[8px] text-slate-600">공격</span>
+                                                </div>
+                                                <span class="portfolio-val text-[10px] text-slate-400 font-mono">0%</span>
+                                            </div>
+                                        </td>
+                                        <td id="eval-isa" class="py-4 px-3 font-medium text-slate-400">데이터 대기 중...</td>
+                                    </tr>
+                                    <!-- Pension -->
+                                    <tr class="border-b border-slate-800/50">
+                                        <td class="py-4 px-3">
+                                            <span class="text-emerald-400 font-bold block">연금저축</span>
+                                            <span class="text-[10px] text-slate-500">지수 추종 (Satellite)</span>
+                                        </td>
+                                        <td class="py-4 px-3">
+                                            <div class="flex flex-col items-center gap-1">
+                                                <span class="text-[9px] text-slate-500 mb-1">공격 자산 비중</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[8px] text-slate-600">방어</span>
+                                                    <input type="range" min="0" max="100" data-key="pension" data-field="aggressiveRatio" class="portfolio-input w-24 accent-rose-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                    <span class="text-[8px] text-slate-600">공격</span>
+                                                </div>
+                                                <span class="portfolio-val text-[10px] text-slate-400 font-mono">0%</span>
+                                            </div>
+                                        </td>
+                                        <td id="eval-pension" class="py-4 px-3 font-medium text-slate-400">데이터 대기 중...</td>
+                                    </tr>
+                                    <!-- Gen Long / CMA -->
+                                    <tr class="border-b border-slate-800/50">
+                                        <td class="py-4 px-3">
+                                            <span class="text-emerald-400 font-bold block">일반 계좌 / CMA (현금)</span>
+                                            <span class="text-[10px] text-slate-500">장기 적립 & 현금 버퍼</span>
+                                        </td>
+                                        <td class="py-4 px-3">
+                                            <div class="flex flex-col gap-3 py-1">
+                                                <div class="flex flex-col items-center gap-1">
+                                                    <span class="text-[9px] text-slate-500">현금(CMA) 비중</span>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="text-[8px] text-slate-600">투자</span>
+                                                        <input type="range" min="0" max="100" data-key="genLong" data-field="cashRatio" class="portfolio-input w-24 accent-emerald-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                        <span class="text-[8px] text-slate-600">현금</span>
+                                                    </div>
+                                                    <span class="portfolio-val text-[9px] text-slate-400 font-mono">0%</span>
+                                                </div>
+                                                <div class="flex flex-col items-center gap-1">
+                                                    <span class="text-[9px] text-slate-500">공격 자산 비중</span>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="text-[8px] text-slate-600">방어</span>
+                                                        <input type="range" min="0" max="100" data-key="genLong" data-field="aggressiveRatio" class="portfolio-input w-24 accent-rose-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                        <span class="text-[8px] text-slate-600">공격</span>
+                                                    </div>
+                                                    <span class="portfolio-val text-[9px] text-slate-400 font-mono">0%</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td id="eval-gen-long" class="py-4 px-3 font-medium text-slate-400">데이터 대기 중...</td>
+                                    </tr>
 
-                        <!-- 공격 (Satellite) 레이어 -->
-                        <div class="bg-slate-900/50 p-4 rounded-lg border border-slate-700">
-                            <h4 class="text-sm font-semibold text-slate-300 mb-3 flex items-center">⚔️ 공격 (Satellite) 계좌 운영 평가</h4>
-                            <div class="space-y-3">
-                                <div class="flex flex-col md:flex-row md:items-center justify-between text-xs pb-3 border-b border-slate-700/50">
-                                    <div class="w-full md:w-1/3 mb-1 md:mb-0">
-                                        <span class="text-slate-200 font-bold block">연금저축</span>
-                                        <span class="text-slate-500">매년 900만 (S&P500/Nasdaq100 장기우상향)</span>
-                                    </div>
-                                    <span id="eval-pension" class="w-full md:w-2/3 text-left md:text-right font-medium text-slate-400">데이터 대기 중...</span>
-                                </div>
-                                <div class="flex flex-col md:flex-row md:items-center justify-between text-xs pb-1">
-                                    <div class="w-full md:w-1/3 mb-1 md:mb-0">
-                                        <span class="text-slate-200 font-bold block">일반 증권계좌</span>
-                                        <span class="text-slate-500">단기/스윙 매매 (Quant v3.6 연동)</span>
-                                    </div>
-                                    <span id="eval-quant" class="w-full md:w-2/3 text-left md:text-right font-medium text-slate-400">데이터 대기 중...</span>
-                                </div>
-                            </div>
+                                    <!-- 단기 투자 섹션 -->
+                                    <tr class="bg-slate-800/30">
+                                        <td colspan="3" class="py-2 px-3 text-[10px] font-bold text-amber-400 uppercase tracking-wider">⚡ 단기 투자 전략 (Quant v3.6)</td>
+                                    </tr>
+                                    <!-- Quant -->
+                                    <tr>
+                                        <td class="py-4 px-3">
+                                            <span class="text-amber-400 font-bold block">일반 계좌 (단기)</span>
+                                            <span class="text-[10px] text-slate-500">퀀트 v3.6 (Alpha)</span>
+                                        </td>
+                                        <td class="py-4 px-3">
+                                            <div class="flex flex-col items-center gap-1">
+                                                <span class="text-[9px] text-slate-500 mb-1">현금 비중</span>
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[8px] text-slate-600">투자</span>
+                                                    <input type="range" min="0" max="100" data-key="quant" class="portfolio-input w-24 accent-amber-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                    <span class="text-[8px] text-slate-600">현금</span>
+                                                </div>
+                                                <span class="portfolio-val text-[10px] text-slate-400 font-mono">0%</span>
+                                            </div>
+                                        </td>
+                                        <td id="eval-quant" class="py-4 px-3 font-medium text-slate-400">데이터 대기 중...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
+                        
+                        <p class="text-[10px] text-slate-500 leading-relaxed italic px-1">
+                            * 현재 각 계좌의 **현금 비중(%)**을 입력하면 현재 마켓 단계(P-Index)의 권장 비중과 비교하여 매수/매도 방향성을 제안합니다.
+                        </p>
                     </div>
                 </div>
 

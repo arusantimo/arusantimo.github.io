@@ -1,0 +1,32 @@
+{
+  "isa": {
+    "total": 0,
+    "cash": 0,
+    "cashRatio": "",
+    "aggressiveRatio": "51"
+  },
+  "pension": {
+    "total": "8000",
+    "cash": 0,
+    "aggressiveRatio": "20"
+  },
+  "genLong": {
+    "total": 0,
+    "cash": 0,
+    "cashRatio": "51",
+    "aggressiveRatio": "84"
+  },
+  "quant": {
+    "total": 0,
+    "cash": 0,
+    "cashRatio": "66"
+  },
+  "cma": {
+    "total": 0,
+    "cash": 0
+  },
+  "irp": {
+    "total": 0,
+    "cash": 0
+  }
+}
