@@ -855,6 +855,14 @@ body.modal-scroll-locked {
   margin-bottom: 12px;
 }
 
+.scard-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .scard-name {
   font-size: 16px;
   font-weight: 800;
@@ -898,6 +906,25 @@ body.modal-scroll-locked {
   background: var(--bg-secondary);
   color: var(--text-secondary);
   border: 1px solid var(--border-color);
+}
+
+.badge-shift {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+}
+
+.badge-shift-good {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--text-success);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.badge-shift-bad {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--text-danger);
+  border: 1px solid rgba(239, 68, 68, 0.22);
 }
 
 .price-row {
@@ -1404,6 +1431,22 @@ body.modal-scroll-locked {
 .modal-verdict.sell { background: rgba(239, 68, 68, 0.1); color: var(--text-danger); border: 1px solid rgba(239,68,68,0.25); }
 .modal-verdict.caution { background: rgba(245, 158, 11, 0.1); color: var(--text-warning); border: 1px solid rgba(245,158,11,0.25); }
 .modal-verdict.hold { background: rgba(16, 185, 129, 0.1); color: var(--text-success); border: 1px solid rgba(16,185,129,0.25); }
+.modal-verdict-shift {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.modal-verdict-shift.badge-shift-good {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--text-success);
+  border: 1px solid rgba(16, 185, 129, 0.24);
+}
+
+.modal-verdict-shift.badge-shift-bad {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--text-danger);
+  border: 1px solid rgba(239, 68, 68, 0.24);
+}
 
 .regime-report-btn {
   padding: 4px 8px;
@@ -1419,6 +1462,85 @@ body.modal-scroll-locked {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 6px;
+}
+
+.scard-plan-current {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.scard-plan-tags {
+  margin-top: 6px;
+}
+
+.plan-current-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+}
+
+.plan-current-summary {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.plan-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.plan-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 8px 9px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.plan-check.active {
+  border-color: rgba(16, 185, 129, 0.22);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.plan-check.available,
+.plan-check.guard {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+.plan-check.blocked {
+  border-color: rgba(239, 68, 68, 0.22);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.plan-check-icon {
+  font-size: 14px;
+  line-height: 1.2;
+  margin-top: 1px;
+}
+
+.plan-check-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.plan-check-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.plan-check-text {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 .plan-prices {
@@ -1471,6 +1593,24 @@ body.modal-scroll-locked {
 
 .modal-triggered-rule {
   margin: 12px 0;
+}
+
+.sell-strategy-panel {
+  margin: 14px 0 12px;
+}
+
+.sell-strategy-summary {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.sell-strategy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .modal-triggered-rule .modal-ind-card.triggered {

@@ -5,6 +5,8 @@ const PROXIES = [
   'https://corsproxy.io/?'
 ];
 
+const ANALYSIS_ARCHIVE_KEY = 'stockAnalyzePreviousAnalysisSnapshotsV1';
+
 const RULE_GUIDE = {
   regimes: [
     {
@@ -239,6 +241,315 @@ function createEmptyGapScore() {
   };
 }
 
+function createEmptyLiveGapState() {
+  return {
+    status: 'idle',
+    score: createEmptyGapScore(),
+    fetchedAt: '',
+    source: '',
+    error: ''
+  };
+}
+
+function formatSignedNumber(value, digits = 1) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '-';
+  return `${num >= 0 ? '+' : ''}${num.toFixed(digits)}`;
+}
+
+function parseGapNumeric(value) {
+  const match = String(value ?? '').replace(/,/g, '').match(/[+-]?\d+(?:\.\d+)?/);
+  return match ? Number.parseFloat(match[0]) : NaN;
+}
+
+function getGapTotalNumber(gapScore) {
+  const fromTotal = parseGapNumeric(gapScore?.totalScore);
+  if (Number.isFinite(fromTotal)) return fromTotal;
+  const sum = (gapScore?.rows || []).reduce((acc, row) => {
+    const weighted = parseGapNumeric(row.weightedScore);
+    return Number.isFinite(weighted) ? acc + weighted : acc;
+  }, 0);
+  return sum;
+}
+
+function isLiveGapReady() {
+  return liveGapState.status === 'ready' && liveGapState.score.rows.length > 0;
+}
+
+function getActiveGapScore() {
+  return isLiveGapReady() ? liveGapState.score : notionSnapshot.gapScore;
+}
+
+function getGapGradeByTotal(totalScore) {
+  if (totalScore >= 7) return 'G-A';
+  if (totalScore >= 2) return 'G-B';
+  if (totalScore >= -2.9) return 'G-C';
+  if (totalScore >= -7.9) return 'G-D';
+  return 'G-E';
+}
+
+function getGapGradeDisplay(grade) {
+  const meta = RULE_GUIDE.gapGrades.find(row => row.grade === grade);
+  return meta ? `${meta.grade} ${meta.color}` : grade;
+}
+
+function getGapGradeRank(grade) {
+  const code = getGapGradeCode(grade);
+  return ['G-A', 'G-B', 'G-C', 'G-D', 'G-E'].indexOf(code);
+}
+
+function getGapComparisonSignal() {
+  if (!isLiveGapReady()) {
+    return {
+      available: false,
+      bias: 0,
+      scoreDelta: 0,
+      gradeShift: 0,
+      tone: 'neutral',
+      summary: '실시간 비교 없음'
+    };
+  }
+
+  const notionGap = notionSnapshot.gapScore;
+  const notionTotal = getGapTotalNumber(notionGap);
+  const liveTotal = getGapTotalNumber(liveGapState.score);
+  const notionRank = getGapGradeRank(notionGap.grade);
+  const liveRank = getGapGradeRank(liveGapState.score.grade);
+  const gradeShift = notionRank >= 0 && liveRank >= 0 ? notionRank - liveRank : 0;
+  const scoreDelta = Number.isFinite(liveTotal) && Number.isFinite(notionTotal) ? liveTotal - notionTotal : 0;
+
+  let bias = 0;
+  if (scoreDelta >= 3 || gradeShift >= 1) bias = 1;
+  else if (scoreDelta <= -3 || gradeShift <= -1) bias = -1;
+
+  const tone = bias > 0 ? 'improved' : bias < 0 ? 'worsened' : 'neutral';
+  const summary = bias > 0
+    ? `실시간 갭 환경이 노션 대비 개선됨 (${formatSignedNumber(scoreDelta, 1)}점)`
+    : bias < 0
+      ? `실시간 갭 환경이 노션 대비 악화됨 (${formatSignedNumber(scoreDelta, 1)}점)`
+      : `실시간 갭 환경이 노션과 유사함 (${formatSignedNumber(scoreDelta, 1)}점)`;
+
+  return {
+    available: Number.isFinite(liveTotal) || gradeShift !== 0,
+    bias,
+    scoreDelta,
+    gradeShift,
+    tone,
+    summary
+  };
+}
+
+function getGapComparisonText() {
+  if (!isLiveGapReady()) return '';
+  const notionGap = notionSnapshot.gapScore;
+  const notionTotal = getGapTotalNumber(notionGap);
+  if (!Number.isFinite(notionTotal) && !notionGap.grade) return '';
+  const liveTotal = getGapTotalNumber(liveGapState.score);
+  const delta = Number.isFinite(liveTotal) && Number.isFinite(notionTotal) ? liveTotal - notionTotal : NaN;
+  const notionLabel = notionGap.grade || '미확인';
+  const liveLabel = liveGapState.score.grade || '미확인';
+  const deltaText = Number.isFinite(delta) ? ` / ${formatSignedNumber(delta, 1)}점 변화` : '';
+  return `노션 ${notionLabel}${Number.isFinite(notionTotal) ? ` (${formatSignedNumber(notionTotal, 1)}점)` : ''} → 실시간 ${liveLabel}${Number.isFinite(liveTotal) ? ` (${formatSignedNumber(liveTotal, 1)}점)` : ''}${deltaText}`;
+}
+
+function scoreNqChange(changePct) {
+  if (changePct >= 1.5) return 2;
+  if (changePct >= 0.5) return 1;
+  if (changePct > -0.5) return 0;
+  if (changePct >= -1.5) return -1;
+  return -2;
+}
+
+function scoreVixLevel(level) {
+  if (level < 12) return 2;
+  if (level < 17) return 1;
+  if (level < 22) return 0;
+  if (level < 28) return -1;
+  return -2;
+}
+
+function scoreBondBpChange(bpChange) {
+  if (bpChange <= -8) return 2;
+  if (bpChange < -3) return 1;
+  if (bpChange <= 3) return 0;
+  if (bpChange < 8) return -1;
+  return -2;
+}
+
+function scoreUsdKrwChange(changeWon) {
+  if (changeWon <= -15) return 2;
+  if (changeWon < -5) return 1;
+  if (changeWon <= 5) return 0;
+  if (changeWon < 15) return -1;
+  return -2;
+}
+
+function scoreSoxChange(changePct) {
+  if (changePct >= 1.5) return 2;
+  if (changePct >= 0) return 1;
+  if (changePct >= -1.5) return -1;
+  return -2;
+}
+
+function applyGapAdjustments(gapScore, gradeCode) {
+  const entryRow = RULE_GUIDE.gapEntryAdjustments.find(row => row.grade === gradeCode);
+  const sellRow = RULE_GUIDE.gapSellAdjustments.find(row => row.grade === gradeCode);
+  gapScore.grade = getGapGradeDisplay(gradeCode);
+  gapScore.entryAdjustment = entryRow ? `${entryRow.trend} / ${entryRow.reversal}` : '';
+  gapScore.sellAdjustment = sellRow ? `${sellRow.premarket} | ${sellRow.stopLoss}` : '';
+  gapScore.swingAdjustment = sellRow ? sellRow.swing : '';
+}
+
+function buildLiveGapScore(liveMetrics) {
+  const gapScore = createEmptyGapScore();
+  const rows = [
+    {
+      indicator: 'NQ 선물 변화율',
+      actualValue: `${formatSignedNumber(liveMetrics.nq.changePct, 2)}%`,
+      baseScore: scoreNqChange(liveMetrics.nq.changePct),
+      weight: 2.5
+    },
+    {
+      indicator: 'VIX 수준',
+      actualValue: liveMetrics.vix.current.toFixed(2),
+      baseScore: scoreVixLevel(liveMetrics.vix.current),
+      weight: 2.0
+    },
+    {
+      indicator: '미국 10년물 금리 전일비',
+      actualValue: `${formatSignedNumber(liveMetrics.tnx.bpChange, 1)}bp`,
+      baseScore: scoreBondBpChange(liveMetrics.tnx.bpChange),
+      weight: 1.5
+    },
+    {
+      indicator: '원달러 환율 변화',
+      actualValue: `${formatSignedNumber(liveMetrics.krw.changeWon, 2)}원`,
+      baseScore: scoreUsdKrwChange(liveMetrics.krw.changeWon),
+      weight: 1.5
+    },
+    {
+      indicator: 'SOX 전일 변화율',
+      actualValue: `${formatSignedNumber(liveMetrics.sox.changePct, 2)}%`,
+      baseScore: scoreSoxChange(liveMetrics.sox.changePct),
+      weight: 1.0
+    }
+  ];
+
+  gapScore.rows = rows.map(row => {
+    const weighted = row.baseScore * row.weight;
+    return {
+      indicator: row.indicator,
+      actualValue: row.actualValue,
+      baseScore: `${row.baseScore >= 0 ? '+' : ''}${row.baseScore}점`,
+      weight: `×${row.weight.toFixed(1)}`,
+      formula: `${row.baseScore >= 0 ? '+' : ''}${row.baseScore} × ${row.weight.toFixed(1)} = ${formatSignedNumber(weighted, 1)}점`,
+      weightedScore: `${formatSignedNumber(weighted, 1)}점`
+    };
+  });
+
+  const totalScore = gapScore.rows.reduce((acc, row) => acc + (parseGapNumeric(row.weightedScore) || 0), 0);
+  const gradeCode = getGapGradeByTotal(totalScore);
+  gapScore.totalScore = `${formatSignedNumber(totalScore, 1)}점`;
+  applyGapAdjustments(gapScore, gradeCode);
+  gapScore.note = '실시간 수집값 기준. 분석 시점의 야간 변동이 반영됩니다.';
+  return gapScore;
+}
+
+async function fetchYahooChartMetric(symbol) {
+  const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=5d&interval=1d`;
+  let lastError = null;
+
+  for (const proxy of PROXIES) {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(targetUrl), { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const meta = json?.chart?.result?.[0]?.meta;
+      if (!meta) throw new Error(json?.chart?.error?.description || 'meta missing');
+      return meta;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  try {
+    const res = await fetch(`https://r.jina.ai/http://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=5d&interval=1d`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Jina HTTP ${res.status}`);
+    const text = await res.text();
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start < 0 || end <= start) throw new Error('Jina JSON payload missing');
+    const json = JSON.parse(text.slice(start, end + 1));
+    const meta = json?.chart?.result?.[0]?.meta;
+    if (!meta) throw new Error(json?.chart?.error?.description || 'Jina meta missing');
+    return meta;
+  } catch (error) {
+    lastError = error;
+  }
+
+  throw lastError || new Error(`failed to fetch ${symbol}`);
+}
+
+async function refreshLiveGapScore(reasonLabel = '분석 시점') {
+  liveGapState = { ...createEmptyLiveGapState(), status: 'loading' };
+  renderAll();
+  log(`📡 ${reasonLabel} 실시간 갭 지표 5종 수집 중...`);
+
+  try {
+    const [nqMeta, vixMeta, tnxMeta, krwMeta, soxMeta] = await Promise.all([
+      fetchYahooChartMetric('NQ=F'),
+      fetchYahooChartMetric('^VIX'),
+      fetchYahooChartMetric('^TNX'),
+      fetchYahooChartMetric('KRW=X'),
+      fetchYahooChartMetric('^SOX')
+    ]);
+
+    const liveMetrics = {
+      nq: {
+        current: Number(nqMeta.regularMarketPrice),
+        previousClose: Number(nqMeta.chartPreviousClose),
+        changePct: ((Number(nqMeta.regularMarketPrice) - Number(nqMeta.chartPreviousClose)) / Number(nqMeta.chartPreviousClose)) * 100
+      },
+      vix: {
+        current: Number(vixMeta.regularMarketPrice),
+        previousClose: Number(vixMeta.chartPreviousClose)
+      },
+      tnx: {
+        current: Number(tnxMeta.regularMarketPrice),
+        previousClose: Number(tnxMeta.chartPreviousClose),
+        bpChange: (Number(tnxMeta.regularMarketPrice) - Number(tnxMeta.chartPreviousClose)) * 100
+      },
+      krw: {
+        current: Number(krwMeta.regularMarketPrice),
+        previousClose: Number(krwMeta.chartPreviousClose),
+        changeWon: Number(krwMeta.regularMarketPrice) - Number(krwMeta.chartPreviousClose)
+      },
+      sox: {
+        current: Number(soxMeta.regularMarketPrice),
+        previousClose: Number(soxMeta.chartPreviousClose),
+        changePct: ((Number(soxMeta.regularMarketPrice) - Number(soxMeta.chartPreviousClose)) / Number(soxMeta.chartPreviousClose)) * 100
+      }
+    };
+
+    liveGapState = {
+      status: 'ready',
+      score: buildLiveGapScore(liveMetrics),
+      fetchedAt: new Date().toLocaleString('ko-KR', { hour12: false }),
+      source: 'Yahoo Finance chart API',
+      error: ''
+    };
+
+    const compareText = getGapComparisonText();
+    log(`✅ 실시간 갭 스코어 갱신 완료. (${liveGapState.score.grade}${compareText ? ` / ${compareText}` : ''})`);
+  } catch (error) {
+    liveGapState = { ...createEmptyLiveGapState(), status: 'error', error: error?.message || 'unknown error' };
+    log('<span style="color:var(--text-warning)">⚠️ 실시간 갭 지표 수집에 실패해 노션 기준 갭 스코어로 계속 분석합니다.</span>');
+    console.error(error);
+  } finally {
+    renderAll();
+  }
+}
+
 function parseGapScoreRows(rows, gapScore) {
   rows.slice(1).forEach(row => {
     const cells = row.map(stripMarkdownText);
@@ -262,17 +573,29 @@ function parseGapScoreRows(rows, gapScore) {
 }
 
 function renderGapScoreSummary() {
-  const gapScore = notionSnapshot.gapScore;
+  const notionGapScore = notionSnapshot.gapScore;
+  const gapScore = getActiveGapScore();
+  const isLive = isLiveGapReady();
   if (!gapScore.rows.length && !gapScore.totalScore && !gapScore.grade) return '';
+
+  const comparisonText = getGapComparisonText();
+  const dataStatusText = isLive
+    ? `실시간 분석 기준은 ${liveGapState.source}에서 ${liveGapState.fetchedAt}에 수집했습니다. 노션 값은 전일 장마감 전 스냅샷으로 비교 기준으로 유지합니다.`
+    : liveGapState.status === 'error'
+      ? `실시간 수집에 실패해 노션 보고서 기준 갭 스코어를 사용 중입니다. (${escapeHtml(liveGapState.error)})`
+      : '현재 화면의 갭 스코어는 노션 보고서에 적힌 값을 파싱한 결과입니다. 분석 버튼 실행 시 실시간 수집을 시도합니다.';
+  const caption = isLive
+    ? '실시간으로 수집한 5개 지표를 우선 적용하고, 노션 스냅샷과의 차이로 overnight drift를 확인합니다.'
+    : '기본 점수에 중요도를 곱해 반영 점수를 만들고, 그 합계로 다음 날 갭 위험을 판단합니다.';
 
   return `
     <div class="gap-score-panel">
       <div class="gap-score-head">
         <div>
           <div class="gap-score-title">📡 익일 갭 예측 스코어</div>
-          <div class="gap-score-caption">기본 점수에 중요도를 곱해 반영 점수를 만들고, 그 합계로 다음 날 갭 위험을 판단합니다.</div>
+          <div class="gap-score-caption">${escapeHtml(caption)}</div>
         </div>
-        ${gapScore.grade ? `<button type="button" class="gap-score-grade gap-score-grade-trigger" aria-label="갭 등급 기준 보기">갭 등급: ${escapeHtml(gapScore.grade)}</button>` : ''}
+        ${gapScore.grade ? `<button type="button" class="gap-score-grade gap-score-grade-trigger" aria-label="갭 등급 기준 보기">갭 등급: ${escapeHtml(gapScore.grade)}${isLive ? ' · 실시간' : ''}</button>` : ''}
       </div>
       <table class="guide-table compact-table gap-score-table">
         <thead>
@@ -309,6 +632,9 @@ function renderGapScoreSummary() {
         ${gapScore.sellAdjustment ? `<div class="gap-score-meta-item"><strong>매도 조정</strong><span>${escapeHtml(gapScore.sellAdjustment)}</span></div>` : ''}
         ${gapScore.swingAdjustment ? `<div class="gap-score-meta-item"><strong>스윙 전환</strong><span>${escapeHtml(gapScore.swingAdjustment)}</span></div>` : ''}
         ${gapScore.note ? `<div class="gap-score-meta-item"><strong>특이사항</strong><span>${escapeHtml(gapScore.note)}</span></div>` : ''}
+        ${comparisonText ? `<div class="gap-score-meta-item"><strong>노션 비교</strong><span>${escapeHtml(comparisonText)}</span></div>` : ''}
+        ${isLive && notionGapScore.note ? `<div class="gap-score-meta-item"><strong>노션 기준</strong><span>${escapeHtml(notionGapScore.grade || '미확인')} / ${escapeHtml(notionGapScore.note)}</span></div>` : ''}
+        <div class="gap-score-meta-item"><strong>데이터 상태</strong><span>${escapeHtml(dataStatusText)}</span></div>
       </div>
     </div>
   `;
@@ -319,6 +645,73 @@ function getGapGradeCode(value) {
   return match ? match[0] : '';
 }
 
+function adjustPriceByRatePoint(basePrice, targetPrice, ratePointDelta) {
+  if (!basePrice || !targetPrice || !ratePointDelta) return targetPrice;
+  return Math.max(0, Math.round(targetPrice - (basePrice * ratePointDelta / 100)));
+}
+
+function clampNumber(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function getGapSellAdjustmentProfile() {
+  const activeGapScore = getActiveGapScore();
+  const grade = getGapGradeCode(activeGapScore.grade);
+  const guideRow = RULE_GUIDE.gapSellAdjustments.find(row => row.grade === grade) || null;
+  const comparison = getGapComparisonSignal();
+
+  const profiles = {
+    'G-A': { severity: 'clear', premarketRateOffset: 0, tightenStopLossRate: 0, immediatePartialExit: false, swingMode: 'allow' },
+    'G-B': { severity: 'clear', premarketRateOffset: 0, tightenStopLossRate: 0, immediatePartialExit: false, swingMode: 'allow' },
+    'G-C': { severity: 'unknown', premarketRateOffset: 0.5, tightenStopLossRate: 0.5, immediatePartialExit: false, swingMode: 'conditional' },
+    'G-D': { severity: 'triggered', premarketRateOffset: 0, tightenStopLossRate: 1.0, immediatePartialExit: true, swingMode: 'ban' },
+    'G-E': { severity: 'triggered', premarketRateOffset: 0, tightenStopLossRate: 1.0, immediatePartialExit: true, swingMode: 'ban' }
+  };
+
+  const profile = profiles[grade] || { severity: 'unknown', premarketRateOffset: 0, tightenStopLossRate: 0, immediatePartialExit: false, swingMode: 'allow' };
+
+  const adjustedPremarketRateOffset = clampNumber(profile.premarketRateOffset + (comparison.bias < 0 ? 0.5 : comparison.bias > 0 ? -0.5 : 0), 0, 1.5);
+  const adjustedTightenStopLossRate = clampNumber(profile.tightenStopLossRate + (comparison.bias < 0 ? 0.5 : comparison.bias > 0 ? -0.5 : 0), 0, 1.5);
+
+  let adjustedSwingMode = profile.swingMode;
+  if (comparison.bias > 0 && profile.swingMode === 'conditional') adjustedSwingMode = 'allow';
+  if (comparison.bias < 0 && profile.swingMode === 'allow') adjustedSwingMode = 'conditional';
+  if (comparison.bias < 0 && profile.swingMode === 'conditional') adjustedSwingMode = 'ban';
+
+  const severity = adjustedSwingMode === 'ban' || profile.immediatePartialExit
+    ? 'triggered'
+    : adjustedTightenStopLossRate > 0 || adjustedSwingMode === 'conditional'
+      ? 'unknown'
+      : 'clear';
+
+  const swingText = adjustedSwingMode === 'allow' ? '허용' : adjustedSwingMode === 'conditional' ? '조건부 허용' : '금지';
+  const stopLossText = adjustedTightenStopLossRate > 0
+    ? `손절폭 -${adjustedTightenStopLossRate.toFixed(1)}%p 축소`
+    : '기본 손절폭 유지';
+  const premarketText = profile.immediatePartialExit
+    ? guideRow?.premarket || '프리마켓 첫 가격 즉시 50% 정리'
+    : adjustedPremarketRateOffset > 0
+      ? `프리마켓 갭업 기준 -${adjustedPremarketRateOffset.toFixed(1)}%p 하향`
+      : '기본 조건 유지';
+
+  return {
+    code: grade,
+    label: activeGapScore.grade || '미확인',
+    severity,
+    premarketRateOffset: adjustedPremarketRateOffset,
+    tightenStopLossRate: adjustedTightenStopLossRate,
+    immediatePartialExit: profile.immediatePartialExit,
+    swingMode: adjustedSwingMode,
+    premarketText,
+    stopLossText,
+    swingText,
+    comparison,
+    summary: grade
+      ? `갭 ${grade} 적용: 프리마켓 ${premarketText} / 손절 ${stopLossText} / 스윙 ${swingText}${comparison.available ? ` / 비교 보정: ${comparison.summary}` : ''}`
+      : '갭 등급 미확인: 기본 매도 기준 유지'
+  };
+}
+
 let activeTab = 'buy';
 let stocks = {
   pullback: [],
@@ -326,9 +719,302 @@ let stocks = {
   swing: []
 };
 let notionSnapshot = createEmptySnapshot();
+let liveGapState = createEmptyLiveGapState();
 const stockDetailMap = {};
 let currentModalState = { code: null, mode: null };
 let isRegimeSummaryCollapsed = false;
+
+function readAnalysisArchive() {
+  try {
+    const raw = localStorage.getItem(ANALYSIS_ARCHIVE_KEY);
+    if (!raw) return { buy: null, sell: {} };
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return { buy: null, sell: {} };
+    return {
+      buy: parsed.buy || null,
+      sell: parsed.sell && typeof parsed.sell === 'object' ? parsed.sell : {}
+    };
+  } catch (error) {
+    console.error(error);
+    return { buy: null, sell: {} };
+  }
+}
+
+function writeAnalysisArchive(archive) {
+  try {
+    localStorage.setItem(ANALYSIS_ARCHIVE_KEY, JSON.stringify(archive));
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+
+function getStageTimeLabel(date = new Date()) {
+  const hh = date.getHours().toString().padStart(2, '0');
+  const mm = date.getMinutes().toString().padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+function getSellStageKeyByTime(date = new Date()) {
+  const totalMins = date.getHours() * 60 + date.getMinutes();
+  return totalMins < (9 * 60 + 8) ? 'stage1' : 'stage2';
+}
+
+function formatArchiveButtonTime(archiveItem) {
+  if (!archiveItem) return '';
+  if (archiveItem.analysisTime) return archiveItem.analysisTime;
+  const savedAt = archiveItem.savedAt ? new Date(archiveItem.savedAt) : null;
+  if (!(savedAt instanceof Date) || Number.isNaN(savedAt.getTime())) return '';
+  return getStageTimeLabel(savedAt);
+}
+
+function getActiveArchiveForTab(tab = activeTab, now = new Date()) {
+  const archive = readAnalysisArchive();
+  if (tab === 'buy') return archive.buy || null;
+  const stageKey = getSellStageKeyByTime(now);
+  return archive.sell?.[stageKey] || null;
+}
+
+function saveAnalysisArchive(mode, options = {}) {
+  const archive = readAnalysisArchive();
+  const payload = mode === 'buy'
+    ? buildBuyAnalysisArchive(options.timeLabel || getStageTimeLabel())
+    : buildSellAnalysisArchive(Boolean(options.isBefore0908), options.timeLabel || getStageTimeLabel());
+
+  if (!payload) return false;
+
+  if (mode === 'buy') {
+    archive.buy = payload;
+  } else {
+    archive.sell = {
+      ...(archive.sell || {}),
+      [payload.stage]: payload
+    };
+  }
+
+  if (!writeAnalysisArchive(archive)) return false;
+
+  if (options.logMessage) {
+    log(options.logMessage(payload));
+  }
+  return true;
+}
+
+function buildBuyAnalysisArchive(timeLabel = '') {
+  const entries = getAllBuyEntries()
+    .filter(entry => entry.liveRefresh)
+    .map(entry => ({
+      code: entry.code,
+      name: entry.name,
+      strategy: entry.strategy,
+      liveRefresh: entry.liveRefresh
+    }));
+
+  if (!entries.length) return null;
+
+  return {
+    type: 'buy',
+    label: '매수 분석',
+    savedAt: new Date().toISOString(),
+    analysisTime: timeLabel || getStageTimeLabel(),
+    count: entries.length,
+    liveGapState,
+    entries
+  };
+}
+
+function buildSellAnalysisArchive(isBefore0908, timeLabel = '') {
+  const stage = isBefore0908 ? 'stage1' : 'stage2';
+  const details = Object.values(stockDetailMap)
+    .filter(detail => detail?.mode === 'sell' && detail.isBefore0908 === isBefore0908)
+    .map(detail => ({
+      code: detail.stock?.code || '',
+      stock: detail.stock,
+      data: detail.data,
+      indicators: detail.indicators,
+      decision: detail.decision,
+      actionStage: detail.actionStage,
+      triggeredRule: detail.triggeredRule,
+      targets: detail.targets,
+      gainRate: detail.gainRate,
+      lossManagement: detail.lossManagement,
+      isBefore0908: detail.isBefore0908,
+      gapProfile: detail.gapProfile
+    }));
+
+  if (!details.length) return null;
+
+  return {
+    type: 'sell',
+    stage,
+    label: `매도 ${isBefore0908 ? '1차' : '2차'} 분석`,
+    savedAt: new Date().toISOString(),
+    analysisTime: timeLabel,
+    count: details.length,
+    liveGapState,
+    details
+  };
+}
+
+function saveAnalysisArchiveBeforeRecheck(mode, options = {}) {
+  return saveAnalysisArchive(mode, {
+    ...options,
+    logMessage: payload => `💾 ${payload.label} 재검사 전 결과 ${payload.count}건을 로컬스토리지에 저장했습니다.`
+  });
+}
+
+function saveAnalysisArchiveAfterAnalysis(mode, options = {}) {
+  return saveAnalysisArchive(mode, {
+    ...options,
+    logMessage: payload => `💾 ${payload.label} 완료 결과 ${payload.count}건을 로컬스토리지에 저장했습니다.`
+  });
+}
+
+function clearSellDetailMap() {
+  Object.keys(stockDetailMap).forEach(code => delete stockDetailMap[code]);
+}
+
+function ensureArchivedSellStock(restoredStock) {
+  if (!restoredStock?.code || !restoredStock?.type || !stocks[restoredStock.type]) return restoredStock;
+  const existing = stocks[restoredStock.type].find(stock => stock.code === restoredStock.code);
+  if (existing) return existing;
+  const normalized = { ...restoredStock };
+  stocks[restoredStock.type].push(normalized);
+  return normalized;
+}
+
+function getLatestArchivedGapState(archive) {
+  const candidates = [archive?.buy, archive?.sell?.stage1, archive?.sell?.stage2]
+    .filter(item => item?.liveGapState && item?.savedAt)
+    .sort((left, right) => new Date(right.savedAt).getTime() - new Date(left.savedAt).getTime());
+  return candidates[0]?.liveGapState || null;
+}
+
+function restoreBuyAnalysisArchive(archiveItem) {
+  if (!archiveItem?.entries?.length) return false;
+  const entryMap = new Map(archiveItem.entries.map(entry => [entry.code, entry.liveRefresh]));
+  let restored = 0;
+
+  getAllBuyEntries().forEach(entry => {
+    const liveRefresh = entryMap.get(entry.code);
+    if (!liveRefresh) return;
+    entry.liveRefresh = liveRefresh;
+    restored += 1;
+  });
+
+  if (!restored) return false;
+  renderBuyStockCards();
+  return true;
+}
+
+function renderSellDetailToCard(detail) {
+  const { stock, data, indicators, decision, actionStage, gainRate, lossManagement, gapProfile, targets } = detail;
+  const card = document.getElementById(`card-${stock.code}`);
+  if (!card) return;
+  const priceRow = document.getElementById(`price-row-${stock.code}`);
+  const meta = document.getElementById(`meta-${stock.code}`);
+  const planBox = document.getElementById(`plan-${stock.code}`);
+  const indBox = document.getElementById(`ind-${stock.code}`);
+  const badge = document.getElementById(`badge-${stock.code}`);
+  const entry = getEntryByCode(stock.code);
+  const entryPrice = stock.entryPrice || targets?.entryPrice || entry?.entryPriceValue || data.prevClose;
+  const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
+  const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
+  const absChg = Math.abs(data.chgRate).toFixed(2);
+  const gainFromEntry = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
+
+  priceRow.innerHTML = `
+    <span class="price">${data.currentPrice.toLocaleString()}원</span>
+    <span class="chg ${chgClass}" style="font-size:14px;font-weight:700">${chgPrefix}${absChg}%</span>
+    ${stock.type === 'swing' ? `<span class="chg ${gainFromEntry >= 0 ? 'up' : 'dn'}" style="font-size:12px;margin-left:8px">매수 대비 ${gainFromEntry >= 0 ? '+' : ''}${gainFromEntry.toFixed(2)}%</span>` : ''}
+  `;
+  meta.innerHTML = `
+    <span style="opacity:0.7">진입가:</span> <strong>${entryPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
+    <span style="opacity:0.7">시가:</span> <strong>${data.openPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
+    <span style="opacity:0.7">체결강도:</span> <strong>${data.strength !== null && data.strength !== undefined ? `${data.strength.toFixed(2)}%` : '미연동'}</strong>
+  `;
+
+  const visibleIndicators = indicators.filter(ind => ind.status !== 'unknown' || ind.title === '갭 등급 조정');
+  const displayIndicators = visibleIndicators.length > 0 ? visibleIndicators : indicators;
+  let cardIndicatorHtml = displayIndicators
+    .map(indicator => `<div class="ind-item ${indicator.status}">${indicator.title}: ${indicator.result}</div>`)
+    .join('');
+
+  if (stock.type === 'swing' && lossManagement && gainRate < 0) {
+    cardIndicatorHtml += `<div class="ind-item ${lossManagement.totalScore >= lossManagement.holdThreshold ? 'clear' : lossManagement.totalScore >= lossManagement.cautionThreshold ? 'unknown' : 'triggered'}" style="margin-top:4px;font-weight:700">
+      손실 관리: ${lossManagement.verdict} | 최대손절 ${lossManagement.maxStopPrice.toLocaleString()}원 | 권장손절 ${lossManagement.recommendedStopPrice.toLocaleString()}원
+    </div>`;
+  }
+
+  indBox.innerHTML = cardIndicatorHtml;
+  if (planBox) {
+    planBox.innerHTML = buildSellCardPlanSummary(stock.code);
+  }
+
+  card.className = `scard ${decision}`;
+  const badgeInfo = getActionBadge(decision, actionStage);
+  badge.className = `badge ${badgeInfo.cls}`;
+  badge.innerText = badgeInfo.text;
+
+  const shiftBadge = document.getElementById(`gap-shift-${stock.code}`);
+  const shiftBadgeInfo = getGapComparisonBadge(gapProfile?.comparison);
+  if (shiftBadge) {
+    if (shiftBadgeInfo) {
+      shiftBadge.className = `badge badge-shift ${shiftBadgeInfo.cls}`;
+      shiftBadge.innerText = shiftBadgeInfo.text;
+      shiftBadge.title = shiftBadgeInfo.detail;
+      shiftBadge.style.display = 'inline-flex';
+    } else {
+      shiftBadge.className = 'badge badge-shift';
+      shiftBadge.innerText = '';
+      shiftBadge.title = '';
+      shiftBadge.style.display = 'none';
+    }
+  }
+
+  const newCard = card.cloneNode(true);
+  card.parentNode.replaceChild(newCard, card);
+  newCard.addEventListener('click', () => openModal(stock.code, 'sell'));
+}
+
+function restoreSellAnalysisArchive(archiveItem) {
+  if (!archiveItem?.details?.length) return false;
+
+  clearSellDetailMap();
+  archiveItem.details.forEach(savedDetail => {
+    ensureArchivedSellStock(savedDetail.stock);
+  });
+  renderSellStockCards();
+
+  archiveItem.details.forEach(savedDetail => {
+    const stock = ensureArchivedSellStock(savedDetail.stock);
+    const restoredDetail = {
+      ...savedDetail,
+      mode: 'sell',
+      stock
+    };
+    stockDetailMap[stock.code] = restoredDetail;
+    renderSellDetailToCard(restoredDetail);
+  });
+
+  return true;
+}
+
+function restoreAnalysisArchiveState() {
+  const archive = readAnalysisArchive();
+  const latestGapState = getLatestArchivedGapState(archive);
+  if (latestGapState) {
+    liveGapState = latestGapState;
+  }
+
+  const buyRestored = restoreBuyAnalysisArchive(archive.buy);
+  const sellRestored = restoreSellAnalysisArchive(getActiveArchiveForTab('sell'));
+
+  updateAnalyzeButtonState();
+  updateCurrentTime();
+  return { buyRestored, sellRestored };
+}
 
 function syncBodyScrollLock() {
   const hasOpenModal = document.querySelector('.modal-overlay.open');
@@ -829,10 +1515,11 @@ function getAllBuyEntries() {
 }
 
 function summarizeGateStatus(entry) {
-  const passed = entry.gates.filter(gate => gate.status === '✅').length;
-  const warned = entry.gates.filter(gate => gate.status === '⚠️').length;
-  const blocked = entry.gates.filter(gate => gate.status === '⛔').length;
-  return { passed, warned, blocked, total: entry.gates.length };
+  const gates = Array.isArray(entry?.gates) ? entry.gates : [];
+  const passed = gates.filter(gate => gate.status === '✅').length;
+  const warned = gates.filter(gate => gate.status === '⚠️').length;
+  const blocked = gates.filter(gate => gate.status === '⛔').length;
+  return { passed, warned, blocked, total: gates.length };
 }
 
 function getBuyGradeFromScore(score, strategy = 'pullback') {
@@ -1112,8 +1799,12 @@ function renderGuideTables() {
 }
 
 function buildSellCardPlanSummary(code) {
+  const detail = stockDetailMap[code];
   const entry = getEntryByCode(code);
   if (!entry || !entry.tradePlanRows || !entry.tradePlanRows.length) {
+    if (detail?.mode === 'sell') {
+      return renderSellStrategyPlan(detail, true);
+    }
     return '<div class="scard-plan-empty">매매 단계 정보 없음</div>';
   }
 
@@ -1133,10 +1824,225 @@ function buildSellCardPlanSummary(code) {
 
   const entryPrice = entry.entryPriceValue ? `진입가: ${entry.entryPriceValue.toLocaleString()}원` : '';
 
+  if (detail?.mode === 'sell') {
+    return `
+      ${renderSellStrategyPlan(detail, true)}
+      <div class="scard-plan scard-plan-tags">
+        <div class="plan-prices">${tags.join('')}</div>
+        ${entryPrice ? `<div class="plan-entry">${entryPrice}</div>` : ''}
+      </div>
+    `;
+  }
+
   return `
     <div class="scard-plan">
       <div class="plan-prices">${tags.join('')}</div>
       ${entryPrice ? `<div class="plan-entry">${entryPrice}</div>` : ''}
+    </div>
+  `;
+}
+
+function getSellStrategyStageMeta(stage) {
+  const stageMap = {
+    premarket: { icon: '🌅', title: '프리마켓 익절', shortTitle: '프리마켓' },
+    openPhase: { icon: '🔔', title: '장초반 익절', shortTitle: '장초반' },
+    intraday1: { icon: '📈', title: '장중 1차 익절', shortTitle: '1차 익절' },
+    intraday2: { icon: '📈', title: '장중 2차 익절', shortTitle: '2차 익절' },
+    swing: { icon: '📊', title: '스윙 전환', shortTitle: '스윙' },
+    stopLoss: { icon: '🛑', title: '손절 라인', shortTitle: '손절' }
+  };
+  return stageMap[stage] || { icon: '•', title: stage || '전략', shortTitle: stage || '전략' };
+}
+
+function summarizeTradePlanRow(row) {
+  if (!row) return '';
+  const summaryParts = [];
+  if (row.quantity) summaryParts.push(`수량 ${row.quantity}`);
+  if (row.targetYield) summaryParts.push(`목표 ${row.targetYield}`);
+  if (row.targetPrice) summaryParts.push(`목표가 ${row.targetPrice}`);
+  return summaryParts.join(' · ');
+}
+
+function describeSellStrategyStage(stage, row, detail) {
+  const rowSummary = summarizeTradePlanRow(row);
+  const rowCondition = row?.condition ? stripMarkdownText(row.condition) : '';
+
+  if (stage === 'premarket') {
+    return `프리마켓에서 ${row?.quantity || '일부'} 익절 우선${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
+  if (stage === 'openPhase') {
+    return `장초반에 ${row?.quantity || '일부'} 정리${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
+  if (stage === 'intraday1') {
+    return `1차 목표 도달 시 ${row?.quantity || '일부'} 차익실현${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
+  if (stage === 'intraday2') {
+    return `2차 목표 도달 시 ${row?.quantity || '잔여 물량'} 추가 정리${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
+  if (stage === 'swing') {
+    if (detail?.gapProfile?.swingMode === 'ban') {
+      return '현재 갭 조건에서는 스윙 전환 금지, 당일 정리 우선';
+    }
+    if (detail?.gapProfile?.swingMode === 'conditional') {
+      return `잔여 물량만 조건부 스윙 검토${rowSummary ? ` · ${rowSummary}` : ''}`;
+    }
+    return `잔여 물량만 스윙 전환 검토${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
+  if (stage === 'stopLoss') {
+    return `손절선 이탈 시 전량 매도${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
+  return rowSummary || rowCondition || '세부 전략 확인';
+}
+
+function buildSyntheticSellStrategyItem(detail) {
+  if (!detail) return null;
+
+  if (detail.actionStage === 'reject' || detail.actionStage === 'loss_cut') {
+    return {
+      status: 'blocked',
+      icon: '🛑',
+      title: '즉시 손절 또는 전량 매도',
+      description: detail.triggeredRule?.result || '핵심 손절 조건이 충족되어 전량 매도 우선입니다.',
+      note: detail.triggeredRule?.value || ''
+    };
+  }
+
+  if (detail.actionStage === 'partial_exit') {
+    const reason = detail.triggeredRule?.result
+      || detail.lossManagement?.verdict
+      || (detail.gapProfile?.swingMode === 'ban'
+        ? '스윙 전환 금지 구간이므로 일부 익절 후 현금화 우선입니다.'
+        : '현재 구간에서는 보유 물량 30~50%를 먼저 줄이고 나머지 물량만 장중 확인합니다.');
+    return {
+      status: 'active',
+      icon: '🟡',
+      title: '지금은 비중 축소 우선',
+      description: reason,
+      note: detail.gapProfile?.summary || ''
+    };
+  }
+
+  if (detail.actionStage === 'hold') {
+    return {
+      status: 'active',
+      icon: '✅',
+      title: '지금은 홀딩 유지',
+      description: '아직 익절 목표 또는 손절 조건이 확정적으로 충족되지 않아 보유 유지가 우선입니다.',
+      note: detail.gapProfile?.summary || ''
+    };
+  }
+
+  if (detail.actionStage === 'wait') {
+    return {
+      status: 'available',
+      icon: '⏳',
+      title: '장 시작 전 대기',
+      description: '프리마켓 또는 시초가 확인 전까지는 대기하고 첫 실행 가격부터 다시 판단합니다.',
+      note: ''
+    };
+  }
+
+  if (detail.actionStage === 'underwater') {
+    return {
+      status: 'active',
+      icon: '⚠️',
+      title: '평가손 관리 우선',
+      description: detail.lossManagement?.verdict || '평가손 구간이므로 손절선과 손실 관리 점수를 우선 확인합니다.',
+      note: detail.lossManagement ? `권장 손절가 ${detail.lossManagement.recommendedStopPrice.toLocaleString()}원` : ''
+    };
+  }
+
+  return null;
+}
+
+function buildSellStrategyPlan(detail) {
+  const entry = getEntryByCode(detail?.stock?.code || '');
+  const targets = detail?.targets || parseTradePlanTargets(entry);
+  const items = [];
+  const currentItem = buildSyntheticSellStrategyItem(detail);
+  const stageOrder = ['premarket', 'openPhase', 'intraday1', 'intraday2', 'swing'];
+
+  if (currentItem) items.push(currentItem);
+
+  stageOrder.forEach(stage => {
+    const target = targets?.[stage];
+    if (!target?.row) return;
+    const meta = getSellStrategyStageMeta(stage);
+    let status = detail?.actionStage === stage ? 'active' : 'available';
+
+    if (stage === 'swing' && detail?.gapProfile?.swingMode === 'ban') {
+      status = 'blocked';
+    } else if (stage === 'swing' && detail?.gapProfile?.swingMode === 'conditional' && detail?.actionStage !== stage) {
+      status = 'guard';
+    }
+
+    items.push({
+      status,
+      icon: meta.icon,
+      title: meta.title,
+      description: describeSellStrategyStage(stage, target.row, detail),
+      note: target.row.condition ? stripMarkdownText(target.row.condition) : ''
+    });
+  });
+
+  const stopLossRow = targets?.stopLoss?.row;
+  if (stopLossRow || detail?.targets?.entryPrice || detail?.data?.prevClose) {
+    items.push({
+      status: detail?.decision === 'sell' ? 'blocked' : 'guard',
+      icon: '🛑',
+      title: '손절 라인 점검',
+      description: describeSellStrategyStage('stopLoss', stopLossRow, detail),
+      note: stopLossRow?.condition ? stripMarkdownText(stopLossRow.condition) : ''
+    });
+  }
+
+  if (!items.length) {
+    items.push({
+      status: 'available',
+      icon: '•',
+      title: '기본 전략 확인',
+      description: '노션 매매 단계 또는 분석 결과를 기반으로 다시 판단합니다.',
+      note: ''
+    });
+  }
+
+  const headlineItem = items[0];
+  return {
+    headline: headlineItem.title,
+    headlineDetail: headlineItem.description,
+    items
+  };
+}
+
+function renderSellStrategyPlan(detail, compact = false) {
+  const plan = buildSellStrategyPlan(detail);
+  const limit = compact ? 3 : plan.items.length;
+  const visibleItems = plan.items.slice(0, limit);
+
+  return `
+    <div class="${compact ? 'scard-plan scard-plan-current' : 'sell-strategy-panel'}">
+      <div class="${compact ? 'plan-current-title' : 'modal-section-label'}">${compact ? '현재 유효 전략' : '🎯 현재 유효한 매매 전략'}</div>
+      <div class="${compact ? 'plan-current-summary' : 'sell-strategy-summary'}">${escapeHtml(plan.headline)}: ${escapeHtml(plan.headlineDetail)}</div>
+      <div class="${compact ? 'plan-checklist' : 'sell-strategy-list'}">
+        ${visibleItems.map(item => `
+          <div class="${compact ? `plan-check ${item.status}` : `modal-ind-card ${item.status === 'blocked' ? 'triggered' : item.status === 'active' ? 'clear' : 'unknown'} sell-strategy-item`}">
+            ${compact ? `
+              <span class="plan-check-icon">${escapeHtml(item.icon)}</span>
+              <div class="plan-check-content">
+                <div class="plan-check-title">${escapeHtml(item.title)}</div>
+                <div class="plan-check-text">${escapeHtml(item.description)}</div>
+              </div>
+            ` : `
+              <div class="modal-ind-icon">${escapeHtml(item.icon)}</div>
+              <div class="modal-ind-content">
+                <div class="modal-ind-title">${escapeHtml(item.title)}</div>
+                <div class="modal-ind-result">→ ${escapeHtml(item.description)}</div>
+                ${item.note ? `<div class="modal-ind-value">📐 ${escapeHtml(item.note)}</div>` : ''}
+              </div>
+            `}
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
 }
@@ -1160,13 +2066,16 @@ function renderSellStockCards() {
               <div class="scard-name">${escapeHtml(stock.name)}</div>
               <div class="scard-code">${escapeHtml(stock.code)}</div>
             </div>
-            <span class="badge badge-pending" id="badge-${stock.code}">대기 중</span>
+            <div class="scard-badges">
+              <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
+              <span class="badge badge-pending" id="badge-${stock.code}">대기 중</span>
+            </div>
           </div>
           <div class="price-row" id="price-row-${stock.code}">
             <span class="price placeholder-price">대기 중</span>
           </div>
           <div class="meta" id="meta-${stock.code}">매수가(전일종가): 대기 중</div>
-          ${planHtml}
+          <div id="plan-${stock.code}">${planHtml}</div>
           <div class="indicators" id="ind-${stock.code}">
             <div class="ind-item unknown">상단에서 분석 시작 버튼을 눌러주세요.</div>
           </div>
@@ -1190,6 +2099,7 @@ function renderSwingCards() {
   }
 
   stocks.swing.forEach(stock => {
+    const planHtml = buildSellCardPlanSummary(stock.code);
     container.innerHTML += `
       <div class="scard swing-card" id="card-${stock.code}">
         <div class="scard-head">
@@ -1197,7 +2107,10 @@ function renderSwingCards() {
             <div class="scard-name">${escapeHtml(stock.name)}</div>
             <div class="scard-code">${escapeHtml(stock.code)}</div>
           </div>
-          <span class="badge badge-swing" id="badge-${stock.code}">스윙 보유</span>
+          <div class="scard-badges">
+            <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
+            <span class="badge badge-swing" id="badge-${stock.code}">스윙 보유</span>
+          </div>
         </div>
         <div class="swing-meta">
           <span class="swing-meta-item">매수일 ${escapeHtml(stock.buyDate)}</span>
@@ -1208,6 +2121,7 @@ function renderSwingCards() {
           <span class="price placeholder-price">대기 중</span>
         </div>
         <div class="meta" id="meta-${stock.code}">수익률: 분석 시작 후 표시</div>
+        <div id="plan-${stock.code}">${planHtml}</div>
         <div class="indicators" id="ind-${stock.code}">
           <div class="ind-item unknown">상단에서 분석 시작 버튼을 눌러주세요.</div>
         </div>
@@ -1311,14 +2225,18 @@ function updateCurrentTime() {
   const analyzeBtn = document.getElementById('btn-analyze');
   if (!analyzeBtn) return;
 
+  const activeArchive = getActiveArchiveForTab(activeTab, now);
+  const archiveTimeLabel = formatArchiveButtonTime(activeArchive);
+  const archiveSuffix = archiveTimeLabel ? ` · ${archiveTimeLabel} 분석` : '';
+
   if (activeTab === 'buy') {
     const hasBuyRefresh = getAllBuyEntries().some(entry => entry.liveRefresh);
-    analyzeBtn.innerHTML = `<span>⚡</span> ${hasBuyRefresh ? '일괄 다시 분석' : '일괄 분석'}`;
+    analyzeBtn.innerHTML = `<span>⚡</span> ${hasBuyRefresh ? '일괄 다시 분석' : '일괄 분석'}${archiveSuffix}`;
     return;
   }
 
   const hasSellResult = [...stocks.pullback, ...stocks.momentum, ...stocks.swing].some(stock => stockDetailMap[stock.code]?.mode === 'sell');
-  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차' : '2차'} ${hasSellResult ? '다시 분석' : '분석 시작'}`;
+  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차' : '2차'} ${hasSellResult ? '다시 분석' : '분석 시작'}${archiveSuffix}`;
 }
 
 async function runBuyBatchRefresh() {
@@ -1378,7 +2296,8 @@ function closeGuideModal() {
 
 function openGapGuideModal() {
   const body = document.getElementById('gap-guide-body');
-  const currentGrade = getGapGradeCode(notionSnapshot.gapScore.grade);
+  const activeGapScore = getActiveGapScore();
+  const currentGrade = getGapGradeCode(activeGapScore.grade);
   body.innerHTML = `
     <div class="guide-grid guide-grid-modal">
       <div class="guide-panel">
@@ -1409,7 +2328,7 @@ function openGapGuideModal() {
         </table>
       </div>
     </div>
-    <div class="gap-guide-note">현재 보고서의 갭 등급은 <strong>${escapeHtml(notionSnapshot.gapScore.grade || '미확인')}</strong> 입니다. 갭 등급은 종목 선정 기준을 완화하지 않고, 포지션 크기와 익일 매도 기준만 조정합니다.</div>
+    <div class="gap-guide-note">현재 분석 기준의 갭 등급은 <strong>${escapeHtml(activeGapScore.grade || '미확인')}</strong> 입니다. 갭 등급은 종목 선정 기준을 완화하지 않고, 포지션 크기와 익일 매도 기준만 조정합니다.</div>
   `;
 
   document.getElementById('gap-guide-modal-overlay').classList.add('open');
@@ -1494,7 +2413,8 @@ function openRegimeReport() {
   const body = document.getElementById('regime-report-body');
   const summaryRows = getRegimeReportSummaryRows();
   const evidenceRows = notionSnapshot.regimeEvidence;
-  const gapScore = notionSnapshot.gapScore;
+  const gapScore = getActiveGapScore();
+  const comparisonText = getGapComparisonText();
 
   syncBodyScrollLock();
   if (!info) {
@@ -1548,6 +2468,8 @@ function openRegimeReport() {
             ${gapScore.sellAdjustment ? `<tr><td style="color:var(--text-tertiary)">매도 조정</td><td><strong>${escapeHtml(gapScore.sellAdjustment)}</strong></td></tr>` : ''}
             ${gapScore.swingAdjustment ? `<tr><td style="color:var(--text-tertiary)">스윙 전환</td><td><strong>${escapeHtml(gapScore.swingAdjustment)}</strong></td></tr>` : ''}
             ${gapScore.note ? `<tr><td style="color:var(--text-tertiary)">특이사항</td><td><strong>${escapeHtml(gapScore.note)}</strong></td></tr>` : ''}
+            ${isLiveGapReady() ? `<tr><td style="color:var(--text-tertiary)">실시간 소스</td><td><strong>${escapeHtml(liveGapState.source)} / ${escapeHtml(liveGapState.fetchedAt)}</strong></td></tr>` : ''}
+            ${comparisonText ? `<tr><td style="color:var(--text-tertiary)">노션 비교</td><td><strong>${escapeHtml(comparisonText)}</strong></td></tr>` : ''}
           </tbody>
         </table>
       ` : ''}
@@ -1630,8 +2552,10 @@ async function fetchNotionData() {
     }
     const sourceText = buildSourceTextFromNotion(data);
     notionSnapshot = parseNotionSnapshotFromText(sourceText);
+    liveGapState = createEmptyLiveGapState();
     rebuildSellStocksFromSnapshot();
     renderAll();
+    restoreAnalysisArchiveState();
 
     const totalBuy = notionSnapshot.pullbackEntries.length + notionSnapshot.momentumEntries.length;
     log(`성공적으로 불러왔습니다. (시장 레짐 ${notionSnapshot.regimeTable.length}개 항목, 매수 후보 ${totalBuy}개)`);
@@ -1706,11 +2630,14 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   const btn = document.getElementById('btn-analyze');
 
   if (activeTab === 'buy') {
+    saveAnalysisArchiveBeforeRecheck('buy');
     btn.disabled = true;
     btn.innerHTML = '<span>⚡</span> 일괄 분석 중...';
 
     try {
+      await refreshLiveGapScore('매수 분석');
       await runBuyBatchRefresh();
+      saveAnalysisArchiveAfterAnalysis('buy');
     } finally {
       btn.disabled = false;
       updateAnalyzeButtonState();
@@ -1724,10 +2651,16 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   const isBefore0908 = totalMins < (9 * 60 + 8);
   const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
+  saveAnalysisArchiveBeforeRecheck('sell', {
+    isBefore0908,
+    timeLabel: timeStr
+  });
+
   btn.disabled = true;
   btn.innerHTML = '<span>⚡</span> 분석 진행 중...';
 
   log(`▶ [현재 시각: ${timeStr}] 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
+  await refreshLiveGapScore('매도 분석');
 
   const allStocks = isBefore0908
     ? [...stocks.swing, ...stocks.momentum]
@@ -1745,6 +2678,10 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
     await new Promise(resolve => setTimeout(resolve, 1500));
   }
 
+  saveAnalysisArchiveAfterAnalysis('sell', {
+    isBefore0908,
+    timeLabel: timeStr
+  });
   log('✅ 모든 종목의 시그널 분석이 완료되었습니다.');
   btn.disabled = false;
   btn.innerHTML = '<span>⚡</span> 다시 분석';
@@ -1868,9 +2805,20 @@ function parseTradePlanTargets(entry) {
   };
 }
 
-function checkRejectionConditions(stock, data, isBefore0908, targets) {
+function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile) {
   const rejections = [];
   const entryPrice = targets?.entryPrice || data.prevClose;
+
+  if (gapProfile?.immediatePartialExit && isBefore0908 && data.currentPrice > 0) {
+    rejections.push({
+      code: 'G1',
+      title: `${gapProfile.code} 프리마켓 보수 운용`,
+      criterion: `갭 등급 ${gapProfile.label}에서는 프리마켓 첫 가격 확인 시 50% 비중 축소를 우선 적용합니다.`,
+      triggered: true,
+      result: `현재가 ${data.currentPrice.toLocaleString()}원 기준으로 50% 선정리 권고`,
+      value: `매도 조정: ${gapProfile.premarketText}`
+    });
+  }
 
   if (data.openPrice > 0 && entryPrice > 0) {
     const gapRate = ((data.openPrice - entryPrice) / entryPrice) * 100;
@@ -1887,30 +2835,40 @@ function checkRejectionConditions(stock, data, isBefore0908, targets) {
     });
   }
 
+  const tightenedDefaultStopPrice = entryPrice > 0
+    ? Math.round(entryPrice * (1 - ((4 - (gapProfile?.tightenStopLossRate || 0)) / 100)))
+    : 0;
+
   if (targets?.stopLoss?.price && data.currentPrice > 0) {
-    const belowStopLoss = data.currentPrice <= targets.stopLoss.price;
+    const effectiveStopPrice = Math.max(targets.stopLoss.price, tightenedDefaultStopPrice || 0);
+    const belowStopLoss = data.currentPrice <= effectiveStopPrice;
     rejections.push({
       code: 'R2',
       title: '손절가 이탈',
-      criterion: `노션 매매전략의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
+      criterion: gapProfile?.tightenStopLossRate
+        ? `노션 손절가와 갭 보수 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(노션 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
+        : `노션 매매전략의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
       triggered: belowStopLoss,
       result: belowStopLoss
-        ? `현재가 ${data.currentPrice.toLocaleString()} ≤ 손절가 ${targets.stopLoss.price.toLocaleString()} → 즉시 전량 매도`
-        : `현재가 ${data.currentPrice.toLocaleString()} > 손절가 ${targets.stopLoss.price.toLocaleString()} — 안전`,
-      value: `현재가 ${data.currentPrice.toLocaleString()} / 손절가 ${targets.stopLoss.price.toLocaleString()}`
+        ? `현재가 ${data.currentPrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 즉시 전량 매도`
+        : `현재가 ${data.currentPrice.toLocaleString()} > 유효 손절가 ${effectiveStopPrice.toLocaleString()} — 안전`,
+      value: `현재가 ${data.currentPrice.toLocaleString()} / 유효 손절가 ${effectiveStopPrice.toLocaleString()}${gapProfile?.tightenStopLossRate ? ` (갭 ${gapProfile.code}로 ${gapProfile.tightenStopLossRate}%p 축소)` : ''}`
     });
   } else if (entryPrice > 0 && data.currentPrice > 0) {
     const lossRate = ((data.currentPrice - entryPrice) / entryPrice) * 100;
-    const belowDefault = lossRate <= -4;
+    const defaultStopLossRate = -4 + (gapProfile?.tightenStopLossRate || 0);
+    const belowDefault = lossRate <= defaultStopLossRate;
     rejections.push({
       code: 'R2',
-      title: '기본 손절선 (-4%) 이탈',
-      criterion: '노션 손절가 미설정 시, 진입가 대비 -4% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ -4%',
+      title: `기본 손절선 (${defaultStopLossRate.toFixed(1)}%) 이탈`,
+      criterion: gapProfile?.tightenStopLossRate
+        ? `노션 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${defaultStopLossRate.toFixed(1)}%`
+        : '노션 손절가 미설정 시, 진입가 대비 -4% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ -4%',
       triggered: belowDefault,
       result: belowDefault
         ? `진입가 대비 ${lossRate.toFixed(2)}% → 즉시 전량 매도`
         : `진입가 대비 ${lossRate.toFixed(2)}% — 손절선 이내`,
-      value: `(${data.currentPrice.toLocaleString()} - ${entryPrice.toLocaleString()}) / ${entryPrice.toLocaleString()} = ${lossRate.toFixed(2)}%`
+      value: `(${data.currentPrice.toLocaleString()} - ${entryPrice.toLocaleString()}) / ${entryPrice.toLocaleString()} = ${lossRate.toFixed(2)}%${gapProfile?.tightenStopLossRate ? ` / 갭 ${gapProfile.code} 기준 ${defaultStopLossRate.toFixed(1)}%` : ''}`
     });
   }
 
@@ -1946,12 +2904,13 @@ function checkRejectionConditions(stock, data, isBefore0908, targets) {
   return rejections;
 }
 
-function evaluateTradeStage(data, targets, prevClose) {
+function evaluateTradeStage(data, targets, prevClose, gapProfile) {
   const basePrice = targets?.entryPrice || prevClose;
   if (!basePrice || !data.currentPrice) return { stage: 'unknown', label: '판단 불가', detail: '가격 데이터 부족' };
 
   const gainRate = ((data.currentPrice - basePrice) / basePrice) * 100;
   const hasTargets = targets && (targets.swing?.price || targets.intraday1?.price || targets.premarket?.price || targets.openPhase?.price);
+  const adjustedPremarketPrice = adjustPriceByRatePoint(basePrice, targets?.premarket?.price, gapProfile?.premarketRateOffset || 0);
 
   if (hasTargets) {
     if (targets.swing?.price && data.currentPrice >= targets.swing.price) {
@@ -1970,8 +2929,15 @@ function evaluateTradeStage(data, targets, prevClose) {
       return { stage: 'openPhase', label: '🔔 장초반 익절 구간', detail: `현재가 ${data.currentPrice.toLocaleString()} ≥ 장초반 목표 ${targets.openPhase.price.toLocaleString()} (진입가 대비 +${gainRate.toFixed(1)}%)`, gainRate };
     }
 
-    if (targets.premarket?.price && data.currentPrice >= targets.premarket.price) {
-      return { stage: 'premarket', label: '🌅 프리마켓 익절 구간', detail: `현재가 ${data.currentPrice.toLocaleString()} ≥ 프리마켓 목표 ${targets.premarket.price.toLocaleString()} (진입가 대비 +${gainRate.toFixed(1)}%)`, gainRate };
+    if (adjustedPremarketPrice && data.currentPrice >= adjustedPremarketPrice) {
+      return {
+        stage: 'premarket',
+        label: '🌅 프리마켓 익절 구간',
+        detail: gapProfile?.premarketRateOffset
+          ? `현재가 ${data.currentPrice.toLocaleString()} ≥ 조정 프리마켓 목표 ${adjustedPremarketPrice.toLocaleString()} (기본 ${targets.premarket.price.toLocaleString()}원, 갭 ${gapProfile.code}로 -${gapProfile.premarketRateOffset}%p)`
+          : `현재가 ${data.currentPrice.toLocaleString()} ≥ 프리마켓 목표 ${targets.premarket.price.toLocaleString()} (진입가 대비 +${gainRate.toFixed(1)}%)`,
+        gainRate
+      };
     }
   }
 
@@ -1986,7 +2952,7 @@ function evaluateTradeStage(data, targets, prevClose) {
   return { stage: 'underwater', label: '⚠️ 평가손 구간', detail: `진입가 대비 ${gainRate.toFixed(1)}% — 손절선 확인 필요`, gainRate };
 }
 
-function buildSwingLossManagement(data, entryPrice, gainRate, volRatio) {
+function buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfile) {
   const scores = [];
 
   // S1: 종가 vs 20MA
@@ -2058,7 +3024,37 @@ function buildSwingLossManagement(data, entryPrice, gainRate, volRatio) {
       : '일별 저가 데이터 미산출'
   });
 
+  const swingGapPass = gapProfile?.swingMode === 'allow';
+  scores.push({
+    code: 'S7', title: '갭 환경',
+    criterion: '익일 갭 등급이 스윙 보유를 허용하는 환경인지 확인',
+    pass: swingGapPass,
+    result: gapProfile?.code
+      ? (gapProfile.swingMode === 'allow'
+        ? `갭 ${gapProfile.code} — 스윙 유지 허용`
+        : gapProfile.swingMode === 'conditional'
+          ? `갭 ${gapProfile.code} — 스윙 조건부 허용, 점수 1점 보수 반영`
+          : `갭 ${gapProfile.code} — 스윙 전환 금지`)
+      : '갭 등급 미확인 — 기본 기준 적용'
+  });
+
+  if (gapProfile?.comparison?.available && gapProfile.comparison.bias !== 0) {
+    const improved = gapProfile.comparison.bias > 0;
+    scores.push({
+      code: 'S8',
+      title: '갭 변화 비교',
+      criterion: '노션 기준 대비 실시간 갭 환경이 개선되면 보유 점수 가산, 악화되면 감점',
+      pass: improved,
+      result: improved
+        ? `실시간 개선 신호 — ${gapProfile.comparison.summary}`
+        : `실시간 악화 신호 — ${gapProfile.comparison.summary}`
+    });
+  }
+
   const totalScore = scores.filter(s => s.pass).length;
+  const maxScore = scores.length;
+  const holdThreshold = Math.max(maxScore - 1, 1);
+  const cautionThreshold = Math.max(maxScore - 3, 1);
 
   // 손실 구간 분류
   let lossLevel, verdict;
@@ -2067,12 +3063,12 @@ function buildSwingLossManagement(data, entryPrice, gainRate, volRatio) {
     verdict = '⛔ 즉시 청산 (위험 손실 -5% 초과)';
   } else if (gainRate <= -3) {
     lossLevel = 'warning';
-    if (totalScore >= 6) verdict = '🟡 관찰 보유 (익일 종가 미회복 시 청산)';
+    if (totalScore >= holdThreshold) verdict = '🟡 관찰 보유 (익일 종가 미회복 시 청산)';
     else verdict = '🔴 전량 손절 권고';
   } else if (gainRate < 0) {
     lossLevel = 'mild';
-    if (totalScore >= 5) verdict = '🟢 홀드 — 지지 건재';
-    else if (totalScore >= 3) verdict = '🟡 비중 축소 50% 권고';
+    if (totalScore >= holdThreshold) verdict = '🟢 홀드 — 지지 건재';
+    else if (totalScore >= cautionThreshold) verdict = '🟡 비중 축소 50% 권고';
     else verdict = '🔴 전량 손절 권고';
   } else {
     lossLevel = 'profit';
@@ -2081,7 +3077,8 @@ function buildSwingLossManagement(data, entryPrice, gainRate, volRatio) {
 
   // 동적 가격 산출
   const stopFromMa20 = data.ma20 > 0 ? data.ma20 : 0;
-  const stopFrom5pct = Math.round(entryPrice * 0.95);
+  const stopBaseRate = 5 - (gapProfile?.tightenStopLossRate || 0);
+  const stopFrom5pct = Math.round(entryPrice * (1 - (stopBaseRate / 100)));
   const stopFromLow5d = data.low5d > 0 ? data.low5d : 0;
   const maxStopPrice = Math.max(stopFromMa20, stopFrom5pct, stopFromLow5d);
   const maxStopRate = entryPrice > 0 ? ((maxStopPrice - entryPrice) / entryPrice) * 100 : 0;
@@ -2096,13 +3093,17 @@ function buildSwingLossManagement(data, entryPrice, gainRate, volRatio) {
   return {
     scores,
     totalScore,
+    maxScore,
+    holdThreshold,
+    cautionThreshold,
     lossLevel,
     verdict,
     maxStopPrice,
     maxStopRate,
     recommendedStopPrice,
     recoveryTarget,
-    reboundTarget
+    reboundTarget,
+    stopBaseRate
   };
 }
 
@@ -2116,6 +3117,27 @@ function buildIndicators(stock, data, isBefore0908) {
   const targets = parseTradePlanTargets(entry);
   const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
   const gainRate = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
+  const gapProfile = getGapSellAdjustmentProfile();
+
+  if (gapProfile.code) {
+    indicators.push({
+      title: '갭 등급 조정',
+      criterion: `현재 보고서의 갭 등급 ${gapProfile.label}에 따라 익일 프리마켓 익절, 손절폭, 스윙 전환 기준을 조정합니다.`,
+      status: gapProfile.severity,
+      result: `프리마켓: ${gapProfile.premarketText} | 손절: ${gapProfile.stopLossText} | 스윙: ${gapProfile.swingText}`,
+      value: gapProfile.summary
+    });
+
+    if (gapProfile.comparison.available) {
+      indicators.push({
+        title: '갭 변화 보정',
+        criterion: '실시간 갭 스코어가 노션 스냅샷보다 개선되면 매도 보수성을 일부 완화하고, 악화되면 추가 강화합니다.',
+        status: gapProfile.comparison.bias > 0 ? 'clear' : gapProfile.comparison.bias < 0 ? 'triggered' : 'unknown',
+        result: gapProfile.comparison.summary,
+        value: getGapComparisonText() || gapProfile.comparison.summary
+      });
+    }
+  }
 
   if (stock.type === 'swing') {
     indicators.push({
@@ -2184,8 +3206,8 @@ function buildIndicators(stock, data, isBefore0908) {
       decision = 'sell';
       actionStage = 'reject';
       triggeredRule = triggeredRejections[0];
-      const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio);
-      return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement };
+      const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfile);
+      return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile };
     }
 
     const below60ma = data.ma60 > 0 && data.currentPrice < data.ma60;
@@ -2199,8 +3221,8 @@ function buildIndicators(stock, data, isBefore0908) {
       decision = 'sell';
       actionStage = 'reject';
       triggeredRule = { code: '60MA', title: '60MA 이탈 강제 청산', triggered: true };
-      const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio);
-      return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement };
+      const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfile);
+      return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile };
     }
     if (data.ma60 > 0) {
       indicators.push({
@@ -2212,7 +3234,7 @@ function buildIndicators(stock, data, isBefore0908) {
     }
 
     // 손실 관리 판정 (손실 구간일 때 적용)
-    const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio);
+    const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfile);
 
     if (gainRate < 0) {
       lossManagement.scores.forEach(s => {
@@ -2226,15 +3248,15 @@ function buildIndicators(stock, data, isBefore0908) {
 
       indicators.push({
         title: '손실 관리 종합 판정',
-        criterion: `6점 만점 기준: 5~6 홀드 / 3~4 비중 축소 / 1~2 전량 손절 / 0 즉시 청산`,
-        status: lossManagement.totalScore >= 5 ? 'clear' : lossManagement.totalScore >= 3 ? 'unknown' : 'triggered',
-        result: `${lossManagement.totalScore}/6점 → ${lossManagement.verdict}`
+        criterion: `${lossManagement.maxScore}점 만점 기준: ${lossManagement.holdThreshold}~${lossManagement.maxScore} 홀드 / ${lossManagement.cautionThreshold}~${lossManagement.holdThreshold - 1} 비중 축소 / 0~${lossManagement.cautionThreshold - 1} 전량 손절`,
+        status: lossManagement.totalScore >= lossManagement.holdThreshold ? 'clear' : lossManagement.totalScore >= lossManagement.cautionThreshold ? 'unknown' : 'triggered',
+        result: `${lossManagement.totalScore}/${lossManagement.maxScore}점 → ${lossManagement.verdict}`
       });
 
-      if (lossManagement.totalScore <= 2) {
+      if (lossManagement.totalScore < lossManagement.cautionThreshold) {
         decision = 'sell';
         actionStage = 'loss_cut';
-      } else if (lossManagement.totalScore <= 4) {
+      } else if (lossManagement.totalScore < lossManagement.holdThreshold) {
         decision = 'caution';
         actionStage = 'partial_exit';
       } else {
@@ -2291,12 +3313,34 @@ function buildIndicators(stock, data, isBefore0908) {
     // 동적 가격 라인 (손절가/목표가)
     indicators.push({
       title: '동적 가격 라인',
-      criterion: '최대 손절가: MAX(20MA 이탈가, 진입가×0.95, 5일 저점) | 권장 손절가: 현재가 -2% 또는 5MA 이탈가',
+      criterion: `최대 손절가: MAX(20MA 이탈가, 진입가×${(1 - (lossManagement.stopBaseRate / 100)).toFixed(3)}, 5일 저점) | 권장 손절가: 현재가 -2% 또는 5MA 이탈가`,
       status: 'unknown',
       result: `최대손절 ${lossManagement.maxStopPrice.toLocaleString()}원 (${lossManagement.maxStopRate >= 0 ? '+' : ''}${lossManagement.maxStopRate.toFixed(1)}%) | 권장손절 ${lossManagement.recommendedStopPrice.toLocaleString()}원 | 반등목표 ${lossManagement.recoveryTarget.toLocaleString()}원`
     });
 
-    return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement };
+    if (gapProfile.swingMode === 'ban' && decision === 'hold') {
+      indicators.push({
+        title: '갭 환경상 스윙 금지',
+        criterion: `갭 등급 ${gapProfile.label}에서는 스윙 보유 연장을 허용하지 않습니다.`,
+        status: 'triggered',
+        result: '스윙 유지 대신 비중 축소 또는 당일 정리 우선',
+        value: `스윙 전환: ${gapProfile.swingText}`
+      });
+      decision = 'caution';
+      actionStage = 'partial_exit';
+    } else if (gapProfile.swingMode === 'conditional' && decision === 'hold') {
+      indicators.push({
+        title: '갭 환경상 조건부 스윙',
+        criterion: `갭 등급 ${gapProfile.label}에서는 스윙 보유를 조건부로만 허용합니다.`,
+        status: 'unknown',
+        result: '일부 익절 후 잔여 물량만 재검토',
+        value: `스윙 전환: ${gapProfile.swingText}`
+      });
+      decision = 'caution';
+      actionStage = 'partial_exit';
+    }
+
+    return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile };
   }
 
   if (stock.type === 'pullback' && isBefore0908) {
@@ -2306,7 +3350,7 @@ function buildIndicators(stock, data, isBefore0908) {
       status: 'unknown',
       result: '1차: 눌림목 베팅 분석 대기 중 (9:08 이후 시작)'
     });
-    return { indicators, decision: 'hold', actionStage: 'wait', triggeredRule: null, targets, gainRate };
+    return { indicators, decision: 'hold', actionStage: 'wait', triggeredRule: null, targets, gainRate, gapProfile };
   }
 
   const stageLabel = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
@@ -2320,7 +3364,7 @@ function buildIndicators(stock, data, isBefore0908) {
     result: `${stageLabel} 진행 중`
   });
 
-  const rejections = checkRejectionConditions(stock, data, isBefore0908, targets);
+  const rejections = checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile);
   const triggeredRejections = rejections.filter(r => r.triggered);
 
   rejections.forEach(r => {
@@ -2343,10 +3387,15 @@ function buildIndicators(stock, data, isBefore0908) {
       actionStage = 'partial_exit';
     }
 
-    return { indicators, decision, actionStage, triggeredRule: triggeredRejections[0], targets, gainRate };
+    if (triggeredRejections[0].code === 'G1') {
+      decision = 'caution';
+      actionStage = 'partial_exit';
+    }
+
+    return { indicators, decision, actionStage, triggeredRule: triggeredRejections[0], targets, gainRate, gapProfile };
   }
 
-  const stageResult = evaluateTradeStage(data, targets, data.prevClose);
+  const stageResult = evaluateTradeStage(data, targets, data.prevClose, gapProfile);
   indicators.push({
     title: '매도 단계 판정',
     criterion: `진입가(${entryPrice ? entryPrice.toLocaleString() + '원' : '미설정'}) 대비 현재 위치를 매매전략 구간에 매칭합니다.`,
@@ -2365,7 +3414,29 @@ function buildIndicators(stock, data, isBefore0908) {
     decision = 'caution';
   }
 
-  if (data.strength) {
+  if (stageResult.stage === 'swing' && gapProfile.swingMode === 'ban') {
+    indicators.push({
+      title: '스윙 전환 제한',
+      criterion: `갭 등급 ${gapProfile.label}에서는 스윙 전환을 허용하지 않고 익절 우선으로 전환합니다.`,
+      status: 'triggered',
+      result: '스윙 전환 대신 비중 축소 또는 당일 정리 우선',
+      value: `스윙 전환: ${gapProfile.swingText}`
+    });
+    decision = 'caution';
+    actionStage = 'partial_exit';
+  } else if (stageResult.stage === 'swing' && gapProfile.swingMode === 'conditional') {
+    indicators.push({
+      title: '스윙 전환 조건부 허용',
+      criterion: `갭 등급 ${gapProfile.label}에서는 스윙 전환 전 일부 익절과 장중 재확인을 우선합니다.`,
+      status: 'unknown',
+      result: '잔여 물량만 조건부 스윙 검토',
+      value: `스윙 전환: ${gapProfile.swingText}`
+    });
+    decision = 'caution';
+    actionStage = 'partial_exit';
+  }
+
+  if (data.strength !== null && data.strength !== undefined) {
     const threshold = stock.type === 'momentum' ? 100 : 80;
     const weakStr = data.strength < threshold;
     indicators.push({
@@ -2378,9 +3449,17 @@ function buildIndicators(stock, data, isBefore0908) {
       value: `체결강도 ${data.strength.toFixed(1)}% (기준: ${threshold}%)`
     });
     if (weakStr && decision !== 'sell') decision = 'caution';
+  } else if (stock.type !== 'swing') {
+    indicators.push({
+      title: '체결강도 상태',
+      criterion: '현재 네이버 경로에서는 체결강도 값이 제공되지 않아 매도 판단에서 제외합니다.',
+      status: 'unknown',
+      result: '체결강도 미연동 — 다른 가격/이평/수급 기준만으로 판정',
+      value: '실시간 체결강도 연동 전까지 중립 처리'
+    });
   }
 
-  return { indicators, decision, actionStage, triggeredRule, targets, gainRate };
+  return { indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile };
 }
 
 function getActionBadge(decision, actionStage) {
@@ -2403,11 +3482,29 @@ function getActionBadge(decision, actionStage) {
   return badges[actionStage] || badges.unknown;
 }
 
+function getGapComparisonBadge(comparison) {
+  if (!comparison?.available || comparison.bias === 0) return null;
+  if (comparison.bias > 0) {
+    return {
+      cls: 'badge-shift-good',
+      text: '개선',
+      detail: comparison.summary
+    };
+  }
+
+  return {
+    cls: 'badge-shift-bad',
+    text: '악화',
+    detail: comparison.summary
+  };
+}
+
 function applyRules(stock, data, isBefore0908) {
   const card = document.getElementById(`card-${stock.code}`);
   if (!card) return;
   const priceRow = document.getElementById(`price-row-${stock.code}`);
   const meta = document.getElementById(`meta-${stock.code}`);
+  const planBox = document.getElementById(`plan-${stock.code}`);
   const indBox = document.getElementById(`ind-${stock.code}`);
   const badge = document.getElementById(`badge-${stock.code}`);
 
@@ -2427,46 +3524,31 @@ function applyRules(stock, data, isBefore0908) {
   meta.innerHTML = `
     <span style="opacity:0.7">진입가:</span> <strong>${entryPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
     <span style="opacity:0.7">시가:</span> <strong>${data.openPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
-    <span style="opacity:0.7">체결강도:</span> <strong>${data.strength ? `${data.strength.toFixed(2)}%` : '-'}</strong>
+    <span style="opacity:0.7">체결강도:</span> <strong>${data.strength !== null && data.strength !== undefined ? `${data.strength.toFixed(2)}%` : '미연동'}</strong>
   `;
 
-  const { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement } = buildIndicators(stock, data, isBefore0908);
+  const { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile } = buildIndicators(stock, data, isBefore0908);
 
-  const visibleIndicators = indicators.filter(ind => ind.status !== 'unknown');
-  const displayIndicators = visibleIndicators.length > 0 ? visibleIndicators : indicators;
-
-  let cardIndicatorHtml = displayIndicators
-    .map(indicator => `<div class="ind-item ${indicator.status}">${indicator.title}: ${indicator.result}</div>`)
-    .join('');
-
-  if (stock.type === 'swing' && lossManagement && gainRate < 0) {
-    cardIndicatorHtml += `<div class="ind-item ${lossManagement.totalScore >= 5 ? 'clear' : lossManagement.totalScore >= 3 ? 'unknown' : 'triggered'}" style="margin-top:4px;font-weight:700">
-      손실 관리: ${lossManagement.verdict} | 최대손절 ${lossManagement.maxStopPrice.toLocaleString()}원 | 권장손절 ${lossManagement.recommendedStopPrice.toLocaleString()}원
-    </div>`;
-  }
-
-  indBox.innerHTML = cardIndicatorHtml;
-
-  card.className = `scard ${decision}`;
-  const badgeInfo = getActionBadge(decision, actionStage);
-  badge.className = `badge ${badgeInfo.cls}`;
-  badge.innerText = badgeInfo.text;
-
-  stockDetailMap[stock.code] = { mode: 'sell', stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908 };
-  const newCard = card.cloneNode(true);
-  card.parentNode.replaceChild(newCard, card);
-  newCard.addEventListener('click', () => openModal(stock.code, 'sell'));
+  stockDetailMap[stock.code] = { mode: 'sell', stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908, gapProfile };
+  renderSellDetailToCard(stockDetailMap[stock.code]);
 }
 
 function updateCardError(code) {
   const card = document.getElementById(`card-${code}`);
   const indBox = document.getElementById(`ind-${code}`);
   const badge = document.getElementById(`badge-${code}`);
+  const shiftBadge = document.getElementById(`gap-shift-${code}`);
   if (!card || !indBox || !badge) return;
 
   card.className = 'scard';
   badge.className = 'badge badge-pending';
   badge.innerText = '통신 오류';
+  if (shiftBadge) {
+    shiftBadge.className = 'badge badge-shift';
+    shiftBadge.innerText = '';
+    shiftBadge.title = '';
+    shiftBadge.style.display = 'none';
+  }
   indBox.innerHTML = '<div class="ind-item unknown">네이버 증권 데이터를 가져오는 데 실패했습니다.<br>잠시 후 다시 시도해주세요.</div>';
 }
 
@@ -2617,7 +3699,7 @@ function openModal(code, mode = 'sell') {
     `;
   } else {
     detailModal.classList.remove('buy-detail-mode');
-    const { stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908 } = detail;
+    const { stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908, gapProfile } = detail;
     document.getElementById('modal-name').textContent = stock.name;
     document.getElementById('modal-code').textContent = stock.code;
     document.getElementById('modal-type').textContent = stock.type === 'swing' ? '🔄 스윙 보유' : stock.type === 'pullback' ? '📊 눌림목 종가베팅' : '🔥 수급 매집형 종가베팅';
@@ -2628,12 +3710,14 @@ function openModal(code, mode = 'sell') {
     const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
 
     const badgeInfo = getActionBadge(decision, actionStage);
+    const shiftBadgeInfo = getGapComparisonBadge(gapProfile?.comparison);
     const verdictCls = decision === 'sell' ? 'sell' : decision === 'caution' ? 'caution' : 'hold';
     const stageCls = isBefore0908 ? 'stage1' : 'stage2';
     const stageText = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
 
     const notionEntry = getEntryByCode(stock.code);
     const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 노션에 없습니다.</div>';
+    const strategyPlanHtml = renderSellStrategyPlan(detail, false);
 
     const triggeredRuleHtml = triggeredRule ? `
       <div class="modal-triggered-rule">
@@ -2650,11 +3734,26 @@ function openModal(code, mode = 'sell') {
       </div>
     ` : '';
 
+    const gapAdjustmentHtml = gapProfile?.code ? `
+      <div class="modal-triggered-rule">
+        <div class="modal-section-label">🌙 갭 조정 적용</div>
+        <div class="modal-ind-card ${gapProfile.severity}">
+          <div class="modal-ind-icon">${gapProfile.severity === 'triggered' ? '🟠' : gapProfile.severity === 'clear' ? '🟢' : '🟡'}</div>
+          <div class="modal-ind-content">
+            <div class="modal-ind-title">갭 등급 ${escapeHtml(gapProfile.label)}</div>
+            <div class="modal-ind-criterion"><span>익일 매도 판단에 프리마켓 익절, 손절폭, 스윙 전환 규칙을 함께 적용합니다.</span></div>
+            <div class="modal-ind-result">→ 프리마켓: ${escapeHtml(gapProfile.premarketText)} / 손절: ${escapeHtml(gapProfile.stopLossText)} / 스윙: ${escapeHtml(gapProfile.swingText)}</div>
+            <div class="modal-ind-value">📐 ${escapeHtml(gapProfile.summary)}</div>
+          </div>
+        </div>
+      </div>
+    ` : '';
+
     const lossManagementHtml = (stock.type === 'swing' && lossManagement) ? `
       <div class="loss-management-panel">
         <div class="modal-section-label">📉 손실 관리 판정</div>
         <div class="loss-verdict ${lossManagement.lossLevel}">
-          <div class="loss-verdict-score">${lossManagement.totalScore} / 6</div>
+          <div class="loss-verdict-score">${lossManagement.totalScore} / ${lossManagement.maxScore}</div>
           <div class="loss-verdict-text">${lossManagement.verdict}</div>
         </div>
         <div class="loss-prices">
@@ -2692,6 +3791,10 @@ function openModal(code, mode = 'sell') {
       </div>
     ` : '';
 
+    const comparisonShiftHtml = shiftBadgeInfo ? `
+      <div class="modal-verdict modal-verdict-shift ${shiftBadgeInfo.cls}">${escapeHtml(shiftBadgeInfo.text)} · ${escapeHtml(shiftBadgeInfo.detail)}</div>
+    ` : '';
+
     document.getElementById('modal-body').innerHTML = `
       <div class="modal-price-bar">
         <span class="price-big">${data.currentPrice.toLocaleString()}원</span>
@@ -2711,13 +3814,16 @@ function openModal(code, mode = 'sell') {
           </div>
           <div class="modal-stat">
             <span class="modal-stat-label">체결강도</span>
-            <span class="modal-stat-value">${data.strength ? `${data.strength.toFixed(2)}%` : '—'}</span>
+            <span class="modal-stat-value">${data.strength !== null && data.strength !== undefined ? `${data.strength.toFixed(2)}%` : '미연동'}</span>
           </div>
         </div>
       </div>
 
       <div class="modal-verdict ${verdictCls}">${badgeInfo.text}</div>
+      ${comparisonShiftHtml}
 
+      ${strategyPlanHtml}
+      ${gapAdjustmentHtml}
       ${triggeredRuleHtml}
       ${lossManagementHtml}
 
@@ -2767,6 +3873,7 @@ window.addEventListener('DOMContentLoaded', () => {
     fetchNotionData();
   } else {
     renderAll();
+    restoreAnalysisArchiveState();
   }
 
   updateCurrentTime();
