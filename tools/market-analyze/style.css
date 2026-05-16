@@ -1,0 +1,5 @@
+.cycle-glow { transition: all 0.5s ease; }
+/* 크롬/사파리 스크롤바 디자인 */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1e293b; }
+::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
