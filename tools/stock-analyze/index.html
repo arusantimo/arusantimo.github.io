@@ -47,7 +47,7 @@
     <section class="tab-panel active" data-tab-panel="buy">
       <div class="section-title section-title-collapsible">
         <div class="section-title-main">
-          <button id="btn-regime-toggle" type="button" class="section-toggle" aria-expanded="true" aria-controls="buy-regime-summary" title="시장 레짐 접기">-</button>
+          <button id="btn-regime-toggle" type="button" class="section-toggle" aria-expanded="false" aria-controls="buy-regime-summary" title="시장 레짐 펼치기">+</button>
           <span>🧭 시장 레짐 체크</span>
           <span id="regime-current-badge" class="regime-current-badge unknown">미확인</span>
         </div>
@@ -58,7 +58,7 @@
           <button id="btn-regime-report" class="btn btn-secondary small regime-report-btn" title="레짐 판단 근거 보고서">📋</button>
         </div>
       </div>
-      <div id="buy-regime-summary"></div>
+      <div id="buy-regime-summary" class="is-collapsed"></div>
 
       <div class="section-title">📊 눌림목 종가베팅</div>
       <div id="buy-list-pullback" class="buy-grid"></div>

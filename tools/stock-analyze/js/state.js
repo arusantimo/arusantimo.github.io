@@ -8,4 +8,4 @@ let notionSnapshot = createEmptySnapshot();
 let liveGapState = createEmptyLiveGapState();
 const stockDetailMap = {};
 let currentModalState = { code: null, mode: null };
-let isRegimeSummaryCollapsed = false;
+let isRegimeSummaryCollapsed = true;
