@@ -325,6 +325,10 @@ function updatePortfolioRebalancing(stageKey, isDebasement) {
     const targets = getPortfolioTargets(stageKey, isDebasement);
     const keys = ["isa", "pension", "genLong", "quant"];
 
+    if (typeof updatePortfolioTargetBands === "function") {
+        updatePortfolioTargetBands(targets);
+    }
+
     keys.forEach(key => {
         const targetEl = document.getElementById(`eval-${key === "genLong" ? "gen-long" : key}`);
         if (!targetEl) return;

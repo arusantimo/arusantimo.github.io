@@ -263,7 +263,7 @@
                                                 <span class="text-[9px] text-slate-500 mb-1">공격 자산 비중</span>
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-[8px] text-slate-600">방어</span>
-                                                    <input type="range" min="0" max="100" data-key="isa" data-field="aggressiveRatio" class="portfolio-input w-24 accent-rose-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                    <input type="range" min="0" max="100" data-key="isa" data-field="aggressiveRatio" class="portfolio-input w-24 cursor-pointer">
                                                     <span class="text-[8px] text-slate-600">공격</span>
                                                 </div>
                                                 <span class="portfolio-val text-[10px] text-slate-400 font-mono">0%</span>
@@ -282,7 +282,7 @@
                                                 <span class="text-[9px] text-slate-500 mb-1">공격 자산 비중</span>
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-[8px] text-slate-600">방어</span>
-                                                    <input type="range" min="0" max="100" data-key="pension" data-field="aggressiveRatio" class="portfolio-input w-24 accent-rose-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                    <input type="range" min="0" max="100" data-key="pension" data-field="aggressiveRatio" class="portfolio-input w-24 cursor-pointer">
                                                     <span class="text-[8px] text-slate-600">공격</span>
                                                 </div>
                                                 <span class="portfolio-val text-[10px] text-slate-400 font-mono">0%</span>
@@ -302,7 +302,7 @@
                                                     <span class="text-[9px] text-slate-500">현금(CMA) 비중</span>
                                                     <div class="flex items-center gap-2">
                                                         <span class="text-[8px] text-slate-600">투자</span>
-                                                        <input type="range" min="0" max="100" data-key="genLong" data-field="cashRatio" class="portfolio-input w-24 accent-emerald-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                        <input type="range" min="0" max="100" data-key="genLong" data-field="cashRatio" class="portfolio-input w-24 cursor-pointer">
                                                         <span class="text-[8px] text-slate-600">현금</span>
                                                     </div>
                                                     <span class="portfolio-val text-[9px] text-slate-400 font-mono">0%</span>
@@ -311,7 +311,7 @@
                                                     <span class="text-[9px] text-slate-500">공격 자산 비중</span>
                                                     <div class="flex items-center gap-2">
                                                         <span class="text-[8px] text-slate-600">방어</span>
-                                                        <input type="range" min="0" max="100" data-key="genLong" data-field="aggressiveRatio" class="portfolio-input w-24 accent-rose-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                        <input type="range" min="0" max="100" data-key="genLong" data-field="aggressiveRatio" class="portfolio-input w-24 cursor-pointer">
                                                         <span class="text-[8px] text-slate-600">공격</span>
                                                     </div>
                                                     <span class="portfolio-val text-[9px] text-slate-400 font-mono">0%</span>
@@ -336,7 +336,7 @@
                                                 <span class="text-[9px] text-slate-500 mb-1">현금 비중</span>
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-[8px] text-slate-600">투자</span>
-                                                    <input type="range" min="0" max="100" data-key="quant" class="portfolio-input w-24 accent-amber-500 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                                                    <input type="range" min="0" max="100" data-key="quant" class="portfolio-input w-24 cursor-pointer">
                                                     <span class="text-[8px] text-slate-600">현금</span>
                                                 </div>
                                                 <span class="portfolio-val text-[10px] text-slate-400 font-mono">0%</span>
@@ -349,7 +349,7 @@
                         </div>
                         
                         <p class="text-[10px] text-slate-500 leading-relaxed italic px-1">
-                            * 현재 각 계좌의 **현금 비중(%)**을 입력하면 현재 마켓 단계(P-Index)의 권장 비중과 비교하여 매수/매도 방향성을 제안합니다.
+                            * 슬라이더의 색 띠는 현재 마켓 단계 기준 권장 범위입니다. 현재 각 계좌의 **현금 비중(%)**을 입력하면 권장 비중과 비교하여 매수/매도 방향성을 제안합니다.
                         </p>
                     </div>
                 </div>
@@ -365,6 +365,7 @@
     <script src="leader-candidates.js"></script>
     <script src="leader-stocks.js"></script>
     <script src="bull-trap.js"></script>
+    <script src="portfolio-range.js"></script>
     <script src="api.js"></script>
     <script src="engine.js"></script>
     <script src="main.js"></script>
