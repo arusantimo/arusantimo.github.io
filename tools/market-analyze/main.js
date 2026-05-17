@@ -16,6 +16,28 @@ function getFlowToneClass(value) {
     return 'text-slate-300';
 }
 
+function formatKrwMillion(value) {
+    if (value === null || value === undefined || Number.isNaN(value)) return "-";
+    const absValue = Math.abs(value);
+    const sign = value < 0 ? "-" : "";
+    if (absValue >= 1_000_000) return `${sign}${(absValue / 1_000_000).toFixed(absValue >= 10_000_000 ? 1 : 2)}조`;
+    if (absValue >= 100) return `${sign}${(absValue / 100).toFixed(absValue >= 10_000 ? 0 : 1)}억`;
+    return `${sign}${absValue.toFixed(0)}백만`;
+}
+
+function formatSignedPercent(value, digits = 1) {
+    if (value === null || value === undefined || Number.isNaN(value)) return "-";
+    const sign = value > 0 ? "+" : "";
+    return `${sign}${value.toFixed(digits)}%`;
+}
+
+function getPercentToneClass(value, reverse = false) {
+    if (value === null || value === undefined || Number.isNaN(value)) return 'text-slate-400';
+    if (Math.abs(value) < 0.001) return 'text-slate-300';
+    if (reverse) return value <= 0 ? 'text-rose-400' : 'text-cyan-400';
+    return value >= 0 ? 'text-rose-400' : 'text-cyan-400';
+}
+
 function updateMarketFlowUI() {
     const flowDateEl = document.getElementById('val-flow-bizdate');
     if (!flowDateEl) return;
@@ -43,6 +65,50 @@ function updateMarketFlowUI() {
     const reasonEl = document.getElementById('val-flow-reason');
     reasonEl.innerText = marketData.flowReason || "수급 데이터 대기 중 (중립 처리)";
     reasonEl.className = `mt-3 text-[10px] leading-relaxed ${marketData.flowBonus > 0 ? 'text-rose-300' : 'text-slate-500'}`;
+}
+
+function updateLeaderTrapUI() {
+    const dateEl = document.getElementById('val-leader-date');
+    const bodyEl = document.getElementById('leader-trap-body');
+    const summaryEl = document.getElementById('val-leader-summary');
+    if (!dateEl || !bodyEl || !summaryEl) return;
+
+    dateEl.innerText = marketData.leaderSnapshotDate ? `기준일 ${formatFlowBizDateLabel(marketData.leaderSnapshotDate)}` : "기준일 -";
+
+    if (!Array.isArray(marketData.leaderStocks) || !marketData.leaderStocks.length) {
+        bodyEl.innerHTML = `<div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">대표주 데이터 대기 중</div>`;
+        summaryEl.innerText = marketData.trapReason || "트랩 데이터 대기 중 (중립 처리)";
+        summaryEl.className = "mt-3 text-[10px] leading-relaxed text-slate-500";
+        return;
+    }
+
+    bodyEl.innerHTML = marketData.leaderStocks.map(stock => `
+        <div class="leader-card">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="text-xs font-bold text-slate-100">${stock.name}</div>
+                    <div class="text-[10px] text-slate-500">15일 누적 ${formatKrwMillion(stock.cum15dTradingValue)} · 비중 ${(stock.weight * 100).toFixed(0)}%</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs font-bold ${getPercentToneClass(stock.dayReturnPct)}">${formatSignedPercent(stock.dayReturnPct)}</div>
+                    <div class="text-[10px] text-slate-500">당일</div>
+                </div>
+            </div>
+            <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-[10px]">
+                <div class="text-slate-400">15일 낙폭</div>
+                <div class="text-right ${getPercentToneClass(stock.drawdown15dPct, true)}">${formatSignedPercent(stock.drawdown15dPct)}</div>
+                <div class="text-slate-400">첫 음봉 폭발</div>
+                <div class="text-right ${stock.shockValueRatio >= 1 ? 'text-rose-300' : 'text-slate-400'}">${stock.shockValueRatio ? `${stock.shockValueRatio.toFixed(2)}x` : '-'}</div>
+                <div class="text-slate-400">3일 누적 낙폭</div>
+                <div class="text-right ${getPercentToneClass(stock.threeDayDropPct, true)}">${formatSignedPercent(stock.threeDayDropPct)}</div>
+                <div class="text-slate-400">종가 회복률</div>
+                <div class="text-right ${stock.closeRecoveryRate <= 0.45 ? 'text-rose-300' : 'text-slate-400'}">${stock.closeRecoveryRate !== null && stock.closeRecoveryRate !== undefined ? `${(stock.closeRecoveryRate * 100).toFixed(0)}%` : '-'}</div>
+            </div>
+        </div>
+    `).join('');
+
+    summaryEl.innerText = marketData.trapReason || "트랩 데이터 대기 중 (중립 처리)";
+    summaryEl.className = `mt-3 text-[10px] leading-relaxed ${marketData.trapScore >= 10 ? 'text-rose-300' : 'text-slate-500'}`;
 }
 
 // 대시보드 UI를 상태에 맞게 수동 강제 업데이트하는 함수
@@ -75,6 +141,7 @@ function updateDashboardUI() {
     }
 
     updateMarketFlowUI();
+    updateLeaderTrapUI();
 
     // 포트폴리오 입력 필드 업데이트
     updatePortfolioUI();

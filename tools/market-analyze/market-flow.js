@@ -1,24 +1,61 @@
 const FLOW_WINDOW_DAYS = 10;
 const FLOW_NEUTRAL_REASON = "수급 데이터 미연동 (중립 처리)";
 
-async function fetchWithProxyFallback(targetUrl, validationKeyword = "") {
-    const proxies = [
-        { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`, type: 'text' },
-        { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, type: 'text' },
-        { url: `https://corsproxy.org/?${encodeURIComponent(targetUrl)}`, type: 'text' },
-        { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, type: 'json' }
-    ];
+function buildProxyConfigs(targetUrl) {
+    return {
+        allorigins: {
+            url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`,
+            type: "json",
+            label: "api.allorigins.win"
+        },
+        alloriginsRaw: {
+            url: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+            type: "text",
+            label: "api.allorigins.win(raw)"
+        },
+        codetabs: {
+            url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`,
+            type: "text",
+            label: "api.codetabs.com"
+        }
+    };
+}
+
+function inferResponseEncoding(targetUrl, explicitEncoding = "") {
+    if (explicitEncoding) return explicitEncoding;
+    return /naver\.com/i.test(String(targetUrl || "")) ? "euc-kr" : "utf-8";
+}
+
+async function readProxyText(response, encoding) {
+    try {
+        const buffer = await response.arrayBuffer();
+        return new TextDecoder(encoding).decode(buffer);
+    } catch (error) {
+        return response.text();
+    }
+}
+
+async function fetchWithProxyFallback(targetUrl, validationKeyword = "", options = {}) {
+    const proxyConfigs = buildProxyConfigs(targetUrl);
+    const proxyOrder = Array.isArray(options.proxyOrder) && options.proxyOrder.length
+        ? options.proxyOrder
+        : ["allorigins", "codetabs"];
+    const proxies = proxyOrder
+        .map(key => proxyConfigs[key])
+        .filter(Boolean);
+    const timeoutMs = Number.isFinite(options.timeoutMs) ? options.timeoutMs : 10000;
+    const responseEncoding = inferResponseEncoding(targetUrl, options.responseEncoding || "");
 
     let lastError;
     for (const proxy of proxies) {
+        let timeoutId;
         try {
-            const hostName = proxy.url.split('/')[2];
+            const hostName = proxy.label || proxy.url.split('/')[2];
             log(`- ${hostName} 접속 시도 중...`);
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
             const response = await fetch(proxy.url, { signal: controller.signal });
-            clearTimeout(timeoutId);
 
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
@@ -28,7 +65,7 @@ async function fetchWithProxyFallback(targetUrl, validationKeyword = "") {
                 if (!data.contents) throw new Error("빈 데이터 응답");
                 text = data.contents;
             } else {
-                text = await response.text();
+                text = await readProxyText(response, responseEncoding);
             }
 
             if (text.length < 100) throw new Error("비정상적인 짧은 응답(차단 의심)");
@@ -38,9 +75,13 @@ async function fetchWithProxyFallback(targetUrl, validationKeyword = "") {
             return text;
         } catch (err) {
             let errMsg = err.message;
-            if (errMsg.includes('signal is aborted')) errMsg = '타임아웃(10초 초과)';
+            if (err?.name === "AbortError" || errMsg.includes("signal is aborted")) {
+                errMsg = `타임아웃(${Math.round(timeoutMs / 1000)}초 초과)`;
+            }
             log(`<span class="text-amber-500/80 text-[10px]">- 프록시 실패: ${errMsg}</span>`);
             lastError = err;
+        } finally {
+            clearTimeout(timeoutId);
         }
     }
 

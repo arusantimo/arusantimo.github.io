@@ -166,3 +166,50 @@ async function fetchKospiDisparityData() {
         }
     }
 }
+
+function parseMarginHistoryRows(html, limit = 20) {
+    const rows = [];
+    const trRegex = /<tr[\s\S]*?<\/tr>/gi;
+    let match;
+
+    while ((match = trRegex.exec(html)) !== null) {
+        const trContent = match[0];
+        if (!trContent.includes('class="date"')) continue;
+
+        const tdMatches = [...trContent.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)];
+        if (tdMatches.length < 5) continue;
+
+        const dateKey = normalizeFlowBizDate(stripHtmlTags(tdMatches[0][1]));
+        const balance = Number(stripHtmlTags(tdMatches[4][1]).replace(/,/g, ""));
+        if (!dateKey || !Number.isFinite(balance)) continue;
+
+        rows.push({ dateKey, balance });
+        if (rows.length >= limit) break;
+    }
+
+    return rows;
+}
+
+function calculateLinearSlope(values) {
+    const X = values.map((_, idx) => idx + 1);
+    const Y = values;
+    const sumX = X.reduce((sum, value) => sum + value, 0);
+    const sumY = Y.reduce((sum, value) => sum + value, 0);
+    const sumXY = X.reduce((sum, value, idx) => sum + (value * Y[idx]), 0);
+    const sumX2 = X.reduce((sum, value) => sum + (value * value), 0);
+    return (Y.length * sumXY - sumX * sumY) / (Y.length * sumX2 - sumX * sumX);
+}
+
+async function fetchMarginIndicatorData() {
+    const html = await fetchWithProxyFallback("https://finance.naver.com/sise/sise_deposit.naver");
+    const marginHistory = parseMarginHistoryRows(html, 20);
+    if (marginHistory.length < 5) {
+        throw new Error("신용융자잔고 5영업일 데이터 확보 실패");
+    }
+
+    const slope = calculateLinearSlope(marginHistory.slice(0, 5).map(row => row.balance).reverse());
+    return {
+        marginSlope: slope,
+        marginHistory
+    };
+}
