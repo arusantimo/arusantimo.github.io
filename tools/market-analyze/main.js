@@ -9,6 +9,42 @@ document.getElementById('input-sent').addEventListener('input', (e) => {
     calculateCycle();
 });
 
+function getFlowToneClass(value) {
+    if (value === null || value === undefined || Number.isNaN(value)) return 'text-slate-300';
+    if (value > 0) return 'text-rose-400';
+    if (value < 0) return 'text-cyan-400';
+    return 'text-slate-300';
+}
+
+function updateMarketFlowUI() {
+    const flowDateEl = document.getElementById('val-flow-bizdate');
+    if (!flowDateEl) return;
+
+    const flowDateLabel = marketData.flowBizDate ? formatFlowBizDateLabel(marketData.flowBizDate) : "기준일";
+    flowDateEl.innerText = marketData.flowBizDate ? `기준일 ${flowDateLabel}` : "기준일 -";
+
+    const bindings = [
+        { todayId: 'flow-retail-today', cumId: 'flow-retail-10d', todayValue: marketData.retailNetToday, cumValue: marketData.retailNet10dCum },
+        { todayId: 'flow-foreign-today', cumId: 'flow-foreign-10d', todayValue: marketData.foreignNetToday, cumValue: marketData.foreignNet10dCum },
+        { todayId: 'flow-institution-today', cumId: 'flow-institution-10d', todayValue: marketData.institutionNetToday, cumValue: marketData.institutionNet10dCum }
+    ];
+
+    bindings.forEach(({ todayId, cumId, todayValue, cumValue }) => {
+        const todayEl = document.getElementById(todayId);
+        const cumEl = document.getElementById(cumId);
+        if (!todayEl || !cumEl) return;
+
+        todayEl.innerText = `${flowDateLabel} ${formatSignedFlowValue(todayValue)}`;
+        todayEl.className = `font-mono font-bold text-sm ${getFlowToneClass(todayValue)}`;
+        cumEl.innerText = `10일 누적 ${formatSignedFlowValue(cumValue)}`;
+        cumEl.className = `text-[10px] mt-1 ${cumValue === null || cumValue === undefined || Number.isNaN(cumValue) ? 'text-slate-500' : getFlowToneClass(cumValue)}`;
+    });
+
+    const reasonEl = document.getElementById('val-flow-reason');
+    reasonEl.innerText = marketData.flowReason || "수급 데이터 대기 중 (중립 처리)";
+    reasonEl.className = `mt-3 text-[10px] leading-relaxed ${marketData.flowBonus > 0 ? 'text-rose-300' : 'text-slate-500'}`;
+}
+
 // 대시보드 UI를 상태에 맞게 수동 강제 업데이트하는 함수
 function updateDashboardUI() {
     document.getElementById('val-fx').innerText = marketData.fx.toLocaleString() + " 원";
@@ -37,6 +73,8 @@ function updateDashboardUI() {
     if (marketData.lastSyncTime) {
         document.getElementById('current-time').innerText = "마지막 동기화: " + marketData.lastSyncTime;
     }
+
+    updateMarketFlowUI();
 
     // 포트폴리오 입력 필드 업데이트
     updatePortfolioUI();

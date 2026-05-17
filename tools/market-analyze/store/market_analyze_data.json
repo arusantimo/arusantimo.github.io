@@ -1,10 +1,21 @@
 {
-  "fx": 1498.079787,
+  "fx": 1497.840406,
   "vix": 18.43,
   "sentiment": 88,
   "gold": 4561.9,
-  "disparity": 100,
+  "disparity": 163.93423762881443,
   "bullRatio": 43.333333333333336,
   "marginSlope": 31375.2,
-  "lastSyncTime": "2026. 5. 17. 오전 1:04:54"
+  "retailNetToday": 70860,
+  "foreignNetToday": -51959,
+  "institutionNetToday": -19020,
+  "retailNet10dCum": 269286,
+  "foreignNet10dCum": -261368,
+  "institutionNet10dCum": -4621,
+  "retailNet10dAbsAvg": 37400.2,
+  "retailNet10dAbsSum": 374002,
+  "flowBizDate": "20260515",
+  "flowBonus": 0,
+  "flowReason": "가격 과열 구간(disparity>103)에서는 수급 보정을 비활성화했습니다 (중립 처리).",
+  "lastSyncTime": "2026. 5. 17. 오후 3:38:37"
 }

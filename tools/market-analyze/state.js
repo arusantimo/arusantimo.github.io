@@ -1,5 +1,25 @@
 // 전역 상태 변수 설정 (기본 기본값)
-let marketData = { fx: 1350, vix: 15.0, sentiment: 50, gold: 2300, disparity: 100, bullRatio: 50, marginSlope: 0, lastSyncTime: "" };
+let marketData = {
+    fx: 1350,
+    vix: 15.0,
+    sentiment: 50,
+    gold: 2300,
+    disparity: 100,
+    bullRatio: 50,
+    marginSlope: 0,
+    retailNetToday: null,
+    foreignNetToday: null,
+    institutionNetToday: null,
+    retailNet10dCum: null,
+    foreignNet10dCum: null,
+    institutionNet10dCum: null,
+    retailNet10dAbsAvg: null,
+    retailNet10dAbsSum: null,
+    flowBizDate: "",
+    flowBonus: 0,
+    flowReason: "수급 데이터 대기 중 (중립 처리)",
+    lastSyncTime: ""
+};
 let portfolioData = {
     isa: { aggressiveRatio: 0 },
     pension: { aggressiveRatio: 0 },

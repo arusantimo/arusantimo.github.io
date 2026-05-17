@@ -95,6 +95,33 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="mt-5 border-t border-slate-700 pt-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold text-slate-200">🏦 시장 수급 요약</h3>
+                            <span id="val-flow-bizdate" class="text-[10px] font-mono text-slate-500">기준일 -</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                                <div class="text-[10px] font-semibold text-slate-400 mb-2">개인</div>
+                                <div id="flow-retail-today" class="font-mono font-bold text-sm text-slate-200">기준일 -</div>
+                                <div id="flow-retail-10d" class="text-[10px] text-slate-500 mt-1">10일 누적 -</div>
+                            </div>
+                            <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                                <div class="text-[10px] font-semibold text-slate-400 mb-2">외국인</div>
+                                <div id="flow-foreign-today" class="font-mono font-bold text-sm text-slate-200">기준일 -</div>
+                                <div id="flow-foreign-10d" class="text-[10px] text-slate-500 mt-1">10일 누적 -</div>
+                            </div>
+                            <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
+                                <div class="text-[10px] font-semibold text-slate-400 mb-2">기관계</div>
+                                <div id="flow-institution-today" class="font-mono font-bold text-sm text-slate-200">기준일 -</div>
+                                <div id="flow-institution-10d" class="text-[10px] text-slate-500 mt-1">10일 누적 -</div>
+                            </div>
+                        </div>
+                        <p id="val-flow-reason" class="mt-3 text-[10px] leading-relaxed text-slate-500">
+                            수급 데이터 대기 중 (중립 처리)
+                        </p>
+                    </div>
                 </div>
 
                 <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl font-mono text-xs">
@@ -118,16 +145,23 @@
                         <span id="cycle-status" class="text-2xl font-extrabold text-slate-300">데이터를 가져오는 중입니다...</span>
                         <span id="pendulum-score" class="text-xs font-mono text-slate-400"></span>
                     </div>
-                    <div class="relative w-full mb-12 mt-6">
+                    <div class="relative w-full mb-16 mt-8">
                         <!-- Connecting Line -->
                         <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1.5 bg-slate-700 rounded-full z-0"></div>
-                        <!-- Active Line -->
-                        <div id="stepper-line" class="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-slate-500 rounded-full z-0 transition-all duration-500" style="width: 50%"></div>
+                        <!-- Active Stage Line -->
+                        <div id="stepper-stage-line" class="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-slate-500 rounded-full z-0 transition-all duration-500" style="width: 0%"></div>
+                        <!-- Score Indicator -->
+                        <div id="stepper-score-indicator" class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 transition-all duration-500" style="left: 50%">
+                            <div id="stepper-score-chip" class="absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-600 bg-slate-950/90 px-2.5 py-1 text-[10px] font-bold text-slate-200 shadow-lg shadow-slate-950/40">
+                                P-Index 50
+                            </div>
+                            <div id="stepper-score-dot" class="h-3.5 w-3.5 rounded-full border-2 border-slate-950 bg-slate-300 shadow-lg shadow-slate-950/60"></div>
+                        </div>
                         
                         <div class="relative z-10 flex justify-between items-center w-full">
                             <!-- Step 1: 투매 -->
                             <div class="group relative flex flex-col items-center cursor-help">
-                                <div id="step-1-circle" class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
+                                <div id="step-1-circle" class="relative z-10 w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
                                     <span class="text-[10px] font-bold text-slate-400">1</span>
                                 </div>
                                 <div id="step-1-label" class="absolute top-8 whitespace-nowrap text-[10px] md:text-xs font-semibold text-slate-400 mt-1">투매</div>
@@ -139,7 +173,7 @@
 
                             <!-- Step 2: 비관 -->
                             <div class="group relative flex flex-col items-center cursor-help">
-                                <div id="step-2-circle" class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
+                                <div id="step-2-circle" class="relative z-10 w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
                                     <span class="text-[10px] font-bold text-slate-400">2</span>
                                 </div>
                                 <div id="step-2-label" class="absolute top-8 whitespace-nowrap text-[10px] md:text-xs font-semibold text-slate-400 mt-1">비관</div>
@@ -151,7 +185,7 @@
 
                             <!-- Step 3: 회의 -->
                             <div class="group relative flex flex-col items-center cursor-help">
-                                <div id="step-3-circle" class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
+                                <div id="step-3-circle" class="relative z-10 w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
                                     <span class="text-[10px] font-bold text-slate-400">3</span>
                                 </div>
                                 <div id="step-3-label" class="absolute top-8 whitespace-nowrap text-[10px] md:text-xs font-semibold text-slate-400 mt-1">회의</div>
@@ -163,7 +197,7 @@
 
                             <!-- Step 4: 낙관 -->
                             <div class="group relative flex flex-col items-center cursor-help">
-                                <div id="step-4-circle" class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
+                                <div id="step-4-circle" class="relative z-10 w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
                                     <span class="text-[10px] font-bold text-slate-400">4</span>
                                 </div>
                                 <div id="step-4-label" class="absolute top-8 whitespace-nowrap text-[10px] md:text-xs font-semibold text-slate-400 mt-1">낙관</div>
@@ -175,7 +209,7 @@
                             
                             <!-- Step 5: 탐욕 -->
                             <div class="group relative flex flex-col items-center cursor-help">
-                                <div id="step-5-circle" class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
+                                <div id="step-5-circle" class="relative z-10 w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
                                     <span class="text-[10px] font-bold text-slate-400">5</span>
                                 </div>
                                 <div id="step-5-label" class="absolute top-8 whitespace-nowrap text-[10px] md:text-xs font-semibold text-slate-400 mt-1">탐욕</div>
@@ -187,7 +221,7 @@
 
                             <!-- Step 6: 환희 -->
                             <div class="group relative flex flex-col items-center cursor-help">
-                                <div id="step-6-circle" class="w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
+                                <div id="step-6-circle" class="relative z-10 w-5 h-5 md:w-7 md:h-7 rounded-full bg-slate-800 border-2 border-slate-500 flex items-center justify-center transition-all duration-500 shadow-md">
                                     <span class="text-[10px] font-bold text-slate-400">6</span>
                                 </div>
                                 <div id="step-6-label" class="absolute top-8 whitespace-nowrap text-[10px] md:text-xs font-semibold text-slate-400 mt-1">환희</div>
@@ -197,6 +231,17 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="flex flex-col gap-1 border-t border-slate-700/50 pt-3 -mt-3">
+                        <p id="cycle-range-note" class="text-[11px] md:text-xs font-semibold text-slate-300">
+                            현재 구간과 점수 위치를 계산 중입니다.
+                        </p>
+                        <p id="cycle-flow-note" class="text-[10px] md:text-xs text-slate-300">
+                            수급 괴리 보너스 +0 · 수급 데이터 대기 중 (중립 처리)
+                        </p>
+                        <p id="cycle-score-note" class="text-[10px] md:text-xs text-slate-500">
+                            굵은 라인은 현재 단계, 점 포인터는 실제 P-Index 위치입니다.
+                        </p>
                     </div>
                     <p id="cycle-desc" class="text-slate-300 text-sm leading-relaxed border-t border-slate-700/60 pt-3 mt-4">
                         우측 상단의 실시간 동기화 버튼을 클릭하면 네이버 증권의 데이터 패킷을 다중 프록시 서버를 통해 안전하게 파싱하여 하워드 막스의 6단계 강세/약세 사이클 시계추 위치를 정량적으로 계산합니다.
@@ -356,6 +401,8 @@
     </div>
 
     <script src="state.js"></script>
+    <script src="market-flow.js"></script>
+    <script src="market-indicators.js"></script>
     <script src="api.js"></script>
     <script src="engine.js"></script>
     <script src="main.js"></script>

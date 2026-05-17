@@ -1,49 +1,3 @@
-// 다중 프록시 폴백을 지원하는 범용 크롤링 엔진
-async function fetchWithProxyFallback(targetUrl, validationKeyword = "") {
-    const proxies = [
-        { url: `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`, type: 'text' },
-        { url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, type: 'text' },
-        { url: `https://corsproxy.org/?${encodeURIComponent(targetUrl)}`, type: 'text' },
-        { url: `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, type: 'json' }
-    ];
-
-    let lastError;
-    for (const proxy of proxies) {
-        try {
-            const hostName = proxy.url.split('/')[2];
-            log(`- ${hostName} 접속 시도 중...`);
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃으로 연장
-            
-            const response = await fetch(proxy.url, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            let text = "";
-            if (proxy.type === 'json') {
-                const data = await response.json();
-                if (!data.contents) throw new Error("빈 데이터 응답");
-                text = data.contents;
-            } else {
-                text = await response.text();
-            }
-            
-            if (text.length < 100) throw new Error("비정상적인 짧은 응답(차단 의심)");
-            if (validationKeyword && !text.includes(validationKeyword)) {
-                throw new Error("웹 방화벽 차단 페이지 응답 의심");
-            }
-            return text;
-        } catch (err) {
-            let errMsg = err.message;
-            if(errMsg.includes('signal is aborted')) errMsg = '타임아웃(10초 초과)';
-            log(`<span class="text-amber-500/80 text-[10px]">- 프록시 실패: ${errMsg}</span>`);
-            lastError = err;
-        }
-    }
-    throw new Error(`모든 프록시 서버 응답 실패 (${lastError?.message})`);
-}
-
 // 실시간 크롤링 및 파싱 핵심 엔진
 async function fetchLiveFinanceData() {
     currentTimeEl.innerText = new Date().toLocaleString('ko-KR') + " 기준";
@@ -75,34 +29,20 @@ async function fetchLiveFinanceData() {
         document.getElementById('val-fx').className = "font-mono font-bold text-amber-500 text-lg";
     }
 
-    // 2. VIX 공포지수 정보 수집 (Yahoo Finance API 전환)
+    // 2. VIX 공포지수 정보 수집 (Yahoo 차트 + CBOE CSV 폴백)
     try {
-        log("[VIX] Yahoo Finance API 파싱 중...");
-        const jsonStr = await fetchWithProxyFallback("https://query1.finance.yahoo.com/v8/finance/chart/^VIX", "regularMarketPrice");
-        
-        let vixVal;
-        try {
-            const data = JSON.parse(jsonStr);
-            vixVal = data.chart.result[0].meta.regularMarketPrice;
-        } catch(e) {
-            // 원시 텍스트에서 정규식 추출 시도
-            const match = jsonStr.match(/"regularMarketPrice"\s*:\s*([\d.]+)/);
-            if (match && match[1]) {
-                vixVal = parseFloat(match[1]);
-            } else {
-                throw new Error("VIX JSON/정규식 파싱 완전 실패");
-            }
-        }
-        
-        if (!vixVal) throw new Error("VIX 데이터 구조 이상");
-
+        log("[VIX] Yahoo/CBOE 데이터 파싱 중...");
+        const vixVal = await fetchVixValue();
         marketData.vix = vixVal;
         document.getElementById('val-vix').innerText = marketData.vix.toFixed(2);
         document.getElementById('val-vix').className = "font-mono font-bold text-emerald-400 text-lg";
         log(`[VIX] <span class='text-emerald-400 font-bold'>성공:</span> 미국 공포지수 ➜ <b>${marketData.vix}</b>`);
     } catch (err) {
-        log(`<span class='text-rose-400'>[VIX ERROR]</span> VIX 파싱 실패(${err.message}). 디폴트(15.0) 유지.`);
-        document.getElementById('val-vix').innerText = "15.0 (에러)";
+        const hasPreviousVix = !!marketData.lastSyncTime || marketData.vix !== 15.0;
+        const fallbackVix = Number.isFinite(marketData.vix) && marketData.vix > 0 ? marketData.vix : 15.0;
+        marketData.vix = fallbackVix;
+        log(`<span class='text-rose-400'>[VIX ERROR]</span> VIX 파싱 실패(${err.message}). ${hasPreviousVix ? `기존 값 ${fallbackVix.toFixed(2)} 유지.` : "기본값(15.0) 유지."}`);
+        document.getElementById('val-vix').innerText = hasPreviousVix ? `${fallbackVix.toFixed(2)} (유지)` : "15.00 (에러)";
         document.getElementById('val-vix').className = "font-mono font-bold text-amber-500 text-lg";
     }
 
@@ -144,61 +84,58 @@ async function fetchLiveFinanceData() {
         log(`<span class='text-rose-400'>[SENT ERROR]</span> 투심 파싱 실패(${err.message}). 수동 슬라이더 유지.`);
     }
 
-    // 4. 국제 금 시세 (Yahoo Finance API)
+    // 4. 국제 금 시세 (Yahoo 차트 기반, 재시도 + 마지막 정상값 유지)
     try {
-        log("[GOLD] Yahoo Finance API 파싱 중...");
-        const jsonStr = await fetchWithProxyFallback("https://query1.finance.yahoo.com/v8/finance/chart/GC=F", "regularMarketPrice");
-        
-        let goldVal;
-        try {
-            const data = JSON.parse(jsonStr);
-            goldVal = data.chart.result[0].meta.regularMarketPrice;
-        } catch(e) {
-            const match = jsonStr.match(/"regularMarketPrice"\s*:\s*([\d.]+)/);
-            if (match && match[1]) goldVal = parseFloat(match[1]);
-            else throw new Error("금 시세 파싱 실패");
-        }
-        
-        if (!goldVal) throw new Error("금 데이터 이상");
-
+        log("[GOLD] Yahoo 차트 데이터 파싱 중...");
+        const goldVal = await fetchGoldValue();
         marketData.gold = goldVal;
         document.getElementById('val-gold').innerText = "$ " + marketData.gold.toLocaleString();
         document.getElementById('val-gold').className = "font-mono font-bold text-emerald-400 text-lg";
         log(`[GOLD] <span class='text-emerald-400 font-bold'>성공:</span> 국제 금 시세 ➜ <b>$${marketData.gold.toLocaleString()}</b>`);
     } catch (err) {
-        log(`<span class='text-rose-400'>[GOLD ERROR]</span> 금 시세 파싱 실패(${err.message}).`);
-        document.getElementById('val-gold').innerText = "에러";
+        const hasPreviousGold = !!marketData.lastSyncTime || marketData.gold !== 2300;
+        const fallbackGold = Number.isFinite(marketData.gold) && marketData.gold > 0 ? marketData.gold : 2300;
+        marketData.gold = fallbackGold;
+        log(`<span class='text-rose-400'>[GOLD ERROR]</span> 금 시세 파싱 실패(${err.message}). ${hasPreviousGold ? `기존 값 $${fallbackGold.toLocaleString()} 유지.` : "기본값($2,300) 유지."}`);
+        document.getElementById('val-gold').innerText = hasPreviousGold ? `$ ${fallbackGold.toLocaleString()} (유지)` : "$ 2,300 (기본)";
         document.getElementById('val-gold').className = "font-mono font-bold text-amber-500 text-lg";
     }
 
-    // 5. 코스피 200일선 이격도 계산 (Yahoo Finance ^KS11)
+    // 5. 코스피 200일선 이격도 계산 (Yahoo 차트 + 네이버 일별 지수 폴백)
     try {
-        log("[KOSPI] 코스피 1년 데이터 파싱 중 (Direct API)...");
-        const response = await fetch("https://query1.finance.yahoo.com/v8/finance/chart/^KS11?range=1y&interval=1d");
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        
-        const result = data.chart.result[0];
-        const closes = result.indicators.quote[0].close;
-        const validCloses = closes.filter(c => c !== null);
-        
-        if (validCloses.length < 200) throw new Error("200일치 데이터 부족");
-        
-        const currentPrice = validCloses[validCloses.length - 1];
-        const sma200 = validCloses.slice(-200).reduce((a,b) => a+b, 0) / 200;
-        const disparity = (currentPrice / sma200) * 100;
-
+        log("[KOSPI] 코스피 1년 데이터 파싱 중...");
+        const { disparity, currentPrice, sma200 } = await fetchKospiDisparityData();
         marketData.disparity = disparity;
         document.getElementById('val-disparity').innerText = marketData.disparity.toFixed(2) + " %";
         document.getElementById('val-disparity').className = "font-mono font-bold text-emerald-400 text-lg";
-        log(`[KOSPI] <span class='text-emerald-400 font-bold'>성공:</span> 200일선 이격도 ➜ <b>${marketData.disparity.toFixed(2)}%</b>`);
+        log(`[KOSPI] <span class='text-emerald-400 font-bold'>성공:</span> 200일선 이격도 ➜ <b>${marketData.disparity.toFixed(2)}%</b> (지수 ${currentPrice.toFixed(2)} / SMA200 ${sma200.toFixed(2)})`);
     } catch (err) {
-        log(`<span class='text-rose-400'>[KOSPI ERROR]</span> 이격도 계산 실패(${err.message}).`);
-        document.getElementById('val-disparity').innerText = "100.00 % (디폴트)";
+        const hasPreviousDisparity = !!marketData.lastSyncTime || marketData.disparity !== 100;
+        const fallbackDisparity = Number.isFinite(marketData.disparity) && marketData.disparity > 0 ? marketData.disparity : 100;
+        marketData.disparity = fallbackDisparity;
+        log(`<span class='text-rose-400'>[KOSPI ERROR]</span> 이격도 계산 실패(${err.message}). ${hasPreviousDisparity ? `기존 값 ${fallbackDisparity.toFixed(2)}% 유지.` : "기본값(100.00%) 유지."}`);
+        document.getElementById('val-disparity').innerText = hasPreviousDisparity ? `${fallbackDisparity.toFixed(2)} % (유지)` : "100.00 % (에러)";
         document.getElementById('val-disparity').className = "font-mono font-bold text-amber-500 text-lg";
     }
 
-    // 6. 거래량 상위 주도주 양봉 마감 비율
+    // 6. 시장 전체 수급 (KOSPI + KOSDAQ, 최근 10영업일)
+    try {
+        const flowSummary = await fetchMarketInvestorFlowData();
+        marketData.retailNetToday = flowSummary.retailNetToday;
+        marketData.foreignNetToday = flowSummary.foreignNetToday;
+        marketData.institutionNetToday = flowSummary.institutionNetToday;
+        marketData.retailNet10dCum = flowSummary.retailNet10dCum;
+        marketData.foreignNet10dCum = flowSummary.foreignNet10dCum;
+        marketData.institutionNet10dCum = flowSummary.institutionNet10dCum;
+        marketData.retailNet10dAbsAvg = flowSummary.retailNet10dAbsAvg;
+        marketData.retailNet10dAbsSum = flowSummary.retailNet10dAbsSum;
+        marketData.flowBizDate = flowSummary.flowBizDate;
+    } catch (err) {
+        setMarketFlowNeutralState();
+        log(`<span class='text-rose-400'>[FLOW ERROR]</span> 시장 수급 파싱 실패(${err.message}). 수급 보정은 중립 처리합니다.`);
+    }
+
+    // 7. 거래량 상위 주도주 양봉 마감 비율
     try {
         log("[DEAL HIGH] 네이버 거래량 상위 종목 파싱 중...");
         // sise_deal_high는 폐쇄되었으므로 거래상위(sise_quant) 페이지 활용
@@ -233,7 +170,7 @@ async function fetchLiveFinanceData() {
         document.getElementById('val-bull-ratio').className = "font-mono font-bold text-amber-500 text-lg";
     }
 
-    // 7. 신용융자 잔고 5일 기울기 (OLS)
+    // 8. 신용융자 잔고 5일 기울기 (OLS)
     try {
         log("[DEPOSIT] 증시자금동향 신용잔고 파싱 중...");
         const html = await fetchWithProxyFallback("https://finance.naver.com/sise/sise_deposit.naver");
@@ -281,12 +218,11 @@ async function fetchLiveFinanceData() {
 
     // 대시보드 계산 로직 구동 및 상태 초기화
     marketData.lastSyncTime = new Date().toLocaleString('ko-KR');
-    saveMarketData(); // 로컬 스토리지에 데이터 영구 저장
-    
     document.getElementById('current-time').innerText = "마지막 동기화: " + marketData.lastSyncTime;
     document.getElementById('data-status').innerText = "실시간 동기화 완료";
     document.getElementById('data-status').className = "text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded";
     calculateCycle();
+    saveMarketData(); // 계산 결과(flowBonus/flowReason 포함)까지 로컬 저장
     
     btnSync.disabled = false;
     syncIcon.classList.remove('animate-spin');
