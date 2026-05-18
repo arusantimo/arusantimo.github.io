@@ -150,9 +150,16 @@ function clearSellDetailMap() {
 }
 
 function ensureArchivedSellStock(restoredStock) {
-  if (!restoredStock?.code || !restoredStock?.type || !stocks[restoredStock.type]) return restoredStock;
+  if (!restoredStock?.code || !restoredStock?.type || !stocks[restoredStock.type]) return null;
   const existing = stocks[restoredStock.type].find(stock => stock.code === restoredStock.code);
   if (existing) return existing;
+
+  // 노션에서 불러온 종목이면서 현재 분석 대상 종목 리스트에 없다면 부활시키지 않음
+  if (restoredStock.source === 'notion' || !restoredStock.manual) {
+    return null;
+  }
+
+  // 수동 추가된 종목만 세션 복구를 위해 다시 추가 허용
   const normalized = { ...restoredStock };
   stocks[restoredStock.type].push(normalized);
   return normalized;
@@ -192,6 +199,7 @@ function restoreSellAnalysisArchive(archiveItem) {
 
   archiveItem.details.forEach(savedDetail => {
     const stock = ensureArchivedSellStock(savedDetail.stock);
+    if (!stock) return; // 유효하지 않은(부활되지 않은) 종목은 건너뜀
     const restoredDetail = {
       ...savedDetail,
       mode: 'sell',
