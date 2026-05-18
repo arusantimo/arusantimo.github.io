@@ -29,6 +29,7 @@ function handleManualAdd(type, nameInputId, codeInputId) {
 
 document.getElementById('btn-add-pullback').addEventListener('click', () => handleManualAdd('pullback', 'pullback-name', 'pullback-code'));
 document.getElementById('btn-add-momentum').addEventListener('click', () => handleManualAdd('momentum', 'momentum-name', 'momentum-code'));
+document.getElementById('btn-add-reversal').addEventListener('click', () => handleManualAdd('reversal', 'reversal-name', 'reversal-code'));
 document.getElementById('btn-add-swing').addEventListener('click', () => {
   const name = document.getElementById('swing-name').value.trim();
   const code = document.getElementById('swing-code').value.trim();
@@ -50,6 +51,20 @@ document.getElementById('btn-buy-guide').addEventListener('click', openGuideModa
 
 document.querySelectorAll('.tab-button').forEach(button => {
   button.addEventListener('click', () => setActiveTab(button.dataset.tab));
+});
+
+document.getElementById('sell-universe-switch')?.addEventListener('click', event => {
+  const button = event.target.closest('[data-sell-universe]');
+  if (!button) return;
+  setSellUniverseMode(button.dataset.sellUniverse);
+  renderSellStockCards();
+  updateAnalyzeButtonState();
+  updateCurrentTime();
+
+  const currentSellDetail = stockDetailMap[currentModalState.code];
+  if (currentModalState.mode === 'sell' && currentSellDetail?.stock && !isSellStockVisible(currentSellDetail.stock)) {
+    closeModal();
+  }
 });
 
 document.getElementById('btn-analyze').addEventListener('click', async () => {
@@ -88,15 +103,22 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   log(`▶ [현재 시각: ${timeStr}] 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
   await refreshLiveGapScore('매도 분석');
 
-  const allStocks = isBefore0908
-    ? [...stocks.swing, ...stocks.momentum]
-    : [...stocks.swing, ...stocks.pullback, ...stocks.momentum];
+  const visibleCollections = getVisibleSellStockCollections();
+  const allStocks = getSellStocksForAnalysis(isBefore0908);
 
-  if (isBefore0908 && stocks.pullback.length > 0) {
-    log(`ℹ️ 1차 분석: 눌림목 ${stocks.pullback.length}개 종목은 9:08 이후에 분석됩니다.`);
+  if (!allStocks.length) {
+    log('<span style="color:var(--text-warning)">ℹ️ 현재 선택한 매도 대상에 분석할 종목이 없습니다. 매수 카드에서 매도 추적을 켜거나 전체 후보 보기를 선택해주세요.</span>');
+    btn.disabled = false;
+    updateAnalyzeButtonState();
+    updateCurrentTime();
+    return;
   }
-  if (stocks.swing.length > 0) {
-    log(`🔄 스윙 보유 ${stocks.swing.length}개 종목 포함하여 분석합니다.`);
+
+  if (isBefore0908 && visibleCollections.pullback.length > 0) {
+    log(`ℹ️ 1차 분석: 눌림목 ${visibleCollections.pullback.length}개 종목은 9:08 이후에 분석됩니다.`);
+  }
+  if (visibleCollections.swing.length > 0) {
+    log(`🔄 스윙 보유 ${visibleCollections.swing.length}개 종목 포함하여 분석합니다.`);
   }
 
   for (const stock of allStocks) {

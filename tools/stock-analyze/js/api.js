@@ -138,27 +138,21 @@ async function refreshBuyEntry(code, options = {}) {
       const upsideRate = currentPrice > 0 && Number.isFinite(targetPrice)
         ? ((targetPrice - currentPrice) / currentPrice) * 100
         : null;
-      const score = clamp(recommMean * 2, 0, 10);
-      const grade = getBuyGradeFromScore(score, entry.strategy);
-
-      entry.liveRefresh = {
+      entry.liveRefresh = buildBuyLiveRefreshPayload(entry, {
         recommMean,
-        score,
-        grade,
         currentPrice,
         targetPrice,
         upsideRate,
-        statusLabel: buildLiveBuyStatusLabel({ recommMean, upsideRate }),
         asOf: consensusInfo.createDate || basicJson.localTradedAt || '',
         refreshedAt: new Date().toISOString()
-      };
+      });
 
       renderBuyStockCards();
       if (currentModalState.mode === 'buy' && currentModalState.code === code && document.getElementById('modal-overlay').classList.contains('open')) {
         openModal(code, 'buy');
       }
 
-      log(`- [${entry.name}] 최신화 완료: 네이버 컨센서스 ${recommMean.toFixed(2)}/5.00 → ${score.toFixed(1)}점 (${grade}등급)`);
+      log(`- [${entry.name}] 최신화 완료: 컨센서스 ${entry.liveRefresh.recommMean.toFixed(2)}/5.00 → 환산 ${entry.liveRefresh.consensusScore.toFixed(1)}점, 보정 ${formatBuySignedPoints(entry.liveRefresh.adjustment)}, 최종 ${entry.liveRefresh.finalScore.toFixed(1)}점 (${entry.liveRefresh.finalGrade}등급)`);
       return true;
     } catch (error) {
       if (attempt <= maxRetries) {
@@ -239,6 +233,7 @@ async function fetchNotionData() {
     }
     const sourceText = buildSourceTextFromNotion(data);
     notionSnapshot = parseNotionSnapshotFromText(sourceText);
+    currentNotionPageId = notionId;
     liveGapState = createEmptyLiveGapState();
     rebuildSellStocksFromSnapshot();
     renderAll();

@@ -134,32 +134,6 @@ function renderSellDetailToCard(detail) {
   card.parentNode.replaceChild(newCard, card);
   newCard.addEventListener('click', () => openModal(stock.code, 'sell'));
 }
-function buildLiveBuyStatusLabel(liveRefresh) {
-  if (Number.isFinite(liveRefresh.upsideRate)) {
-    return `목표가 ${formatSignedPercent(liveRefresh.upsideRate)}`;
-  }
-  return `컨센서스 ${liveRefresh.recommMean.toFixed(2)} / 5.00`;
-}
-
-function getBuyPresentation(entry) {
-  const liveRefresh = entry.liveRefresh;
-  const score = liveRefresh?.score ?? entry.score;
-  const grade = liveRefresh?.grade ?? entry.grade;
-  const statusLabel = liveRefresh?.statusLabel ?? entry.statusLabel;
-
-  return {
-    score,
-    grade,
-    statusLabel,
-    verdictClass: getBuyVerdictClassFromGrade(grade),
-    liveRefresh,
-    changed: {
-      score: Boolean(liveRefresh && Math.abs(score - entry.score) >= 0.05),
-      grade: Boolean(liveRefresh && grade !== entry.grade),
-      statusLabel: Boolean(liveRefresh && statusLabel !== entry.statusLabel)
-    }
-  };
-}
 function renderRegimeSummary() {
   const container = document.getElementById('buy-regime-summary');
   if (!container) return;
@@ -583,6 +557,7 @@ function renderSellStockCards() {
 
   renderGroup(stocks.pullback, 'list-pullback');
   renderGroup(stocks.momentum, 'list-momentum');
+  renderGroup(stocks.reversal, 'list-reversal');
   renderSwingCards();
 }
 
@@ -642,6 +617,9 @@ function renderBuyStockCards() {
       const presentation = getBuyPresentation(entry);
       const verdictClass = presentation.verdictClass;
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';
+      const liveMetaHtml = presentation.liveRefresh
+        ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
+        : '';
       container.innerHTML += `
         <div class="buy-card ${verdictClass}" data-code="${entry.code}">
           <div class="buy-card-head">
@@ -651,24 +629,20 @@ function renderBuyStockCards() {
               <div class="buy-card-code">${escapeHtml(entry.code)}</div>
             </div>
             <div class="buy-card-scorebox">
-              <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.score.toFixed(1)}</div>
-              <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.grade)}</div>
+              <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.primaryScore.toFixed(1)}</div>
+              <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryGrade)}</div>
+              <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
             </div>
           </div>
-          <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.statusLabel)}</div>
+          <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
           <div class="buy-card-tags">
+            <span class="buy-tag strategy">전략 판정 ${escapeHtml(entry.statusLabel || presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
             <span class="buy-tag">충족 ${entry.matchedRules.length}</span>
             <span class="buy-tag muted">미충족 ${entry.unmatchedRules.length}</span>
           </div>
           <div class="buy-card-summary">${escapeHtml(rationale)}</div>
-          ${presentation.liveRefresh ? `
-            <div class="buy-live-meta">
-              <span class="buy-live-pill ${presentation.changed.score || presentation.changed.grade ? 'buy-changed' : ''}">네이버 ${presentation.liveRefresh.recommMean.toFixed(2)} / 5.00</span>
-              ${presentation.liveRefresh.targetPrice ? `<span class="buy-live-pill ${presentation.changed.statusLabel ? 'buy-changed' : ''}">목표가 ${formatWon(presentation.liveRefresh.targetPrice)} (${formatSignedPercent(presentation.liveRefresh.upsideRate)})</span>` : ''}
-              ${presentation.liveRefresh.asOf ? `<span class="buy-live-pill">기준 ${escapeHtml(formatCompactDate(presentation.liveRefresh.asOf))}</span>` : ''}
-            </div>
-          ` : ''}
+          ${liveMetaHtml}
           <div class="buy-card-footer">
             <span>${formatWon(entry.entryPriceValue)}</span>
             <span>R/R ${escapeHtml(entry.rr || '미기재')}</span>
@@ -699,8 +673,8 @@ function renderAll() {
 
 function updateAnalyzeButtonState() {
   const analyzeBtn = document.getElementById('btn-analyze');
-  const hasBuyEntries = notionSnapshot.pullbackEntries.length > 0 || notionSnapshot.momentumEntries.length > 0;
-  const hasSellStocks = stocks.pullback.length > 0 || stocks.momentum.length > 0 || stocks.swing.length > 0;
+  const hasBuyEntries = notionSnapshot.pullbackEntries.length > 0 || notionSnapshot.momentumEntries.length > 0 || notionSnapshot.reversalEntries.length > 0;
+  const hasSellStocks = stocks.pullback.length > 0 || stocks.momentum.length > 0 || stocks.reversal.length > 0 || stocks.swing.length > 0;
   analyzeBtn.disabled = activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks;
 }
 
@@ -1066,126 +1040,6 @@ function renderTradePlanTable(entry) {
   `;
 }
 
-function buildBuyVerificationHtml(entry) {
-  const liveRefresh = entry.liveRefresh;
-  if (!liveRefresh) {
-    return `
-      <div class="buy-verification-panel">
-        <div class="modal-section-label">🔍 실시간 데이터 일치성 검증 (네이버 컨센서스)</div>
-        <div class="verification-header unknown">
-          <span class="verification-icon">🧭</span>
-          <div class="verification-summary">
-            <div class="verification-title">실시간 검증 대기 중</div>
-            <div class="verification-desc">아직 네이버 컨센서스 실시간 데이터를 수집하지 않았습니다. 분석 시작 버튼을 눌러주세요.</div>
-          </div>
-        </div>
-        <div class="verification-actions">
-          <button class="btn btn-primary btn-sm" id="btn-modal-refresh-buy" onclick="handleModalRefreshBuy('${entry.code}')" style="background:var(--accent-secondary);border:1px solid rgba(255,255,255,0.1);padding:6px 12px;border-radius:6px;cursor:pointer;color:white;font-weight:bold;font-size:12px;">
-            <span>⚡</span> 이 종목만 실시간 데이터 수집 및 검증하기
-          </button>
-        </div>
-      </div>
-    `;
-  }
-
-  const scoreDiff = liveRefresh.score - entry.score;
-  const gradeChanged = liveRefresh.grade !== entry.grade;
-  
-  let cls = 'clear';
-  let icon = '✅';
-  let title = '데이터 완벽 일치';
-  let desc = '노션 분석 시점의 데이터와 실시간 네이버 컨센서스 데이터가 완벽하게 일치합니다.';
-
-  if (Math.abs(scoreDiff) > 0.01 && !gradeChanged) {
-    cls = 'clear';
-    icon = '✅';
-    title = '데이터 안정적 일치';
-    desc = `실시간 컨센서스에 미세한 변화(평점 편차 ${Math.abs(scoreDiff / 2).toFixed(2)})가 있으나 등급 변동이 없는 안정적인 상태입니다.`;
-  } else if (scoreDiff > 0 && gradeChanged) {
-    cls = 'clear';
-    icon = '📈';
-    title = '실시간 등급 상승 (우호적)';
-    desc = `실시간 네이버 컨센서스 평가가 상승하여 등급이 ${entry.grade}등급에서 ${liveRefresh.grade}등급으로 상향되었습니다. 진입 조건이 우호적입니다.`;
-  } else if (scoreDiff < 0 && gradeChanged) {
-    cls = 'triggered';
-    icon = '🚨';
-    title = '실시간 등급 하락 (경계)';
-    desc = `실시간 네이버 컨센서스 평가가 하락하여 등급이 ${entry.grade}등급에서 ${liveRefresh.grade}등급으로 하향 조정되었습니다. 노션 등록 시점 대비 위험도가 높습니다.`;
-  }
-
-  const scoreDiffBadge = scoreDiff === 0 
-    ? `<span class="badge badge-shift badge-shift-good" style="display:inline-block;padding:2px 6px;font-size:10px;">0.00 (일치)</span>` 
-    : `<span class="badge badge-shift ${scoreDiff > 0 ? 'badge-shift-good' : 'badge-shift-bad'}" style="display:inline-block;padding:2px 6px;font-size:10px;">${scoreDiff > 0 ? '▲ ' : '▼ '}${Math.abs(scoreDiff / 2).toFixed(2)}</span>`;
-
-  const finalScoreDiffBadge = scoreDiff === 0 
-    ? `<span class="badge badge-shift badge-shift-good" style="display:inline-block;padding:2px 6px;font-size:10px;">0.0 (일치)</span>` 
-    : `<span class="badge badge-shift ${scoreDiff > 0 ? 'badge-shift-good' : 'badge-shift-bad'}" style="display:inline-block;padding:2px 6px;font-size:10px;">${scoreDiff > 0 ? '▲ ' : '▼ '}${Math.abs(scoreDiff).toFixed(1)}점</span>`;
-
-  const gradeBadge = !gradeChanged
-    ? `<span class="badge badge-shift badge-shift-good" style="display:inline-block;padding:2px 6px;font-size:10px;">✅ 일치</span>`
-    : `<span class="badge badge-shift badge-shift-bad" style="display:inline-block;padding:2px 6px;font-size:10px;">⚠️ ${entry.grade} → ${liveRefresh.grade}</span>`;
-
-  const upsideBadge = liveRefresh.targetPrice
-    ? `<span class="badge badge-shift ${liveRefresh.upsideRate >= 10 ? 'badge-shift-good' : 'badge-shift-bad'}" style="display:inline-block;padding:2px 6px;font-size:10px;">${liveRefresh.upsideRate >= 0 ? '+' : ''}${liveRefresh.upsideRate.toFixed(1)}%</span>`
-    : `<span class="badge badge-pending" style="display:inline-block;padding:2px 6px;font-size:10px;">판단 불가</span>`;
-
-  return `
-    <div class="buy-verification-panel">
-      <div class="modal-section-label">🔍 실시간 데이터 일치성 검증 (네이버 컨센서스)</div>
-      <div class="verification-header ${cls}">
-        <span class="verification-icon">${icon}</span>
-        <div class="verification-summary">
-          <div class="verification-title">${title}</div>
-          <div class="verification-desc">${desc}</div>
-        </div>
-      </div>
-      <table class="guide-table verification-table" style="margin-bottom:0px;">
-        <thead>
-          <tr>
-            <th>검증 지표</th>
-            <th>노션 기준 (A)</th>
-            <th>실시간 수집 (B)</th>
-            <th>수집데이터 검증 결과</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>애널리스트 추천 평점</strong></td>
-            <td>${(entry.score / 2).toFixed(2)} / 5.00</td>
-            <td>${liveRefresh.recommMean.toFixed(2)} / 5.00</td>
-            <td>${scoreDiffBadge}</td>
-          </tr>
-          <tr>
-            <td><strong>최종 환산 점수</strong></td>
-            <td>${entry.score.toFixed(1)} 점</td>
-            <td>${liveRefresh.score.toFixed(1)} 점</td>
-            <td>${finalScoreDiffBadge}</td>
-          </tr>
-          <tr>
-            <td><strong>진입 판단 등급</strong></td>
-            <td>${entry.grade} 등급</td>
-            <td>${liveRefresh.grade} 등급</td>
-            <td>${gradeBadge}</td>
-          </tr>
-          <tr>
-            <td><strong>상승 여력 (현재가 대비)</strong></td>
-            <td>진입가: ${entry.entryPriceValue ? entry.entryPriceValue.toLocaleString() : '—'}원</td>
-            <td>
-              ${liveRefresh.targetPrice ? `목표가: ${liveRefresh.targetPrice.toLocaleString()}원<br>현재가: ${liveRefresh.currentPrice.toLocaleString()}원` : '목표가 미시'}
-            </td>
-            <td>${upsideBadge}</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="verification-actions" style="margin-top: 4px;">
-        <button class="btn btn-primary btn-sm" id="btn-modal-refresh-buy" onclick="handleModalRefreshBuy('${entry.code}')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 12px;border-radius:6px;cursor:pointer;color:white;font-weight:bold;font-size:12px;">
-          <span>🔄</span> 다시 데이터 검증하기
-        </button>
-      </div>
-    </div>
-  `;
-}
-
 window.handleModalRefreshBuy = async function(code) {
   const btn = document.getElementById('btn-modal-refresh-buy');
   if (btn) {
@@ -1205,25 +1059,25 @@ function openModal(code, mode = 'sell') {
     detailModal.classList.add('buy-detail-mode');
     const entry = detail;
     const presentation = getBuyPresentation(entry);
+    const verdictText = buildBuyModalVerdictText(presentation);
+    const modalLiveMetaHtml = buildBuyLivePillsHtml(entry, presentation, {
+      includeCurrentPrice: Boolean(presentation.liveRefresh),
+      includeTargetPrice: Boolean(presentation.liveRefresh),
+      includeAsOf: Boolean(presentation.liveRefresh)
+    });
     document.getElementById('modal-name').textContent = entry.name;
     document.getElementById('modal-code').textContent = entry.code;
     document.getElementById('modal-type').textContent = `${STRATEGY_META[entry.strategy].label} · ${entry.rank}위`;
 
     const verdictClass = presentation.verdictClass;
-    const verdictMap = {
-      strong: 'S 등급 · 강력매수',
-      good: 'A 등급 · 매수추천',
-      watch: 'B 등급 · 관심후보',
-      exclude: 'C 등급 · 제외'
-    };
 
     document.getElementById('modal-body').innerHTML = `
       <div class="buy-modal-layout">
         <div class="buy-modal-fixed">
           <div class="modal-price-bar buy-price-bar">
             <div>
-              <div class="price-big ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.score.toFixed(1)} / 10</div>
-              <div class="buy-modal-scoreline"><span class="${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.grade)}</span> · <span class="${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.statusLabel)}</span></div>
+              <div class="price-big ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.primaryScore.toFixed(1)} / 10</div>
+              <div class="buy-modal-scoreline"><span class="${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</span></div>
             </div>
             <div class="modal-stats">
               <div class="modal-stat">
@@ -1241,16 +1095,9 @@ function openModal(code, mode = 'sell') {
             </div>
           </div>
 
-          ${presentation.liveRefresh ? `
-            <div class="buy-live-meta buy-live-meta-modal">
-              <span class="buy-live-pill ${presentation.changed.score || presentation.changed.grade ? 'buy-changed' : ''}">네이버 컨센서스 ${presentation.liveRefresh.recommMean.toFixed(2)} / 5.00</span>
-              ${presentation.liveRefresh.currentPrice ? `<span class="buy-live-pill">현재가 ${formatWon(presentation.liveRefresh.currentPrice)}</span>` : ''}
-              ${presentation.liveRefresh.targetPrice ? `<span class="buy-live-pill ${presentation.changed.statusLabel ? 'buy-changed' : ''}">목표가 ${formatWon(presentation.liveRefresh.targetPrice)} (${formatSignedPercent(presentation.liveRefresh.upsideRate)})</span>` : ''}
-              ${presentation.liveRefresh.asOf ? `<span class="buy-live-pill">기준 ${escapeHtml(formatCompactDate(presentation.liveRefresh.asOf))}</span>` : ''}
-            </div>
-          ` : ''}
+          <div class="buy-live-meta buy-live-meta-modal">${modalLiveMetaHtml}</div>
 
-          <div class="modal-verdict ${verdictClass === 'strong' ? 'hold' : verdictClass === 'good' ? 'caution' : verdictClass === 'watch' ? 'caution' : 'sell'}">${escapeHtml(verdictMap[verdictClass])}</div>
+          <div class="modal-verdict ${verdictClass === 'strong' ? 'hold' : verdictClass === 'good' ? 'caution' : verdictClass === 'watch' ? 'caution' : 'sell'}">${escapeHtml(verdictText)}</div>
 
           <div class="buy-modal-fixed-grid">
             <div class="buy-detail-block buy-detail-block-fixed">

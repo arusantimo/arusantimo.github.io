@@ -1,0 +1,164 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+
+function loadBuyLiveContext() {
+  const code = fs.readFileSync(new URL('./buy-live.js', import.meta.url), 'utf8');
+  const context = {
+    console,
+    clamp: (value, min, max) => Math.min(Math.max(Number(value) || 0, min), max),
+    escapeHtml: value => String(value ?? ''),
+    formatWon: value => `${Math.round(Number(value) || 0).toLocaleString()}원`,
+    formatSignedPercent: value => `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}%`,
+    formatCompactDate: value => String(value ?? ''),
+    getBuyGradeFromScore(score, strategy = 'pullback') {
+      if (strategy === 'reversal') {
+        if (score >= 8.5) return 'S';
+        if (score >= 7.0) return 'A';
+        if (score >= 5.5) return 'B';
+        return 'C';
+      }
+      if (score >= 9) return 'S';
+      if (score >= 7.5) return 'A';
+      if (score >= 6) return 'B';
+      return 'C';
+    },
+    getBuyVerdictClassFromGrade(grade) {
+      if (String(grade ?? '').startsWith('S')) return 'strong';
+      if (String(grade ?? '').startsWith('A')) return 'good';
+      if (String(grade ?? '').startsWith('B')) return 'watch';
+      return 'exclude';
+    }
+  };
+  vm.createContext(context);
+  vm.runInContext(code, context);
+  return context;
+}
+
+test('컨센서스 보정 payload는 전략 점수를 제한형 가감산으로 계산한다', () => {
+  const { buildBuyLiveRefreshPayload } = loadBuyLiveContext();
+  const entry = { score: 7.8, grade: 'A', strategy: 'pullback' };
+  const payload = buildBuyLiveRefreshPayload(entry, {
+    recommMean: 4.1,
+    currentPrice: 10000,
+    targetPrice: 11000,
+    upsideRate: 10,
+    asOf: '20260518'
+  });
+
+  assert.equal(payload.consensusScore, 8.2);
+  assert.equal(payload.scoreGap, 0.4);
+  assert.equal(payload.adjustment, 0.1);
+  assert.equal(payload.finalScore, 7.9);
+  assert.equal(payload.finalGrade, 'A');
+  assert.equal(payload.finalStatusLabel, '매수추천');
+});
+
+test('상향 보정은 최대 +1.0점으로 제한된다', () => {
+  const { buildBuyLiveRefreshPayload } = loadBuyLiveContext();
+  const entry = { score: 6.5, grade: 'B', strategy: 'pullback' };
+  const payload = buildBuyLiveRefreshPayload(entry, {
+    recommMean: 5.0,
+    currentPrice: 10000,
+    targetPrice: 12000,
+    upsideRate: 20,
+    asOf: '20260518'
+  });
+
+  assert.equal(payload.consensusScore, 10.0);
+  assert.equal(payload.adjustment, 1.0);
+  assert.equal(payload.finalScore, 7.5);
+});
+
+test('하향 보정은 최대 -1.0점으로 제한된다', () => {
+  const { buildBuyLiveRefreshPayload } = loadBuyLiveContext();
+  const entry = { score: 8.5, grade: 'A', strategy: 'pullback' };
+  const payload = buildBuyLiveRefreshPayload(entry, {
+    recommMean: 2.5,
+    currentPrice: 10000,
+    targetPrice: 9500,
+    upsideRate: -5,
+    asOf: '20260518'
+  });
+
+  assert.equal(payload.consensusScore, 5.0);
+  assert.equal(payload.adjustment, -1.0);
+  assert.equal(payload.finalScore, 7.5);
+});
+
+test('급락 반등 전략은 최종 점수 7.0에서 A로 승격된다', () => {
+  const { buildBuyLiveRefreshPayload } = loadBuyLiveContext();
+  const entry = { score: 6.9, grade: 'B', strategy: 'reversal' };
+  const payload = buildBuyLiveRefreshPayload(entry, {
+    recommMean: 4.0,
+    currentPrice: 10000,
+    targetPrice: 11200,
+    upsideRate: 12,
+    asOf: '20260518'
+  });
+
+  assert.equal(payload.consensusScore, 8.0);
+  assert.equal(payload.adjustment, 0.4);
+  assert.equal(payload.finalScore, 7.3);
+  assert.equal(payload.finalGrade, 'A');
+});
+
+test('구형 archive liveRefresh는 consensus 기준으로 정규화된다', () => {
+  const { normalizeBuyLiveRefresh, getBuyPresentation } = loadBuyLiveContext();
+  const entry = {
+    score: 7.8,
+    grade: 'A',
+    statusLabel: '종가베팅',
+    strategy: 'pullback',
+    liveRefresh: {
+      recommMean: 4.1,
+      score: 8.2,
+      grade: 'A',
+      currentPrice: 10000,
+      targetPrice: 11000,
+      upsideRate: 10,
+      asOf: '20260518'
+    }
+  };
+
+  const normalized = normalizeBuyLiveRefresh(entry, entry.liveRefresh);
+  const presentation = getBuyPresentation(entry);
+  assert.equal(normalized.consensusScore, 8.2);
+  assert.equal(normalized.adjustment, 0.1);
+  assert.equal(normalized.finalScore, 7.9);
+  assert.equal(presentation.primaryGrade, 'A');
+  assert.equal(presentation.primaryStatusLabel, '매수추천');
+});
+
+test('검증 패널은 전략, 컨센서스, 최종 3축을 모두 노출한다', () => {
+  const { buildBuyVerificationHtml } = loadBuyLiveContext();
+  const entry = {
+    code: '123456',
+    score: 7.8,
+    grade: 'A',
+    statusLabel: '종가베팅',
+    strategy: 'pullback',
+    entryPriceValue: 10000,
+    liveRefresh: {
+      recommMean: 4.1,
+      consensusScore: 8.2,
+      consensusGrade: 'A',
+      scoreGap: 0.4,
+      adjustment: 0.1,
+      finalScore: 7.9,
+      finalGrade: 'A',
+      finalStatusLabel: '매수추천',
+      currentPrice: 10000,
+      targetPrice: 11000,
+      upsideRate: 10,
+      asOf: '20260518'
+    }
+  };
+
+  const html = buildBuyVerificationHtml(entry);
+  assert.match(html, /전략 기준/);
+  assert.match(html, /컨센서스 환산/);
+  assert.match(html, /최종 결과/);
+  assert.match(html, /\+0\.1점 → 7\.9점/);
+});

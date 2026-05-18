@@ -6,6 +6,7 @@ const PROXIES = [
 ];
 
 const ANALYSIS_ARCHIVE_KEY = 'stockAnalyzePreviousAnalysisSnapshotsV1';
+const SELL_TRACKING_STATE_KEY = 'stockAnalyzeSellTrackingStateV1';
 
 const RULE_GUIDE = {
   regimes: [

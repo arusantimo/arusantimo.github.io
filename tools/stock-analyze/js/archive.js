@@ -82,7 +82,7 @@ function buildBuyAnalysisArchive(timeLabel = '') {
       code: entry.code,
       name: entry.name,
       strategy: entry.strategy,
-      liveRefresh: entry.liveRefresh
+      liveRefresh: normalizeBuyLiveRefresh(entry, entry.liveRefresh) || entry.liveRefresh
     }));
 
   if (!entries.length) return null;
@@ -180,7 +180,7 @@ function restoreBuyAnalysisArchive(archiveItem) {
   getAllBuyEntries().forEach(entry => {
     const liveRefresh = entryMap.get(entry.code);
     if (!liveRefresh) return;
-    entry.liveRefresh = liveRefresh;
+    entry.liveRefresh = normalizeBuyLiveRefresh(entry, liveRefresh) || liveRefresh;
     restored += 1;
   });
 

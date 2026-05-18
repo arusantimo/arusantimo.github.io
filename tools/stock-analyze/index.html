@@ -71,6 +71,20 @@
     </section>
 
     <section class="tab-panel" data-tab-panel="sell">
+      <div class="sell-universe-toolbar">
+        <div>
+          <div class="sell-universe-title">🎯 매도 분석 대상</div>
+          <div class="sell-universe-copy">기본은 실매수 추적 종목만 표시하고, 필요할 때 전체 후보로 넓혀 볼 수 있습니다.</div>
+        </div>
+        <div class="sell-universe-actions">
+          <div class="sell-universe-switch" id="sell-universe-switch">
+            <button type="button" class="sell-universe-btn active" data-sell-universe="actual">실매수 종목</button>
+            <button type="button" class="sell-universe-btn" data-sell-universe="all">전체 후보</button>
+          </div>
+          <div class="sell-universe-summary" id="sell-universe-summary"></div>
+        </div>
+      </div>
+
       <div class="section-title split-title">
         <div>🔄 스윙 보유 종목 <span class="section-help">D+1 스윙 전환 평가 · 실시간 손익 추적</span></div>
         <div class="inline-inputs">
@@ -105,6 +119,18 @@
         </div>
       </div>
       <div id="list-momentum" class="stock-grid">
+        <div class="empty-state">종목 데이터가 없습니다.</div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>🔻 주도주 급락 반등 (전략 ③) <span class="section-help">9:08 이전/이후 모두 분석</span></div>
+        <div class="inline-inputs">
+          <input type="text" id="reversal-name" placeholder="종목명">
+          <input type="text" id="reversal-code" placeholder="코드(6자리)" maxlength="6">
+          <button id="btn-add-reversal" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-reversal" class="stock-grid">
         <div class="empty-state">종목 데이터가 없습니다.</div>
       </div>
     </section>
@@ -196,7 +222,13 @@
   <script src="js/notion.js"></script>
   <script src="js/api.js"></script>
   <script src="js/analysis.js"></script>
+  <script src="js/buy-live.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/sell-tracking.js"></script>
+  <script src="js/sell-score.js"></script>
+  <script src="js/sell-rules.js"></script>
+  <script src="js/sell-score-ui.js"></script>
+  <script src="js/sell-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 

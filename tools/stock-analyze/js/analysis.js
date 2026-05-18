@@ -1,6 +1,7 @@
 function rebuildSellStocksFromSnapshot() {
   const manualPullback = stocks.pullback.filter(stock => stock.manual);
   const manualMomentum = stocks.momentum.filter(stock => stock.manual);
+  const manualReversal = (stocks.reversal || []).filter(stock => stock.manual);
 
   stocks.pullback = [
     ...notionSnapshot.pullbackEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'pullback', strategy: 'pullback', source: 'notion' })),
@@ -10,6 +11,11 @@ function rebuildSellStocksFromSnapshot() {
   stocks.momentum = [
     ...notionSnapshot.momentumEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'momentum', strategy: 'momentum', source: 'notion' })),
     ...manualMomentum.filter(stock => !notionSnapshot.momentumEntries.some(entry => entry.code === stock.code))
+  ];
+
+  stocks.reversal = [
+    ...notionSnapshot.reversalEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'reversal', strategy: 'reversal', source: 'notion' })),
+    ...manualReversal.filter(stock => !notionSnapshot.reversalEntries.some(entry => entry.code === stock.code))
   ];
 
   stocks.swing = notionSnapshot.swingEntries.map(entry => ({
@@ -204,8 +210,9 @@ function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile
     });
   }
 
+  const baseLossRate = stock.type === 'reversal' ? -3 : -4;
   const tightenedDefaultStopPrice = entryPrice > 0
-    ? Math.round(entryPrice * (1 - ((4 - (gapProfile?.tightenStopLossRate || 0)) / 100)))
+    ? Math.round(entryPrice * (1 - ((Math.abs(baseLossRate) - (gapProfile?.tightenStopLossRate || 0)) / 100)))
     : 0;
 
   if (targets?.stopLoss?.price && data.currentPrice > 0) {
@@ -225,14 +232,14 @@ function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile
     });
   } else if (entryPrice > 0 && data.currentPrice > 0) {
     const lossRate = ((data.currentPrice - entryPrice) / entryPrice) * 100;
-    const defaultStopLossRate = -4 + (gapProfile?.tightenStopLossRate || 0);
+    const defaultStopLossRate = baseLossRate + (gapProfile?.tightenStopLossRate || 0);
     const belowDefault = lossRate <= defaultStopLossRate;
     rejections.push({
       code: 'R2',
       title: `기본 손절선 (${defaultStopLossRate.toFixed(1)}%) 이탈`,
       criterion: gapProfile?.tightenStopLossRate
         ? `노션 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${defaultStopLossRate.toFixed(1)}%`
-        : '노션 손절가 미설정 시, 진입가 대비 -4% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ -4%',
+        : `노션 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
       triggered: belowDefault,
       result: belowDefault
         ? `진입가 대비 ${lossRate.toFixed(2)}% → 즉시 전량 매도`
