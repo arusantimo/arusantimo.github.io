@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Capture Pro Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo-wrapper">
+        <img src="icon.png" alt="Logo" class="logo">
+        <div class="logo-glow"></div>
+      </div>
+      <div class="title-section">
+        <h1>Capture Pro</h1>
+        <p class="subtitle">Screen Capture Assistant</p>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Toggle Switch Card -->
+      <div class="card status-card">
+        <div class="card-content">
+          <div class="status-info">
+            <span class="label">P 키 캡처 단축키</span>
+            <span id="status-text" class="status-indicator enabled">활성화됨</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="enabled-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Settings Form -->
+      <div class="card form-card">
+        <h2>저장 설정</h2>
+        
+        <!-- Folder Name Setting -->
+        <div class="form-group">
+          <label for="folder-name">저장할 하위 폴더명</label>
+          <div class="input-wrapper">
+            <span class="folder-prefix">Downloads /</span>
+            <input type="text" id="folder-name" placeholder="ScreenCaptures" value="ScreenCaptures">
+          </div>
+          <p class="help-text">브라우저의 기본 다운로드 폴더(Downloads) 기준 상대 경로입니다.</p>
+        </div>
+
+        <label class="section-label">파일명 형식 구분</label>
+        <!-- Naming Mode Tab Switcher -->
+        <div class="mode-selector">
+          <button type="button" class="mode-tab active" data-mode="date">날짜 형식</button>
+          <button type="button" class="mode-tab" data-mode="counter">자동 증가 형식</button>
+        </div>
+
+        <!-- Date Mode Panel -->
+        <div id="date-mode-panel" class="mode-panel">
+          <div class="form-group">
+            <label for="filename-pattern">파일명 형식</label>
+            <input type="text" id="filename-pattern" placeholder="capture_{yyyy}{MM}{dd}_{hh}{mm}{ss}" value="capture_{yyyy}{MM}{dd}_{hh}{mm}{ss}">
+            <p class="help-text">태그를 클릭하여 파일명에 간편하게 패턴을 추가하세요.</p>
+            
+            <!-- Tag Buttons for easy configuration -->
+            <div class="tags-container">
+              <button type="button" class="tag-btn" data-tag="{yyyy}">년 ({yyyy})</button>
+              <button type="button" class="tag-btn" data-tag="{MM}">월 ({MM})</button>
+              <button type="button" class="tag-btn" data-tag="{dd}">일 ({dd})</button>
+              <button type="button" class="tag-btn" data-tag="{hh}">시 ({hh})</button>
+              <button type="button" class="tag-btn" data-tag="{mm}">분 ({mm})</button>
+              <button type="button" class="tag-btn" data-tag="{ss}">초 ({ss})</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Counter Mode Panel -->
+        <div id="counter-mode-panel" class="mode-panel hidden">
+          <div class="form-group">
+            <label for="counter-prefix">파일 접두사</label>
+            <input type="text" id="counter-prefix" placeholder="capture_" value="capture_">
+          </div>
+          <div class="form-group inline-group">
+            <div class="number-input-col">
+              <label for="counter-value">다음 번호</label>
+              <input type="number" id="counter-value" value="1" min="1">
+            </div>
+            <button type="button" id="reset-counter-btn" class="btn secondary-btn">번호 초기화</button>
+          </div>
+          <p class="help-text">캡처할 때마다 번호가 1씩 자동으로 증가하며 다운로드됩니다.</p>
+        </div>
+
+        <!-- Action Button -->
+        <button type="button" id="save-btn" class="btn primary-btn">
+          <span>설정 저장하기</span>
+          <div class="btn-glow"></div>
+        </button>
+      </div>
+
+      <!-- Quick Tips Card -->
+      <div class="card tips-card">
+        <h3>💡 간편 도움말</h3>
+        <ul>
+          <li>웹페이지에서 <strong>P</strong> 키를 누르면 즉시 화면을 캡처합니다.</li>
+          <li>입력 필드(검색창, 댓글창 등) 타이핑 중에는 오작동 방지를 위해 작동하지 않습니다.</li>
+        </ul>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>v1.0.0 &bull; Designed by Antigravity</p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
