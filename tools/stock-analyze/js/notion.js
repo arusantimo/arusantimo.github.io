@@ -26,7 +26,7 @@ function parseStockHeader(line, strategy) {
 }
 
 function parseGateTokens(text) {
-  const matches = [...text.matchAll(/(G\d)\s*(✅|⚠️|⛔)?(?:\(([^)]*)\))?/g)];
+  const matches = [...text.matchAll(/(G\d)\s*(✅|⚠️|⛔)?\s*(?:\(([^)]*)\))?/g)];
   return matches.map(match => ({
     code: match[1],
     status: match[2] || '미상',
@@ -336,8 +336,8 @@ function parseNotionSnapshotFromText(sourceText) {
       continue;
     }
 
-    if (currentSection === 'swing' && /^[>\s]*[-*]/.test(line)) {
-      const swingLine = line.replace(/^[>\s]*[-*]\s*/, '').replace(/\*\*/g, '').trim();
+    if (currentSection === 'swing' && /^[>\s•*-]+/.test(line)) {
+      const swingLine = line.replace(/^[>\s•*-]+\s*/, '').replace(/\*\*/g, '').trim();
       const codeMatch = swingLine.match(/^(.+?)\((\d{6})\)\s+(.+)$/);
       if (codeMatch) {
         const name = codeMatch[1].trim();

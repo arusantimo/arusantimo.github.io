@@ -1066,6 +1066,135 @@ function renderTradePlanTable(entry) {
   `;
 }
 
+function buildBuyVerificationHtml(entry) {
+  const liveRefresh = entry.liveRefresh;
+  if (!liveRefresh) {
+    return `
+      <div class="buy-verification-panel">
+        <div class="modal-section-label">🔍 실시간 데이터 일치성 검증 (네이버 컨센서스)</div>
+        <div class="verification-header unknown">
+          <span class="verification-icon">🧭</span>
+          <div class="verification-summary">
+            <div class="verification-title">실시간 검증 대기 중</div>
+            <div class="verification-desc">아직 네이버 컨센서스 실시간 데이터를 수집하지 않았습니다. 분석 시작 버튼을 눌러주세요.</div>
+          </div>
+        </div>
+        <div class="verification-actions">
+          <button class="btn btn-primary btn-sm" id="btn-modal-refresh-buy" onclick="handleModalRefreshBuy('${entry.code}')" style="background:var(--accent-secondary);border:1px solid rgba(255,255,255,0.1);padding:6px 12px;border-radius:6px;cursor:pointer;color:white;font-weight:bold;font-size:12px;">
+            <span>⚡</span> 이 종목만 실시간 데이터 수집 및 검증하기
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  const scoreDiff = liveRefresh.score - entry.score;
+  const gradeChanged = liveRefresh.grade !== entry.grade;
+  
+  let cls = 'clear';
+  let icon = '✅';
+  let title = '데이터 완벽 일치';
+  let desc = '노션 분석 시점의 데이터와 실시간 네이버 컨센서스 데이터가 완벽하게 일치합니다.';
+
+  if (Math.abs(scoreDiff) > 0.01 && !gradeChanged) {
+    cls = 'clear';
+    icon = '✅';
+    title = '데이터 안정적 일치';
+    desc = `실시간 컨센서스에 미세한 변화(평점 편차 ${Math.abs(scoreDiff / 2).toFixed(2)})가 있으나 등급 변동이 없는 안정적인 상태입니다.`;
+  } else if (scoreDiff > 0 && gradeChanged) {
+    cls = 'clear';
+    icon = '📈';
+    title = '실시간 등급 상승 (우호적)';
+    desc = `실시간 네이버 컨센서스 평가가 상승하여 등급이 ${entry.grade}등급에서 ${liveRefresh.grade}등급으로 상향되었습니다. 진입 조건이 우호적입니다.`;
+  } else if (scoreDiff < 0 && gradeChanged) {
+    cls = 'triggered';
+    icon = '🚨';
+    title = '실시간 등급 하락 (경계)';
+    desc = `실시간 네이버 컨센서스 평가가 하락하여 등급이 ${entry.grade}등급에서 ${liveRefresh.grade}등급으로 하향 조정되었습니다. 노션 등록 시점 대비 위험도가 높습니다.`;
+  }
+
+  const scoreDiffBadge = scoreDiff === 0 
+    ? `<span class="badge badge-shift badge-shift-good" style="display:inline-block;padding:2px 6px;font-size:10px;">0.00 (일치)</span>` 
+    : `<span class="badge badge-shift ${scoreDiff > 0 ? 'badge-shift-good' : 'badge-shift-bad'}" style="display:inline-block;padding:2px 6px;font-size:10px;">${scoreDiff > 0 ? '▲ ' : '▼ '}${Math.abs(scoreDiff / 2).toFixed(2)}</span>`;
+
+  const finalScoreDiffBadge = scoreDiff === 0 
+    ? `<span class="badge badge-shift badge-shift-good" style="display:inline-block;padding:2px 6px;font-size:10px;">0.0 (일치)</span>` 
+    : `<span class="badge badge-shift ${scoreDiff > 0 ? 'badge-shift-good' : 'badge-shift-bad'}" style="display:inline-block;padding:2px 6px;font-size:10px;">${scoreDiff > 0 ? '▲ ' : '▼ '}${Math.abs(scoreDiff).toFixed(1)}점</span>`;
+
+  const gradeBadge = !gradeChanged
+    ? `<span class="badge badge-shift badge-shift-good" style="display:inline-block;padding:2px 6px;font-size:10px;">✅ 일치</span>`
+    : `<span class="badge badge-shift badge-shift-bad" style="display:inline-block;padding:2px 6px;font-size:10px;">⚠️ ${entry.grade} → ${liveRefresh.grade}</span>`;
+
+  const upsideBadge = liveRefresh.targetPrice
+    ? `<span class="badge badge-shift ${liveRefresh.upsideRate >= 10 ? 'badge-shift-good' : 'badge-shift-bad'}" style="display:inline-block;padding:2px 6px;font-size:10px;">${liveRefresh.upsideRate >= 0 ? '+' : ''}${liveRefresh.upsideRate.toFixed(1)}%</span>`
+    : `<span class="badge badge-pending" style="display:inline-block;padding:2px 6px;font-size:10px;">판단 불가</span>`;
+
+  return `
+    <div class="buy-verification-panel">
+      <div class="modal-section-label">🔍 실시간 데이터 일치성 검증 (네이버 컨센서스)</div>
+      <div class="verification-header ${cls}">
+        <span class="verification-icon">${icon}</span>
+        <div class="verification-summary">
+          <div class="verification-title">${title}</div>
+          <div class="verification-desc">${desc}</div>
+        </div>
+      </div>
+      <table class="guide-table verification-table" style="margin-bottom:0px;">
+        <thead>
+          <tr>
+            <th>검증 지표</th>
+            <th>노션 기준 (A)</th>
+            <th>실시간 수집 (B)</th>
+            <th>수집데이터 검증 결과</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>애널리스트 추천 평점</strong></td>
+            <td>${(entry.score / 2).toFixed(2)} / 5.00</td>
+            <td>${liveRefresh.recommMean.toFixed(2)} / 5.00</td>
+            <td>${scoreDiffBadge}</td>
+          </tr>
+          <tr>
+            <td><strong>최종 환산 점수</strong></td>
+            <td>${entry.score.toFixed(1)} 점</td>
+            <td>${liveRefresh.score.toFixed(1)} 점</td>
+            <td>${finalScoreDiffBadge}</td>
+          </tr>
+          <tr>
+            <td><strong>진입 판단 등급</strong></td>
+            <td>${entry.grade} 등급</td>
+            <td>${liveRefresh.grade} 등급</td>
+            <td>${gradeBadge}</td>
+          </tr>
+          <tr>
+            <td><strong>상승 여력 (현재가 대비)</strong></td>
+            <td>진입가: ${entry.entryPriceValue ? entry.entryPriceValue.toLocaleString() : '—'}원</td>
+            <td>
+              ${liveRefresh.targetPrice ? `목표가: ${liveRefresh.targetPrice.toLocaleString()}원<br>현재가: ${liveRefresh.currentPrice.toLocaleString()}원` : '목표가 미시'}
+            </td>
+            <td>${upsideBadge}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="verification-actions" style="margin-top: 4px;">
+        <button class="btn btn-primary btn-sm" id="btn-modal-refresh-buy" onclick="handleModalRefreshBuy('${entry.code}')" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 12px;border-radius:6px;cursor:pointer;color:white;font-weight:bold;font-size:12px;">
+          <span>🔄</span> 다시 데이터 검증하기
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+window.handleModalRefreshBuy = async function(code) {
+  const btn = document.getElementById('btn-modal-refresh-buy');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '데이터 수집 중...';
+  }
+  await refreshBuyEntry(code, { logLabel: '상세 검증' });
+};
+
 function openModal(code, mode = 'sell') {
   const detail = mode === 'buy' ? getEntryByCode(code) : stockDetailMap[code];
   if (!detail) return;
@@ -1139,6 +1268,8 @@ function openModal(code, mode = 'sell') {
         </div>
 
         <div class="buy-modal-scroll" id="buy-modal-scroll-area">
+          ${buildBuyVerificationHtml(entry)}
+
           <div>
             <div class="modal-stage-badge stage2">🧭 노션 기준 매수 판단</div>
             <div class="modal-section-label">Gate 일치 여부</div>

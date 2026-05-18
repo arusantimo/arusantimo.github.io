@@ -1856,3 +1856,105 @@ body.modal-scroll-locked {
 @media (max-width: 600px) {
   .loss-prices { grid-template-columns: 1fr; }
 }
+
+/* 실시간 수집 데이터 기반 정밀 검증 패널 스타일 */
+.buy-verification-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: 16px 20px;
+  margin-top: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.verification-header {
+  display: flex;
+  gap: 14px;
+  align-items: start;
+  border-radius: 6px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+}
+
+.verification-header.clear {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.verification-header.triggered {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.verification-header.unknown {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border-color);
+}
+
+.verification-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.verification-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.verification-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.verification-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.verification-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.verification-table {
+  width: 100%;
+  margin-bottom: 0 !important;
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-collapse: collapse;
+}
+
+.verification-table th, 
+.verification-table td {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.verification-table th {
+  font-size: 11px;
+  color: var(--text-tertiary) !important;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.verification-table td {
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.badge-bull {
+  background: rgba(16, 185, 129, 0.12) !important;
+  color: var(--text-success) !important;
+  border: 1px solid rgba(16, 185, 129, 0.22) !important;
+}
+
+.badge-bear {
+  background: rgba(239, 68, 68, 0.12) !important;
+  color: var(--text-danger) !important;
+  border: 1px solid rgba(239, 68, 68, 0.22) !important;
+}

@@ -205,7 +205,8 @@ async function runBuyBatchRefresh() {
 }
 async function fetchNotionData() {
   const urlInput = document.getElementById('notion-url').value;
-  const matchId = urlInput.replace(/-/g, '').match(/[a-f0-9]{32}/i);
+  const cleanUrl = urlInput.split('?')[0].split('#')[0].replace(/\/+$/, '');
+  const matchId = cleanUrl.replace(/-/g, '').match(/[a-f0-9]{32}$/i);
   if (!matchId) {
     alert('유효한 노션 주소 또는 페이지 ID를 입력해주세요.');
     return;
