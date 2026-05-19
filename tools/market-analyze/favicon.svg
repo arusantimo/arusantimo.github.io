@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Market analyze favicon">
+  <defs>
+    <linearGradient id="bg" x1="9" y1="7" x2="55" y2="57" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M14 44C18 28 28 18 40 18C46 18 51 20 54 24" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 22L54 24L52 29" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M14 44C18 48 24 51 31 51C41 51 50 44 53 35" fill="none" stroke="#f97316" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="32" cy="34" r="6" fill="#f8fafc"/>
+  <circle cx="32" cy="34" r="3" fill="#0f172a"/>
+</svg>

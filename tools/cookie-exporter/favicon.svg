@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Cookie exporter favicon">
+  <defs>
+    <linearGradient id="bg" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#422006"/>
+      <stop offset="1" stop-color="#1c1917"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M22 18C22 23 27 27 32 27C32 32 36 36 41 36C41 42 36 48 28 48C19 48 12 41 12 32C12 23 19 18 22 18Z" fill="#fbbf24"/>
+  <circle cx="24" cy="28" r="2.4" fill="#78350f"/>
+  <circle cx="19" cy="37" r="2.6" fill="#78350f"/>
+  <circle cx="29" cy="39" r="2.2" fill="#78350f"/>
+  <circle cx="31" cy="31" r="2.3" fill="#78350f"/>
+  <path d="M37 18V46" stroke="#f8fafc" stroke-width="3"/>
+  <path d="M45 18V46" stroke="#f8fafc" stroke-width="3"/>
+  <path d="M37 26H51" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+  <path d="M37 38H51" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+</svg>

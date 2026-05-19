@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Screen capture favicon">
+  <defs>
+    <linearGradient id="bg" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="lens" x1="24" y1="24" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <path d="M18 14H28" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M14 18V28" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M36 14H46" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 18V28" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M18 50H28" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M14 36V46" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M36 50H46" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 36V46" stroke="#f8fafc" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="10" fill="url(#lens)"/>
+  <circle cx="32" cy="32" r="4" fill="#0f172a"/>
+</svg>

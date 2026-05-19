@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>한국 주식 공포탐욕지수 — Korea Stock Fear & Greed Index</title>
+  <meta name="description" content="네이버 증권, 디시인사이드 등 국내 주식 커뮤니티 여론을 분석하여 극단적 공포(Extreme Fear)와 FOMO(탐욕)를 실시간 지수로 측정합니다.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════ -->
+<header class="site-header">
+  <a href="../../index.html" class="header-brand">
+    <span class="header-brand-icon">😱</span>
+    <div class="header-brand-text">
+      <h1>Korea Fear &amp; Greed Index</h1>
+      <p>국내 주식 커뮤니티 공포·탐욕 지수</p>
+    </div>
+  </a>
+  <div class="header-meta">
+    <span class="last-updated" id="last-updated">—</span>
+    <button class="btn-load" id="btn-header-load">
+      📂 JSON 불러오기
+    </button>
+  </div>
+</header>
+
+<!-- ══ MAIN ════════════════════════════════════════════ -->
+<main class="main">
+
+  <!-- ── 로더 섹션 ───────────────────────────────────── -->
+  <section id="loader-section" style="margin-bottom: 24px;">
+    <div class="card">
+      <div class="card-title">
+        <span class="dot"></span>
+        데이터 소스
+      </div>
+      <div id="drop-zone" class="drop-zone">
+        <div class="drop-zone-icon">📊</div>
+        <div class="drop-zone-title">JSON 파일을 드래그하거나 선택하세요</div>
+        <div class="drop-zone-sub">Python 크롤러(<code>scripts/crawl.py</code>)가 생성한 <code>fear_greed_data.json</code>을 로드합니다</div>
+        <button class="btn-demo" id="btn-load-demo">⚡ 데모 데이터 보기</button>
+        <button class="btn-file" id="btn-select-file">📁 파일 선택</button>
+      </div>
+      <input type="file" id="file-input" accept=".json" style="display:none">
+    </div>
+  </section>
+
+  <!-- 데이터 없음 안내 배너 (fear_greed_data.json 미존재 시 표시) -->
+  <div id="no-data-notice" style="display:none; margin-bottom:24px;">
+    <div class="card" style="text-align:center; padding:40px 24px;">
+      <div style="font-size:48px; margin-bottom:16px;">📭</div>
+      <div id="no-data-title" style="font-size:18px; font-weight:700; margin-bottom:8px; color:var(--text-primary);">
+        실제 데이터가 없습니다
+      </div>
+      <div id="no-data-body" style="font-size:13px; color:var(--text-secondary); line-height:1.8; margin-bottom:20px;">
+        <code style="background:var(--bg-card-2); padding:2px 8px; border-radius:4px;">fear_greed_data.json</code> 파일이 없습니다.<br>
+        아래 명령어를 실행하여 데이터를 수집한 후 위의 옵션으로 로드하세요.
+      </div>
+      <!-- 공통: 크롤링 명령 -->
+      <div style="background:var(--bg-card-2); border-radius:10px; padding:16px 20px; display:inline-block; text-align:left; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-secondary); line-height:2; border:1px solid var(--border); margin-bottom:16px;">
+        <span style="color:#4a5a70"># scripts 폴더에서</span><br>
+        <span style="color:var(--accent)">python</span> crawl.py<br>
+        <span style="color:var(--accent)">python</span> analyze.py
+      </div>
+      <!-- file:// 전용: 서버 실행 안내 -->
+      <div id="no-data-server-hint" style="background:rgba(239,35,60,0.08); border:1px solid rgba(239,35,60,0.25); border-radius:10px; padding:14px 20px; display:inline-block; text-align:left; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-secondary); line-height:2; margin-bottom:20px; width:100%; max-width:420px;">
+        <span style="color:#ef233c; font-weight:700">⚠ file:// 프로토콜 감지</span><br>
+        <span style="color:#4a5a70"># 아래 명령으로 로컬 서버 실행 후 접속하세요</span><br>
+        <span style="color:var(--accent)">python</span> -m http.server 7788<br>
+        <span style="color:#4a5a70"># 브라우저에서:</span><br>
+        <span style="color:#10b981">http://localhost:7788/tools/fear-greed/</span>
+      </div><br>
+      <button class="btn-demo" id="btn-load-demo" style="margin-right:8px;">⚡ 데모 데이터 보기</button>
+      <button class="btn-file" id="btn-select-file-2" onclick="document.getElementById('file-input').click()">📁 직접 파일 선택</button>
+    </div>
+  </div>
+
+
+  <!-- ══ DASHBOARD ══════════════════════════════════════ -->
+  <div id="dashboard">
+
+    <!-- ── HERO: 게이지 + 통계 ───────────────────────── -->
+    <div class="hero" style="margin-bottom: 20px;">
+
+      <!-- 게이지 카드 -->
+      <div class="card gauge-card">
+        <div class="card-title"><span class="dot"></span> 현재 지수</div>
+
+        <div class="gauge-wrap">
+          <canvas id="gauge-canvas"></canvas>
+        </div>
+
+        <div class="gauge-labels">
+          <span>극단적 공포</span>
+          <span>중립</span>
+          <span>극단적 탐욕</span>
+        </div>
+
+        <!-- 스펙트럼 바 -->
+        <div class="spectrum-bar" style="width:260px; margin-top:12px; position:relative;">
+          <div class="spectrum-marker" id="spectrum-marker" style="left:50%"></div>
+        </div>
+
+        <div class="gauge-score-display">
+          <div class="score-number" id="score-number">—</div>
+          <div class="score-label" id="score-label">로딩 중...</div>
+          <div class="score-change" id="score-change"></div>
+          <p class="score-desc" id="score-desc"></p>
+        </div>
+      </div>
+
+      <!-- 우측 패널 -->
+      <div class="info-panel">
+
+        <!-- 통계 그리드 -->
+        <div class="card" style="padding: 20px 24px;">
+          <div class="card-title"><span class="dot"></span> 분석 현황</div>
+          <div class="stat-grid">
+            <div class="stat-item">
+              <div class="stat-item-label">📝 분석 게시글</div>
+              <div class="stat-item-value color-accent" id="stat-total-posts">—</div>
+              <div class="stat-item-sub">네이버 + 디시</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-label">⚡ 시간당 게시속도</div>
+              <div class="stat-item-value color-accent" id="stat-velocity">—</div>
+              <div class="stat-item-sub">게시글/시간</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-label">🟢 네이버 증권</div>
+              <div class="stat-item-value" id="stat-naver-score">—</div>
+              <div class="stat-item-sub">종목토론방 지수</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-item-label">🟡 디시인사이드</div>
+              <div class="stat-item-value" id="stat-dc-score">—</div>
+              <div class="stat-item-sub">주식갤 지수</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 커뮤니티별 분석 -->
+        <div class="card community-card">
+          <div class="card-title"><span class="dot"></span> 커뮤니티별 분석</div>
+
+          <!-- 네이버 -->
+          <div class="community-item" data-comm="네이버 증권 토론방">
+            <div class="community-icon">🟢</div>
+            <div class="community-info">
+              <div class="community-name">네이버 증권 토론방</div>
+              <div class="community-meta" id="naver-meta">종목토론방 · 게시글 분석</div>
+              <div class="community-bar-wrap">
+                <div class="community-bar-row">
+                  <span class="community-bar-label">공포</span>
+                  <div class="community-bar-bg">
+                    <div class="community-bar-fill fear" style="width:0%"></div>
+                  </div>
+                  <span class="community-bar-pct" id="naver-fear-pct">—%</span>
+                </div>
+                <div class="community-bar-row">
+                  <span class="community-bar-label">탐욕</span>
+                  <div class="community-bar-bg">
+                    <div class="community-bar-fill greed" style="width:0%"></div>
+                  </div>
+                  <span class="community-bar-pct" id="naver-greed-pct">—%</span>
+                </div>
+              </div>
+            </div>
+            <div class="community-score-wrap">
+              <div class="community-score" id="naver-score">—</div>
+              <div class="community-label" id="naver-label"></div>
+            </div>
+          </div>
+
+          <!-- 디시인사이드 -->
+          <div class="community-item" data-comm="디시인사이드 주식갤">
+            <div class="community-icon">🟡</div>
+            <div class="community-info">
+              <div class="community-name">디시인사이드 주식갤</div>
+              <div class="community-meta" id="dc-meta">주식/미국주식 갤러리</div>
+              <div class="community-bar-wrap">
+                <div class="community-bar-row">
+                  <span class="community-bar-label">공포</span>
+                  <div class="community-bar-bg">
+                    <div class="community-bar-fill fear" style="width:0%"></div>
+                  </div>
+                  <span class="community-bar-pct" id="dc-fear-pct">—%</span>
+                </div>
+                <div class="community-bar-row">
+                  <span class="community-bar-label">탐욕</span>
+                  <div class="community-bar-bg">
+                    <div class="community-bar-fill greed" style="width:0%"></div>
+                  </div>
+                  <span class="community-bar-pct" id="dc-greed-pct">—%</span>
+                </div>
+              </div>
+            </div>
+            <div class="community-score-wrap">
+              <div class="community-score" id="dc-score">—</div>
+              <div class="community-label" id="dc-label"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── 추이 차트 ────────────────────────────────── -->
+    <div class="card chart-card" style="margin-bottom:20px;">
+      <div class="chart-header">
+        <div class="card-title" style="margin-bottom:0;">
+          <span class="dot"></span> 공포·탐욕 추이
+        </div>
+        <div class="chart-tabs">
+          <button class="chart-tab" data-days="7">7일</button>
+          <button class="chart-tab active" data-days="30">30일</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="history-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- ── 키워드 분석 ──────────────────────────────── -->
+    <div class="keyword-section">
+      <!-- 공포 키워드 -->
+      <div class="card keyword-card">
+        <div class="card-title">
+          <span style="color:#ef233c">😨</span> 공포 키워드 TOP 10
+        </div>
+        <div class="keyword-list" id="keyword-fear-list">
+          <div style="color:var(--text-tertiary); font-size:12px;">데이터를 로드하면 표시됩니다.</div>
+        </div>
+      </div>
+      <!-- 탐욕 키워드 -->
+      <div class="card keyword-card">
+        <div class="card-title">
+          <span style="color:#10b981">🚀</span> 탐욕 키워드 TOP 10
+        </div>
+        <div class="keyword-list" id="keyword-greed-list">
+          <div style="color:var(--text-tertiary); font-size:12px;">데이터를 로드하면 표시됩니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 샘플 게시글 ─────────────────────────────── -->
+    <div class="card posts-card" style="margin-bottom: 20px;">
+      <div class="section-head">
+        <div class="card-title" style="margin-bottom:0;">
+          <span class="dot"></span> 주요 게시글 샘플
+        </div>
+        <span style="font-size:11px; color:var(--text-tertiary);">지수 산출 근거 게시글</span>
+      </div>
+      <div class="posts-grid" id="posts-grid">
+        <div style="color:var(--text-tertiary); font-size:12px;">데이터를 로드하면 표시됩니다.</div>
+      </div>
+    </div>
+
+    <!-- ── 지수 계산 방식 안내 ──────────────────────── -->
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-title"><span class="dot"></span> 지수 계산 방식</div>
+      <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:16px;">
+        <div style="background:var(--bg-card-2); border-radius:12px; padding:16px; border:1px solid var(--border);">
+          <div style="font-size:24px; margin-bottom:8px;">🗣️</div>
+          <div style="font-size:13px; font-weight:700; margin-bottom:6px;">키워드 감성 점수</div>
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6;">공포/탐욕 단어 히트 수와 가중치를 계산합니다. 한강, 패닉셀 등 은어 포함.</div>
+          <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--accent);">가중치 50%</div>
+        </div>
+        <div style="background:var(--bg-card-2); border-radius:12px; padding:16px; border:1px solid var(--border);">
+          <div style="font-size:24px; margin-bottom:8px;">⚡</div>
+          <div style="font-size:13px; font-weight:700; margin-bottom:6px;">게시글 속도 (Velocity)</div>
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6;">단위 시간당 게시글 급증 여부를 측정합니다. 패닉/FOMO 시 속도가 급증합니다.</div>
+          <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--accent);">가중치 30%</div>
+        </div>
+        <div style="background:var(--bg-card-2); border-radius:12px; padding:16px; border:1px solid var(--border);">
+          <div style="font-size:24px; margin-bottom:8px;">👍</div>
+          <div style="font-size:13px; font-weight:700; margin-bottom:6px;">추천/비추천 비율</div>
+          <div style="font-size:12px; color:var(--text-secondary); line-height:1.6;">공포성 게시글의 추천 수가 높을수록 집단 심리가 강하다고 판단합니다.</div>
+          <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--accent);">가중치 20%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Python 스크립트 안내 ────────────────────── -->
+    <div class="card">
+      <div class="card-title"><span class="dot"></span> 데이터 수집 방법 (로컬 Python 스크립트)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+        <div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px; line-height:1.6;">
+            <strong style="color:var(--text-primary);">scripts/</strong> 폴더의 Python 스크립트를 로컬에서 실행하면
+            <code style="background:var(--bg-card-2); padding:2px 6px; border-radius:4px; font-family:JetBrains Mono; font-size:10px;">fear_greed_data.json</code> 파일이 생성됩니다.
+            이 파일을 위의 드롭존에 올리면 대시보드가 업데이트됩니다.
+          </div>
+          <div style="background:var(--bg-card-2); border-radius:10px; padding:14px; border:1px solid var(--border); font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-secondary); line-height:2;">
+            <span style="color:#4a5a70"># 1. 의존성 설치</span><br>
+            <span style="color:var(--accent)">pip</span> install -r requirements.txt<br><br>
+            <span style="color:#4a5a70"># 2. 크롤링 + 분석 실행</span><br>
+            <span style="color:var(--accent)">python</span> crawl.py<br>
+            <span style="color:var(--accent)">python</span> analyze.py<br><br>
+            <span style="color:#4a5a70"># 3. 생성된 JSON을 위 드롭존에 드래그</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">⚠️ 크롤링 주의사항</div>
+          <ul style="font-size:12px; color:var(--text-secondary); line-height:2; list-style:none; padding:0;">
+            <li>🔒 네이버, 디시인사이드는 robots.txt로 크롤링을 제한합니다</li>
+            <li>👤 스크립트는 <strong>개인 로컬 사용</strong>을 전제합니다</li>
+            <li>⏱️ 요청 간 적절한 딜레이(1~3초)가 설정되어 있습니다</li>
+            <li>🚫 수집 데이터를 무단으로 재배포하지 마세요</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#dashboard -->
+
+</main>
+
+<!-- ══ SCRIPTS ════════════════════════════════════════ -->
+<script src="js/gauge.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/keyword.js"></script>
+<script src="js/loader.js"></script>
+<!-- analyze.py가 생성한 JS 데이터 파일 (file:// 프로토콜 지원용) -->
+<!-- 파일이 없어도 onerror로 조용히 처리됨 -->
+<script src="./data/fear_greed_data.js" onerror="window.FEAR_GREED_DATA=null"></script>
+<script src="js/app.js"></script>
+
+<!-- 커뮤니티 바 애니메이션 전용 inline 패치 -->
+<script>
+(function() {
+  // app.js renderCommunity를 override하여 HTML data-comm 셀렉터 방식 대신
+  // 직접 ID로 업데이트하는 간단한 패치
+  const _orig = typeof renderAll !== 'undefined' ? renderAll : null;
+
+  function patchCommunity(data) {
+    const naver = data.community?.naver;
+    const dc    = data.community?.dcinside;
+
+    function applyComm(score, label, fearPct, greedPct, prefix, metaEl, postsEl, velEl) {
+      const colorFn = s => {
+        if (s <= 20) return 'color-extreme-fear';
+        if (s <= 40) return 'color-fear';
+        if (s <= 60) return 'color-neutral';
+        if (s <= 80) return 'color-greed';
+        return 'color-extreme-greed';
+      };
+      const sEl = document.getElementById(prefix + '-score');
+      const lEl = document.getElementById(prefix + '-label');
+      const fEl = document.getElementById(prefix + '-fear-pct');
+      const gEl = document.getElementById(prefix + '-greed-pct');
+      if (sEl) { sEl.textContent = score; sEl.className = 'community-score ' + colorFn(score); }
+      if (lEl) { lEl.textContent = label; lEl.className = 'community-label ' + colorFn(score); }
+      if (fEl) fEl.textContent = fearPct + '%';
+      if (gEl) gEl.textContent = greedPct + '%';
+
+      // 바 채우기
+      const comm = prefix === 'naver' ? '네이버 증권 토론방' : '디시인사이드 주식갤';
+      const el   = document.querySelector(`[data-comm="${comm}"]`);
+      if (el) {
+        const fearBar  = el.querySelector('.community-bar-fill.fear');
+        const greedBar = el.querySelector('.community-bar-fill.greed');
+        setTimeout(() => { if (fearBar)  fearBar.style.width  = fearPct + '%';  }, 300);
+        setTimeout(() => { if (greedBar) greedBar.style.width = greedPct + '%'; }, 400);
+      }
+    }
+
+    if (naver) {
+      const lbl = s => { if(s<=20)return'극단적 공포'; if(s<=40)return'공포'; if(s<=60)return'중립'; if(s<=80)return'탐욕'; return'극단적 탐욕'; };
+      applyComm(naver.score, lbl(naver.score), naver.fear_hit, naver.greed_hit, 'naver');
+      const m = document.getElementById('naver-meta');
+      if (m) m.textContent = `종목토론방 · ${(naver.posts_analyzed||0).toLocaleString()}건 분석 · ${naver.velocity_per_hour||0}건/시`;
+    }
+    if (dc) {
+      const lbl = s => { if(s<=20)return'극단적 공포'; if(s<=40)return'공포'; if(s<=60)return'중립'; if(s<=80)return'탐욕'; return'극단적 탐욕'; };
+      applyComm(dc.score, lbl(dc.score), dc.fear_hit, dc.greed_hit, 'dc');
+      const m = document.getElementById('dc-meta');
+      if (m) m.textContent = `주식/미국주식 갤 · ${(dc.posts_analyzed||0).toLocaleString()}건 분석 · ${dc.velocity_per_hour||0}건/시`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const origDataLoader = DataLoader;
+
+    // loadDemo 패치
+    const origLoadDemo = origDataLoader.loadDemo.bind(origDataLoader);
+    origDataLoader.loadDemo = function(cb) {
+      origLoadDemo(data => {
+        cb(data);
+        setTimeout(() => patchCommunity(data), 50);
+      });
+    };
+
+    // loadRealData 패치
+    const origLoadRealData = origDataLoader.loadRealData.bind(origDataLoader);
+    origDataLoader.loadRealData = function(cb, onNotFound) {
+      origLoadRealData(data => {
+        cb(data);
+        setTimeout(() => patchCommunity(data), 50);
+      }, onNotFound);
+    };
+
+    const origInit = origDataLoader.init.bind(origDataLoader);
+    origDataLoader.init = function(opts) {
+      const origOnLoad = opts.onLoad;
+      opts.onLoad = data => {
+        origOnLoad(data);
+        setTimeout(() => patchCommunity(data), 50);
+      };
+      origInit(opts);
+    };
+  });
+})();
+</script>
+
+</body>
+</html>
