@@ -125,17 +125,93 @@ async function fetchLeaderInvestorSeries(candidate) {
         const rawText = await fetchWithProxyFallback(url, "dealTrendInfos", { timeoutMs: 12000 });
         const json = JSON.parse(rawText);
         const deals = Array.isArray(json?.dealTrendInfos) ? json.dealTrendInfos : [];
+        if (!deals.length) {
+            return {
+                foreignNet: [],
+                instNet: [],
+                retailNet: [],
+                available: false,
+                reason: "투자자 수급 시계열 없음"
+            };
+        }
         const ordered = deals
             .slice()
             .reverse()
             .slice(-60);
+        const parseInvestorValue = (value) => {
+            if (typeof value === "number") return Number.isFinite(value) ? value : null;
+            if (typeof value === "string") {
+                const cleaned = value.replace(/,/g, "").trim();
+                if (!cleaned) return null;
+                const parsed = Number(cleaned);
+                return Number.isFinite(parsed) ? parsed : null;
+            }
+            return null;
+        };
+        const normalizeKey = (value) => String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const flattenEntries = (input, prefix = "") => {
+            if (!input || typeof input !== "object") return [];
+            return Object.entries(input).flatMap(([key, value]) => {
+                const nextKey = prefix ? `${prefix}.${key}` : key;
+                if (value && typeof value === "object" && !Array.isArray(value)) {
+                    return flattenEntries(value, nextKey);
+                }
+                return [[nextKey, value]];
+            });
+        };
+        const pickNumber = (row, keys, fallbackTokenGroups = []) => {
+            for (const key of keys) {
+                const value = parseInvestorValue(row?.[key]);
+                if (Number.isFinite(value)) return value;
+            }
+            const flattened = flattenEntries(row);
+            if (!flattened.length || !fallbackTokenGroups.length) return null;
+            for (const [rawKey, rawValue] of flattened) {
+                const key = normalizeKey(rawKey);
+                const matched = fallbackTokenGroups.some(tokens => tokens.every(token => key.includes(token)));
+                if (!matched) continue;
+                const value = parseInvestorValue(rawValue);
+                if (Number.isFinite(value)) return value;
+            }
+            return null;
+        };
+        const foreignNet = ordered
+            .map(row => pickNumber(
+                row,
+                ["foreignerPureBuyQuant", "foreignPureBuyQuant", "foreignerNetBuyQuant"],
+                [["foreigner", "buy"], ["foreign", "buy"], ["foreigner", "net"], ["foreign", "net"]]
+            ))
+            .filter(value => Number.isFinite(value));
+        const instNet = ordered
+            .map(row => pickNumber(
+                row,
+                ["organPureBuyQuant", "institutionPureBuyQuant", "organNetBuyQuant"],
+                [["organ", "buy"], ["institution", "buy"], ["organ", "net"], ["institution", "net"]]
+            ))
+            .filter(value => Number.isFinite(value));
+        const retailNet = ordered
+            .map(row => pickNumber(
+                row,
+                ["individualPureBuyQuant", "retailPureBuyQuant", "individualNetBuyQuant"],
+                [["individual", "buy"], ["retail", "buy"], ["individual", "net"], ["retail", "net"]]
+            ))
+            .filter(value => Number.isFinite(value));
+        const available = foreignNet.length > 0 || instNet.length > 0 || retailNet.length > 0;
         return {
-            foreignNet: ordered.map(row => Number(row.foreignerPureBuyQuant) || 0),
-            instNet: ordered.map(row => Number(row.organPureBuyQuant) || 0),
-            retailNet: ordered.map(row => Number(row.individualPureBuyQuant) || 0)
+            foreignNet,
+            instNet,
+            retailNet,
+            available,
+            reason: available ? "" : "투자자 수급 필드/형식 미확인"
         };
     } catch (error) {
-        return { foreignNet: [], instNet: [], retailNet: [] };
+        return {
+            foreignNet: [],
+            instNet: [],
+            retailNet: [],
+            available: false,
+            reason: "투자자 수급 조회 실패"
+        };
     }
 }
 
@@ -207,8 +283,13 @@ function computeLeaderMetrics(candidate, history, investorSeries = null) {
 
     const foreignNet = investorSeries?.foreignNet || [];
     const instNet = investorSeries?.instNet || [];
-    const foreignCum60d = foreignNet.reduce((acc, v) => acc + (Number(v) || 0), 0);
-    const instCum60d = instNet.reduce((acc, v) => acc + (Number(v) || 0), 0);
+    const hasInvestorSeries = investorSeries?.available !== false && (foreignNet.length > 0 || instNet.length > 0);
+    const foreignCum60d = hasInvestorSeries && foreignNet.length
+        ? foreignNet.reduce((acc, v) => acc + (Number(v) || 0), 0)
+        : null;
+    const instCum60d = hasInvestorSeries && instNet.length
+        ? instNet.reduce((acc, v) => acc + (Number(v) || 0), 0)
+        : null;
 
     let wyckoff = { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족', metrics: {} };
     if (typeof classifyWyckoffPhase === 'function' && history.length >= 10) {
@@ -235,7 +316,9 @@ function computeLeaderMetrics(candidate, history, investorSeries = null) {
         latestDate: latest.dateKey,
         foreignNetCum60d: foreignCum60d,
         instNetCum60d: instCum60d,
-        smartCum60d: foreignCum60d + instCum60d,
+        smartCum60d: Number.isFinite(foreignCum60d) && Number.isFinite(instCum60d) ? foreignCum60d + instCum60d : null,
+        investorSeriesAvailable: hasInvestorSeries,
+        investorSeriesReason: investorSeries?.reason || "",
         wyckoffPhase: wyckoff.phase,
         wyckoffConfidence: wyckoff.confidence,
         wyckoffReason: wyckoff.reason

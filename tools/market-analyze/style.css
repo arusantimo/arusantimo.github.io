@@ -383,6 +383,43 @@
 ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
 
 /* 거장 이론 서브탭 */
+.theory-subtab-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.theory-subtab-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid rgba(71, 85, 105, 0.45);
+    background: rgba(15, 23, 42, 0.46);
+}
+
+.theory-subtab-group.is-scored {
+    border-color: rgba(251, 191, 36, 0.34);
+    background: rgba(120, 53, 15, 0.2);
+}
+
+.theory-subtab-group.is-interpretive {
+    border-color: rgba(34, 211, 238, 0.28);
+    background: rgba(8, 47, 73, 0.22);
+}
+
+.theory-subtab-group-label {
+    flex: 0 0 auto;
+    padding: 0 5px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1;
+}
+
 .theory-subtab-btn {
     padding: 4px 10px;
     border-radius: 6px;
@@ -414,29 +451,177 @@
     display: block;
 }
 
+.theory-panel-classifier {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    margin-bottom: 12px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(71, 85, 105, 0.54);
+    background: rgba(15, 23, 42, 0.66);
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.theory-panel-classifier.is-scored {
+    border-color: rgba(251, 191, 36, 0.36);
+    background: rgba(120, 53, 15, 0.24);
+    color: #fcd34d;
+}
+
+.theory-panel-classifier.is-interpretive {
+    border-color: rgba(34, 211, 238, 0.32);
+    background: rgba(8, 47, 73, 0.28);
+    color: #67e8f9;
+}
+
+.theory-panel-intro {
+    max-width: 820px;
+    margin: 0 0 14px;
+    color: #cbd5e1;
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+@media (min-width: 1280px) {
+    .theory-subtab-bar {
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 640px) {
+    .theory-subtab-group {
+        width: 100%;
+    }
+
+    .theory-subtab-group-label {
+        min-width: 54px;
+    }
+}
+
 /* 코스톨라니 달걀 모형 */
 .kostolany-egg-shell {
-    width: 200px;
+    position: relative;
+    width: min(100%, 300px);
+    min-width: 260px;
+    aspect-ratio: 1;
+    margin-block: 18px;
+    overflow: visible;
+    box-sizing: border-box;
+    border-radius: 9999px;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.9) 0 33%, rgba(15, 23, 42, 0.22) 34% 100%),
+        conic-gradient(from -150deg, rgba(34, 197, 94, 0.32), rgba(251, 191, 36, 0.32), rgba(244, 63, 94, 0.32), rgba(34, 211, 238, 0.28), rgba(34, 197, 94, 0.32));
+}
+
+.kostolany-egg-shell::before {
+    content: "";
+    position: absolute;
+    inset: 18%;
+    border-radius: 9999px;
+    border: 1px dashed rgba(148, 163, 184, 0.34);
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.7), 0 14px 30px rgba(2, 6, 23, 0.26);
+}
+
+.kostolany-egg-shell::after {
+    content: "순환\A Cycle";
+    white-space: pre;
+    position: absolute;
+    inset: 38%;
     display: grid;
-    grid-template-rows: repeat(6, 1fr);
-    border-radius: 50% / 30%;
-    overflow: hidden;
-    border: 1px solid rgba(71, 85, 105, 0.5);
-    background: rgba(15, 23, 42, 0.6);
+    place-items: center;
+    border-radius: 9999px;
+    border: 1px solid rgba(71, 85, 105, 0.48);
+    background: rgba(2, 6, 23, 0.72);
+    color: #94a3b8;
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: center;
+}
+
+.kostolany-cycle-flow {
+    position: absolute;
+    inset: -8%;
+    z-index: 0;
+    overflow: visible;
+    pointer-events: none;
+}
+
+.kostolany-cycle-flow marker path {
+    fill: rgba(248, 250, 252, 0.82);
+}
+
+.kostolany-flow-ring {
+    fill: none;
+    stroke: rgba(248, 250, 252, 0.16);
+    stroke-width: 0.55;
+    stroke-linecap: round;
+}
+
+.kostolany-flow-path {
+    fill: none;
+    stroke: rgba(248, 250, 252, 0.62);
+    stroke-width: 0.72;
+    stroke-linecap: round;
+    stroke-dasharray: 2 2.8;
+    marker-end: url(#kostolany-arrowhead);
+    filter: drop-shadow(0 0 2px rgba(248, 250, 252, 0.18));
 }
 
 .kostolany-egg-cell {
+    position: absolute;
+    z-index: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 14px;
-    border-bottom: 1px dashed rgba(71, 85, 105, 0.3);
+    justify-content: center;
+    gap: 2px;
+    width: 86px;
+    min-height: 44px;
+    padding: 7px 9px;
+    border: 1px solid rgba(71, 85, 105, 0.48);
+    border-radius: 8px;
+    background: rgba(2, 6, 23, 0.78);
+    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.32);
     font-size: 12px;
-    transition: all 0.3s ease;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
 }
 
-.kostolany-egg-cell:last-child {
-    border-bottom: 0;
+.kostolany-egg-cell[data-egg="B1"] {
+    left: 24%;
+    top: 70%;
+}
+
+.kostolany-egg-cell[data-egg="B2"] {
+    left: 24%;
+    top: 34%;
+}
+
+.kostolany-egg-cell[data-egg="B3"] {
+    left: 50%;
+    top: 16%;
+}
+
+.kostolany-egg-cell[data-egg="A1"] {
+    left: 76%;
+    top: 34%;
+}
+
+.kostolany-egg-cell[data-egg="A2"] {
+    left: 76%;
+    top: 70%;
+}
+
+.kostolany-egg-cell[data-egg="A3"] {
+    left: 50%;
+    top: 88%;
 }
 
 .kostolany-egg-cell .egg-label {
@@ -446,18 +631,42 @@
 }
 
 .kostolany-egg-cell .egg-name {
+    min-width: 0;
     color: #cbd5e1;
     font-size: 11px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .kostolany-egg-cell.is-active {
-    background: linear-gradient(90deg, rgba(74, 222, 128, 0.3), rgba(74, 222, 128, 0.05));
-    box-shadow: inset 3px 0 0 #4ade80;
+    z-index: 2;
+    border-color: #4ade80;
+    background: rgba(5, 46, 22, 0.9);
+    box-shadow: 0 0 0 5px rgba(74, 222, 128, 0.16), 0 16px 28px rgba(2, 6, 23, 0.42);
+    transform: translate(-50%, -50%) scale(1.08);
 }
 
 .kostolany-egg-cell.is-active .egg-label,
 .kostolany-egg-cell.is-active .egg-name {
     color: #4ade80;
+}
+
+@media (max-width: 420px) {
+    .kostolany-egg-shell {
+        min-width: 0;
+        width: 100%;
+        max-width: 292px;
+    }
+
+    .kostolany-egg-cell {
+        width: 78px;
+        min-height: 42px;
+        padding-inline: 6px;
+    }
+
+    .kostolany-egg-cell .egg-name {
+        font-size: 10px;
+    }
 }
 
 /* 와이코프 카드 */

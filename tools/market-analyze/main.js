@@ -357,6 +357,15 @@ function renderWyckoffPanel() {
         const phase = stock.wyckoffPhase || 'NEUTRAL';
         const accent = phaseAccent(phase);
         const isNeutral = phase === 'NEUTRAL';
+        const foreignTone = !Number.isFinite(stock.foreignNetCum60d)
+            ? 'text-slate-500'
+            : stock.foreignNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300';
+        const instTone = !Number.isFinite(stock.instNetCum60d)
+            ? 'text-slate-500'
+            : stock.instNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300';
+        const investorReason = stock.investorSeriesAvailable === false
+            ? ` · ${stock.investorSeriesReason || '투자자 수급 미연동'}`
+            : '';
         return `
             <div class="wyckoff-card">
                 <div>
@@ -369,10 +378,10 @@ function renderWyckoffPanel() {
                         <div class="text-slate-400">외인 60일 누적</div>
                         <div class="text-slate-400">기관 60일 누적</div>
                         <div class="${stock.drawdown15dPct <= -5 ? 'text-rose-300' : 'text-slate-200'} font-mono">${formatNullable(stock.drawdown15dPct, '%', 1)}</div>
-                        <div class="${stock.foreignNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300'} font-mono">${Number.isFinite(stock.foreignNetCum60d) ? stock.foreignNetCum60d.toLocaleString() : '-'}</div>
-                        <div class="${stock.instNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300'} font-mono">${Number.isFinite(stock.instNetCum60d) ? stock.instNetCum60d.toLocaleString() : '-'}</div>
+                        <div class="${foreignTone} font-mono">${Number.isFinite(stock.foreignNetCum60d) ? stock.foreignNetCum60d.toLocaleString() : '-'}</div>
+                        <div class="${instTone} font-mono">${Number.isFinite(stock.instNetCum60d) ? stock.instNetCum60d.toLocaleString() : '-'}</div>
                     </div>
-                    <div class="text-[10px] text-slate-500 mt-1">${stock.wyckoffReason || ''}</div>
+                    <div class="text-[10px] text-slate-500 mt-1">${stock.wyckoffReason || ''}${investorReason}</div>
                 </div>
                 <div class="text-right">
                     <span class="phase-badge ${isNeutral ? 'is-neutral' : ''}" style="${isNeutral ? '' : `background:${accent};`}">${phaseLabel(phase)}</span>
@@ -394,14 +403,31 @@ function renderMinskyPanel() {
     const ratioEl = document.getElementById('minsky-deposit-ratio');
     ratioEl.innerText = Number.isFinite(ratio) ? `${(ratio * 100).toFixed(1)}%` : '-';
     ratioEl.style.color = Number.isFinite(ratio) && ratio >= 0.20 ? '#f87171' : '#e2e8f0';
-    document.getElementById('minsky-deposit-state').innerText = Number.isFinite(ratio) && ratio >= 0.20
-        ? '폰지 임계 초과 — 마진콜 누적 위험'
-        : '임계 0.20 이하 — 안정 구간';
+    document.getElementById('minsky-deposit-state').innerText = !Number.isFinite(ratio)
+        ? '금액 기준 비율 · 데이터 부족'
+        : Number.isFinite(ratio) && ratio >= 0.20
+            ? '금액 기준 비율 · 폰지 임계 초과'
+            : '금액 기준 비율 · 계좌 수 지표 아님';
 
     const shock = marketData.marginShockChangePct;
     const shockEl = document.getElementById('minsky-shock-change');
+    const shockStateEl = document.getElementById('minsky-shock-state');
     shockEl.innerText = Number.isFinite(shock) ? `${shock > 0 ? '+' : ''}${shock.toFixed(2)}%` : '-';
     shockEl.style.color = Number.isFinite(shock) && shock >= 0 ? '#f87171' : '#22d3ee';
+    const shockAnchorLabel = marketData.shockAnchorDate
+        ? (typeof formatFlowBizDateLabel === 'function' ? formatFlowBizDateLabel(marketData.shockAnchorDate) : marketData.shockAnchorDate)
+        : '';
+    if (Number.isFinite(shock)) {
+        shockStateEl.innerText = shock >= 0
+            ? '0% 이상 유지 시 마진콜 임박'
+            : '충격 이후 신용이 감소 중';
+    } else if (!marketData.shockAnchorDate) {
+        shockStateEl.innerText = '대표주 충격일 미검출로 비교 보류';
+    } else if (!Number.isFinite(marketData.marginBalanceBeforeShock)) {
+        shockStateEl.innerText = `${shockAnchorLabel} 이전 기준 신용잔고 없음`;
+    } else {
+        shockStateEl.innerText = '비교용 신용 데이터 부족';
+    }
 
     const trapState = marketData.trapState;
     const banner = document.getElementById('minsky-banner');

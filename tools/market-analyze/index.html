@@ -156,18 +156,30 @@
             <div class="lg:col-span-2 space-y-6">
 
                 <div id="cycle-card" class="cycle-glow bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                    <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 mb-3">
                         <h2 class="text-lg font-semibold text-slate-400">하워드 막스 마켓 사이클 진단</h2>
-                        <div id="theory-subtab-bar" class="flex flex-wrap gap-1 text-[11px]">
-                            <button class="theory-subtab-btn is-active" data-subtab="cycle">사이클</button>
-                            <button class="theory-subtab-btn" data-subtab="soros">소로스</button>
-                            <button class="theory-subtab-btn" data-subtab="kostolany">코스톨라니</button>
-                            <button class="theory-subtab-btn" data-subtab="wyckoff">와이코프</button>
-                            <button class="theory-subtab-btn" data-subtab="minsky">민스키</button>
+                        <div id="theory-subtab-bar" class="theory-subtab-bar">
+                            <div class="theory-subtab-group">
+                                <span class="theory-subtab-group-label">핵심</span>
+                                <button class="theory-subtab-btn is-active" data-subtab="cycle">사이클</button>
+                            </div>
+                            <div class="theory-subtab-group is-scored">
+                                <span class="theory-subtab-group-label">점수 반영</span>
+                                <button class="theory-subtab-btn" data-subtab="soros">소로스</button>
+                                <button class="theory-subtab-btn" data-subtab="minsky">민스키</button>
+                            </div>
+                            <div class="theory-subtab-group is-interpretive">
+                                <span class="theory-subtab-group-label">해석 전용</span>
+                                <button class="theory-subtab-btn" data-subtab="kostolany">코스톨라니</button>
+                                <button class="theory-subtab-btn" data-subtab="wyckoff">와이코프</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="theory-subtab-panel is-active" data-subtab-panel="cycle">
+                    <p class="theory-panel-intro">
+                        하워드 막스 사이클은 시장을 공포와 탐욕 사이에서 움직이는 반복적 심리 진자로 보고, 현재 가격·심리·스트레스가 어느 국면에 가까운지 판단합니다.
+                    </p>
                     <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-6 items-center">
                         <div>
                             <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-4">
@@ -219,6 +231,10 @@
 
                     <!-- 소로스 재귀성 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="soros">
+                        <div class="theory-panel-classifier is-scored">점수 반영 · P-Index e_greed 가산</div>
+                        <p class="theory-panel-intro">
+                            소로스 재귀성은 가격과 투자자 믿음이 서로를 강화해 실제 가치보다 과도한 상승이나 붕괴를 만들 수 있다는 관점입니다.
+                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-3">
                                 <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">재귀성 폭주 지수</div>
@@ -256,8 +272,26 @@
 
                     <!-- 코스톨라니 달걀 모형 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="kostolany">
+                        <div class="theory-panel-classifier is-interpretive">해석 전용 · P-Index 결과 재분류</div>
+                        <p class="theory-panel-intro">
+                            코스톨라니 달걀 모형은 자금이 소신파에서 부화수로 이동하는 흐름을 통해 상승과 하락의 여섯 구간을 읽는 심리 순환 모델입니다.
+                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-4 items-start">
                             <div id="kostolany-egg" class="kostolany-egg-shell mx-auto">
+                                <svg class="kostolany-cycle-flow" viewBox="0 0 100 100" aria-hidden="true">
+                                    <defs>
+                                        <marker id="kostolany-arrowhead" markerWidth="4" markerHeight="4" refX="3.1" refY="2" orient="auto">
+                                            <path d="M0,0 L3.6,2 L0,4 Z"></path>
+                                        </marker>
+                                    </defs>
+                                    <circle class="kostolany-flow-ring" cx="50" cy="50" r="48"></circle>
+                                    <path class="kostolany-flow-path" d="M13.2 80.9 A48 48 0 0 1 13.2 19.1"></path>
+                                    <path class="kostolany-flow-path" d="M13.2 19.1 A48 48 0 0 1 50 2"></path>
+                                    <path class="kostolany-flow-path" d="M50 2 A48 48 0 0 1 86.8 19.1"></path>
+                                    <path class="kostolany-flow-path" d="M86.8 19.1 A48 48 0 0 1 86.8 80.9"></path>
+                                    <path class="kostolany-flow-path" d="M86.8 80.9 A48 48 0 0 1 50 98"></path>
+                                    <path class="kostolany-flow-path" d="M50 98 A48 48 0 0 1 13.2 80.9"></path>
+                                </svg>
                                 <div class="kostolany-egg-cell" data-egg="B3"><span class="egg-label">B3</span><span class="egg-name">상승 과열</span></div>
                                 <div class="kostolany-egg-cell" data-egg="B2"><span class="egg-label">B2</span><span class="egg-name">상승 조정</span></div>
                                 <div class="kostolany-egg-cell" data-egg="B1"><span class="egg-label">B1</span><span class="egg-name">상승 준비</span></div>
@@ -282,6 +316,10 @@
 
                     <!-- 와이코프 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="wyckoff">
+                        <div class="theory-panel-classifier is-interpretive">해석 전용 · 대표주 매집/분배 진단</div>
+                        <p class="theory-panel-intro">
+                            와이코프 이론은 가격·거래량·수급을 함께 보며 큰손이 조용히 매집하는지, 고점에서 분배하는지를 단계별로 추적합니다.
+                        </p>
                         <div class="space-y-2">
                             <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">대표주 매집/분배 단계 (Phase A~E)</div>
                             <div id="wyckoff-body" class="space-y-2">
@@ -295,6 +333,10 @@
 
                     <!-- 민스키 모멘트 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="minsky">
+                        <div class="theory-panel-classifier is-scored">점수/오버라이드 반영 · 신용·Bull Trap 리스크</div>
+                        <p class="theory-panel-intro">
+                            민스키 모멘트는 평온한 상승장 속에서 레버리지가 누적되다가 작은 충격이 강제 청산과 급락으로 번지는 순간을 경고합니다.
+                        </p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
                                 <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용잔고 5일 기울기</div>
@@ -302,14 +344,14 @@
                                 <div class="text-[10px] text-slate-500">상승 = 폰지 누적 / 하락 = 청산</div>
                             </div>
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
-                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용 / 예탁 비율</div>
+                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용잔고 / 고객예탁금 비율</div>
                                 <div id="minsky-deposit-ratio" class="text-2xl font-mono font-bold text-slate-100">-</div>
-                                <div id="minsky-deposit-state" class="text-[10px] text-slate-500">임계 0.20 이상 시 폰지 위험</div>
+                                <div id="minsky-deposit-state" class="text-[10px] text-slate-500">금액 기준 비율 · 계좌 수 지표 아님</div>
                             </div>
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
                                 <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">충격 후 신용 변화율</div>
                                 <div id="minsky-shock-change" class="text-2xl font-mono font-bold text-slate-100">-</div>
-                                <div class="text-[10px] text-slate-500">0% 이상 유지 시 마진콜 임박</div>
+                                <div id="minsky-shock-state" class="text-[10px] text-slate-500">0% 이상 유지 시 마진콜 임박</div>
                             </div>
                         </div>
                         <div id="minsky-banner" class="hidden mt-4 p-3 rounded bg-rose-900/40 border border-rose-500/50 text-[12px] text-rose-200">
