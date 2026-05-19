@@ -156,10 +156,21 @@ async function fetchLiveFinanceData() {
             );
             log(`[DEPOSIT] <span class='text-emerald-400 font-bold'>성공:</span> 신용잔고 기울기 ➜ <b>${marketData.marginSlope.toFixed(2)}</b>`);
             marketData.marginBalanceToday = marginResult.value.marginHistory[0]?.balance ?? null;
+            marketData.customerDeposit = marginResult.value.customerDepositToday ?? null;
+            marketData.customerDepositSlope = marginResult.value.customerDepositSlope ?? null;
+            if (Number.isFinite(marketData.customerDeposit) && marketData.customerDeposit > 0 && Number.isFinite(marketData.marginBalanceToday)) {
+                marketData.depositMarginRatio = marketData.marginBalanceToday / marketData.customerDeposit;
+                log(`[DEPOSIT] 고객예탁금 ${marketData.customerDeposit.toLocaleString()}억 / 신용잔고 비율 ${(marketData.depositMarginRatio * 100).toFixed(1)}%`);
+            } else {
+                marketData.depositMarginRatio = null;
+            }
         } else {
             log(`<span class='text-rose-400'>[DEPOSIT ERROR]</span> 신용잔고 파싱 실패(${marginResult.reason?.message || "알 수 없는 오류"}).`);
             setMetricDisplay("val-margin-slope", "에러", "font-mono font-bold text-amber-500 text-lg");
             marketData.marginBalanceToday = null;
+            marketData.customerDeposit = null;
+            marketData.customerDepositSlope = null;
+            marketData.depositMarginRatio = null;
         }
 
         if (leaderResult.status === "fulfilled") {

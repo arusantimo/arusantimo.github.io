@@ -119,6 +119,26 @@ async function fetchLeaderHistory(candidate) {
     return history;
 }
 
+async function fetchLeaderInvestorSeries(candidate) {
+    try {
+        const url = `https://m.stock.naver.com/api/stock/${candidate.code}/integration`;
+        const rawText = await fetchWithProxyFallback(url, "dealTrendInfos", { timeoutMs: 12000 });
+        const json = JSON.parse(rawText);
+        const deals = Array.isArray(json?.dealTrendInfos) ? json.dealTrendInfos : [];
+        const ordered = deals
+            .slice()
+            .reverse()
+            .slice(-60);
+        return {
+            foreignNet: ordered.map(row => Number(row.foreignerPureBuyQuant) || 0),
+            instNet: ordered.map(row => Number(row.organPureBuyQuant) || 0),
+            retailNet: ordered.map(row => Number(row.individualPureBuyQuant) || 0)
+        };
+    } catch (error) {
+        return { foreignNet: [], instNet: [], retailNet: [] };
+    }
+}
+
 function computeShockMetrics(history) {
     let rollingHigh = 0;
     const shockStart = Math.max(0, history.length - 5);
@@ -178,12 +198,26 @@ function computeThreeDayMetrics(history) {
     };
 }
 
-function computeLeaderMetrics(candidate, history) {
+function computeLeaderMetrics(candidate, history, investorSeries = null) {
     const latest = history.at(-1);
     const previous = history.at(-2);
     const highestHigh = Math.max(...history.map(row => row.high));
     const shockMetrics = computeShockMetrics(history);
     const threeDayMetrics = computeThreeDayMetrics(history);
+
+    const foreignNet = investorSeries?.foreignNet || [];
+    const instNet = investorSeries?.instNet || [];
+    const foreignCum60d = foreignNet.reduce((acc, v) => acc + (Number(v) || 0), 0);
+    const instCum60d = instNet.reduce((acc, v) => acc + (Number(v) || 0), 0);
+
+    let wyckoff = { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족', metrics: {} };
+    if (typeof classifyWyckoffPhase === 'function' && history.length >= 10) {
+        wyckoff = classifyWyckoffPhase({
+            ohlcv: history,
+            foreignNet,
+            instNet
+        });
+    }
 
     return {
         code: candidate.code,
@@ -198,7 +232,13 @@ function computeLeaderMetrics(candidate, history) {
         threeDayValueRatio: threeDayMetrics.threeDayValueRatio,
         closeRecoveryRate: shockMetrics.closeRecoveryRate,
         shockDate: shockMetrics.shockDate,
-        latestDate: latest.dateKey
+        latestDate: latest.dateKey,
+        foreignNetCum60d: foreignCum60d,
+        instNetCum60d: instCum60d,
+        smartCum60d: foreignCum60d + instCum60d,
+        wyckoffPhase: wyckoff.phase,
+        wyckoffConfidence: wyckoff.confidence,
+        wyckoffReason: wyckoff.reason
     };
 }
 
@@ -224,7 +264,13 @@ async function collectLeaderMetrics(universe, label) {
     const results = await runWithConcurrency(
         universe,
         LEADER_FETCH_CONCURRENCY,
-        async candidate => computeLeaderMetrics(candidate, await fetchLeaderHistory(candidate))
+        async candidate => {
+            const [history, investorSeries] = await Promise.all([
+                fetchLeaderHistory(candidate),
+                fetchLeaderInvestorSeries(candidate)
+            ]);
+            return computeLeaderMetrics(candidate, history, investorSeries);
+        }
     );
     const successes = results.filter(result => result && !result.error && Number.isFinite(result.cum15dTradingValue));
     const failures = results.filter(result => result?.error);

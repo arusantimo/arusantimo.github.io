@@ -156,7 +156,18 @@
             <div class="lg:col-span-2 space-y-6">
 
                 <div id="cycle-card" class="cycle-glow bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
-                    <h2 class="text-lg font-semibold mb-2 text-slate-400">하워드 막스 마켓 사이클 진단</h2>
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                        <h2 class="text-lg font-semibold text-slate-400">하워드 막스 마켓 사이클 진단</h2>
+                        <div id="theory-subtab-bar" class="flex flex-wrap gap-1 text-[11px]">
+                            <button class="theory-subtab-btn is-active" data-subtab="cycle">사이클</button>
+                            <button class="theory-subtab-btn" data-subtab="soros">소로스</button>
+                            <button class="theory-subtab-btn" data-subtab="kostolany">코스톨라니</button>
+                            <button class="theory-subtab-btn" data-subtab="wyckoff">와이코프</button>
+                            <button class="theory-subtab-btn" data-subtab="minsky">민스키</button>
+                        </div>
+                    </div>
+
+                    <div class="theory-subtab-panel is-active" data-subtab-panel="cycle">
                     <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-6 items-center">
                         <div>
                             <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 mb-4">
@@ -203,6 +214,110 @@
                                 우측 상단의 실시간 동기화 버튼을 클릭하면 네이버 증권 데이터를 자동 파싱해 9단계 순환형 마켓 사이클과 Bull Trap 리스크를 동시에 계산합니다.
                             </p>
                         </div>
+                    </div>
+                    </div>
+
+                    <!-- 소로스 재귀성 패널 -->
+                    <div class="theory-subtab-panel" data-subtab-panel="soros">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-3">
+                                <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">재귀성 폭주 지수</div>
+                                <div class="flex items-baseline gap-2">
+                                    <span id="soros-synergy-value" class="text-3xl font-extrabold text-rose-300">0.0</span>
+                                    <span class="text-xs text-slate-500">/ 25 점</span>
+                                </div>
+                                <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div id="soros-synergy-bar" class="h-full bg-gradient-to-r from-cyan-400 via-amber-300 to-rose-500" style="width: 0%"></div>
+                                </div>
+                                <div id="soros-state-label" class="text-sm font-bold text-slate-300">상태: 정상 (피드백 루프 없음)</div>
+                                <p id="soros-state-note" class="text-[11px] text-slate-400 leading-relaxed">이격도와 종토방 심리가 같은 방향으로 폭주하면 가격이 가격을 강화하는 재귀 루프가 형성됩니다.</p>
+                            </div>
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-2">
+                                <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">입력 좌표 (Disparity × Sentiment)</div>
+                                <div class="grid grid-cols-2 gap-2 text-[12px]">
+                                    <div class="bg-slate-950/60 p-2 rounded">
+                                        <div class="text-[10px] text-slate-500">200일 이격도</div>
+                                        <div id="soros-disparity-value" class="font-mono font-bold text-slate-100 text-lg">-</div>
+                                    </div>
+                                    <div class="bg-slate-950/60 p-2 rounded">
+                                        <div class="text-[10px] text-slate-500">종토방 심리</div>
+                                        <div id="soros-sentiment-value" class="font-mono font-bold text-slate-100 text-lg">-</div>
+                                    </div>
+                                </div>
+                                <div id="soros-debasement-banner" class="hidden mt-2 p-2 rounded bg-rose-900/40 border border-rose-500/50 text-[11px] text-rose-200">
+                                    🚨 화폐몰락 버블 신호: 환율·신용·금이 동반 폭등 — 초비상 방어 태세 권고.
+                                </div>
+                                <p class="text-[11px] text-slate-400 leading-relaxed mt-2">
+                                    P-Index의 e_greed 항에 비선형 가중치로 합산되며, 0~25점 범위입니다. 6점 이상에서 주의, 15점 이상에서 폭주 단계로 전환됩니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 코스톨라니 달걀 모형 패널 -->
+                    <div class="theory-subtab-panel" data-subtab-panel="kostolany">
+                        <div class="grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-4 items-start">
+                            <div id="kostolany-egg" class="kostolany-egg-shell mx-auto">
+                                <div class="kostolany-egg-cell" data-egg="B3"><span class="egg-label">B3</span><span class="egg-name">상승 과열</span></div>
+                                <div class="kostolany-egg-cell" data-egg="B2"><span class="egg-label">B2</span><span class="egg-name">상승 조정</span></div>
+                                <div class="kostolany-egg-cell" data-egg="B1"><span class="egg-label">B1</span><span class="egg-name">상승 준비</span></div>
+                                <div class="kostolany-egg-cell" data-egg="A1"><span class="egg-label">A1</span><span class="egg-name">하락 준비</span></div>
+                                <div class="kostolany-egg-cell" data-egg="A2"><span class="egg-label">A2</span><span class="egg-name">하락 조정</span></div>
+                                <div class="kostolany-egg-cell" data-egg="A3"><span class="egg-label">A3</span><span class="egg-name">하락 과열</span></div>
+                            </div>
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-3">
+                                <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">현재 단계</div>
+                                <div id="kostolany-stage-label" class="text-2xl font-extrabold text-emerald-300">B2 · 상승 조정</div>
+                                <p id="kostolany-divergence-note" class="text-[12px] text-slate-300 leading-relaxed">거래량과 가격이 동행 (정상)</p>
+                                <div class="border-t border-slate-700 pt-3 space-y-1">
+                                    <div class="flex justify-between text-[11px] text-slate-400"><span>P-Index</span><span id="kostolany-p-index" class="font-mono text-slate-200">50</span></div>
+                                    <div class="flex justify-between text-[11px] text-slate-400"><span>양봉 비율</span><span id="kostolany-bull-ratio" class="font-mono text-slate-200">-</span></div>
+                                    <div class="flex justify-between text-[11px] text-slate-400"><span>고객 예탁금</span><span id="kostolany-deposit" class="font-mono text-slate-200">-</span></div>
+                                    <div class="flex justify-between text-[11px] text-slate-400"><span>예탁금 기울기</span><span id="kostolany-deposit-slope" class="font-mono text-slate-200">-</span></div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 leading-relaxed">소신파(Strong)와 부화수(Trembling)의 물량 이동을 P-Index와 거래량 변화로 추정합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 와이코프 패널 -->
+                    <div class="theory-subtab-panel" data-subtab-panel="wyckoff">
+                        <div class="space-y-2">
+                            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">대표주 매집/분배 단계 (Phase A~E)</div>
+                            <div id="wyckoff-body" class="space-y-2">
+                                <div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">대표주 데이터 대기 중</div>
+                            </div>
+                            <p class="text-[10px] text-slate-500 leading-relaxed mt-2">
+                                와이코프 5단계는 가격·거래량·외인+기관 60일 누적 매수의 조합으로 자동 판정됩니다. Phase B(매집)·D(상승)는 진입 기회, Phase E(분배)는 청산 신호로 해석합니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 민스키 모멘트 패널 -->
+                    <div class="theory-subtab-panel" data-subtab-panel="minsky">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
+                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용잔고 5일 기울기</div>
+                                <div id="minsky-margin-slope" class="text-2xl font-mono font-bold text-slate-100">-</div>
+                                <div class="text-[10px] text-slate-500">상승 = 폰지 누적 / 하락 = 청산</div>
+                            </div>
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
+                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용 / 예탁 비율</div>
+                                <div id="minsky-deposit-ratio" class="text-2xl font-mono font-bold text-slate-100">-</div>
+                                <div id="minsky-deposit-state" class="text-[10px] text-slate-500">임계 0.20 이상 시 폰지 위험</div>
+                            </div>
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
+                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">충격 후 신용 변화율</div>
+                                <div id="minsky-shock-change" class="text-2xl font-mono font-bold text-slate-100">-</div>
+                                <div class="text-[10px] text-slate-500">0% 이상 유지 시 마진콜 임박</div>
+                            </div>
+                        </div>
+                        <div id="minsky-banner" class="hidden mt-4 p-3 rounded bg-rose-900/40 border border-rose-500/50 text-[12px] text-rose-200">
+                            🚨 민스키 모멘트 임박: 1차 충격이 발생했음에도 신용이 청산되지 않았습니다. 가짜 반등(Stage 6 안도·자만)에 동참하지 마세요.
+                        </div>
+                        <p class="text-[10px] text-slate-500 leading-relaxed mt-3">
+                            폰지 채무자(레버리지 의존)들이 강제 청산을 거부하는 한, 진정한 바닥은 오지 않습니다. 신용잔고가 마진콜로 한 번에 쓸려나간 뒤에야 반등 매수의 정당성이 생깁니다.
+                        </p>
                     </div>
                 </div>
 
@@ -360,6 +475,7 @@
 
     <script src="state.js"></script>
     <script src="cycle-config.js"></script>
+    <script src="wyckoff.js"></script>
     <script src="market-flow.js"></script>
     <script src="market-indicators.js"></script>
     <script src="leader-candidates.js"></script>

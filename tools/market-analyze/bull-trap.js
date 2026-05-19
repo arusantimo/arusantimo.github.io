@@ -93,10 +93,23 @@ function calculateTrapMarginScore(data, basketDrawdown15d) {
         return { score: 0, label: "신용 기준값 없음" };
     }
 
-    if (basketDrawdown15d <= -8 && changePct >= 1) return { score: 4, label: `신용 ${changePct.toFixed(1)}% 증가` };
-    if (basketDrawdown15d <= -8 && changePct >= 0) return { score: 3, label: `신용 ${changePct.toFixed(1)}% 유지` };
-    if (basketDrawdown15d <= -5 && changePct > -2) return { score: 2, label: `신용 ${changePct.toFixed(1)}% 견조` };
-    return { score: 0, label: `신용 ${changePct.toFixed(1)}% 감소` };
+    let baseScore = 0;
+    let baseLabel = "";
+    if (basketDrawdown15d <= -8 && changePct >= 1) { baseScore = 4; baseLabel = `신용 ${changePct.toFixed(1)}% 증가`; }
+    else if (basketDrawdown15d <= -8 && changePct >= 0) { baseScore = 3; baseLabel = `신용 ${changePct.toFixed(1)}% 유지`; }
+    else if (basketDrawdown15d <= -5 && changePct > -2) { baseScore = 2; baseLabel = `신용 ${changePct.toFixed(1)}% 견조`; }
+    else { baseScore = 0; baseLabel = `신용 ${changePct.toFixed(1)}% 감소`; }
+
+    // 민스키 폰지 임계: 신용/예탁 비율이 0.20 이상 + 1차 충격 후 신용이 줄지 않음
+    const depositMarginRatio = Number(data.depositMarginRatio);
+    if (Number.isFinite(depositMarginRatio) && depositMarginRatio >= 0.20 && basketDrawdown15d <= -5 && changePct >= 0) {
+        return {
+            score: Math.min(5, baseScore + 1),
+            label: `${baseLabel} · 폰지 신용/예탁 ${(depositMarginRatio * 100).toFixed(0)}%`
+        };
+    }
+
+    return { score: baseScore, label: baseLabel };
 }
 
 function calculateTrapFirstShockScore(leaderStocks) {

@@ -263,6 +263,159 @@ document.getElementById('file-portfolio-import').addEventListener('change', (e) 
     reader.readAsText(file);
 });
 
+// 거장 이론 서브탭 전환
+const theorySubtabBar = document.getElementById('theory-subtab-bar');
+if (theorySubtabBar) {
+    theorySubtabBar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.theory-subtab-btn');
+        if (!btn) return;
+        const target = btn.dataset.subtab;
+        document.querySelectorAll('.theory-subtab-btn').forEach(b => b.classList.toggle('is-active', b === btn));
+        document.querySelectorAll('.theory-subtab-panel').forEach(p => p.classList.toggle('is-active', p.dataset.subtabPanel === target));
+        renderTheorySubtabs();
+    });
+}
+
+function formatNullable(value, suffix = '', digits = 2) {
+    if (value === null || value === undefined || Number.isNaN(value)) return '-';
+    const num = Number(value);
+    if (!Number.isFinite(num)) return '-';
+    return `${num.toFixed(digits)}${suffix}`;
+}
+
+function renderSorosPanel() {
+    const synergy = Number(marketData.reflexivitySynergyPoints) || 0;
+    const synergyValue = document.getElementById('soros-synergy-value');
+    const synergyBar = document.getElementById('soros-synergy-bar');
+    const stateLabel = document.getElementById('soros-state-label');
+    const stateNote = document.getElementById('soros-state-note');
+    const dispValue = document.getElementById('soros-disparity-value');
+    const sentValue = document.getElementById('soros-sentiment-value');
+    const banner = document.getElementById('soros-debasement-banner');
+    if (!synergyValue) return;
+
+    synergyValue.innerText = synergy.toFixed(1);
+    synergyBar.style.width = `${Math.min(100, (synergy / 25) * 100)}%`;
+
+    const state = marketData.reflexivityState || 'normal';
+    const labels = {
+        normal: { label: '상태: 정상 (피드백 루프 없음)', color: '#cbd5e1', note: '이격도와 심리 모두 안정 구간. 정상적인 추세를 따르세요.' },
+        caution: { label: '상태: 주의 (재귀 루프 형성 중)', color: '#fbbf24', note: '가격과 심리가 동조하기 시작합니다. 신규 공격 매수 속도를 늦추세요.' },
+        runaway: { label: '상태: 폭주 (정점 임박)', color: '#f43f5e', note: '가격이 가격을 강화하는 폭주 구간. 분할 익절과 현금 비중 확대가 우선입니다.' }
+    };
+    const meta = labels[state];
+    stateLabel.innerText = meta.label;
+    stateLabel.style.color = meta.color;
+    stateNote.innerText = meta.note;
+
+    dispValue.innerText = formatNullable(marketData.disparity, '%', 2);
+    sentValue.innerText = formatNullable(marketData.sentiment, '점', 0);
+    banner.classList.toggle('hidden', !marketData.debasementAlert);
+}
+
+const KOSTOLANY_STAGE_NAMES = {
+    A1: '하락 1 · 안도', A2: '하락 2 · 부인', A3: '하락 3 · 항복',
+    B1: '상승 1 · 회복', B2: '상승 2 · 정석', B3: '상승 3 · 환희'
+};
+
+function renderKostolanyPanel() {
+    const stage = marketData.kostolanyStage || 'B2';
+    const stageLabel = document.getElementById('kostolany-stage-label');
+    if (!stageLabel) return;
+
+    stageLabel.innerText = `${stage} · ${KOSTOLANY_STAGE_NAMES[stage] || ''}`;
+    document.getElementById('kostolany-divergence-note').innerText = marketData.kostolanyDivergenceNote || '-';
+    document.getElementById('kostolany-p-index').innerText = Math.round(marketData.riskIndex || 0);
+    document.getElementById('kostolany-bull-ratio').innerText = formatNullable(marketData.bullRatio, '%', 1);
+    document.getElementById('kostolany-deposit').innerText = Number.isFinite(marketData.customerDeposit)
+        ? `${Math.round(marketData.customerDeposit).toLocaleString()}억`
+        : '-';
+    const slope = marketData.customerDepositSlope;
+    document.getElementById('kostolany-deposit-slope').innerText = Number.isFinite(slope)
+        ? `${slope > 0 ? '+' : ''}${slope.toFixed(1)}`
+        : '-';
+
+    document.querySelectorAll('.kostolany-egg-cell').forEach(cell => {
+        cell.classList.toggle('is-active', cell.dataset.egg === stage);
+    });
+}
+
+function renderWyckoffPanel() {
+    const body = document.getElementById('wyckoff-body');
+    if (!body) return;
+
+    const stocks = Array.isArray(marketData.leaderStocks) ? marketData.leaderStocks : [];
+    if (!stocks.length) {
+        body.innerHTML = `<div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">대표주 데이터 대기 중</div>`;
+        return;
+    }
+
+    const phaseLabel = typeof getWyckoffPhaseLabel === 'function' ? getWyckoffPhaseLabel : (p => p);
+    const phaseAccent = typeof getWyckoffPhaseAccent === 'function' ? getWyckoffPhaseAccent : (() => '#64748b');
+
+    body.innerHTML = stocks.map(stock => {
+        const phase = stock.wyckoffPhase || 'NEUTRAL';
+        const accent = phaseAccent(phase);
+        const isNeutral = phase === 'NEUTRAL';
+        return `
+            <div class="wyckoff-card">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sm font-bold text-slate-100">${stock.name}</span>
+                        <span class="text-[10px] text-slate-500">${stock.code} · 비중 ${(stock.weight * 100).toFixed(0)}%</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-x-3 gap-y-1 text-[10px]">
+                        <div class="text-slate-400">15일 낙폭</div>
+                        <div class="text-slate-400">외인 60일 누적</div>
+                        <div class="text-slate-400">기관 60일 누적</div>
+                        <div class="${stock.drawdown15dPct <= -5 ? 'text-rose-300' : 'text-slate-200'} font-mono">${formatNullable(stock.drawdown15dPct, '%', 1)}</div>
+                        <div class="${stock.foreignNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300'} font-mono">${Number.isFinite(stock.foreignNetCum60d) ? stock.foreignNetCum60d.toLocaleString() : '-'}</div>
+                        <div class="${stock.instNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300'} font-mono">${Number.isFinite(stock.instNetCum60d) ? stock.instNetCum60d.toLocaleString() : '-'}</div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 mt-1">${stock.wyckoffReason || ''}</div>
+                </div>
+                <div class="text-right">
+                    <span class="phase-badge ${isNeutral ? 'is-neutral' : ''}" style="${isNeutral ? '' : `background:${accent};`}">${phaseLabel(phase)}</span>
+                    <div class="text-[10px] text-slate-500 mt-1">신뢰도 ${Math.round((stock.wyckoffConfidence || 0) * 100)}%</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderMinskyPanel() {
+    const slopeEl = document.getElementById('minsky-margin-slope');
+    if (!slopeEl) return;
+    const slope = marketData.marginSlope;
+    slopeEl.innerText = Number.isFinite(slope) ? `${slope > 0 ? '+' : ''}${slope.toFixed(2)}` : '-';
+    slopeEl.style.color = slope > 0 ? '#f87171' : slope < 0 ? '#22d3ee' : '#cbd5e1';
+
+    const ratio = marketData.depositMarginRatio;
+    const ratioEl = document.getElementById('minsky-deposit-ratio');
+    ratioEl.innerText = Number.isFinite(ratio) ? `${(ratio * 100).toFixed(1)}%` : '-';
+    ratioEl.style.color = Number.isFinite(ratio) && ratio >= 0.20 ? '#f87171' : '#e2e8f0';
+    document.getElementById('minsky-deposit-state').innerText = Number.isFinite(ratio) && ratio >= 0.20
+        ? '폰지 임계 초과 — 마진콜 누적 위험'
+        : '임계 0.20 이하 — 안정 구간';
+
+    const shock = marketData.marginShockChangePct;
+    const shockEl = document.getElementById('minsky-shock-change');
+    shockEl.innerText = Number.isFinite(shock) ? `${shock > 0 ? '+' : ''}${shock.toFixed(2)}%` : '-';
+    shockEl.style.color = Number.isFinite(shock) && shock >= 0 ? '#f87171' : '#22d3ee';
+
+    const trapState = marketData.trapState;
+    const banner = document.getElementById('minsky-banner');
+    const showBanner = (trapState === 'complacency' || trapState === 'denial') && Number.isFinite(shock) && shock >= 0;
+    banner.classList.toggle('hidden', !showBanner);
+}
+
+function renderTheorySubtabs() {
+    renderSorosPanel();
+    renderKostolanyPanel();
+    renderWyckoffPanel();
+    renderMinskyPanel();
+}
+
 // 초기 화면 구동 시 로컬 JSON 파일에서 데이터 로드 (Async)
 async function initData() {
     try {

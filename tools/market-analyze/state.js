@@ -38,6 +38,14 @@ let marketData = {
     marginBalanceToday: null,
     marginBalanceBeforeShock: null,
     marginShockChangePct: null,
+    customerDeposit: null,
+    customerDepositSlope: null,
+    depositMarginRatio: null,
+    reflexivitySynergyPoints: 0,
+    reflexivityState: "normal",
+    debasementAlert: false,
+    kostolanyStage: "B2",
+    kostolanyDivergenceNote: "",
     lastSyncTime: ""
 };
 let portfolioData = {

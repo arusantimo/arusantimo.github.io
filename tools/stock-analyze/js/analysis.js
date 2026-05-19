@@ -128,7 +128,33 @@ async function analyzeStock(stock, isBefore0908) {
       const foreignNet = parseNum(todayDeal.foreignerPureBuyQuant ?? 0);
       const institutionNet = parseNum(todayDeal.organPureBuyQuant ?? 0);
 
-      const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction };
+      // 와이코프 분석용 60일 시계열 보강 (네이버 응답이 최신순이므로 역순으로 시간 정렬)
+      const ordered = deals.slice().reverse().slice(-60);
+      const foreignNetSeries = ordered.map(row => parseNum(row.foreignerPureBuyQuant ?? 0));
+      const instNetSeries = ordered.map(row => parseNum(row.organPureBuyQuant ?? 0));
+      const ohlcvSeries = priceHistory
+        .slice()
+        .reverse()
+        .map(row => ({
+          date: row.localTradedAt || row.date || '',
+          open: parseNum(row.openPrice),
+          high: parseNum(row.highPrice),
+          low: parseNum(row.lowPrice),
+          close: parseNum(row.closePrice),
+          volume: parseNum(row.accumulatedTradingVolume)
+        }))
+        .filter(row => row.close > 0);
+
+      let wyckoff = { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족', metrics: {} };
+      if (typeof classifyWyckoffPhase === 'function' && ohlcvSeries.length >= 30) {
+        wyckoff = classifyWyckoffPhase({
+          ohlcv: ohlcvSeries,
+          foreignNet: foreignNetSeries,
+          instNet: instNetSeries
+        });
+      }
+
+      const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction, foreignNetSeries, instNetSeries, ohlcvSeries, wyckoff };
       log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원, 20MA: ${ma20.toLocaleString()}원, 외인: ${foreignNet.toLocaleString()}주)`);
       applyRules(stock, data, isBefore0908);
       return;
@@ -494,6 +520,22 @@ function buildIndicators(stock, data, isBefore0908) {
   const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
   const gainRate = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
   const gapProfile = getGapSellAdjustmentProfile();
+
+  // 와이코프 매집/분배 단계 (참고용 시그널)
+  if (data.wyckoff && data.wyckoff.phase) {
+    const phaseLabel = typeof getWyckoffPhaseLabel === 'function'
+      ? getWyckoffPhaseLabel(data.wyckoff.phase)
+      : data.wyckoff.phase;
+    const phase = data.wyckoff.phase;
+    const status = phase === 'E' ? 'triggered' : (phase === 'NEUTRAL' ? 'unknown' : 'clear');
+    indicators.push({
+      title: '와이코프 매집/분배 단계',
+      criterion: '60일 OHLCV + 외인/기관 누적 매수로 Phase A~E 자동 판정 (B=매집, D=상승, E=분배)',
+      status,
+      result: phaseLabel,
+      value: data.wyckoff.reason || ''
+    });
+  }
 
   if (gapProfile.code) {
     indicators.push({

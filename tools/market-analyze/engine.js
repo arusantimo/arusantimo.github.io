@@ -216,8 +216,13 @@ function calculateCycle() {
     l_credit = Math.min(100, l_credit);
     let s_text = sentiment;
 
-    let e_greed = (i_disparity * 0.4) + (l_credit * 0.3) + (s_text * 0.3);
-    e_greed = Math.min(100, Math.max(0, e_greed)) || 50; // NaN 방지
+    const linear_greed = (i_disparity * 0.4) + (l_credit * 0.3) + (s_text * 0.3);
+    // 소로스 재귀성 시너지: 이격(+5%마다 1)과 심리(50 위 20pt마다 1)의 곱이 폭주를 비선형으로 잡는다.
+    const disparitySurplus = Math.max(0, (disparity - 100) / 5);
+    const sentimentSurplus = Math.max(0, (sentiment - 50) / 20);
+    const reflexivityRaw = disparitySurplus * sentimentSurplus * 12;
+    const reflexivitySynergyPoints = Math.min(25, Math.max(0, reflexivityRaw));
+    let e_greed = clamp(linear_greed + reflexivitySynergyPoints, 0, 100) || 50;
     let p_index = 50 + (e_greed - m_stress);
     p_index = Math.max(0, Math.min(100, p_index)) || 50; // NaN 방지
     let isDebasement = false;
@@ -225,6 +230,13 @@ function calculateCycle() {
         isDebasement = true;
         p_index = Math.max(p_index, 85);
     }
+    marketData.reflexivitySynergyPoints = reflexivitySynergyPoints;
+    marketData.reflexivityState = reflexivitySynergyPoints >= 15
+        ? "runaway"
+        : reflexivitySynergyPoints >= 6
+            ? "caution"
+            : "normal";
+    marketData.debasementAlert = isDebasement;
 
     const flowResult = calculateEuphoriaFlowBonus(marketData);
     marketData.flowBonus = flowResult.flowBonus;
@@ -282,11 +294,40 @@ function calculateCycle() {
     const cycleScoreNote = document.getElementById("cycle-score-note");
     cycleScoreNote.innerText = stageOverrideReason || "원형 링의 점 포인터는 현재 단계 내 위치를 표시합니다.";
 
+    // 코스톨라니 6단계 매핑 — cycleLeg + riskIndex 기반
+    const kostolanyMapping = resolveKostolanyStage(cycleLeg, riskIndex, marketData.bullRatio);
+    marketData.kostolanyStage = kostolanyMapping.stage;
+    marketData.kostolanyDivergenceNote = kostolanyMapping.note;
+
     updateCycleRing(stage, stageProgress);
     updateActionableGuide(stage, isDebasement);
     if (typeof updateMarketFlowUI === "function") updateMarketFlowUI();
     if (typeof updateLeaderTrapUI === "function") updateLeaderTrapUI();
+    if (typeof renderTheorySubtabs === "function") renderTheorySubtabs();
     updatePortfolioRebalancing(stage.key, isDebasement);
+}
+
+function resolveKostolanyStage(cycleLeg, riskIndex, bullRatio) {
+    let stage = "B2";
+    if (cycleLeg === "rising") {
+        if (riskIndex <= 33) stage = "B1";       // 상승 준비 (회복 초입)
+        else if (riskIndex <= 66) stage = "B2";  // 상승 조정 (정석 추세)
+        else stage = "B3";                       // 상승 과열 (탐욕/환희)
+    } else if (cycleLeg === "falling") {
+        if (riskIndex >= 66) stage = "A1";       // 하락 준비 (안도·자만)
+        else if (riskIndex >= 33) stage = "A2";  // 하락 조정 (불안·부인)
+        else stage = "A3";                       // 하락 과열 (공포·항복)
+    }
+
+    // 거래량-가격 다이버전스: bullRatio가 80 이상으로 폭증인데 P가 정체(상승 레그) → 부화수 인수 신호
+    let note = "거래량과 가격이 동행 (정상)";
+    if (cycleLeg === "rising" && Number.isFinite(bullRatio) && bullRatio >= 80 && riskIndex >= 60) {
+        note = "양봉 비율 폭증 · 부화수가 물량을 인수하는 정점 신호";
+    } else if (cycleLeg === "falling" && Number.isFinite(bullRatio) && bullRatio <= 25 && riskIndex <= 35) {
+        note = "거래량 고갈 · 소신파만 남는 바닥 신호";
+    }
+
+    return { stage, note };
 }
 
 function updateActionableGuide(stage, isDebasement) {

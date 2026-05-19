@@ -181,9 +181,14 @@ function parseMarginHistoryRows(html, limit = 20) {
 
         const dateKey = normalizeFlowBizDate(stripHtmlTags(tdMatches[0][1]));
         const balance = Number(stripHtmlTags(tdMatches[4][1]).replace(/,/g, ""));
+        const deposit = Number(stripHtmlTags(tdMatches[1][1]).replace(/,/g, ""));
         if (!dateKey || !Number.isFinite(balance)) continue;
 
-        rows.push({ dateKey, balance });
+        rows.push({
+            dateKey,
+            balance,
+            deposit: Number.isFinite(deposit) ? deposit : null
+        });
         if (rows.length >= limit) break;
     }
 
@@ -208,8 +213,20 @@ async function fetchMarginIndicatorData() {
     }
 
     const slope = calculateLinearSlope(marginHistory.slice(0, 5).map(row => row.balance).reverse());
+
+    const depositSeries = marginHistory
+        .slice(0, 5)
+        .map(row => row.deposit)
+        .filter(value => Number.isFinite(value));
+    const depositSlope = depositSeries.length >= 3
+        ? calculateLinearSlope(depositSeries.slice().reverse())
+        : null;
+    const customerDepositToday = marginHistory[0]?.deposit ?? null;
+
     return {
         marginSlope: slope,
-        marginHistory
+        marginHistory,
+        customerDepositToday,
+        customerDepositSlope: depositSlope
     };
 }

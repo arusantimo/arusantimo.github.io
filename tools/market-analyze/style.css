@@ -381,3 +381,110 @@
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #1e293b; }
 ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+/* 거장 이론 서브탭 */
+.theory-subtab-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.theory-subtab-btn:hover {
+    color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.7);
+}
+
+.theory-subtab-btn.is-active {
+    color: #0f172a;
+    background: var(--cycle-accent, #4ade80);
+    border-color: var(--cycle-accent, #4ade80);
+}
+
+.theory-subtab-panel {
+    display: none;
+}
+
+.theory-subtab-panel.is-active {
+    display: block;
+}
+
+/* 코스톨라니 달걀 모형 */
+.kostolany-egg-shell {
+    width: 200px;
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+    border-radius: 50% / 30%;
+    overflow: hidden;
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    background: rgba(15, 23, 42, 0.6);
+}
+
+.kostolany-egg-cell {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px dashed rgba(71, 85, 105, 0.3);
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.kostolany-egg-cell:last-child {
+    border-bottom: 0;
+}
+
+.kostolany-egg-cell .egg-label {
+    font-weight: 800;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.kostolany-egg-cell .egg-name {
+    color: #cbd5e1;
+    font-size: 11px;
+}
+
+.kostolany-egg-cell.is-active {
+    background: linear-gradient(90deg, rgba(74, 222, 128, 0.3), rgba(74, 222, 128, 0.05));
+    box-shadow: inset 3px 0 0 #4ade80;
+}
+
+.kostolany-egg-cell.is-active .egg-label,
+.kostolany-egg-cell.is-active .egg-name {
+    color: #4ade80;
+}
+
+/* 와이코프 카드 */
+.wyckoff-card {
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    background: rgba(15, 23, 42, 0.65);
+    border-radius: 0.75rem;
+    padding: 0.85rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.wyckoff-card .phase-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.wyckoff-card .phase-badge.is-neutral {
+    color: #cbd5e1;
+    background: rgba(100, 116, 139, 0.3);
+    border: 1px solid rgba(148, 163, 184, 0.4);
+}
