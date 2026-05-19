@@ -156,6 +156,18 @@ body.modal-scroll-locked {
   flex-wrap: wrap;
 }
 
+.notion-row-double {
+  align-items: stretch;
+}
+
+.slot-input-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
 .action-row {
   justify-content: space-between;
 }
@@ -395,6 +407,45 @@ body.modal-scroll-locked {
   border-radius: var(--border-radius-lg);
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.03);
+}
+
+.page-switch-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.page-switch-copy {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.page-switcher {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+}
+
+.page-switch-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.page-switch-btn.active {
+  color: var(--bg-primary);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
 }
 
 .sell-universe-title {
@@ -945,7 +996,8 @@ body.modal-scroll-locked {
 }
 
 .buy-live-pill.strategy,
-.buy-live-pill.consensus {
+.buy-live-pill.consensus,
+.buy-live-pill.wyckoff {
   color: var(--text-primary);
 }
 
@@ -959,6 +1011,11 @@ body.modal-scroll-locked {
   color: var(--text-danger);
   border-color: rgba(239, 68, 68, 0.22);
   background: rgba(239, 68, 68, 0.08);
+}
+
+.buy-live-pill.adjustment.flat {
+  color: var(--text-secondary);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .buy-card-footer {
@@ -2315,4 +2372,10 @@ body.modal-scroll-locked {
   background: rgba(239, 68, 68, 0.12) !important;
   color: var(--text-danger) !important;
   border: 1px solid rgba(239, 68, 68, 0.22) !important;
+}
+
+.badge-page {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }

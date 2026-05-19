@@ -32,11 +32,17 @@ function roundSellScorePoints(value) {
   return Math.round(clamp(value || 0, 0, 100));
 }
 
+function roundSellScoreDelta(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return 0;
+  return Math.round(num);
+}
+
 function buildSellScoreItem({ code, label, points, maxPoints, triggered, detail }) {
   return {
     code,
     label,
-    points: roundSellScorePoints(points),
+    points: roundSellScoreDelta(points),
     maxPoints,
     triggered: Boolean(triggered),
     detail
@@ -153,6 +159,9 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
   const weakStrength = Number.isFinite(data.strength) ? data.strength < (stock.type === 'momentum' ? 100 : 80) : false;
   const gapTriggered = hasTriggeredSellRule(ruleSet, 'P1') || hasTriggeredSellRule(ruleSet, 'W1');
   const ma5Triggered = hasTriggeredSellRule(ruleSet, 'W2');
+  const wyckoffInfo = typeof getSellWyckoffScoreInfo === 'function'
+    ? getSellWyckoffScoreInfo(data.wyckoff)
+    : { points: 0, applied: false, detail: '와이코프 중립' };
   const breakdown = [
     buildSellScoreItem({
       code: 'S-S1',
@@ -195,6 +204,14 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
       detail: Number.isFinite(data.strength)
         ? `체결강도 ${data.strength.toFixed(1)}%`
         : '체결강도 미연동'
+    }),
+    buildSellScoreItem({
+      code: 'S-S6',
+      label: '와이코프 Phase',
+      points: wyckoffInfo.points,
+      maxPoints: 15,
+      triggered: wyckoffInfo.applied,
+      detail: wyckoffInfo.detail
     })
   ];
 
@@ -229,6 +246,9 @@ function buildSwingSellScoreContext({ stock, payload, data, isBefore0908 }) {
   const weakStrength = Number.isFinite(data.strength) ? data.strength < 90 : false;
   const adverseGap = payload.gapProfile?.code && payload.gapProfile.swingMode !== 'allow';
   const driftWorse = payload.gapProfile?.comparison?.available && payload.gapProfile.comparison.bias < 0;
+  const wyckoffInfo = typeof getSellWyckoffScoreInfo === 'function'
+    ? getSellWyckoffScoreInfo(data.wyckoff)
+    : { points: 0, applied: false, detail: '와이코프 중립' };
   const breakdown = [
     buildSellScoreItem({ code: 'SW1', label: '20MA 이탈 위험', points: data.ma20 > 0 && data.currentPrice < data.ma20 ? 20 : 0, maxPoints: 20, triggered: data.ma20 > 0 && data.currentPrice < data.ma20, detail: data.ma20 > 0 ? `${formatWon(data.currentPrice)} vs 20MA ${formatWon(data.ma20)}` : '20MA 미산출' }),
     buildSellScoreItem({ code: 'SW2', label: '5MA 방향 악화', points: data.ma5Direction === 'down' ? 10 : 0, maxPoints: 10, triggered: data.ma5Direction === 'down', detail: data.ma5Direction === 'down' ? '5MA 하락 전환' : `5MA ${data.ma5Direction || '미확인'}` }),
@@ -237,7 +257,8 @@ function buildSwingSellScoreContext({ stock, payload, data, isBefore0908 }) {
     buildSellScoreItem({ code: 'SW5', label: '체결강도 약화', points: weakStrength ? 10 : 0, maxPoints: 10, triggered: weakStrength, detail: Number.isFinite(data.strength) ? `체결강도 ${data.strength.toFixed(1)}%` : '체결강도 미연동' }),
     buildSellScoreItem({ code: 'SW6', label: '5일 저점 이탈', points: data.low5d > 0 && data.currentPrice < data.low5d ? 15 : 0, maxPoints: 15, triggered: data.low5d > 0 && data.currentPrice < data.low5d, detail: data.low5d > 0 ? `${formatWon(data.currentPrice)} vs 5일 저점 ${formatWon(data.low5d)}` : '5일 저점 미산출' }),
     buildSellScoreItem({ code: 'SW7', label: '갭 환경 악화', points: adverseGap ? 10 : 0, maxPoints: 10, triggered: adverseGap, detail: payload.gapProfile?.code ? `${payload.gapProfile.code} / 스윙 ${payload.gapProfile.swingText}` : '갭 등급 미확인' }),
-    buildSellScoreItem({ code: 'SW8', label: '노션 대비 갭 드리프트 악화', points: driftWorse ? 10 : 0, maxPoints: 10, triggered: driftWorse, detail: payload.gapProfile?.comparison?.summary || '노션 대비 변화 없음' })
+    buildSellScoreItem({ code: 'SW8', label: '노션 대비 갭 드리프트 악화', points: driftWorse ? 10 : 0, maxPoints: 10, triggered: driftWorse, detail: payload.gapProfile?.comparison?.summary || '노션 대비 변화 없음' }),
+    buildSellScoreItem({ code: 'SW9', label: '와이코프 Phase', points: wyckoffInfo.points, maxPoints: 15, triggered: wyckoffInfo.applied, detail: wyckoffInfo.detail })
   ];
 
   let sellScore = breakdown.reduce((sum, item) => sum + item.points, 0);

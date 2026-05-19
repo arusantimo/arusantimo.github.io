@@ -46,7 +46,7 @@ function isLiveGapReady() {
 }
 
 function getActiveGapScore() {
-  return isLiveGapReady() ? liveGapState.score : notionSnapshot.gapScore;
+  return isLiveGapReady() ? liveGapState.score : getActiveBuySnapshot().gapScore;
 }
 
 function getGapGradeByTotal(totalScore) {
@@ -79,7 +79,7 @@ function getGapComparisonSignal() {
     };
   }
 
-  const notionGap = notionSnapshot.gapScore;
+  const notionGap = getActiveBuySnapshot().gapScore;
   const notionTotal = getGapTotalNumber(notionGap);
   const liveTotal = getGapTotalNumber(liveGapState.score);
   const notionRank = getGapGradeRank(notionGap.grade);
@@ -110,7 +110,7 @@ function getGapComparisonSignal() {
 
 function getGapComparisonText() {
   if (!isLiveGapReady()) return '';
-  const notionGap = notionSnapshot.gapScore;
+  const notionGap = getActiveBuySnapshot().gapScore;
   const notionTotal = getGapTotalNumber(notionGap);
   if (!Number.isFinite(notionTotal) && !notionGap.grade) return '';
   const liveTotal = getGapTotalNumber(liveGapState.score);

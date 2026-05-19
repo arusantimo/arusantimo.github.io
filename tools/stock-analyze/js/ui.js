@@ -662,6 +662,9 @@ function renderBuyStockCards() {
 }
 
 function renderAll() {
+  if (typeof syncSlotSwitchers === 'function') {
+    syncSlotSwitchers();
+  }
   renderRegimeSummary();
   updateRegimeHeader();
   renderGuideTables();
@@ -962,11 +965,12 @@ function openRegimeReport() {
 function closeRegimeReport() {
   document.getElementById('regime-report-overlay').classList.remove('open');
 }
-function updateCardError(code) {
-  const card = document.getElementById(`card-${code}`);
-  const indBox = document.getElementById(`ind-${code}`);
-  const badge = document.getElementById(`badge-${code}`);
-  const shiftBadge = document.getElementById(`gap-shift-${code}`);
+function updateCardError(codeOrEntryKey) {
+  const parsed = parseEntryKey(codeOrEntryKey, activeSellSlot);
+  const card = document.getElementById(getCardDomId(parsed.entryKey));
+  const indBox = document.getElementById(getIndicatorDomId(parsed.entryKey));
+  const badge = document.getElementById(getBadgeDomId(parsed.entryKey));
+  const shiftBadge = document.getElementById(getGapShiftDomId(parsed.entryKey));
   if (!card || !indBox || !badge) return;
 
   card.className = 'scard';
@@ -1040,19 +1044,27 @@ function renderTradePlanTable(entry) {
   `;
 }
 
-window.handleModalRefreshBuy = async function(code) {
+window.handleModalRefreshBuy = async function(entryKey) {
   const btn = document.getElementById('btn-modal-refresh-buy');
   if (btn) {
     btn.disabled = true;
     btn.textContent = '데이터 수집 중...';
   }
-  await refreshBuyEntry(code, { logLabel: '상세 검증' });
+  await refreshBuyEntry(entryKey, { logLabel: '상세 검증' });
 };
 
-function openModal(code, mode = 'sell') {
-  const detail = mode === 'buy' ? getEntryByCode(code) : stockDetailMap[code];
+function openModal(codeOrEntryKey, mode = 'sell') {
+  const parsed = parseEntryKey(codeOrEntryKey, mode === 'buy' ? activeBuySlot : activeSellSlot);
+  const detail = mode === 'buy'
+    ? getEntryByCode(parsed.entryKey, parsed.slotId)
+    : stockDetailMap[parsed.entryKey];
   if (!detail) return;
-  currentModalState = { code, mode };
+  currentModalState = {
+    key: parsed.entryKey,
+    code: parsed.code,
+    slotId: parsed.slotId,
+    mode
+  };
   const detailModal = document.getElementById('detail-modal');
 
   if (mode === 'buy') {
@@ -1294,7 +1306,7 @@ function openModal(code, mode = 'sell') {
 }
 
 function closeModal() {
-  currentModalState = { code: null, mode: null };
+  currentModalState = { key: null, code: null, slotId: null, mode: null };
   document.getElementById('modal-overlay').classList.remove('open');
   syncBodyScrollLock();
 }

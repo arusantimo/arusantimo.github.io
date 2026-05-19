@@ -28,7 +28,7 @@ function getSellRuleDisplayMeta(rule) {
 }
 
 function buildSellContextChips(stock, detail = null) {
-  const entry = stock?.type === 'swing' ? null : getEntryByCode(stock?.code || '');
+  const entry = stock?.type === 'swing' ? null : getEntryByCode(stock?.entryKey || stock?.code || '', stock?.slotId);
   const entryGrade = detail?.entryGrade || entry?.grade || '';
   const entryStatusLabel = detail?.entryStatusLabel || entry?.statusLabel || '';
   const signalChip = detail ? getSellSignalChipMeta(detail) : null;
@@ -58,29 +58,31 @@ function buildSellContextChips(stock, detail = null) {
   return chips.join('');
 }
 
-function buildBuyTrackingButtonHtml(code, compact = false) {
-  const tracked = isBuyEntryTrackedForSell(code);
+function buildBuyTrackingButtonHtml(entryOrKey, compact = false) {
+  const normalizedSlotId = typeof entryOrKey === 'object' ? entryOrKey.slotId : activeBuySlot;
+  const entryKey = getEntryKey(entryOrKey, normalizedSlotId);
+  const tracked = isBuyEntryTrackedForSell(entryKey, normalizedSlotId);
   return `
     <button type="button"
       class="buy-track-toggle ${tracked ? 'tracked' : 'untracked'} ${compact ? 'compact' : ''}"
-      data-track-code="${escapeHtml(code)}"
+      data-entry-key="${escapeHtml(entryKey)}"
       aria-pressed="${tracked ? 'true' : 'false'}">
       ${tracked ? '매도 추적 중' : '매도 추적'}
     </button>
   `;
 }
 
-function handleBuyTrackingToggle(code) {
-  toggleBuyEntryTrackedForSell(code);
+function handleBuyTrackingToggle(entryKey) {
+  toggleBuyEntryTrackedForSell(entryKey);
   renderBuyStockCards();
   renderSellStockCards();
   updateAnalyzeButtonState();
   updateCurrentTime();
 
-  if (currentModalState.mode === 'buy' && currentModalState.code === code && document.getElementById('modal-overlay').classList.contains('open')) {
-    openModal(code, 'buy');
+  if (currentModalState.mode === 'buy' && currentModalState.key === entryKey && document.getElementById('modal-overlay').classList.contains('open')) {
+    openModal(entryKey, 'buy');
   }
-  const currentSellDetail = stockDetailMap[currentModalState.code];
+  const currentSellDetail = stockDetailMap[currentModalState.key];
   if (currentModalState.mode === 'sell' && currentSellDetail?.stock && !isSellStockVisible(currentSellDetail.stock)) {
     closeModal();
   }
@@ -90,19 +92,19 @@ function bindBuyTrackingButtons(container) {
   container.querySelectorAll('.buy-card').forEach(card => {
     card.addEventListener('click', event => {
       if (event.target.closest('.buy-track-toggle')) return;
-      openModal(card.dataset.code, 'buy');
+      openModal(card.dataset.entryKey, 'buy');
     });
   });
 
   container.querySelectorAll('.buy-track-toggle').forEach(button => {
     button.addEventListener('click', event => {
       event.stopPropagation();
-      handleBuyTrackingToggle(button.dataset.trackCode);
+      handleBuyTrackingToggle(button.dataset.entryKey);
     });
   });
 }
 
-function enhanceBuyModalTracking(code) {
+function enhanceBuyModalTracking(entryKey) {
   const fixedSection = document.querySelector('.buy-modal-fixed');
   if (!fixedSection) return;
   const existing = document.getElementById('buy-modal-tracking');
@@ -114,7 +116,7 @@ function enhanceBuyModalTracking(code) {
       <div class="buy-modal-tracking-copy">
         실제 진입한 종목만 매도 분석기 기본 목록에 표시합니다.
       </div>
-      ${buildBuyTrackingButtonHtml(code, true)}
+      ${buildBuyTrackingButtonHtml(entryKey, true)}
     </div>
   `;
 
@@ -125,7 +127,7 @@ function enhanceBuyModalTracking(code) {
   if (button) {
     button.addEventListener('click', event => {
       event.stopPropagation();
-      handleBuyTrackingToggle(code);
+      handleBuyTrackingToggle(entryKey);
     });
   }
 }
@@ -135,7 +137,7 @@ function renderSellUniverseControls() {
   const summary = document.getElementById('sell-universe-summary');
   if (!switcher || !summary) return;
 
-  const info = getSellUniverseSummary();
+  const info = getSellUniverseSummary(activeSellSlot);
   switcher.querySelectorAll('[data-sell-universe]').forEach(button => {
     button.classList.toggle('active', button.dataset.sellUniverse === info.mode);
   });
@@ -155,8 +157,8 @@ function getSellEmptyMessage(mode, type) {
 }
 
 function renderVisibleSellDetails() {
-  getVisibleSellStocksList().forEach(stock => {
-    const detail = stockDetailMap[stock.code];
+  getVisibleSellStocksList(activeSellSlot).forEach(stock => {
+    const detail = stockDetailMap[stock.entryKey];
     if (detail?.mode === 'sell') {
       renderSellDetailToCard(detail);
     }
@@ -165,8 +167,8 @@ function renderVisibleSellDetails() {
 
 renderSellStockCards = function renderSellStockCardsOverride() {
   renderSellUniverseControls();
-  const mode = getSellUniverseMode();
-  const groups = getVisibleSellStockCollections();
+  const mode = getSellUniverseMode(activeSellSlot);
+  const groups = getVisibleSellStockCollections(activeSellSlot);
 
   const renderGroup = (arr, containerId, type) => {
     const container = document.getElementById(containerId);
@@ -178,19 +180,20 @@ renderSellStockCards = function renderSellStockCardsOverride() {
     }
 
     container.innerHTML = arr.map(stock => {
-      const detail = stockDetailMap[stock.code];
-      const planHtml = buildSellCardPlanSummary(stock.code);
+      const detail = stockDetailMap[stock.entryKey];
+      const planHtml = buildSellCardPlanSummary(stock.entryKey);
       const entryPrice = stock.entryPrice ? `매수가 ${stock.entryPrice.toLocaleString()}원` : '매수가(전일종가): 대기 중';
       return `
-        <div class="scard" id="card-${stock.code}">
+        <div class="scard" id="${getCardDomId(stock.entryKey)}" data-entry-key="${escapeHtml(stock.entryKey)}">
           <div class="scard-head">
             <div>
               <div class="scard-name">${escapeHtml(stock.name)}</div>
-              <div class="scard-code">${escapeHtml(stock.code)}</div>
+              <div class="scard-code">${escapeHtml(stock.code)} · ${escapeHtml(stock.slotLabel || getSlotLabel(stock.slotId))}</div>
             </div>
             <div class="scard-badges">
-              <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
-              <span class="badge ${stock.type === 'swing' ? 'badge-swing' : 'badge-pending'}" id="badge-${stock.code}">${stock.type === 'swing' ? '스윙 보유' : '대기 중'}</span>
+              <span class="badge badge-page">${escapeHtml(stock.slotLabel || getSlotLabel(stock.slotId))}</span>
+              <span class="badge badge-shift" id="${getGapShiftDomId(stock.entryKey)}" style="display:none"></span>
+              <span class="badge ${stock.type === 'swing' ? 'badge-swing' : 'badge-pending'}" id="${getBadgeDomId(stock.entryKey)}">${stock.type === 'swing' ? '스윙 보유' : '대기 중'}</span>
             </div>
           </div>
           ${stock.type === 'swing' ? `
@@ -200,13 +203,13 @@ renderSellStockCards = function renderSellStockCardsOverride() {
               <span class="swing-meta-item">${escapeHtml(stock.status || '보유중')}</span>
             </div>
           ` : ''}
-          <div class="price-row" id="price-row-${stock.code}">
+          <div class="price-row" id="${getPriceRowDomId(stock.entryKey)}">
             <span class="price placeholder-price">대기 중</span>
           </div>
-          <div class="meta" id="meta-${stock.code}">${entryPrice}</div>
-          <div class="sell-context" id="sell-context-${stock.code}">${buildSellContextChips(stock, detail)}</div>
-          <div id="plan-${stock.code}">${planHtml}</div>
-          <div class="indicators" id="ind-${stock.code}">
+          <div class="meta" id="${getMetaDomId(stock.entryKey)}">${entryPrice}</div>
+          <div class="sell-context" id="${getSellContextDomId(stock.entryKey)}">${buildSellContextChips(stock, detail)}</div>
+          <div id="${getPlanDomId(stock.entryKey)}">${planHtml}</div>
+          <div class="indicators" id="${getIndicatorDomId(stock.entryKey)}">
             <div class="ind-item unknown">상단에서 분석 시작 버튼을 눌러주세요.</div>
           </div>
         </div>
@@ -214,7 +217,7 @@ renderSellStockCards = function renderSellStockCardsOverride() {
     }).join('');
 
     container.querySelectorAll('.scard').forEach(card => {
-      card.addEventListener('click', () => openModal(card.id.replace('card-', ''), 'sell'));
+      card.addEventListener('click', () => openModal(card.dataset.entryKey, 'sell'));
     });
   };
 
@@ -243,10 +246,10 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
       return `
-        <div class="buy-card ${presentation.verdictClass}" data-code="${entry.code}">
+        <div class="buy-card ${presentation.verdictClass}" data-entry-key="${escapeHtml(entry.entryKey)}">
           <div class="buy-card-head">
             <div>
-              <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}</div>
+              <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)} · ${escapeHtml(entry.slotLabel || getSlotLabel(entry.slotId))}</div>
               <div class="buy-card-name">${escapeHtml(entry.name)}</div>
               <div class="buy-card-code">${escapeHtml(entry.code)}</div>
             </div>
@@ -254,7 +257,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.primaryScore.toFixed(1)}</div>
               <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryGrade)}</div>
               <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
-              ${buildBuyTrackingButtonHtml(entry.code)}
+              ${buildBuyTrackingButtonHtml(entry)}
             </div>
           </div>
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
@@ -277,9 +280,10 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
     bindBuyTrackingButtons(container);
   };
 
-  renderGroup(notionSnapshot.pullbackEntries, 'buy-list-pullback');
-  renderGroup(notionSnapshot.momentumEntries, 'buy-list-momentum');
-  renderGroup(notionSnapshot.reversalEntries, 'buy-list-reversal');
+  const snapshot = getActiveBuySnapshot();
+  renderGroup(snapshot.pullbackEntries, 'buy-list-pullback');
+  renderGroup(snapshot.momentumEntries, 'buy-list-momentum');
+  renderGroup(snapshot.reversalEntries, 'buy-list-reversal');
 };
 
 function getSellStrategyStageMeta(stage) {
@@ -394,7 +398,7 @@ function buildSyntheticSellStrategyItem(detail) {
 }
 
 function buildSellStrategyPlan(detail) {
-  const entry = getEntryByCode(detail?.stock?.code || '');
+  const entry = getEntryByCode(detail?.stock?.entryKey || detail?.stock?.code || '', detail?.stock?.slotId);
   const targets = detail?.targets || parseTradePlanTargets(entry);
   const items = [];
   const currentItem = buildSyntheticSellStrategyItem(detail);
@@ -487,9 +491,10 @@ function renderSellStrategyPlan(detail, compact = false) {
   `;
 }
 
-buildSellCardPlanSummary = function buildSellCardPlanSummaryOverride(code) {
-  const detail = stockDetailMap[code];
-  const entry = getEntryByCode(code);
+buildSellCardPlanSummary = function buildSellCardPlanSummaryOverride(codeOrEntryKey) {
+  const parsed = parseEntryKey(codeOrEntryKey, activeSellSlot);
+  const detail = stockDetailMap[parsed.entryKey];
+  const entry = getEntryByCode(parsed.entryKey, parsed.slotId);
   if (!entry || !entry.tradePlanRows || !entry.tradePlanRows.length) {
     if (detail?.mode === 'sell') return renderSellStrategyPlan(detail, true);
     return '<div class="scard-plan-empty">매매 단계 정보 없음</div>';
@@ -530,15 +535,16 @@ buildSellCardPlanSummary = function buildSellCardPlanSummaryOverride(code) {
 
 renderSellDetailToCard = function renderSellDetailToCardOverride(detail) {
   const { stock, data, indicators, decision, gainRate, lossManagement, gapProfile, targets } = detail;
-  const card = document.getElementById(`card-${stock.code}`);
+  const key = stock.entryKey || buildEntryKey(stock.slotId, stock.code);
+  const card = document.getElementById(getCardDomId(key));
   if (!card) return;
-  const priceRow = document.getElementById(`price-row-${stock.code}`);
-  const meta = document.getElementById(`meta-${stock.code}`);
-  const context = document.getElementById(`sell-context-${stock.code}`);
-  const planBox = document.getElementById(`plan-${stock.code}`);
-  const indBox = document.getElementById(`ind-${stock.code}`);
-  const badge = document.getElementById(`badge-${stock.code}`);
-  const entryPrice = stock.entryPrice || targets?.entryPrice || getEntryByCode(stock.code)?.entryPriceValue || data.prevClose;
+  const priceRow = document.getElementById(getPriceRowDomId(key));
+  const meta = document.getElementById(getMetaDomId(key));
+  const context = document.getElementById(getSellContextDomId(key));
+  const planBox = document.getElementById(getPlanDomId(key));
+  const indBox = document.getElementById(getIndicatorDomId(key));
+  const badge = document.getElementById(getBadgeDomId(key));
+  const entryPrice = stock.entryPrice || targets?.entryPrice || getEntryByCode(key, stock.slotId)?.entryPriceValue || data.prevClose;
   const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
   const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
   const absChg = Math.abs(data.chgRate).toFixed(2);
@@ -569,14 +575,14 @@ renderSellDetailToCard = function renderSellDetailToCardOverride(detail) {
   }
 
   indBox.innerHTML = cardIndicatorHtml;
-  if (planBox) planBox.innerHTML = buildSellCardPlanSummary(stock.code);
+  if (planBox) planBox.innerHTML = buildSellCardPlanSummary(key);
 
   card.className = `scard ${decision}`;
   const badgeInfo = getSellActionPlanBadge(detail);
   badge.className = `badge ${badgeInfo.cls}`;
   badge.innerText = badgeInfo.text;
 
-  const shiftBadge = document.getElementById(`gap-shift-${stock.code}`);
+  const shiftBadge = document.getElementById(getGapShiftDomId(key));
   const shiftBadgeInfo = getGapComparisonBadge(gapProfile?.comparison);
   if (shiftBadge) {
     if (shiftBadgeInfo) {
@@ -594,7 +600,7 @@ renderSellDetailToCard = function renderSellDetailToCardOverride(detail) {
 
   const newCard = card.cloneNode(true);
   card.parentNode.replaceChild(newCard, card);
-  newCard.addEventListener('click', () => openModal(stock.code, 'sell'));
+  newCard.addEventListener('click', () => openModal(key, 'sell'));
 };
 
 function buildSellTriggeredRuleHtml(triggeredRule) {
@@ -623,7 +629,7 @@ function buildSellModalBody(detail) {
   const verdictCls = badgeInfo.tone;
   const stageCls = isBefore0908 ? 'stage1' : 'stage2';
   const stageText = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
-  const notionEntry = getEntryByCode(stock.code);
+  const notionEntry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
   const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 노션에 없습니다.</div>';
   const strategyPlanHtml = renderSellStrategyPlan(detail, false);
   const scoreBreakdownHtml = renderSellScoreBreakdown(detail);
@@ -757,16 +763,22 @@ function buildSellModalBody(detail) {
   `;
 }
 
-openModal = function openModalOverride(code, mode = 'sell') {
+openModal = function openModalOverride(codeOrEntryKey, mode = 'sell') {
+  const parsed = parseEntryKey(codeOrEntryKey, mode === 'buy' ? activeBuySlot : activeSellSlot);
   if (mode === 'buy') {
-    legacyOpenModal(code, mode);
-    enhanceBuyModalTracking(code);
+    legacyOpenModal(parsed.entryKey, mode);
+    enhanceBuyModalTracking(parsed.entryKey);
     return;
   }
 
-  const detail = stockDetailMap[code];
+  const detail = stockDetailMap[parsed.entryKey];
   if (!detail) return;
-  currentModalState = { code, mode };
+  currentModalState = {
+    key: parsed.entryKey,
+    code: parsed.code,
+    slotId: parsed.slotId,
+    mode
+  };
   const detailModal = document.getElementById('detail-modal');
   detailModal.classList.remove('buy-detail-mode');
   document.getElementById('modal-name').textContent = detail.stock.name;
@@ -785,8 +797,8 @@ openModal = function openModalOverride(code, mode = 'sell') {
 
 updateAnalyzeButtonState = function updateAnalyzeButtonStateOverride() {
   const analyzeBtn = document.getElementById('btn-analyze');
-  const hasBuyEntries = notionSnapshot.pullbackEntries.length > 0 || notionSnapshot.momentumEntries.length > 0 || notionSnapshot.reversalEntries.length > 0;
-  const hasSellStocks = getVisibleSellStocksList().length > 0;
+  const hasBuyEntries = NOTION_SLOT_IDS.some(slotId => getVisibleBuyEntries(slotId).length > 0);
+  const hasSellStocks = NOTION_SLOT_IDS.some(slotId => getVisibleSellStocksList(slotId, getSellUniverseMode(slotId)).length > 0);
   analyzeBtn.disabled = activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks;
 };
 
@@ -813,20 +825,20 @@ updateCurrentTime = function updateCurrentTimeOverride() {
   const archiveSuffix = archiveTimeLabel ? ` · ${archiveTimeLabel} 분석` : '';
 
   if (activeTab === 'buy') {
-    const hasBuyRefresh = getAllBuyEntries().some(entry => entry.liveRefresh);
-    analyzeBtn.innerHTML = `<span>⚡</span> ${hasBuyRefresh ? '일괄 다시 분석' : '일괄 분석'}${archiveSuffix}`;
+    const hasBuyRefresh = NOTION_SLOT_IDS.some(slotId => getVisibleBuyEntries(slotId).some(entry => entry.liveRefresh));
+    analyzeBtn.innerHTML = `<span>⚡</span> ${hasBuyRefresh ? '두 페이지 다시 분석' : '두 페이지 일괄 분석'}${archiveSuffix}`;
     return;
   }
 
-  const hasSellResult = getVisibleSellStocksList().some(stock => stockDetailMap[stock.code]?.mode === 'sell');
-  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차' : '2차'} ${hasSellResult ? '다시 분석' : '분석 시작'}${archiveSuffix}`;
+  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '두 페이지 1차 분석' : '두 페이지 2차 분석'}${archiveSuffix}`;
 };
 
-updateCardError = function updateCardErrorOverride(code) {
-  legacyUpdateCardError(code);
-  const stock = getSellStockByCode(code);
-  const context = document.getElementById(`sell-context-${code}`);
-  const planBox = document.getElementById(`plan-${code}`);
-  if (context && stock) context.innerHTML = buildSellContextChips(stock, stockDetailMap[code] || null);
-  if (planBox) planBox.innerHTML = buildSellCardPlanSummary(code);
+updateCardError = function updateCardErrorOverride(codeOrEntryKey) {
+  legacyUpdateCardError(codeOrEntryKey);
+  const parsed = parseEntryKey(codeOrEntryKey, activeSellSlot);
+  const stock = getSellStockByCode(parsed.entryKey, parsed.slotId);
+  const context = document.getElementById(getSellContextDomId(parsed.entryKey));
+  const planBox = document.getElementById(getPlanDomId(parsed.entryKey));
+  if (context && stock) context.innerHTML = buildSellContextChips(stock, stockDetailMap[parsed.entryKey] || null);
+  if (planBox) planBox.innerHTML = buildSellCardPlanSummary(parsed.entryKey);
 };

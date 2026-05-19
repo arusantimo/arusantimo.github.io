@@ -1,8 +1,45 @@
 document.getElementById('btn-fetch-notion').addEventListener('click', fetchNotionData);
 
+function syncSlotSwitchers() {
+  document.querySelectorAll('[data-buy-slot]').forEach(button => {
+    button.classList.toggle('active', button.dataset.buySlot === activeBuySlot);
+  });
+  document.querySelectorAll('[data-sell-slot]').forEach(button => {
+    button.classList.toggle('active', button.dataset.sellSlot === activeSellSlot);
+  });
+}
+
+function handleBuySlotChange(slotId) {
+  setActiveBuySlot(slotId);
+  syncSlotSwitchers();
+  renderRegimeSummary();
+  updateRegimeHeader();
+  renderBuyStockCards();
+  updateAnalyzeButtonState();
+  updateCurrentTime();
+
+  if (currentModalState.mode === 'buy' && currentModalState.slotId && currentModalState.slotId !== activeBuySlot) {
+    closeModal();
+  }
+}
+
+function handleSellSlotChange(slotId) {
+  setActiveSellSlot(slotId);
+  syncSlotSwitchers();
+  renderSellStockCards();
+  updateAnalyzeButtonState();
+  updateCurrentTime();
+
+  const currentSellDetail = stockDetailMap[currentModalState.key];
+  if (currentModalState.mode === 'sell' && currentSellDetail?.stock && currentSellDetail.stock.slotId !== activeSellSlot) {
+    closeModal();
+  }
+}
+
 function handleManualAdd(type, nameInputId, codeInputId) {
   const name = document.getElementById(nameInputId).value.trim();
   const code = document.getElementById(codeInputId).value.trim();
+  const entryKey = buildEntryKey(activeSellSlot, code);
 
   if (!name || !code) {
     alert('종목명과 종목코드(6자리)를 모두 입력해주세요.');
@@ -13,11 +50,11 @@ function handleManualAdd(type, nameInputId, codeInputId) {
     return;
   }
 
-  if (!stocks[type].find(stock => stock.code === code)) {
-    stocks[type].push({ name, code, type, strategy: type, manual: true, source: 'manual' });
+  if (!stocks[type].find(stock => stock.entryKey === entryKey)) {
+    stocks[type].push(ensureStockIdentity({ name, code, type, strategy: type, manual: true, source: 'manual' }, activeSellSlot));
     renderSellStockCards();
     updateAnalyzeButtonState();
-    log(`▶ 수동 추가: ${name} (${code}) -> ${STRATEGY_META[type].noun}`);
+    log(`▶ ${getSlotLabel(activeSellSlot)} 수동 추가: ${name} (${code}) -> ${STRATEGY_META[type].noun}`);
 
     document.getElementById(nameInputId).value = '';
     document.getElementById(codeInputId).value = '';
@@ -34,34 +71,56 @@ document.getElementById('btn-add-swing').addEventListener('click', () => {
   const name = document.getElementById('swing-name').value.trim();
   const code = document.getElementById('swing-code').value.trim();
   const entryPriceRaw = document.getElementById('swing-entry-price').value.trim();
+  const entryKey = buildEntryKey(activeSellSlot, code);
   if (!name || !code) { alert('종목명과 종목코드(6자리)를 모두 입력해주세요.'); return; }
   if (!/^\d{6}$/.test(code)) { alert('종목코드는 6자리 숫자여야 합니다.'); return; }
   const entryPrice = parseInt(entryPriceRaw.replace(/,/g, ''), 10) || 0;
-  if (!stocks.swing.find(s => s.code === code)) {
-    stocks.swing.push({ name, code, type: 'swing', strategy: 'swing', buyDate: '', entryPrice, status: '보유중', manual: true, source: 'manual' });
+  if (!stocks.swing.find(stock => stock.entryKey === entryKey)) {
+    stocks.swing.push(ensureStockIdentity({
+      name,
+      code,
+      type: 'swing',
+      strategy: 'swing',
+      buyDate: '',
+      entryPrice,
+      status: '보유중',
+      manual: true,
+      source: 'manual'
+    }, activeSellSlot));
     renderSellStockCards();
     updateAnalyzeButtonState();
-    log(`▶ 수동 추가: ${name} (${code}) -> 스윙 보유 (매수가 ${entryPrice.toLocaleString()}원)`);
+    log(`▶ ${getSlotLabel(activeSellSlot)} 수동 추가: ${name} (${code}) -> 스윙 보유 (매수가 ${entryPrice.toLocaleString()}원)`);
     document.getElementById('swing-name').value = '';
     document.getElementById('swing-code').value = '';
     document.getElementById('swing-entry-price').value = '';
-  } else { alert('이미 추가된 종목입니다.'); }
+  } else {
+    alert('이미 추가된 종목입니다.');
+  }
 });
+
 document.getElementById('btn-buy-guide').addEventListener('click', openGuideModal);
 
 document.querySelectorAll('.tab-button').forEach(button => {
   button.addEventListener('click', () => setActiveTab(button.dataset.tab));
 });
 
+document.querySelectorAll('[data-buy-slot]').forEach(button => {
+  button.addEventListener('click', () => handleBuySlotChange(button.dataset.buySlot));
+});
+
+document.querySelectorAll('[data-sell-slot]').forEach(button => {
+  button.addEventListener('click', () => handleSellSlotChange(button.dataset.sellSlot));
+});
+
 document.getElementById('sell-universe-switch')?.addEventListener('click', event => {
   const button = event.target.closest('[data-sell-universe]');
   if (!button) return;
-  setSellUniverseMode(button.dataset.sellUniverse);
+  setSellUniverseMode(button.dataset.sellUniverse, activeSellSlot);
   renderSellStockCards();
   updateAnalyzeButtonState();
   updateCurrentTime();
 
-  const currentSellDetail = stockDetailMap[currentModalState.code];
+  const currentSellDetail = stockDetailMap[currentModalState.key];
   if (currentModalState.mode === 'sell' && currentSellDetail?.stock && !isSellStockVisible(currentSellDetail.stock)) {
     closeModal();
   }
@@ -73,7 +132,7 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   if (activeTab === 'buy') {
     saveAnalysisArchiveBeforeRecheck('buy');
     btn.disabled = true;
-    btn.innerHTML = '<span>⚡</span> 일괄 분석 중...';
+    btn.innerHTML = '<span>⚡</span> 두 페이지 일괄 분석 중...';
 
     try {
       await refreshLiveGapScore('매수 분석');
@@ -81,6 +140,7 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
       saveAnalysisArchiveAfterAnalysis('buy');
     } finally {
       btn.disabled = false;
+      renderBuyStockCards();
       updateAnalyzeButtonState();
       updateCurrentTime();
     }
@@ -98,28 +158,30 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   });
 
   btn.disabled = true;
-  btn.innerHTML = '<span>⚡</span> 분석 진행 중...';
+  btn.innerHTML = `<span>⚡</span> ${isBefore0908 ? '두 페이지 1차 분석' : '두 페이지 2차 분석'} 진행 중...`;
 
-  log(`▶ [현재 시각: ${timeStr}] 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
+  log(`▶ [현재 시각: ${timeStr}] 두 페이지 매도 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
   await refreshLiveGapScore('매도 분석');
 
-  const visibleCollections = getVisibleSellStockCollections();
-  const allStocks = getSellStocksForAnalysis(isBefore0908);
+  const allStocks = getAllSellStocksForAnalysis(isBefore0908);
+  const visibleCollections = NOTION_SLOT_IDS.map(slotId => ({
+    slotId,
+    label: getSlotLabel(slotId),
+    collections: getVisibleSellStockCollections(slotId, getSellUniverseMode(slotId))
+  }));
 
   if (!allStocks.length) {
-    log('<span style="color:var(--text-warning)">ℹ️ 현재 선택한 매도 대상에 분석할 종목이 없습니다. 매수 카드에서 매도 추적을 켜거나 전체 후보 보기를 선택해주세요.</span>');
+    log('<span style="color:var(--text-warning)">ℹ️ 두 페이지 모두 현재 분석할 매도 대상이 없습니다. 매수 카드에서 매도 추적을 켜거나 전체 후보 보기를 선택해주세요.</span>');
     btn.disabled = false;
     updateAnalyzeButtonState();
     updateCurrentTime();
     return;
   }
 
-  if (isBefore0908 && visibleCollections.pullback.length > 0) {
-    log(`ℹ️ 1차 분석: 눌림목 ${visibleCollections.pullback.length}개 종목은 9:08 이후에 분석됩니다.`);
-  }
-  if (visibleCollections.swing.length > 0) {
-    log(`🔄 스윙 보유 ${visibleCollections.swing.length}개 종목 포함하여 분석합니다.`);
-  }
+  visibleCollections.forEach(({ label, collections }) => {
+    const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
+    log(`ℹ️ ${label}: 분석 대상 ${sellCount}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
+  });
 
   for (const stock of allStocks) {
     await analyzeStock(stock, isBefore0908);
@@ -130,16 +192,20 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
     isBefore0908,
     timeLabel: timeStr
   });
-  log('✅ 모든 종목의 시그널 분석이 완료되었습니다.');
+  renderSellStockCards();
+  log('✅ 두 페이지 매도 분석이 완료되었습니다.');
   btn.disabled = false;
-  btn.innerHTML = '<span>⚡</span> 다시 분석';
   updateAnalyzeButtonState();
   updateCurrentTime();
 });
+
 window.addEventListener('DOMContentLoaded', () => {
-  const savedUrl = localStorage.getItem('savedNotionUrl');
-  if (savedUrl) {
-    document.getElementById('notion-url').value = savedUrl;
+  const savedUrls = readSavedNotionUrls();
+  setNotionUrlInputValue('slotA', savedUrls.slotA);
+  setNotionUrlInputValue('slotB', savedUrls.slotB);
+  syncSlotSwitchers();
+
+  if (savedUrls.slotA || savedUrls.slotB) {
     fetchNotionData();
   } else {
     renderAll();

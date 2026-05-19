@@ -1,12 +1,14 @@
 // CORS Proxy to bypass Naver's block (여러 개의 프록시 서버를 두어 안정성을 높임)
 const PROXIES = [
-  'https://api.allorigins.win/raw?url=',
   'https://api.codetabs.com/v1/proxy?quest=',
+  'https://api.allorigins.win/raw?url=',
   'https://corsproxy.io/?'
 ];
 
 const ANALYSIS_ARCHIVE_KEY = 'stockAnalyzePreviousAnalysisSnapshotsV1';
 const SELL_TRACKING_STATE_KEY = 'stockAnalyzeSellTrackingStateV1';
+const SAVED_NOTION_URLS_KEY = 'stockAnalyzeSavedNotionUrlsV2';
+const LEGACY_SAVED_NOTION_URL_KEY = 'savedNotionUrl';
 
 const RULE_GUIDE = {
   regimes: [

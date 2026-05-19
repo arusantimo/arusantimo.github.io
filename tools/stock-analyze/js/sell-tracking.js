@@ -1,17 +1,25 @@
 function createDefaultSellTrackingState() {
   return {
     universeMode: 'actual',
-    trackedCodes: []
+    trackedEntryKeys: []
   };
 }
 
-function normalizeSellTrackingState(state) {
+function normalizeTrackedEntryKeys(state = {}, slotId = activeSellSlot) {
+  const source = state && typeof state === 'object' ? state : {};
   const next = createDefaultSellTrackingState();
-  if (!state || typeof state !== 'object') return next;
-  next.universeMode = state.universeMode === 'all' ? 'all' : 'actual';
-  next.trackedCodes = Array.isArray(state.trackedCodes)
-    ? [...new Set(state.trackedCodes.map(code => String(code || '').trim()).filter(Boolean))]
+  next.universeMode = source.universeMode === 'all' ? 'all' : 'actual';
+
+  const legacyTrackedCodes = Array.isArray(source.trackedCodes)
+    ? source.trackedCodes.map(code => buildEntryKey(slotId, code))
     : [];
+  const trackedEntryKeys = Array.isArray(source.trackedEntryKeys) ? source.trackedEntryKeys : [];
+
+  next.trackedEntryKeys = [...new Set(
+    [...trackedEntryKeys, ...legacyTrackedCodes]
+      .map(key => getEntryKey(key, slotId))
+      .filter(Boolean)
+  )];
   return next;
 }
 
@@ -37,63 +45,92 @@ function writeSellTrackingStore(store) {
   }
 }
 
-function getSellTrackingScopeKey() {
-  return currentNotionPageId || '__manual__';
+function getSellTrackingScopeKey(slotId = activeSellSlot) {
+  const normalizedSlotId = normalizeSlotId(slotId);
+  const pageId = getNotionPageState(normalizedSlotId).notionPageId || '__manual__';
+  return `${normalizedSlotId}:${pageId}`;
 }
 
-function getCurrentSellTrackingState() {
-  const store = readSellTrackingStore();
-  return normalizeSellTrackingState(store[getSellTrackingScopeKey()]);
+function getLegacySellTrackingScopeKey(slotId = activeSellSlot) {
+  const normalizedSlotId = normalizeSlotId(slotId);
+  if (normalizedSlotId !== 'slotA') return '';
+  return getNotionPageState(normalizedSlotId).notionPageId || '__manual__';
 }
 
-function updateCurrentSellTrackingState(updater) {
+function getCurrentSellTrackingState(slotId = activeSellSlot) {
+  const normalizedSlotId = normalizeSlotId(slotId);
   const store = readSellTrackingStore();
-  const scopeKey = getSellTrackingScopeKey();
-  const currentState = normalizeSellTrackingState(store[scopeKey]);
-  const nextState = normalizeSellTrackingState(
-    typeof updater === 'function' ? updater(currentState) : { ...currentState, ...updater }
+  const currentScope = getSellTrackingScopeKey(normalizedSlotId);
+  if (store[currentScope]) {
+    return normalizeTrackedEntryKeys(store[currentScope], normalizedSlotId);
+  }
+
+  const legacyScope = getLegacySellTrackingScopeKey(normalizedSlotId);
+  if (legacyScope && store[legacyScope]) {
+    const migrated = normalizeTrackedEntryKeys(store[legacyScope], normalizedSlotId);
+    store[currentScope] = migrated;
+    delete store[legacyScope];
+    writeSellTrackingStore(store);
+    return migrated;
+  }
+
+  return normalizeTrackedEntryKeys(null, normalizedSlotId);
+}
+
+function updateCurrentSellTrackingState(updater, slotId = activeSellSlot) {
+  const normalizedSlotId = normalizeSlotId(slotId);
+  const store = readSellTrackingStore();
+  const scopeKey = getSellTrackingScopeKey(normalizedSlotId);
+  const currentState = normalizeTrackedEntryKeys(store[scopeKey], normalizedSlotId);
+  const nextState = normalizeTrackedEntryKeys(
+    typeof updater === 'function' ? updater(currentState) : { ...currentState, ...updater },
+    normalizedSlotId
   );
   store[scopeKey] = nextState;
   writeSellTrackingStore(store);
   return nextState;
 }
 
-function getSellUniverseMode() {
-  return getCurrentSellTrackingState().universeMode;
+function getSellUniverseMode(slotId = activeSellSlot) {
+  return getCurrentSellTrackingState(slotId).universeMode;
 }
 
-function setSellUniverseMode(mode) {
+function setSellUniverseMode(mode, slotId = activeSellSlot) {
   return updateCurrentSellTrackingState(state => ({
     ...state,
     universeMode: mode === 'all' ? 'all' : 'actual'
-  }));
+  }), slotId);
 }
 
-function getTrackedSellCodes() {
-  return new Set(getCurrentSellTrackingState().trackedCodes);
+function getTrackedSellEntryKeys(slotId = activeSellSlot) {
+  return new Set(getCurrentSellTrackingState(slotId).trackedEntryKeys);
 }
 
-function isBuyEntryTrackedForSell(code) {
-  return getTrackedSellCodes().has(String(code || '').trim());
+function isBuyEntryTrackedForSell(entryOrKey, slotId = null) {
+  const normalizedSlotId = normalizeSlotId(slotId || (typeof entryOrKey === 'object' ? entryOrKey.slotId : activeSellSlot));
+  return getTrackedSellEntryKeys(normalizedSlotId).has(getEntryKey(entryOrKey, normalizedSlotId));
 }
 
-function setBuyEntryTrackedForSell(code, tracked) {
-  const normalizedCode = String(code || '').trim();
-  if (!normalizedCode) return getCurrentSellTrackingState();
+function setBuyEntryTrackedForSell(entryOrKey, tracked, slotId = null) {
+  const normalizedSlotId = normalizeSlotId(slotId || (typeof entryOrKey === 'object' ? entryOrKey.slotId : activeSellSlot));
+  const entryKey = getEntryKey(entryOrKey, normalizedSlotId);
+  if (!entryKey) return getCurrentSellTrackingState(normalizedSlotId);
+
   return updateCurrentSellTrackingState(state => {
-    const nextCodes = new Set(state.trackedCodes);
-    if (tracked) nextCodes.add(normalizedCode);
-    else nextCodes.delete(normalizedCode);
+    const nextKeys = new Set(state.trackedEntryKeys);
+    if (tracked) nextKeys.add(entryKey);
+    else nextKeys.delete(entryKey);
     return {
       ...state,
-      trackedCodes: [...nextCodes]
+      trackedEntryKeys: [...nextKeys]
     };
-  });
+  }, normalizedSlotId);
 }
 
-function toggleBuyEntryTrackedForSell(code) {
-  const tracked = !isBuyEntryTrackedForSell(code);
-  setBuyEntryTrackedForSell(code, tracked);
+function toggleBuyEntryTrackedForSell(entryOrKey, slotId = null) {
+  const normalizedSlotId = normalizeSlotId(slotId || (typeof entryOrKey === 'object' ? entryOrKey.slotId : activeSellSlot));
+  const tracked = !isBuyEntryTrackedForSell(entryOrKey, normalizedSlotId);
+  setBuyEntryTrackedForSell(entryOrKey, tracked, normalizedSlotId);
   return tracked;
 }
 
@@ -101,14 +138,12 @@ function isAlwaysVisibleSellStock(stock) {
   return Boolean(stock?.type === 'swing' || stock?.manual || stock?.source === 'manual');
 }
 
-function isSellStockVisible(stock, universeMode = getSellUniverseMode()) {
+function isSellStockVisible(stock, universeMode = getSellUniverseMode(stock?.slotId || activeSellSlot)) {
   if (!stock) return false;
   if (isAlwaysVisibleSellStock(stock)) return true;
   if (universeMode === 'all') return true;
 
-  // 매수 분석기에서 조정 등급(primaryGrade)이 A 또는 S인 우량 후보 종목은
-  // 수동 추적 버튼을 누르지 않아도 실매수 종목 목록에 자동으로 노출시킵니다.
-  const entry = typeof getEntryByCode === 'function' ? getEntryByCode(stock.code) : null;
+  const entry = stock.type === 'swing' ? null : getEntryByCode(stock.entryKey || stock.code, stock.slotId);
   if (entry) {
     const presentation = typeof getBuyPresentation === 'function' ? getBuyPresentation(entry) : null;
     const primaryGrade = presentation?.primaryGrade || entry.grade || '';
@@ -117,173 +152,126 @@ function isSellStockVisible(stock, universeMode = getSellUniverseMode()) {
     }
   }
 
-  return isBuyEntryTrackedForSell(stock.code);
+  return isBuyEntryTrackedForSell(stock.entryKey || stock.code, stock.slotId);
 }
 
-function getSellStocksByType(type, universeMode = getSellUniverseMode()) {
-  return (stocks[type] || []).filter(stock => isSellStockVisible(stock, universeMode));
+function getSellStocksByType(type, slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
+  const normalizedSlotId = normalizeSlotId(slotId);
+  return (stocks[type] || [])
+    .filter(stock => stock.slotId === normalizedSlotId)
+    .map(stock => ensureStockIdentity(stock, normalizedSlotId))
+    .filter(stock => isSellStockVisible(stock, universeMode));
 }
 
-function getVisibleSellStockCollections(universeMode = getSellUniverseMode()) {
+function getVisibleSellStockCollections(slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
   return {
-    swing: getSellStocksByType('swing', universeMode),
-    pullback: getSellStocksByType('pullback', universeMode),
-    momentum: getSellStocksByType('momentum', universeMode),
-    reversal: getSellStocksByType('reversal', universeMode)
+    swing: getSellStocksByType('swing', slotId, universeMode),
+    pullback: getSellStocksByType('pullback', slotId, universeMode),
+    momentum: getSellStocksByType('momentum', slotId, universeMode),
+    reversal: getSellStocksByType('reversal', slotId, universeMode)
   };
 }
 
-function getVisibleSellStocksList(universeMode = getSellUniverseMode()) {
-  const collections = getVisibleSellStockCollections(universeMode);
+function getVisibleSellStocksList(slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
+  const collections = getVisibleSellStockCollections(slotId, universeMode);
   return [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
 }
 
-function getSellStocksForAnalysis(isBefore0908, universeMode = getSellUniverseMode()) {
-  const collections = getVisibleSellStockCollections(universeMode);
+function getAllSellStocks() {
+  return ['swing', 'pullback', 'momentum', 'reversal']
+    .flatMap(type => stocks[type] || [])
+    .map(stock => ensureStockIdentity(stock, stock.slotId));
+}
+
+function getSellStocksForAnalysis(isBefore0908, slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
+  const collections = getVisibleSellStockCollections(slotId, universeMode);
   return isBefore0908
     ? [...collections.swing, ...collections.momentum, ...collections.reversal]
     : [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
 }
 
-function getVisibleSellCodeSet(isBefore0908 = null, universeMode = getSellUniverseMode()) {
+function getAllSellStocksForAnalysis(isBefore0908) {
+  return NOTION_SLOT_IDS.flatMap(slotId => getSellStocksForAnalysis(isBefore0908, slotId, getSellUniverseMode(slotId)));
+}
+
+function getVisibleSellCodeSet(slotId = activeSellSlot, isBefore0908 = null, universeMode = getSellUniverseMode(slotId)) {
   const visibleStocks = isBefore0908 === null
-    ? getVisibleSellStocksList(universeMode)
-    : getSellStocksForAnalysis(isBefore0908, universeMode);
-  return new Set(visibleStocks.map(stock => stock.code));
+    ? getVisibleSellStocksList(slotId, universeMode)
+    : getSellStocksForAnalysis(isBefore0908, slotId, universeMode);
+  return new Set(visibleStocks.map(stock => stock.entryKey));
 }
 
-function getSellStockByCode(code) {
-  const normalizedCode = String(code || '').trim();
-  return ['swing', 'pullback', 'momentum', 'reversal']
-    .flatMap(type => stocks[type] || [])
-    .find(stock => stock.code === normalizedCode) || null;
+function getSellStockByCode(codeOrEntryKey, slotId = null) {
+  const parsed = parseEntryKey(codeOrEntryKey, slotId || activeSellSlot);
+  return getAllSellStocks().find(stock => stock.entryKey === parsed.entryKey || (stock.slotId === parsed.slotId && stock.code === parsed.code)) || null;
 }
 
-function getSellUniverseSummary() {
-  const actualCollections = getVisibleSellStockCollections('actual');
-  const allCollections = getVisibleSellStockCollections('all');
+function getSellUniverseSummary(slotId = activeSellSlot) {
+  const actualCollections = getVisibleSellStockCollections(slotId, 'actual');
+  const allCollections = getVisibleSellStockCollections(slotId, 'all');
   const countStocks = collections => Object.values(collections).reduce((sum, arr) => sum + arr.length, 0);
   return {
-    mode: getSellUniverseMode(),
-    trackedEntryCount: getTrackedSellCodes().size,
+    mode: getSellUniverseMode(slotId),
+    trackedEntryCount: getTrackedSellEntryKeys(slotId).size,
     actualCount: countStocks(actualCollections),
     allCount: countStocks(allCollections)
   };
 }
 
-function rebuildSellStocksFromSnapshot() {
-  const manualPullback = stocks.pullback.filter(stock => stock.manual);
-  const manualMomentum = stocks.momentum.filter(stock => stock.manual);
-  const manualReversal = (stocks.reversal || []).filter(stock => stock.manual);
-
+function rebuildSellStocksFromSnapshots() {
   clearSellDetailMap();
 
-  stocks.pullback = [
-    ...notionSnapshot.pullbackEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'pullback', strategy: 'pullback', source: 'notion' })),
-    ...manualPullback.filter(stock => !notionSnapshot.pullbackEntries.some(entry => entry.code === stock.code))
-  ];
+  NOTION_SLOT_IDS.forEach(slotId => {
+    const snapshot = getSlotSnapshot(slotId);
+    const manualPullback = (stocks.pullback || []).filter(stock => stock.manual && stock.slotId === slotId);
+    const manualMomentum = (stocks.momentum || []).filter(stock => stock.manual && stock.slotId === slotId);
+    const manualReversal = (stocks.reversal || []).filter(stock => stock.manual && stock.slotId === slotId);
+    const manualSwing = (stocks.swing || []).filter(stock => stock.manual && stock.slotId === slotId);
 
-  stocks.momentum = [
-    ...notionSnapshot.momentumEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'momentum', strategy: 'momentum', source: 'notion' })),
-    ...manualMomentum.filter(stock => !notionSnapshot.momentumEntries.some(entry => entry.code === stock.code))
-  ];
-
-  stocks.reversal = [
-    ...notionSnapshot.reversalEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'reversal', strategy: 'reversal', source: 'notion' })),
-    ...manualReversal.filter(stock => !notionSnapshot.reversalEntries.some(entry => entry.code === stock.code))
-  ];
-
-  stocks.swing = notionSnapshot.swingEntries.map(entry => ({
-    name: entry.name,
-    code: entry.code,
-    type: 'swing',
-    strategy: 'swing',
-    source: 'notion',
-    entryPrice: entry.entryPrice,
-    buyDate: entry.buyDate,
-    status: entry.status
-  }));
-}
-
-function buildSellAnalysisArchive(isBefore0908, timeLabel = '') {
-  const stage = isBefore0908 ? 'stage1' : 'stage2';
-  const visibleCodes = getVisibleSellCodeSet(isBefore0908);
-  const details = Object.values(stockDetailMap)
-    .filter(detail => detail?.mode === 'sell' && detail.isBefore0908 === isBefore0908 && visibleCodes.has(detail.stock?.code))
-    .map(detail => ({
-      code: detail.stock?.code || '',
-      stock: detail.stock,
-      data: detail.data,
-      indicators: detail.indicators,
-      decision: detail.decision,
-      actionStage: detail.actionStage,
-      triggeredRule: detail.triggeredRule,
-      targets: detail.targets,
-      gainRate: detail.gainRate,
-      lossManagement: detail.lossManagement,
-      isBefore0908: detail.isBefore0908,
-      gapProfile: detail.gapProfile,
-      entryGrade: detail.entryGrade || '',
-      entryStatusLabel: detail.entryStatusLabel || '',
-      signalSeverity: detail.signalSeverity || 'info',
-      signalBucket: detail.signalBucket || 'warning',
-      sellScore: Number.isFinite(detail.sellScore) ? detail.sellScore : 0,
-      scoreDirection: detail.scoreDirection || SELL_SCORE_DIRECTION,
-      scoreBreakdown: Array.isArray(detail.scoreBreakdown) ? detail.scoreBreakdown : [],
-      actionPlan: detail.actionPlan || null
-    }));
-
-  if (!details.length) return null;
-
-  return {
-    type: 'sell',
-    stage,
-    label: `매도 ${isBefore0908 ? '1차' : '2차'} 분석`,
-    savedAt: new Date().toISOString(),
-    analysisTime: timeLabel,
-    count: details.length,
-    liveGapState,
-    notionPageId: currentNotionPageId || '',
-    universeMode: getSellUniverseMode(),
-    trackingScope: getSellTrackingScopeKey(),
-    details
-  };
-}
-
-function isSellArchiveScopeCompatible(archiveItem) {
-  if (!archiveItem || typeof archiveItem !== 'object') return false;
-
-  const currentScope = getSellTrackingScopeKey();
-  const archiveScope = String(archiveItem.trackingScope || '').trim();
-  if (archiveScope) return archiveScope === currentScope;
-
-  if ('notionPageId' in archiveItem) {
-    return (archiveItem.notionPageId || '__manual__') === currentScope;
-  }
-
-  return !currentNotionPageId;
-}
-
-function restoreSellAnalysisArchive(archiveItem) {
-  if (!archiveItem?.details?.length || !isSellArchiveScopeCompatible(archiveItem)) return false;
-
-  clearSellDetailMap();
-  archiveItem.details.forEach(savedDetail => {
-    ensureArchivedSellStock(savedDetail.stock);
+    replaceStocksForSlot(slotId, {
+      pullback: [
+        ...snapshot.pullbackEntries.map(entry => ensureStockIdentity({
+          name: entry.name,
+          code: entry.code,
+          type: 'pullback',
+          strategy: 'pullback',
+          source: 'notion'
+        }, slotId)),
+        ...manualPullback.filter(stock => !snapshot.pullbackEntries.some(entry => entry.code === stock.code))
+      ],
+      momentum: [
+        ...snapshot.momentumEntries.map(entry => ensureStockIdentity({
+          name: entry.name,
+          code: entry.code,
+          type: 'momentum',
+          strategy: 'momentum',
+          source: 'notion'
+        }, slotId)),
+        ...manualMomentum.filter(stock => !snapshot.momentumEntries.some(entry => entry.code === stock.code))
+      ],
+      reversal: [
+        ...snapshot.reversalEntries.map(entry => ensureStockIdentity({
+          name: entry.name,
+          code: entry.code,
+          type: 'reversal',
+          strategy: 'reversal',
+          source: 'notion'
+        }, slotId)),
+        ...manualReversal.filter(stock => !snapshot.reversalEntries.some(entry => entry.code === stock.code))
+      ],
+      swing: [
+        ...snapshot.swingEntries.map(entry => ensureStockIdentity({
+          name: entry.name,
+          code: entry.code,
+          type: 'swing',
+          strategy: 'swing',
+          source: 'notion',
+          entryPrice: entry.entryPrice,
+          buyDate: entry.buyDate,
+          status: entry.status
+        }, slotId)),
+        ...manualSwing.filter(stock => !snapshot.swingEntries.some(entry => entry.code === stock.code))
+      ]
+    });
   });
-  renderSellStockCards();
-
-  archiveItem.details.forEach(savedDetail => {
-    const stock = ensureArchivedSellStock(savedDetail.stock);
-    if (!stock || !isSellStockVisible(stock)) return;
-    const restoredDetail = {
-      ...savedDetail,
-      mode: 'sell',
-      stock
-    };
-    stockDetailMap[stock.code] = restoredDetail;
-    renderSellDetailToCard(restoredDetail);
-  });
-
-  return true;
 }

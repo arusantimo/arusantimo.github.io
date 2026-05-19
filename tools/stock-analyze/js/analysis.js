@@ -1,35 +1,64 @@
 function rebuildSellStocksFromSnapshot() {
-  const manualPullback = stocks.pullback.filter(stock => stock.manual);
-  const manualMomentum = stocks.momentum.filter(stock => stock.manual);
-  const manualReversal = (stocks.reversal || []).filter(stock => stock.manual);
+  if (typeof rebuildSellStocksFromSnapshots === 'function') {
+    rebuildSellStocksFromSnapshots();
+    return;
+  }
 
-  stocks.pullback = [
-    ...notionSnapshot.pullbackEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'pullback', strategy: 'pullback', source: 'notion' })),
-    ...manualPullback.filter(stock => !notionSnapshot.pullbackEntries.some(entry => entry.code === stock.code))
-  ];
-
-  stocks.momentum = [
-    ...notionSnapshot.momentumEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'momentum', strategy: 'momentum', source: 'notion' })),
-    ...manualMomentum.filter(stock => !notionSnapshot.momentumEntries.some(entry => entry.code === stock.code))
-  ];
-
-  stocks.reversal = [
-    ...notionSnapshot.reversalEntries.map(entry => ({ name: entry.name, code: entry.code, type: 'reversal', strategy: 'reversal', source: 'notion' })),
-    ...manualReversal.filter(stock => !notionSnapshot.reversalEntries.some(entry => entry.code === stock.code))
-  ];
-
-  stocks.swing = notionSnapshot.swingEntries.map(entry => ({
-    name: entry.name, code: entry.code, type: 'swing', strategy: 'swing', source: 'notion',
-    entryPrice: entry.entryPrice, buyDate: entry.buyDate, status: entry.status
-  }));
+  const visibleSnapshot = getActiveSellSnapshot();
+  replaceStocksForSlot(activeSellSlot, {
+    pullback: visibleSnapshot.pullbackEntries.map(entry => ensureStockIdentity({
+      name: entry.name,
+      code: entry.code,
+      type: 'pullback',
+      strategy: 'pullback',
+      source: 'notion'
+    }, activeSellSlot)),
+    momentum: visibleSnapshot.momentumEntries.map(entry => ensureStockIdentity({
+      name: entry.name,
+      code: entry.code,
+      type: 'momentum',
+      strategy: 'momentum',
+      source: 'notion'
+    }, activeSellSlot)),
+    reversal: visibleSnapshot.reversalEntries.map(entry => ensureStockIdentity({
+      name: entry.name,
+      code: entry.code,
+      type: 'reversal',
+      strategy: 'reversal',
+      source: 'notion'
+    }, activeSellSlot)),
+    swing: visibleSnapshot.swingEntries.map(entry => ensureStockIdentity({
+      name: entry.name,
+      code: entry.code,
+      type: 'swing',
+      strategy: 'swing',
+      source: 'notion',
+      entryPrice: entry.entryPrice,
+      buyDate: entry.buyDate,
+      status: entry.status
+    }, activeSellSlot))
+  });
 }
 
-function getEntryByCode(code) {
-  return [...notionSnapshot.pullbackEntries, ...notionSnapshot.momentumEntries, ...notionSnapshot.reversalEntries].find(entry => entry.code === code);
+function getVisibleBuyEntries(slotId = activeBuySlot) {
+  const snapshot = getSlotSnapshot(slotId);
+  return [
+    ...snapshot.pullbackEntries,
+    ...snapshot.momentumEntries,
+    ...snapshot.reversalEntries
+  ].map(entry => ensureEntryIdentity(entry, slotId));
 }
 
 function getAllBuyEntries() {
-  return [...notionSnapshot.pullbackEntries, ...notionSnapshot.momentumEntries, ...notionSnapshot.reversalEntries];
+  return NOTION_SLOT_IDS.flatMap(slotId => getVisibleBuyEntries(slotId));
+}
+
+function getEntryByCode(codeOrEntryKey, slotId = null) {
+  const parsed = parseEntryKey(codeOrEntryKey, slotId || (activeTab === 'sell' ? activeSellSlot : activeBuySlot));
+  const entries = slotId || String(codeOrEntryKey ?? '').includes(':')
+    ? getVisibleBuyEntries(parsed.slotId)
+    : getAllBuyEntries();
+  return entries.find(entry => entry.entryKey === parsed.entryKey || entry.code === parsed.code) || null;
 }
 
 function summarizeGateStatus(entry) {
@@ -65,16 +94,14 @@ function getBuyVerdictClass(entry) {
   return getBuyVerdictClassFromGrade(entry.grade);
 }
 async function analyzeStock(stock, isBefore0908) {
-  log(`- [${stock.name}] 네이버 증권 데이터 파싱 중...`);
+  const stockLabel = stock.slotLabel || getSlotLabel(stock.slotId);
+  log(`- [${stockLabel} · ${stock.name}] 네이버 증권 데이터 파싱 중...`);
   const maxRetries = 2;
 
   for (let attempt = 1; attempt <= maxRetries + 1; attempt += 1) {
     try {
-      const proxy = PROXIES[(attempt - 1) % PROXIES.length];
       const basicUrl = `https://m.stock.naver.com/api/stock/${stock.code}/basic`;
-      const basicRes = await fetch(proxy + encodeURIComponent(basicUrl));
-      if (!basicRes.ok) throw new Error(`basic API error (${basicRes.status})`);
-      const basicJson = await basicRes.json();
+      const basicJson = await fetchJsonWithProxyFallback(basicUrl, { timeoutMs: 8000 });
 
       const parseNum = value => parseInt(String(value).replace(/,/g, ''), 10) || 0;
       const parseFloat2 = value => parseFloat(String(value).replace(/,/g, '').replace('%', '')) || 0;
@@ -83,13 +110,11 @@ async function analyzeStock(stock, isBefore0908) {
       const chgRateRaw = parseFloat2(basicJson.fluctuationsRatio ?? basicJson.changeRate ?? 0);
 
       const [intRes, priceRes] = await Promise.all([
-        fetch(proxy + encodeURIComponent(`https://m.stock.naver.com/api/stock/${stock.code}/integration`)),
-        fetch(proxy + encodeURIComponent(`https://m.stock.naver.com/api/stock/${stock.code}/price?pageSize=60&page=1`))
+        fetchJsonWithProxyFallback(`https://m.stock.naver.com/api/stock/${stock.code}/integration`, { timeoutMs: 8000 }),
+        fetchJsonWithProxyFallback(`https://m.stock.naver.com/api/stock/${stock.code}/price?pageSize=120&page=1`, { timeoutMs: 8000 })
       ]);
-      if (!intRes.ok) throw new Error(`integration API error (${intRes.status})`);
-      if (!priceRes.ok) throw new Error(`price API error (${priceRes.status})`);
-      const intJson = await intRes.json();
-      const priceJson = await priceRes.json();
+      const intJson = intRes;
+      const priceJson = priceRes;
 
       const findInfo = code => (intJson.totalInfos ?? []).find(info => info.code === code);
       const prevClose = parseNum(findInfo('lastClosePrice')?.value ?? 0) || currentPrice;
@@ -128,8 +153,7 @@ async function analyzeStock(stock, isBefore0908) {
       const foreignNet = parseNum(todayDeal.foreignerPureBuyQuant ?? 0);
       const institutionNet = parseNum(todayDeal.organPureBuyQuant ?? 0);
 
-      // 와이코프 분석용 60일 시계열 보강 (네이버 응답이 최신순이므로 역순으로 시간 정렬)
-      const ordered = deals.slice().reverse().slice(-60);
+      const ordered = deals.slice().reverse().slice(-STOCK_ANALYZE_WYCKOFF_HISTORY_DAYS);
       const foreignNetSeries = ordered.map(row => parseNum(row.foreignerPureBuyQuant ?? 0));
       const instNetSeries = ordered.map(row => parseNum(row.organPureBuyQuant ?? 0));
       const ohlcvSeries = priceHistory
@@ -143,29 +167,28 @@ async function analyzeStock(stock, isBefore0908) {
           close: parseNum(row.closePrice),
           volume: parseNum(row.accumulatedTradingVolume)
         }))
-        .filter(row => row.close > 0);
-
-      let wyckoff = { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족', metrics: {} };
-      if (typeof classifyWyckoffPhase === 'function' && ohlcvSeries.length >= 30) {
-        wyckoff = classifyWyckoffPhase({
-          ohlcv: ohlcvSeries,
-          foreignNet: foreignNetSeries,
-          instNet: instNetSeries
-        });
-      }
+        .filter(row => row.close > 0)
+        .slice(-STOCK_ANALYZE_WYCKOFF_HISTORY_DAYS);
+      const wyckoff = typeof buildWyckoffSignalFromNaverData === 'function'
+        ? buildWyckoffSignalFromNaverData({
+          priceHistory,
+          dealTrendInfos: deals,
+          fallbackReason: '데이터 부족/수집 실패'
+        })
+        : { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족/수집 실패', metrics: {} };
 
       const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction, foreignNetSeries, instNetSeries, ohlcvSeries, wyckoff };
-      log(`- [${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원, 20MA: ${ma20.toLocaleString()}원, 외인: ${foreignNet.toLocaleString()}주)`);
+      log(`- [${stockLabel} · ${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원, 20MA: ${ma20.toLocaleString()}원, 외인: ${foreignNet.toLocaleString()}주)`);
       applyRules(stock, data, isBefore0908);
       return;
     } catch (error) {
       if (attempt <= maxRetries) {
-        log(`<span style="color:var(--text-warning)">- [${stock.name}] 통신 지연 (${attempt}회 실패). 다른 우회 서버로 재시도합니다...</span>`);
+        log(`<span style="color:var(--text-warning)">- [${stockLabel} · ${stock.name}] 통신 지연 (${attempt}회 실패 / ${escapeHtml(error?.message || 'unknown error')}). 다른 우회 서버로 재시도합니다...</span>`);
         await new Promise(resolve => setTimeout(resolve, 2000));
       } else {
-        log(`<span style="color:var(--text-danger)">- [${stock.name}] 데이터 수집 최종 실패</span>`);
+        log(`<span style="color:var(--text-danger)">- [${stockLabel} · ${stock.name}] 데이터 수집 최종 실패 (${escapeHtml(error?.message || 'unknown error')})</span>`);
         console.error(error);
-        updateCardError(stock.code);
+        updateCardError(stock.entryKey || buildEntryKey(stock.slotId, stock.code));
       }
     }
   }
@@ -530,7 +553,7 @@ function buildIndicators(stock, data, isBefore0908) {
     const status = phase === 'E' ? 'triggered' : (phase === 'NEUTRAL' ? 'unknown' : 'clear');
     indicators.push({
       title: '와이코프 매집/분배 단계',
-      criterion: '60일 OHLCV + 외인/기관 누적 매수로 Phase A~E 자동 판정 (B=매집, D=상승, E=분배)',
+      criterion: '120일 OHLCV + 외인/기관 누적 매수로 Phase A~E 자동 판정 (B=매집, D=상승, E=분배)',
       status,
       result: phaseLabel,
       value: data.wyckoff.reason || ''

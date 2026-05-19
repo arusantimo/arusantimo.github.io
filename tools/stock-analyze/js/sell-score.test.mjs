@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 function loadSellScoreContext() {
+  const wyckoffCode = fs.readFileSync(new URL('./wyckoff-bias.js', import.meta.url), 'utf8');
   const code = fs.readFileSync(new URL('./sell-score.js', import.meta.url), 'utf8');
   const context = {
     console,
@@ -11,6 +12,7 @@ function loadSellScoreContext() {
     formatWon: value => `${Math.round(Number(value) || 0).toLocaleString()}원`
   };
   vm.createContext(context);
+  vm.runInContext(wyckoffCode, context);
   vm.runInContext(code, context);
   return context;
 }
@@ -106,6 +108,139 @@ test('프리마켓 보수 운용 partial 신호는 최소 70점으로 유지된�
 
   assert.equal(result.sellScore, 70);
   assert.equal(result.actionPlan.bucket, 'trim70');
+});
+
+test('Phase E는 매도 점수를 가산한다', () => {
+  const { buildSellExecutionContext } = loadSellScoreContext();
+  const baseline = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9500 } },
+      gapProfile: {}
+    },
+    data: {
+      currentPrice: 10000,
+      openPrice: 10050,
+      strength: 90,
+      wyckoff: { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족/수집 실패' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9500, fallbackStopPrice: 9500, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+  const result = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9500 } },
+      gapProfile: {}
+    },
+    data: {
+      currentPrice: 10000,
+      openPrice: 10050,
+      strength: 90,
+      wyckoff: { phase: 'E', confidence: 0.7, reason: '분배' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9500, fallbackStopPrice: 9500, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+
+  assert.equal(baseline.sellScore, 9);
+  assert.equal(result.sellScore, 24);
+  assert.equal(result.sellScore - baseline.sellScore, 15);
+  assert.ok(result.scoreBreakdown.some(item => item.code === 'S-S6' && item.points === 15));
+});
+
+test('Phase D는 과도한 매도 점수를 완화하지만 하드 손절을 덮지 않는다', () => {
+  const { buildSellExecutionContext } = loadSellScoreContext();
+  const neutral = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9800 } },
+      gapProfile: {}
+    },
+    data: {
+      currentPrice: 10050,
+      openPrice: 10000,
+      strength: 70,
+      wyckoff: { phase: 'NEUTRAL', confidence: 0, reason: '중립' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9800, fallbackStopPrice: 9800, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+  const normal = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9800 } },
+      gapProfile: {}
+    },
+    data: {
+      currentPrice: 10050,
+      openPrice: 10000,
+      strength: 70,
+      wyckoff: { phase: 'D', confidence: 0.68, reason: '상승 추세' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9800, fallbackStopPrice: 9800, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+  const hardExit = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: { severity: 'hard', code: 'H1', title: '유효 손절가 이탈', result: '즉시 전량 매도' },
+      targets: { stopLoss: { price: 9800 } }
+    },
+    data: {
+      currentPrice: 9700,
+      openPrice: 10000,
+      strength: 70,
+      wyckoff: { phase: 'D', confidence: 0.68, reason: '상승 추세' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9800, fallbackStopPrice: 9800, rules: [] }
+  });
+
+  assert.equal(neutral.sellScore, 19);
+  assert.equal(normal.sellScore, 9);
+  assert.equal(neutral.sellScore - normal.sellScore, 10);
+  assert.ok(normal.scoreBreakdown.some(item => item.code === 'S-S6' && item.points === -10));
+  assert.equal(hardExit.sellScore, 100);
+  assert.equal(hardExit.actionPlan.bucket, 'full_exit');
+});
+
+test('와이코프 데이터 부족은 기존 매도 점수를 유지한다', () => {
+  const { buildSellExecutionContext } = loadSellScoreContext();
+  const result = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9500 } },
+      gapProfile: {}
+    },
+    data: {
+      currentPrice: 10000,
+      openPrice: 10050,
+      strength: 90,
+      wyckoff: { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족/수집 실패' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9500, fallbackStopPrice: 9500, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+
+  assert.equal(result.sellScore, 9);
+  assert.ok(result.scoreBreakdown.some(item => item.code === 'S-S6' && item.points === 0));
 });
 
 test('단계형 익절 구간은 다음 단계 재평가 문구를 유지한다', () => {

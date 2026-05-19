@@ -170,7 +170,7 @@ function resolveSellSignalMeta(decision, actionStage, triggeredRule = null) {
 }
 
 function attachEntryContext(payload, stock, meta = {}) {
-  const entry = stock.type === 'swing' ? null : getEntryByCode(stock.code);
+  const entry = stock.type === 'swing' ? null : getEntryByCode(stock.entryKey || stock.code, stock.slotId);
   const signalMeta = resolveSellSignalMeta(payload.decision, payload.actionStage, payload.triggeredRule);
   const executionMeta = buildSellExecutionContext({
     stock,
@@ -194,12 +194,13 @@ function attachEntryContext(payload, stock, meta = {}) {
 }
 
 function buildIndicators(stock, data, isBefore0908) {
+  ensureStockIdentity(stock, stock.slotId);
   const indicators = [];
   let decision = 'hold';
   let actionStage = null;
   let triggeredRule = null;
 
-  const entry = getEntryByCode(stock.code);
+  const entry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
   const targets = parseTradePlanTargets(entry);
   const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
   const gainRate = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
@@ -553,40 +554,17 @@ function buildIndicators(stock, data, isBefore0908) {
 }
 
 function applyRules(stock, data, isBefore0908) {
-  const card = document.getElementById(`card-${stock.code}`);
-  if (!card) return;
-  const priceRow = document.getElementById(`price-row-${stock.code}`);
-  const meta = document.getElementById(`meta-${stock.code}`);
-  const planBox = document.getElementById(`plan-${stock.code}`);
-  const indBox = document.getElementById(`ind-${stock.code}`);
-  const badge = document.getElementById(`badge-${stock.code}`);
-
-  const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
-  const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
-  const absChg = Math.abs(data.chgRate).toFixed(2);
-
-  const entry = getEntryByCode(stock.code);
-  const entryPrice = stock.entryPrice || entry?.entryPriceValue || data.prevClose;
-  const gainFromEntry = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
-
-  priceRow.innerHTML = `
-    <span class="price">${data.currentPrice.toLocaleString()}원</span>
-    <span class="chg ${chgClass}" style="font-size:14px;font-weight:700">${chgPrefix}${absChg}%</span>
-    ${stock.type === 'swing' ? `<span class="chg ${gainFromEntry >= 0 ? 'up' : 'dn'}" style="font-size:12px;margin-left:8px">매수 대비 ${gainFromEntry >= 0 ? '+' : ''}${gainFromEntry.toFixed(2)}%</span>` : ''}
-  `;
-  meta.innerHTML = `
-    <span style="opacity:0.7">진입가:</span> <strong>${entryPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
-    <span style="opacity:0.7">시가:</span> <strong>${data.openPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
-    <span style="opacity:0.7">체결강도:</span> <strong>${data.strength !== null && data.strength !== undefined ? `${data.strength.toFixed(2)}%` : '미연동'}</strong>
-  `;
-
+  ensureStockIdentity(stock, stock.slotId);
+  const key = stock.entryKey || buildEntryKey(stock.slotId, stock.code);
+  const card = document.getElementById(getCardDomId(key));
+  const priceRow = document.getElementById(getPriceRowDomId(key));
+  const meta = document.getElementById(getMetaDomId(key));
+  const planBox = document.getElementById(getPlanDomId(key));
+  const indBox = document.getElementById(getIndicatorDomId(key));
+  const badge = document.getElementById(getBadgeDomId(key));
   const detail = buildIndicators(stock, data, isBefore0908);
-  if (planBox && !detail.targets) {
-    planBox.innerHTML = '<div class="scard-plan-empty">매매 단계 정보 없음</div>';
-  }
-  if (!indBox || !badge) return;
 
-  stockDetailMap[stock.code] = {
+  stockDetailMap[key] = {
     mode: 'sell',
     stock,
     data,
@@ -608,5 +586,32 @@ function applyRules(stock, data, isBefore0908) {
     scoreBreakdown: detail.scoreBreakdown,
     actionPlan: detail.actionPlan
   };
-  renderSellDetailToCard(stockDetailMap[stock.code]);
+
+  if (!card || !priceRow || !meta || !indBox || !badge) {
+    return;
+  }
+
+  const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
+  const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
+  const absChg = Math.abs(data.chgRate).toFixed(2);
+
+  const entry = getEntryByCode(key, stock.slotId);
+  const entryPrice = stock.entryPrice || entry?.entryPriceValue || data.prevClose;
+  const gainFromEntry = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
+
+  priceRow.innerHTML = `
+    <span class="price">${data.currentPrice.toLocaleString()}원</span>
+    <span class="chg ${chgClass}" style="font-size:14px;font-weight:700">${chgPrefix}${absChg}%</span>
+    ${stock.type === 'swing' ? `<span class="chg ${gainFromEntry >= 0 ? 'up' : 'dn'}" style="font-size:12px;margin-left:8px">매수 대비 ${gainFromEntry >= 0 ? '+' : ''}${gainFromEntry.toFixed(2)}%</span>` : ''}
+  `;
+  meta.innerHTML = `
+    <span style="opacity:0.7">진입가:</span> <strong>${entryPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
+    <span style="opacity:0.7">시가:</span> <strong>${data.openPrice.toLocaleString()}원</strong> &nbsp;|&nbsp;
+    <span style="opacity:0.7">체결강도:</span> <strong>${data.strength !== null && data.strength !== undefined ? `${data.strength.toFixed(2)}%` : '미연동'}</strong>
+  `;
+
+  if (planBox && !detail.targets) {
+    planBox.innerHTML = '<div class="scard-plan-empty">매매 단계 정보 없음</div>';
+  }
+  renderSellDetailToCard(stockDetailMap[key]);
 }
