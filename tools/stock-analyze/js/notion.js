@@ -1,5 +1,5 @@
 function parseStockHeader(line, strategy) {
-  const match = line.match(/^(\d+)위\.\s*([^()]+?)\s*\((\d{6})\)\s*[—\-–]\s*([\d.]+)\/10\s*\[([^\]]+)\]\s*[—\-–←]\s*(.+)$/);
+  const match = line.match(/^(\d+)위\.\s*([^()]+?)\s*\((\d{6})\)\s*[—\-–]\s*(?:추정\s*)?([\d.]+)\/10\s*\[([^\]]+)\]\s*[—\-–←]\s*(.+)$/);
   if (!match) return null;
   return {
     rank: Number(match[1]),
