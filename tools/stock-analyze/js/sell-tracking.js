@@ -105,6 +105,18 @@ function isSellStockVisible(stock, universeMode = getSellUniverseMode()) {
   if (!stock) return false;
   if (isAlwaysVisibleSellStock(stock)) return true;
   if (universeMode === 'all') return true;
+
+  // 매수 분석기에서 조정 등급(primaryGrade)이 A 또는 S인 우량 후보 종목은
+  // 수동 추적 버튼을 누르지 않아도 실매수 종목 목록에 자동으로 노출시킵니다.
+  const entry = typeof getEntryByCode === 'function' ? getEntryByCode(stock.code) : null;
+  if (entry) {
+    const presentation = typeof getBuyPresentation === 'function' ? getBuyPresentation(entry) : null;
+    const primaryGrade = presentation?.primaryGrade || entry.grade || '';
+    if (primaryGrade.startsWith('S') || primaryGrade.startsWith('A')) {
+      return true;
+    }
+  }
+
   return isBuyEntryTrackedForSell(stock.code);
 }
 
