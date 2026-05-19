@@ -283,6 +283,68 @@ function formatNullable(value, suffix = '', digits = 2) {
     return `${num.toFixed(digits)}${suffix}`;
 }
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function getWyckoffActionGuide(phase, confidence) {
+    const confidencePct = Math.round((Number(confidence) || 0) * 100);
+    const guides = {
+        A: {
+            title: '하락 정지 대응',
+            body: `급락 진정 여부를 먼저 확인하세요. ${confidencePct >= 55 ? '소액 분할 진입을 검토할 수 있지만' : '아직은'} 추세 반전 확정 전까지는 현금과 관찰 비중을 유지하는 편이 좋습니다.`
+        },
+        B: {
+            title: '매집 구간 대응',
+            body: `박스권 분할 매수에 유리한 구간입니다. 다만 상단 돌파 전까지는 한 번에 크게 들어가기보다 여러 번 나눠 담는 쪽이 안정적입니다.`
+        },
+        C: {
+            title: 'Spring 구간 대응',
+            body: `하단 테스트 후 회복 신호입니다. 회복이 하루 이틀 더 이어지는지 확인하면서 확인 매수 성격으로 접근하는 것이 좋습니다.`
+        },
+        D: {
+            title: '상승 추세 대응',
+            body: `보유 유지나 눌림목 추가 대응이 가능한 구간입니다. 다만 과열 추격보다는 거래량이 실린 돌파 이후 눌림을 기다리는 편이 좋습니다.`
+        },
+        E: {
+            title: '분배 구간 대응',
+            body: `신규 진입은 보수적으로 보고, 기존 보유분은 분할 익절이나 비중 축소를 우선 검토하세요. 반등이 나와도 회복 매수보다 리스크 관리가 먼저입니다.`
+        },
+        NEUTRAL: {
+            title: '관망 대응',
+            body: `증거가 아직 한쪽으로 충분히 모이지 않았습니다. 후보 단계와 신뢰도를 참고하되, 포지션은 가볍게 유지하고 다음 동기화에서 구조 변화를 확인하는 편이 좋습니다.`
+        }
+    };
+    return guides[phase] || guides.NEUTRAL;
+}
+
+function initializeWyckoffHelpModal() {
+    const modal = document.getElementById('wyckoff-help-modal');
+    const openBtn = document.getElementById('wyckoff-help-open');
+    if (!modal || !openBtn) return;
+
+    const closeModal = () => modal.classList.add('hidden');
+    const openModal = () => modal.classList.remove('hidden');
+
+    openBtn.addEventListener('click', openModal);
+    modal.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target instanceof HTMLElement && target.dataset.wyckoffClose === 'true') {
+            closeModal();
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            closeModal();
+        }
+    });
+}
+
 function renderSorosPanel() {
     const synergy = Number(marketData.reflexivitySynergyPoints) || 0;
     const synergyValue = document.getElementById('soros-synergy-value');
@@ -357,15 +419,28 @@ function renderWyckoffPanel() {
         const phase = stock.wyckoffPhase || 'NEUTRAL';
         const accent = phaseAccent(phase);
         const isNeutral = phase === 'NEUTRAL';
-        const foreignTone = !Number.isFinite(stock.foreignNetCum60d)
+        const candidatePhase = stock.wyckoffCandidatePhase || 'NEUTRAL';
+        const candidateLabel = phaseLabel(candidatePhase);
+        const actionGuide = getWyckoffActionGuide(phase, stock.wyckoffConfidence);
+        const wyckoffHistoryCount = Number(stock.historyWyckoffCount ?? stock.history60dCount) || 0;
+        const investorSeriesCount = Number(stock.investorSeriesCount) || 0;
+        const foreignCum = stock.foreignNetCumWyckoff ?? stock.foreignNetCum60d;
+        const instCum = stock.instNetCumWyckoff ?? stock.instNetCum60d;
+        const flowPeriodLabel = investorSeriesCount > 0 ? `${investorSeriesCount}일` : '-';
+        const foreignTone = !Number.isFinite(foreignCum)
             ? 'text-slate-500'
-            : stock.foreignNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300';
-        const instTone = !Number.isFinite(stock.instNetCum60d)
+            : foreignCum > 0 ? 'text-emerald-300' : 'text-rose-300';
+        const instTone = !Number.isFinite(instCum)
             ? 'text-slate-500'
-            : stock.instNetCum60d > 0 ? 'text-emerald-300' : 'text-rose-300';
+            : instCum > 0 ? 'text-emerald-300' : 'text-rose-300';
         const investorReason = stock.investorSeriesAvailable === false
             ? ` · ${stock.investorSeriesReason || '투자자 수급 미연동'}`
-            : '';
+            : investorSeriesCount > 0 && investorSeriesCount < wyckoffHistoryCount
+                ? ` · 수급 ${investorSeriesCount}영업일`
+                : '';
+        const historyReason = wyckoffHistoryCount < 120
+            ? ` · 구조 ${wyckoffHistoryCount}영업일`
+            : ' · 구조 120영업일';
         return `
             <div class="wyckoff-card">
                 <div>
@@ -375,17 +450,21 @@ function renderWyckoffPanel() {
                     </div>
                     <div class="grid grid-cols-3 gap-x-3 gap-y-1 text-[10px]">
                         <div class="text-slate-400">15일 낙폭</div>
-                        <div class="text-slate-400">외인 60일 누적</div>
-                        <div class="text-slate-400">기관 60일 누적</div>
+                        <div class="text-slate-400">외인 누적 (${flowPeriodLabel})</div>
+                        <div class="text-slate-400">기관 누적 (${flowPeriodLabel})</div>
                         <div class="${stock.drawdown15dPct <= -5 ? 'text-rose-300' : 'text-slate-200'} font-mono">${formatNullable(stock.drawdown15dPct, '%', 1)}</div>
-                        <div class="${foreignTone} font-mono">${Number.isFinite(stock.foreignNetCum60d) ? stock.foreignNetCum60d.toLocaleString() : '-'}</div>
-                        <div class="${instTone} font-mono">${Number.isFinite(stock.instNetCum60d) ? stock.instNetCum60d.toLocaleString() : '-'}</div>
+                        <div class="${foreignTone} font-mono">${Number.isFinite(foreignCum) ? foreignCum.toLocaleString() : '-'}</div>
+                        <div class="${instTone} font-mono">${Number.isFinite(instCum) ? instCum.toLocaleString() : '-'}</div>
                     </div>
-                    <div class="text-[10px] text-slate-500 mt-1">${stock.wyckoffReason || ''}${investorReason}</div>
+                    <div class="text-[10px] text-slate-500 mt-1">${stock.wyckoffReason || ''}${historyReason}${investorReason}</div>
+                    <div class="text-[10px] mt-1 ${isNeutral ? 'text-amber-300' : 'text-slate-500'}">후보 단계 ${candidateLabel}${stock.wyckoffCandidateReason ? ` · ${stock.wyckoffCandidateReason}` : ''}</div>
                 </div>
                 <div class="text-right">
-                    <span class="phase-badge ${isNeutral ? 'is-neutral' : ''}" style="${isNeutral ? '' : `background:${accent};`}">${phaseLabel(phase)}</span>
-                    <div class="text-[10px] text-slate-500 mt-1">신뢰도 ${Math.round((stock.wyckoffConfidence || 0) * 100)}%</div>
+                    <span class="phase-badge-wrap" tabindex="0">
+                        <span class="phase-badge ${isNeutral ? 'is-neutral' : ''}" style="${isNeutral ? '' : `background:${accent};`}">${phaseLabel(phase)}</span>
+                        <span class="phase-hover-tip"><strong>${escapeHtml(actionGuide.title)}</strong>${escapeHtml(actionGuide.body)}</span>
+                    </span>
+                    <div class="text-[10px] text-slate-500 mt-1">${isNeutral ? '보류 신뢰도' : '신뢰도'} ${Math.round((stock.wyckoffConfidence || 0) * 100)}%</div>
                 </div>
             </div>
         `;
@@ -441,6 +520,8 @@ function renderTheorySubtabs() {
     renderWyckoffPanel();
     renderMinskyPanel();
 }
+
+initializeWyckoffHelpModal();
 
 // 초기 화면 구동 시 로컬 JSON 파일에서 데이터 로드 (Async)
 async function initData() {

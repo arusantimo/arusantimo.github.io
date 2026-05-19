@@ -321,12 +321,17 @@
                             와이코프 이론은 가격·거래량·수급을 함께 보며 큰손이 조용히 매집하는지, 고점에서 분배하는지를 단계별로 추적합니다.
                         </p>
                         <div class="space-y-2">
-                            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">대표주 매집/분배 단계 (Phase A~E)</div>
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">대표주 매집/분배 단계 (Phase A~E)</div>
+                                <button id="wyckoff-help-open" type="button" class="wyckoff-help-btn" aria-haspopup="dialog" aria-controls="wyckoff-help-modal">
+                                    설명 보기
+                                </button>
+                            </div>
                             <div id="wyckoff-body" class="space-y-2">
                                 <div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">대표주 데이터 대기 중</div>
                             </div>
                             <p class="text-[10px] text-slate-500 leading-relaxed mt-2">
-                                와이코프 5단계는 가격·거래량·외인+기관 60일 누적 매수의 조합으로 자동 판정됩니다. Phase B(매집)·D(상승)는 진입 기회, Phase E(분배)는 청산 신호로 해석합니다.
+                                와이코프 5단계는 가격·거래량의 최대 120영업일 구조와 외인+기관 누적 수급을 함께 보고 자동 판정됩니다. 구조는 길게, 수급은 실제 확보된 기간만 반영합니다. Phase B(매집)·D(상승)는 진입 기회, Phase E(분배)는 청산 신호로 해석합니다.
                             </p>
                         </div>
                     </div>
@@ -511,6 +516,43 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <div id="wyckoff-help-modal" class="wyckoff-help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="wyckoff-help-title">
+        <div class="wyckoff-help-backdrop" data-wyckoff-close="true"></div>
+        <div class="wyckoff-help-dialog">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Wyckoff Guide</div>
+                    <h3 id="wyckoff-help-title" class="text-lg font-bold text-slate-100 mt-1">Phase와 지표 읽는 법</h3>
+                </div>
+                <button type="button" class="wyckoff-help-close" data-wyckoff-close="true" aria-label="설명 닫기">×</button>
+            </div>
+            <div class="wyckoff-help-grid">
+                <div class="wyckoff-help-section">
+                    <div class="wyckoff-help-section-title">Phase 의미</div>
+                    <div class="wyckoff-help-list">
+                        <div><strong>Phase A</strong> 급락이 멈추는 초기 구간입니다. 바닥 확인 전이라 성급한 풀매수보다는 진정 신호를 확인하는 단계입니다.</div>
+                        <div><strong>Phase B</strong> 큰손이 박스권에서 조용히 모으는 매집 구간입니다. 분할 접근이 가능한 구간이지만 추세 돌파 전까지는 속도 조절이 필요합니다.</div>
+                        <div><strong>Phase C</strong> 하단을 한 번 더 찔렀다가 회복하는 Spring 구간입니다. 실패하면 재하락할 수 있어 확인 매수 성격이 강합니다.</div>
+                        <div><strong>Phase D</strong> 박스권을 벗어나 상승 추세가 드러나는 구간입니다. 눌림목 대응이나 보유 확대를 검토할 수 있습니다.</div>
+                        <div><strong>Phase E</strong> 고점권 분배 가능성이 큰 구간입니다. 신규 진입보다 비중 축소와 익절 관리가 우선입니다.</div>
+                        <div><strong>관망</strong> 특정 단계 증거가 아직 약하거나 서로 충돌하는 상태입니다. 후보 단계와 신뢰도를 함께 보는 것이 좋습니다.</div>
+                    </div>
+                </div>
+                <div class="wyckoff-help-section">
+                    <div class="wyckoff-help-section-title">화면 값 해석</div>
+                    <div class="wyckoff-help-list">
+                        <div><strong>15일 낙폭</strong> 최근 15영업일 고점 대비 현재가가 얼마나 밀렸는지 보여줍니다. 낙폭이 깊을수록 하락 정지나 반등 초기 가능성을 같이 봅니다.</div>
+                        <div><strong>외인 누적 / 기관 누적</strong> 표시된 기간 동안 외국인과 기관이 순매수했는지 순매도했는지 보여줍니다. 둘 다 강한 음수면 분배 쪽, 양수면 매집 쪽 신호가 강해집니다.</div>
+                        <div><strong>구조 n영업일</strong> 와이코프 판정에 사용한 가격 구조 길이입니다. 길수록 큰 흐름을 더 많이 반영합니다.</div>
+                        <div><strong>수급 n영업일</strong> 실제 확보된 외인/기관 누적 기간입니다. 구조 기간보다 짧으면 수급 근거는 그 길이만큼만 반영됩니다.</div>
+                        <div><strong>후보 단계</strong> 아직 확정은 아니지만 현재 데이터에서 가장 닮은 단계입니다. 관망이어도 후보 단계가 있으면 방향 힌트로 볼 수 있습니다.</div>
+                        <div><strong>신뢰도</strong> 현재 단계 판정의 강도입니다. 높을수록 가격·거래량·수급 신호가 같은 방향으로 정렬됐다는 뜻입니다.</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

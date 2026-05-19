@@ -2,8 +2,9 @@ const LEADER_PICK_COUNT = 4;
 const LEADER_SCREEN_LIMIT = 60;
 const LEADER_PRIMARY_HISTORY_LIMIT = 12;
 const LEADER_FALLBACK_HISTORY_LIMIT = 8;
-const LEADER_HISTORY_DAYS = 15;
-const LEADER_HISTORY_FETCH_COUNT = 20;
+const LEADER_RECENT_HISTORY_DAYS = 15;
+const LEADER_WYCKOFF_HISTORY_DAYS = 120;
+const LEADER_HISTORY_FETCH_COUNT = 160;
 const LEADER_FETCH_CONCURRENCY = 4;
 const LEADER_EXCLUDE_REGEX = /(ETF|ETN|KODEX|TIGER|KOSEF|ARIRANG|KBSTAR|HANARO|ACE|SOL|RISE|PLUS|TIMEFOLIO|인버스|레버리지)/i;
 
@@ -65,7 +66,7 @@ function createLeaderChartUrl(code) {
         "https://fchart.stock.naver.com/sise.nhn",
         `?symbol=${code}`,
         "&timeframe=day",
-        `&count=${Math.max(LEADER_HISTORY_FETCH_COUNT, LEADER_HISTORY_DAYS + 5)}`,
+        `&count=${Math.max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS + 10)}`,
         "&requestType=0"
     ].join("");
 }
@@ -101,7 +102,7 @@ function parseLeaderChartRows(xmlText) {
 
     return [...new Map(rows.map(row => [row.dateKey, row])).values()]
         .sort((left, right) => left.dateKey.localeCompare(right.dateKey))
-        .slice(-LEADER_HISTORY_DAYS);
+        .slice(-Math.max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS));
 }
 
 async function fetchLeaderHistory(candidate) {
@@ -112,8 +113,8 @@ async function fetchLeaderHistory(candidate) {
     );
     const history = parseLeaderChartRows(xml);
 
-    if (history.length < LEADER_HISTORY_DAYS) {
-        throw new Error(`${candidate.name} 차트 15영업일 확보 실패`);
+    if (history.length < LEADER_RECENT_HISTORY_DAYS) {
+        throw new Error(`${candidate.name} 차트 ${LEADER_RECENT_HISTORY_DAYS}영업일 확보 실패`);
     }
 
     return history;
@@ -137,7 +138,7 @@ async function fetchLeaderInvestorSeries(candidate) {
         const ordered = deals
             .slice()
             .reverse()
-            .slice(-60);
+            .slice(-LEADER_WYCKOFF_HISTORY_DAYS);
         const parseInvestorValue = (value) => {
             if (typeof value === "number") return Number.isFinite(value) ? value : null;
             if (typeof value === "string") {
@@ -274,27 +275,30 @@ function computeThreeDayMetrics(history) {
     };
 }
 
-function computeLeaderMetrics(candidate, history, investorSeries = null) {
-    const latest = history.at(-1);
-    const previous = history.at(-2);
-    const highestHigh = Math.max(...history.map(row => row.high));
-    const shockMetrics = computeShockMetrics(history);
-    const threeDayMetrics = computeThreeDayMetrics(history);
+function computeLeaderMetrics(candidate, fullHistory, investorSeries = null) {
+    const recentHistory = fullHistory.slice(-LEADER_RECENT_HISTORY_DAYS);
+    const wyckoffHistory = fullHistory.slice(-LEADER_WYCKOFF_HISTORY_DAYS);
+    const latest = recentHistory.at(-1);
+    const previous = recentHistory.at(-2);
+    const highestHigh = Math.max(...recentHistory.map(row => row.high));
+    const shockMetrics = computeShockMetrics(recentHistory);
+    const threeDayMetrics = computeThreeDayMetrics(recentHistory);
 
     const foreignNet = investorSeries?.foreignNet || [];
     const instNet = investorSeries?.instNet || [];
     const hasInvestorSeries = investorSeries?.available !== false && (foreignNet.length > 0 || instNet.length > 0);
-    const foreignCum60d = hasInvestorSeries && foreignNet.length
-        ? foreignNet.reduce((acc, v) => acc + (Number(v) || 0), 0)
+    const investorSeriesCount = Math.max(foreignNet.length, instNet.length);
+    const foreignCumWyckoff = hasInvestorSeries && foreignNet.length
+        ? foreignNet.slice(-LEADER_WYCKOFF_HISTORY_DAYS).reduce((acc, v) => acc + (Number(v) || 0), 0)
         : null;
-    const instCum60d = hasInvestorSeries && instNet.length
-        ? instNet.reduce((acc, v) => acc + (Number(v) || 0), 0)
+    const instCumWyckoff = hasInvestorSeries && instNet.length
+        ? instNet.slice(-LEADER_WYCKOFF_HISTORY_DAYS).reduce((acc, v) => acc + (Number(v) || 0), 0)
         : null;
 
     let wyckoff = { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족', metrics: {} };
-    if (typeof classifyWyckoffPhase === 'function' && history.length >= 10) {
+    if (typeof classifyWyckoffPhase === 'function' && wyckoffHistory.length >= 10) {
         wyckoff = classifyWyckoffPhase({
-            ohlcv: history,
+            ohlcv: wyckoffHistory,
             foreignNet,
             instNet
         });
@@ -305,7 +309,9 @@ function computeLeaderMetrics(candidate, history, investorSeries = null) {
         name: candidate.name,
         weight: 0,
         todayTradingValue: candidate.todayTradingValue,
-        cum15dTradingValue: history.reduce((sum, row) => sum + row.tradingValue, 0),
+        history15dCount: recentHistory.length,
+        historyWyckoffCount: wyckoffHistory.length,
+        cum15dTradingValue: recentHistory.reduce((sum, row) => sum + row.tradingValue, 0),
         dayReturnPct: previous ? ((latest.close / previous.close) - 1) * 100 : null,
         drawdown15dPct: highestHigh > 0 ? ((latest.close / highestHigh) - 1) * 100 : null,
         shockValueRatio: shockMetrics.shockValueRatio,
@@ -314,14 +320,21 @@ function computeLeaderMetrics(candidate, history, investorSeries = null) {
         closeRecoveryRate: shockMetrics.closeRecoveryRate,
         shockDate: shockMetrics.shockDate,
         latestDate: latest.dateKey,
-        foreignNetCum60d: foreignCum60d,
-        instNetCum60d: instCum60d,
-        smartCum60d: Number.isFinite(foreignCum60d) && Number.isFinite(instCum60d) ? foreignCum60d + instCum60d : null,
+        investorSeriesCount,
+        foreignNetCumWyckoff: foreignCumWyckoff,
+        instNetCumWyckoff: instCumWyckoff,
+        smartCumWyckoff: Number.isFinite(foreignCumWyckoff) && Number.isFinite(instCumWyckoff) ? foreignCumWyckoff + instCumWyckoff : null,
         investorSeriesAvailable: hasInvestorSeries,
         investorSeriesReason: investorSeries?.reason || "",
+        history60dCount: wyckoffHistory.length,
+        foreignNetCum60d: foreignCumWyckoff,
+        instNetCum60d: instCumWyckoff,
+        smartCum60d: Number.isFinite(foreignCumWyckoff) && Number.isFinite(instCumWyckoff) ? foreignCumWyckoff + instCumWyckoff : null,
         wyckoffPhase: wyckoff.phase,
         wyckoffConfidence: wyckoff.confidence,
-        wyckoffReason: wyckoff.reason
+        wyckoffReason: wyckoff.reason,
+        wyckoffCandidatePhase: wyckoff.candidatePhase || 'NEUTRAL',
+        wyckoffCandidateReason: wyckoff.candidateReason || ''
     };
 }
 

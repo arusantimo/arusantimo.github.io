@@ -681,6 +681,36 @@
     align-items: center;
 }
 
+.wyckoff-help-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 72px;
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(15, 23, 42, 0.68);
+    color: #cbd5e1;
+    font-size: 11px;
+    font-weight: 700;
+    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.wyckoff-help-btn:hover,
+.wyckoff-help-btn:focus-visible {
+    border-color: rgba(34, 211, 238, 0.5);
+    background: rgba(8, 47, 73, 0.78);
+    color: #ecfeff;
+    outline: none;
+}
+
+.wyckoff-card .phase-badge-wrap {
+    position: relative;
+    display: inline-flex;
+    justify-content: flex-end;
+}
+
 .wyckoff-card .phase-badge {
     display: inline-flex;
     align-items: center;
@@ -692,8 +722,136 @@
     color: #0f172a;
 }
 
+.wyckoff-card .phase-hover-tip {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 220px;
+    padding: 0.7rem 0.8rem;
+    border-radius: 0.8rem;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(2, 6, 23, 0.96);
+    color: #cbd5e1;
+    font-size: 11px;
+    line-height: 1.45;
+    text-align: left;
+    box-shadow: 0 14px 28px rgba(2, 6, 23, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    z-index: 8;
+}
+
+.wyckoff-card .phase-hover-tip strong {
+    display: block;
+    color: #f8fafc;
+    font-size: 11px;
+    font-weight: 800;
+    margin-bottom: 0.2rem;
+}
+
+.wyckoff-card .phase-badge-wrap:hover .phase-hover-tip,
+.wyckoff-card .phase-badge-wrap:focus-within .phase-hover-tip {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .wyckoff-card .phase-badge.is-neutral {
     color: #cbd5e1;
     background: rgba(100, 116, 139, 0.3);
     border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.wyckoff-help-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.wyckoff-help-modal.hidden {
+    display: none;
+}
+
+.wyckoff-help-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.72);
+    backdrop-filter: blur(6px);
+}
+
+.wyckoff-help-dialog {
+    position: relative;
+    width: min(760px, 100%);
+    max-height: min(88vh, 860px);
+    overflow: auto;
+    border-radius: 1rem;
+    border: 1px solid rgba(71, 85, 105, 0.65);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.97), rgba(2, 6, 23, 0.95));
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.5);
+    padding: 1.1rem;
+}
+
+.wyckoff-help-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: rgba(15, 23, 42, 0.82);
+    color: #cbd5e1;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.wyckoff-help-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 1rem;
+}
+
+.wyckoff-help-section {
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 0.85rem;
+    background: rgba(15, 23, 42, 0.62);
+    padding: 0.95rem;
+}
+
+.wyckoff-help-section-title {
+    color: #f8fafc;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 0.7rem;
+}
+
+.wyckoff-help-list {
+    display: grid;
+    gap: 0.7rem;
+    color: #cbd5e1;
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.wyckoff-help-list strong {
+    color: #f8fafc;
+}
+
+@media (max-width: 720px) {
+    .wyckoff-help-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .wyckoff-card {
+        grid-template-columns: 1fr;
+    }
+
+    .wyckoff-card .phase-hover-tip {
+        left: 0;
+        right: auto;
+        width: min(220px, calc(100vw - 56px));
+    }
 }
