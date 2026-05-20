@@ -1,19 +1,19 @@
 {
-  "generated_at": "2026-05-19T21:15:29.061227+09:00",
+  "generated_at": "2026-05-20T14:34:44.617772+09:00",
   "current": {
-    "score": 56,
+    "score": 58,
     "label": "중립",
     "label_en": "Neutral",
-    "change": 0,
+    "change": 2,
     "description": "시장 심리가 중립적입니다. 공포와 탐욕이 균형을 이루고 있습니다."
   },
   "community": {
     "naver": {
-      "score": 56,
+      "score": 58,
       "label": "중립",
-      "posts_analyzed": 589,
+      "posts_analyzed": 588,
       "velocity_per_hour": 200,
-      "avg_likes": 4,
+      "avg_likes": 3,
       "avg_views": 0,
       "fear_hit": 50,
       "greed_hit": 50
@@ -35,16 +35,15 @@
       "date": "2026-05-19",
       "score": 56,
       "label": "중립"
+    },
+    {
+      "date": "2026-05-20",
+      "score": 58,
+      "label": "중립"
     }
   ],
   "keywords": {
-    "fear": [
-      {
-        "word": "IMF",
-        "count": 1,
-        "change": 0
-      }
-    ],
+    "fear": [],
     "greed": []
   },
   "sample_posts": []
