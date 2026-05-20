@@ -257,7 +257,7 @@ function buildSwingSellScoreContext({ stock, payload, data, isBefore0908 }) {
     buildSellScoreItem({ code: 'SW5', label: '체결강도 약화', points: weakStrength ? 10 : 0, maxPoints: 10, triggered: weakStrength, detail: Number.isFinite(data.strength) ? `체결강도 ${data.strength.toFixed(1)}%` : '체결강도 미연동' }),
     buildSellScoreItem({ code: 'SW6', label: '5일 저점 이탈', points: data.low5d > 0 && data.currentPrice < data.low5d ? 15 : 0, maxPoints: 15, triggered: data.low5d > 0 && data.currentPrice < data.low5d, detail: data.low5d > 0 ? `${formatWon(data.currentPrice)} vs 5일 저점 ${formatWon(data.low5d)}` : '5일 저점 미산출' }),
     buildSellScoreItem({ code: 'SW7', label: '갭 환경 악화', points: adverseGap ? 10 : 0, maxPoints: 10, triggered: adverseGap, detail: payload.gapProfile?.code ? `${payload.gapProfile.code} / 스윙 ${payload.gapProfile.swingText}` : '갭 등급 미확인' }),
-    buildSellScoreItem({ code: 'SW8', label: '노션 대비 갭 드리프트 악화', points: driftWorse ? 10 : 0, maxPoints: 10, triggered: driftWorse, detail: payload.gapProfile?.comparison?.summary || '노션 대비 변화 없음' }),
+    buildSellScoreItem({ code: 'SW8', label: '기준 스냅샷 대비 갭 드리프트 악화', points: driftWorse ? 10 : 0, maxPoints: 10, triggered: driftWorse, detail: payload.gapProfile?.comparison?.summary || '기준 스냅샷 대비 변화 없음' }),
     buildSellScoreItem({ code: 'SW9', label: '와이코프 Phase', points: wyckoffInfo.points, maxPoints: 15, triggered: wyckoffInfo.applied, detail: wyckoffInfo.detail })
   ];
 

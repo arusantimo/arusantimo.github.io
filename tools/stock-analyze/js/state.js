@@ -4,6 +4,18 @@ const NOTION_SLOT_LABELS = {
   slotB: 'Page B'
 };
 
+function isSingleSlotUiMode() {
+  return typeof document !== 'undefined' && Boolean(document.getElementById('jongga-quality-panel'));
+}
+
+function getUiSlotIds() {
+  return isSingleSlotUiMode() ? ['slotA'] : NOTION_SLOT_IDS;
+}
+
+function shouldShowSlotLabel() {
+  return !isSingleSlotUiMode();
+}
+
 function normalizeSlotId(slotId) {
   return NOTION_SLOT_IDS.includes(slotId) ? slotId : 'slotA';
 }
@@ -98,6 +110,7 @@ function getSellContextDomId(target, fallbackSlotId = null) {
 }
 
 function getSlotLabel(slotId) {
+  if (isSingleSlotUiMode()) return '현재 페이지';
   return NOTION_SLOT_LABELS[normalizeSlotId(slotId)];
 }
 
@@ -180,6 +193,8 @@ let liveGapState = createEmptyLiveGapState();
 const stockDetailMap = {};
 let currentModalState = { key: null, code: null, slotId: null, mode: null };
 let isRegimeSummaryCollapsed = true;
+let isJonggaQualityCollapsed = true;
+let isJonggaCollectionLogCollapsed = true;
 let isAnalysisRunning = false;
 
 function syncAnalysisUIState() {

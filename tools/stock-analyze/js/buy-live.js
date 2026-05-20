@@ -282,7 +282,7 @@ function buildBuyVerificationHtml(entry) {
           <span class="verification-icon">🧾</span>
           <div class="verification-summary">
             <div class="verification-title">전략 점수 미산출</div>
-            <div class="verification-desc">노션 원문에 수치 점수가 없어 네이버 컨센서스 및 와이코프 보정을 실행하지 않습니다. 이 항목은 관찰/메모 용으로만 유지됩니다.</div>
+            <div class="verification-desc">전략 데이터에 수치 점수가 없어 네이버 컨센서스 및 와이코프 보정을 실행하지 않습니다. 이 항목은 관찰/메모 용으로만 유지됩니다.</div>
           </div>
         </div>
       </div>

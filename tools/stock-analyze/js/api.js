@@ -227,7 +227,7 @@ async function refreshLiveGapScore(reasonLabel = '분석 시점') {
     log(`✅ 실시간 갭 스코어 갱신 완료. (${liveGapState.score.grade}${compareText ? ` / ${compareText}` : ''})`);
   } catch (error) {
     liveGapState = { ...createEmptyLiveGapState(), status: 'error', error: error?.message || 'unknown error' };
-    log('<span style="color:var(--text-warning)">⚠️ 실시간 갭 지표 수집에 실패해 노션 기준 갭 스코어로 계속 분석합니다.</span>');
+    log('<span style="color:var(--text-warning)">⚠️ 실시간 갭 지표 수집에 실패해 전략 데이터 기준 갭 스코어로 계속 분석합니다.</span>');
     console.error(error);
   } finally {
     renderAll();
@@ -392,7 +392,7 @@ async function runBuyBatchRefresh() {
     return;
   }
 
-  log(`▶ 네이버 컨센서스 기반 매수 후보 두 페이지 일괄 분석을 시작합니다. (총 ${eligibleEntries.length}개${skippedCount ? `, 점수 미산출 ${skippedCount}개 제외` : ''})`);
+  log(`▶ 네이버 컨센서스 기반 매수 후보 일괄 분석을 시작합니다. (총 ${eligibleEntries.length}개${skippedCount ? `, 점수 미산출 ${skippedCount}개 제외` : ''})`);
   let successCount = 0;
 
   for (const entry of eligibleEntries) {

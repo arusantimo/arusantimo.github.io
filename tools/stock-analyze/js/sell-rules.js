@@ -76,8 +76,8 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
       code: 'H1',
       title: '유효 손절가 이탈',
       criterion: gapProfile?.tightenStopLossRate
-        ? `노션 손절가와 갭 조정 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(노션 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
-        : `노션 매매전략의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
+        ? `전략 손절가와 갭 조정 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
+        : `전략 데이터의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
       triggered: belowStopLoss,
       result: belowStopLoss
         ? `현재가 ${data.currentPrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 즉시 전량 매도`
@@ -93,8 +93,8 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
       code: 'H2',
       title: `기본 손절선 (${adjustedStopLossRate.toFixed(1)}%) 이탈`,
       criterion: gapProfile?.tightenStopLossRate
-        ? `노션 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${adjustedStopLossRate.toFixed(1)}%`
-        : `노션 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
+        ? `전략 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${adjustedStopLossRate.toFixed(1)}%`
+        : `전략 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
       triggered: belowDefault,
       result: belowDefault
         ? `진입가 대비 ${lossRate.toFixed(2)}% → 즉시 전량 매도`
@@ -218,7 +218,7 @@ function buildIndicators(stock, data, isBefore0908) {
     if (gapProfile.comparison.available) {
       indicators.push({
         title: '갭 변화 보정',
-        criterion: '실시간 갭 스코어가 노션 스냅샷보다 개선되면 매도 보수성을 일부 완화하고, 악화되면 추가 강화합니다.',
+        criterion: '실시간 갭 스코어가 기준 스냅샷보다 개선되면 매도 보수성을 일부 완화하고, 악화되면 추가 강화합니다.',
         status: gapProfile.comparison.bias > 0 ? 'clear' : gapProfile.comparison.bias < 0 ? 'warning' : 'unknown',
         result: gapProfile.comparison.summary,
         value: getGapComparisonText() || gapProfile.comparison.summary

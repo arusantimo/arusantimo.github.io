@@ -6,12 +6,12 @@ function renderGapScoreSummary() {
 
   const comparisonText = getGapComparisonText();
   const dataStatusText = isLive
-    ? `실시간 분석 기준은 ${liveGapState.source}에서 ${liveGapState.fetchedAt}에 수집했습니다. 노션 값은 전일 장마감 전 스냅샷으로 비교 기준으로 유지합니다.`
+    ? `실시간 분석 기준은 ${liveGapState.source}에서 ${liveGapState.fetchedAt}에 수집했습니다. 기준 데이터는 전일 장마감 전 스냅샷으로 비교 기준으로 유지합니다.`
     : liveGapState.status === 'error'
-      ? `실시간 수집에 실패해 노션 보고서 기준 갭 스코어를 사용 중입니다. (${escapeHtml(liveGapState.error)})`
-      : '현재 화면의 갭 스코어는 노션 보고서에 적힌 값을 파싱한 결과입니다. 분석 버튼 실행 시 실시간 수집을 시도합니다.';
+      ? `실시간 수집에 실패해 전략 데이터 기준 갭 스코어를 사용 중입니다. (${escapeHtml(liveGapState.error)})`
+      : '현재 화면의 갭 스코어는 전략 JSON에 포함된 값을 파싱한 결과입니다. 분석 버튼 실행 시 실시간 수집을 시도합니다.';
   const caption = isLive
-    ? '실시간으로 수집한 5개 지표를 우선 적용하고, 노션 스냅샷과의 차이로 overnight drift를 확인합니다.'
+    ? '실시간으로 수집한 5개 지표를 우선 적용하고, 기준 스냅샷과의 차이로 overnight drift를 확인합니다.'
     : '기본 점수에 중요도를 곱해 반영 점수를 만들고, 그 합계로 다음 날 갭 위험을 판단합니다.';
 
   return `
@@ -58,8 +58,8 @@ function renderGapScoreSummary() {
         ${gapScore.sellAdjustment ? `<div class="gap-score-meta-item"><strong>매도 조정</strong><span>${escapeHtml(gapScore.sellAdjustment)}</span></div>` : ''}
         ${gapScore.swingAdjustment ? `<div class="gap-score-meta-item"><strong>스윙 전환</strong><span>${escapeHtml(gapScore.swingAdjustment)}</span></div>` : ''}
         ${gapScore.note ? `<div class="gap-score-meta-item"><strong>특이사항</strong><span>${escapeHtml(gapScore.note)}</span></div>` : ''}
-        ${comparisonText ? `<div class="gap-score-meta-item"><strong>노션 비교</strong><span>${escapeHtml(comparisonText)}</span></div>` : ''}
-        ${isLive && notionGapScore.note ? `<div class="gap-score-meta-item"><strong>노션 기준</strong><span>${escapeHtml(notionGapScore.grade || '미확인')} / ${escapeHtml(notionGapScore.note)}</span></div>` : ''}
+        ${comparisonText ? `<div class="gap-score-meta-item"><strong>스냅샷 비교</strong><span>${escapeHtml(comparisonText)}</span></div>` : ''}
+        ${isLive && notionGapScore.note ? `<div class="gap-score-meta-item"><strong>기준 데이터</strong><span>${escapeHtml(notionGapScore.grade || '미확인')} / ${escapeHtml(notionGapScore.note)}</span></div>` : ''}
         <div class="gap-score-meta-item"><strong>데이터 상태</strong><span>${escapeHtml(dataStatusText)}</span></div>
       </div>
     </div>
@@ -146,7 +146,7 @@ function renderRegimeSummary() {
   });
 
   if (!summaryRows.length && !hasDetailedGapScore) {
-    container.innerHTML = '<div class="empty-state">노션에서 시장 레짐 요약을 불러오면 여기에 표시됩니다.</div>';
+    container.innerHTML = '<div class="empty-state">전략 JSON에서 시장 레짐 요약을 불러오면 여기에 표시됩니다.</div>';
     return;
   }
 
@@ -472,7 +472,7 @@ function buildSellStrategyPlan(detail) {
       status: 'available',
       icon: '•',
       title: '기본 전략 확인',
-      description: '노션 매매 단계 또는 분석 결과를 기반으로 다시 판단합니다.',
+      description: '전략 데이터의 매매 단계 또는 분석 결과를 기반으로 다시 판단합니다.',
       note: ''
     });
   }
@@ -608,7 +608,7 @@ function renderBuyStockCards() {
     if (!container) return;
     container.innerHTML = '';
     if (!entries.length) {
-      container.innerHTML = '<div class="empty-state">노션에서 불러온 매수 후보가 없습니다.</div>';
+      container.innerHTML = '<div class="empty-state">전략 JSON에서 불러온 매수 후보가 없습니다.</div>';
       return;
     }
 
@@ -869,7 +869,7 @@ function openRegimeReport() {
 
   syncBodyScrollLock();
   if (!info) {
-    body.innerHTML = '<div class="empty-state">노션에서 시장 레짐 데이터를 불러온 뒤 다시 시도하세요.</div>';
+    body.innerHTML = '<div class="empty-state">전략 JSON에서 시장 레짐 데이터를 불러온 뒤 다시 시도하세요.</div>';
     document.getElementById('regime-report-overlay').classList.add('open');
     return;
   }
@@ -920,7 +920,7 @@ function openRegimeReport() {
             ${gapScore.swingAdjustment ? `<tr><td style="color:var(--text-tertiary)">스윙 전환</td><td><strong>${escapeHtml(gapScore.swingAdjustment)}</strong></td></tr>` : ''}
             ${gapScore.note ? `<tr><td style="color:var(--text-tertiary)">특이사항</td><td><strong>${escapeHtml(gapScore.note)}</strong></td></tr>` : ''}
             ${isLiveGapReady() ? `<tr><td style="color:var(--text-tertiary)">실시간 소스</td><td><strong>${escapeHtml(liveGapState.source)} / ${escapeHtml(liveGapState.fetchedAt)}</strong></td></tr>` : ''}
-            ${comparisonText ? `<tr><td style="color:var(--text-tertiary)">노션 비교</td><td><strong>${escapeHtml(comparisonText)}</strong></td></tr>` : ''}
+            ${comparisonText ? `<tr><td style="color:var(--text-tertiary)">스냅샷 비교</td><td><strong>${escapeHtml(comparisonText)}</strong></td></tr>` : ''}
           </tbody>
         </table>
       ` : ''}
@@ -998,7 +998,7 @@ function renderRuleMatchList(entry) {
         <div class="modal-ind-content">
           <div class="modal-ind-title">${escapeHtml(ruleInfo.code)} ${matched ? '일치' : '불일치'}</div>
           <div class="modal-ind-criterion">${escapeHtml(guide.condition)}</div>
-          <div class="modal-ind-result">→ ${escapeHtml(`${matched ? '노션 충족' : '노션 미충족'}${note}`)}</div>
+          <div class="modal-ind-result">→ ${escapeHtml(`${matched ? '전략 데이터 충족' : '전략 데이터 미충족'}${note}`)}</div>
           ${guide.source ? `<div class="modal-ind-value">출처: ${escapeHtml(guide.source)}</div>` : ''}
         </div>
       </div>
@@ -1023,7 +1023,7 @@ function renderGateList(entry) {
         <div class="modal-ind-content">
           <div class="modal-ind-title">${escapeHtml(gate.code)} ${statusLabel}</div>
           <div class="modal-ind-criterion">${escapeHtml(guide.condition)}</div>
-          <div class="modal-ind-result">→ ${escapeHtml(gate.note || '노션 기준 판정')}</div>
+          <div class="modal-ind-result">→ ${escapeHtml(gate.note || '전략 데이터 기준 판정')}</div>
           ${guide.source ? `<div class="modal-ind-value">출처: ${escapeHtml(guide.source)}</div>` : ''}
         </div>
       </div>
@@ -1134,7 +1134,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
           ${buildBuyVerificationHtml(entry)}
 
           <div>
-            <div class="modal-stage-badge stage2">🧭 노션 기준 매수 판단</div>
+            <div class="modal-stage-badge stage2">🧭 전략 데이터 기준 매수 판단</div>
             <div class="modal-section-label">Gate 일치 여부</div>
             <div class="modal-ind-list">${renderGateList(entry)}</div>
           </div>
@@ -1165,7 +1165,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
     const stageText = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
 
     const notionEntry = getEntryByCode(stock.code);
-    const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 노션에 없습니다.</div>';
+    const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 전략 데이터에 없습니다.</div>';
     const strategyPlanHtml = renderSellStrategyPlan(detail, false);
 
     const triggeredRuleHtml = triggeredRule ? `
@@ -1277,7 +1277,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       ${lossManagementHtml}
 
       <div>
-        <div class="modal-section-label">매매 전략 (노션)</div>
+        <div class="modal-section-label">매매 전략 (전략 데이터)</div>
         ${tradePlanHtml}
       </div>
 

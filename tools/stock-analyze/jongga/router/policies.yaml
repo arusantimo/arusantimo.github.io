@@ -1,0 +1,54 @@
+{
+  "metrics": {
+    "current_price": {
+      "minConfidence": 0.6,
+      "cache": { "ttlSeconds": 1800, "allowStale": true },
+      "routes": [
+        { "provider": "kis", "layer": "api" },
+        { "provider": "naver_mobile", "layer": "public_api" },
+        { "provider": "naver_html", "layer": "http_scraper" },
+        { "provider": "naver_browser", "layer": "headless_browser" }
+      ]
+    },
+    "top_trading_value": {
+      "minConfidence": 0.65,
+      "cache": { "ttlSeconds": 86400, "allowStale": true },
+      "routes": [
+        { "provider": "krx_pykrx", "layer": "api" },
+        { "provider": "krx_http", "layer": "http_scraper" },
+        { "provider": "naver_quant", "layer": "http_scraper" },
+        { "provider": "naver_browser", "layer": "headless_browser" }
+      ]
+    },
+    "ohlcv_120d": {
+      "minConfidence": 0.7,
+      "cache": { "ttlSeconds": 86400, "allowStale": true },
+      "routes": [
+        { "provider": "krx_pykrx", "layer": "api" },
+        { "provider": "kis_daily", "layer": "api" },
+        { "provider": "naver_chart", "layer": "public_api" },
+        { "provider": "naver_html", "layer": "http_scraper" }
+      ]
+    },
+    "global_gap_metric": {
+      "minConfidence": 0.55,
+      "cache": { "ttlSeconds": 1800, "allowStale": true },
+      "routes": [
+        { "provider": "polygon", "layer": "api" },
+        { "provider": "alpha_vantage", "layer": "api" },
+        { "provider": "yahoo_chart", "layer": "public_api" },
+        { "provider": "yahoo_html", "layer": "http_scraper" },
+        { "provider": "yahoo_browser", "layer": "headless_browser" }
+      ]
+    },
+    "toss_execution_strength": {
+      "minConfidence": 0.8,
+      "cache": { "ttlSeconds": 1800, "allowStale": false },
+      "routes": [
+        { "provider": "kis_orderbook_proxy", "layer": "api" },
+        { "provider": "manual_override", "layer": "manual_override" }
+      ]
+    }
+  }
+}
+

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>종가 베팅 매수/매도 분석기 - Notion Legacy</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="panel">
+      <div class="header-title">📈 종가 베팅 매수/매도 분석기</div>
+      <p class="header-copy">
+        두 개의 노션 공용 페이지를 Page A / Page B 슬롯으로 불러오고,<br>
+        매수/매도 탭에서 각 페이지를 전환해 보면서 두 페이지 전체 종목을 함께 분석할 수 있습니다.
+      </p>
+
+      <div class="controls shared-controls">
+        <div class="notion-row notion-row-double">
+          <div class="input-group notion-input-wrap">
+            <label class="slot-input-label" for="notion-url-slotA">Page A</label>
+            <input type="text" id="notion-url-slotA" placeholder="Page A 노션 페이지 주소 또는 ID">
+          </div>
+          <div class="input-group notion-input-wrap">
+            <label class="slot-input-label" for="notion-url-slotB">Page B</label>
+            <input type="text" id="notion-url-slotB" placeholder="Page B 노션 페이지 주소 또는 ID">
+          </div>
+          <button id="btn-fetch-notion" class="btn btn-secondary">두 페이지 불러오기</button>
+        </div>
+
+        <div class="action-row">
+          <div class="tab-switcher">
+            <button class="tab-button active" data-tab="buy">매수 분석기</button>
+            <button class="tab-button" data-tab="sell">매도 분석기</button>
+          </div>
+          <div class="action-meta">
+            <div id="current-time-display" class="current-time-display"></div>
+            <button id="btn-analyze" class="btn btn-primary" disabled>
+              <span>⚡</span> 두 페이지 일괄 분석
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="log-output" class="log-box">
+        <div style="color:var(--text-tertiary);border:none">시스템이 대기 중입니다. 노션 데이터 불러오기를 클릭하세요.</div>
+      </div>
+    </div>
+
+    <section class="tab-panel active" data-tab-panel="buy">
+      <div class="page-switch-toolbar">
+        <div class="page-switch-copy">매수 화면 표시 페이지</div>
+        <div class="page-switcher" id="buy-slot-switch">
+          <button type="button" class="page-switch-btn active" data-buy-slot="slotA">Page A</button>
+          <button type="button" class="page-switch-btn" data-buy-slot="slotB">Page B</button>
+        </div>
+      </div>
+
+      <div class="section-title section-title-collapsible">
+        <div class="section-title-main">
+          <button id="btn-regime-toggle" type="button" class="section-toggle" aria-expanded="false" aria-controls="buy-regime-summary" title="시장 레짐 펼치기">+</button>
+          <span>🧭 시장 레짐 체크</span>
+          <span id="regime-current-badge" class="regime-current-badge unknown">미확인</span>
+        </div>
+        <div class="section-title-actions">
+          <button id="btn-buy-guide" class="btn btn-secondary small">매수 등급 기준</button>
+          <button id="btn-regime-report" class="btn btn-secondary small regime-report-btn" title="레짐 판단 근거 보고서">📋</button>
+        </div>
+      </div>
+      <div id="buy-regime-summary" class="is-collapsed"></div>
+
+      <div class="section-title">📊 눌림목 종가베팅</div>
+      <div id="buy-list-pullback" class="buy-grid"></div>
+
+      <div class="section-title">🔥 수급 매집형 종가베팅 TOP</div>
+      <div id="buy-list-momentum" class="buy-grid"></div>
+
+      <div class="section-title">🔻 주도주 급락 반등 후보 (전략 ③)</div>
+      <div id="buy-list-reversal" class="buy-grid"></div>
+    </section>
+
+    <section class="tab-panel" data-tab-panel="sell">
+      <div class="sell-universe-toolbar">
+        <div>
+          <div class="sell-universe-title">🎯 매도 분석 대상</div>
+          <div class="sell-universe-copy">기본은 실매수 추적 종목만 표시하고, 필요할 때 전체 후보로 넓혀 볼 수 있습니다.</div>
+        </div>
+        <div class="sell-universe-actions">
+          <div class="page-switcher" id="sell-slot-switch">
+            <button type="button" class="page-switch-btn active" data-sell-slot="slotA">Page A</button>
+            <button type="button" class="page-switch-btn" data-sell-slot="slotB">Page B</button>
+          </div>
+          <div class="sell-universe-switch" id="sell-universe-switch">
+            <button type="button" class="sell-universe-btn active" data-sell-universe="actual">실매수 종목</button>
+            <button type="button" class="sell-universe-btn" data-sell-universe="all">전체 후보</button>
+          </div>
+          <div class="sell-universe-summary" id="sell-universe-summary"></div>
+        </div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>🔄 스윙 보유 종목 <span class="section-help">D+1 스윙 전환 평가 · 실시간 손익 추적</span></div>
+        <div class="inline-inputs">
+          <input type="text" id="swing-name" placeholder="종목명">
+          <input type="text" id="swing-code" placeholder="코드(6자리)" maxlength="6">
+          <input type="text" id="swing-entry-price" placeholder="매수가" style="width:80px">
+          <button id="btn-add-swing" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-swing" class="stock-grid">
+        <div class="empty-state">스윙 보유 종목이 없습니다.</div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>📊 눌림목 종가베팅 <span class="section-help">9:08 이후 매도/손절 분석</span></div>
+        <div class="inline-inputs">
+          <input type="text" id="pullback-name" placeholder="종목명">
+          <input type="text" id="pullback-code" placeholder="코드(6자리)" maxlength="6">
+          <button id="btn-add-pullback" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-pullback" class="stock-grid">
+        <div class="empty-state">종목 데이터가 없습니다.</div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>🔥 수급 매집형 종가베팅 <span class="section-help">9:08 이전 손절, 이후 모두 분석</span></div>
+        <div class="inline-inputs">
+          <input type="text" id="momentum-name" placeholder="종목명">
+          <input type="text" id="momentum-code" placeholder="코드(6자리)" maxlength="6">
+          <button id="btn-add-momentum" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-momentum" class="stock-grid">
+        <div class="empty-state">종목 데이터가 없습니다.</div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>🔻 주도주 급락 반등 (전략 ③) <span class="section-help">9:08 이전/이후 모두 분석</span></div>
+        <div class="inline-inputs">
+          <input type="text" id="reversal-name" placeholder="종목명">
+          <input type="text" id="reversal-code" placeholder="코드(6자리)" maxlength="6">
+          <button id="btn-add-reversal" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-reversal" class="stock-grid">
+        <div class="empty-state">종목 데이터가 없습니다.</div>
+      </div>
+    </section>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal" id="detail-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name" id="modal-name"></div>
+          <div class="modal-stock-sub">
+            <span id="modal-code"></span>
+            <span id="modal-type"></span>
+          </div>
+        </div>
+        <button class="modal-close" id="modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="regime-report-overlay" class="modal-overlay">
+    <div class="modal" id="regime-report-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name">📋 시장 레짐 판단 보고서</div>
+          <div class="modal-stock-sub"><span>현재 레짐 결정 근거 및 전략 우선순위</span></div>
+        </div>
+        <button class="modal-close" id="regime-report-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="regime-report-body"></div>
+    </div>
+  </div>
+
+  <div id="guide-modal-overlay" class="modal-overlay">
+    <div class="modal guide-modal" id="guide-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name">매수 등급 기준</div>
+          <div class="modal-stock-sub"><span>시장 레짐, 전략별 등급, 매매 가능 여부, VKOSPI 보정</span></div>
+        </div>
+        <button class="modal-close" id="guide-modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-grid guide-grid-modal">
+          <div class="guide-panel">
+            <div class="guide-title">시장 레짐 체크</div>
+            <div id="guide-regime-table"></div>
+          </div>
+          <div class="guide-panel">
+            <div class="guide-title">등급 기준</div>
+            <div id="guide-grade-table"></div>
+          </div>
+          <div class="guide-panel">
+            <div class="guide-title">레짐 × 등급 매매 가능 여부</div>
+            <div id="guide-permission-table"></div>
+          </div>
+          <div class="guide-panel">
+            <div class="guide-title">VKOSPI 점수 보정</div>
+            <div id="guide-adjust-table"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="gap-guide-modal-overlay" class="modal-overlay">
+    <div class="modal guide-modal" id="gap-guide-modal">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <div class="modal-stock-name">갭 등급 기준</div>
+          <div class="modal-stock-sub"><span>합산 점수, 진입 조정, 익일 매도 조정 기준</span></div>
+        </div>
+        <button class="modal-close" id="gap-guide-modal-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="gap-guide-body"></div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/gap.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/archive.js"></script>
+  <script src="js/notion.js"></script>
+  <script src="js/api.js"></script>
+  <script src="../market-analyze/wyckoff.js"></script>
+  <script src="js/wyckoff-bias.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/buy-live.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/sell-tracking.js"></script>
+  <script src="js/sell-score.js"></script>
+  <script src="js/sell-rules.js"></script>
+  <script src="js/sell-score-ui.js"></script>
+  <script src="js/sell-ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>

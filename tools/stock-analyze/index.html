@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>종가 베팅 매수/매도 분석기</title>
+  <title>종가 베팅 JSON 매수/매도 분석기</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -12,23 +12,25 @@
 <body>
   <div class="container">
     <div class="panel">
-      <div class="header-title">📈 종가 베팅 매수/매도 분석기</div>
+      <div class="header-title">📈 종가 베팅 JSON 매수/매도 분석기</div>
       <p class="header-copy">
-        두 개의 노션 공용 페이지를 Page A / Page B 슬롯으로 불러오고,<br>
-        매수/매도 탭에서 각 페이지를 전환해 보면서 두 페이지 전체 종목을 함께 분석할 수 있습니다.
+        jongga_data.js를 단일 페이지로 고정 로드하고,<br>
+        수집 품질, provider fallback, 안전 차단 결과를 확인한 뒤 매수/매도 분석에 연결합니다.
       </p>
 
       <div class="controls shared-controls">
-        <div class="notion-row notion-row-double">
-          <div class="input-group notion-input-wrap">
-            <label class="slot-input-label" for="notion-url-slotA">Page A</label>
-            <input type="text" id="notion-url-slotA" placeholder="Page A 노션 페이지 주소 또는 ID">
+        <div class="json-loader">
+          <div class="action-row">
+            <a href="manual-overrides.html" class="btn btn-secondary">🧩 수동 입력 레이어</a>
           </div>
-          <div class="input-group notion-input-wrap">
-            <label class="slot-input-label" for="notion-url-slotB">Page B</label>
-            <input type="text" id="notion-url-slotB" placeholder="Page B 노션 페이지 주소 또는 ID">
+          <div class="section-title section-title-collapsible quality-section-title">
+            <div class="section-title-main">
+              <button id="btn-jongga-quality-toggle" type="button" class="section-toggle" aria-expanded="false" aria-controls="jongga-quality-panel" title="JSON 데이터 품질 펼치기">+</button>
+              <span>📦 JSON 데이터 품질</span>
+              <span id="jongga-quality-current-badge" class="quality-status unknown">미확인</span>
+            </div>
           </div>
-          <button id="btn-fetch-notion" class="btn btn-secondary">두 페이지 불러오기</button>
+          <div id="jongga-quality-panel" class="quality-panel is-collapsed"></div>
         </div>
 
         <div class="action-row">
@@ -39,24 +41,20 @@
           <div class="action-meta">
             <div id="current-time-display" class="current-time-display"></div>
             <button id="btn-analyze" class="btn btn-primary" disabled>
-              <span>⚡</span> 두 페이지 일괄 분석
+              <span>⚡</span> 일괄 분석
             </button>
           </div>
         </div>
       </div>
 
       <div id="log-output" class="log-box">
-        <div style="color:var(--text-tertiary);border:none">시스템이 대기 중입니다. 노션 데이터 불러오기를 클릭하세요.</div>
+        <div style="color:var(--text-tertiary);border:none">시스템이 대기 중입니다. jongga_data.js 자동 로드를 기다립니다.</div>
       </div>
     </div>
 
     <section class="tab-panel active" data-tab-panel="buy">
       <div class="page-switch-toolbar">
-        <div class="page-switch-copy">매수 화면 표시 페이지</div>
-        <div class="page-switcher" id="buy-slot-switch">
-          <button type="button" class="page-switch-btn active" data-buy-slot="slotA">Page A</button>
-          <button type="button" class="page-switch-btn" data-buy-slot="slotB">Page B</button>
-        </div>
+        <div class="page-switch-copy">매수 화면은 단일 페이지 결과만 표시합니다.</div>
       </div>
 
       <div class="section-title section-title-collapsible">
@@ -88,13 +86,9 @@
       <div class="sell-universe-toolbar">
         <div>
           <div class="sell-universe-title">🎯 매도 분석 대상</div>
-          <div class="sell-universe-copy">기본은 실매수 추적 종목만 표시하고, 필요할 때 전체 후보로 넓혀 볼 수 있습니다.</div>
+          <div class="sell-universe-copy">단일 페이지 기준으로 실매수 추적 종목을 먼저 보여주고, 필요할 때 전체 후보로 넓혀 볼 수 있습니다.</div>
         </div>
         <div class="sell-universe-actions">
-          <div class="page-switcher" id="sell-slot-switch">
-            <button type="button" class="page-switch-btn active" data-sell-slot="slotA">Page A</button>
-            <button type="button" class="page-switch-btn" data-sell-slot="slotB">Page B</button>
-          </div>
           <div class="sell-universe-switch" id="sell-universe-switch">
             <button type="button" class="sell-universe-btn active" data-sell-universe="actual">실매수 종목</button>
             <button type="button" class="sell-universe-btn" data-sell-universe="all">전체 후보</button>
@@ -232,17 +226,21 @@
     </div>
   </div>
 
+  <script src="jongga/output/jongga_data.js"></script>
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
   <script src="js/gap.js"></script>
   <script src="js/state.js"></script>
   <script src="js/archive.js"></script>
-  <script src="js/notion.js"></script>
   <script src="js/api.js"></script>
   <script src="../market-analyze/wyckoff.js"></script>
   <script src="js/wyckoff-bias.js"></script>
   <script src="js/analysis.js"></script>
   <script src="js/buy-live.js"></script>
+  <script src="js/jongga-schema.js"></script>
+  <script src="js/jongga-manual-overrides.js"></script>
+  <script src="js/jongga-adapter.js"></script>
+  <script src="js/jongga-loader.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/sell-tracking.js"></script>
   <script src="js/sell-score.js"></script>

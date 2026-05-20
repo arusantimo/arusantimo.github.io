@@ -11,28 +11,28 @@ function rebuildSellStocksFromSnapshot() {
       code: entry.code,
       type: 'pullback',
       strategy: 'pullback',
-      source: 'notion'
+      source: entry.source || 'strategy-data'
     }, activeSellSlot)),
     momentum: visibleSnapshot.momentumEntries.map(entry => ensureStockIdentity({
       name: entry.name,
       code: entry.code,
       type: 'momentum',
       strategy: 'momentum',
-      source: 'notion'
+      source: entry.source || 'strategy-data'
     }, activeSellSlot)),
     reversal: visibleSnapshot.reversalEntries.map(entry => ensureStockIdentity({
       name: entry.name,
       code: entry.code,
       type: 'reversal',
       strategy: 'reversal',
-      source: 'notion'
+      source: entry.source || 'strategy-data'
     }, activeSellSlot)),
     swing: visibleSnapshot.swingEntries.map(entry => ensureStockIdentity({
       name: entry.name,
       code: entry.code,
       type: 'swing',
       strategy: 'swing',
-      source: 'notion',
+      source: entry.source || 'strategy-data',
       entryPrice: entry.entryPrice,
       buyDate: entry.buyDate,
       status: entry.status
@@ -177,8 +177,11 @@ async function analyzeStock(stock, isBefore0908) {
         })
         : { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족/수집 실패', metrics: {} };
 
-      const data = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction, foreignNetSeries, instNetSeries, ohlcvSeries, wyckoff };
-      log(`- [${stockLabel} · ${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원, 20MA: ${ma20.toLocaleString()}원, 외인: ${foreignNet.toLocaleString()}주)`);
+      const rawData = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction, foreignNetSeries, instNetSeries, ohlcvSeries, wyckoff };
+      const data = typeof applyJonggaManualOverridesToMarketData === 'function'
+        ? applyJonggaManualOverridesToMarketData(stock, rawData)
+        : rawData;
+      log(`- [${stockLabel} · ${stock.name}] 완료. (현재가: ${data.currentPrice.toLocaleString()}, 등락률: ${data.chgRate.toFixed(2)}%, 시가: ${data.openPrice.toLocaleString()}, 전일종가: ${data.prevClose.toLocaleString()}, 5일MA: ${ma5.toLocaleString()}원, 20MA: ${ma20.toLocaleString()}원, 외인: ${foreignNet.toLocaleString()}주${Number.isFinite(data.strength) ? `, 체결강도: ${data.strength.toFixed(1)}%` : ''})`);
       applyRules(stock, data, isBefore0908);
       return;
     } catch (error) {
@@ -271,8 +274,8 @@ function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile
       code: 'R2',
       title: '손절가 이탈',
       criterion: gapProfile?.tightenStopLossRate
-        ? `노션 손절가와 갭 보수 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(노션 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
-        : `노션 매매전략의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
+        ? `전략 손절가와 갭 보수 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
+        : `전략 데이터의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
       triggered: belowStopLoss,
       result: belowStopLoss
         ? `현재가 ${data.currentPrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 즉시 전량 매도`
@@ -287,8 +290,8 @@ function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile
       code: 'R2',
       title: `기본 손절선 (${defaultStopLossRate.toFixed(1)}%) 이탈`,
       criterion: gapProfile?.tightenStopLossRate
-        ? `노션 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${defaultStopLossRate.toFixed(1)}%`
-        : `노션 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
+        ? `전략 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${defaultStopLossRate.toFixed(1)}%`
+        : `전략 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
       triggered: belowDefault,
       result: belowDefault
         ? `진입가 대비 ${lossRate.toFixed(2)}% → 즉시 전량 매도`
@@ -468,7 +471,7 @@ function buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfi
     scores.push({
       code: 'S8',
       title: '갭 변화 비교',
-      criterion: '노션 기준 대비 실시간 갭 환경이 개선되면 보유 점수 가산, 악화되면 감점',
+      criterion: '기준 스냅샷 대비 실시간 갭 환경이 개선되면 보유 점수 가산, 악화되면 감점',
       pass: improved,
       result: improved
         ? `실시간 개선 신호 — ${gapProfile.comparison.summary}`
@@ -572,7 +575,7 @@ function buildIndicators(stock, data, isBefore0908) {
     if (gapProfile.comparison.available) {
       indicators.push({
         title: '갭 변화 보정',
-        criterion: '실시간 갭 스코어가 노션 스냅샷보다 개선되면 매도 보수성을 일부 완화하고, 악화되면 추가 강화합니다.',
+        criterion: '실시간 갭 스코어가 기준 스냅샷보다 개선되면 매도 보수성을 일부 완화하고, 악화되면 추가 강화합니다.',
         status: gapProfile.comparison.bias > 0 ? 'clear' : gapProfile.comparison.bias < 0 ? 'triggered' : 'unknown',
         result: gapProfile.comparison.summary,
         value: getGapComparisonText() || gapProfile.comparison.summary

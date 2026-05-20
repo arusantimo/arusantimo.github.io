@@ -93,10 +93,10 @@ function getGapComparisonSignal() {
 
   const tone = bias > 0 ? 'improved' : bias < 0 ? 'worsened' : 'neutral';
   const summary = bias > 0
-    ? `실시간 갭 환경이 노션 대비 개선됨 (${formatSignedNumber(scoreDelta, 1)}점)`
+    ? `실시간 갭 환경이 기준 스냅샷 대비 개선됨 (${formatSignedNumber(scoreDelta, 1)}점)`
     : bias < 0
-      ? `실시간 갭 환경이 노션 대비 악화됨 (${formatSignedNumber(scoreDelta, 1)}점)`
-      : `실시간 갭 환경이 노션과 유사함 (${formatSignedNumber(scoreDelta, 1)}점)`;
+      ? `실시간 갭 환경이 기준 스냅샷 대비 악화됨 (${formatSignedNumber(scoreDelta, 1)}점)`
+      : `실시간 갭 환경이 기준 스냅샷과 유사함 (${formatSignedNumber(scoreDelta, 1)}점)`;
 
   return {
     available: Number.isFinite(liveTotal) || gradeShift !== 0,
@@ -118,7 +118,7 @@ function getGapComparisonText() {
   const notionLabel = notionGap.grade || '미확인';
   const liveLabel = liveGapState.score.grade || '미확인';
   const deltaText = Number.isFinite(delta) ? ` / ${formatSignedNumber(delta, 1)}점 변화` : '';
-  return `노션 ${notionLabel}${Number.isFinite(notionTotal) ? ` (${formatSignedNumber(notionTotal, 1)}점)` : ''} → 실시간 ${liveLabel}${Number.isFinite(liveTotal) ? ` (${formatSignedNumber(liveTotal, 1)}점)` : ''}${deltaText}`;
+  return `기준 ${notionLabel}${Number.isFinite(notionTotal) ? ` (${formatSignedNumber(notionTotal, 1)}점)` : ''} → 실시간 ${liveLabel}${Number.isFinite(liveTotal) ? ` (${formatSignedNumber(liveTotal, 1)}점)` : ''}${deltaText}`;
 }
 
 function scoreNqChange(changePct) {

@@ -38,15 +38,15 @@ function buildSellContextChips(stock, detail = null) {
     chips.push('<span class="sell-chip source">수동 추가</span>');
   } else if (stock?.type === 'swing') {
     chips.push('<span class="sell-chip source">스윙 보유</span>');
-  } else if (stock?.source === 'notion') {
-    chips.push('<span class="sell-chip source">노션 후보</span>');
+  } else if (['notion', 'jongga-json', 'strategy-data'].includes(stock?.source)) {
+    chips.push('<span class="sell-chip source">전략 후보</span>');
   }
 
   if (entryGrade) {
     chips.push(`<span class="sell-chip entry">진입 당시 ${escapeHtml(entryGrade)}등급</span>`);
   }
   if (entryStatusLabel) {
-    chips.push(`<span class="sell-chip entry">노션 판정 ${escapeHtml(entryStatusLabel)}</span>`);
+    chips.push(`<span class="sell-chip entry">전략 판정 ${escapeHtml(entryStatusLabel)}</span>`);
   }
   if (Number.isFinite(detail?.sellScore)) {
     chips.push(`<span class="sell-chip score">매도 ${detail.sellScore}점</span>`);
@@ -183,15 +183,16 @@ renderSellStockCards = function renderSellStockCardsOverride() {
       const detail = stockDetailMap[stock.entryKey];
       const planHtml = buildSellCardPlanSummary(stock.entryKey);
       const entryPrice = stock.entryPrice ? `매수가 ${stock.entryPrice.toLocaleString()}원` : '매수가(전일종가): 대기 중';
+      const slotLabel = shouldShowSlotLabel() ? escapeHtml(stock.slotLabel || getSlotLabel(stock.slotId)) : '';
       return `
         <div class="scard" id="${getCardDomId(stock.entryKey)}" data-entry-key="${escapeHtml(stock.entryKey)}">
           <div class="scard-head">
             <div>
               <div class="scard-name">${escapeHtml(stock.name)}</div>
-              <div class="scard-code">${escapeHtml(stock.code)} · ${escapeHtml(stock.slotLabel || getSlotLabel(stock.slotId))}</div>
+              <div class="scard-code">${escapeHtml(stock.code)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
             </div>
             <div class="scard-badges">
-              <span class="badge badge-page">${escapeHtml(stock.slotLabel || getSlotLabel(stock.slotId))}</span>
+              ${slotLabel ? `<span class="badge badge-page">${slotLabel}</span>` : ''}
               <span class="badge badge-shift" id="${getGapShiftDomId(stock.entryKey)}" style="display:none"></span>
               <span class="badge ${stock.type === 'swing' ? 'badge-swing' : 'badge-pending'}" id="${getBadgeDomId(stock.entryKey)}">${stock.type === 'swing' ? '스윙 보유' : '대기 중'}</span>
             </div>
@@ -234,7 +235,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
     if (!container) return;
     container.innerHTML = '';
     if (!entries.length) {
-      container.innerHTML = '<div class="empty-state">노션에서 불러온 매수 후보가 없습니다.</div>';
+      container.innerHTML = '<div class="empty-state">전략 JSON에서 불러온 매수 후보가 없습니다.</div>';
       return;
     }
 
@@ -243,6 +244,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
       const presentation = getBuyPresentation(entry);
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';
       const scoreDisplay = getBuyDisplayScore(entry, presentation.primaryScore);
+      const slotLabel = shouldShowSlotLabel() ? escapeHtml(entry.slotLabel || getSlotLabel(entry.slotId)) : '';
       const liveMetaHtml = presentation.liveRefresh
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
@@ -250,7 +252,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
         <div class="buy-card ${presentation.verdictClass}" data-entry-key="${escapeHtml(entry.entryKey)}">
           <div class="buy-card-head">
             <div>
-              <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)} · ${escapeHtml(entry.slotLabel || getSlotLabel(entry.slotId))}</div>
+              <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
               <div class="buy-card-name">${escapeHtml(entry.name)}</div>
               <div class="buy-card-code">${escapeHtml(entry.code)}</div>
             </div>
@@ -441,7 +443,7 @@ function buildSellStrategyPlan(detail) {
       status: 'available',
       icon: '•',
       title: '기본 전략 확인',
-      description: '노션 매매 단계 또는 분석 결과를 기반으로 다시 판단합니다.',
+      description: '전략 데이터의 매매 단계 또는 분석 결과를 기반으로 다시 판단합니다.',
       note: ''
     });
   }
@@ -631,7 +633,7 @@ function buildSellModalBody(detail) {
   const stageCls = isBefore0908 ? 'stage1' : 'stage2';
   const stageText = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
   const notionEntry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
-  const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 노션에 없습니다.</div>';
+  const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 전략 데이터에 없습니다.</div>';
   const strategyPlanHtml = renderSellStrategyPlan(detail, false);
   const scoreBreakdownHtml = renderSellScoreBreakdown(detail);
   const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
@@ -736,7 +738,7 @@ function buildSellModalBody(detail) {
     ${lossManagementHtml}
 
     <div>
-      <div class="modal-section-label">매매 전략 (노션)</div>
+      <div class="modal-section-label">매매 전략 (전략 데이터)</div>
       ${tradePlanHtml}
     </div>
 
@@ -798,8 +800,9 @@ openModal = function openModalOverride(codeOrEntryKey, mode = 'sell') {
 
 updateAnalyzeButtonState = function updateAnalyzeButtonStateOverride() {
   const analyzeBtn = document.getElementById('btn-analyze');
-  const hasBuyEntries = NOTION_SLOT_IDS.some(slotId => getVisibleBuyEntries(slotId).length > 0);
-  const hasSellStocks = NOTION_SLOT_IDS.some(slotId => getVisibleSellStocksList(slotId, getSellUniverseMode(slotId)).length > 0);
+  const uiSlotIds = getUiSlotIds();
+  const hasBuyEntries = uiSlotIds.some(slotId => getVisibleBuyEntries(slotId).length > 0);
+  const hasSellStocks = uiSlotIds.some(slotId => getVisibleSellStocksList(slotId, getSellUniverseMode(slotId)).length > 0);
   analyzeBtn.disabled = isAnalysisRunning || (activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks);
 };
 
@@ -827,12 +830,12 @@ updateCurrentTime = function updateCurrentTimeOverride() {
   const archiveSuffix = archiveTimeLabel ? ` · ${archiveTimeLabel} 분석` : '';
 
   if (activeTab === 'buy') {
-    const hasBuyRefresh = NOTION_SLOT_IDS.some(slotId => getVisibleBuyEntries(slotId).some(entry => entry.liveRefresh));
-    analyzeBtn.innerHTML = `<span>⚡</span> ${hasBuyRefresh ? '두 페이지 다시 분석' : '두 페이지 일괄 분석'}${archiveSuffix}`;
+    const hasBuyRefresh = getUiSlotIds().some(slotId => getVisibleBuyEntries(slotId).some(entry => entry.liveRefresh));
+    analyzeBtn.innerHTML = `<span>⚡</span> ${hasBuyRefresh ? '다시 분석' : '일괄 분석'}${archiveSuffix}`;
     return;
   }
 
-  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '두 페이지 1차 분석' : '두 페이지 2차 분석'}${archiveSuffix}`;
+  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차 분석' : '2차 분석'}${archiveSuffix}`;
 };
 
 updateCardError = function updateCardErrorOverride(codeOrEntryKey) {

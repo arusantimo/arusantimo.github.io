@@ -235,7 +235,7 @@ function rebuildSellStocksFromSnapshots() {
           code: entry.code,
           type: 'pullback',
           strategy: 'pullback',
-          source: 'notion'
+          source: entry.source || 'strategy-data'
         }, slotId)),
         ...manualPullback.filter(stock => !snapshot.pullbackEntries.some(entry => entry.code === stock.code))
       ],
@@ -245,7 +245,7 @@ function rebuildSellStocksFromSnapshots() {
           code: entry.code,
           type: 'momentum',
           strategy: 'momentum',
-          source: 'notion'
+          source: entry.source || 'strategy-data'
         }, slotId)),
         ...manualMomentum.filter(stock => !snapshot.momentumEntries.some(entry => entry.code === stock.code))
       ],
@@ -255,7 +255,7 @@ function rebuildSellStocksFromSnapshots() {
           code: entry.code,
           type: 'reversal',
           strategy: 'reversal',
-          source: 'notion'
+          source: entry.source || 'strategy-data'
         }, slotId)),
         ...manualReversal.filter(stock => !snapshot.reversalEntries.some(entry => entry.code === stock.code))
       ],
@@ -265,7 +265,7 @@ function rebuildSellStocksFromSnapshots() {
           code: entry.code,
           type: 'swing',
           strategy: 'swing',
-          source: 'notion',
+          source: entry.source || 'strategy-data',
           entryPrice: entry.entryPrice,
           buyDate: entry.buyDate,
           status: entry.status
