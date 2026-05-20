@@ -9,26 +9,60 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.130.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-12</span>
+        <span class="meta-version">v0.132.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-20</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.130.0)</span>
+        <span>📋 최근 변경사항 (v0.132.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="v0.129.0~v0.130.0 주요 업데이트"
-            data-tt-desc="codex remote-control 커맨드가 추가되어 헤드리스 원격 제어가 쉬워졌습니다. 플러그인 공유 시 메타데이터와 디스커버빌리티 제어가 가능해졌으며, Bedrock 인증 시 aws login 프로필을 지원합니다. 그 외 Windows 샌드박스 설정 및 스레드 성능이 개선되었습니다."
-            data-tt-example="">v0.129.0~v0.130.0 업데이트 — <code>codex remote-control</code> 추가, Bedrock aws login 지원 및 플러그인 공유 기능 강화 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Python SDK 인증 지원 (v0.132.0)"
+            data-tt-desc="Python SDK에 API 키 로그인, ChatGPT 브라우저 및 디바이스 코드 플로우, 계정 확인 및 로그아웃 API가 지원됩니다."
+            data-tt-example="">Python SDK 인증 확장 — API 키, ChatGPT, 디바이스 코드 플로우 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex exec resume --output-schema (v0.132.0)"
+            data-tt-desc="codex exec resume에 --output-schema 옵션이 추가되었습니다. 세션 컨텍스트를 유지하면서 구조화된 JSON 출력을 강제할 수 있습니다."
+            data-tt-example="codex exec resume --output-schema schema.json"><code>codex exec resume --output-schema</code> 옵션 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="TUI 시작 속도 개선 (v0.132.0)"
+            data-tt-desc="TUI 시작 시 터미널 성능 프로브가 일괄 처리되어 첫 번째 인터랙티브 프레임 이전에 여러 시리얼 채크를 기다리는 시간이 없어졌습니다."
+            data-tt-example="">TUI 시작 속도 개선 — 터미널 프로브 일괄 처리 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 실행기 인증 단순화 (v0.132.0)"
+            data-tt-desc="원격 실행기 등록 시 별도 레지스트리 커넥션 플로우 없이 Codex 표준 인증을 사용할 수 있습니다."
+            data-tt-example="">원격 실행기 등록에 Codex 표준 인증 사용 가능 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Windows 안정성 개선 (v0.132.0)"
+            data-tt-desc="codex doctor가 npm 관리 설치를 올바르게 감지하며, MSVC 릴리스 바이너리가 별도 VC++ 런타임 DLL 없이 실행됩니다."
+            data-tt-example="">Windows: <code>codex doctor</code> npm 감지 수정 및 MSVC 정적 링크 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="메모리 요약 버전 관리 (v0.132.0)"
+            data-tt-desc="메모리 요약이 버전이 지정되어 저장 형식이 오래되면 자동으로 재생성됩니다."
+            data-tt-example="">메모리 요약 버전 관리 — 오래된 형식 자동 재생성 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.131.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.131.0 주요 업데이트"
+                data-tt-desc="Python SDK에 터널 API, 프로그레스 피드, 모델/샌드박스 설정 지원이 추가되었습니다. 세션 피커에서 이름 변경된 스레드가 name (thread-id) 형식으로 표시되며, 플러그인 멘션 API가 추가되었습니다."
+                data-tt-example="">v0.131.0 업데이트 — Python SDK 터널 API, 세션 피커 개선, 플러그인 멘션 API 추가</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v0.129.0~v0.130.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="v0.129.0~v0.130.0 주요 업데이트"
+                data-tt-desc="codex remote-control 커맨드가 추가되어 헤드리스 원격 제어가 쉬워졌습니다. 플러그인 공유 시 메타데이터와 디스커버빌리티 제어가 가능해졌으며, Bedrock 인증 시 aws login 프로필을 지원합니다. 그 외 Windows 샌드박스 설정 및 스레드 성능이 개선되었습니다."
+                data-tt-example="">v0.129.0~v0.130.0 업데이트 — <code>codex remote-control</code> 추가, Bedrock aws login 지원 및 플러그인 공유 기능 강화</li>
+            </ul>
+          </details>
+
 
           <details class="ver-group">
             <summary>v0.128.0</summary>
@@ -38,6 +72,7 @@ const codexContent = `
                 data-tt-example="">v0.126.0~v0.128.0 업데이트 — <code>/goal</code> 워크플로, <code>codex update</code>, 권한 프로필 확장 및 외부 세션 임포트</li>
             </ul>
           </details>
+
 
           <details class="ver-group">
             <summary>v0.125.0</summary>
@@ -168,6 +203,10 @@ const codexContent = `
                 <div class="row-desc">마지막 exec 세션 이어가기</div>
               </div>
               <div class="row">
+                <div class="row-key"><code>codex exec resume --output-schema</code></div>
+                <div class="row-desc">세션 재개 + 구조화 출력 강제 <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row">
                 <div class="row-key"><code>codex resume --last</code></div>
                 <div class="row-desc">대화형 세션 재개</div>
               </div>
@@ -295,7 +334,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>codex remote-control</code></div>
-                <div class="row-desc">헤드리스 원격 제어용 서버 시작 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">헤드리스 원격 제어용 서버 시작</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>codex cloud exec --env ENV_ID</code></div>

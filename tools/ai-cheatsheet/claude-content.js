@@ -9,44 +9,77 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.139</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-12</span>
+        <span class="meta-version">v2.1.145</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-20</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.139)</span>
+        <span>📋 최근 변경사항 (v2.1.145)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="claude agents 에이전트 뷰 (v2.1.139)"
-            data-tt-desc="Research Preview: 모든 Claude Code 세션 목록(실행 중, 대기 중, 완료)을 하나의 리스트로 볼 수 있는 에이전트 뷰. claude agents 명령으로 시작합니다."
-            data-tt-example="claude agents"><code>claude agents</code> 에이전트 뷰 추가 (Research Preview) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/goal 명령어 (v2.1.139)"
-            data-tt-desc="완료 조건을 설정하면 Claude가 조건 충족까지 여러 턴에 걸쳐 작업을 계속합니다. 대화형, -p, Remote Control에서 작동하며 전경판널로 경과/턴/토큰을 실시간 표시합니다."
-            data-tt-example="/goal"><code>/goal</code> 명령어 추가 — 완료 조건 설정 및 자동 진행 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/scroll-speed 명령어 (v2.1.139)"
-            data-tt-desc="마우스 휠 스크롤 속도를 라이브 프리뷰로 조정할 수 있는 슬래시 명령어 추가."
-            data-tt-example="/scroll-speed"><code>/scroll-speed</code> 명령어 추가 — 스크롤 속도 조정 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="hook continueOnBlock 옵션 (v2.1.139)"
-            data-tt-desc="PostToolUse 훅에 continueOnBlock: true를 설정하면, 훅이 거부 이유를 Claude에 피드백하고 턴을 계속 진행합니다."
-            data-tt-example=""><code>continueOnBlock</code> 훅 옵션 추가 (PostToolUse) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="CLAUDE_PROJECT_DIR 환경변수 (v2.1.139)"
-            data-tt-desc="MCP stdio 서버가 CLAUDE_PROJECT_DIR 환경변수를 수신하며, 플러그인 설정에서 \${CLAUDE_PROJECT_DIR}를 참조할 수 있습니다."
-            data-tt-example="\${CLAUDE_PROJECT_DIR}"><code>CLAUDE_PROJECT_DIR</code> MCP stdio 서버 환경변수 지원 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="에이전트 ID 헤더 (v2.1.139)"
-            data-tt-desc="서브에이전트의 API 요청에 x-claude-code-agent-id / x-claude-code-parent-agent-id 헤더가 포함되며, OTEL 스팬에도 agent_id / parent_agent_id 속성이 포함됩니다."
-            data-tt-example=""><code>x-claude-code-agent-id</code> / <code>x-claude-code-parent-agent-id</code> 서브에이전트 API 헤더 추가 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="v2.1.131~v2.1.139 주요 설정 업데이트"
-            data-tt-desc="worktree.baseRef 및 sandbox.bwrapPath 등 신규 설정 추가. Hooks에서 $CLAUDE_EFFORT 참조 가능. CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN 환경변수로 네이티브 스크롤백 지원 및 TUI 시각적 일관성 대폭 개선."
-            data-tt-example="">v2.1.131~v2.1.139 주요 설정 업데이트 — <code>worktree.baseRef</code>, <code>$CLAUDE_EFFORT</code>, <code>CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN</code> 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude agents --json 세션 목록 (v2.1.145)"
+            data-tt-desc="claude agents --json 명령으로 실행 중인 Claude 세션 목록을 JSON으로 출력합니다. tmux-resurrect, 상태바, 세션 피커 스크립팅에 활용 가능합니다."
+            data-tt-example="claude agents --json"><code>claude agents --json</code> — 세션 JSON 목록 출력 (스크립팅용) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/model 변경 사항 (v2.1.144)"
+            data-tt-desc="/model은 이제 현재 세션에만 적용됩니다. 모델 피커에서 'd'를 누르면 새 세션의 기본값으로 설정됩니다. /resume 시 세션이 사용 중이던 모델을 유지합니다."
+            data-tt-example="/model"><code>/model</code> — 현재 세션 전용 (d: 기본값 저장) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/extra-usage → /usage-credits 변경 (v2.1.144)"
+            data-tt-desc="'extra usage'가 'usage credits'로 이름이 변경되었습니다. /extra-usage는 /usage-credits로 변경되었으나 기존 이름도 계속 작동합니다."
+            data-tt-example="/usage-credits"><code>/extra-usage</code> → <code>/usage-credits</code> 명칭 변경 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/resume 백그라운드 세션 지원 (v2.1.144)"
+            data-tt-desc="/resume에서 백그라운드 세션도 표시됩니다. claude --bg 또는 에이전트 뷰로 시작한 세션은 'bg' 표시와 함께 나타납니다."
+            data-tt-example="/resume"><code>/resume</code> — 백그라운드 세션 포함 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="worktree.bgIsolation: none 설정 (v2.1.143)"
+            data-tt-desc="worktree.bgIsolation: none 설정으로 백그라운드 세션이 EnterWorktree 없이 워킹 카피를 직접 편집할 수 있습니다. 워크트리 사용이 어려운 저장소에서 유용합니다."
+            data-tt-example=""><code>worktree.bgIsolation: "none"</code> 설정 추가 — 워크트리 없이 직접 편집 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="ANTHROPIC_WORKSPACE_ID 환경변수 (v2.1.141)"
+            data-tt-desc="워크로드 ID 연합(federation)을 위한 ANTHROPIC_WORKSPACE_ID 환경변수가 추가됐습니다. 연합 규칙이 여러 워크스페이스를 포함할 때 특정 워크스페이스로 범위를 지정합니다."
+            data-tt-example="export ANTHROPIC_WORKSPACE_ID=ws-xxx"><code>ANTHROPIC_WORKSPACE_ID</code> 환경변수 추가 (워크로드 ID 연합) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_CODE_PLUGIN_PREFER_HTTPS 환경변수 (v2.1.141)"
+            data-tt-desc="GitHub 플러그인 소스를 SSH 대신 HTTPS로 클론하도록 합니다. GitHub SSH 키가 없는 환경에서 유용합니다."
+            data-tt-example="export CLAUDE_CODE_PLUGIN_PREFER_HTTPS=1"><code>CLAUDE_CODE_PLUGIN_PREFER_HTTPS</code> 환경변수 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude agents 플래그 확장 (v2.1.141~v2.1.142)"
+            data-tt-desc="claude agents에 --cwd, --add-dir, --settings, --mcp-config, --plugin-dir, --permission-mode, --model, --effort, --dangerously-skip-permissions 플래그가 추가됩니다."
+            data-tt-example="claude agents --cwd /path/to/project"><code>claude agents --cwd</code> 및 다수 플래그 추가 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="보안 패치: Bash 변수 할당 자동승인 우회 수정 (v2.1.145)"
+            data-tt-desc="Bash 명령에서 허용되지 않은 환경변수에 대한 변수 할당이 자동으로 승인되던 권한 프롬프트 우회 문제가 수정되었습니다."
+            data-tt-example="">🔒 Bash 변수 할당 자동승인 우회 보안 수정 (v2.1.145) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.139</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="claude agents 에이전트 뷰 (v2.1.139)"
+                data-tt-desc="Research Preview: 모든 Claude Code 세션 목록(실행 중, 대기 중, 완료)을 하나의 리스트로 볼 수 있는 에이전트 뷰. claude agents 명령으로 시작합니다."
+                data-tt-example="claude agents"><code>claude agents</code> 에이전트 뷰 추가 (Research Preview)</li>
+              <li class="cl-tip" data-tt-title="/goal 명령어 (v2.1.139)"
+                data-tt-desc="완료 조건을 설정하면 Claude가 조건 충족까지 여러 턴에 걸쳐 작업을 계속합니다. 대화형, -p, Remote Control에서 작동하며 전경판널로 경과/턴/토큰을 실시간 표시합니다."
+                data-tt-example="/goal"><code>/goal</code> 명령어 추가 — 완료 조건 설정 및 자동 진행</li>
+              <li class="cl-tip" data-tt-title="/scroll-speed 명령어 (v2.1.139)"
+                data-tt-desc="마우스 휠 스크롤 속도를 라이브 프리뷰로 조정할 수 있는 슬래시 명령어 추가."
+                data-tt-example="/scroll-speed"><code>/scroll-speed</code> 명령어 추가 — 스크롤 속도 조정</li>
+              <li class="cl-tip" data-tt-title="hook continueOnBlock 옵션 (v2.1.139)"
+                data-tt-desc="PostToolUse 훅에 continueOnBlock: true를 설정하면, 훅이 거부 이유를 Claude에 피드백하고 턴을 계속 진행합니다."
+                data-tt-example=""><code>continueOnBlock</code> 훅 옵션 추가 (PostToolUse)</li>
+              <li class="cl-tip" data-tt-title="CLAUDE_PROJECT_DIR 환경변수 (v2.1.139)"
+                data-tt-desc="MCP stdio 서버가 CLAUDE_PROJECT_DIR 환경변수를 수신하며, 플러그인 설정에서 \${CLAUDE_PROJECT_DIR}를 참조할 수 있습니다."
+                data-tt-example="\${CLAUDE_PROJECT_DIR}"><code>CLAUDE_PROJECT_DIR</code> MCP stdio 서버 환경변수 지원</li>
+              <li class="cl-tip" data-tt-title="에이전트 ID 헤더 (v2.1.139)"
+                data-tt-desc="서브에이전트의 API 요청에 x-claude-code-agent-id / x-claude-code-parent-agent-id 헤더가 포함되며, OTEL 스팬에도 agent_id / parent_agent_id 속성이 포함됩니다."
+                data-tt-example=""><code>x-claude-code-agent-id</code> / <code>x-claude-code-parent-agent-id</code> 서브에이전트 API 헤더 추가</li>
+              <li class="cl-tip" data-tt-title="v2.1.131~v2.1.139 주요 설정 업데이트"
+                data-tt-desc="worktree.baseRef 및 sandbox.bwrapPath 등 신규 설정 추가. Hooks에서 $CLAUDE_EFFORT 참조 가능. CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN 환경변수로 네이티브 스크롤백 지원 및 TUI 시각적 일관성 대폭 개선."
+                data-tt-example="">v2.1.131~v2.1.139 주요 설정 업데이트 — <code>worktree.baseRef</code>, <code>$CLAUDE_EFFORT</code>, <code>CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN</code> 추가</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.124~v2.1.136</summary>
@@ -56,6 +89,7 @@ const claudeContent = `
                 data-tt-example="">v2.1.124~v2.1.136 업데이트 — <code>claude project purge</code>, <code>--plugin-url</code>, <code>worktree.baseRef</code>, 훅 effort 지원 등</li>
             </ul>
           </details>
+
 
           <details class="ver-group">
             <summary>v2.1.123</summary>
