@@ -180,6 +180,22 @@ let liveGapState = createEmptyLiveGapState();
 const stockDetailMap = {};
 let currentModalState = { key: null, code: null, slotId: null, mode: null };
 let isRegimeSummaryCollapsed = true;
+let isAnalysisRunning = false;
+
+function syncAnalysisUIState() {
+  const logOutput = document.getElementById('log-output');
+  if (logOutput) {
+    logOutput.classList.toggle('is-active', isAnalysisRunning);
+  }
+  if (typeof updateAnalyzeButtonState === 'function') updateAnalyzeButtonState();
+  if (typeof updateCurrentTime === 'function') updateCurrentTime();
+}
+
+function setAnalysisRunning(nextValue) {
+  isAnalysisRunning = Boolean(nextValue);
+  syncAnalysisUIState();
+  return isAnalysisRunning;
+}
 
 function syncLegacyStateAliases() {
   notionSnapshot = getNotionPageState(activeBuySlot).snapshot;

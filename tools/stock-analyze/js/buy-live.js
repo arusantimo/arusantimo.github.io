@@ -26,8 +26,11 @@ function normalizeBuyLiveRefresh(entry, liveRefresh) {
   const strategyScore = roundBuyScoreValue(entry.score);
   const strategyGrade = entry.grade || getBuyGradeFromScore(strategyScore, entry.strategy);
   const wyckoffInfo = getDefaultBuyWyckoffInfo(entry, liveRefresh.wyckoff);
+  const consensusUnavailable = Boolean(liveRefresh.consensusUnavailable);
   const rawRecommMean = Number.parseFloat(String(liveRefresh.recommMean ?? '').replace(/,/g, ''));
-  const recommMean = Number.isFinite(rawRecommMean)
+  const recommMean = consensusUnavailable
+    ? null
+    : Number.isFinite(rawRecommMean)
     ? roundBuyScoreValue(clamp(rawRecommMean, 0, 5))
     : Number.isFinite(liveRefresh.consensusScore)
       ? roundBuyScoreValue(clamp(Number(liveRefresh.consensusScore) / 2, 0, 5))
@@ -44,18 +47,24 @@ function normalizeBuyLiveRefresh(entry, liveRefresh) {
   consensusScore = Number.isFinite(consensusScore)
     ? roundBuyScoreValue(clamp(consensusScore, 0, 10))
     : strategyScore;
-  const consensusGrade = String(
-    liveRefresh.consensusGrade
-    || liveRefresh.grade
-    || getBuyGradeFromScore(consensusScore, entry.strategy)
-  ).trim();
+  const consensusGrade = consensusUnavailable
+    ? '미제공'
+    : String(
+      liveRefresh.consensusGrade
+      || liveRefresh.grade
+      || getBuyGradeFromScore(consensusScore, entry.strategy)
+    ).trim();
 
-  let scoreGap = Number.isFinite(liveRefresh.scoreGap)
+  let scoreGap = consensusUnavailable
+    ? 0
+    : Number.isFinite(liveRefresh.scoreGap)
     ? Number(liveRefresh.scoreGap)
     : consensusScore - strategyScore;
   scoreGap = roundBuyScoreValue(scoreGap);
 
-  let adjustment = Number.isFinite(liveRefresh.adjustment)
+  let adjustment = consensusUnavailable
+    ? 0
+    : Number.isFinite(liveRefresh.adjustment)
     ? Number(liveRefresh.adjustment)
     : clamp(scoreGap * 0.35, -1, 1);
   adjustment = roundBuyScoreValue(clamp(adjustment, -1, 1));
@@ -87,6 +96,7 @@ function normalizeBuyLiveRefresh(entry, liveRefresh) {
 
   return {
     ...liveRefresh,
+    consensusUnavailable,
     recommMean,
     consensusScore,
     consensusGrade,
@@ -106,13 +116,14 @@ function normalizeBuyLiveRefresh(entry, liveRefresh) {
 }
 
 function buildBuyLiveRefreshPayload(entry, liveData) {
+  const consensusUnavailable = Boolean(liveData.consensusUnavailable);
   const rawRecommMean = Number.parseFloat(String(liveData.recommMean ?? '').replace(/,/g, ''));
-  const recommMean = roundBuyScoreValue(clamp(rawRecommMean, 0, 5));
   const strategyScore = roundBuyScoreValue(entry.score);
-  const consensusScore = roundBuyScoreValue(clamp(recommMean * 2, 0, 10));
-  const consensusGrade = getBuyGradeFromScore(consensusScore, entry.strategy);
-  const scoreGap = roundBuyScoreValue(consensusScore - strategyScore);
-  const adjustment = roundBuyScoreValue(clamp(scoreGap * 0.35, -1, 1));
+  const recommMean = consensusUnavailable ? null : roundBuyScoreValue(clamp(rawRecommMean, 0, 5));
+  const consensusScore = consensusUnavailable ? strategyScore : roundBuyScoreValue(clamp(recommMean * 2, 0, 10));
+  const consensusGrade = consensusUnavailable ? '미제공' : getBuyGradeFromScore(consensusScore, entry.strategy);
+  const scoreGap = consensusUnavailable ? 0 : roundBuyScoreValue(consensusScore - strategyScore);
+  const adjustment = consensusUnavailable ? 0 : roundBuyScoreValue(clamp(scoreGap * 0.35, -1, 1));
   const wyckoff = liveData.wyckoff || (typeof buildWyckoffSignalFromNaverData === 'function'
     ? buildWyckoffSignalFromNaverData({
       priceHistory: liveData.priceHistory,
@@ -130,6 +141,7 @@ function buildBuyLiveRefreshPayload(entry, liveData) {
   const finalStatusLabel = getBuyFinalStatusLabel(finalGrade);
 
   return {
+    consensusUnavailable,
     recommMean,
     consensusScore,
     consensusGrade,
@@ -180,7 +192,9 @@ function getBuyPresentation(entry) {
     primaryGrade,
     primaryStatusLabel,
     primarySummary: normalizedLiveRefresh
-      ? `최종 ${primaryGrade} · 컨센서스 ${formatBuySignedPoints(normalizedLiveRefresh.adjustment)} · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
+      ? normalizedLiveRefresh.consensusUnavailable
+        ? `최종 ${primaryGrade} · 컨센서스 미제공 · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
+        : `최종 ${primaryGrade} · 컨센서스 ${formatBuySignedPoints(normalizedLiveRefresh.adjustment)} · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
       : `전략 기준 ${strategyGrade}`,
     verdictClass: getBuyVerdictClassFromGrade(primaryGrade),
     liveRefresh: normalizedLiveRefresh,
@@ -207,8 +221,13 @@ function buildBuyLivePillsHtml(entry, presentation, options = {}) {
 
   const adjustmentTone = liveRefresh.adjustment >= 0 ? 'up' : 'down';
   const wyckoffTone = liveRefresh.wyckoffAdjustment > 0 ? 'up' : liveRefresh.wyckoffAdjustment < 0 ? 'down' : 'flat';
-  pills.push(`<span class="buy-live-pill consensus">컨센서스 ${liveRefresh.consensusScore.toFixed(1)} / ${escapeHtml(liveRefresh.consensusGrade)}</span>`);
-  pills.push(`<span class="buy-live-pill adjustment ${adjustmentTone}">보정 ${formatBuySignedPoints(liveRefresh.adjustment)}</span>`);
+  if (liveRefresh.consensusUnavailable) {
+    pills.push('<span class="buy-live-pill consensus">컨센서스 미제공</span>');
+    pills.push('<span class="buy-live-pill adjustment flat">전략 점수 유지</span>');
+  } else {
+    pills.push(`<span class="buy-live-pill consensus">컨센서스 ${liveRefresh.consensusScore.toFixed(1)} / ${escapeHtml(liveRefresh.consensusGrade)}</span>`);
+    pills.push(`<span class="buy-live-pill adjustment ${adjustmentTone}">보정 ${formatBuySignedPoints(liveRefresh.adjustment)}</span>`);
+  }
   pills.push(`<span class="buy-live-pill wyckoff">와이코프 ${escapeHtml(liveRefresh.wyckoff?.label || '관망 (Neutral)')} · ${liveRefresh.wyckoff?.confidencePct || 0}%</span>`);
   pills.push(`<span class="buy-live-pill adjustment ${wyckoffTone}">와이코프 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)}</span>`);
   if (liveRefresh.gradeCap) {
@@ -265,7 +284,9 @@ function buildBuyVerificationHtml(entry) {
   const gradeText = gradeShift
     ? `최종 등급이 ${presentation.strategyGrade} → ${presentation.finalGrade}로 조정되었습니다.`
     : `최종 등급은 ${presentation.finalGrade}로 유지됩니다.`;
-  const desc = `컨센서스 ${liveRefresh.recommMean.toFixed(2)}/5.00를 ${liveRefresh.consensusScore.toFixed(1)}점으로 환산해 ${formatBuySignedPoints(liveRefresh.adjustment)} 반영했고, ${liveRefresh.wyckoff?.label || '관망 (Neutral)'} ${liveRefresh.wyckoff?.confidencePct || 0}%로 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)} 보정해 최종 ${liveRefresh.finalScore.toFixed(1)}점으로 계산했습니다.${liveRefresh.gradeCap ? ` 분배 고신뢰도라 최종 등급 상한은 ${liveRefresh.gradeCap}입니다.` : ''} ${gradeText}`;
+  const desc = liveRefresh.consensusUnavailable
+    ? `네이버 컨센서스가 제공되지 않아 전략 점수 ${presentation.strategyScore.toFixed(1)}점을 그대로 유지했고, ${liveRefresh.wyckoff?.label || '관망 (Neutral)'} ${liveRefresh.wyckoff?.confidencePct || 0}%로 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)}만 반영해 최종 ${liveRefresh.finalScore.toFixed(1)}점으로 계산했습니다.${liveRefresh.gradeCap ? ` 분배 고신뢰도라 최종 등급 상한은 ${liveRefresh.gradeCap}입니다.` : ''} ${gradeText}`
+    : `컨센서스 ${liveRefresh.recommMean.toFixed(2)}/5.00를 ${liveRefresh.consensusScore.toFixed(1)}점으로 환산해 ${formatBuySignedPoints(liveRefresh.adjustment)} 반영했고, ${liveRefresh.wyckoff?.label || '관망 (Neutral)'} ${liveRefresh.wyckoff?.confidencePct || 0}%로 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)} 보정해 최종 ${liveRefresh.finalScore.toFixed(1)}점으로 계산했습니다.${liveRefresh.gradeCap ? ` 분배 고신뢰도라 최종 등급 상한은 ${liveRefresh.gradeCap}입니다.` : ''} ${gradeText}`;
   return `
     <div class="buy-verification-panel">
       <div class="modal-section-label">🔍 실시간 컨센서스/와이코프 보정 검증</div>
@@ -289,13 +310,13 @@ function buildBuyVerificationHtml(entry) {
           <tr>
             <td><strong>점수 / 등급</strong></td>
             <td>${presentation.strategyScore.toFixed(1)}점 / ${escapeHtml(presentation.strategyGrade)}</td>
-            <td>컨센서스 ${liveRefresh.consensusScore.toFixed(1)}점 / ${escapeHtml(liveRefresh.consensusGrade)}<br>${escapeHtml(liveRefresh.wyckoff?.label || '관망 (Neutral)')} / ${liveRefresh.wyckoff?.confidencePct || 0}%</td>
-            <td>컨센서스 ${formatBuySignedPoints(liveRefresh.adjustment)} + 와이코프 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)} → ${presentation.finalScore.toFixed(1)}점 / ${escapeHtml(presentation.finalGrade)}</td>
+            <td>${liveRefresh.consensusUnavailable ? '컨센서스 미제공' : `컨센서스 ${liveRefresh.consensusScore.toFixed(1)}점 / ${escapeHtml(liveRefresh.consensusGrade)}`}<br>${escapeHtml(liveRefresh.wyckoff?.label || '관망 (Neutral)')} / ${liveRefresh.wyckoff?.confidencePct || 0}%</td>
+            <td>${liveRefresh.consensusUnavailable ? '전략 점수 유지' : `컨센서스 ${formatBuySignedPoints(liveRefresh.adjustment)}`} + 와이코프 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)} → ${presentation.finalScore.toFixed(1)}점 / ${escapeHtml(presentation.finalGrade)}</td>
           </tr>
           <tr>
             <td><strong>운영 판정</strong></td>
             <td>${escapeHtml(entry.statusLabel || presentation.strategyStatusLabel)}</td>
-            <td>네이버 ${liveRefresh.recommMean.toFixed(2)} / 5.00<br>${escapeHtml(liveRefresh.wyckoff?.reason || '와이코프 중립')}</td>
+            <td>${liveRefresh.consensusUnavailable ? '네이버 컨센서스 미제공' : `네이버 ${liveRefresh.recommMean.toFixed(2)} / 5.00`}<br>${escapeHtml(liveRefresh.wyckoff?.reason || '와이코프 중립')}</td>
             <td>${escapeHtml(presentation.finalStatusLabel)}${liveRefresh.gradeCap ? `<br>등급 상한 ${escapeHtml(liveRefresh.gradeCap)}` : ''}</td>
           </tr>
           <tr>

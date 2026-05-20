@@ -6,6 +6,94 @@ function getProxyHostLabel(proxy) {
   }
 }
 
+function parseProxyJsonPayload(text, hostLabel) {
+  if (!text) throw new Error(`${hostLabel} empty response`);
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    const start = text.indexOf('{');
+    const end = text.lastIndexOf('}');
+    if (start >= 0 && end > start) {
+      return JSON.parse(text.slice(start, end + 1));
+    }
+    const arrStart = text.indexOf('[');
+    const arrEnd = text.lastIndexOf(']');
+    if (arrStart >= 0 && arrEnd > arrStart) {
+      return JSON.parse(text.slice(arrStart, arrEnd + 1));
+    }
+    throw new Error(`${hostLabel} invalid JSON payload`);
+  }
+}
+
+async function fetchJsonViaAllOriginsGet(targetUrl, timeoutMs) {
+  const hostLabel = 'api.allorigins.win(get)';
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error(`timeout ${timeoutMs}ms`)), timeoutMs);
+
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+    const res = await fetch(proxyUrl, {
+      cache: 'no-store',
+      signal: controller.signal
+    });
+    clearTimeout(timer);
+    if (!res.ok) throw new Error(`${hostLabel} HTTP ${res.status}`);
+
+    const wrapped = await res.json();
+    const text = String(wrapped?.contents || '').trim();
+    return parseProxyJsonPayload(text, hostLabel);
+  } catch (error) {
+    clearTimeout(timer);
+    throw error?.name === 'AbortError'
+      ? new Error(`${hostLabel} timeout ${timeoutMs}ms`)
+      : error;
+  }
+}
+
+function buildNaverChartHistoryUrl(code, count = 120) {
+  return [
+    'https://fchart.stock.naver.com/sise.nhn',
+    `?symbol=${encodeURIComponent(code)}`,
+    '&timeframe=day',
+    `&count=${Math.max(10, Number(count) || 120)}`,
+    '&requestType=0'
+  ].join('');
+}
+
+function parseNaverChartHistoryRows(xmlText) {
+  const rows = [];
+  const itemRegex = /<item[^>]*data="([^"]+)"/gi;
+  let match;
+
+  while ((match = itemRegex.exec(String(xmlText || ''))) !== null) {
+    const [dateKey, open, high, low, close, volume] = match[1].split('|');
+    if (!dateKey || [open, high, low, close, volume].some(value => value === undefined)) continue;
+
+    rows.push({
+      localTradedAt: dateKey,
+      openPrice: open,
+      highPrice: high,
+      lowPrice: low,
+      closePrice: close,
+      accumulatedTradingVolume: volume
+    });
+  }
+
+  return rows.sort((left, right) => String(right.localTradedAt).localeCompare(String(left.localTradedAt)));
+}
+
+async function fetchNaverPriceHistory(code, options = {}) {
+  const timeoutMs = Number.isFinite(options.timeoutMs) ? options.timeoutMs : 8000;
+  const count = Number.isFinite(options.count) ? options.count : 120;
+  const xmlText = await fetchJsonWithProxyFallback(buildNaverChartHistoryUrl(code, count), {
+    timeoutMs,
+    parseMode: 'text'
+  });
+  const rows = parseNaverChartHistoryRows(xmlText);
+  if (!rows.length) throw new Error('naver chart history unavailable');
+  return rows;
+}
+
 async function fetchJsonWithProxyFallback(targetUrl, options = {}) {
   const {
     timeoutMs = 8000,
@@ -31,28 +119,20 @@ async function fetchJsonWithProxyFallback(targetUrl, options = {}) {
       }
 
       const text = await res.text();
-      if (!text) throw new Error(`${getProxyHostLabel(proxy)} empty response`);
-
-      try {
-        return JSON.parse(text);
-      } catch (error) {
-        const start = text.indexOf('{');
-        const end = text.lastIndexOf('}');
-        if (start >= 0 && end > start) {
-          return JSON.parse(text.slice(start, end + 1));
-        }
-        const arrStart = text.indexOf('[');
-        const arrEnd = text.lastIndexOf(']');
-        if (arrStart >= 0 && arrEnd > arrStart) {
-          return JSON.parse(text.slice(arrStart, arrEnd + 1));
-        }
-        throw new Error(`${getProxyHostLabel(proxy)} invalid JSON payload`);
-      }
+      return parseProxyJsonPayload(text, getProxyHostLabel(proxy));
     } catch (error) {
       clearTimeout(timer);
       lastError = error?.name === 'AbortError'
         ? new Error(`${getProxyHostLabel(proxy)} timeout ${timeoutMs}ms`)
         : error;
+    }
+  }
+
+  if (parseMode !== 'text') {
+    try {
+      return await fetchJsonViaAllOriginsGet(targetUrl, timeoutMs);
+    } catch (error) {
+      lastError = error;
     }
   }
 
@@ -215,12 +295,11 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
     try {
       const basicUrl = `https://m.stock.naver.com/api/stock/${entry.code}/basic`;
       const integrationUrl = `https://m.stock.naver.com/api/stock/${entry.code}/integration`;
-      const priceUrl = `https://m.stock.naver.com/api/stock/${entry.code}/price?pageSize=120&page=1`;
 
       const [basicResult, integrationResult, priceResult] = await Promise.allSettled([
         fetchJsonWithProxyFallback(basicUrl, { timeoutMs: 8000 }),
         fetchJsonWithProxyFallback(integrationUrl, { timeoutMs: 8000 }),
-        fetchJsonWithProxyFallback(priceUrl, { timeoutMs: 8000 })
+        fetchNaverPriceHistory(entry.code, { timeoutMs: 8000, count: 120 })
       ]);
 
       if (basicResult.status !== 'fulfilled') throw basicResult.reason;
@@ -240,10 +319,7 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
 
       const consensusInfo = integrationJson.consensusInfo || {};
       const recommMean = Number.parseFloat(String(consensusInfo.recommMean ?? '').replace(/,/g, ''));
-
-      if (!Number.isFinite(recommMean) || recommMean <= 0) {
-        throw new Error('consensus grade unavailable');
-      }
+      const consensusUnavailable = !Number.isFinite(recommMean) || recommMean <= 0;
 
       const currentPrice = extractFirstNumber(basicJson.closePrice ?? basicJson.stockPrice ?? 0) ?? 0;
       const targetPrice = extractFirstNumber(consensusInfo.priceTargetMean);
@@ -252,6 +328,7 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
         : null;
       entry.liveRefresh = buildBuyLiveRefreshPayload(entry, {
         recommMean,
+        consensusUnavailable,
         currentPrice,
         targetPrice,
         upsideRate,
@@ -267,7 +344,11 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
         openModal(entry.entryKey, 'buy');
       }
 
-      log(`- [${entry.slotLabel} · ${entry.name}] 최신화 완료: 컨센서스 ${entry.liveRefresh.recommMean.toFixed(2)}/5.00 → 환산 ${entry.liveRefresh.consensusScore.toFixed(1)}점, 컨센서스 ${formatBuySignedPoints(entry.liveRefresh.adjustment)}, 와이코프 ${formatBuySignedPoints(entry.liveRefresh.wyckoffAdjustment)} (${entry.liveRefresh.wyckoff?.label || '관망'} ${entry.liveRefresh.wyckoff?.confidencePct || 0}%), 최종 ${entry.liveRefresh.finalScore.toFixed(1)}점 (${entry.liveRefresh.finalGrade}등급)`);
+      if (entry.liveRefresh.consensusUnavailable) {
+        log(`- [${entry.slotLabel} · ${entry.name}] 최신화 완료: 네이버 컨센서스 미제공 → 전략 ${roundBuyScoreValue(entry.score).toFixed(1)}점 유지, 와이코프 ${formatBuySignedPoints(entry.liveRefresh.wyckoffAdjustment)} (${entry.liveRefresh.wyckoff?.label || '관망'} ${entry.liveRefresh.wyckoff?.confidencePct || 0}%), 최종 ${entry.liveRefresh.finalScore.toFixed(1)}점 (${entry.liveRefresh.finalGrade}등급)`);
+      } else {
+        log(`- [${entry.slotLabel} · ${entry.name}] 최신화 완료: 컨센서스 ${entry.liveRefresh.recommMean.toFixed(2)}/5.00 → 환산 ${entry.liveRefresh.consensusScore.toFixed(1)}점, 컨센서스 ${formatBuySignedPoints(entry.liveRefresh.adjustment)}, 와이코프 ${formatBuySignedPoints(entry.liveRefresh.wyckoffAdjustment)} (${entry.liveRefresh.wyckoff?.label || '관망'} ${entry.liveRefresh.wyckoff?.confidencePct || 0}%), 최종 ${entry.liveRefresh.finalScore.toFixed(1)}점 (${entry.liveRefresh.finalGrade}등급)`);
+      }
       return true;
     } catch (error) {
       if (attempt <= maxRetries) {

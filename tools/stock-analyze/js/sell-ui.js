@@ -799,7 +799,7 @@ updateAnalyzeButtonState = function updateAnalyzeButtonStateOverride() {
   const analyzeBtn = document.getElementById('btn-analyze');
   const hasBuyEntries = NOTION_SLOT_IDS.some(slotId => getVisibleBuyEntries(slotId).length > 0);
   const hasSellStocks = NOTION_SLOT_IDS.some(slotId => getVisibleSellStocksList(slotId, getSellUniverseMode(slotId)).length > 0);
-  analyzeBtn.disabled = activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks;
+  analyzeBtn.disabled = isAnalysisRunning || (activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks);
 };
 
 updateCurrentTime = function updateCurrentTimeOverride() {
@@ -819,6 +819,7 @@ updateCurrentTime = function updateCurrentTimeOverride() {
 
   const analyzeBtn = document.getElementById('btn-analyze');
   if (!analyzeBtn) return;
+  if (isAnalysisRunning) return;
 
   const activeArchive = getActiveArchiveForTab(activeTab, now);
   const archiveTimeLabel = formatArchiveButtonTime(activeArchive);

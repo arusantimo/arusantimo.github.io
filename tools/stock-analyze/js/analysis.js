@@ -111,7 +111,7 @@ async function analyzeStock(stock, isBefore0908) {
 
       const [intRes, priceRes] = await Promise.all([
         fetchJsonWithProxyFallback(`https://m.stock.naver.com/api/stock/${stock.code}/integration`, { timeoutMs: 8000 }),
-        fetchJsonWithProxyFallback(`https://m.stock.naver.com/api/stock/${stock.code}/price?pageSize=120&page=1`, { timeoutMs: 8000 })
+        fetchNaverPriceHistory(stock.code, { timeoutMs: 8000, count: 120 })
       ]);
       const intJson = intRes;
       const priceJson = priceRes;
@@ -903,19 +903,20 @@ function buildIndicators(stock, data, isBefore0908) {
   return { indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile };
 }
 function applyRules(stock, data, isBefore0908) {
-  const card = document.getElementById(`card-${stock.code}`);
+  const entryKey = stock.entryKey || buildEntryKey(stock.slotId, stock.code);
+  const card = document.getElementById(getCardDomId(entryKey));
   if (!card) return;
-  const priceRow = document.getElementById(`price-row-${stock.code}`);
-  const meta = document.getElementById(`meta-${stock.code}`);
-  const planBox = document.getElementById(`plan-${stock.code}`);
-  const indBox = document.getElementById(`ind-${stock.code}`);
-  const badge = document.getElementById(`badge-${stock.code}`);
+  const priceRow = document.getElementById(getPriceRowDomId(entryKey));
+  const meta = document.getElementById(getMetaDomId(entryKey));
+  const planBox = document.getElementById(getPlanDomId(entryKey));
+  const indBox = document.getElementById(getIndicatorDomId(entryKey));
+  const badge = document.getElementById(getBadgeDomId(entryKey));
 
   const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
   const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
   const absChg = Math.abs(data.chgRate).toFixed(2);
 
-  const entry = getEntryByCode(stock.code);
+  const entry = getEntryByCode(entryKey, stock.slotId);
   const entryPrice = stock.entryPrice || entry?.entryPriceValue || data.prevClose;
   const gainFromEntry = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
 
@@ -932,6 +933,7 @@ function applyRules(stock, data, isBefore0908) {
 
   const { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile } = buildIndicators(stock, data, isBefore0908);
 
-  stockDetailMap[stock.code] = { mode: 'sell', stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908, gapProfile };
-  renderSellDetailToCard(stockDetailMap[stock.code]);
+  const detail = { mode: 'sell', stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908, gapProfile };
+  stockDetailMap[entryKey] = detail;
+  renderSellDetailToCard(detail);
 }

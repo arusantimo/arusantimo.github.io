@@ -128,10 +128,11 @@ document.getElementById('sell-universe-switch')?.addEventListener('click', event
 
 document.getElementById('btn-analyze').addEventListener('click', async () => {
   const btn = document.getElementById('btn-analyze');
+  if (isAnalysisRunning) return;
 
   if (activeTab === 'buy') {
     saveAnalysisArchiveBeforeRecheck('buy');
-    btn.disabled = true;
+    setAnalysisRunning(true);
     btn.innerHTML = '<span>⚡</span> 두 페이지 일괄 분석 중...';
 
     try {
@@ -139,7 +140,7 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
       await runBuyBatchRefresh();
       saveAnalysisArchiveAfterAnalysis('buy');
     } finally {
-      btn.disabled = false;
+      setAnalysisRunning(false);
       renderBuyStockCards();
       updateAnalyzeButtonState();
       updateCurrentTime();
@@ -157,46 +158,46 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
     timeLabel: timeStr
   });
 
-  btn.disabled = true;
+  setAnalysisRunning(true);
   btn.innerHTML = `<span>⚡</span> ${isBefore0908 ? '두 페이지 1차 분석' : '두 페이지 2차 분석'} 진행 중...`;
 
-  log(`▶ [현재 시각: ${timeStr}] 두 페이지 매도 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
-  await refreshLiveGapScore('매도 분석');
+  try {
+    log(`▶ [현재 시각: ${timeStr}] 두 페이지 매도 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
+    await refreshLiveGapScore('매도 분석');
 
-  const allStocks = getAllSellStocksForAnalysis(isBefore0908);
-  const visibleCollections = NOTION_SLOT_IDS.map(slotId => ({
-    slotId,
-    label: getSlotLabel(slotId),
-    collections: getVisibleSellStockCollections(slotId, getSellUniverseMode(slotId))
-  }));
+    const allStocks = getAllSellStocksForAnalysis(isBefore0908);
+    const visibleCollections = NOTION_SLOT_IDS.map(slotId => ({
+      slotId,
+      label: getSlotLabel(slotId),
+      collections: getVisibleSellStockCollections(slotId, getSellUniverseMode(slotId))
+    }));
 
-  if (!allStocks.length) {
-    log('<span style="color:var(--text-warning)">ℹ️ 두 페이지 모두 현재 분석할 매도 대상이 없습니다. 매수 카드에서 매도 추적을 켜거나 전체 후보 보기를 선택해주세요.</span>');
-    btn.disabled = false;
+    if (!allStocks.length) {
+      log('<span style="color:var(--text-warning)">ℹ️ 두 페이지 모두 현재 분석할 매도 대상이 없습니다. 매수 카드에서 매도 추적을 켜거나 전체 후보 보기를 선택해주세요.</span>');
+      return;
+    }
+
+    visibleCollections.forEach(({ label, collections }) => {
+      const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
+      log(`ℹ️ ${label}: 분석 대상 ${sellCount}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
+    });
+
+    for (const stock of allStocks) {
+      await analyzeStock(stock, isBefore0908);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+
+    saveAnalysisArchiveAfterAnalysis('sell', {
+      isBefore0908,
+      timeLabel: timeStr
+    });
+    renderSellStockCards();
+    log('✅ 두 페이지 매도 분석이 완료되었습니다.');
+  } finally {
+    setAnalysisRunning(false);
     updateAnalyzeButtonState();
     updateCurrentTime();
-    return;
   }
-
-  visibleCollections.forEach(({ label, collections }) => {
-    const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
-    log(`ℹ️ ${label}: 분석 대상 ${sellCount}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
-  });
-
-  for (const stock of allStocks) {
-    await analyzeStock(stock, isBefore0908);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-  }
-
-  saveAnalysisArchiveAfterAnalysis('sell', {
-    isBefore0908,
-    timeLabel: timeStr
-  });
-  renderSellStockCards();
-  log('✅ 두 페이지 매도 분석이 완료되었습니다.');
-  btn.disabled = false;
-  updateAnalyzeButtonState();
-  updateCurrentTime();
 });
 
 window.addEventListener('DOMContentLoaded', () => {

@@ -234,6 +234,30 @@ test('Phase B 저신뢰도와 Neutral은 와이코프 보정을 적용하지 않
   assert.equal(lowConfidence.finalScore, neutral.finalScore);
 });
 
+test('컨센서스 미제공 종목은 전략 점수를 유지한 채 와이코프만 반영한다', () => {
+  const { buildBuyLiveRefreshPayload, getBuyPresentation } = loadBuyLiveContext();
+  const entry = { score: 7.2, grade: 'B', statusLabel: '관심후보', strategy: 'pullback' };
+  const payload = buildBuyLiveRefreshPayload(entry, {
+    consensusUnavailable: true,
+    wyckoff: {
+      phase: 'D',
+      confidence: 0.71,
+      reason: '상승 추세'
+    }
+  });
+
+  assert.equal(payload.consensusUnavailable, true);
+  assert.equal(payload.recommMean, null);
+  assert.equal(payload.consensusScore, 7.2);
+  assert.equal(payload.consensusGrade, '미제공');
+  assert.equal(payload.adjustment, 0);
+  assert.equal(payload.wyckoffAdjustment, 0.4);
+  assert.equal(payload.finalScore, 7.6);
+
+  const presentation = getBuyPresentation({ ...entry, liveRefresh: payload });
+  assert.match(presentation.primarySummary, /컨센서스 미제공/);
+});
+
 test('검증 패널은 전략, 실시간 근거, 최종 결과와 와이코프 보정을 모두 노출한다', () => {
   const { buildBuyVerificationHtml } = loadBuyLiveContext();
   const entry = {

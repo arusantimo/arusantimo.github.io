@@ -678,7 +678,7 @@ function updateAnalyzeButtonState() {
   const analyzeBtn = document.getElementById('btn-analyze');
   const hasBuyEntries = notionSnapshot.pullbackEntries.length > 0 || notionSnapshot.momentumEntries.length > 0 || notionSnapshot.reversalEntries.length > 0;
   const hasSellStocks = stocks.pullback.length > 0 || stocks.momentum.length > 0 || stocks.reversal.length > 0 || stocks.swing.length > 0;
-  analyzeBtn.disabled = activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks;
+  analyzeBtn.disabled = isAnalysisRunning || (activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks);
 }
 
 function updateCurrentTime() {
@@ -698,6 +698,7 @@ function updateCurrentTime() {
 
   const analyzeBtn = document.getElementById('btn-analyze');
   if (!analyzeBtn) return;
+  if (isAnalysisRunning) return;
 
   const activeArchive = getActiveArchiveForTab(activeTab, now);
   const archiveTimeLabel = formatArchiveButtonTime(activeArchive);
