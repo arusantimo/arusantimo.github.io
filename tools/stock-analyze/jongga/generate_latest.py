@@ -7,7 +7,7 @@ import math
 import re
 from time import perf_counter
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
@@ -15,10 +15,16 @@ from urllib.request import Request, urlopen
 
 
 USER_AGENT = "Mozilla/5.0 jongga-live-generator/1.0"
+BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
+TOSS_ORDER_URL_TEMPLATE = "https://www.tossinvest.com/stocks/A{code}/order"
+NAVER_ORDERBOOK_URL_TEMPLATE = "https://finance.naver.com/item/main.naver?code={code}"
+KIND_DISCLOSURE_SEARCH_URL = "https://kind.krx.co.kr/disclosureSimpleSearch.do?method=disclosureSimpleSearchMain"
 ETF_NAME_PATTERN = re.compile(
     r"KODEX|TIGER|KOSEF|KBSTAR|ARIRANG|HANARO|ACE|SOL|TIMEFOLIO|PLUS|ETF|ETN|스팩|우B?$",
     re.IGNORECASE,
 )
+KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업\(잠정\)실적|잠정실적|실적발표|결산실적", re.IGNORECASE)
+KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
 
 
 def utc_now_iso() -> str:
@@ -215,6 +221,297 @@ def fetch_reversal_intraday_signal(code: str, market_type: str | None) -> dict[s
             "source": "yahoo_chart",
             "note": f"30분봉 수집 실패: {error}",
         }
+
+
+def parse_toss_stock_price_detail_payload(payload: Any) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    rows = payload.get("result")
+    if not isinstance(rows, list) or not rows:
+        return None
+    row = rows[0] if isinstance(rows[0], dict) else None
+    if not row:
+        return None
+    strength = parse_float(row.get("tradingStrength"))
+    if not math.isfinite(strength) or strength <= 0:
+        return None
+    return {
+        "avgStrength": round(strength, 1),
+        "note": f"토스 공개 체결강도 {strength:.1f}%",
+        "source": "toss_playwright_response",
+        "sourceUrl": TOSS_ORDER_URL_TEMPLATE.format(code=str(row.get('code', '')).replace('A', '')),
+        "asOf": str(row.get("tradeDateTime") or ""),
+    }
+
+
+def parse_naver_orderbook_ratio_html(html: str, code: str) -> dict[str, Any] | None:
+    match = re.search(
+        r'<tr class="total">.*?<td[^>]*>\s*([\d,]+)\s*</td>\s*<td>잔량합계</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>',
+        html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not match:
+        return None
+    ask_total = parse_float(match.group(1))
+    bid_total = parse_float(match.group(2))
+    if not ask_total or not bid_total:
+        return None
+    ratio = bid_total / ask_total if ask_total else 0.0
+    return {
+        "bidAskRatio": round(ratio, 4),
+        "bidTotal": int(bid_total),
+        "askTotal": int(ask_total),
+        "note": f"Naver 호가잔량합계 매수 {int(bid_total):,} / 매도 {int(ask_total):,}",
+        "source": "naver_orderbook_browser",
+        "sourceUrl": NAVER_ORDERBOOK_URL_TEMPLATE.format(code=code),
+    }
+
+
+def parse_kind_disclosure_rows(rows: list[str], company_name: str) -> list[dict[str, str]]:
+    parsed_rows: list[dict[str, str]] = []
+    normalized_name = str(company_name or "").strip()
+    for raw_row in rows:
+        row = re.sub(r"\s+", " ", str(raw_row or "")).strip()
+        match = re.match(r"^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2})\s+(.+)$", row)
+        if not match:
+            continue
+        row_date, row_time, remaining = match.groups()
+        title = remaining
+        if normalized_name and remaining.startswith(normalized_name):
+            title = remaining[len(normalized_name):].strip()
+        else:
+            split = remaining.split(" ", 1)
+            title = split[1].strip() if len(split) == 2 else remaining
+        if not title:
+            continue
+        parsed_rows.append({"date": row_date, "time": row_time, "title": title})
+    return parsed_rows
+
+
+def build_kind_event_filter_from_rows(rows: list[dict[str, str]], today: date | None = None) -> dict[str, Any] | None:
+    base_date = today or datetime.now().date()
+    for row in rows:
+        try:
+            disclosed_at = datetime.strptime(row["date"], "%Y-%m-%d").date()
+        except Exception:  # noqa: BLE001
+            continue
+        age_days = (base_date - disclosed_at).days
+        title = row["title"]
+        if age_days < 0:
+            continue
+        if KIND_EARNINGS_EVENT_PATTERN.search(title) and age_days <= 14:
+            return {
+                "blocked": True,
+                "earningsDays": None,
+                "corporateActionDays": None,
+                "note": f"KIND 최근공시 {row['date']} {title}",
+                "source": "kind_playwright_recent_disclosure",
+            }
+        if KIND_CORP_ACTION_PATTERN.search(title) and age_days <= 30:
+            return {
+                "blocked": True,
+                "earningsDays": None,
+                "corporateActionDays": None,
+                "note": f"KIND 최근공시 {row['date']} {title}",
+                "source": "kind_playwright_recent_disclosure",
+            }
+    return None
+
+
+def configure_browser_page(page: Any) -> None:
+    page.route(
+        "**/*",
+        lambda route: route.abort()
+        if route.request.resource_type in {"image", "font", "stylesheet", "media"}
+        else route.continue_(),
+    )
+
+
+def fetch_toss_strength_with_browser(context: Any, code: str) -> dict[str, Any] | None:
+    page = context.new_page()
+    configure_browser_page(page)
+    response_bodies: list[str] = []
+    target_fragment = f"stock-prices/details?productCodes=A{code}"
+
+    def capture_response(response: Any) -> None:
+        if target_fragment not in str(response.url):
+            return
+        try:
+            response_bodies.append(response.text())
+        except Exception:  # noqa: BLE001
+            return
+
+    page.on("response", capture_response)
+    try:
+        page.goto(TOSS_ORDER_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(5000)
+        for body in reversed(response_bodies):
+            parsed = parse_toss_stock_price_detail_payload(json.loads(body))
+            if parsed:
+                return parsed
+        text = page.locator("body").inner_text()
+        match = re.search(r"체결강도\s*([\d.,]+)%", text)
+        if match:
+            strength = parse_float(match.group(1))
+            if strength > 0:
+                return {
+                    "avgStrength": round(strength, 1),
+                    "note": f"토스 DOM 체결강도 {strength:.1f}%",
+                    "source": "toss_playwright_dom",
+                    "sourceUrl": TOSS_ORDER_URL_TEMPLATE.format(code=code),
+                }
+        return None
+    finally:
+        page.close()
+
+
+def fetch_naver_orderbook_with_browser(context: Any, code: str) -> dict[str, Any] | None:
+    page = context.new_page()
+    configure_browser_page(page)
+    try:
+        page.goto(NAVER_ORDERBOOK_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(1500)
+        return parse_naver_orderbook_ratio_html(page.content(), code)
+    finally:
+        page.close()
+
+
+def fetch_kind_event_filter_with_browser(context: Any, code: str, company_name: str) -> dict[str, Any] | None:
+    page = context.new_page()
+    configure_browser_page(page)
+    try:
+        page.goto(KIND_DISCLOSURE_SEARCH_URL, wait_until="domcontentloaded", timeout=30000)
+        page.fill("#AKCKwdTop", code)
+        page.click("input.submit")
+        page.wait_for_timeout(4000)
+        rows = [text.strip() for text in page.locator("table.list.type-00 tbody tr").all_inner_texts() if text.strip()]
+        parsed_rows = parse_kind_disclosure_rows(rows, company_name)
+        return build_kind_event_filter_from_rows(parsed_rows)
+    finally:
+        page.close()
+
+
+def fetch_browser_candidate_enrichments(candidates: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    if not candidates:
+        return {}, []
+    try:
+        from playwright.sync_api import sync_playwright
+    except Exception as error:  # noqa: BLE001
+        return {}, [f"playwright unavailable: {error}"]
+
+    enrichments: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        context = browser.new_context(viewport={"width": 1440, "height": 1600}, user_agent=BROWSER_USER_AGENT, locale="ko-KR")
+        for candidate in candidates:
+            code = str(candidate["code"])
+            name = str(candidate.get("name") or "")
+            wants_event_filter = bool(candidate.get("needsEventFilter"))
+            enrichment = {"toss": None, "orderbook": None, "eventFilter": None, "errors": []}
+            try:
+                enrichment["toss"] = fetch_toss_strength_with_browser(context, code)
+            except Exception as error:  # noqa: BLE001
+                enrichment["errors"].append(f"toss {code}: {error}")
+            try:
+                enrichment["orderbook"] = fetch_naver_orderbook_with_browser(context, code)
+            except Exception as error:  # noqa: BLE001
+                enrichment["errors"].append(f"orderbook {code}: {error}")
+            if wants_event_filter:
+                try:
+                    enrichment["eventFilter"] = fetch_kind_event_filter_with_browser(context, code, name)
+                except Exception as error:  # noqa: BLE001
+                    enrichment["errors"].append(f"kind {code}: {error}")
+            if enrichment["errors"]:
+                errors.extend(enrichment["errors"])
+            enrichments[code] = enrichment
+        browser.close()
+    return enrichments, errors
+
+
+def is_entry_field_satisfied(entry: dict[str, Any], field_key: str) -> bool:
+    toss = entry.get("toss") or {}
+    orderbook = entry.get("orderbook") or {}
+    event_filter = entry.get("eventFilter") or {}
+    if field_key == "toss.avgStrength":
+        return math.isfinite(parse_float(toss.get("avgStrength"))) and parse_float(toss.get("avgStrength")) > 0
+    if field_key == "toss.intradayAbove100Ratio":
+        return math.isfinite(parse_float(toss.get("intradayAbove100Ratio"))) and parse_float(toss.get("intradayAbove100Ratio")) > 0
+    if field_key == "toss.lastHourAvgStrength":
+        return math.isfinite(parse_float(toss.get("lastHourAvgStrength"))) and parse_float(toss.get("lastHourAvgStrength")) > 0
+    if field_key == "orderbook.bidAskRatio":
+        return math.isfinite(parse_float(orderbook.get("bidAskRatio"))) and parse_float(orderbook.get("bidAskRatio")) > 0
+    if field_key == "eventFilter":
+        return bool(event_filter.get("blocked")) or bool(normalize_text(event_filter.get("note"))) or event_filter.get("earningsDays") is not None or event_filter.get("corporateActionDays") is not None
+    return False
+
+
+def normalize_text(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def sync_entry_manual_input(entry: dict[str, Any]) -> None:
+    manual_input = entry.get("manualInput")
+    if not isinstance(manual_input, dict):
+        return
+    fields = [field for field in manual_input.get("fields", []) if isinstance(field, dict)]
+    remaining_fields = [field for field in fields if not is_entry_field_satisfied(entry, str(field.get("fieldKey") or ""))]
+    manual_input["fields"] = remaining_fields
+    manual_input["missingFieldCodes"] = [str(field.get("fieldKey") or "") for field in remaining_fields]
+    manual_input["required"] = bool(remaining_fields)
+    manual_input["summary"] = "수동 입력이 필요한 필드만 남겨둔 항목입니다." if remaining_fields else "현재 수동 입력 필드가 없습니다."
+    manual_input["source"] = "browser_manual_override" if remaining_fields else "public_data_only"
+
+
+def rebuild_entry_notes(entry: dict[str, Any], strategy: str) -> None:
+    notes: list[str] = []
+    toss = entry.get("toss") or {}
+    orderbook = entry.get("orderbook") or {}
+    event_filter = entry.get("eventFilter") or {}
+    if strategy == "momentum":
+        if not is_entry_field_satisfied(entry, "toss.avgStrength"):
+            notes.append("토스 체결강도 미반영")
+        if not is_entry_field_satisfied(entry, "toss.intradayAbove100Ratio"):
+            notes.append("체결강도 100% 유지 비율 미반영")
+        if not is_entry_field_satisfied(entry, "orderbook.bidAskRatio"):
+            notes.append("호가잔량 미반영")
+    if strategy == "reversal":
+        intraday_30m = entry.get("intraday30m") or {}
+        if not is_entry_field_satisfied(entry, "toss.avgStrength"):
+            notes.append("토스 체결강도 미반영")
+        if not is_entry_field_satisfied(entry, "toss.lastHourAvgStrength"):
+            notes.append("마지막 1시간 체결강도 미반영")
+        if not is_entry_field_satisfied(entry, "orderbook.bidAskRatio"):
+            notes.append("호가잔량 미반영")
+        if not (bool(event_filter.get("blocked")) or bool(normalize_text(event_filter.get("note"))) or event_filter.get("earningsDays") is not None or event_filter.get("corporateActionDays") is not None):
+            notes.append("기업 이벤트 필터는 미반영")
+        if not intraday_30m.get("available"):
+            notes.append("30분봉 데이터 미반영")
+    entry["notes"] = notes
+
+
+def apply_browser_enrichment_to_entry(entry: dict[str, Any], strategy: str, enrichment: dict[str, Any], context: dict[str, Any]) -> None:
+    toss = enrichment.get("toss")
+    orderbook = enrichment.get("orderbook")
+    event_filter = enrichment.get("eventFilter")
+    if isinstance(toss, dict):
+        merged_toss = dict(entry.get("toss") or {})
+        merged_toss.update(toss)
+        entry["toss"] = merged_toss
+    if isinstance(orderbook, dict):
+        merged_orderbook = dict(entry.get("orderbook") or {})
+        merged_orderbook.update(orderbook)
+        entry["orderbook"] = merged_orderbook
+    if strategy == "reversal" and isinstance(event_filter, dict):
+        entry["eventFilter"] = {**(entry.get("eventFilter") or {}), **event_filter}
+        filters = entry.get("filters") if isinstance(entry.get("filters"), list) else []
+        for row in filters:
+            if row.get("code") == "F3":
+                row["status"] = "⛔" if event_filter.get("blocked") else "✅"
+                row["note"] = normalize_text(event_filter.get("note")) or ("KIND 최근공시 차단" if event_filter.get("blocked") else "이벤트 필터 통과")
+        entry["statusLabel"] = reversal_status_label(entry.get("grade", "C"), context["regimeLabel"], context["gapScore"]["code"], filters, entry.get("gates") or [])
+    sync_entry_manual_input(entry)
+    rebuild_entry_notes(entry, strategy)
 
 
 def parse_cnbc_quote_html(html: str) -> dict[str, float]:
@@ -1304,6 +1601,42 @@ def collect_live_payload(top_limit: int = 30) -> dict[str, Any]:
         count=len(pullback_entries) + len(momentum_entries) + len(reversal_entries),
     )
 
+    browser_candidates: list[dict[str, Any]] = []
+    seen_browser_codes: set[str] = set()
+    for entry in momentum_entries:
+        if entry["code"] in seen_browser_codes:
+            continue
+        browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": False})
+        seen_browser_codes.add(entry["code"])
+    for entry in reversal_entries:
+        if entry["code"] in seen_browser_codes:
+            for candidate in browser_candidates:
+                if candidate["code"] == entry["code"]:
+                    candidate["needsEventFilter"] = True
+                    break
+            continue
+        browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": True})
+        seen_browser_codes.add(entry["code"])
+
+    started_at = perf_counter()
+    browser_enrichments, browser_errors = fetch_browser_candidate_enrichments(browser_candidates)
+    for entry in momentum_entries:
+        enrichment = browser_enrichments.get(entry["code"])
+        if enrichment:
+            apply_browser_enrichment_to_entry(entry, "momentum", enrichment, context)
+    for entry in reversal_entries:
+        enrichment = browser_enrichments.get(entry["code"])
+        if enrichment:
+            apply_browser_enrichment_to_entry(entry, "reversal", enrichment, context)
+    log_step(
+        "browser_enrichment",
+        "브라우저 보강 수집",
+        started_at,
+        status="partial" if browser_errors else "ok",
+        detail=f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / 호가 {sum(1 for item in browser_enrichments.values() if item.get('orderbook'))} / KIND {sum(1 for item in browser_enrichments.values() if item.get('eventFilter'))}",
+        count=len(browser_candidates),
+    )
+
     all_entries = pullback_entries + momentum_entries + reversal_entries
     missing_public_metrics = sum(1 for entry in all_entries if entry.get("notes"))
     fallback_keys = ["vkospi"] if live_metrics["vkospi"]["isFallback"] else []
@@ -1312,9 +1645,12 @@ def collect_live_payload(top_limit: int = 30) -> dict[str, Any]:
         manual_keys.append("toss_metrics")
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
-    data_quality_status = "partial" if errors or missing_public_metrics or fallback_keys else "complete"
+    data_quality_status = "partial" if errors or browser_errors or missing_public_metrics or fallback_keys else "complete"
     intraday_ok = sum(1 for snapshot in snapshots if snapshot.intraday_30m.get("available"))
     event_schedule_ok = sum(1 for snapshot in snapshots if snapshot.event_filter)
+    toss_strength_ok = sum(1 for item in browser_enrichments.values() if item.get("toss"))
+    orderbook_ok = sum(1 for item in browser_enrichments.values() if item.get("orderbook"))
+    kind_browser_ok = sum(1 for item in browser_enrichments.values() if item.get("eventFilter"))
 
     payload = {
         "schemaVersion": "jongga_result.v1",
@@ -1329,7 +1665,7 @@ def collect_live_payload(top_limit: int = 30) -> dict[str, Any]:
                 "fallback": len(fallback_keys),
                 "slots": 1,
             },
-            "failedKeys": errors,
+            "failedKeys": errors + browser_errors,
             "staleKeys": [],
             "manualKeys": manual_keys,
             "fallbackKeys": fallback_keys,
@@ -1339,6 +1675,9 @@ def collect_live_payload(top_limit: int = 30) -> dict[str, Any]:
                 "naver_integration_schedule": {"ok": event_schedule_ok},
                 "yahoo_chart": {"ok": 5 + (1 if live_metrics["vkospi"]["isFallback"] else 0)},
                 "yahoo_intraday_30m": {"ok": intraday_ok},
+                "toss_playwright_strength": {"ok": toss_strength_ok},
+                "naver_orderbook_browser": {"ok": orderbook_ok},
+                "kind_playwright_disclosure": {"ok": kind_browser_ok},
                 "cnbc_quote": {"ok": 0 if live_metrics["vkospi"]["isFallback"] else 1},
             },
             "fallbackUsage": [
@@ -1352,7 +1691,7 @@ def collect_live_payload(top_limit: int = 30) -> dict[str, Any]:
                 }
             ] if fallback_keys else [],
             "collectionLog": collection_log,
-            "note": "CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산하며, Naver 통합 일정이 있으면 이벤트 필터를 자동 반영합니다. 토스 체결강도/호가는 여전히 수동 또는 별도 수집이 필요합니다.",
+            "note": "CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 토스 공개 체결강도는 Playwright로, 호가 잔량 비율은 Naver 호가 10단계를 브라우저로 읽어 보강하며, Naver 일정이 없을 때는 KIND 최근공시를 Playwright로 조회해 이벤트 필터를 확장합니다.",
         },
         "slots": [
             {

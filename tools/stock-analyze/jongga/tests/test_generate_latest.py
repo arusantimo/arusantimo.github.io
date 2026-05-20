@@ -1,6 +1,7 @@
 import unittest
+from datetime import date
 
-from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_market_context, grade_from_score, parse_cnbc_quote_html, parse_market_cap_trillion
+from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload
 
 
 class GenerateLatestTest(unittest.TestCase):
@@ -57,6 +58,44 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(event_filter["corporateActionDays"], 8)
         self.assertFalse(event_filter["blocked"])
         self.assertIn("주총 D-8", event_filter["note"])
+
+    def test_parse_toss_stock_price_detail_payload_reads_strength(self):
+        parsed = parse_toss_stock_price_detail_payload({
+            "result": [{
+                "code": "A005930",
+                "tradingStrength": 107.0,
+                "tradeDateTime": "2026-05-19T15:20:00+09:00",
+            }]
+        })
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed["avgStrength"], 107.0)
+        self.assertEqual(parsed["source"], "toss_playwright_response")
+
+    def test_parse_naver_orderbook_ratio_html_reads_total_row(self):
+        parsed = parse_naver_orderbook_ratio_html(
+            '<tr class="total"><td class="f_down">629,695</td><td>잔량합계</td><td class="f_up">698,319</td></tr>',
+            "005930",
+        )
+        self.assertIsNotNone(parsed)
+        self.assertAlmostEqual(parsed["bidAskRatio"], 698319 / 629695, places=4)
+        self.assertEqual(parsed["bidTotal"], 698319)
+        self.assertEqual(parsed["askTotal"], 629695)
+
+    def test_parse_kind_disclosure_rows_strips_company_name(self):
+        rows = parse_kind_disclosure_rows([
+            '2026-05-15 16:14 삼성전자 분기보고서(일반법인)(2026.03)',
+            '2026-04-30 08:53 삼성전자 현금ㆍ현물 배당 결정',
+        ], '삼성전자')
+        self.assertEqual(rows[0]["title"], '분기보고서(일반법인)(2026.03)')
+        self.assertEqual(rows[1]["title"], '현금ㆍ현물 배당 결정')
+
+    def test_build_kind_event_filter_blocks_recent_corporate_action(self):
+        event_filter = build_kind_event_filter_from_rows([
+            {"date": "2026-05-15", "time": "16:14", "title": "현금ㆍ현물 배당 결정"},
+        ], today=date(2026, 5, 19))
+        self.assertIsNotNone(event_filter)
+        self.assertTrue(event_filter["blocked"])
+        self.assertIn("배당 결정", event_filter["note"])
 
 
 if __name__ == "__main__":

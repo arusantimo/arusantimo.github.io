@@ -107,6 +107,8 @@ test('momentum manual overrides promote score and matched rules', () => {
           score: 6.0,
           grade: 'B',
           statusLabel: '관심후보',
+          toss: { avgStrength: 107, note: '자동 수집값' },
+          orderbook: { bidAskRatio: 1.01, note: '자동 수집값' },
           gates: validGateMap(['G1', 'G2', 'G3', 'G4']),
           notes: ['토스 체결강도·호가잔량 미반영']
         }]
@@ -115,10 +117,13 @@ test('momentum manual overrides promote score and matched rules', () => {
   };
 
   const effective = context.applyJonggaManualOverridesToPayload(payload);
+  const rawEntry = effective.slots[0].entries.momentum[0];
   context.applyJonggaResultToState(effective);
   const entry = context.getSlotSnapshot('slotA').momentumEntries[0];
   assert.equal(entry.score, 9);
   assert.equal(entry.grade, 'S');
+  assert.equal(rawEntry.toss.avgStrength, 112.5);
+  assert.equal(rawEntry.orderbook.bidAskRatio, 1.33);
   assert.deepEqual(Array.from(entry.matchedRules, rule => rule.code).sort(), ['C3', 'S2']);
   assert.ok(entry.notes.some(note => note.includes('수동 입력 반영')));
 });
@@ -147,6 +152,7 @@ test('reversal event filter manual block enforces safety block', () => {
           score: 8.6,
           grade: 'S',
           statusLabel: '최우선 진입',
+          eventFilter: { blocked: false, note: '자동 수집값' },
           filters: validGateMap(['F1', 'F2', 'F3', 'F4']),
           gates: validGateMap(['G1', 'G2', 'G3', 'G4', 'G5'])
         }]
@@ -157,10 +163,13 @@ test('reversal event filter manual block enforces safety block', () => {
   const effective = context.applyJonggaManualOverridesToPayload(payload);
   const validation = context.validateJonggaResult(effective);
   assert.equal(validation.safetyBlocks.length, 1);
+  const rawEntry = effective.slots[0].entries.reversal[0];
 
   context.applyJonggaResultToState(effective);
   const entry = context.getSlotSnapshot('slotA').reversalEntries[0];
   assert.equal(entry.statusLabel, '자동매수 금지');
   assert.ok(entry.safety.blocked);
+  assert.equal(rawEntry.eventFilter.blocked, true);
+  assert.equal(rawEntry.eventFilter.note, '실적 D-1');
   assert.ok(entry.filters.find(rule => rule.code === 'F3')?.note.includes('이벤트 필터 차단'));
 });

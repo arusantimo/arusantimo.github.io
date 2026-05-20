@@ -243,12 +243,22 @@ function applyJonggaManualOverridesToRawEntry(rawEntry, strategy, context = {}) 
   if (!override) return rawEntry;
 
   const next = cloneManualOverrideJson(rawEntry, rawEntry);
+  next.toss = { ...(next.toss || {}) };
+  next.orderbook = { ...(next.orderbook || {}) };
+  next.eventFilter = { ...(next.eventFilter || {}) };
   const appliedLabels = [];
   const vkospiValue = parseManualVkospiValueFromContext(context);
   const scoreMultiplier = strategy === 'reversal'
     ? getReversalManualMultiplier(vkospiValue)
     : getTrendManualMultiplier(vkospiValue);
   let scoreDelta = 0;
+
+  if (Number.isFinite(override.toss.avgStrength)) next.toss.avgStrength = override.toss.avgStrength;
+  if (Number.isFinite(override.toss.intradayAbove100Ratio)) next.toss.intradayAbove100Ratio = override.toss.intradayAbove100Ratio;
+  if (Number.isFinite(override.toss.lastHourAvgStrength)) next.toss.lastHourAvgStrength = override.toss.lastHourAvgStrength;
+  if (normalizeManualOverrideText(override.toss.note)) next.toss.note = override.toss.note;
+  if (Number.isFinite(override.orderbook.bidAskRatio)) next.orderbook.bidAskRatio = override.orderbook.bidAskRatio;
+  if (normalizeManualOverrideText(override.orderbook.note)) next.orderbook.note = override.orderbook.note;
 
   if (strategy === 'momentum') {
     const tossPass = Number.isFinite(override.toss.avgStrength) && Number.isFinite(override.toss.intradayAbove100Ratio)
@@ -283,6 +293,10 @@ function applyJonggaManualOverridesToRawEntry(rawEntry, strategy, context = {}) 
       || Number.isFinite(override.eventFilter.corporateActionDays)
       || normalizeManualOverrideText(override.eventFilter.note);
     if (eventConfigured) {
+      next.eventFilter.blocked = eventBlocked;
+      next.eventFilter.earningsDays = Number.isFinite(override.eventFilter.earningsDays) ? override.eventFilter.earningsDays : null;
+      next.eventFilter.corporateActionDays = Number.isFinite(override.eventFilter.corporateActionDays) ? override.eventFilter.corporateActionDays : null;
+      next.eventFilter.note = normalizeManualOverrideText(override.eventFilter.note);
       const eventNoteParts = [];
       if (Number.isFinite(override.eventFilter.earningsDays)) eventNoteParts.push(`실적 ${override.eventFilter.earningsDays}일`);
       if (Number.isFinite(override.eventFilter.corporateActionDays)) eventNoteParts.push(`기업행사 ${override.eventFilter.corporateActionDays}일`);
