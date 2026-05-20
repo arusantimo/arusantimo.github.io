@@ -1,5 +1,22 @@
 const BUY_FINAL_STATUS_LABELS = { S: '강력매수', A: '매수추천', B: '관심후보', C: '제외' };
 
+function hasBuyStrategyScore(entry) {
+  return !entry?.scoreUnavailable && Number.isFinite(Number(entry?.score));
+}
+
+function getBuyUnavailableScoreLabel(entry) {
+  return String(entry?.scoreLabel || '미산출').trim() || '미산출';
+}
+
+function getBuyDisplayScore(entry, value) {
+  if (value === null || value === undefined || value === '') {
+    return getBuyUnavailableScoreLabel(entry);
+  }
+  const num = Number(value);
+  if (Number.isFinite(num)) return roundBuyScoreValue(num).toFixed(1);
+  return getBuyUnavailableScoreLabel(entry);
+}
+
 function roundBuyScoreValue(value) {
   const num = Number(value);
   if (!Number.isFinite(num)) return 0;
@@ -23,6 +40,7 @@ function getDefaultBuyWyckoffInfo(entry, wyckoff) {
 }
 function normalizeBuyLiveRefresh(entry, liveRefresh) {
   if (!entry || !liveRefresh || typeof liveRefresh !== 'object') return null;
+  if (!hasBuyStrategyScore(entry)) return null;
   const strategyScore = roundBuyScoreValue(entry.score);
   const strategyGrade = entry.grade || getBuyGradeFromScore(strategyScore, entry.strategy);
   const wyckoffInfo = getDefaultBuyWyckoffInfo(entry, liveRefresh.wyckoff);
@@ -166,14 +184,15 @@ function buildBuyLiveRefreshPayload(entry, liveData) {
 }
 
 function getBuyPresentation(entry) {
-  const strategyScore = roundBuyScoreValue(entry.score);
-  const strategyGrade = entry.grade || getBuyGradeFromScore(strategyScore, entry.strategy);
+  const hasStrategyScore = hasBuyStrategyScore(entry);
+  const strategyScore = hasStrategyScore ? roundBuyScoreValue(entry.score) : null;
+  const strategyGrade = entry.grade || (hasStrategyScore ? getBuyGradeFromScore(strategyScore, entry.strategy) : '미산출');
   const strategyStatusLabel = entry.statusLabel || getBuyFinalStatusLabel(strategyGrade);
-  const normalizedLiveRefresh = normalizeBuyLiveRefresh(entry, entry.liveRefresh);
+  const normalizedLiveRefresh = hasStrategyScore ? normalizeBuyLiveRefresh(entry, entry.liveRefresh) : null;
   const hasLiveRefresh = Boolean(normalizedLiveRefresh);
   const primaryScore = normalizedLiveRefresh?.finalScore ?? strategyScore;
   const primaryGrade = normalizedLiveRefresh?.finalGrade ?? strategyGrade;
-  const primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? getBuyFinalStatusLabel(primaryGrade);
+  const primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? strategyStatusLabel;
 
   return {
     strategyScore,
@@ -195,12 +214,14 @@ function getBuyPresentation(entry) {
       ? normalizedLiveRefresh.consensusUnavailable
         ? `최종 ${primaryGrade} · 컨센서스 미제공 · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
         : `최종 ${primaryGrade} · 컨센서스 ${formatBuySignedPoints(normalizedLiveRefresh.adjustment)} · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
-      : `전략 기준 ${strategyGrade}`,
+      : hasStrategyScore
+        ? `전략 기준 ${strategyGrade}`
+        : `전략 점수 ${getBuyUnavailableScoreLabel(entry)}`,
     verdictClass: getBuyVerdictClassFromGrade(primaryGrade),
     liveRefresh: normalizedLiveRefresh,
     hasLiveRefresh,
     changed: {
-      score: hasLiveRefresh && Math.abs(primaryScore - strategyScore) >= 0.05,
+      score: hasLiveRefresh && Number.isFinite(primaryScore) && Number.isFinite(strategyScore) && Math.abs(primaryScore - strategyScore) >= 0.05,
       grade: hasLiveRefresh && primaryGrade !== strategyGrade,
       statusLabel: hasLiveRefresh && primaryStatusLabel !== strategyStatusLabel,
       adjustment: hasLiveRefresh && (Math.abs(normalizedLiveRefresh.adjustment) >= 0.05 || Math.abs(normalizedLiveRefresh.wyckoffAdjustment) >= 0.05),
@@ -211,7 +232,8 @@ function getBuyPresentation(entry) {
 function buildBuyLivePillsHtml(entry, presentation, options = {}) {
   const liveRefresh = presentation.liveRefresh;
   const includeStrategyStatus = options.includeStrategyStatus !== false;
-  const pills = [`<span class="buy-live-pill strategy">전략 ${presentation.strategyScore.toFixed(1)} / ${escapeHtml(presentation.strategyGrade)}</span>`];
+  const strategyScoreText = getBuyDisplayScore(entry, presentation.strategyScore);
+  const pills = [`<span class="buy-live-pill strategy">전략 ${escapeHtml(strategyScoreText)} / ${escapeHtml(presentation.strategyGrade)}</span>`];
 
   if (includeStrategyStatus && entry.statusLabel) {
     pills.push(`<span class="buy-live-pill strategy">전략 판정 ${escapeHtml(entry.statusLabel)}</span>`);
@@ -252,6 +274,20 @@ function buildBuyModalVerdictText(presentation) {
 function buildBuyVerificationHtml(entry) {
   const presentation = getBuyPresentation(entry);
   const liveRefresh = presentation.liveRefresh;
+  if (!hasBuyStrategyScore(entry)) {
+    return `
+      <div class="buy-verification-panel">
+        <div class="modal-section-label">🔍 실시간 컨센서스/와이코프 보정 검증</div>
+        <div class="verification-header unknown">
+          <span class="verification-icon">🧾</span>
+          <div class="verification-summary">
+            <div class="verification-title">전략 점수 미산출</div>
+            <div class="verification-desc">노션 원문에 수치 점수가 없어 네이버 컨센서스 및 와이코프 보정을 실행하지 않습니다. 이 항목은 관찰/메모 용으로만 유지됩니다.</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
   if (!liveRefresh) {
     return `
       <div class="buy-verification-panel">
@@ -309,7 +345,7 @@ function buildBuyVerificationHtml(entry) {
         <tbody>
           <tr>
             <td><strong>점수 / 등급</strong></td>
-            <td>${presentation.strategyScore.toFixed(1)}점 / ${escapeHtml(presentation.strategyGrade)}</td>
+            <td>${getBuyDisplayScore(entry, presentation.strategyScore)}점 / ${escapeHtml(presentation.strategyGrade)}</td>
             <td>${liveRefresh.consensusUnavailable ? '컨센서스 미제공' : `컨센서스 ${liveRefresh.consensusScore.toFixed(1)}점 / ${escapeHtml(liveRefresh.consensusGrade)}`}<br>${escapeHtml(liveRefresh.wyckoff?.label || '관망 (Neutral)')} / ${liveRefresh.wyckoff?.confidencePct || 0}%</td>
             <td>${liveRefresh.consensusUnavailable ? '전략 점수 유지' : `컨센서스 ${formatBuySignedPoints(liveRefresh.adjustment)}`} + 와이코프 ${formatBuySignedPoints(liveRefresh.wyckoffAdjustment)} → ${presentation.finalScore.toFixed(1)}점 / ${escapeHtml(presentation.finalGrade)}</td>
           </tr>

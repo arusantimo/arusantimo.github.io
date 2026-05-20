@@ -617,6 +617,7 @@ function renderBuyStockCards() {
       const presentation = getBuyPresentation(entry);
       const verdictClass = presentation.verdictClass;
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';
+      const scoreDisplay = getBuyDisplayScore(entry, presentation.primaryScore);
       const liveMetaHtml = presentation.liveRefresh
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
@@ -629,7 +630,7 @@ function renderBuyStockCards() {
               <div class="buy-card-code">${escapeHtml(entry.code)}</div>
             </div>
             <div class="buy-card-scorebox">
-              <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.primaryScore.toFixed(1)}</div>
+              <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">${escapeHtml(scoreDisplay)}</div>
               <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryGrade)}</div>
               <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
             </div>
@@ -1073,6 +1074,8 @@ function openModal(codeOrEntryKey, mode = 'sell') {
     const entry = detail;
     const presentation = getBuyPresentation(entry);
     const verdictText = buildBuyModalVerdictText(presentation);
+    const scoreDisplay = getBuyDisplayScore(entry, presentation.primaryScore);
+    const scoreSuffix = Number.isFinite(Number(presentation.primaryScore)) ? ' / 10' : '';
     const modalLiveMetaHtml = buildBuyLivePillsHtml(entry, presentation, {
       includeCurrentPrice: Boolean(presentation.liveRefresh),
       includeTargetPrice: Boolean(presentation.liveRefresh),
@@ -1089,7 +1092,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
         <div class="buy-modal-fixed">
           <div class="modal-price-bar buy-price-bar">
             <div>
-              <div class="price-big ${presentation.changed.score ? 'buy-changed' : ''}">${presentation.primaryScore.toFixed(1)} / 10</div>
+              <div class="price-big ${presentation.changed.score ? 'buy-changed' : ''}">${escapeHtml(scoreDisplay)}${scoreSuffix}</div>
               <div class="buy-modal-scoreline"><span class="${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</span></div>
             </div>
             <div class="modal-stats">

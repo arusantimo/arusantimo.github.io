@@ -288,6 +288,15 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
     triggerButton.textContent = '분석 중...';
   }
 
+  if (typeof hasBuyStrategyScore === 'function' && !hasBuyStrategyScore(entry)) {
+    log(`<span style="color:var(--text-warning)">- [${entry.slotLabel} · ${entry.name}] 전략 점수가 미산출 상태라 ${logLabel}을 건너뜁니다.</span>`);
+    if (triggerButton) {
+      triggerButton.disabled = false;
+      triggerButton.textContent = entry.liveRefresh ? '다시 분석' : '개별 분석';
+    }
+    return false;
+  }
+
   log(`- [${entry.slotLabel} · ${entry.name}] 네이버 컨센서스 기반 ${logLabel}을 시작합니다...`);
   const maxRetries = 2;
 
@@ -373,11 +382,20 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
 async function runBuyBatchRefresh() {
   const allEntries = getAllBuyEntries();
   if (!allEntries.length) return;
+  const eligibleEntries = typeof hasBuyStrategyScore === 'function'
+    ? allEntries.filter(entry => hasBuyStrategyScore(entry))
+    : allEntries;
+  const skippedCount = allEntries.length - eligibleEntries.length;
 
-  log(`▶ 네이버 컨센서스 기반 매수 후보 두 페이지 일괄 분석을 시작합니다. (총 ${allEntries.length}개)`);
+  if (!eligibleEntries.length) {
+    log('<span style="color:var(--text-warning)">⚠️ 전략 점수가 있는 매수 후보가 없어 일괄 분석을 건너뜁니다.</span>');
+    return;
+  }
+
+  log(`▶ 네이버 컨센서스 기반 매수 후보 두 페이지 일괄 분석을 시작합니다. (총 ${eligibleEntries.length}개${skippedCount ? `, 점수 미산출 ${skippedCount}개 제외` : ''})`);
   let successCount = 0;
 
-  for (const entry of allEntries) {
+  for (const entry of eligibleEntries) {
     const success = await refreshBuyEntry(entry, {
       suppressAlert: true,
       logLabel: '일괄 분석'
@@ -386,11 +404,14 @@ async function runBuyBatchRefresh() {
     await new Promise(resolve => setTimeout(resolve, 1200));
   }
 
-  const failedCount = allEntries.length - successCount;
+  const failedCount = eligibleEntries.length - successCount;
   if (failedCount > 0) {
     log(`<span style="color:var(--text-warning)">✅ 매수 후보 ${successCount}개 최신화 완료, ${failedCount}개는 실패했습니다.</span>`);
   } else {
     log(`✅ 매수 후보 ${successCount}개 네이버 컨센서스 최신화가 완료되었습니다.`);
+  }
+  if (skippedCount > 0) {
+    log(`<span style="color:var(--text-warning)">ℹ️ 점수 미산출 ${skippedCount}개는 일괄 분석 대상에서 제외했습니다.</span>`);
   }
 }
 
@@ -454,7 +475,11 @@ async function loadNotionSlot(slotId, urlInput) {
 
   log(`✅ ${slotLabel} 불러오기 완료. (시장 레짐 ${decoratedSnapshot.regimeTable.length}개 항목, 매수 후보 ${totalBuy}개, 스윙 ${decoratedSnapshot.swingEntries.length}개)`);
   if (!totalBuy) {
-    log(`<span style="color:var(--text-warning)">⚠️ ${slotLabel}: 전략별 종목 상세를 찾지 못했습니다. 노션 섹션 제목 형식이 바뀌었는지 확인해주세요.</span>`);
+    const hasStrategySections = /종가베팅\s+신규\s+진입|급락\s+반등\s+후보|전략\s*③/.test(sourceText);
+    const warningMessage = hasStrategySections
+      ? `⚠️ ${slotLabel}: 전략 섹션은 찾았지만 종목 헤더 형식을 인식하지 못했습니다. 점수 미산출/매매금지 같은 표기가 추가됐는지 확인해주세요.`
+      : `⚠️ ${slotLabel}: 전략별 종목 상세를 찾지 못했습니다. 노션 섹션 제목 형식이 바뀌었는지 확인해주세요.`;
+    log(`<span style="color:var(--text-warning)">${warningMessage}</span>`);
   }
 
   return { slotId: normalizedSlotId, loaded: true, totalBuy, totalSell };

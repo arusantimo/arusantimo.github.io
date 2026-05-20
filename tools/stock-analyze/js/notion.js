@@ -1,13 +1,46 @@
+function parseStockScoreMeta(segment) {
+  const normalized = sanitizeText(segment).replace(/\s+/g, ' ').trim();
+  const scoredMatch = normalized.match(/^(?:추정\s*)?([\d.]+)\/10\s*\[([^\]]+)\]$/);
+  if (scoredMatch) {
+    return {
+      score: Number(scoredMatch[1]),
+      grade: scoredMatch[2].trim(),
+      scoreUnavailable: false,
+      scoreLabel: ''
+    };
+  }
+
+  const unavailableMatch = normalized.match(/^(?:(.+?)\s*)?점수\s*미산출(?:\s*\[([^\]]+)\])?$/);
+  if (!unavailableMatch) return null;
+
+  const prefixReason = String(unavailableMatch[1] || '')
+    .replace(/^추정\s*/i, '')
+    .replace(/으로$/u, '')
+    .trim();
+  const bracketReason = String(unavailableMatch[2] || '').trim();
+  const reason = bracketReason || prefixReason || '미산출';
+
+  return {
+    score: null,
+    grade: reason,
+    scoreUnavailable: true,
+    scoreLabel: '미산출'
+  };
+}
+
 function parseStockHeader(line, strategy) {
-  const match = line.match(/^(\d+)위\.\s*([^()]+?)\s*\((\d{6})\)\s*[—\-–]\s*(?:추정\s*)?([\d.]+)\/10\s*\[([^\]]+)\]\s*[—\-–←]\s*(.+)$/);
+  const match = line.match(/^(\d+)위\.\s*([^()]+?)\s*\((\d{6})\)\s*[—\-–]\s*(.+?)\s*[—\-–←]\s*(.+)$/);
   if (!match) return null;
+
+  const scoreMeta = parseStockScoreMeta(match[4]);
+  if (!scoreMeta) return null;
+
   return {
     rank: Number(match[1]),
     name: match[2].trim(),
     code: match[3],
-    score: Number(match[4]),
-    grade: match[5].trim(),
-    statusLabel: match[6].trim(),
+    ...scoreMeta,
+    statusLabel: match[5].trim(),
     strategy,
     type: strategy,
     gates: [],
