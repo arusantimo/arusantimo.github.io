@@ -149,23 +149,20 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   }
 
   const now = new Date();
-  const totalMins = now.getHours() * 60 + now.getMinutes();
-  const isBefore0908 = totalMins < (9 * 60 + 8);
   const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   saveAnalysisArchiveBeforeRecheck('sell', {
-    isBefore0908,
     timeLabel: timeStr
   });
 
   setAnalysisRunning(true);
-  btn.innerHTML = `<span>⚡</span> ${isBefore0908 ? '1차 분석' : '2차 분석'} 진행 중...`;
+  btn.innerHTML = '<span>⚡</span> 통합 분석 진행 중...';
 
   try {
-    log(`▶ [현재 시각: ${timeStr}] 매도 분석을 시작합니다. (9시 8분 <b>${isBefore0908 ? '이전' : '이후'}</b> 로직 적용)`);
+    log(`▶ [현재 시각: ${timeStr}] 매도 통합 분석을 시작합니다.`);
     await refreshLiveGapScore('매도 분석');
 
-    const allStocks = getAllSellStocksForAnalysis(isBefore0908);
+    const allStocks = getAllSellStocksForAnalysis();
     const visibleCollections = getUiSlotIds().map(slotId => ({
       slotId,
       label: getSlotLabel(slotId),
@@ -183,12 +180,11 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
     });
 
     for (const stock of allStocks) {
-      await analyzeStock(stock, isBefore0908);
+      await analyzeStock(stock, false);
       await new Promise(resolve => setTimeout(resolve, 1500));
     }
 
     saveAnalysisArchiveAfterAnalysis('sell', {
-      isBefore0908,
       timeLabel: timeStr
     });
     renderSellStockCards();

@@ -102,9 +102,6 @@ function buildSellRecheckLabel({ stock, payload, data, isBefore0908, stage }) {
   if (payload.actionStage === 'reject' || payload.actionStage === 'loss_cut' || payload.triggeredRule?.severity === 'hard') {
     return '즉시 실행';
   }
-  if (stock.type === 'momentum' && isBefore0908 && data.openPrice > 0 && data.currentPrice < data.openPrice) {
-    return '09:08 재분석';
-  }
   if (['premarket', 'openPhase', 'intraday1', 'intraday2'].includes(stage)) {
     return '다음 매매 단계 도달 시 재평가';
   }
@@ -216,9 +213,6 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
   ];
 
   let sellScore = breakdown.reduce((sum, item) => sum + item.points, 0);
-  if (stock.type === 'momentum' && isBefore0908 && data.openPrice > 0 && data.currentPrice < data.openPrice) {
-    sellScore = Math.max(sellScore, 70);
-  }
   if (hasTriggeredSellRule(ruleSet, 'P1')) {
     sellScore = Math.max(sellScore, 70);
   }

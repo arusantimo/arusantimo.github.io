@@ -630,8 +630,8 @@ function buildSellModalBody(detail) {
   const badgeInfo = getSellActionPlanBadge(detail);
   const shiftBadgeInfo = getGapComparisonBadge(gapProfile?.comparison);
   const verdictCls = badgeInfo.tone;
-  const stageCls = isBefore0908 ? 'stage1' : 'stage2';
-  const stageText = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
+  const stageCls = 'stage2';
+  const stageText = '통합 매도 분석';
   const notionEntry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
   const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 전략 데이터에 없습니다.</div>';
   const strategyPlanHtml = renderSellStrategyPlan(detail, false);
@@ -811,13 +811,11 @@ updateCurrentTime = function updateCurrentTimeOverride() {
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
   const ss = now.getSeconds().toString().padStart(2, '0');
-  const totalMins = now.getHours() * 60 + now.getMinutes();
-  const isBefore = totalMins < (9 * 60 + 8);
-  const label = isBefore ? '[1차 분석] 9:08 이전 (수급 매집형 손절 점검)' : '[2차 분석] 9:08 이후 (전체 매도/손절 분석)';
+  const label = '통합 매도 분석 로직';
   const el = document.getElementById('current-time-display');
   if (el) {
     el.innerHTML = activeTab === 'sell'
-      ? `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; 적용 로직: <strong style="color:${isBefore ? 'var(--text-warning)' : 'var(--text-success)'}">${label}</strong>`
+      ? `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; 적용 로직: <strong style="color:var(--text-success)">${label}</strong>`
       : '🧭 매수 탭에서는 상단 분석 시작 버튼으로 네이버 컨센서스를 일괄 최신화할 수 있습니다.';
   }
 
@@ -835,7 +833,7 @@ updateCurrentTime = function updateCurrentTimeOverride() {
     return;
   }
 
-  analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차 분석' : '2차 분석'}${archiveSuffix}`;
+  analyzeBtn.innerHTML = `<span>⚡</span> 통합 분석${archiveSuffix}`;
 };
 
 updateCardError = function updateCardErrorOverride(codeOrEntryKey) {
