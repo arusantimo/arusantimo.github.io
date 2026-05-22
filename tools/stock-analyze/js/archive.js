@@ -144,8 +144,7 @@ function getStageTimeLabel(date = new Date()) {
 }
 
 function getSellStageKeyByTime(date = new Date()) {
-  const totalMins = date.getHours() * 60 + date.getMinutes();
-  return totalMins < (9 * 60 + 8) ? 'stage1' : 'stage2';
+  return 'stage2';
 }
 
 function formatArchiveButtonTime(archiveItem) {
@@ -194,10 +193,10 @@ function buildBuyAnalysisArchiveForSlot(slotId, timeLabel = '') {
 }
 
 function buildSellAnalysisArchiveForSlot(slotId, isBefore0908, timeLabel = '') {
-  const stage = isBefore0908 ? 'stage1' : 'stage2';
-  const visibleKeys = getVisibleSellCodeSet(slotId, isBefore0908, getSellUniverseMode(slotId));
+  const stage = 'stage2';
+  const visibleKeys = getVisibleSellCodeSet(slotId, null, getSellUniverseMode(slotId));
   const details = Object.values(stockDetailMap)
-    .filter(detail => detail?.mode === 'sell' && detail.isBefore0908 === isBefore0908 && detail.stock?.slotId === slotId && visibleKeys.has(detail.stock?.entryKey))
+    .filter(detail => detail?.mode === 'sell' && detail.stock?.slotId === slotId && visibleKeys.has(detail.stock?.entryKey))
     .map(detail => ({
       entryKey: detail.stock?.entryKey || '',
       code: detail.stock?.code || '',
@@ -228,7 +227,7 @@ function buildSellAnalysisArchiveForSlot(slotId, isBefore0908, timeLabel = '') {
   return {
     type: 'sell',
     stage,
-    label: `매도 ${isBefore0908 ? '1차' : '2차'} 분석`,
+    label: '매도 통합 분석',
     savedAt: new Date().toISOString(),
     analysisTime: timeLabel,
     count: details.length,
@@ -251,7 +250,7 @@ function saveAnalysisArchive(mode, options = {}) {
     });
     archive.buy.activeSlot = activeBuySlot;
   } else {
-    const stageKey = options.isBefore0908 ? 'stage1' : 'stage2';
+    const stageKey = getSellStageKeyByTime();
     NOTION_SLOT_IDS.forEach(slotId => {
       const payload = buildSellAnalysisArchiveForSlot(slotId, Boolean(options.isBefore0908), options.timeLabel || getStageTimeLabel());
       archive.sell.bySlot[slotId][stageKey] = payload || null;
@@ -264,8 +263,8 @@ function saveAnalysisArchive(mode, options = {}) {
   if (options.logMessage) {
     const totalCount = mode === 'buy'
       ? NOTION_SLOT_IDS.reduce((sum, slotId) => sum + (archive.buy.bySlot[slotId]?.count || 0), 0)
-      : NOTION_SLOT_IDS.reduce((sum, slotId) => sum + (archive.sell.bySlot[slotId]?.[options.isBefore0908 ? 'stage1' : 'stage2']?.count || 0), 0);
-    log(options.logMessage({ label: mode === 'buy' ? '매수 분석' : `매도 ${options.isBefore0908 ? '1차' : '2차'} 분석`, count: totalCount }));
+      : NOTION_SLOT_IDS.reduce((sum, slotId) => sum + (archive.sell.bySlot[slotId]?.[getSellStageKeyByTime()]?.count || 0), 0);
+    log(options.logMessage({ label: mode === 'buy' ? '매수 분석' : '매도 통합 분석', count: totalCount }));
   }
   return true;
 }

@@ -185,9 +185,7 @@ function getAllSellStocks() {
 
 function getSellStocksForAnalysis(isBefore0908, slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
   const collections = getVisibleSellStockCollections(slotId, universeMode);
-  return isBefore0908
-    ? [...collections.swing, ...collections.momentum, ...collections.reversal]
-    : [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
+  return [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
 }
 
 function getAllSellStocksForAnalysis(isBefore0908) {
