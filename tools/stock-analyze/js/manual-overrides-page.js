@@ -104,6 +104,11 @@ function summarizeManualOverrideEntry(entry) {
 }
 
 function getGeneratedPayload() {
+  const dateKey = typeof getJonggaKstTodayKey === 'function' ? getJonggaKstTodayKey() : '';
+  const dailyPayload = dateKey && globalThis.JONGGA_DAILY_DATA && typeof globalThis.JONGGA_DAILY_DATA === 'object'
+    ? globalThis.JONGGA_DAILY_DATA[dateKey]
+    : null;
+  if (dailyPayload && typeof dailyPayload === 'object') return dailyPayload;
   return globalThis.JONGGA_DATA && typeof globalThis.JONGGA_DATA === 'object' ? globalThis.JONGGA_DATA : null;
 }
 
@@ -325,11 +330,12 @@ function renderGeneratedMeta() {
   if (!target) return;
   const payload = getGeneratedPayload();
   if (!payload) {
-    target.textContent = 'jongga/output/jongga_data.js를 찾지 못했습니다. 최신 데이터를 먼저 생성해주세요.';
+    const dateKey = typeof getJonggaKstTodayKey === 'function' ? getJonggaKstTodayKey() : '오늘';
+    target.textContent = `${dateKey} 기준 Jongga 데이터 파일을 찾지 못했습니다. 최신 데이터를 먼저 생성해주세요.`;
     return;
   }
   const status = payload?.dataQuality?.status || 'unknown';
-  target.textContent = `기준 데이터: ${formatGeneratedAt(payload.generatedAt)} | 데이터 품질: ${status}`;
+  target.textContent = `기준 데이터: ${payload.analysisDate || '날짜 미확인'} / ${formatGeneratedAt(payload.generatedAt)} | 데이터 품질: ${status}`;
 }
 
 function renderRecommendedList() {
@@ -474,7 +480,19 @@ function importManualOverrideFile(file) {
   reader.readAsText(file, 'utf-8');
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+async function loadGeneratedPayloadForManualOverridePage() {
+  if (typeof loadJonggaDailyScript !== 'function' || typeof getJonggaKstTodayKey !== 'function') return;
+  const dateKey = getJonggaKstTodayKey();
+  try {
+    await loadJonggaDailyScript(dateKey);
+  } catch (error) {
+    console.warn(error);
+    setOverrideStatus(`${dateKey} 기준 Jongga 데이터 파일을 찾지 못했습니다.`);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadGeneratedPayloadForManualOverridePage();
   renderGeneratedMeta();
   renderRecommendedList();
   renderManualOverrideTable();

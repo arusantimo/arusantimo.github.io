@@ -6,7 +6,7 @@ if /i "%~1"=="--no-pause" set "PAUSE_AT_END="
 
 pushd "%~dp0"
 
-python -m jongga.generate_latest --out "jongga\output\latest.json" --bridge-js "jongga\output\jongga_data.js"
+python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js"
 set "EXITCODE=%ERRORLEVEL%"
 
 if not "%EXITCODE%"=="0" (
@@ -19,8 +19,9 @@ if not "%EXITCODE%"=="0" (
 
 echo.
 echo Generated files:
-echo   jongga\output\latest.json
-echo   jongga\output\jongga_data.js
+echo   jongga\output\latest_YYYYMMDD.json
+echo   jongga\output\jongga_data_YYYYMMDD.js
+echo   jongga\output\jongga_history.js
 
 popd
 if defined PAUSE_AT_END pause

@@ -172,6 +172,47 @@ body.modal-scroll-locked {
   justify-content: space-between;
 }
 
+.daily-data-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.today-data-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.today-data-status.loaded,
+.today-data-status.manual {
+  color: var(--text-success);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: var(--bg-success-light);
+}
+
+.today-data-status.missing,
+.today-data-status.loading {
+  color: var(--text-warning);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: var(--bg-warning-light);
+}
+
+.today-data-status.error {
+  color: var(--text-danger);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: var(--bg-danger-light);
+}
+
 .action-meta {
   display: flex;
   align-items: center;
@@ -1316,6 +1357,24 @@ body.modal-scroll-locked {
   border-top: 1px dashed var(--border-color);
 }
 
+.buy-price-stack {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.buy-entry-price {
+  font-size: 13px;
+  line-height: 1.1;
+}
+
+.buy-price-change {
+  font-size: 11px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
 .scard {
   padding: 20px;
   position: relative;
@@ -1981,6 +2040,83 @@ body.modal-scroll-locked {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.jongga-json-input {
+  min-height: 320px;
+  resize: vertical;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  outline: none;
+  padding: 12px;
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+}
+
+.history-item {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  padding: 14px;
+}
+
+.history-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.history-date {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.history-meta,
+.history-empty {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.history-recommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.history-rec {
+  display: grid;
+  gap: 4px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px;
+}
+
+.history-rec strong {
+  font-size: 13px;
+}
+
+.history-rec span {
+  color: var(--text-tertiary);
 }
 
 .modal.buy-detail-mode .modal-body {

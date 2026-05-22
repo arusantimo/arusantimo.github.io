@@ -242,18 +242,15 @@ function loadJonggaPayload(payload, meta = {}) {
 
 function bindJonggaLoaderControls() {
   document.getElementById('btn-jongga-quality-toggle')?.addEventListener('click', toggleJonggaQualityPanel);
+  if (typeof bindJonggaDailyControls === 'function') bindJonggaDailyControls();
   renderJonggaQualityPanel();
   updateJonggaQualityHeader();
 }
 
 function loadInitialJonggaData() {
-  if (window.JONGGA_DATA) {
-    try {
-      loadJonggaPayload(window.JONGGA_DATA, { source: 'jongga/output/jongga_data.js' });
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    log('<span style="color:var(--text-danger)">jongga_data.js를 찾지 못했습니다. 생성 파일이 최신인지 확인하세요.</span>');
+  if (typeof loadJonggaDailyData === 'function') {
+    loadJonggaDailyData();
+    return;
   }
+  log('<span style="color:var(--text-danger)">날짜별 Jongga 로더를 찾지 못했습니다. js/jongga-daily.js 로드 순서를 확인하세요.</span>');
 }

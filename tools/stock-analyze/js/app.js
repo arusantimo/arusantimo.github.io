@@ -247,6 +247,8 @@ window.addEventListener('DOMContentLoaded', () => {
       closeGuideModal();
       closeGapGuideModal();
       closeRegimeReport();
+      if (typeof closeJonggaJsonInputModal === 'function') closeJonggaJsonInputModal();
+      if (typeof closeJonggaHistoryModal === 'function') closeJonggaHistoryModal();
     }
   });
 });

@@ -110,6 +110,10 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
           code: '005930',
           score: 8.1,
           grade: 'A',
+          currentPrice: 71200,
+          previousClose: 70000,
+          dailyChange: 1200,
+          dailyChangePct: 1.71,
           gates: validGateMap(['G1', 'G2', 'G3', 'G4']),
           matchedRules: [{ code: 'S1' }]
         }]
@@ -124,4 +128,6 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(snapshot.gapScore.grade, 'G-B');
   assert.equal(snapshot.momentumEntries[0].entryKey, 'slotA:005930');
   assert.equal(snapshot.momentumEntries[0].source, 'jongga-json');
+  assert.equal(snapshot.momentumEntries[0].dailyChangePct, 1.71);
+  assert.equal(snapshot.momentumEntries[0].dailyChange, 1200);
 });

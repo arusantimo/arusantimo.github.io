@@ -645,7 +645,7 @@ function renderBuyStockCards() {
           <div class="buy-card-summary">${escapeHtml(rationale)}</div>
           ${liveMetaHtml}
           <div class="buy-card-footer">
-            <span>${formatWon(entry.entryPriceValue)}</span>
+            ${renderBuyPriceWithDailyChange(entry)}
             <span>R/R ${escapeHtml(entry.rr || '미기재')}</span>
           </div>
         </div>

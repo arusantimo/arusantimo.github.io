@@ -13,6 +13,8 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from jongga.output_contract import payload_with_analysis_date, resolve_analysis_date, write_daily_outputs
+
 
 USER_AGENT = "Mozilla/5.0 jongga-live-generator/1.0"
 BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
@@ -25,6 +27,8 @@ ETF_NAME_PATTERN = re.compile(
 )
 KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업\(잠정\)실적|잠정실적|실적발표|결산실적", re.IGNORECASE)
 KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
+TOP_TRADING_VALUE_LIMIT = 40
+NAVER_MARKET_VALUE_API_TEMPLATE = "https://m.stock.naver.com/api/stocks/marketValue/{market}?page={page}&pageSize={page_size}"
 
 
 def utc_now_iso() -> str:
@@ -615,21 +619,52 @@ def fetch_kospi_history(count: int = 90) -> list[dict[str, Any]]:
 
 
 
-def fetch_top_trading_codes(limit: int = 30) -> list[tuple[int, str, str]]:
-    text = request_text("https://finance.naver.com/sise/sise_quant.naver", timeout=20.0, encoding="euc-kr")
+def fetch_naver_market_value_rows(market: str, *, page_size: int = 100) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    page = 1
+    while True:
+        payload = request_json(NAVER_MARKET_VALUE_API_TEMPLATE.format(market=market, page=page, page_size=page_size), timeout=20.0)
+        stocks = payload.get("stocks") if isinstance(payload, dict) else []
+        if not isinstance(stocks, list) or not stocks:
+            break
+        rows.extend(row for row in stocks if isinstance(row, dict))
+        total_count = parse_int(payload.get("totalCount")) if isinstance(payload, dict) else 0
+        if total_count and page * page_size >= total_count:
+            break
+        page += 1
+    return rows
+
+
+def select_top_trading_value_codes(rows: list[dict[str, Any]], limit: int = TOP_TRADING_VALUE_LIMIT) -> list[tuple[int, str, str]]:
+    candidates: list[tuple[float, str, str]] = []
+    for row in rows:
+        code = str(row.get("itemCode") or row.get("code") or "").strip()
+        name = str(row.get("stockName") or row.get("name") or "").strip()
+        trading_value = parse_float(row.get("accumulatedTradingValueRaw") or row.get("accumulatedTradingValue"))
+        if not code or not name or trading_value <= 0:
+            continue
+        candidates.append((trading_value, code, name))
+
     results: list[tuple[int, str, str]] = []
     seen: set[str] = set()
-    for match in re.finditer(r'/item/main\.naver\?code=(\d{6})[^>]*>([^<]+)</a>', text):
-        code = match.group(1)
-        name = match.group(2).strip()
+    for raw_rank, (_, code, name) in enumerate(sorted(candidates, reverse=True), start=1):
+        if raw_rank > limit:
+            break
         if code in seen or ETF_NAME_PATTERN.search(name):
             continue
         seen.add(code)
-        results.append((len(results) + 1, code, name))
-        if len(results) >= limit:
-            break
+        results.append((raw_rank, code, name))
+    return results
+
+
+def fetch_top_trading_codes(limit: int = TOP_TRADING_VALUE_LIMIT) -> list[tuple[int, str, str]]:
+    effective_limit = min(limit, TOP_TRADING_VALUE_LIMIT)
+    rows: list[dict[str, Any]] = []
+    for market in ("KOSPI", "KOSDAQ"):
+        rows.extend(fetch_naver_market_value_rows(market))
+    results = select_top_trading_value_codes(rows, effective_limit)
     if not results:
-        raise RuntimeError("failed to scrape top trading codes from Naver")
+        raise RuntimeError("failed to fetch top trading-value codes from Naver mobile API")
     return results
 
 
@@ -833,6 +868,18 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
 
 def stock_daily_change(snapshot: StockSnapshot) -> float:
     return ((snapshot.current_price - snapshot.prev_close) / snapshot.prev_close) * 100 if snapshot.prev_close else 0.0
+
+
+def build_price_change_meta(snapshot: StockSnapshot) -> dict[str, Any]:
+    daily_change = snapshot.current_price - snapshot.prev_close
+    daily_change_pct = stock_daily_change(snapshot)
+    return {
+        "currentPrice": round(snapshot.current_price),
+        "previousClose": round(snapshot.prev_close),
+        "dailyChange": round(daily_change),
+        "dailyChangePct": round(daily_change_pct, 2),
+        "dailyDirection": "up" if daily_change > 0 else "down" if daily_change < 0 else "flat",
+    }
 
 
 def lower_wick_ratio(snapshot: StockSnapshot) -> float:
@@ -1184,6 +1231,10 @@ def rr_text(entry_price: float, stop_rate: float, target_rate: float) -> str:
     return f"1 : {reward / risk:.1f}"
 
 
+def build_top_trading_value_gate(rank: int, code: str) -> dict[str, Any]:
+    return {"code": code, **to_status(rank <= TOP_TRADING_VALUE_LIMIT, f"거래대금 TOP{TOP_TRADING_VALUE_LIMIT} 순위 {rank}")}
+
+
 def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[dict[str, Any]]:
     toss_order_url = f"https://www.tossinvest.com/stocks/A{snapshot.code}/order"
     toss_chart_url = f"https://www.tossinvest.com/stocks/A{snapshot.code}/chart"
@@ -1305,6 +1356,7 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
     gates = [
+        build_top_trading_value_gate(snapshot.rank, "G0"),
         {"code": "G1", **to_status(bool(snapshot.ma5 and snapshot.ma20 and snapshot.ma60 and snapshot.ma5 > snapshot.ma20 > snapshot.ma60 and snapshot.ma5_prev and snapshot.ma5 > snapshot.ma5_prev), "5MA>20MA>60MA")},
         {"code": "G2", **to_status(bool(snapshot.ma60 and snapshot.current_price > snapshot.ma60), "종가 > 60MA")},
         {"code": "G3", **(to_status(bool(snapshot.weekly_rsi and snapshot.weekly_rsi >= 50), f"주봉 RSI {snapshot.weekly_rsi:.1f}" if snapshot.weekly_rsi else "") if snapshot.weekly_rsi is not None else warning_status("주봉 RSI 계산 데이터 제한"))},
@@ -1335,6 +1387,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "gates": gates,
         "matchedRules": [{"code": code, "note": "공개 데이터 충족"} for code, passed in score_items.items() if passed >= 1.0],
         "unmatchedRules": [{"code": code, "note": "미충족 또는 공개 데이터 부족"} for code, passed in score_items.items() if passed < 1.0],
+        **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
@@ -1353,7 +1406,7 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         {"code": "G1", **to_status(rs_top10, "3개월 상대강도 상위 10%")},
         {"code": "G2", **to_status(snapshot.return_5d - kospi_return_5d > 0 and snapshot.return_20d - kospi_return_20d > 0, "5일·20일 초과수익률")},
         {"code": "G3", **to_status(bool(snapshot.high_52w and snapshot.current_price >= snapshot.high_52w * 0.92), f"52주 고가 대비 {snapshot.current_price / snapshot.high_52w * 100:.1f}%" if snapshot.high_52w else "")},
-        {"code": "G4", **to_status(snapshot.rank <= 30, f"거래대금 순위 {snapshot.rank}")},
+        build_top_trading_value_gate(snapshot.rank, "G4"),
     ]
     score_items = {
         "S1": 1.0 if snapshot.foreign_net > 0 and snapshot.institution_net > 0 else 0.0,
@@ -1379,6 +1432,7 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "gates": gates,
         "matchedRules": [{"code": code, "note": "공개 데이터 충족"} for code, passed in score_items.items() if passed >= 1.0],
         "unmatchedRules": [{"code": code, "note": "토스 또는 추가 데이터 필요"} for code, passed in score_items.items() if passed < 1.0],
+        **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
@@ -1405,7 +1459,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     long_lower = lower_wick_ratio(snapshot) >= 1.5
     g5_variant = "G5-a" if bullish else "G5-b" if long_lower else "G5-c" if doji else "G5"
     filters = [
-        {"code": "F1", **to_status(snapshot.rank <= 30, f"거래대금 순위 {snapshot.rank}")},
+        build_top_trading_value_gate(snapshot.rank, "F1"),
         {"code": "F2", **to_status(snapshot.market_cap_trillion >= 30.0, f"시총 {snapshot.market_cap_trillion:.1f}조")},
         {"code": "F3", **(
             to_status(not auto_event_filter.get("blocked"), auto_event_filter.get("note") or "Naver 일정 기반 이벤트 필터")
@@ -1452,6 +1506,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "gates": gates,
         "matchedRules": [{"code": code, "note": "공개 데이터 충족"} for code, passed in score_items.items() if passed >= 1.0],
         "unmatchedRules": [{"code": code, "note": "토스·이벤트 데이터 필요"} for code, passed in score_items.items() if passed < 1.0],
+        **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
@@ -1472,7 +1527,7 @@ def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return entries
 
 
-def collect_live_payload(top_limit: int = 30) -> dict[str, Any]:
+def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, Any]:
     collection_log: list[dict[str, Any]] = []
 
     def log_step(step: str, label: str, started_at: float, *, status: str = "ok", detail: str = "", count: int | None = None) -> None:
@@ -1726,18 +1781,28 @@ def write_outputs(payload: dict[str, Any], output_path: str | Path, bridge_js_pa
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Generate jongga latest.json from live public data")
-    parser.add_argument("--out", required=True, help="Output latest.json path")
-    parser.add_argument("--bridge-js", help="Optional bridge JS output path")
-    parser.add_argument("--top-limit", type=int, default=30, help="Universe size from Naver top trading list")
+    parser = argparse.ArgumentParser(description="Generate dated jongga JSON/JS from live public data")
+    parser.add_argument("--date", help="Analysis date in YYYY-MM-DD. Defaults to Asia/Seoul today")
+    parser.add_argument("--out-dir", default="jongga/output", help="Daily output directory")
+    parser.add_argument("--history-js", default="jongga/output/jongga_history.js", help="History manifest JS path")
+    parser.add_argument("--out", help="Legacy latest.json output path")
+    parser.add_argument("--bridge-js", help="Legacy window.JONGGA_DATA bridge JS output path")
+    parser.add_argument("--top-limit", type=int, default=TOP_TRADING_VALUE_LIMIT, help="Universe size from Naver top trading-value list. Hard-capped at 40")
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
-    payload = collect_live_payload(top_limit=args.top_limit)
-    write_outputs(payload, args.out, args.bridge_js)
-    print(f"generated {args.out} with {len(payload['slots'][0]['entries']['pullback']) + len(payload['slots'][0]['entries']['momentum']) + len(payload['slots'][0]['entries']['reversal'])} entries")
+    analysis_date = resolve_analysis_date(args.date)
+    payload = payload_with_analysis_date(collect_live_payload(top_limit=args.top_limit), analysis_date)
+    json_path, js_path, history_path = write_daily_outputs(payload, args.out_dir, args.history_js)
+    if args.out or args.bridge_js:
+        if not args.out:
+            raise SystemExit("--out is required when --bridge-js is used")
+        write_outputs(payload, args.out, args.bridge_js)
+    buy_count = len(payload["slots"][0]["entries"]["pullback"]) + len(payload["slots"][0]["entries"]["momentum"]) + len(payload["slots"][0]["entries"]["reversal"])
+    print(f"generated {js_path} and {json_path} for {analysis_date.isoformat()} with {buy_count} entries")
+    print(f"updated {history_path}")
     return 0
 
 

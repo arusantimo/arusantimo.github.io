@@ -114,6 +114,34 @@ function formatWon(value) {
   return `${Number(value).toLocaleString()}원`;
 }
 
+function getDailyChangeTone(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num === 0) return 'nt';
+  return num > 0 ? 'up' : 'dn';
+}
+
+function formatSignedWon(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num === 0) return '';
+  return `${num > 0 ? '+' : ''}${Math.round(num).toLocaleString()}원`;
+}
+
+function renderBuyPriceWithDailyChange(entry) {
+  const pct = Number(entry?.dailyChangePct);
+  const tone = getDailyChangeTone(pct);
+  const priceClass = Number.isFinite(pct) ? `buy-entry-price chg ${tone}` : 'buy-entry-price';
+  const priceHtml = `<span class="${priceClass}">${escapeHtml(formatWon(entry?.entryPriceValue))}</span>`;
+  if (!Number.isFinite(pct)) return priceHtml;
+  const pctText = `${pct > 0 ? '+' : ''}${pct.toFixed(2)}%`;
+  const changeText = formatSignedWon(entry?.dailyChange);
+  return `
+    <span class="buy-price-stack">
+      ${priceHtml}
+      <span class="buy-price-change chg ${tone}">${escapeHtml(pctText)}${changeText ? ` · ${escapeHtml(changeText)}` : ''}</span>
+    </span>
+  `;
+}
+
 function extractFirstNumber(text) {
   const match = String(text ?? '').replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
   return match ? Number(match[0]) : null;

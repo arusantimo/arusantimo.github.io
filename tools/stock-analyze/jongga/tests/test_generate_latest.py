@@ -1,7 +1,9 @@
 import unittest
 from datetime import date
 
-from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload
+from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_top_trading_value_gate, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload, select_top_trading_value_codes
+from jongga.output_contract import build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
+from tempfile import TemporaryDirectory
 
 
 class GenerateLatestTest(unittest.TestCase):
@@ -96,6 +98,84 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIsNotNone(event_filter)
         self.assertTrue(event_filter["blocked"])
         self.assertIn("배당 결정", event_filter["note"])
+
+    def test_select_top_trading_value_codes_keeps_raw_top40_only(self):
+        rows = [
+            {"itemCode": "069500", "stockName": "KODEX 200", "accumulatedTradingValueRaw": "100000"},
+            {"itemCode": "000001", "stockName": "1위종목", "accumulatedTradingValueRaw": "99000"},
+        ]
+        rows.extend(
+            {"itemCode": f"{index:06d}", "stockName": f"{index}위종목", "accumulatedTradingValueRaw": str(99000 - index)}
+            for index in range(3, 43)
+        )
+        selected = select_top_trading_value_codes(rows, limit=40)
+        self.assertEqual(selected[0], (2, "000001", "1위종목"))
+        self.assertIn((40, "000040", "40위종목"), selected)
+        self.assertNotIn((41, "000041", "41위종목"), selected)
+        self.assertTrue(all(rank <= 40 for rank, _, _ in selected))
+
+    def test_top_trading_value_gate_blocks_rank_over_40(self):
+        passed = build_top_trading_value_gate(40, "G0")
+        blocked = build_top_trading_value_gate(41, "G0")
+        self.assertEqual(passed["status"], "✅")
+        self.assertEqual(blocked["status"], "⛔")
+        self.assertIn("TOP40", blocked["note"])
+
+    def test_daily_output_paths_use_compact_date(self):
+        json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22))
+        self.assertEqual(json_path.as_posix(), "jongga/output/latest_20260522.json")
+        self.assertEqual(js_path.as_posix(), "jongga/output/jongga_data_20260522.js")
+
+    def test_daily_bridge_uses_date_key(self):
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22))
+        bridge = render_daily_bridge_js(payload)
+        self.assertIn("window.JONGGA_DAILY_DATA", bridge)
+        self.assertIn('"2026-05-22"', bridge)
+        self.assertNotIn("window.JONGGA_DATA =", bridge)
+
+    def test_history_entry_extracts_top_recommendations(self):
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22))
+        entry = build_history_entry(payload, "jongga/output/jongga_data_20260522.js", "jongga/output/latest_20260522.json", top_limit=1)
+        self.assertEqual(entry["date"], "2026-05-22")
+        self.assertEqual(entry["status"], "partial")
+        self.assertEqual(entry["buyCount"], 2)
+        self.assertEqual(entry["topRecommendations"][0]["code"], "000020")
+
+    def test_history_update_replaces_same_date(self):
+        entries = update_history_index(
+            [{"date": "2026-05-21", "buyCount": 1}, {"date": "2026-05-22", "buyCount": 2}],
+            {"date": "2026-05-22", "buyCount": 3},
+        )
+        self.assertEqual([entry["date"] for entry in entries], ["2026-05-22", "2026-05-21"])
+        self.assertEqual(entries[0]["buyCount"], 3)
+
+    def test_write_daily_outputs_writes_manifest_without_duplicates(self):
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22))
+        with TemporaryDirectory() as tmp:
+            history_path = f"{tmp}/jongga_history.js"
+            write_daily_outputs(payload, tmp, history_path)
+            write_daily_outputs(payload, tmp, history_path)
+            with open(history_path, encoding="utf-8") as handle:
+                history_js = handle.read()
+            self.assertEqual(history_js.count('"date": "2026-05-22"'), 1)
+            with open(f"{tmp}/jongga_data_20260522.js", encoding="utf-8") as handle:
+                self.assertIn('window.JONGGA_DAILY_DATA["2026-05-22"]', handle.read())
+
+    def _sample_payload(self):
+        return {
+            "schemaVersion": "jongga_result.v1",
+            "generatedAt": "2026-05-22T01:00:00+00:00",
+            "dataQuality": {"status": "partial"},
+            "slots": [{
+                "slotId": "slotA",
+                "entries": {
+                    "pullback": [{"name": "낮은점수", "code": "000010", "score": 6.1, "grade": "B", "statusLabel": "관심후보"}],
+                    "momentum": [{"name": "높은점수", "code": "000020", "score": 8.7, "grade": "A", "statusLabel": "매수추천"}],
+                    "reversal": [],
+                    "swing": [],
+                },
+            }],
+        }
 
 
 if __name__ == "__main__":

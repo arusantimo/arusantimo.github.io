@@ -16,19 +16,22 @@ python -m unittest discover -s tools/stock-analyze/jongga/tests -p "test_*.py"
 
 ```powershell
 Set-Location "tools/stock-analyze"
-python -m jongga.generate_latest --out "jongga\output\latest.json" --bridge-js "jongga\output\jongga_data.js"
+python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js"
 ```
 
 - 공개 소스: 네이버 모바일 API, 네이버 차트, Yahoo chart API, CNBC quote page
+- 추천 universe는 네이버 모바일 전체 종목의 금일 누적 거래대금 기준 TOP40으로 제한합니다. ETF/ETN은 제외하되 41위 이하 종목을 백필하지 않습니다.
 - VKOSPI는 CNBC `.KSVKOSPI` 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 폴백합니다.
 - 토스 전용 지표와 이벤트 필터는 아직 수동 확인이 필요합니다.
 
 ## HTML 연결
 
-`tools/stock-analyze/index.html`은 더 이상 Notion MD를 직접 읽지 않고 `jongga_result.v1` JSON을 읽습니다.
+`tools/stock-analyze/index.html`은 더 이상 Notion MD를 직접 읽지 않고 날짜별 `jongga_result.v1` JSON bridge를 읽습니다.
 
-- HTTP 환경: `jongga/output/latest.json` 같은 경로를 입력하고 `JSON 직접 불러오기`를 누릅니다.
-- `file://` 직접 실행: 브라우저 보안상 local JSON fetch가 막힐 수 있으므로 파일 선택/붙여넣기를 사용하거나 `jongga/output/jongga_data.js`에 `window.JONGGA_DATA = {...}` 형태로 생성합니다.
+- 기본 출력: `jongga/output/jongga_data_YYYYMMDD.js`, `jongga/output/latest_YYYYMMDD.json`, `jongga/output/jongga_history.js`
+- 웹앱은 KST 오늘 날짜의 `jongga_data_YYYYMMDD.js`만 자동 적용합니다.
+- 오늘 파일이 없으면 메인 화면의 `직접 JSON 입력` 모달에서 `jongga_result.v1` JSON을 localStorage에 날짜별로 저장해 적용합니다.
+- `file://` 직접 실행도 날짜별 JS bridge를 script로 로드하므로 local JSON fetch가 필요 없습니다.
 - 레거시 Notion 흐름은 `tools/stock-analyze/legacy.html`에 보존했습니다.
 
 최소 구조:
