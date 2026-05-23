@@ -14,6 +14,33 @@ function resetLeaderTrapData(reason = "대표주 데이터 미연동 (중립 처
     marketData.trapRecoveryScore = 0;
 }
 
+function applyFundamentalAnchorData(bundle = {}) {
+    const exportMomentum = bundle.exportMomentum || {};
+    const earningsBreadth = bundle.earningsBreadth || {};
+    const broadeningData = bundle.broadeningData || {};
+    const fundamentalAnchor = bundle.fundamentalAnchor || {};
+
+    marketData.fundamentalAnchorScore = Number.isFinite(fundamentalAnchor.score) ? fundamentalAnchor.score : null;
+    marketData.fundamentalAnchorState = fundamentalAnchor.state || "neutral";
+    marketData.fundamentalAnchorReason = fundamentalAnchor.reason || "펀더멘털 앵커 대기 중";
+    marketData.exportLatestMonth = exportMomentum.latestMonth || "";
+    marketData.exportValueUsd = Number.isFinite(exportMomentum.exportValueUsd) ? exportMomentum.exportValueUsd : null;
+    marketData.exportYoY = Number.isFinite(exportMomentum.exportYoY) ? exportMomentum.exportYoY : null;
+    marketData.exportYoYDelta = Number.isFinite(exportMomentum.exportYoYDelta) ? exportMomentum.exportYoYDelta : null;
+    marketData.export3mAvgYoY = Number.isFinite(exportMomentum.export3mAvgYoY) ? exportMomentum.export3mAvgYoY : null;
+    marketData.earningsCoverageCount = Number(earningsBreadth.coverageCount) || 0;
+    marketData.earningsSnapshotQuarter = earningsBreadth.snapshotQuarter || "";
+    marketData.opIncomeBreadth = Number.isFinite(earningsBreadth.opIncomeBreadth) ? earningsBreadth.opIncomeBreadth : null;
+    marketData.netIncomeBreadth = Number.isFinite(earningsBreadth.netIncomeBreadth) ? earningsBreadth.netIncomeBreadth : null;
+    marketData.turnaroundBreadth = Number.isFinite(earningsBreadth.turnaroundBreadth) ? earningsBreadth.turnaroundBreadth : null;
+    marketData.positiveRoeBreadth = Number.isFinite(earningsBreadth.positiveRoeBreadth) ? earningsBreadth.positiveRoeBreadth : null;
+    marketData.broadeningScore = Number.isFinite(broadeningData.broadeningScore) ? broadeningData.broadeningScore : null;
+    marketData.broadeningState = broadeningData.broadeningState || "neutral";
+    marketData.supportBreadth20d = Number.isFinite(broadeningData.supportBreadth20d) ? broadeningData.supportBreadth20d : null;
+    marketData.supportBreadth60d = Number.isFinite(broadeningData.supportBreadth60d) ? broadeningData.supportBreadth60d : null;
+    marketData.supportPositiveReturnBreadth = Number.isFinite(broadeningData.supportPositiveReturnBreadth) ? broadeningData.supportPositiveReturnBreadth : null;
+}
+
 function setMetricDisplay(id, text, className) {
     const target = document.getElementById(id);
     if (!target) return;
@@ -196,6 +223,33 @@ async function fetchLiveFinanceData() {
             marketData.shockAnchorDate = "";
             marketData.marginBalanceBeforeShock = null;
             marketData.marginShockChangePct = null;
+        }
+
+        if (typeof fetchFundamentalAnchorBundle === "function") {
+            try {
+                log("[ANCHOR] 수출·실적·확산 레이어 계산 중...");
+                const anchorBundle = await fetchFundamentalAnchorBundle({
+                    quantHtml: quantRankingHtml,
+                    leaderStocks: marketData.leaderStocks,
+                    settings: analysisSettings
+                });
+                applyFundamentalAnchorData(anchorBundle);
+                const exportYoYLabel = Number.isFinite(anchorBundle.exportMomentum?.exportYoY)
+                    ? `${anchorBundle.exportMomentum.exportYoY > 0 ? "+" : ""}${anchorBundle.exportMomentum.exportYoY.toFixed(1)}%`
+                    : "중립";
+                log(
+                    `[ANCHOR] <span class='text-emerald-400 font-bold'>성공:</span> `
+                    + `앵커 ${Math.round(anchorBundle.fundamentalAnchor?.score || 0)}/100 `
+                    + `· 수출 ${exportYoYLabel} `
+                    + `· 실적 breadth ${Math.round((anchorBundle.earningsBreadth?.opIncomeBreadth || 0) * 100)}% `
+                    + `· 확산 ${Math.round(anchorBundle.broadeningData?.broadeningScore || 0)}/30`
+                );
+            } catch (error) {
+                if (typeof resetFundamentalAnchorData === "function") {
+                    resetFundamentalAnchorData(`펀더멘털 앵커 실패 (${error.message})`);
+                }
+                log(`<span class='text-rose-400'>[ANCHOR ERROR]</span> 펀더멘털 앵커 계산 실패(${error.message}).`);
+            }
         }
 
         marketData.lastSyncTime = new Date().toLocaleString("ko-KR");

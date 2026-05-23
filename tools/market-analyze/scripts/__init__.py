@@ -1,0 +1,1 @@
+# Market analyze generator helpers.

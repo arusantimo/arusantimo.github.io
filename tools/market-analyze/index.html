@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Howard Marks Cycle Dashboard (v3.8 Bull Trap)</title>
+    <title>마켓 평가 대시보드</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="style.css">
@@ -14,29 +14,37 @@
 
     <div class="max-w-6xl mx-auto">
         <header
-            class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-700 pb-4 mb-6 gap-4">
+            class="flex flex-col xl:flex-row justify-between items-start xl:items-end border-b border-slate-700 pb-5 mb-6 gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-emerald-400 flex items-center gap-2">
-                    <span>📊 실시간 마켓 사이클 평가 시스템</span>
+                    <span>📊 마켓 평가 대시보드</span>
                 </h1>
-                <p class="text-sm text-slate-400">오픈 프록시(CORS Bypass) 기반 네이버 증권 실시간 데이터 자동 파싱 엔진</p>
+                <p class="text-sm text-slate-400">생성된 결과 아티팩트에서 심리·펀더멘털·리스크를 함께 읽는 마켓 평가 뷰어</p>
             </div>
-            <div class="flex flex-col items-end gap-1">
-                <div class="flex gap-2 mb-1">
-                    <button id="btn-export" class="text-[11px] text-slate-400 hover:text-emerald-400 underline cursor-pointer transition-colors">데이터 백업</button>
-                    <button id="btn-import" class="text-[11px] text-slate-400 hover:text-emerald-400 underline cursor-pointer transition-colors">데이터 불러오기</button>
+            <div class="w-full xl:w-auto flex flex-col items-stretch xl:items-end gap-3">
+                <div class="flex flex-wrap justify-start xl:justify-end gap-2">
+                    <button id="btn-export" class="text-[11px] text-slate-400 hover:text-emerald-400 underline cursor-pointer transition-colors">로컬 상태 백업</button>
+                    <button id="btn-import" class="text-[11px] text-slate-400 hover:text-emerald-400 underline cursor-pointer transition-colors">로컬 상태 불러오기</button>
                     <input type="file" id="file-import" class="hidden" accept=".json">
                 </div>
-                <button id="btn-sync"
-                    class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition shadow-lg shadow-emerald-500/20 cursor-pointer flex items-center gap-2">
-                    <svg id="sync-icon" class="w-4 h-4 animate-none" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.253 8H18"></path>
-                    </svg>
-                    <span id="sync-text">실시간 데이터 동기화</span>
-                </button>
-                <span id="current-time" class="text-xs font-mono text-slate-500 mt-1">마지막 동기화: 없음</span>
+                <div class="result-meta-grid">
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">결과 기준일</div>
+                        <div id="result-meta-date" class="result-meta-value">-</div>
+                    </div>
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">생성 시각</div>
+                        <div id="result-meta-generated" class="result-meta-value">-</div>
+                    </div>
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">스키마 버전</div>
+                        <div id="result-meta-schema" class="result-meta-value">-</div>
+                    </div>
+                    <div class="result-meta-item">
+                        <div class="result-meta-label">로드 상태</div>
+                        <div id="result-meta-load-state" class="result-meta-value">대기 중</div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -46,10 +54,12 @@
                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
                     <h2
                         class="text-lg font-semibold mb-4 text-slate-200 border-b border-slate-700 pb-2 flex justify-between items-center">
-                        <span>파싱 데이터 현황</span>
-                        <span id="data-status" class="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded">동기화 대기
-                            중</span>
+                        <span>생성 결과 요약</span>
+                        <span id="data-status" class="panel-status-badge is-missing">아티팩트 대기</span>
                     </h2>
+                    <p class="text-[11px] text-slate-500 leading-relaxed mb-4">
+                        값이 비어 있으면 아래의 데이터 로드 상태 카드에서 누락/오류 이유를 함께 확인하세요.
+                    </p>
 
                     <div class="space-y-4">
                         <div
@@ -140,45 +150,97 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl font-mono text-xs">
-                    <h3 class="text-slate-400 font-semibold mb-2 flex justify-between items-center">
-                        <span>🛰️ 시스템 크롤링 로그</span>
-                        <button id="btn-clear-log"
-                            class="text-[10px] text-slate-500 hover:text-slate-300 underline">Clear</button>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-xl">
+                    <h3 class="text-slate-200 font-semibold mb-3 flex justify-between items-center">
+                        <span>데이터 로드 상태</span>
+                        <span id="artifact-load-source" class="text-[10px] text-slate-500">-</span>
                     </h3>
-                    <div id="sys-log"
-                        class="bg-slate-950 p-3 rounded-lg h-40 overflow-y-auto text-slate-400 space-y-1 border border-slate-800">
-                        <div>[SYSTEM] 대시보드가 준비되었습니다. 동기화 버튼을 누르세요.</div>
+                    <div class="space-y-3 text-[11px]">
+                        <div class="artifact-meta-row">
+                            <span class="artifact-meta-key">로드 파일</span>
+                            <span id="artifact-load-file" class="artifact-meta-value">-</span>
+                        </div>
+                        <div class="artifact-meta-row">
+                            <span class="artifact-meta-key">문제 지표 수</span>
+                            <span id="artifact-load-problems-count" class="artifact-meta-value">0건</span>
+                        </div>
+                        <div id="artifact-load-message" class="artifact-load-message">
+                            생성된 결과 파일을 불러오면 상태가 여기에 표시됩니다.
+                        </div>
+                        <div id="artifact-load-problems-list" class="space-y-2">
+                            <div class="text-[11px] text-slate-500">핵심 누락/오류 지표 없음</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="lg:col-span-2 space-y-6">
+                <div id="market-evaluation-card" class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
+                    <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4 mb-4">
+                        <div>
+                            <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Main View</div>
+                            <h2 class="text-lg font-semibold text-slate-200 mt-1">마켓 평가</h2>
+                            <p id="market-flow-title" class="text-xl font-bold text-slate-100 mt-3">생성 결과를 불러오면 현재 흐름을 정리합니다.</p>
+                        </div>
+                        <div class="text-right">
+                            <div id="market-evaluation-label" class="text-2xl font-extrabold text-emerald-300">판단 보류</div>
+                            <div id="market-advice-stance" class="text-sm font-bold text-slate-300 mt-1">균형 유지</div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col md:flex-row md:items-center gap-2 mb-4">
+                        <span id="market-evaluation-status" class="panel-status-badge is-missing">미수집</span>
+                        <span id="market-evaluation-status-message" class="text-[11px] text-slate-400">핵심 모델 결과 대기 중</span>
+                    </div>
+                    <p id="market-flow-narrative" class="text-sm leading-relaxed text-slate-300">
+                        심리, 실적, 수출, 확산, 리스크를 함께 묶어 현재 시장을 하나의 흐름으로 설명합니다.
+                    </p>
+                    <div id="market-eval-chip-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4"></div>
+                    <div class="mt-4 rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+                        <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Evidence</div>
+                        <p id="market-evidence-note" class="text-[11px] text-slate-300 leading-relaxed mt-2">
+                            생성 결과를 읽어 수출·실적·확산·리스크 근거를 요약합니다.
+                        </p>
+                        <p id="market-advice-reason" class="text-[10px] text-slate-500 leading-relaxed mt-2">
+                            현재 투자 스탠스 근거가 여기에 표시됩니다.
+                        </p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
+                        <div class="market-advice-panel">
+                            <div class="market-advice-label">지금 행동</div>
+                            <p id="market-advice-now" class="market-advice-text">최신 생성본을 불러오면 행동 가이드가 표시됩니다.</p>
+                        </div>
+                        <div class="market-advice-panel">
+                            <div class="market-advice-label">추가 확인</div>
+                            <p id="market-advice-watch" class="market-advice-text">-</p>
+                        </div>
+                        <div class="market-advice-panel">
+                            <div class="market-advice-label">무너지면 바뀌는 조건</div>
+                            <p id="market-advice-break" class="market-advice-text">-</p>
+                        </div>
+                    </div>
+                </div>
 
                 <div id="cycle-card" class="cycle-glow bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
                     <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 mb-3">
-                        <h2 class="text-lg font-semibold text-slate-400">하워드 막스 마켓 사이클 진단</h2>
+                        <h2 class="text-lg font-semibold text-slate-400">세부 분석</h2>
                         <div id="theory-subtab-bar" class="theory-subtab-bar">
-                            <div class="theory-subtab-group">
-                                <span class="theory-subtab-group-label">핵심</span>
-                                <button class="theory-subtab-btn is-active" data-subtab="cycle">사이클</button>
-                            </div>
-                            <div class="theory-subtab-group is-scored">
-                                <span class="theory-subtab-group-label">점수 반영</span>
-                                <button class="theory-subtab-btn" data-subtab="soros">소로스</button>
-                                <button class="theory-subtab-btn" data-subtab="minsky">민스키</button>
-                            </div>
-                            <div class="theory-subtab-group is-interpretive">
-                                <span class="theory-subtab-group-label">해석 전용</span>
-                                <button class="theory-subtab-btn" data-subtab="kostolany">코스톨라니</button>
-                                <button class="theory-subtab-btn" data-subtab="wyckoff">와이코프</button>
-                            </div>
+                            <button class="theory-subtab-btn is-active" data-subtab="cycle">하워드 막스</button>
+                            <button class="theory-subtab-btn" data-subtab="anchor">펀더멘털 앵커</button>
+                            <button class="theory-subtab-btn" data-subtab="soros">소로스</button>
+                            <button class="theory-subtab-btn" data-subtab="minsky">민스키</button>
+                            <button class="theory-subtab-btn" data-subtab="kostolany">코스톨라니</button>
+                            <button class="theory-subtab-btn" data-subtab="wyckoff">와이코프</button>
                         </div>
                     </div>
 
                     <div class="theory-subtab-panel is-active" data-subtab-panel="cycle">
+                    <div class="theory-panel-header">
+                        <div class="theory-panel-classifier">하워드 막스 · 심리/가격 진자</div>
+                        <span id="cycle-panel-status" class="panel-status-badge is-missing">미수집</span>
+                    </div>
+                    <p id="cycle-panel-status-message" class="theory-panel-status-text">핵심 입력 결과 대기 중</p>
                     <p class="theory-panel-intro">
-                        하워드 막스 사이클은 시장을 공포와 탐욕 사이에서 움직이는 반복적 심리 진자로 보고, 현재 가격·심리·스트레스가 어느 국면에 가까운지 판단합니다.
+                        하워드 막스의 마켓 사이클 관점으로 시장을 공포와 탐욕 사이에서 움직이는 반복적 심리 진자로 보고, 현재 가격·심리·스트레스가 어느 국면에 가까운지 판단합니다.
                     </p>
                     <div class="grid grid-cols-1 xl:grid-cols-[1.15fr_0.85fr] gap-6 items-center">
                         <div>
@@ -205,7 +267,7 @@
 
                         <div class="space-y-3">
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
-                                <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-2">Cycle Notes</div>
+                                <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500 mb-2">Howard Marks Notes</div>
                                 <div class="flex flex-col gap-2">
                                     <p id="cycle-range-note" class="text-[11px] md:text-xs font-semibold text-slate-300">
                                         현재 구간과 점수 위치를 계산 중입니다.
@@ -223,15 +285,102 @@
                             </div>
 
                             <p id="cycle-desc" class="text-slate-300 text-sm leading-relaxed border-t border-slate-700/60 pt-3">
-                                우측 상단의 실시간 동기화 버튼을 클릭하면 네이버 증권 데이터를 자동 파싱해 9단계 순환형 마켓 사이클과 Bull Trap 리스크를 동시에 계산합니다.
+                                생성된 결과 아티팩트를 읽어 심리 사이클과 Bull Trap 리스크를 함께 계산합니다.
                             </p>
                         </div>
                     </div>
                     </div>
 
+                    <div class="theory-subtab-panel" data-subtab-panel="anchor">
+                        <div class="theory-panel-header">
+                            <div class="theory-panel-classifier is-scored">메인 평가 반영 · 수출·실적·확산 종합</div>
+                            <span id="anchor-panel-status" class="panel-status-badge is-missing">미수집</span>
+                        </div>
+                        <p id="anchor-panel-status-message" class="theory-panel-status-text">앵커 구성 지표 결과 대기 중</p>
+                        <p class="theory-panel-intro">
+                            펀더멘털 앵커는 현재의 과열이나 공포가 실적과 실물 흐름으로 정당화되는지 확인하는 보강 레이어입니다. 수출 모멘텀, 분기 실적 breadth, 비주도주 확산을 함께 묶어 메인 마켓 평가를 보정합니다.
+                        </p>
+                        <div class="grid grid-cols-1 xl:grid-cols-[0.95fr_1.05fr] gap-4">
+                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-4">
+                                <div>
+                                    <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">펀더멘털 앵커 종합</div>
+                                    <div class="flex items-end gap-2 mt-2">
+                                        <span id="anchor-score" class="text-3xl font-extrabold text-emerald-300">-</span>
+                                        <span class="text-xs text-slate-500">/ 100 점</span>
+                                    </div>
+                                    <div id="anchor-state" class="text-sm font-bold text-slate-200 mt-2">중립</div>
+                                    <p id="anchor-reason" class="text-[11px] text-slate-400 leading-relaxed mt-2">수출·실적·확산 근거를 기다리는 중입니다.</p>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="rounded-lg border border-slate-700/70 bg-slate-950/60 p-3">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">수출</div>
+                                            <span id="anchor-export-status-badge" class="panel-status-badge is-missing">미수집</span>
+                                        </div>
+                                        <div id="anchor-export-state" class="text-sm font-bold text-slate-100 mt-2">중립</div>
+                                        <div id="anchor-export-reason" class="text-[10px] text-slate-500 mt-1">-</div>
+                                    </div>
+                                    <div class="rounded-lg border border-slate-700/70 bg-slate-950/60 p-3">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">실적 breadth</div>
+                                            <span id="anchor-earnings-status-badge" class="panel-status-badge is-missing">미수집</span>
+                                        </div>
+                                        <div id="anchor-earnings-state" class="text-sm font-bold text-slate-100 mt-2">중립</div>
+                                        <div id="anchor-earnings-reason" class="text-[10px] text-slate-500 mt-1">-</div>
+                                    </div>
+                                    <div class="rounded-lg border border-slate-700/70 bg-slate-950/60 p-3">
+                                        <div class="flex items-center justify-between gap-2">
+                                            <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">확산</div>
+                                            <span id="anchor-broadening-status-badge" class="panel-status-badge is-missing">미수집</span>
+                                        </div>
+                                        <div id="anchor-broadening-state" class="text-sm font-bold text-slate-100 mt-2">중립</div>
+                                        <div id="anchor-broadening-reason" class="text-[10px] text-slate-500 mt-1">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+                                    <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">수출 모멘텀</div>
+                                    <div class="space-y-2 mt-3 text-[11px]">
+                                        <div class="flex justify-between text-slate-400"><span>최신 발표월</span><span id="anchor-export-month" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>최신 수출 레벨</span><span id="anchor-export-value" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>YoY</span><span id="anchor-export-yoy" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>YoY 가속도</span><span id="anchor-export-delta" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>3개월 평균 YoY</span><span id="anchor-export-avg" class="font-mono text-slate-200">-</span></div>
+                                    </div>
+                                </div>
+                                <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+                                    <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">분기 실적 breadth</div>
+                                    <div class="space-y-2 mt-3 text-[11px]">
+                                        <div class="flex justify-between text-slate-400"><span>기준 분기</span><span id="anchor-earnings-quarter" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>커버 종목 수</span><span id="anchor-earnings-count" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>영업이익 breadth</span><span id="anchor-op-breadth" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>순이익 breadth</span><span id="anchor-net-breadth" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>턴어라운드 breadth</span><span id="anchor-turnaround" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>양의 ROE breadth</span><span id="anchor-roe" class="font-mono text-slate-200">-</span></div>
+                                    </div>
+                                </div>
+                                <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+                                    <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">비주도주 확산</div>
+                                    <div class="space-y-2 mt-3 text-[11px]">
+                                        <div class="flex justify-between text-slate-400"><span>확산 점수</span><span id="anchor-broadening-score" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>20일 수익 breadth</span><span id="anchor-return20" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>20일선 상회</span><span id="anchor-ma20" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>60일선 상회</span><span id="anchor-ma60" class="font-mono text-slate-200">-</span></div>
+                                        <div class="flex justify-between text-slate-400"><span>메인 해석 반영</span><span id="anchor-eval-link" class="font-mono text-slate-200">-</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 소로스 재귀성 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="soros">
-                        <div class="theory-panel-classifier is-scored">점수 반영 · P-Index e_greed 가산</div>
+                        <div class="theory-panel-header">
+                            <div class="theory-panel-classifier is-scored">점수 반영 · P-Index e_greed 가산</div>
+                            <span id="soros-panel-status" class="panel-status-badge is-missing">미수집</span>
+                        </div>
+                        <p id="soros-panel-status-message" class="theory-panel-status-text">소로스 입력 결과 대기 중</p>
                         <p class="theory-panel-intro">
                             소로스 재귀성은 가격과 투자자 믿음이 서로를 강화해 실제 가치보다 과도한 상승이나 붕괴를 만들 수 있다는 관점입니다.
                         </p>
@@ -272,7 +421,11 @@
 
                     <!-- 코스톨라니 달걀 모형 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="kostolany">
-                        <div class="theory-panel-classifier is-interpretive">해석 전용 · P-Index 결과 재분류</div>
+                        <div class="theory-panel-header">
+                            <div class="theory-panel-classifier is-interpretive">해석 전용 · P-Index 결과 재분류</div>
+                            <span id="kostolany-panel-status" class="panel-status-badge is-missing">미수집</span>
+                        </div>
+                        <p id="kostolany-panel-status-message" class="theory-panel-status-text">코스톨라니 입력 결과 대기 중</p>
                         <p class="theory-panel-intro">
                             코스톨라니 달걀 모형은 자금이 소신파에서 부화수로 이동하는 흐름을 통해 상승과 하락의 여섯 구간을 읽는 심리 순환 모델입니다.
                         </p>
@@ -316,7 +469,11 @@
 
                     <!-- 와이코프 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="wyckoff">
-                        <div class="theory-panel-classifier is-interpretive">해석 전용 · 대표주 매집/분배 진단</div>
+                        <div class="theory-panel-header">
+                            <div class="theory-panel-classifier is-interpretive">해석 전용 · 대표주 매집/분배 진단</div>
+                            <span id="wyckoff-panel-status" class="panel-status-badge is-missing">미수집</span>
+                        </div>
+                        <p id="wyckoff-panel-status-message" class="theory-panel-status-text">대표주 구조 결과 대기 중</p>
                         <p class="theory-panel-intro">
                             와이코프 이론은 가격·거래량·수급을 함께 보며 큰손이 조용히 매집하는지, 고점에서 분배하는지를 단계별로 추적합니다.
                         </p>
@@ -338,7 +495,11 @@
 
                     <!-- 민스키 모멘트 패널 -->
                     <div class="theory-subtab-panel" data-subtab-panel="minsky">
-                        <div class="theory-panel-classifier is-scored">점수/오버라이드 반영 · 신용·Bull Trap 리스크</div>
+                        <div class="theory-panel-header">
+                            <div class="theory-panel-classifier is-scored">점수/오버라이드 반영 · 신용·Bull Trap 리스크</div>
+                            <span id="minsky-panel-status" class="panel-status-badge is-missing">미수집</span>
+                        </div>
+                        <p id="minsky-panel-status-message" class="theory-panel-status-text">민스키 입력 결과 대기 중</p>
                         <p class="theory-panel-intro">
                             민스키 모멘트는 평온한 상승장 속에서 레버리지가 누적되다가 작은 충격이 강제 청산과 급락으로 번지는 순간을 경고합니다.
                         </p>
@@ -370,20 +531,6 @@
 
                 <!-- Combined Actionable Guide & Portfolio Evaluation -->
                 <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl mt-6 relative overflow-hidden" id="portfolio-manual-card">
-                    
-                    <!-- Actionable Banner -->
-                    <div id="actionable-guide-card" class="mb-6 p-4 rounded-lg bg-indigo-900/40 border-2 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                        <h3 id="actionable-title" class="text-base font-bold mb-2 flex items-center text-indigo-400">
-                            <svg class="w-6 h-6 mr-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                            [긴급] 즉시 실행 액션 가이드
-                        </h3>
-                        <p id="actionable-guide-text" class="text-indigo-100 text-xs md:text-sm font-bold leading-relaxed">
-                            데이터 동기화 대기 중...
-                        </p>
-                    </div>
-
                     <h3 class="text-md font-bold mb-4 text-emerald-400 flex items-center justify-between border-b border-slate-700 pb-3">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -406,7 +553,7 @@
                                     <tr class="text-slate-500 border-b border-slate-700 bg-slate-800/50">
                                         <th class="py-3 px-3">계좌/전략</th>
                                         <th class="py-3 px-3">현재 현금 비중 (%)</th>
-                                        <th class="py-3 px-3">마켓 사이클 권고 대응</th>
+                                        <th class="py-3 px-3">마켓 평가 권고 대응</th>
                                     </tr>
                                 </thead>
                                 <tbody id="portfolio-guide-body" class="text-slate-300">
@@ -511,7 +658,7 @@
                         </div>
                         
                         <p class="text-[10px] text-slate-500 leading-relaxed italic px-1">
-                            * 슬라이더의 색 띠는 현재 마켓 단계 기준 권장 범위입니다. 현재 각 계좌의 **현금 비중(%)**을 입력하면 권장 비중과 비교하여 매수/매도 방향성을 제안합니다.
+                            * 슬라이더의 색 띠는 현재 마켓 평가 기준 권장 범위입니다. 현재 각 계좌의 **현금 비중(%)**을 입력하면 권장 비중과 비교하여 매수/매도 방향성을 제안합니다.
                         </p>
                     </div>
                 </div>
@@ -566,7 +713,9 @@
     <script src="leader-stocks.js"></script>
     <script src="bull-trap.js"></script>
     <script src="portfolio-range.js"></script>
-    <script src="api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="fundamental-anchor.js"></script>
+    <script src="artifact-loader.js"></script>
     <script src="engine.js"></script>
     <script src="main.js"></script>
 </body>

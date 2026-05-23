@@ -1,19 +1,19 @@
-// 동기화 버튼 클릭 이벤트 바인딩
-btnSync.addEventListener('click', fetchLiveFinanceData);
-
-// 수동 종토방 슬라이더 연동
-document.getElementById('input-sent').addEventListener('input', (e) => {
-    marketData.sentiment = parseInt(e.target.value);
-    document.getElementById('val-sent').innerText = marketData.sentiment + "점 (수동/AI)";
-    saveMarketData(); // 수동 조작 시에도 로컬 스토리지에 즉각 저장
-    calculateCycle();
-});
+const inputSent = document.getElementById("input-sent");
+if (inputSent) {
+    inputSent.addEventListener("input", (event) => {
+        marketData.sentiment = parseInt(event.target.value, 10);
+        const sentValueEl = document.getElementById("val-sent");
+        if (sentValueEl) sentValueEl.innerText = `${marketData.sentiment}점 (수동/AI)`;
+        saveMarketData();
+        calculateCycle();
+    });
+}
 
 function getFlowToneClass(value) {
-    if (value === null || value === undefined || Number.isNaN(value)) return 'text-slate-300';
-    if (value > 0) return 'text-rose-400';
-    if (value < 0) return 'text-cyan-400';
-    return 'text-slate-300';
+    if (value === null || value === undefined || Number.isNaN(value)) return "text-slate-300";
+    if (value > 0) return "text-rose-400";
+    if (value < 0) return "text-cyan-400";
+    return "text-slate-300";
 }
 
 function formatKrwMillion(value) {
@@ -31,24 +31,234 @@ function formatSignedPercent(value, digits = 1) {
     return `${sign}${value.toFixed(digits)}%`;
 }
 
+function formatNullable(value, suffix = "", digits = 2) {
+    if (value === null || value === undefined || Number.isNaN(value)) return "-";
+    const num = Number(value);
+    if (!Number.isFinite(num)) return "-";
+    return `${num.toFixed(digits)}${suffix}`;
+}
+
 function getPercentToneClass(value, reverse = false) {
-    if (value === null || value === undefined || Number.isNaN(value)) return 'text-slate-400';
-    if (Math.abs(value) < 0.001) return 'text-slate-300';
-    if (reverse) return value <= 0 ? 'text-rose-400' : 'text-cyan-400';
-    return value >= 0 ? 'text-rose-400' : 'text-cyan-400';
+    if (value === null || value === undefined || Number.isNaN(value)) return "text-slate-400";
+    if (Math.abs(value) < 0.001) return "text-slate-300";
+    if (reverse) return value <= 0 ? "text-rose-400" : "text-cyan-400";
+    return value >= 0 ? "text-rose-400" : "text-cyan-400";
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function getStatusBadgeClass(state) {
+    if (state === "ok") return "panel-status-badge is-ok";
+    if (state === "partial") return "panel-status-badge is-partial";
+    if (state === "error") return "panel-status-badge is-error";
+    return "panel-status-badge is-missing";
+}
+
+function getMetricValueToneClass(statusEntry, fallbackClass = "text-emerald-400") {
+    const state = statusEntry?.state;
+    if (state === "error") return "text-rose-300";
+    if (state === "missing") return "text-slate-500";
+    if (state === "partial") return "text-amber-300";
+    return fallbackClass;
+}
+
+function setStatusBadge(targetId, statusEntry) {
+    const target = document.getElementById(targetId);
+    if (!target || !statusEntry) return;
+    target.className = getStatusBadgeClass(statusEntry.state);
+    target.innerText = getStatusStateLabel(statusEntry.state);
+    target.title = statusEntry.message || "";
+}
+
+function setStatusMessage(targetId, statusEntry, fallbackMessage = "-") {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    target.innerText = statusEntry?.message || fallbackMessage;
+}
+
+function setMetricDisplay(targetId, text, className) {
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    target.innerText = text;
+    target.className = className;
+}
+
+function isAnchorComputed() {
+    return Number.isFinite(marketData.fundamentalAnchorScore)
+        || !!marketData.fundamentalAnchorReason
+        || ["validated", "supportive", "fragile"].includes(marketData.fundamentalAnchorState);
+}
+
+function getDisplayProblemEntries(options = {}) {
+    const includeOk = !!options.includeOk;
+    const includeAnchorBreakdown = !!options.includeAnchorBreakdown;
+    const flattenedEntries = flattenMarketStatus(marketStatus, { includeOk });
+    const anchorEntries = flattenedEntries.filter(entry => entry.key.startsWith("anchor."));
+    const nonAnchorEntries = flattenedEntries.filter(entry => !entry.key.startsWith("anchor."));
+
+    if (!anchorEntries.length) {
+        return flattenedEntries;
+    }
+
+    const displayEntries = [...nonAnchorEntries];
+    if (isAnchorComputed()) {
+        const anchorSummary = summarizeAnchorDisplayStatus();
+        if (includeOk || anchorSummary.state !== "ok") {
+            displayEntries.push({
+                key: "anchor",
+                label: "펀더멘털 앵커",
+                state: anchorSummary.state,
+                source: anchorSummary.source,
+                message: anchorSummary.message
+            });
+        }
+        if (includeAnchorBreakdown) {
+            displayEntries.push(...anchorEntries
+                .filter(entry => includeOk || entry.state !== "ok")
+                .map(entry => ({
+                    ...entry,
+                    label: entry.label.replace("앵커-", "앵커 세부 · ")
+                })));
+        }
+    } else {
+        displayEntries.push(...anchorEntries);
+    }
+
+    return displayEntries.sort((left, right) => getStatusPriority(right.state) - getStatusPriority(left.state));
+}
+
+function summarizeProblemStatuses() {
+    const entries = getDisplayProblemEntries({ includeAnchorBreakdown: true });
+    const problems = entries.filter(entry => entry.state !== "ok");
+    return {
+        problems,
+        critical: problems.filter(entry => entry.state === "missing" || entry.state === "error")
+    };
+}
+
+function renderHeaderMeta() {
+    const resultDateEl = document.getElementById("result-meta-date");
+    const generatedAtEl = document.getElementById("result-meta-generated");
+    const schemaEl = document.getElementById("result-meta-schema");
+    const loadStateEl = document.getElementById("result-meta-load-state");
+    if (!resultDateEl || !generatedAtEl || !schemaEl || !loadStateEl) return;
+
+    resultDateEl.innerText = formatResultDateLabel(marketResultMeta.resultDate);
+    generatedAtEl.innerText = formatGeneratedAtLabel(marketResultMeta.generatedAt);
+    schemaEl.innerText = marketResultMeta.schemaVersion || "-";
+    loadStateEl.innerText = marketResultMeta.loadMessage || "대기 중";
+    loadStateEl.className = `result-meta-value ${marketResultMeta.loadState === "artifact" ? "text-emerald-300" : marketResultMeta.loadState === "fallback" ? "text-amber-300" : "text-slate-300"}`;
+
+    const dataStatus = document.getElementById("data-status");
+    if (dataStatus) {
+        dataStatus.className = getStatusBadgeClass(
+            marketResultMeta.loadState === "artifact"
+                ? "ok"
+                : marketResultMeta.loadState === "fallback"
+                    ? "partial"
+                    : marketResultMeta.loadState === "local"
+                        ? "partial"
+                        : "missing"
+        );
+        dataStatus.innerText = marketResultMeta.sourceLabel || "아티팩트 대기";
+    }
+}
+
+function renderDataLoadStatus() {
+    const loadedFileEl = document.getElementById("artifact-load-file");
+    const problemCountEl = document.getElementById("artifact-load-problems-count");
+    const problemListEl = document.getElementById("artifact-load-problems-list");
+    const loadMessageEl = document.getElementById("artifact-load-message");
+    const sourceEl = document.getElementById("artifact-load-source");
+    if (!loadedFileEl || !problemCountEl || !problemListEl || !loadMessageEl || !sourceEl) return;
+
+    const { problems, critical } = summarizeProblemStatuses();
+    const anchorSummary = summarizeAnchorDisplayStatus();
+    const hasAnchorCritical = critical.some(entry => entry.key?.startsWith("anchor."));
+    const visibleCriticalEntries = hasAnchorCritical && isAnchorComputed()
+        ? [
+            {
+                key: "anchor",
+                label: "펀더멘털 앵커",
+                state: anchorSummary.state,
+                source: anchorSummary.source,
+                message: `전체 앵커는 ${getStatusStateLabel(anchorSummary.state)}로 유지됩니다. ${anchorSummary.message}`
+            },
+            ...critical
+        ]
+        : critical;
+    loadedFileEl.innerText = marketResultMeta.loadedFile || "-";
+    problemCountEl.innerText = `${problems.length}건`;
+    loadMessageEl.innerText = marketResultMeta.loadMessage || "생성 결과 대기 중";
+    sourceEl.innerText = marketResultMeta.sourceLabel || "-";
+
+    if (!visibleCriticalEntries.length) {
+        problemListEl.innerHTML = `<div class="text-[11px] text-slate-400">핵심 누락/오류 지표 없음</div>`;
+        return;
+    }
+
+    problemListEl.innerHTML = visibleCriticalEntries.slice(0, 6).map(entry => `
+        <div class="artifact-problem-row">
+            <span class="${getStatusBadgeClass(entry.state)}">${getStatusStateLabel(entry.state)}</span>
+            <div>
+                <div class="artifact-problem-label">${entry.label}</div>
+                <div class="artifact-problem-message">${escapeHtml(entry.message)}</div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function renderPanelStatus(panelId, statusEntries, messageId) {
+    const summary = summarizeStatusEntries(statusEntries);
+    setStatusBadge(panelId, summary);
+    if (messageId) setStatusMessage(messageId, summary);
+    return summary;
+}
+
+function summarizeAnchorDisplayStatus() {
+    const entries = [
+        { label: "수출", entry: marketStatus.anchor?.export },
+        { label: "실적", entry: marketStatus.anchor?.earnings },
+        { label: "확산", entry: marketStatus.anchor?.broadening }
+    ];
+    const baseSummary = summarizeStatusEntries(entries.map(item => item.entry));
+    const hasComputedAnchor = isAnchorComputed();
+    const availableCount = entries.filter(item => ["ok", "partial"].includes(item.entry?.state)).length;
+    const problemEntries = entries.filter(item => ["missing", "error"].includes(item.entry?.state));
+
+    if (!hasComputedAnchor || availableCount <= 0 || !problemEntries.length) {
+        return baseSummary;
+    }
+
+    const sources = [...new Set(problemEntries.map(item => item.entry?.source).filter(Boolean))];
+    const labels = problemEntries.map(item => `${item.label} ${getStatusStateLabel(item.entry?.state)}`);
+    const messages = [...new Set(problemEntries.map(item => item.entry?.message).filter(Boolean))];
+
+    return createStatusEntry(
+        "partial",
+        sources.join(" · ") || baseSummary.source,
+        `일부 축은 누락/오류 근거로 계산됨 (${labels.join(", ")})${messages.length ? ` · ${messages[0]}` : ""}`
+    );
 }
 
 function updateMarketFlowUI() {
-    const flowDateEl = document.getElementById('val-flow-bizdate');
+    const flowDateEl = document.getElementById("val-flow-bizdate");
     if (!flowDateEl) return;
 
     const flowDateLabel = marketData.flowBizDate ? formatFlowBizDateLabel(marketData.flowBizDate) : "기준일";
     flowDateEl.innerText = marketData.flowBizDate ? `기준일 ${flowDateLabel}` : "기준일 -";
 
     const bindings = [
-        { todayId: 'flow-retail-today', cumId: 'flow-retail-10d', todayValue: marketData.retailNetToday, cumValue: marketData.retailNet10dCum },
-        { todayId: 'flow-foreign-today', cumId: 'flow-foreign-10d', todayValue: marketData.foreignNetToday, cumValue: marketData.foreignNet10dCum },
-        { todayId: 'flow-institution-today', cumId: 'flow-institution-10d', todayValue: marketData.institutionNetToday, cumValue: marketData.institutionNet10dCum }
+        { todayId: "flow-retail-today", cumId: "flow-retail-10d", todayValue: marketData.retailNetToday, cumValue: marketData.retailNet10dCum },
+        { todayId: "flow-foreign-today", cumId: "flow-foreign-10d", todayValue: marketData.foreignNetToday, cumValue: marketData.foreignNet10dCum },
+        { todayId: "flow-institution-today", cumId: "flow-institution-10d", todayValue: marketData.institutionNetToday, cumValue: marketData.institutionNet10dCum }
     ];
 
     bindings.forEach(({ todayId, cumId, todayValue, cumValue }) => {
@@ -59,25 +269,38 @@ function updateMarketFlowUI() {
         todayEl.innerText = `${flowDateLabel} ${formatSignedFlowValue(todayValue)}`;
         todayEl.className = `font-mono font-bold text-sm ${getFlowToneClass(todayValue)}`;
         cumEl.innerText = `10일 누적 ${formatSignedFlowValue(cumValue)}`;
-        cumEl.className = `text-[10px] mt-1 ${cumValue === null || cumValue === undefined || Number.isNaN(cumValue) ? 'text-slate-500' : getFlowToneClass(cumValue)}`;
+        cumEl.className = `text-[10px] mt-1 ${cumValue === null || cumValue === undefined || Number.isNaN(cumValue) ? "text-slate-500" : getFlowToneClass(cumValue)}`;
     });
 
-    const reasonEl = document.getElementById('val-flow-reason');
-    reasonEl.innerText = marketData.flowReason || "수급 데이터 대기 중 (중립 처리)";
-    reasonEl.className = `mt-3 text-[10px] leading-relaxed ${marketData.flowBonus > 0 ? 'text-rose-300' : 'text-slate-500'}`;
+    const flowStatus = marketStatus.flow;
+    const reasonEl = document.getElementById("val-flow-reason");
+    if (reasonEl) {
+        reasonEl.innerText = flowStatus?.state === "ok"
+            ? (marketData.flowReason || "시장 수급을 반영했습니다.")
+            : flowStatus?.message || marketData.flowReason || "수급 데이터 대기 중 (중립 처리)";
+        reasonEl.className = `mt-3 text-[10px] leading-relaxed ${flowStatus?.state === "error" ? "text-rose-300" : flowStatus?.state === "missing" ? "text-slate-500" : marketData.flowBonus > 0 ? "text-rose-300" : "text-slate-500"}`;
+    }
 }
 
 function updateLeaderTrapUI() {
-    const dateEl = document.getElementById('val-leader-date');
-    const bodyEl = document.getElementById('leader-trap-body');
-    const summaryEl = document.getElementById('val-leader-summary');
+    const dateEl = document.getElementById("val-leader-date");
+    const bodyEl = document.getElementById("leader-trap-body");
+    const summaryEl = document.getElementById("val-leader-summary");
     if (!dateEl || !bodyEl || !summaryEl) return;
 
     dateEl.innerText = marketData.leaderSnapshotDate ? `기준일 ${formatFlowBizDateLabel(marketData.leaderSnapshotDate)}` : "기준일 -";
 
+    const leadersStatus = marketStatus.leaders;
     if (!Array.isArray(marketData.leaderStocks) || !marketData.leaderStocks.length) {
-        bodyEl.innerHTML = `<div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">대표주 데이터 대기 중</div>`;
-        summaryEl.innerText = marketData.trapReason || "트랩 데이터 대기 중 (중립 처리)";
+        bodyEl.innerHTML = `
+            <div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">
+                <div class="flex items-center gap-2">
+                    <span class="${getStatusBadgeClass(leadersStatus?.state || "missing")}">${getStatusStateLabel(leadersStatus?.state || "missing")}</span>
+                    <span>${escapeHtml(leadersStatus?.message || "대표주 데이터 대기 중")}</span>
+                </div>
+            </div>
+        `;
+        summaryEl.innerText = leadersStatus?.message || marketData.trapReason || "트랩 데이터 대기 중 (중립 처리)";
         summaryEl.className = "mt-3 text-[10px] leading-relaxed text-slate-500";
         return;
     }
@@ -98,107 +321,122 @@ function updateLeaderTrapUI() {
                 <div class="text-slate-400">15일 낙폭</div>
                 <div class="text-right ${getPercentToneClass(stock.drawdown15dPct, true)}">${formatSignedPercent(stock.drawdown15dPct)}</div>
                 <div class="text-slate-400">첫 음봉 폭발</div>
-                <div class="text-right ${stock.shockValueRatio >= 1 ? 'text-rose-300' : 'text-slate-400'}">${stock.shockValueRatio ? `${stock.shockValueRatio.toFixed(2)}x` : '-'}</div>
+                <div class="text-right ${stock.shockValueRatio >= 1 ? "text-rose-300" : "text-slate-400"}">${stock.shockValueRatio ? `${stock.shockValueRatio.toFixed(2)}x` : "-"}</div>
                 <div class="text-slate-400">3일 누적 낙폭</div>
                 <div class="text-right ${getPercentToneClass(stock.threeDayDropPct, true)}">${formatSignedPercent(stock.threeDayDropPct)}</div>
                 <div class="text-slate-400">종가 회복률</div>
-                <div class="text-right ${stock.closeRecoveryRate <= 0.45 ? 'text-rose-300' : 'text-slate-400'}">${stock.closeRecoveryRate !== null && stock.closeRecoveryRate !== undefined ? `${(stock.closeRecoveryRate * 100).toFixed(0)}%` : '-'}</div>
+                <div class="text-right ${stock.closeRecoveryRate <= 0.45 ? "text-rose-300" : "text-slate-400"}">${stock.closeRecoveryRate !== null && stock.closeRecoveryRate !== undefined ? `${(stock.closeRecoveryRate * 100).toFixed(0)}%` : "-"}</div>
             </div>
         </div>
-    `).join('');
+    `).join("");
 
-    summaryEl.innerText = marketData.trapReason || "트랩 데이터 대기 중 (중립 처리)";
-    summaryEl.className = `mt-3 text-[10px] leading-relaxed ${marketData.trapScore >= 10 ? 'text-rose-300' : 'text-slate-500'}`;
+    summaryEl.innerText = marketData.trapReason || leadersStatus?.message || "트랩 데이터 대기 중 (중립 처리)";
+    summaryEl.className = `mt-3 text-[10px] leading-relaxed ${marketData.trapScore >= 10 ? "text-rose-300" : leadersStatus?.state === "partial" ? "text-amber-300" : "text-slate-500"}`;
 }
 
-// 대시보드 UI를 상태에 맞게 수동 강제 업데이트하는 함수
 function updateDashboardUI() {
-    document.getElementById('val-fx').innerText = marketData.fx.toLocaleString() + " 원";
-    document.getElementById('val-fx').className = "font-mono font-bold text-emerald-400 text-lg";
-
-    document.getElementById('val-vix').innerText = marketData.vix.toFixed(2);
-    document.getElementById('val-vix').className = "font-mono font-bold text-emerald-400 text-lg";
-
-    document.getElementById('val-gold').innerText = "$ " + marketData.gold.toLocaleString();
-    document.getElementById('val-gold').className = "font-mono font-bold text-emerald-400 text-lg";
-
-    document.getElementById('val-disparity').innerText = marketData.disparity.toFixed(2) + " %";
-    document.getElementById('val-disparity').className = "font-mono font-bold text-emerald-400 text-lg";
-
-    document.getElementById('val-bull-ratio').innerText = marketData.bullRatio.toFixed(1) + " %";
-    document.getElementById('val-bull-ratio').className = "font-mono font-bold text-emerald-400 text-lg";
+    setMetricDisplay(
+        "val-fx",
+        Number.isFinite(marketData.fx) ? `${marketData.fx.toLocaleString()} 원` : "-",
+        `font-mono font-bold text-lg ${getMetricValueToneClass(marketStatus.fx)}`
+    );
+    setMetricDisplay(
+        "val-vix",
+        Number.isFinite(marketData.vix) ? marketData.vix.toFixed(2) : "-",
+        `font-mono font-bold text-lg ${getMetricValueToneClass(marketStatus.vix)}`
+    );
+    setMetricDisplay(
+        "val-gold",
+        Number.isFinite(marketData.gold) ? `$ ${marketData.gold.toLocaleString()}` : "-",
+        `font-mono font-bold text-lg ${getMetricValueToneClass(marketStatus.gold)}`
+    );
+    setMetricDisplay(
+        "val-disparity",
+        Number.isFinite(marketData.disparity) ? `${marketData.disparity.toFixed(2)} %` : "-",
+        `font-mono font-bold text-lg ${getMetricValueToneClass(marketStatus.disparity)}`
+    );
+    setMetricDisplay(
+        "val-bull-ratio",
+        Number.isFinite(marketData.bullRatio) ? `${marketData.bullRatio.toFixed(1)} %` : "-",
+        `font-mono font-bold text-lg ${getMetricValueToneClass(marketStatus.kostolany, "text-emerald-400")}`
+    );
 
     const slope = marketData.marginSlope;
-    document.getElementById('val-margin-slope').innerText = (slope > 0 ? "+" : "") + slope.toFixed(2);
-    document.getElementById('val-margin-slope').className = `font-mono font-bold text-lg ${slope > 0 ? 'text-rose-400' : 'text-cyan-400'}`;
+    setMetricDisplay(
+        "val-margin-slope",
+        Number.isFinite(slope) ? `${slope > 0 ? "+" : ""}${slope.toFixed(2)}` : "-",
+        `font-mono font-bold text-lg ${marketStatus.margin?.state === "ok" ? (slope > 0 ? "text-rose-400" : slope < 0 ? "text-cyan-400" : "text-slate-300") : getMetricValueToneClass(marketStatus.margin, "text-slate-300")}`
+    );
 
-    document.getElementById('val-sent').innerText = marketData.sentiment + "점 (수동/AI)";
-    document.getElementById('val-sent').className = "font-mono text-cyan-400 font-bold text-lg";
-    document.getElementById('input-sent').value = marketData.sentiment;
+    setMetricDisplay(
+        "val-sent",
+        `${marketData.sentiment}점 (수동/AI)`,
+        "font-mono text-cyan-400 font-bold text-lg"
+    );
+    if (inputSent) inputSent.value = marketData.sentiment;
 
-    if (marketData.lastSyncTime) {
-        document.getElementById('current-time').innerText = "마지막 동기화: " + marketData.lastSyncTime;
-    }
-
+    renderHeaderMeta();
+    renderDataLoadStatus();
     updateMarketFlowUI();
     updateLeaderTrapUI();
-
-    // 포트폴리오 입력 필드 업데이트
     updatePortfolioUI();
 }
 
-// 포트폴리오 입력 필드 값들을 데이터 상태와 동기화
 function updatePortfolioUI() {
-    const inputs = document.querySelectorAll('.portfolio-input');
+    const inputs = document.querySelectorAll(".portfolio-input");
     inputs.forEach(input => {
-        const key = input.getAttribute('data-key');
-        const field = input.getAttribute('data-field') || 'cashRatio';
-        if (portfolioData[key]) {
-            const val = portfolioData[key][field] || 0;
-            input.value = val;
-            const valSpan = input.nextElementSibling;
-            if (valSpan && valSpan.classList.contains('portfolio-val')) {
-                valSpan.innerText = val + "%";
-            }
+        const key = input.getAttribute("data-key");
+        const field = input.getAttribute("data-field") || "cashRatio";
+        if (!portfolioData[key]) return;
+        const value = portfolioData[key][field] || 0;
+        input.value = value;
+        const valueSpan = input.nextElementSibling;
+        if (valueSpan && valueSpan.classList.contains("portfolio-val")) {
+            valueSpan.innerText = `${value}%`;
         }
     });
 }
 
-// 포트폴리오 입력 이벤트 리스너 (위임 방식)
-const portfolioBody = document.getElementById('portfolio-guide-body');
+const portfolioBody = document.getElementById("portfolio-guide-body");
 if (portfolioBody) {
-    portfolioBody.addEventListener('input', (e) => {
-        if (e.target.classList.contains('portfolio-input')) {
-            const key = e.target.getAttribute('data-key');
-            const field = e.target.getAttribute('data-field') || 'cashRatio';
-            portfolioData[key][field] = e.target.value;
-            
-            const valSpan = e.target.nextElementSibling;
-            if (valSpan && valSpan.classList.contains('portfolio-val')) {
-                valSpan.innerText = e.target.value + "%";
-            }
-            
-            saveMarketData();
-            calculateCycle();
+    portfolioBody.addEventListener("input", event => {
+        if (!event.target.classList.contains("portfolio-input")) return;
+        const key = event.target.getAttribute("data-key");
+        const field = event.target.getAttribute("data-field") || "cashRatio";
+        if (!portfolioData[key]) return;
+        portfolioData[key][field] = event.target.value;
+
+        const valueSpan = event.target.nextElementSibling;
+        if (valueSpan && valueSpan.classList.contains("portfolio-val")) {
+            valueSpan.innerText = `${event.target.value}%`;
         }
+
+        saveMarketData();
+        calculateCycle();
     });
 }
 
-// --- 마켓 데이터 전용 JSON 백업(저장) ---
-document.getElementById('btn-export').addEventListener('click', () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(marketData, null, 2));
-    const downloadAnchorNode = document.createElement('a');
+document.getElementById("btn-export")?.addEventListener("click", () => {
+    const payload = {
+        type: "market-analyze-local-state",
+        savedAt: new Date().toISOString(),
+        marketData,
+        marketStatus,
+        marketResultMeta,
+        portfolioData
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+    const downloadAnchorNode = document.createElement("a");
     downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", `market_analyze_data_${new Date().getTime()}.json`);
+    downloadAnchorNode.setAttribute("download", `market_analyze_local_state_${new Date().getTime()}.json`);
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 });
 
-// --- 포트폴리오 설정 전용 JSON 백업(저장) ---
-document.getElementById('btn-portfolio-export').addEventListener('click', () => {
+document.getElementById("btn-portfolio-export")?.addEventListener("click", () => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(portfolioData, null, 2));
-    const downloadAnchorNode = document.createElement('a');
+    const downloadAnchorNode = document.createElement("a");
     downloadAnchorNode.setAttribute("href", dataStr);
     downloadAnchorNode.setAttribute("download", `portfolio_settings_${new Date().getTime()}.json`);
     document.body.appendChild(downloadAnchorNode);
@@ -206,57 +444,63 @@ document.getElementById('btn-portfolio-export').addEventListener('click', () => 
     downloadAnchorNode.remove();
 });
 
-// JSON 파일 복구(불러오기) 버튼 및 파일 인풋 이벤트
-document.getElementById('btn-import').addEventListener('click', () => {
-    document.getElementById('file-import').click();
+document.getElementById("btn-import")?.addEventListener("click", () => {
+    document.getElementById("file-import")?.click();
 });
 
-// --- 마켓 데이터 전용 파일 인풋 이벤트 ---
-document.getElementById('file-import').addEventListener('change', (e) => {
-    const file = e.target.files[0];
+document.getElementById("file-import")?.addEventListener("change", event => {
+    const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = loadEvent => {
         try {
-            const parsed = JSON.parse(evt.target.result);
-            // 만약 통합 포맷이나 포트폴리오 전용 파일이 들어왔을 경우를 대비한 처리
-            const dataToLoad = parsed.marketData || parsed;
+            const parsed = JSON.parse(loadEvent.target.result);
+            const dataToLoad = parsed.marketData || parsed.data || parsed;
+            const statusToLoad = parsed.marketStatus || parsed.status || inferMarketStatusFromData(dataToLoad, "imported_json");
+            const metaToLoad = parsed.marketResultMeta || parsed.meta || createResultMetaPatch({
+                loadState: "local",
+                loadMessage: "로컬 상태 백업을 불러왔습니다.",
+                sourceLabel: "로컬 상태 백업",
+                loadedFile: file.name,
+                fallbackUsed: true
+            });
+
             marketData = { ...marketData, ...dataToLoad };
+            marketStatus = normalizeMarketStatus(statusToLoad);
+            marketResultMeta = { ...marketResultMeta, ...metaToLoad };
+            if (parsed.portfolioData) {
+                portfolioData = { ...portfolioData, ...parsed.portfolioData };
+            }
 
             saveMarketData();
             updateDashboardUI();
             calculateCycle();
-            
-            document.getElementById('data-status').innerText = "시장 데이터 로드 완료";
-            alert("시장 분석 데이터가 성공적으로 복구되었습니다.");
-        } catch (err) {
+            alert("로컬 상태 백업을 성공적으로 복구했습니다.");
+        } catch (error) {
             alert("잘못된 형태의 JSON 파일입니다.");
         }
     };
     reader.readAsText(file);
 });
 
-// --- 포트폴리오 설정 전용 불러오기 버튼 및 파일 인풋 이벤트 ---
-document.getElementById('btn-portfolio-import').addEventListener('click', () => {
-    document.getElementById('file-portfolio-import').click();
+document.getElementById("btn-portfolio-import")?.addEventListener("click", () => {
+    document.getElementById("file-portfolio-import")?.click();
 });
 
-document.getElementById('file-portfolio-import').addEventListener('change', (e) => {
-    const file = e.target.files[0];
+document.getElementById("file-portfolio-import")?.addEventListener("change", event => {
+    const file = event.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(evt) {
+    reader.onload = loadEvent => {
         try {
-            const parsed = JSON.parse(evt.target.result);
+            const parsed = JSON.parse(loadEvent.target.result);
             const dataToLoad = parsed.portfolioData || parsed;
             portfolioData = { ...portfolioData, ...dataToLoad };
-
             saveMarketData();
             updateDashboardUI();
             calculateCycle();
-            
-            alert("포트폴리오 설정이 성공적으로 복구되었습니다.");
-        } catch (err) {
+            alert("포트폴리오 설정을 성공적으로 복구했습니다.");
+        } catch (error) {
             alert("잘못된 형태의 포트폴리오 설정 파일입니다.");
         }
     };
@@ -274,22 +518,6 @@ if (theorySubtabBar) {
         document.querySelectorAll('.theory-subtab-panel').forEach(p => p.classList.toggle('is-active', p.dataset.subtabPanel === target));
         renderTheorySubtabs();
     });
-}
-
-function formatNullable(value, suffix = '', digits = 2) {
-    if (value === null || value === undefined || Number.isNaN(value)) return '-';
-    const num = Number(value);
-    if (!Number.isFinite(num)) return '-';
-    return `${num.toFixed(digits)}${suffix}`;
-}
-
-function escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
 }
 
 function getWyckoffActionGuide(phase, confidence) {
@@ -317,7 +545,7 @@ function getWyckoffActionGuide(phase, confidence) {
         },
         NEUTRAL: {
             title: '관망 대응',
-            body: `증거가 아직 한쪽으로 충분히 모이지 않았습니다. 후보 단계와 신뢰도를 참고하되, 포지션은 가볍게 유지하고 다음 동기화에서 구조 변화를 확인하는 편이 좋습니다.`
+            body: `증거가 아직 한쪽으로 충분히 모이지 않았습니다. 후보 단계와 신뢰도를 참고하되, 포지션은 가볍게 유지하고 다음 생성본에서 구조 변화를 확인하는 편이 좋습니다.`
         }
     };
     return guides[phase] || guides.NEUTRAL;
@@ -345,6 +573,336 @@ function initializeWyckoffHelpModal() {
     });
 }
 
+function getMarketEvaluationTone(state) {
+    const tones = {
+        "structural-bull": { accent: "#34d399", chip: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30" },
+        "validated-overheat": { accent: "#fbbf24", chip: "bg-amber-500/15 text-amber-200 border-amber-400/30" },
+        "overheat-only": { accent: "#fb923c", chip: "bg-orange-500/15 text-orange-200 border-orange-400/30" },
+        "distribution-risk": { accent: "#f87171", chip: "bg-rose-500/15 text-rose-200 border-rose-400/30" },
+        "reaccumulation": { accent: "#38bdf8", chip: "bg-cyan-500/15 text-cyan-200 border-cyan-400/30" },
+        balanced: { accent: "#94a3b8", chip: "bg-slate-500/15 text-slate-200 border-slate-400/30" }
+    };
+    return tones[state] || tones.balanced;
+}
+
+function getAnchorStateLabel(state) {
+    if (state === "validated") return "강함";
+    if (state === "supportive") return "보통";
+    if (state === "fragile") return "약함";
+    return "중립";
+}
+
+function getAnchorStateTone(state) {
+    if (state === "validated") return "#34d399";
+    if (state === "supportive") return "#fbbf24";
+    if (state === "fragile") return "#f87171";
+    return "#cbd5e1";
+}
+
+function buildMarketChipHtml(label, value, chipClass, statusEntry = null) {
+    const badgeHtml = statusEntry && statusEntry.state !== "ok"
+        ? `<span class="${getStatusBadgeClass(statusEntry.state)} chip-inline-badge">${getStatusStateLabel(statusEntry.state)}</span>`
+        : "";
+    return `
+        <div class="market-eval-chip ${chipClass}">
+            <div class="market-eval-chip-label">
+                <span>${label}</span>
+                ${badgeHtml}
+            </div>
+            <div class="market-eval-chip-value">${value}</div>
+        </div>
+    `;
+}
+
+function buildRiskSummary() {
+    const parts = [
+        `Bull Trap ${marketData.trapScore || 0}/20`,
+        Number.isFinite(marketData.wyckoffDistributionBreadth) ? `분배 ${(marketData.wyckoffDistributionBreadth * 100).toFixed(0)}%` : "분배 -",
+        marketData.reflexivityState === "runaway" ? "재귀성 폭주" : marketData.reflexivityState === "caution" ? "재귀성 주의" : "재귀성 중립"
+    ];
+    if (Number.isFinite(marketData.marginShockChangePct) && marketData.marginShockChangePct >= 0) {
+        parts.push("신용 경계");
+    } else if (Number.isFinite(marketData.depositMarginRatio) && marketData.depositMarginRatio >= 0.2) {
+        parts.push("민스키 경고");
+    }
+    return parts.join(" · ");
+}
+
+function getReflexivitySummaryLabel() {
+    if (marketData.reflexivityState === "runaway") return "폭주";
+    if (marketData.reflexivityState === "caution") return "주의";
+    return "정상";
+}
+
+function getMinskySummaryLabel() {
+    if ((Number.isFinite(marketData.marginShockChangePct) && marketData.marginShockChangePct >= 0)
+        || (Number.isFinite(marketData.depositMarginRatio) && marketData.depositMarginRatio >= 0.2)
+        || (Number.isFinite(marketData.marginSlope) && marketData.marginSlope >= 300)) {
+        return "경고";
+    }
+    if ((Number.isFinite(marketData.marginSlope) && marketData.marginSlope > 0)
+        || (Number.isFinite(marketData.depositMarginRatio) && marketData.depositMarginRatio >= 0.12)) {
+        return "주의";
+    }
+    if ((Number.isFinite(marketData.marginShockChangePct) && marketData.marginShockChangePct < 0)
+        || (Number.isFinite(marketData.marginSlope) && marketData.marginSlope < 0)) {
+        return "완화";
+    }
+    return "중립";
+}
+
+function getWyckoffConsensusLabel() {
+    const stocks = Array.isArray(marketData.leaderStocks) ? marketData.leaderStocks : [];
+    if (!stocks.length) return "관망";
+
+    const phaseWeight = {};
+    stocks.forEach(stock => {
+        const phase = stock?.wyckoffPhase || "NEUTRAL";
+        phaseWeight[phase] = (phaseWeight[phase] || 0) + (Number(stock.weight) || 0);
+    });
+
+    if (Number.isFinite(marketData.wyckoffDistributionBreadth) && marketData.wyckoffDistributionBreadth >= 0.5) {
+        return "E 분배 우세";
+    }
+
+    const topEntry = Object.entries(phaseWeight).sort((left, right) => right[1] - left[1])[0];
+    const topPhase = topEntry?.[0] || "NEUTRAL";
+    const topWeight = topEntry?.[1] || 0;
+    if (topPhase === "NEUTRAL" || topWeight < 0.3) return "관망";
+
+    const labelFn = typeof getWyckoffPhaseLabel === 'function' ? getWyckoffPhaseLabel : (phase => phase);
+    const compactLabel = labelFn(topPhase).replace(/\s*\(Phase [A-E]\)/, "");
+    return `${compactLabel} 우세`;
+}
+
+function getProblemSummaryText(limit = 4) {
+    const problems = getDisplayProblemEntries().filter(entry => entry.state !== "ok");
+    if (!problems.length) return "";
+    return problems
+        .slice(0, limit)
+        .map(entry => `${entry.label} ${getStatusStateLabel(entry.state)}`)
+        .join(", ");
+}
+
+function renderMarketEvaluationView() {
+    const labelEl = document.getElementById("market-evaluation-label");
+    if (!labelEl) return;
+
+    const tone = getMarketEvaluationTone(marketData.marketEvaluationState);
+    const titleEl = document.getElementById("market-flow-title");
+    const narrativeEl = document.getElementById("market-flow-narrative");
+    const chipsEl = document.getElementById("market-eval-chip-grid");
+    const stanceEl = document.getElementById("market-advice-stance");
+    const reasonEl = document.getElementById("market-advice-reason");
+    const nowEl = document.getElementById("market-advice-now");
+    const watchEl = document.getElementById("market-advice-watch");
+    const breakEl = document.getElementById("market-advice-break");
+    const evidenceEl = document.getElementById("market-evidence-note");
+    const statusBadgeEl = document.getElementById("market-evaluation-status");
+    const statusMessageEl = document.getElementById("market-evaluation-status-message");
+    const anchorStatusSummary = summarizeAnchorDisplayStatus();
+    const coreStatusSummary = summarizeStatusEntries([
+        marketStatus.soros,
+        marketStatus.minsky,
+        marketStatus.kostolany,
+        marketStatus.wyckoff,
+        anchorStatusSummary
+    ]);
+    const problemSummary = getProblemSummaryText();
+
+    labelEl.innerText = marketData.marketEvaluationLabel || "판단 보류";
+    labelEl.style.color = tone.accent;
+    titleEl.innerText = marketData.marketFlowTitle || "데이터 대기 중";
+    narrativeEl.innerText = marketData.marketFlowNarrative || "생성된 결과 아티팩트를 바탕으로 현재 시장 흐름을 정리합니다.";
+    if (statusBadgeEl) setStatusBadge("market-evaluation-status", coreStatusSummary);
+    if (statusMessageEl) {
+        statusMessageEl.innerText = coreStatusSummary.state === "ok"
+            ? "핵심 모델 근거가 모두 채워진 상태입니다."
+            : coreStatusSummary.message || "일부 모델은 부분/누락 근거로 계산됩니다.";
+    }
+    chipsEl.innerHTML = [
+        buildMarketChipHtml(
+            "하워드 막스",
+            `${marketData.cycleStageLabel || "-"} · P ${Math.round(marketData.riskIndex || 0)}`,
+            tone.chip,
+            summarizeStatusEntries([marketStatus.disparity, marketStatus.flow, marketStatus.vix])
+        ),
+        buildMarketChipHtml(
+            "펀더멘털 앵커",
+            `${getAnchorStateLabel(marketData.fundamentalAnchorState)} · ${Number.isFinite(marketData.fundamentalAnchorScore) ? Math.round(marketData.fundamentalAnchorScore) : "-"}점`,
+            tone.chip,
+            anchorStatusSummary
+        ),
+        buildMarketChipHtml(
+            "소로스",
+            `${getReflexivitySummaryLabel()} · ${Number(marketData.reflexivitySynergyPoints || 0).toFixed(1)}점`,
+            tone.chip,
+            marketStatus.soros
+        ),
+        buildMarketChipHtml(
+            "민스키",
+            `${getMinskySummaryLabel()} · ${Number.isFinite(marketData.depositMarginRatio) ? (marketData.depositMarginRatio * 100).toFixed(1) : "-"}%`,
+            tone.chip,
+            marketStatus.minsky
+        ),
+        buildMarketChipHtml(
+            "코스톨라니",
+            `${marketData.kostolanyStage || "-"} · ${KOSTOLANY_STAGE_NAMES[marketData.kostolanyStage] || "-"}`,
+            tone.chip,
+            marketStatus.kostolany
+        ),
+        buildMarketChipHtml(
+            "와이코프",
+            `${getWyckoffConsensusLabel()} · ${Number.isFinite(marketData.wyckoffDistributionBreadth) ? `분배 ${(marketData.wyckoffDistributionBreadth * 100).toFixed(0)}%` : "분배 -"}`,
+            tone.chip,
+            marketStatus.wyckoff
+        )
+    ].join("");
+
+    stanceEl.innerText = marketData.marketAdviceStance || "균형 유지";
+    stanceEl.style.color = tone.accent;
+    reasonEl.innerText = marketData.marketAdviceReason || "시장 해석 대기 중";
+    nowEl.innerText = marketData.marketAdviceActions?.now || "최신 생성본을 불러오면 행동 가이드가 표시됩니다.";
+    watchEl.innerText = marketData.marketAdviceActions?.watch || "-";
+    breakEl.innerText = marketData.marketAdviceActions?.break || "-";
+
+    const evidenceParts = [
+        `막스 ${marketData.cycleStageLabel || "-"}`,
+        `소로스 ${getReflexivitySummaryLabel()}`,
+        `민스키 ${getMinskySummaryLabel()}`,
+        `코스톨라니 ${marketData.kostolanyStage || "-"}`,
+        `와이코프 ${getWyckoffConsensusLabel()}`,
+        `앵커 ${getAnchorStateLabel(marketData.fundamentalAnchorState)}`
+    ];
+    if (marketData.exportLatestMonth) {
+        evidenceParts.push(`수출 ${marketData.exportLatestMonth.slice(0, 4)}.${marketData.exportLatestMonth.slice(4, 6)}`);
+    }
+    if (Number.isFinite(marketData.exportYoY)) {
+        evidenceParts.push(`수출 YoY ${formatSignedPercent(marketData.exportYoY, 1)}`);
+    }
+    if (Number.isFinite(marketData.exportYoYDelta)) {
+        evidenceParts.push(`가속도 ${marketData.exportYoYDelta > 0 ? '+' : ''}${marketData.exportYoYDelta.toFixed(1)}%p`);
+    }
+    if (marketData.earningsSnapshotQuarter) {
+        evidenceParts.push(`실적 ${marketData.earningsSnapshotQuarter}`);
+    }
+    if (Number.isFinite(marketData.opIncomeBreadth)) {
+        evidenceParts.push(`영업이익 breadth ${(marketData.opIncomeBreadth * 100).toFixed(0)}%`);
+    }
+    if (Number.isFinite(marketData.netIncomeBreadth)) {
+        evidenceParts.push(`순이익 breadth ${(marketData.netIncomeBreadth * 100).toFixed(0)}%`);
+    }
+    if (Number.isFinite(marketData.supportPositiveReturnBreadth)) {
+        evidenceParts.push(`비주도주 20일 breadth ${(marketData.supportPositiveReturnBreadth * 100).toFixed(0)}%`);
+    }
+    if (Number.isFinite(marketData.supportBreadth60d)) {
+        evidenceParts.push(`비주도주 60일선 ${(marketData.supportBreadth60d * 100).toFixed(0)}%`);
+    }
+
+    const evidenceBase = evidenceParts.join(" · ");
+    const anchorTail = marketData.fundamentalAnchorReason ? ` · ${marketData.fundamentalAnchorReason}` : "";
+    const partialTail = problemSummary ? ` · 부분 근거(${problemSummary})` : "";
+    evidenceEl.innerText = `${evidenceBase}${anchorTail}${partialTail}`;
+}
+
+function renderFundamentalAnchorPanel() {
+    const scoreEl = document.getElementById("anchor-score");
+    if (!scoreEl) return;
+
+    const anchorState = marketData.fundamentalAnchorState || "neutral";
+    const exportState = Number.isFinite(marketData.exportYoY) && marketData.exportYoY > 5 && Number.isFinite(marketData.exportYoYDelta) && marketData.exportYoYDelta > 0
+        ? "validated"
+        : Number.isFinite(marketData.exportYoY) && marketData.exportYoY <= 0 && Number.isFinite(marketData.exportYoYDelta) && marketData.exportYoYDelta < 0
+            ? "fragile"
+            : Number.isFinite(marketData.exportYoY) || marketData.exportLatestMonth
+                ? "supportive"
+                : "neutral";
+    const earningsState = marketData.earningsCoverageCount > 0
+        ? (Number.isFinite(marketData.opIncomeBreadth) && marketData.opIncomeBreadth >= 0.6 && Number.isFinite(marketData.netIncomeBreadth) && marketData.netIncomeBreadth >= 0.5
+            ? "validated"
+            : (Number.isFinite(marketData.opIncomeBreadth) && marketData.opIncomeBreadth >= 0.4) || (Number.isFinite(marketData.netIncomeBreadth) && marketData.netIncomeBreadth >= 0.4)
+                ? "supportive"
+                : "fragile")
+        : "neutral";
+    const broadeningState = marketData.broadeningState || "neutral";
+    const anchorPanelSummary = renderPanelStatus(
+        "anchor-panel-status",
+        [summarizeAnchorDisplayStatus()],
+        "anchor-panel-status-message"
+    );
+
+    scoreEl.innerText = Number.isFinite(marketData.fundamentalAnchorScore) ? Math.round(marketData.fundamentalAnchorScore) : "-";
+    scoreEl.style.color = getAnchorStateTone(anchorState);
+
+    const stateEl = document.getElementById("anchor-state");
+    stateEl.innerText = `${getAnchorStateLabel(anchorState)} · ${marketData.marketEvaluationLabel || "메인 평가 대기"}`;
+    stateEl.style.color = getAnchorStateTone(anchorState);
+    const anchorReasonParts = [marketData.fundamentalAnchorReason || "수출·실적·확산 근거를 기다리는 중입니다."];
+    if (anchorPanelSummary.state !== "ok") {
+        if (isAnchorComputed()) {
+            anchorReasonParts.push(`전체 앵커는 ${getStatusStateLabel(anchorPanelSummary.state)}로 유지됩니다`);
+        }
+        anchorReasonParts.push(anchorPanelSummary.message);
+    }
+    document.getElementById("anchor-reason").innerText = anchorReasonParts.join(" · ");
+
+    const exportStateEl = document.getElementById("anchor-export-state");
+    const earningsStateEl = document.getElementById("anchor-earnings-state");
+    const broadeningStateEl = document.getElementById("anchor-broadening-state");
+    exportStateEl.innerText = getAnchorStateLabel(exportState);
+    earningsStateEl.innerText = getAnchorStateLabel(earningsState);
+    broadeningStateEl.innerText = getAnchorStateLabel(broadeningState);
+    exportStateEl.style.color = getAnchorStateTone(exportState);
+    earningsStateEl.style.color = getAnchorStateTone(earningsState);
+    broadeningStateEl.style.color = getAnchorStateTone(broadeningState);
+    setStatusBadge("anchor-export-status-badge", marketStatus.anchor.export);
+    setStatusBadge("anchor-earnings-status-badge", marketStatus.anchor.earnings);
+    setStatusBadge("anchor-broadening-status-badge", marketStatus.anchor.broadening);
+
+    document.getElementById("anchor-export-reason").innerText = marketStatus.anchor.export.state !== "ok"
+        ? marketStatus.anchor.export.message
+        : marketData.exportLatestMonth
+            ? `${marketData.exportLatestMonth.slice(0, 4)}.${marketData.exportLatestMonth.slice(4, 6)} 기준`
+            : "수출 시계열 대기";
+    document.getElementById("anchor-earnings-reason").innerText = marketStatus.anchor.earnings.state !== "ok"
+        ? marketStatus.anchor.earnings.message
+        : marketData.earningsSnapshotQuarter
+            ? `${marketData.earningsSnapshotQuarter} · ${marketData.earningsCoverageCount || 0}종목`
+            : "분기 실적 breadth 대기";
+    document.getElementById("anchor-broadening-reason").innerText = marketStatus.anchor.broadening.state !== "ok"
+        ? marketStatus.anchor.broadening.message
+        : Number.isFinite(marketData.broadeningScore)
+            ? `확산 점수 ${Math.round(marketData.broadeningScore)}/30`
+            : "비주도주 확산 대기";
+
+    document.getElementById("anchor-export-month").innerText = marketData.exportLatestMonth
+        ? `${marketData.exportLatestMonth.slice(0, 4)}.${marketData.exportLatestMonth.slice(4, 6)}`
+        : "-";
+    document.getElementById("anchor-export-value").innerText = Number.isFinite(marketData.exportValueUsd)
+        ? marketData.exportValueUsd.toLocaleString()
+        : "-";
+    document.getElementById("anchor-export-yoy").innerText = formatSignedPercent(marketData.exportYoY, 1);
+    document.getElementById("anchor-export-delta").innerText = Number.isFinite(marketData.exportYoYDelta)
+        ? `${marketData.exportYoYDelta > 0 ? "+" : ""}${marketData.exportYoYDelta.toFixed(1)}%p`
+        : "-";
+    document.getElementById("anchor-export-avg").innerText = formatSignedPercent(marketData.export3mAvgYoY, 1);
+
+    document.getElementById("anchor-earnings-quarter").innerText = marketData.earningsSnapshotQuarter || "-";
+    document.getElementById("anchor-earnings-count").innerText = marketData.earningsCoverageCount ? `${marketData.earningsCoverageCount}종목` : "-";
+    document.getElementById("anchor-op-breadth").innerText = formatNullable(Number.isFinite(marketData.opIncomeBreadth) ? marketData.opIncomeBreadth * 100 : null, '%', 0);
+    document.getElementById("anchor-net-breadth").innerText = formatNullable(Number.isFinite(marketData.netIncomeBreadth) ? marketData.netIncomeBreadth * 100 : null, '%', 0);
+    document.getElementById("anchor-turnaround").innerText = formatNullable(Number.isFinite(marketData.turnaroundBreadth) ? marketData.turnaroundBreadth * 100 : null, '%', 0);
+    document.getElementById("anchor-roe").innerText = formatNullable(Number.isFinite(marketData.positiveRoeBreadth) ? marketData.positiveRoeBreadth * 100 : null, '%', 0);
+
+    document.getElementById("anchor-broadening-score").innerText = Number.isFinite(marketData.broadeningScore)
+        ? `${Math.round(marketData.broadeningScore)}/30`
+        : "-";
+    document.getElementById("anchor-return20").innerText = formatNullable(Number.isFinite(marketData.supportPositiveReturnBreadth) ? marketData.supportPositiveReturnBreadth * 100 : null, '%', 0);
+    document.getElementById("anchor-ma20").innerText = formatNullable(Number.isFinite(marketData.supportBreadth20d) ? marketData.supportBreadth20d * 100 : null, '%', 0);
+    document.getElementById("anchor-ma60").innerText = formatNullable(Number.isFinite(marketData.supportBreadth60d) ? marketData.supportBreadth60d * 100 : null, '%', 0);
+    document.getElementById("anchor-eval-link").innerText = marketData.marketAdviceStance || "-";
+}
+
 function renderSorosPanel() {
     const synergy = Number(marketData.reflexivitySynergyPoints) || 0;
     const synergyValue = document.getElementById('soros-synergy-value');
@@ -355,6 +913,7 @@ function renderSorosPanel() {
     const sentValue = document.getElementById('soros-sentiment-value');
     const banner = document.getElementById('soros-debasement-banner');
     if (!synergyValue) return;
+    renderPanelStatus("soros-panel-status", [marketStatus.soros], "soros-panel-status-message");
 
     synergyValue.innerText = synergy.toFixed(1);
     synergyBar.style.width = `${Math.min(100, (synergy / 25) * 100)}%`;
@@ -368,7 +927,7 @@ function renderSorosPanel() {
     const meta = labels[state];
     stateLabel.innerText = meta.label;
     stateLabel.style.color = meta.color;
-    stateNote.innerText = meta.note;
+    stateNote.innerText = marketStatus.soros.state === "ok" ? meta.note : marketStatus.soros.message;
 
     dispValue.innerText = formatNullable(marketData.disparity, '%', 2);
     sentValue.innerText = formatNullable(marketData.sentiment, '점', 0);
@@ -384,6 +943,7 @@ function renderKostolanyPanel() {
     const stage = marketData.kostolanyStage || 'B2';
     const stageLabel = document.getElementById('kostolany-stage-label');
     if (!stageLabel) return;
+    renderPanelStatus("kostolany-panel-status", [marketStatus.kostolany], "kostolany-panel-status-message");
 
     stageLabel.innerText = `${stage} · ${KOSTOLANY_STAGE_NAMES[stage] || ''}`;
     document.getElementById('kostolany-divergence-note').innerText = marketData.kostolanyDivergenceNote || '-';
@@ -405,10 +965,11 @@ function renderKostolanyPanel() {
 function renderWyckoffPanel() {
     const body = document.getElementById('wyckoff-body');
     if (!body) return;
+    const wyckoffSummary = renderPanelStatus("wyckoff-panel-status", [marketStatus.wyckoff, marketStatus.leaders], "wyckoff-panel-status-message");
 
     const stocks = Array.isArray(marketData.leaderStocks) ? marketData.leaderStocks : [];
     if (!stocks.length) {
-        body.innerHTML = `<div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">대표주 데이터 대기 중</div>`;
+        body.innerHTML = `<div class="text-[11px] text-slate-500 bg-slate-900/40 p-3 rounded-lg border border-slate-700/50">${escapeHtml(wyckoffSummary.message || "대표주 데이터 대기 중")}</div>`;
         return;
     }
 
@@ -474,6 +1035,7 @@ function renderWyckoffPanel() {
 function renderMinskyPanel() {
     const slopeEl = document.getElementById('minsky-margin-slope');
     if (!slopeEl) return;
+    const minskySummary = renderPanelStatus("minsky-panel-status", [marketStatus.minsky, marketStatus.margin], "minsky-panel-status-message");
     const slope = marketData.marginSlope;
     slopeEl.innerText = Number.isFinite(slope) ? `${slope > 0 ? '+' : ''}${slope.toFixed(2)}` : '-';
     slopeEl.style.color = slope > 0 ? '#f87171' : slope < 0 ? '#22d3ee' : '#cbd5e1';
@@ -482,11 +1044,13 @@ function renderMinskyPanel() {
     const ratioEl = document.getElementById('minsky-deposit-ratio');
     ratioEl.innerText = Number.isFinite(ratio) ? `${(ratio * 100).toFixed(1)}%` : '-';
     ratioEl.style.color = Number.isFinite(ratio) && ratio >= 0.20 ? '#f87171' : '#e2e8f0';
-    document.getElementById('minsky-deposit-state').innerText = !Number.isFinite(ratio)
+    document.getElementById('minsky-deposit-state').innerText = marketStatus.margin.state === "ok"
+        ? (!Number.isFinite(ratio)
         ? '금액 기준 비율 · 데이터 부족'
         : Number.isFinite(ratio) && ratio >= 0.20
             ? '금액 기준 비율 · 폰지 임계 초과'
-            : '금액 기준 비율 · 계좌 수 지표 아님';
+            : '금액 기준 비율 · 계좌 수 지표 아님')
+        : minskySummary.message;
 
     const shock = marketData.marginShockChangePct;
     const shockEl = document.getElementById('minsky-shock-change');
@@ -515,6 +1079,12 @@ function renderMinskyPanel() {
 }
 
 function renderTheorySubtabs() {
+    renderPanelStatus(
+        "cycle-panel-status",
+        [marketStatus.fx, marketStatus.vix, marketStatus.gold, marketStatus.disparity, marketStatus.flow],
+        "cycle-panel-status-message"
+    );
+    renderFundamentalAnchorPanel();
     renderSorosPanel();
     renderKostolanyPanel();
     renderWyckoffPanel();
@@ -523,37 +1093,40 @@ function renderTheorySubtabs() {
 
 initializeWyckoffHelpModal();
 
-// 초기 화면 구동 시 로컬 JSON 파일에서 데이터 로드 (Async)
 async function initData() {
     try {
-        // 1. 마켓 데이터 로드
-        const marketRes = await fetch('store/market_analyze_data.json');
-        if (marketRes.ok) {
-            const mData = await marketRes.json();
-            marketData = { ...marketData, ...mData };
-            document.getElementById('data-status').innerText = "서버 데이터 로드됨";
+        try {
+            const portfolioRes = await fetch("store/portfolio_settings.json", { cache: "no-store" });
+            if (portfolioRes.ok) {
+                const portfolioJson = await portfolioRes.json();
+                portfolioData = { ...portfolioData, ...portfolioJson };
+            }
+        } catch (portfolioError) {
+            console.warn("포트폴리오 기본 설정 로드 실패:", portfolioError);
         }
 
-        // 2. 포트폴리오 설정 로드
-        const portfolioRes = await fetch('store/portfolio_settings.json');
-        if (portfolioRes.ok) {
-            const pData = await portfolioRes.json();
-            portfolioData = { ...portfolioData, ...pData };
-        }
+        loadMarketData();
 
-        // UI 업데이트 및 계산
+        const artifactBundle = await loadLatestMarketArtifact();
+        marketData = { ...marketData, ...(artifactBundle.data || {}) };
+        marketStatus = normalizeMarketStatus(artifactBundle.status || {});
+        marketResultMeta = { ...marketResultMeta, ...(artifactBundle.meta || {}) };
+
         updateDashboardUI();
         calculateCycle();
-        
-        document.getElementById('data-status').className = "text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded";
+        saveMarketData();
     } catch (err) {
         console.error("초기 데이터 로드 중 오류:", err);
-        // 오류 발생 시 로컬 스토리지 시도 (백업용)
-        if (loadMarketData()) {
-            updateDashboardUI();
-            calculateCycle();
-            document.getElementById('data-status').innerText = "로컬 저장소 로드됨";
-        }
+        marketStatus = inferMarketStatusFromData(marketData, "local_state");
+        marketResultMeta = createResultMetaPatch({
+            loadedFile: "localStorage",
+            loadState: "local",
+            loadMessage: `초기 로드 실패 (${err.message || "알 수 없는 오류"})`,
+            sourceLabel: "브라우저 로컬 상태",
+            fallbackUsed: true
+        });
+        updateDashboardUI();
+        calculateCycle();
     }
 }
 

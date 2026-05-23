@@ -298,13 +298,43 @@ function calculateCycle() {
     const kostolanyMapping = resolveKostolanyStage(cycleLeg, riskIndex, marketData.bullRatio);
     marketData.kostolanyStage = kostolanyMapping.stage;
     marketData.kostolanyDivergenceNote = kostolanyMapping.note;
+    const leaderStocks = Array.isArray(marketData.leaderStocks) ? marketData.leaderStocks : [];
+    marketData.wyckoffDistributionBreadth = leaderStocks.length
+        ? clamp(
+            leaderStocks.reduce((sum, stock) => sum + (stock.wyckoffPhase === "E" ? Number(stock.weight) || 0 : 0), 0),
+            0,
+            1
+        )
+        : null;
+
+    if (typeof deriveMarketEvaluation === "function") {
+        const evaluation = deriveMarketEvaluation({
+            ...marketData,
+            cycleStageKey: stage.key,
+            cycleStageLabel: stage.fullLabel
+        });
+        marketData.marketEvaluationState = evaluation.marketEvaluationState;
+        marketData.marketEvaluationLabel = evaluation.marketEvaluationLabel;
+        marketData.marketFlowTitle = evaluation.marketFlowTitle;
+        marketData.marketFlowNarrative = evaluation.marketFlowNarrative;
+        marketData.marketAdviceBias = evaluation.marketAdviceBias;
+        marketData.marketAdviceStance = evaluation.marketAdviceStance;
+        marketData.marketAdviceReason = evaluation.marketAdviceReason;
+        marketData.marketAdviceActions = evaluation.marketAdviceActions;
+        if (typeof getProblemSummaryText === "function") {
+            const problemSummary = getProblemSummaryText();
+            if (problemSummary) {
+                marketData.marketAdviceReason = `${marketData.marketAdviceReason} · 부분/누락 ${problemSummary}`;
+            }
+        }
+    }
 
     updateCycleRing(stage, stageProgress);
-    updateActionableGuide(stage, isDebasement);
+    if (typeof renderMarketEvaluationView === "function") renderMarketEvaluationView();
     if (typeof updateMarketFlowUI === "function") updateMarketFlowUI();
     if (typeof updateLeaderTrapUI === "function") updateLeaderTrapUI();
     if (typeof renderTheorySubtabs === "function") renderTheorySubtabs();
-    updatePortfolioRebalancing(stage.key, isDebasement);
+    updatePortfolioRebalancing(marketData.marketAdviceStance, isDebasement);
 }
 
 function resolveKostolanyStage(cycleLeg, riskIndex, bullRatio) {
@@ -328,38 +358,6 @@ function resolveKostolanyStage(cycleLeg, riskIndex, bullRatio) {
     }
 
     return { stage, note };
-}
-
-function updateActionableGuide(stage, isDebasement) {
-    const card = document.getElementById("actionable-guide-card");
-    const title = document.getElementById("actionable-title");
-    const text = document.getElementById("actionable-guide-text");
-    const accent = isDebasement ? "#f87171" : stage.accent;
-    const soft = isDebasement ? "rgba(248, 113, 113, 0.18)" : stage.soft;
-
-    card.style.borderColor = `${accent}66`;
-    card.style.background = `linear-gradient(180deg, ${soft}, rgba(15, 23, 42, 0.5))`;
-    title.style.color = accent;
-    text.style.color = "#e2e8f0";
-
-    if (isDebasement) {
-        text.innerHTML = "🚨 <b>화폐 가치 하락 경고:</b> 가격보다 유동성 왜곡이 강합니다. 실물/현금 버퍼를 우선하고 공격 매수는 잠시 멈추는 편이 안전합니다.";
-        return;
-    }
-
-    const messages = {
-        panic: "🎯 <b>역발상 진입:</b> 투매성 청산이 진행 중입니다. 현금이 남아 있다면 분할 매수 계획을 기계적으로 실행할 수 있는 구간입니다.",
-        pessimism: "🧭 <b>회복 준비:</b> 바닥 신뢰는 약하지만 가격은 안정되는 구간입니다. 섹터 리더를 추적하며 리스크를 제한한 분할 진입이 유효합니다.",
-        skepticism: "✅ <b>정석 투자:</b> 회복 추세가 유지됩니다. 추세 추종과 적립을 병행하되 밸류에이션 과속 여부를 계속 점검해야 합니다.",
-        optimism: "📈 <b>추세 유지:</b> 시장이 강세를 인정하는 구간입니다. 추세는 따르되, 현금 비중을 너무 낮추지 않는 균형이 중요합니다.",
-        greed: "⚠️ <b>방어 전환:</b> 상승은 이어지지만 탐욕이 빠르게 쌓이는 구간입니다. 신규 진입보다 익절 기준과 현금 회수 계획을 먼저 고정하세요.",
-        euphoria: "🚨 <b>정점 경계:</b> 실물보다 기대가 앞서는 환희 구간입니다. 신규 공격 매수를 멈추고 현금 버퍼를 크게 확보해야 합니다.",
-        complacency: "🧨 <b>Bull Trap 경계:</b> 첫 급락을 눌림목으로 오해하기 쉬운 구간입니다. 개인이 물량을 받아내는지, 신용이 안 줄어드는지 먼저 확인하세요.",
-        denial: "🛡️ <b>반등 집착 금지:</b> 반등 기대가 반복적으로 깨지는 구간입니다. 현금 버퍼를 지키고 리스크 축소를 기계적으로 이어가야 합니다.",
-        capitulation: "🔁 <b>항복 후 재진입 준비:</b> 손절과 강제 청산이 집중되는 구간입니다. 바닥 신호를 기다리며 분할 재진입 리스트를 정리할 타이밍입니다."
-    };
-
-    text.innerHTML = messages[stage.key] || messages.skepticism;
 }
 
 function updatePortfolioRebalancing(stageKey, isDebasement) {

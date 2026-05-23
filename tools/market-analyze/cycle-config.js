@@ -139,6 +139,13 @@ const CYCLE_STAGES = [
 ];
 
 const CYCLE_STAGE_MAP = Object.fromEntries(CYCLE_STAGES.map(stage => [stage.key, stage]));
+const PORTFOLIO_STANCE_TARGETS = {
+    "분할 확대": { cashTarget: 15, aggressiveTarget: 82 },
+    "선별 유지": { cashTarget: 25, aggressiveTarget: 68 },
+    "균형 유지": { cashTarget: 35, aggressiveTarget: 52 },
+    "비중 조절": { cashTarget: 55, aggressiveTarget: 30 },
+    "현금 우선": { cashTarget: 80, aggressiveTarget: 10 }
+};
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -214,16 +221,17 @@ function resolveCycleStage(riskIndex, vix, cycleLeg, trapScore) {
 }
 
 function getPortfolioTargets(stageKey, isDebasement = false) {
-    const stage = getCycleStage(stageKey);
+    const stanceTargets = PORTFOLIO_STANCE_TARGETS[stageKey];
+    const stage = stanceTargets ? null : getCycleStage(stageKey);
     if (isDebasement) {
         return {
-            cashTarget: Math.max(stage.cashTarget, 85),
-            aggressiveTarget: Math.min(stage.aggressiveTarget, 10)
+            cashTarget: Math.max((stanceTargets?.cashTarget ?? stage.cashTarget), 85),
+            aggressiveTarget: Math.min((stanceTargets?.aggressiveTarget ?? stage.aggressiveTarget), 10)
         };
     }
 
     return {
-        cashTarget: stage.cashTarget,
-        aggressiveTarget: stage.aggressiveTarget
+        cashTarget: stanceTargets?.cashTarget ?? stage.cashTarget,
+        aggressiveTarget: stanceTargets?.aggressiveTarget ?? stage.aggressiveTarget
     };
 }

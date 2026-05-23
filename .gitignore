@@ -1,1 +1,4 @@
 .DS_Store
+__pycache__/
+tools/market-analyze/store/cache/
+tools/market-analyze/store/analysis_settings.local.json
