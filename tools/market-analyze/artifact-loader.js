@@ -43,7 +43,10 @@ function normalizeMarketStatus(status = {}) {
         anchor: {
             export: normalizeStatusEntry(status.anchor?.export, defaults.anchor.export),
             earnings: normalizeStatusEntry(status.anchor?.earnings, defaults.anchor.earnings),
-            broadening: normalizeStatusEntry(status.anchor?.broadening, defaults.anchor.broadening)
+            broadening: normalizeStatusEntry(status.anchor?.broadening, defaults.anchor.broadening),
+            sectorBreadth: normalizeStatusEntry(status.anchor?.sectorBreadth, defaults.anchor.sectorBreadth),
+            valuation: normalizeStatusEntry(status.anchor?.valuation, defaults.anchor.valuation),
+            support: normalizeStatusEntry(status.anchor?.support, defaults.anchor.support)
         }
     };
 }
@@ -108,6 +111,9 @@ function flattenMarketStatus(status = marketStatus, options = {}) {
     addEntry("anchor.export", normalized.anchor.export, "앵커-수출");
     addEntry("anchor.earnings", normalized.anchor.earnings, "앵커-실적");
     addEntry("anchor.broadening", normalized.anchor.broadening, "앵커-확산");
+    addEntry("anchor.sectorBreadth", normalized.anchor.sectorBreadth, "앵커-업종 확산");
+    addEntry("anchor.valuation", normalized.anchor.valuation, "앵커-밸류에이션");
+    addEntry("anchor.support", normalized.anchor.support, "앵커-지지력");
 
     return entries.sort((left, right) => getStatusPriority(right.state) - getStatusPriority(left.state));
 }
@@ -152,9 +158,20 @@ function inferMarketStatusFromData(data = {}, source = "legacy_json") {
     const exportAvailable = !!data.exportLatestMonth || hasFiniteValue(data.exportValueUsd, data.exportYoY, data.exportYoYDelta, data.export3mAvgYoY);
     const earningsAvailable = Number(data.earningsCoverageCount) > 0 || hasFiniteValue(data.opIncomeBreadth, data.netIncomeBreadth, data.turnaroundBreadth, data.positiveRoeBreadth);
     const broadeningAvailable = hasFiniteValue(data.broadeningScore, data.supportBreadth20d, data.supportBreadth60d, data.supportPositiveReturnBreadth);
+    const sectorBreadthAvailable = (Number(data.nonSemiconductorMomentumCoverageCount) || 0) > 0
+        || hasFiniteValue(data.nonSemiconductorMomentum);
+    const valuationAvailable = (Number(data.marketValuationCoverageCount) || 0) > 0
+        || data.marketValuationStability === true
+        || data.marketValuationStability === false
+        || hasFiniteValue(data.marketValuationForwardPerAvg, data.marketValuationScore);
+    const supportAvailable = hasFiniteValue(data.fundamentalSupportScore, data.supportOffsetPoints)
+        || ["validated", "supportive", "fragile"].includes(String(data.fundamentalSupportState || ""));
     status.anchor.export = useSnapshot(exportAvailable, "수출 근거 확보", "수출 근거 없음");
     status.anchor.earnings = useSnapshot(earningsAvailable, "실적 breadth 확보", "실적 breadth 없음");
     status.anchor.broadening = useSnapshot(broadeningAvailable, "확산 근거 확보", "확산 근거 없음");
+    status.anchor.sectorBreadth = useSnapshot(sectorBreadthAvailable, "업종 확산 근거 확보", "업종 확산 근거 없음");
+    status.anchor.valuation = useSnapshot(valuationAvailable, "밸류에이션 근거 확보", "밸류에이션 근거 없음");
+    status.anchor.support = useSnapshot(supportAvailable, "펀더멘털 지지력 확보", "펀더멘털 지지력 없음");
 
     status.soros = useSnapshot(hasFiniteValue(data.disparity, data.sentiment), "이격도/심리 입력 확보", "소로스 입력 부족");
     status.minsky = useSnapshot(marginAvailable, "신용/예탁금 입력 확보", "민스키 입력 부족");
@@ -209,7 +226,62 @@ function createResultMetaPatch(patch = {}) {
     };
 }
 
-async function loadLatestMarketArtifact() {
+function normalizeResultDateKey(raw) {
+    const normalized = String(raw || "").replace(/\D/g, "");
+    return normalized.length === 8 ? normalized : "";
+}
+
+function buildResultArtifactPath(latestFile, resultDate) {
+    const normalizedDate = normalizeResultDateKey(resultDate);
+    if (!normalizedDate) return latestFile || "";
+    const prefixMatch = String(latestFile || "").match(/^(.*\/)result-\d{8}\.js$/);
+    const basePath = prefixMatch?.[1] || "store/results/";
+    return `${basePath}result-${normalizedDate}.js`;
+}
+
+function resolveRequestedArtifact(manifest, preferredDate = "latest") {
+    const availableDates = Array.isArray(manifest?.availableDates)
+        ? manifest.availableDates.map(normalizeResultDateKey).filter(Boolean)
+        : [];
+    const latestDate = normalizeResultDateKey(manifest?.latestDate);
+    const requestedDate = preferredDate === "latest" ? "latest" : normalizeResultDateKey(preferredDate);
+
+    if (requestedDate && requestedDate !== "latest" && availableDates.includes(requestedDate)) {
+        return {
+            requestedDate,
+            resolvedDate: requestedDate,
+            filePath: buildResultArtifactPath(manifest.latestFile, requestedDate),
+            loadTargetLabel: `${requestedDate} 고정`,
+            loadMessage: `${requestedDate} 생성본을 고정 로드했습니다.`,
+            availableDates,
+            latestDate
+        };
+    }
+
+    if (requestedDate && requestedDate !== "latest" && latestDate) {
+        return {
+            requestedDate,
+            resolvedDate: latestDate,
+            filePath: manifest.latestFile,
+            loadTargetLabel: `${requestedDate} 고정(대체)`,
+            loadMessage: `선택한 ${requestedDate} 생성본이 없어 최신 생성본 ${latestDate}를 불러왔습니다.`,
+            availableDates,
+            latestDate
+        };
+    }
+
+    return {
+        requestedDate: "latest",
+        resolvedDate: latestDate,
+        filePath: manifest.latestFile,
+        loadTargetLabel: "최신 생성본",
+        loadMessage: "최신 생성 결과를 불러왔습니다.",
+        availableDates,
+        latestDate
+    };
+}
+
+async function loadMarketArtifact(preferredDate = "latest") {
     delete window.__MARKET_ANALYZE_RESULT__;
 
     try {
@@ -218,7 +290,8 @@ async function loadLatestMarketArtifact() {
             throw new Error("manifest 최신 파일 정보 없음");
         }
 
-        await loadScriptOrThrow(manifest.latestFile);
+        const selection = resolveRequestedArtifact(manifest, preferredDate);
+        await loadScriptOrThrow(selection.filePath);
 
         const payload = window.__MARKET_ANALYZE_RESULT__;
         if (!payload || typeof payload !== "object") {
@@ -229,14 +302,19 @@ async function loadLatestMarketArtifact() {
             data: payload.data || {},
             status: normalizeMarketStatus(payload.status || {}),
             meta: createResultMetaPatch({
-                resultDate: payload.meta?.resultDate || manifest.latestDate || "",
+                resultDate: payload.meta?.resultDate || selection.resolvedDate || manifest.latestDate || "",
+                latestDate: selection.latestDate || manifest.latestDate || "",
                 generatedAt: payload.meta?.generatedAt || manifest.generatedAt || "",
                 schemaVersion: payload.meta?.schemaVersion || manifest.schemaVersion || "",
-                loadedFile: manifest.latestFile,
+                loadedFile: selection.filePath,
                 loadState: "artifact",
-                loadMessage: "최신 생성 결과를 불러왔습니다.",
+                loadMessage: selection.loadMessage,
                 sourceLabel: "생성 아티팩트",
-                fallbackUsed: false
+                fallbackUsed: false,
+                availableDates: selection.availableDates,
+                requestedResultDate: selection.requestedDate,
+                resolvedResultDate: payload.meta?.resultDate || selection.resolvedDate || "",
+                loadTargetLabel: selection.loadTargetLabel
             })
         };
     } catch (artifactError) {
@@ -251,13 +329,17 @@ async function loadLatestMarketArtifact() {
                 status: normalizeMarketStatus(payload.status || {}),
                 meta: createResultMetaPatch({
                     resultDate: payload.meta?.resultDate || "",
+                    latestDate: payload.meta?.resultDate || "",
                     generatedAt: payload.meta?.generatedAt || "",
                     schemaVersion: payload.meta?.schemaVersion || "",
                     loadedFile: "store/results/latest.js",
                     loadState: "artifact",
                     loadMessage: `manifest 로드 실패로 latest.js 별칭을 사용했습니다 (${artifactError.message})`,
                     sourceLabel: "생성 아티팩트",
-                    fallbackUsed: false
+                    fallbackUsed: false,
+                    requestedResultDate: preferredDate === "latest" ? "latest" : normalizeResultDateKey(preferredDate),
+                    resolvedResultDate: payload.meta?.resultDate || "",
+                    loadTargetLabel: preferredDate === "latest" ? "최신 생성본" : `${normalizeResultDateKey(preferredDate)} 고정`
                 })
             };
         } catch (latestError) {
@@ -272,7 +354,9 @@ async function loadLatestMarketArtifact() {
                     loadMessage: `아티팩트 로드 실패로 기존 JSON을 사용합니다 (${artifactError.message}; ${latestError.message})`,
                     schemaVersion: "legacy-fallback",
                     sourceLabel: "기존 JSON 폴백",
-                    fallbackUsed: true
+                    fallbackUsed: true,
+                    requestedResultDate: preferredDate === "latest" ? "latest" : normalizeResultDateKey(preferredDate),
+                    loadTargetLabel: preferredDate === "latest" ? "최신 생성본" : `${normalizeResultDateKey(preferredDate)} 고정`
                 })
             };
         } catch (fallbackError) {
@@ -285,10 +369,16 @@ async function loadLatestMarketArtifact() {
                     loadMessage: `아티팩트/기존 JSON 모두 실패 (${artifactError.message}; ${latestError.message}; ${fallbackError.message})`,
                     schemaVersion: "local-state",
                     sourceLabel: "브라우저 로컬 상태",
-                    fallbackUsed: true
+                    fallbackUsed: true,
+                    requestedResultDate: preferredDate === "latest" ? "latest" : normalizeResultDateKey(preferredDate),
+                    loadTargetLabel: preferredDate === "latest" ? "최신 생성본" : `${normalizeResultDateKey(preferredDate)} 고정`
                 })
             };
         }
         }
     }
+}
+
+async function loadLatestMarketArtifact() {
+    return loadMarketArtifact("latest");
 }

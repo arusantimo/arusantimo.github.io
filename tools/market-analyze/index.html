@@ -27,6 +27,15 @@
                     <button id="btn-import" class="text-[11px] text-slate-400 hover:text-emerald-400 underline cursor-pointer transition-colors">로컬 상태 불러오기</button>
                     <input type="file" id="file-import" class="hidden" accept=".json">
                 </div>
+                <div class="w-full xl:w-auto flex flex-col items-start xl:items-end gap-1">
+                    <label for="result-date-picker" class="text-[11px] text-slate-400">불러올 결과 생성본</label>
+                    <div class="flex items-center gap-2 w-full xl:w-auto">
+                        <select id="result-date-picker" class="w-full xl:w-52 bg-slate-900/80 border border-slate-700 text-slate-100 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-emerald-400">
+                            <option value="latest">최신 생성본</option>
+                        </select>
+                    </div>
+                    <div id="result-date-picker-hint" class="text-[10px] text-slate-500">manifest 대기 중</div>
+                </div>
                 <div class="result-meta-grid">
                     <div class="result-meta-item">
                         <div class="result-meta-label">결과 기준일</div>
@@ -300,74 +309,127 @@
                         <p class="theory-panel-intro">
                             펀더멘털 앵커는 현재의 과열이나 공포가 실적과 실물 흐름으로 정당화되는지 확인하는 보강 레이어입니다. 수출 모멘텀, 분기 실적 breadth, 비주도주 확산을 함께 묶어 메인 마켓 평가를 보정합니다.
                         </p>
-                        <div class="grid grid-cols-1 xl:grid-cols-[0.95fr_1.05fr] gap-4">
-                            <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-4">
-                                <div>
+                        <div class="anchor-panel-layout">
+                            <div class="anchor-summary-panel">
+                                <div class="anchor-summary-main">
                                     <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500">펀더멘털 앵커 종합</div>
                                     <div class="flex items-end gap-2 mt-2">
                                         <span id="anchor-score" class="text-3xl font-extrabold text-emerald-300">-</span>
                                         <span class="text-xs text-slate-500">/ 100 점</span>
                                     </div>
-                                    <div id="anchor-state" class="text-sm font-bold text-slate-200 mt-2">중립</div>
-                                    <p id="anchor-reason" class="text-[11px] text-slate-400 leading-relaxed mt-2">수출·실적·확산 근거를 기다리는 중입니다.</p>
+                                    <div id="anchor-state" class="anchor-state-row">중립</div>
+                                    <p id="anchor-reason" class="anchor-summary-reason">수출·실적·확산 근거를 기다리는 중입니다.</p>
+                                    <p id="anchor-subnote" class="anchor-summary-subnote">세부 지지력과 누락 상태는 아래에서 확인할 수 있습니다.</p>
                                 </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    <div class="rounded-lg border border-slate-700/70 bg-slate-950/60 p-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">수출</div>
+                                <div class="anchor-summary-grid">
+                                    <div class="anchor-summary-card">
+                                        <div class="anchor-summary-card-header">
+                                            <div class="anchor-summary-card-label">수출</div>
                                             <span id="anchor-export-status-badge" class="panel-status-badge is-missing">미수집</span>
                                         </div>
-                                        <div id="anchor-export-state" class="text-sm font-bold text-slate-100 mt-2">중립</div>
-                                        <div id="anchor-export-reason" class="text-[10px] text-slate-500 mt-1">-</div>
+                                        <div id="anchor-export-state" class="anchor-summary-card-state">중립</div>
+                                        <div id="anchor-export-reason" class="anchor-summary-card-reason">-</div>
                                     </div>
-                                    <div class="rounded-lg border border-slate-700/70 bg-slate-950/60 p-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">실적 breadth</div>
+                                    <div class="anchor-summary-card">
+                                        <div class="anchor-summary-card-header">
+                                            <div class="anchor-summary-card-label">실적 breadth</div>
                                             <span id="anchor-earnings-status-badge" class="panel-status-badge is-missing">미수집</span>
                                         </div>
-                                        <div id="anchor-earnings-state" class="text-sm font-bold text-slate-100 mt-2">중립</div>
-                                        <div id="anchor-earnings-reason" class="text-[10px] text-slate-500 mt-1">-</div>
+                                        <div id="anchor-earnings-state" class="anchor-summary-card-state">중립</div>
+                                        <div id="anchor-earnings-reason" class="anchor-summary-card-reason">-</div>
                                     </div>
-                                    <div class="rounded-lg border border-slate-700/70 bg-slate-950/60 p-3">
-                                        <div class="flex items-center justify-between gap-2">
-                                            <div class="text-[10px] uppercase tracking-[0.14em] text-slate-500">확산</div>
+                                    <div class="anchor-summary-card">
+                                        <div class="anchor-summary-card-header">
+                                            <div class="anchor-summary-card-label">확산</div>
                                             <span id="anchor-broadening-status-badge" class="panel-status-badge is-missing">미수집</span>
                                         </div>
-                                        <div id="anchor-broadening-state" class="text-sm font-bold text-slate-100 mt-2">중립</div>
-                                        <div id="anchor-broadening-reason" class="text-[10px] text-slate-500 mt-1">-</div>
+                                        <div id="anchor-broadening-state" class="anchor-summary-card-state">중립</div>
+                                        <div id="anchor-broadening-reason" class="anchor-summary-card-reason">-</div>
+                                    </div>
+                                    <div class="anchor-summary-card">
+                                        <div class="anchor-summary-card-header">
+                                            <div class="anchor-summary-card-label">지지력</div>
+                                            <span id="anchor-support-chip-status-badge" class="panel-status-badge is-missing">미수집</span>
+                                        </div>
+                                        <div id="anchor-support-state" class="anchor-summary-card-state">중립</div>
+                                        <div id="anchor-support-reason" class="anchor-summary-card-reason">-</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
-                                    <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">수출 모멘텀</div>
-                                    <div class="space-y-2 mt-3 text-[11px]">
-                                        <div class="flex justify-between text-slate-400"><span>최신 발표월</span><span id="anchor-export-month" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>최신 수출 레벨</span><span id="anchor-export-value" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>YoY</span><span id="anchor-export-yoy" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>YoY 가속도</span><span id="anchor-export-delta" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>3개월 평균 YoY</span><span id="anchor-export-avg" class="font-mono text-slate-200">-</span></div>
+
+                            <div class="anchor-metric-grid">
+                                <div class="anchor-detail-card">
+                                    <div class="anchor-detail-card-title">수출 모멘텀</div>
+                                    <div class="anchor-detail-list">
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">최신 발표월</span><span id="anchor-export-month" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">최신 수출 레벨</span><span id="anchor-export-value" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">YoY</span><span id="anchor-export-yoy" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">YoY 가속도</span><span id="anchor-export-delta" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">3개월 평균 YoY</span><span id="anchor-export-avg" class="anchor-detail-value">-</span></div>
+                                    </div>
+                                    <div id="anchor-export-detail-reason" class="anchor-detail-reason">-</div>
+                                </div>
+                                <div class="anchor-detail-card">
+                                    <div class="anchor-detail-card-title">분기 실적 breadth</div>
+                                    <div class="anchor-detail-list">
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">기준 분기</span><span id="anchor-earnings-quarter" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">커버 종목 수</span><span id="anchor-earnings-count" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">영업이익 breadth</span><span id="anchor-op-breadth" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">순이익 breadth</span><span id="anchor-net-breadth" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">턴어라운드 breadth</span><span id="anchor-turnaround" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">양의 ROE breadth</span><span id="anchor-roe" class="anchor-detail-value">-</span></div>
+                                    </div>
+                                    <div id="anchor-earnings-detail-reason" class="anchor-detail-reason">-</div>
+                                </div>
+                                <div class="anchor-detail-card">
+                                    <div class="anchor-detail-card-title">비주도주 확산</div>
+                                    <div class="anchor-detail-list">
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">확산 점수</span><span id="anchor-broadening-score" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">20일 수익 breadth</span><span id="anchor-return20" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">20일선 상회</span><span id="anchor-ma20" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">60일선 상회</span><span id="anchor-ma60" class="anchor-detail-value">-</span></div>
+                                        <div class="anchor-detail-row"><span class="anchor-detail-label">메인 해석 반영</span><span id="anchor-eval-link" class="anchor-detail-value">-</span></div>
+                                    </div>
+                                    <div id="anchor-broadening-detail-reason" class="anchor-detail-reason">-</div>
+                                </div>
+                            </div>
+
+                            <div class="anchor-support-panel">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                    <div>
+                                        <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">펀더멘털 지지력</div>
+                                        <div class="text-[12px] text-slate-300 mt-1 leading-relaxed">비반도체 업종 확산과 밸류에이션 안정도로 환율 급등 구간의 과민 반응을 완화합니다.</div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span id="anchor-sector-status-badge" class="panel-status-badge is-missing">미수집</span>
+                                        <span id="anchor-valuation-status-badge" class="panel-status-badge is-missing">미수집</span>
+                                        <span id="anchor-support-status-badge" class="panel-status-badge is-missing">미수집</span>
                                     </div>
                                 </div>
-                                <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
-                                    <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">분기 실적 breadth</div>
-                                    <div class="space-y-2 mt-3 text-[11px]">
-                                        <div class="flex justify-between text-slate-400"><span>기준 분기</span><span id="anchor-earnings-quarter" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>커버 종목 수</span><span id="anchor-earnings-count" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>영업이익 breadth</span><span id="anchor-op-breadth" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>순이익 breadth</span><span id="anchor-net-breadth" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>턴어라운드 breadth</span><span id="anchor-turnaround" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>양의 ROE breadth</span><span id="anchor-roe" class="font-mono text-slate-200">-</span></div>
+                                <div class="anchor-support-grid">
+                                    <div class="anchor-detail-card is-compact">
+                                        <div class="anchor-detail-card-title">비반도체 업종 확산도</div>
+                                        <div class="anchor-detail-list">
+                                            <div class="anchor-detail-row"><span class="anchor-detail-label">통과 비율</span><span id="anchor-nonsemi-momentum" class="anchor-detail-value">-</span></div>
+                                            <div class="anchor-detail-row"><span class="anchor-detail-label">통과/커버</span><span id="anchor-nonsemi-coverage" class="anchor-detail-value">-</span></div>
+                                        </div>
+                                        <div id="anchor-sector-reason" class="anchor-detail-reason">-</div>
                                     </div>
-                                </div>
-                                <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
-                                    <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">비주도주 확산</div>
-                                    <div class="space-y-2 mt-3 text-[11px]">
-                                        <div class="flex justify-between text-slate-400"><span>확산 점수</span><span id="anchor-broadening-score" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>20일 수익 breadth</span><span id="anchor-return20" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>20일선 상회</span><span id="anchor-ma20" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>60일선 상회</span><span id="anchor-ma60" class="font-mono text-slate-200">-</span></div>
-                                        <div class="flex justify-between text-slate-400"><span>메인 해석 반영</span><span id="anchor-eval-link" class="font-mono text-slate-200">-</span></div>
+                                    <div class="anchor-detail-card is-compact">
+                                        <div class="anchor-detail-card-title">밸류에이션 안정도</div>
+                                        <div class="anchor-detail-list">
+                                            <div class="anchor-detail-row"><span class="anchor-detail-label">안정 판정</span><span id="anchor-valuation-stability" class="anchor-detail-value">-</span></div>
+                                            <div class="anchor-detail-row"><span class="anchor-detail-label">가중 Fwd PER</span><span id="anchor-valuation-forward-per" class="anchor-detail-value">-</span></div>
+                                        </div>
+                                        <div id="anchor-valuation-reason" class="anchor-detail-reason">-</div>
+                                    </div>
+                                    <div class="anchor-detail-card is-compact">
+                                        <div class="anchor-detail-card-title">F_support / 레짐</div>
+                                        <div class="anchor-detail-list">
+                                            <div class="anchor-detail-row"><span class="anchor-detail-label">F_support</span><span id="anchor-fsupport-score" class="anchor-detail-value">-</span></div>
+                                            <div class="anchor-detail-row"><span class="anchor-detail-label">현재 레짐</span><span id="anchor-regime-label" class="anchor-detail-value">-</span></div>
+                                        </div>
+                                        <div id="anchor-support-detail-reason" class="anchor-detail-reason">-</div>
                                     </div>
                                 </div>
                             </div>

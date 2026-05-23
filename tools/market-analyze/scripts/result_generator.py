@@ -9,9 +9,13 @@ from typing import Any, Dict, List, Optional
 from .anchor_collectors import (
     build_anchor_universes,
     calculate_fundamental_anchor_values,
+    calculate_support_adjusted_cycle_values,
+    calculate_fundamental_support_values,
     collect_broadening,
     collect_earnings_breadth,
     collect_export_momentum,
+    collect_market_valuation,
+    collect_sector_breadth,
 )
 from .collectors import (
     CollectorResult,
@@ -27,7 +31,7 @@ from .collectors import (
 )
 
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
 RESULT_VAR_NAME = "window.__MARKET_ANALYZE_RESULT__"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -99,6 +103,17 @@ def infer_snapshot_statuses(data: Dict[str, Any], source: str = "store/market_an
         data.get("supportBreadth60d"),
         data.get("supportPositiveReturnBreadth"),
     )
+    sector_breadth_available = (data.get("nonSemiconductorMomentumCoverageCount") or 0) > 0 or has_value(
+        data.get("nonSemiconductorMomentum"),
+    )
+    valuation_available = (data.get("marketValuationCoverageCount") or 0) > 0 or has_value(
+        data.get("marketValuationForwardPerAvg"),
+        data.get("marketValuationScore"),
+    ) or data.get("marketValuationStability") in {True, False}
+    support_available = has_value(
+        data.get("fundamentalSupportScore"),
+        data.get("supportOffsetPoints"),
+    ) or str(data.get("fundamentalSupportState") or "") in {"validated", "supportive", "fragile"}
 
     status = {
         "fx": snapshot_status(safe_number(data.get("fx")) is not None, "환율 값 확보", "환율 값 없음"),
@@ -124,6 +139,9 @@ def infer_snapshot_statuses(data: Dict[str, Any], source: str = "store/market_an
             "export": snapshot_status(export_available, "수출 근거 확보", "수출 근거 없음"),
             "earnings": snapshot_status(earnings_available, "실적 breadth 확보", "실적 breadth 없음"),
             "broadening": snapshot_status(broadening_available, "확산 근거 확보", "확산 근거 없음"),
+            "sectorBreadth": snapshot_status(sector_breadth_available, "업종 확산 근거 확보", "업종 확산 근거 없음"),
+            "valuation": snapshot_status(valuation_available, "밸류에이션 근거 확보", "밸류에이션 근거 없음"),
+            "support": snapshot_status(support_available, "펀더멘털 지지력 확보", "펀더멘털 지지력 없음"),
         },
     }
     return status
@@ -137,6 +155,36 @@ def summarize_statuses(entries: List[Dict[str, str]]) -> Dict[str, str]:
     sources = " · ".join(dict.fromkeys(entry["source"] for entry in unique_entries if entry.get("source")))
     messages = " · ".join(dict.fromkeys(entry["message"] for entry in unique_entries if entry.get("message")))
     return status_entry(worst["state"], sources or worst["source"], messages or worst["message"])
+
+
+def derive_anchor_support_status(data: Dict[str, Any], statuses: Dict[str, Any]) -> Dict[str, str]:
+    sector_status = statuses.get("anchor", {}).get("sectorBreadth")
+    valuation_status = statuses.get("anchor", {}).get("valuation")
+    entries = [entry for entry in (sector_status, valuation_status) if entry]
+    if not entries:
+        return status_entry("missing", "artifact", "펀더멘털 지지력 입력 상태 없음")
+
+    available_entries = [entry for entry in entries if entry.get("state") in {"ok", "partial"}]
+    problem_entries = [entry for entry in entries if entry.get("state") in {"missing", "error"}]
+    source = " · ".join(dict.fromkeys(entry.get("source") for entry in entries if entry.get("source"))) or "artifact"
+    reason = str(data.get("fundamentalSupportReason") or "펀더멘털 지지력 계산 완료")
+    support_computed = has_value(
+        data.get("fundamentalSupportScore"),
+        data.get("supportOffsetPoints"),
+    ) or str(data.get("fundamentalSupportState") or "") in {"validated", "supportive", "fragile"}
+
+    if available_entries and not problem_entries:
+        state = "ok" if all(entry.get("state") == "ok" for entry in available_entries) else "partial"
+        return status_entry(state, source, reason)
+    if available_entries and problem_entries:
+        labels = ", ".join(f"{entry.get('source', '입력')} {entry.get('state')}" for entry in problem_entries)
+        return status_entry("partial", source, f"{reason} · 일부 항목 중립값 반영 ({labels})")
+    if support_computed and problem_entries:
+        labels = ", ".join(f"{entry.get('source', '입력')} {entry.get('state')}" for entry in problem_entries)
+        return status_entry("partial", source, f"{reason} · 입력 부족으로 중립값 반영 ({labels})")
+    if any(entry.get("state") == "error" for entry in problem_entries):
+        return status_entry("error", source, f"{reason} · 지지력 입력 수집 실패")
+    return status_entry("missing", source, f"{reason} · 지지력 입력 미수집")
 
 
 def derive_model_statuses(data: Dict[str, Any], statuses: Dict[str, Any]) -> None:
@@ -264,6 +312,14 @@ def generate_result(
         merge_patch(data, broadening_result.data_patch)
         set_status_value(statuses, "anchor.broadening", broadening_result)
 
+        sector_breadth_result = collect_sector_breadth(data)
+        merge_patch(data, sector_breadth_result.data_patch)
+        set_status_value(statuses, "anchor.sectorBreadth", sector_breadth_result)
+
+        valuation_result = collect_market_valuation(data, anchor_universes)
+        merge_patch(data, valuation_result.data_patch)
+        set_status_value(statuses, "anchor.valuation", valuation_result)
+
         if anchor_universe_error and statuses["anchor"]["broadening"]["state"] == "error":
             statuses["anchor"]["broadening"] = status_entry(
                 "error",
@@ -276,8 +332,17 @@ def generate_result(
                 statuses["anchor"]["earnings"]["source"],
                 f"{statuses['anchor']['earnings']['message']} · 유니버스 구축 실패 ({anchor_universe_error})",
             )
+        if anchor_universe_error and statuses["anchor"]["valuation"]["state"] == "missing":
+            statuses["anchor"]["valuation"] = status_entry(
+                statuses["anchor"]["valuation"]["state"],
+                statuses["anchor"]["valuation"]["source"],
+                f"{statuses['anchor']['valuation']['message']} · 유니버스 구축 실패 ({anchor_universe_error})",
+            )
 
     merge_patch(data, calculate_fundamental_anchor_values(data))
+    merge_patch(data, calculate_fundamental_support_values(data))
+    merge_patch(data, calculate_support_adjusted_cycle_values(data))
+    statuses["anchor"]["support"] = derive_anchor_support_status(data, statuses)
     derive_model_statuses(data, statuses)
     generated_at = now_local().isoformat(timespec="seconds")
     result_date = explicit_date or result_date_key()

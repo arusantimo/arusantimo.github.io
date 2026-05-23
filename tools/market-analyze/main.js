@@ -54,6 +54,46 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+function formatYearMonthLabel(value) {
+    if (!value || typeof value !== "string" || value.length < 6) return value || "-";
+    return `${value.slice(0, 4)}.${value.slice(4, 6)}`;
+}
+
+function compactStatusMessage(message, options = {}) {
+    const fallback = options.fallback || "-";
+    const maxLength = Number.isFinite(options.maxLength) ? options.maxLength : 84;
+    const maxClauses = Number.isFinite(options.maxClauses) ? options.maxClauses : 2;
+    if (!message) return fallback;
+
+    let text = String(message)
+        .replace(/\s+/g, " ")
+        .replace(/최근 성공 캐시 사용 \([^)]*\)/g, "최근 성공 캐시 사용")
+        .replace(/기존 스냅샷 유지 \([^)]*\)/g, "기존 스냅샷 유지")
+        .replace(/\(<urlopen error[^>]*>\)/gi, "네트워크 연결 오류")
+        .replace(/<urlopen error[^>]*>/gi, "네트워크 연결 오류")
+        .replace(/\[Errno \d+\][^)·]+/gi, "네트워크 연결 오류")
+        .trim();
+
+    text = text
+        .replace(/\(([^()]{1,64})\)/g, " · $1")
+        .replace(/\s*·\s*·\s*/g, " · ")
+        .replace(/\s{2,}/g, " ")
+        .replace(/^·\s*/, "")
+        .trim();
+
+    let clauses = text.split(" · ").map(part => part.trim()).filter(Boolean);
+    if (clauses.length > maxClauses) {
+        clauses = clauses.slice(0, maxClauses);
+    }
+    text = clauses.join(" · ");
+
+    if (text.length > maxLength) {
+        text = `${text.slice(0, Math.max(0, maxLength - 1)).trimEnd()}…`;
+    }
+
+    return text || fallback;
+}
+
 function getStatusBadgeClass(state) {
     if (state === "ok") return "panel-status-badge is-ok";
     if (state === "partial") return "panel-status-badge is-partial";
@@ -94,6 +134,12 @@ function isAnchorComputed() {
     return Number.isFinite(marketData.fundamentalAnchorScore)
         || !!marketData.fundamentalAnchorReason
         || ["validated", "supportive", "fragile"].includes(marketData.fundamentalAnchorState);
+}
+
+function isFundamentalSupportComputed() {
+    return Number.isFinite(marketData.fundamentalSupportScore)
+        || !!marketData.fundamentalSupportReason
+        || ["validated", "supportive", "fragile"].includes(marketData.fundamentalSupportState);
 }
 
 function getDisplayProblemEntries(options = {}) {
@@ -155,6 +201,7 @@ function renderHeaderMeta() {
     schemaEl.innerText = marketResultMeta.schemaVersion || "-";
     loadStateEl.innerText = marketResultMeta.loadMessage || "대기 중";
     loadStateEl.className = `result-meta-value ${marketResultMeta.loadState === "artifact" ? "text-emerald-300" : marketResultMeta.loadState === "fallback" ? "text-amber-300" : "text-slate-300"}`;
+    renderResultDatePicker();
 
     const dataStatus = document.getElementById("data-status");
     if (dataStatus) {
@@ -169,6 +216,58 @@ function renderHeaderMeta() {
         );
         dataStatus.innerText = marketResultMeta.sourceLabel || "아티팩트 대기";
     }
+}
+
+function renderResultDatePicker() {
+    const picker = document.getElementById("result-date-picker");
+    const hint = document.getElementById("result-date-picker-hint");
+    if (!picker || !hint) return;
+
+    const requested = artifactViewSettings.selectedResultDate || "latest";
+    const availableDates = Array.isArray(marketResultMeta.availableDates)
+        ? marketResultMeta.availableDates.filter(Boolean)
+        : [];
+    const sortedDates = [...new Set(availableDates)].sort((left, right) => right.localeCompare(left));
+    const options = [{ value: "latest", label: "최신 생성본" }];
+
+    if (requested !== "latest" && !sortedDates.includes(requested)) {
+        options.push({
+            value: requested,
+            label: `고정값 없음 (${formatResultDateLabel(requested)})`
+        });
+    }
+
+    sortedDates.forEach(dateKey => {
+        options.push({
+            value: dateKey,
+            label: formatResultDateLabel(dateKey)
+        });
+    });
+
+    picker.innerHTML = options.map(option => `
+        <option value="${option.value}">${escapeHtml(option.label)}</option>
+    `).join("");
+
+    picker.value = options.some(option => option.value === requested) ? requested : "latest";
+
+    if (requested === "latest") {
+        hint.innerText = marketResultMeta.latestDate
+            ? `최신 생성본 ${formatResultDateLabel(marketResultMeta.latestDate)} 기준`
+            : "최신 생성본 기준";
+        return;
+    }
+
+    if (requested === marketResultMeta.resolvedResultDate) {
+        hint.innerText = `${formatResultDateLabel(requested)} 생성본 고정 로드 중`;
+        return;
+    }
+
+    if (marketResultMeta.resolvedResultDate) {
+        hint.innerText = `${formatResultDateLabel(requested)} 생성본이 없어 ${formatResultDateLabel(marketResultMeta.resolvedResultDate)}로 대체 로드`;
+        return;
+    }
+
+    hint.innerText = `${formatResultDateLabel(requested)} 생성본 고정값 대기 중`;
 }
 
 function renderDataLoadStatus() {
@@ -226,7 +325,10 @@ function summarizeAnchorDisplayStatus() {
     const entries = [
         { label: "수출", entry: marketStatus.anchor?.export },
         { label: "실적", entry: marketStatus.anchor?.earnings },
-        { label: "확산", entry: marketStatus.anchor?.broadening }
+        { label: "확산", entry: marketStatus.anchor?.broadening },
+        { label: "업종 확산", entry: marketStatus.anchor?.sectorBreadth },
+        { label: "밸류에이션", entry: marketStatus.anchor?.valuation },
+        { label: "지지력", entry: summarizeSupportDisplayStatus() }
     ];
     const baseSummary = summarizeStatusEntries(entries.map(item => item.entry));
     const hasComputedAnchor = isAnchorComputed();
@@ -245,6 +347,41 @@ function summarizeAnchorDisplayStatus() {
         "partial",
         sources.join(" · ") || baseSummary.source,
         `일부 축은 누락/오류 근거로 계산됨 (${labels.join(", ")})${messages.length ? ` · ${messages[0]}` : ""}`
+    );
+}
+
+function summarizeSupportDisplayStatus() {
+    const supportEntry = marketStatus.anchor?.support;
+    const detailEntries = [
+        { label: "업종 확산", entry: marketStatus.anchor?.sectorBreadth },
+        { label: "밸류에이션", entry: marketStatus.anchor?.valuation }
+    ];
+    const baseSummary = summarizeStatusEntries([supportEntry, ...detailEntries.map(item => item.entry)]);
+    if (!isFundamentalSupportComputed()) {
+        return baseSummary;
+    }
+
+    const problemEntries = detailEntries.filter(item => ["missing", "error"].includes(item.entry?.state));
+    if (!problemEntries.length) {
+        return supportEntry?.state
+            ? summarizeStatusEntries([supportEntry, ...detailEntries.map(item => item.entry)])
+            : baseSummary;
+    }
+
+    const sources = [
+        ...new Set(
+            [supportEntry, ...problemEntries.map(item => item.entry)]
+                .map(entry => entry?.source)
+                .filter(Boolean)
+        )
+    ];
+    const labels = problemEntries.map(item => `${item.label} ${getStatusStateLabel(item.entry?.state)}`);
+    const prefix = supportEntry?.message || marketData.fundamentalSupportReason || "펀더멘털 지지력 계산은 유지됩니다.";
+
+    return createStatusEntry(
+        "partial",
+        sources.join(" · ") || baseSummary.source,
+        `${prefix} · 세부 입력 상태: ${labels.join(", ")}`
     );
 }
 
@@ -423,6 +560,7 @@ document.getElementById("btn-export")?.addEventListener("click", () => {
         marketData,
         marketStatus,
         marketResultMeta,
+        artifactViewSettings,
         portfolioData
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
@@ -468,6 +606,9 @@ document.getElementById("file-import")?.addEventListener("change", event => {
             marketData = { ...marketData, ...dataToLoad };
             marketStatus = normalizeMarketStatus(statusToLoad);
             marketResultMeta = { ...marketResultMeta, ...metaToLoad };
+            if (parsed.artifactViewSettings) {
+                artifactViewSettings = { ...artifactViewSettings, ...parsed.artifactViewSettings };
+            }
             if (parsed.portfolioData) {
                 portfolioData = { ...portfolioData, ...parsed.portfolioData };
             }
@@ -599,6 +740,31 @@ function getAnchorStateTone(state) {
     return "#cbd5e1";
 }
 
+function getAnchorStatePillClass(state) {
+    if (state === "validated") return "anchor-state-pill is-validated";
+    if (state === "supportive") return "anchor-state-pill is-supportive";
+    if (state === "fragile") return "anchor-state-pill is-fragile";
+    return "anchor-state-pill is-neutral";
+}
+
+function getMarketRegimeTone(regimeKey) {
+    if (regimeKey === "secular-expansion") return "#34d399";
+    if (regimeKey === "debasement-bubble") return "#f87171";
+    return "#94a3b8";
+}
+
+function getValuationStabilityLabel(value) {
+    if (value === true) return "안정";
+    if (value === false) return "불안정";
+    return "-";
+}
+
+function getMarketRegimeCompactLabel(regimeKey, regimeLabel) {
+    if (regimeKey === "secular-expansion") return "Secular Expansion";
+    if (regimeKey === "debasement-bubble") return "Debasement Bubble";
+    return regimeLabel || "표준 레짐";
+}
+
 function buildMarketChipHtml(label, value, chipClass, statusEntry = null) {
     const badgeHtml = statusEntry && statusEntry.state !== "ok"
         ? `<span class="${getStatusBadgeClass(statusEntry.state)} chip-inline-badge">${getStatusStateLabel(statusEntry.state)}</span>`
@@ -701,6 +867,7 @@ function renderMarketEvaluationView() {
     const statusBadgeEl = document.getElementById("market-evaluation-status");
     const statusMessageEl = document.getElementById("market-evaluation-status-message");
     const anchorStatusSummary = summarizeAnchorDisplayStatus();
+    const supportStatusSummary = summarizeSupportDisplayStatus();
     const coreStatusSummary = summarizeStatusEntries([
         marketStatus.soros,
         marketStatus.minsky,
@@ -721,6 +888,12 @@ function renderMarketEvaluationView() {
             : coreStatusSummary.message || "일부 모델은 부분/누락 근거로 계산됩니다.";
     }
     chipsEl.innerHTML = [
+        buildMarketChipHtml(
+            "레짐",
+            `${getMarketRegimeCompactLabel(marketData.marketRegimeKey, marketData.marketRegimeLabel)} · F_support ${Number.isFinite(marketData.fundamentalSupportScore) ? Math.round(marketData.fundamentalSupportScore) : "-"}`,
+            tone.chip,
+            summarizeStatusEntries([marketStatus.fx, marketStatus.disparity, supportStatusSummary])
+        ),
         buildMarketChipHtml(
             "하워드 막스",
             `${marketData.cycleStageLabel || "-"} · P ${Math.round(marketData.riskIndex || 0)}`,
@@ -756,6 +929,12 @@ function renderMarketEvaluationView() {
             `${getWyckoffConsensusLabel()} · ${Number.isFinite(marketData.wyckoffDistributionBreadth) ? `분배 ${(marketData.wyckoffDistributionBreadth * 100).toFixed(0)}%` : "분배 -"}`,
             tone.chip,
             marketStatus.wyckoff
+        ),
+        buildMarketChipHtml(
+            "펀더멘털 지지력",
+            `${getAnchorStateLabel(marketData.fundamentalSupportState)} · ${Number.isFinite(marketData.nonSemiconductorMomentum) ? `${Math.round(marketData.nonSemiconductorMomentum)}%` : "-"} / ${getValuationStabilityLabel(marketData.marketValuationStability)}`,
+            tone.chip,
+            supportStatusSummary
         )
     ].join("");
 
@@ -767,13 +946,24 @@ function renderMarketEvaluationView() {
     breakEl.innerText = marketData.marketAdviceActions?.break || "-";
 
     const evidenceParts = [
+        `레짐 ${marketData.marketRegimeLabel || "표준 레짐"}`,
         `막스 ${marketData.cycleStageLabel || "-"}`,
         `소로스 ${getReflexivitySummaryLabel()}`,
         `민스키 ${getMinskySummaryLabel()}`,
         `코스톨라니 ${marketData.kostolanyStage || "-"}`,
         `와이코프 ${getWyckoffConsensusLabel()}`,
-        `앵커 ${getAnchorStateLabel(marketData.fundamentalAnchorState)}`
+        `앵커 ${getAnchorStateLabel(marketData.fundamentalAnchorState)}`,
+        `지지력 ${getAnchorStateLabel(marketData.fundamentalSupportState)}`
     ];
+    if (Number.isFinite(marketData.rawRiskIndex) || Number.isFinite(marketData.riskIndex)) {
+        evidenceParts.push(`raw P ${Number.isFinite(marketData.rawRiskIndex) ? Math.round(marketData.rawRiskIndex) : "-"} -> adjusted P ${Number.isFinite(marketData.riskIndex) ? Math.round(marketData.riskIndex) : "-"}`);
+    }
+    if (Number.isFinite(marketData.fundamentalSupportScore)) {
+        evidenceParts.push(`F_support ${Math.round(marketData.fundamentalSupportScore)}`);
+    }
+    if (Number.isFinite(marketData.supportOffsetPoints)) {
+        evidenceParts.push(`offset -${marketData.supportOffsetPoints.toFixed(1)}`);
+    }
     if (marketData.exportLatestMonth) {
         evidenceParts.push(`수출 ${marketData.exportLatestMonth.slice(0, 4)}.${marketData.exportLatestMonth.slice(4, 6)}`);
     }
@@ -798,11 +988,23 @@ function renderMarketEvaluationView() {
     if (Number.isFinite(marketData.supportBreadth60d)) {
         evidenceParts.push(`비주도주 60일선 ${(marketData.supportBreadth60d * 100).toFixed(0)}%`);
     }
+    if (Number.isFinite(marketData.nonSemiconductorMomentum)) {
+        evidenceParts.push(`업종 확산 ${Math.round(marketData.nonSemiconductorMomentum)}%`);
+    }
+    if (marketData.marketValuationStability === true || marketData.marketValuationStability === false) {
+        evidenceParts.push(`밸류에이션 ${getValuationStabilityLabel(marketData.marketValuationStability)}`);
+    }
+    if (Number.isFinite(marketData.marketValuationForwardPerAvg)) {
+        evidenceParts.push(`가중 Fwd PER ${marketData.marketValuationForwardPerAvg.toFixed(1)}배`);
+    }
 
     const evidenceBase = evidenceParts.join(" · ");
-    const anchorTail = marketData.fundamentalAnchorReason ? ` · ${marketData.fundamentalAnchorReason}` : "";
+    const anchorTail = [
+        marketData.fundamentalAnchorReason,
+        marketData.fundamentalSupportReason
+    ].filter(Boolean).join(" · ");
     const partialTail = problemSummary ? ` · 부분 근거(${problemSummary})` : "";
-    evidenceEl.innerText = `${evidenceBase}${anchorTail}${partialTail}`;
+    evidenceEl.innerText = `${evidenceBase}${anchorTail ? ` · ${anchorTail}` : ""}${partialTail}`;
 }
 
 function renderFundamentalAnchorPanel() {
@@ -810,6 +1012,7 @@ function renderFundamentalAnchorPanel() {
     if (!scoreEl) return;
 
     const anchorState = marketData.fundamentalAnchorState || "neutral";
+    const supportState = marketData.fundamentalSupportState || "neutral";
     const exportState = Number.isFinite(marketData.exportYoY) && marketData.exportYoY > 5 && Number.isFinite(marketData.exportYoYDelta) && marketData.exportYoYDelta > 0
         ? "validated"
         : Number.isFinite(marketData.exportYoY) && marketData.exportYoY <= 0 && Number.isFinite(marketData.exportYoYDelta) && marketData.exportYoYDelta < 0
@@ -825,58 +1028,130 @@ function renderFundamentalAnchorPanel() {
                 : "fragile")
         : "neutral";
     const broadeningState = marketData.broadeningState || "neutral";
+    const supportDisplaySummary = summarizeSupportDisplayStatus();
     const anchorPanelSummary = renderPanelStatus(
         "anchor-panel-status",
         [summarizeAnchorDisplayStatus()],
         "anchor-panel-status-message"
     );
+    const exportStatus = marketStatus.anchor.export;
+    const earningsStatus = marketStatus.anchor.earnings;
+    const broadeningStatus = marketStatus.anchor.broadening;
+    const sectorStatus = marketStatus.anchor.sectorBreadth;
+    const valuationStatus = marketStatus.anchor.valuation;
+
+    const exportMonthLabel = marketData.exportLatestMonth ? formatYearMonthLabel(marketData.exportLatestMonth) : "-";
+    const exportSummarySuccess = [
+        marketData.exportLatestMonth ? `${exportMonthLabel} 기준` : null,
+        Number.isFinite(marketData.exportYoY) ? `YoY ${formatSignedPercent(marketData.exportYoY, 1)}` : null
+    ].filter(Boolean).join(" · ") || "수출 시계열 대기";
+    const exportDetailSuccess = [
+        marketData.exportLatestMonth ? `${exportMonthLabel} 발표월 기준` : null,
+        Number.isFinite(marketData.exportYoY) ? `YoY ${formatSignedPercent(marketData.exportYoY, 1)}` : null,
+        Number.isFinite(marketData.exportYoYDelta) ? `가속도 ${marketData.exportYoYDelta > 0 ? "+" : ""}${marketData.exportYoYDelta.toFixed(1)}%p` : null,
+        Number.isFinite(marketData.export3mAvgYoY) ? `3개월 평균 ${formatSignedPercent(marketData.export3mAvgYoY, 1)}` : null
+    ].filter(Boolean).join(" · ") || "수출 모멘텀 계산 대기";
+
+    const earningsSummarySuccess = [
+        marketData.earningsSnapshotQuarter || null,
+        Number.isFinite(marketData.opIncomeBreadth) && Number.isFinite(marketData.netIncomeBreadth)
+            ? `영업 ${formatNullable(marketData.opIncomeBreadth * 100, "%", 0)} / 순이익 ${formatNullable(marketData.netIncomeBreadth * 100, "%", 0)}`
+            : marketData.earningsCoverageCount
+                ? `${marketData.earningsCoverageCount}종목 커버`
+                : null
+    ].filter(Boolean).join(" · ") || "분기 실적 breadth 대기";
+    const earningsDetailSuccess = [
+        marketData.earningsSnapshotQuarter || null,
+        marketData.earningsCoverageCount ? `${marketData.earningsCoverageCount}종목 커버` : null,
+        Number.isFinite(marketData.opIncomeBreadth) ? `영업이익 breadth ${formatNullable(marketData.opIncomeBreadth * 100, "%", 0)}` : null,
+        Number.isFinite(marketData.netIncomeBreadth) ? `순이익 breadth ${formatNullable(marketData.netIncomeBreadth * 100, "%", 0)}` : null,
+        Number.isFinite(marketData.turnaroundBreadth) ? `턴어라운드 ${formatNullable(marketData.turnaroundBreadth * 100, "%", 0)}` : null,
+        Number.isFinite(marketData.positiveRoeBreadth) ? `양의 ROE ${formatNullable(marketData.positiveRoeBreadth * 100, "%", 0)}` : null
+    ].filter(Boolean).join(" · ") || "분기 실적 breadth 계산 대기";
+
+    const broadeningSummarySuccess = [
+        Number.isFinite(marketData.broadeningScore) ? `점수 ${Math.round(marketData.broadeningScore)}/30` : null,
+        Number.isFinite(marketData.supportPositiveReturnBreadth) ? `20일 breadth ${formatNullable(marketData.supportPositiveReturnBreadth * 100, "%", 0)}` : null
+    ].filter(Boolean).join(" · ") || "비주도주 확산 대기";
+    const broadeningDetailSuccess = [
+        Number.isFinite(marketData.broadeningScore) ? `확산 점수 ${Math.round(marketData.broadeningScore)}/30` : null,
+        Number.isFinite(marketData.supportPositiveReturnBreadth) ? `20일 수익 breadth ${formatNullable(marketData.supportPositiveReturnBreadth * 100, "%", 0)}` : null,
+        Number.isFinite(marketData.supportBreadth20d) ? `20일선 상회 ${formatNullable(marketData.supportBreadth20d * 100, "%", 0)}` : null,
+        Number.isFinite(marketData.supportBreadth60d) ? `60일선 상회 ${formatNullable(marketData.supportBreadth60d * 100, "%", 0)}` : null
+    ].filter(Boolean).join(" · ") || "비주도주 확산 계산 대기";
+
+    const supportSummarySuccess = [
+        Number.isFinite(marketData.fundamentalSupportScore) ? `F_support ${Math.round(marketData.fundamentalSupportScore)}/100` : null,
+        getMarketRegimeCompactLabel(marketData.marketRegimeKey, marketData.marketRegimeLabel)
+    ].filter(Boolean).join(" · ") || "지지력 계산 대기";
 
     scoreEl.innerText = Number.isFinite(marketData.fundamentalAnchorScore) ? Math.round(marketData.fundamentalAnchorScore) : "-";
     scoreEl.style.color = getAnchorStateTone(anchorState);
 
     const stateEl = document.getElementById("anchor-state");
-    stateEl.innerText = `${getAnchorStateLabel(anchorState)} · ${marketData.marketEvaluationLabel || "메인 평가 대기"}`;
-    stateEl.style.color = getAnchorStateTone(anchorState);
-    const anchorReasonParts = [marketData.fundamentalAnchorReason || "수출·실적·확산 근거를 기다리는 중입니다."];
-    if (anchorPanelSummary.state !== "ok") {
-        if (isAnchorComputed()) {
-            anchorReasonParts.push(`전체 앵커는 ${getStatusStateLabel(anchorPanelSummary.state)}로 유지됩니다`);
-        }
-        anchorReasonParts.push(anchorPanelSummary.message);
+    const evaluationLabel = marketData.marketEvaluationLabel || "메인 평가 대기";
+    stateEl.innerHTML = [
+        `<span class="${getAnchorStatePillClass(anchorState)}">${escapeHtml(getAnchorStateLabel(anchorState))}</span>`,
+        `<span class="${getAnchorStatePillClass(supportState)}">지지력 ${escapeHtml(getAnchorStateLabel(supportState))}</span>`,
+        `<span class="anchor-state-pill is-evaluation">${escapeHtml(evaluationLabel)}</span>`
+    ].join("");
+    document.getElementById("anchor-reason").innerText = compactStatusMessage(
+        marketData.fundamentalAnchorReason || "수출·실적·확산 근거를 기다리는 중입니다.",
+        { maxLength: 140, maxClauses: 3, fallback: "수출·실적·확산 근거를 기다리는 중입니다." }
+    );
+    const subnoteParts = [];
+    const supportSubnote = compactStatusMessage(
+        marketData.fundamentalSupportReason || supportDisplaySummary.message,
+        { maxLength: 118, maxClauses: 2, fallback: "" }
+    );
+    if (supportSubnote) {
+        subnoteParts.push(`지지력 보정: ${supportSubnote}`);
     }
-    document.getElementById("anchor-reason").innerText = anchorReasonParts.join(" · ");
+    if (anchorPanelSummary.state !== "ok") {
+        const inputStateSummary = compactStatusMessage(
+            anchorPanelSummary.message,
+            { maxLength: 118, maxClauses: 2, fallback: anchorPanelSummary.message || "" }
+        );
+        if (inputStateSummary) {
+            subnoteParts.push(`입력 상태: ${inputStateSummary}`);
+        }
+    }
+    document.getElementById("anchor-subnote").innerText = subnoteParts.length
+        ? subnoteParts.join(" · ")
+        : "세부 지지력과 누락 상태는 아래 카드에서 확인할 수 있습니다.";
 
     const exportStateEl = document.getElementById("anchor-export-state");
     const earningsStateEl = document.getElementById("anchor-earnings-state");
     const broadeningStateEl = document.getElementById("anchor-broadening-state");
+    const supportStateEl = document.getElementById("anchor-support-state");
     exportStateEl.innerText = getAnchorStateLabel(exportState);
     earningsStateEl.innerText = getAnchorStateLabel(earningsState);
     broadeningStateEl.innerText = getAnchorStateLabel(broadeningState);
+    supportStateEl.innerText = getAnchorStateLabel(supportState);
     exportStateEl.style.color = getAnchorStateTone(exportState);
     earningsStateEl.style.color = getAnchorStateTone(earningsState);
     broadeningStateEl.style.color = getAnchorStateTone(broadeningState);
-    setStatusBadge("anchor-export-status-badge", marketStatus.anchor.export);
-    setStatusBadge("anchor-earnings-status-badge", marketStatus.anchor.earnings);
-    setStatusBadge("anchor-broadening-status-badge", marketStatus.anchor.broadening);
+    supportStateEl.style.color = getAnchorStateTone(supportState);
+    setStatusBadge("anchor-export-status-badge", exportStatus);
+    setStatusBadge("anchor-earnings-status-badge", earningsStatus);
+    setStatusBadge("anchor-broadening-status-badge", broadeningStatus);
+    setStatusBadge("anchor-support-chip-status-badge", supportDisplaySummary);
 
-    document.getElementById("anchor-export-reason").innerText = marketStatus.anchor.export.state !== "ok"
-        ? marketStatus.anchor.export.message
-        : marketData.exportLatestMonth
-            ? `${marketData.exportLatestMonth.slice(0, 4)}.${marketData.exportLatestMonth.slice(4, 6)} 기준`
-            : "수출 시계열 대기";
-    document.getElementById("anchor-earnings-reason").innerText = marketStatus.anchor.earnings.state !== "ok"
-        ? marketStatus.anchor.earnings.message
-        : marketData.earningsSnapshotQuarter
-            ? `${marketData.earningsSnapshotQuarter} · ${marketData.earningsCoverageCount || 0}종목`
-            : "분기 실적 breadth 대기";
-    document.getElementById("anchor-broadening-reason").innerText = marketStatus.anchor.broadening.state !== "ok"
-        ? marketStatus.anchor.broadening.message
-        : Number.isFinite(marketData.broadeningScore)
-            ? `확산 점수 ${Math.round(marketData.broadeningScore)}/30`
-            : "비주도주 확산 대기";
+    document.getElementById("anchor-export-reason").innerText = exportStatus.state !== "ok"
+        ? compactStatusMessage(exportStatus.message, { maxLength: 52, maxClauses: 2, fallback: "수출 시계열 대기" })
+        : exportSummarySuccess;
+    document.getElementById("anchor-earnings-reason").innerText = earningsStatus.state !== "ok"
+        ? compactStatusMessage(earningsStatus.message, { maxLength: 52, maxClauses: 2, fallback: "분기 실적 breadth 대기" })
+        : earningsSummarySuccess;
+    document.getElementById("anchor-broadening-reason").innerText = broadeningStatus.state !== "ok"
+        ? compactStatusMessage(broadeningStatus.message, { maxLength: 52, maxClauses: 2, fallback: "비주도주 확산 대기" })
+        : broadeningSummarySuccess;
+    document.getElementById("anchor-support-reason").innerText = supportDisplaySummary.state !== "ok"
+        ? compactStatusMessage(supportDisplaySummary.message, { maxLength: 52, maxClauses: 2, fallback: "지지력 계산 대기" })
+        : supportSummarySuccess;
 
     document.getElementById("anchor-export-month").innerText = marketData.exportLatestMonth
-        ? `${marketData.exportLatestMonth.slice(0, 4)}.${marketData.exportLatestMonth.slice(4, 6)}`
+        ? exportMonthLabel
         : "-";
     document.getElementById("anchor-export-value").innerText = Number.isFinite(marketData.exportValueUsd)
         ? marketData.exportValueUsd.toLocaleString()
@@ -886,6 +1161,9 @@ function renderFundamentalAnchorPanel() {
         ? `${marketData.exportYoYDelta > 0 ? "+" : ""}${marketData.exportYoYDelta.toFixed(1)}%p`
         : "-";
     document.getElementById("anchor-export-avg").innerText = formatSignedPercent(marketData.export3mAvgYoY, 1);
+    document.getElementById("anchor-export-detail-reason").innerText = exportStatus.state !== "ok"
+        ? exportStatus.message || "수출 모멘텀 계산 대기"
+        : exportDetailSuccess;
 
     document.getElementById("anchor-earnings-quarter").innerText = marketData.earningsSnapshotQuarter || "-";
     document.getElementById("anchor-earnings-count").innerText = marketData.earningsCoverageCount ? `${marketData.earningsCoverageCount}종목` : "-";
@@ -893,6 +1171,9 @@ function renderFundamentalAnchorPanel() {
     document.getElementById("anchor-net-breadth").innerText = formatNullable(Number.isFinite(marketData.netIncomeBreadth) ? marketData.netIncomeBreadth * 100 : null, '%', 0);
     document.getElementById("anchor-turnaround").innerText = formatNullable(Number.isFinite(marketData.turnaroundBreadth) ? marketData.turnaroundBreadth * 100 : null, '%', 0);
     document.getElementById("anchor-roe").innerText = formatNullable(Number.isFinite(marketData.positiveRoeBreadth) ? marketData.positiveRoeBreadth * 100 : null, '%', 0);
+    document.getElementById("anchor-earnings-detail-reason").innerText = earningsStatus.state !== "ok"
+        ? earningsStatus.message || "분기 실적 breadth 계산 대기"
+        : earningsDetailSuccess;
 
     document.getElementById("anchor-broadening-score").innerText = Number.isFinite(marketData.broadeningScore)
         ? `${Math.round(marketData.broadeningScore)}/30`
@@ -901,6 +1182,40 @@ function renderFundamentalAnchorPanel() {
     document.getElementById("anchor-ma20").innerText = formatNullable(Number.isFinite(marketData.supportBreadth20d) ? marketData.supportBreadth20d * 100 : null, '%', 0);
     document.getElementById("anchor-ma60").innerText = formatNullable(Number.isFinite(marketData.supportBreadth60d) ? marketData.supportBreadth60d * 100 : null, '%', 0);
     document.getElementById("anchor-eval-link").innerText = marketData.marketAdviceStance || "-";
+    document.getElementById("anchor-broadening-detail-reason").innerText = broadeningStatus.state !== "ok"
+        ? broadeningStatus.message || "비주도주 확산 계산 대기"
+        : broadeningDetailSuccess;
+
+    setStatusBadge("anchor-sector-status-badge", sectorStatus);
+    setStatusBadge("anchor-valuation-status-badge", valuationStatus);
+    setStatusBadge("anchor-support-status-badge", supportDisplaySummary);
+
+    document.getElementById("anchor-sector-reason").innerText = sectorStatus.state !== "ok"
+        ? compactStatusMessage(sectorStatus.message, { maxLength: 92, maxClauses: 2, fallback: "업종 확산 대기" })
+        : `${marketData.nonSemiconductorMomentumPassCount || 0}/${marketData.nonSemiconductorMomentumCoverageCount || 0} 업종 통과`;
+    document.getElementById("anchor-valuation-reason").innerText = valuationStatus.state !== "ok"
+        ? compactStatusMessage(valuationStatus.message, { maxLength: 92, maxClauses: 2, fallback: "밸류에이션 대기" })
+        : Number.isFinite(marketData.marketValuationForwardPerAvg)
+            ? `가중 평균 ${marketData.marketValuationForwardPerAvg.toFixed(1)}배`
+            : "밸류에이션 대기";
+    document.getElementById("anchor-support-detail-reason").innerText = supportDisplaySummary.state !== "ok"
+        ? supportDisplaySummary.message
+        : marketData.marketRegimeReason || marketData.fundamentalSupportReason || "지지력 계산 대기";
+
+    document.getElementById("anchor-nonsemi-momentum").innerText = formatNullable(marketData.nonSemiconductorMomentum, '%', 0);
+    document.getElementById("anchor-nonsemi-coverage").innerText = marketData.nonSemiconductorMomentumCoverageCount
+        ? `${marketData.nonSemiconductorMomentumPassCount || 0}/${marketData.nonSemiconductorMomentumCoverageCount}`
+        : "-";
+    document.getElementById("anchor-valuation-stability").innerText = getValuationStabilityLabel(marketData.marketValuationStability);
+    document.getElementById("anchor-valuation-forward-per").innerText = Number.isFinite(marketData.marketValuationForwardPerAvg)
+        ? `${marketData.marketValuationForwardPerAvg.toFixed(1)}배`
+        : "-";
+    document.getElementById("anchor-fsupport-score").innerText = Number.isFinite(marketData.fundamentalSupportScore)
+        ? `${Math.round(marketData.fundamentalSupportScore)}/100`
+        : "-";
+    const regimeLabelEl = document.getElementById("anchor-regime-label");
+    regimeLabelEl.innerText = getMarketRegimeCompactLabel(marketData.marketRegimeKey, marketData.marketRegimeLabel) || "-";
+    regimeLabelEl.style.color = getMarketRegimeTone(marketData.marketRegimeKey);
 }
 
 function renderSorosPanel() {
@@ -1093,6 +1408,33 @@ function renderTheorySubtabs() {
 
 initializeWyckoffHelpModal();
 
+async function reloadArtifactData() {
+    const artifactBundle = await loadMarketArtifact(artifactViewSettings.selectedResultDate || "latest");
+    marketData = { ...marketData, ...(artifactBundle.data || {}) };
+    marketStatus = normalizeMarketStatus(artifactBundle.status || {});
+    marketResultMeta = { ...marketResultMeta, ...(artifactBundle.meta || {}) };
+    updateDashboardUI();
+    calculateCycle();
+    saveMarketData();
+}
+
+document.getElementById("result-date-picker")?.addEventListener("change", async event => {
+    const picker = event.target;
+    const nextValue = String(picker.value || "latest");
+    artifactViewSettings.selectedResultDate = nextValue;
+    picker.disabled = true;
+    saveMarketData();
+    try {
+        await reloadArtifactData();
+    } catch (error) {
+        console.error("결과 생성본 재로드 중 오류:", error);
+        alert("선택한 결과 생성본을 불러오지 못했습니다.");
+    } finally {
+        picker.disabled = false;
+        renderResultDatePicker();
+    }
+});
+
 async function initData() {
     try {
         try {
@@ -1106,15 +1448,7 @@ async function initData() {
         }
 
         loadMarketData();
-
-        const artifactBundle = await loadLatestMarketArtifact();
-        marketData = { ...marketData, ...(artifactBundle.data || {}) };
-        marketStatus = normalizeMarketStatus(artifactBundle.status || {});
-        marketResultMeta = { ...marketResultMeta, ...(artifactBundle.meta || {}) };
-
-        updateDashboardUI();
-        calculateCycle();
-        saveMarketData();
+        await reloadArtifactData();
     } catch (err) {
         console.error("초기 데이터 로드 중 오류:", err);
         marketStatus = inferMarketStatusFromData(marketData, "local_state");
@@ -1123,7 +1457,11 @@ async function initData() {
             loadState: "local",
             loadMessage: `초기 로드 실패 (${err.message || "알 수 없는 오류"})`,
             sourceLabel: "브라우저 로컬 상태",
-            fallbackUsed: true
+            fallbackUsed: true,
+            requestedResultDate: artifactViewSettings.selectedResultDate || "latest",
+            loadTargetLabel: artifactViewSettings.selectedResultDate === "latest"
+                ? "최신 생성본"
+                : `${artifactViewSettings.selectedResultDate} 고정`
         });
         updateDashboardUI();
         calculateCycle();

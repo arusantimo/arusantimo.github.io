@@ -707,6 +707,68 @@
         };
     }
 
+    function normalizeBooleanFlagLocal(value) {
+        if (value === true || value === false) return value;
+        const normalized = String(value || "").trim().toLowerCase();
+        if (["true", "1", "stable", "validated"].includes(normalized)) return true;
+        if (["false", "0", "unstable", "fragile"].includes(normalized)) return false;
+        return null;
+    }
+
+    function calculateFundamentalSupport(data = {}) {
+        const sectorMomentum = Number(data.nonSemiconductorMomentum);
+        const sectorCoverage = Number(data.nonSemiconductorMomentumCoverageCount) || 0;
+        const sectorPassCount = Number(data.nonSemiconductorMomentumPassCount) || 0;
+        const hasSectorMeasurement = sectorCoverage >= 3 && Number.isFinite(sectorMomentum);
+        const sectorSupportPoints = hasSectorMeasurement
+            ? clampLocal(sectorMomentum * 0.5, 0, 50)
+            : 25;
+
+        const valuationThreshold = Number.isFinite(Number(data.marketValuationThreshold))
+            ? Number(data.marketValuationThreshold)
+            : 13;
+        const valuationStability = normalizeBooleanFlagLocal(data.marketValuationStability);
+        const valuationSupportPoints = valuationStability === true
+            ? 50
+            : valuationStability === false
+                ? 0
+                : 25;
+
+        const score = clampLocal(sectorSupportPoints + valuationSupportPoints, 0, 100);
+        let state = "fragile";
+        if (score >= 70) state = "validated";
+        else if (score >= 45) state = "supportive";
+
+        const valuationAvg = Number.isFinite(Number(data.marketValuationForwardPerAvg))
+            ? Number(data.marketValuationForwardPerAvg)
+            : null;
+        const sectorReason = hasSectorMeasurement
+            ? `업종 확산 ${sectorPassCount}/${sectorCoverage}개 통과`
+            : sectorCoverage > 0 && Number.isFinite(sectorMomentum)
+                ? `업종 확산 커버리지 ${sectorCoverage}개로 중립값`
+                : "업종 확산 중립값";
+        const valuationReason = valuationStability === true
+            ? `가중 Fwd PER ${valuationAvg !== null ? valuationAvg.toFixed(1) : "-"}배 <= ${valuationThreshold.toFixed(1)}배`
+            : valuationStability === false
+                ? `가중 Fwd PER ${valuationAvg !== null ? valuationAvg.toFixed(1) : "-"}배 > ${valuationThreshold.toFixed(1)}배`
+                : "밸류에이션 중립값";
+
+        return {
+            fundamentalSupportScore: score,
+            fundamentalSupportState: state,
+            fundamentalSupportReason: `업종 확산 ${Math.round(sectorSupportPoints)}/50 · 밸류에이션 ${Math.round(valuationSupportPoints)}/50 · ${sectorReason} · ${valuationReason}`,
+            marketValuationScore: valuationSupportPoints,
+            marketValuationThreshold: valuationThreshold,
+            supportOffsetPoints: Number((score * 0.3).toFixed(2))
+        };
+    }
+
+    function hydrateFundamentalSupportData(data = {}) {
+        return {
+            ...calculateFundamentalSupport(data)
+        };
+    }
+
     function getAdviceStanceLabel(bias) {
         const labels = ["분할 확대", "선별 유지", "균형 유지", "비중 조절", "현금 우선"];
         return labels[clampLocal(bias, 0, labels.length - 1)] || labels[2];
@@ -817,18 +879,25 @@
     }
 
     function deriveMarketEvaluation(data = {}) {
+        const supportPatch = calculateFundamentalSupport(data);
         const stageKey = data.cycleStageKey || "skepticism";
         const anchorState = data.fundamentalAnchorState || "neutral";
         const broadeningState = data.broadeningState || "neutral";
+        const supportState = data.fundamentalSupportState || supportPatch.fundamentalSupportState || "supportive";
         const trapScore = Number(data.trapScore) || 0;
         const wyckoffDistributionBreadth = Number(data.wyckoffDistributionBreadth) || 0;
         const reflexivityState = data.reflexivityState || "normal";
+        const marketRegimeKey = data.marketRegimeKey || "standard";
+        const marketRegimeLabel = data.marketRegimeLabel || "표준 레짐";
+        const marketRegimeReason = data.marketRegimeReason || "특수 레짐 조건 없음";
         const hotPsychology = stageKey === "greed" || stageKey === "euphoria";
         const lowCycle = ["panic", "capitulation", "pessimism"].includes(stageKey);
         const anchorStrong = anchorState === "validated";
         const anchorSupportive = anchorState === "validated" || anchorState === "supportive";
         const broadeningStrong = broadeningState === "validated";
         const broadeningSupportive = broadeningState === "validated" || broadeningState === "supportive";
+        const supportStrong = supportState === "validated";
+        const supportSupportive = supportState === "validated" || supportState === "supportive";
         const minskyWarning = (Number.isFinite(data.depositMarginRatio) && data.depositMarginRatio >= 0.2)
             || (data.shockAnchorDate && Number.isFinite(data.marginShockChangePct) && data.marginShockChangePct >= 0)
             || (Number.isFinite(data.marginSlope) && data.marginSlope >= 300);
@@ -839,6 +908,7 @@
         const wyckoffView = getWyckoffModelLabel(data);
         const anchorView = getSupportStateLabel(anchorState);
         const broadeningView = getSupportStateLabel(broadeningState);
+        const supportView = getSupportStateLabel(supportState);
 
         let state = "balanced";
         let label = "균형 국면";
@@ -861,6 +931,16 @@
         } else if (anchorStrong && broadeningSupportive) {
             state = "structural-bull";
             label = "구조 강세 연장";
+        }
+
+        if (marketRegimeKey === "secular-expansion" && state !== "distribution-risk") {
+            if (anchorStrong && broadeningSupportive) {
+                state = "structural-bull";
+                label = "구조 강세 연장";
+            } else {
+                state = "validated-overheat";
+                label = "과열이지만 정당화됨";
+            }
         }
 
         const baseBiasMap = {
@@ -887,6 +967,13 @@
         if (riskSignals >= 2) {
             marketAdviceBias = Math.min(4, marketAdviceBias + 1);
         }
+        if (marketRegimeKey === "secular-expansion" && riskSignals < 2) {
+            marketAdviceBias = Math.max(0, marketAdviceBias - 1);
+        }
+        if (marketRegimeKey === "debasement-bubble") {
+            marketAdviceBias = Math.min(4, marketAdviceBias + 1);
+            marketAdviceBias = Math.max(3, marketAdviceBias);
+        }
         if (state === "distribution-risk") {
             marketAdviceBias = Math.max(marketAdviceBias, 3);
         }
@@ -896,24 +983,27 @@
         const marketAdviceStance = getAdviceStanceLabel(marketAdviceBias);
         const actions = buildAdviceActions(state, marketAdviceStance, data);
 
-        let title = "여섯 모델이 혼합 신호를 보내고 있습니다.";
-        let narrative = `하워드 막스는 ${marksView}, 소로스는 ${sorosView}, 민스키는 ${minskyView}, 코스톨라니는 ${kostolanyView}, 와이코프는 ${wyckoffView}, 펀더멘털 앵커는 ${anchorView}로 읽힙니다. 아직 한 모델만 따라가기보다 모델 간 합치와 충돌을 함께 보는 구간입니다.`;
+        const regimePhrase = marketRegimeKey === "standard"
+            ? "표준 레짐"
+            : marketRegimeLabel;
+        let title = "모델별 신호를 하나의 흐름으로 묶으면 아직 혼합 국면입니다.";
+        let narrative = `하워드 막스는 ${marksView}, 소로스는 ${sorosView}, 민스키는 ${minskyView}, 코스톨라니는 ${kostolanyView}, 와이코프는 ${wyckoffView}, 펀더멘털 앵커는 ${anchorView}, 지지력 인덱스는 ${supportView}로 읽힙니다. 현재 레짐은 ${regimePhrase}이며, 심리와 가치 근거가 얼마나 함께 움직이는지 계속 대조해야 합니다.`;
 
         if (state === "structural-bull") {
-            title = "상단 모델도 뜨겁지만, 종합 판정은 아직 강세 지속 쪽입니다.";
-            narrative = `하워드 막스는 ${marksView}, 코스톨라니는 ${kostolanyView}로 상단 심리를 가리키지만, 펀더멘털 앵커 ${anchorView}와 확산 ${broadeningView}가 이를 지지하고 있습니다. 소로스 ${sorosView}, 민스키 ${minskyView}, 와이코프 ${wyckoffView}도 아직 즉시 붕괴를 주도할 정도는 아니라서 고원 구간 또는 추가 오버슈팅 가능성을 함께 열어두는 해석이 자연스럽습니다.`;
+            title = "상단 심리는 뜨겁지만, 종합 평가는 아직 강세 연장 쪽입니다.";
+            narrative = `하워드 막스 ${marksView}, 코스톨라니 ${kostolanyView}가 상단 심리를 가리켜도 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}가 이를 받치고 있습니다. ${marketRegimeKey === "secular-expansion" ? `${marketRegimeLabel}로 분류되는 만큼, 환율 부담보다 실적 정당화 신호를 더 비중 있게 봅니다.` : `현재 레짐은 ${regimePhrase}이며, 아직은 고점 체류나 추가 오버슈팅까지 열어둘 만한 조합입니다.`}`;
         } else if (state === "validated-overheat") {
-            title = "과열 경고와 강세 근거가 함께 공존하는 구간입니다.";
-            narrative = `하워드 막스 ${marksView}, 코스톨라니 ${kostolanyView}, 소로스 ${sorosView}가 과열을 말하고 있지만, 펀더멘털 앵커 ${anchorView}와 확산 ${broadeningView}가 아직 완전히 무너지지 않았습니다. 민스키 ${minskyView}와 와이코프 ${wyckoffView}가 결정적 경고로 번지는지 확인하면서, 공격보다 속도 조절에 초점을 맞추는 편이 합리적입니다.`;
+            title = "과열 경고와 정당화 근거가 함께 공존하는 구간입니다.";
+            narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 코스톨라니 ${kostolanyView}가 뜨거움을 보여주지만, 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}가 아직 완전히 꺾이지 않았습니다. 레짐은 ${regimePhrase}이며, 민스키 ${minskyView}와 와이코프 ${wyckoffView}가 더 나빠지는지 확인하면서 속도 조절이 맞는 장면입니다.`;
         } else if (state === "overheat-only") {
-            title = "상승 심리는 뜨겁지만 다수 모델의 확인은 약합니다.";
-            narrative = `하워드 막스 ${marksView}, 코스톨라니 ${kostolanyView}, 소로스 ${sorosView}가 상단 심리를 가리키는 반면 펀더멘털 앵커는 ${anchorView}, 확산은 ${broadeningView}에 머물고 있습니다. 여기에 민스키 ${minskyView}나 와이코프 ${wyckoffView}가 더 악화되면 메인 뷰는 빠르게 방어 쪽으로 기울 수 있습니다.`;
+            title = "상승 심리는 앞서가지만 근거 모델의 합치는 약합니다.";
+            narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 코스톨라니 ${kostolanyView}가 상단 심리를 가리키는 반면 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}는 충분한 합의를 만들지 못하고 있습니다. ${marketRegimeKey === "debasement-bubble" ? `${marketRegimeLabel}로 분류되는 만큼 환율 급등과 고이격이 가치보다 앞서가는지 더 엄격하게 봐야 합니다.` : `현재 레짐은 ${regimePhrase}이며, 추가 경고가 겹치면 방어 강도가 빠르게 높아질 수 있습니다.`}`;
         } else if (state === "distribution-risk") {
             title = "경고 모델들이 메인 뷰에서 우세해지고 있습니다.";
-            narrative = `하워드 막스 ${marksView}의 상단 심리 위에 소로스 ${sorosView}, 민스키 ${minskyView}, 와이코프 ${wyckoffView}가 겹치면서 리스크 모델들이 주도권을 잡고 있습니다. 펀더멘털 앵커가 ${anchorView}라도 Bull Trap과 분배/신용 경고가 함께 켜진 구간에서는 방어가 우선입니다.`;
+            narrative = `하워드 막스 ${marksView}의 상단 심리 위에 소로스 ${sorosView}, 민스키 ${minskyView}, 와이코프 ${wyckoffView}가 겹치며 리스크 모델들이 주도권을 잡고 있습니다. 펀더멘털 앵커 ${anchorView}, 지지력 ${supportView}, 레짐 ${regimePhrase}가 일부 버텨도 Bull Trap과 분배 경고가 함께 뜨는 구간에서는 방어가 우선입니다.`;
         } else if (state === "reaccumulation") {
             title = "약세 말기 모델과 회복 근거가 함께 나타나는 구간입니다.";
-            narrative = `하워드 막스 ${marksView}와 코스톨라니 ${kostolanyView}는 하단 국면을 가리키고, 와이코프 ${wyckoffView}와 펀더멘털 앵커 ${anchorView}는 재축적 가능성을 탐색하게 만듭니다. 소로스 ${sorosView}, 민스키 ${minskyView}가 진정되는지 확인하면서 성급한 몰빵보다 분할 접근으로 준비하는 편이 좋습니다.`;
+            narrative = `하워드 막스 ${marksView}와 코스톨라니 ${kostolanyView}는 하단 국면을, 와이코프 ${wyckoffView}, 펀더멘털 앵커 ${anchorView}, 지지력 ${supportView}는 재축적 가능성을 시사합니다. 레짐은 ${regimePhrase}이며, 소로스 ${sorosView}와 민스키 ${minskyView}가 진정되는지 확인하면서 분할 접근이 유리합니다.`;
         }
 
         return {
@@ -923,7 +1013,7 @@
             marketFlowNarrative: narrative,
             marketAdviceBias,
             marketAdviceStance,
-            marketAdviceReason: `막스 ${marksView} · 소로스 ${sorosView} · 민스키 ${minskyView} · 코스톨라니 ${kostolanyView} · 와이코프 ${wyckoffView} · 앵커 ${anchorView} · 확산 ${broadeningView} · 리스크 ${riskSignals}개`,
+            marketAdviceReason: `막스 ${marksView} · 소로스 ${sorosView} · 민스키 ${minskyView} · 코스톨라니 ${kostolanyView} · 와이코프 ${wyckoffView} · 앵커 ${anchorView} · 확산 ${broadeningView} · 지지력 ${supportView} · 레짐 ${regimePhrase} · 리스크 ${riskSignals}개`,
             marketAdviceActions: actions
         };
     }
@@ -960,6 +1050,9 @@
         marketData.fundamentalAnchorScore = null;
         marketData.fundamentalAnchorState = "neutral";
         marketData.fundamentalAnchorReason = reason;
+        marketData.fundamentalSupportScore = null;
+        marketData.fundamentalSupportState = "neutral";
+        marketData.fundamentalSupportReason = "펀더멘털 지지력 대기 중";
         marketData.exportLatestMonth = "";
         marketData.exportValueUsd = null;
         marketData.exportYoY = null;
@@ -976,6 +1069,18 @@
         marketData.supportBreadth20d = null;
         marketData.supportBreadth60d = null;
         marketData.supportPositiveReturnBreadth = null;
+        marketData.nonSemiconductorMomentum = null;
+        marketData.nonSemiconductorMomentumCoverageCount = 0;
+        marketData.nonSemiconductorMomentumPassCount = 0;
+        marketData.marketValuationStability = null;
+        marketData.marketValuationScore = null;
+        marketData.marketValuationCoverageCount = 0;
+        marketData.marketValuationForwardPerAvg = null;
+        marketData.marketValuationThreshold = 13;
+        marketData.supportOffsetPoints = 0;
+        marketData.marketRegimeKey = "standard";
+        marketData.marketRegimeLabel = "표준 레짐";
+        marketData.marketRegimeReason = "특수 레짐 조건 대기 중";
     }
 
     async function fetchFundamentalAnchorBundle(options = {}) {
@@ -1012,6 +1117,8 @@
     root.fetchEarningsBreadthData = fetchEarningsBreadthData;
     root.calculateBroadeningData = calculateBroadeningData;
     root.calculateFundamentalAnchor = calculateFundamentalAnchor;
+    root.calculateFundamentalSupport = calculateFundamentalSupport;
+    root.hydrateFundamentalSupportData = hydrateFundamentalSupportData;
     root.deriveMarketEvaluation = deriveMarketEvaluation;
     root.fetchFundamentalAnchorBundle = fetchFundamentalAnchorBundle;
     root.resetFundamentalAnchorData = resetFundamentalAnchorData;

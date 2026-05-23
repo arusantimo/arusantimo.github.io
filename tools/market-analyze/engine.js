@@ -195,6 +195,10 @@ function calculateEuphoriaFlowBonus(data) {
 }
 
 function calculateCycle() {
+    if (typeof hydrateFundamentalSupportData === "function") {
+        Object.assign(marketData, hydrateFundamentalSupportData(marketData));
+    }
+
     const { fx, vix, sentiment, gold, disparity, bullRatio, marginSlope } = marketData;
     let f_fx = 0;
     if (fx >= 1450) f_fx = 1.5;
@@ -208,9 +212,11 @@ function calculateCycle() {
 
     let m_stress = (40 * f_fx) + (30 * g_vix);
     m_stress = Math.min(70, m_stress);
+    marketData.macroStressScore = m_stress;
 
     let i_disparity = Math.max(0, (disparity - 95)) * 2; // 이격도가 높을수록 탐욕
     i_disparity = Math.min(100, i_disparity + (bullRatio * 0.5));
+    marketData.equityOverboughtScore = i_disparity;
 
     let l_credit = Math.max(0, marginSlope / 200);
     l_credit = Math.min(100, l_credit);
@@ -223,27 +229,52 @@ function calculateCycle() {
     const reflexivityRaw = disparitySurplus * sentimentSurplus * 12;
     const reflexivitySynergyPoints = Math.min(25, Math.max(0, reflexivityRaw));
     let e_greed = clamp(linear_greed + reflexivitySynergyPoints, 0, 100) || 50;
-    let p_index = 50 + (e_greed - m_stress);
-    p_index = Math.max(0, Math.min(100, p_index)) || 50; // NaN 방지
-    let isDebasement = false;
-    if (fx >= 1450 && (i_disparity >= 75 || marginSlope >= 15000 || gold >= 3000)) {
-        isDebasement = true;
-        p_index = Math.max(p_index, 85);
-    }
+    marketData.greedScore = e_greed;
     marketData.reflexivitySynergyPoints = reflexivitySynergyPoints;
     marketData.reflexivityState = reflexivitySynergyPoints >= 15
         ? "runaway"
         : reflexivitySynergyPoints >= 6
             ? "caution"
             : "normal";
-    marketData.debasementAlert = isDebasement;
 
     const flowResult = calculateEuphoriaFlowBonus(marketData);
     marketData.flowBonus = flowResult.flowBonus;
     marketData.flowReason = flowResult.flowReason;
-    p_index = clamp(p_index + flowResult.flowBonus, 0, 100);
+    const rawRiskIndex = clamp(50 + (e_greed - m_stress) + flowResult.flowBonus, 0, 100);
+    const fundamentalSupportScore = Number.isFinite(Number(marketData.fundamentalSupportScore))
+        ? Number(marketData.fundamentalSupportScore)
+        : 50;
+    const supportOffsetPoints = Number.isFinite(Number(marketData.supportOffsetPoints))
+        ? Number(marketData.supportOffsetPoints)
+        : Number((fundamentalSupportScore * 0.3).toFixed(2));
+    let riskIndex = clamp(rawRiskIndex - supportOffsetPoints, 0, 100);
+    let marketRegimeKey = "standard";
+    let marketRegimeLabel = "표준 레짐";
+    let marketRegimeReason = "특수 레짐 조건 없음";
+    let isDebasement = false;
 
-    const riskIndex = p_index;
+    if (fx >= 1450 && i_disparity >= 75) {
+        if (fundamentalSupportScore >= 70) {
+            marketRegimeKey = "secular-expansion";
+            marketRegimeLabel = "Stage 3.5: 실적 정당화형 구조적 확장기 (Secular Expansion)";
+            marketRegimeReason = `원/달러 ${Math.round(fx)}원과 과열 이격이 겹쳐도 F_support ${Math.round(fundamentalSupportScore)}점이 높아 구조적 확장기로 완화했습니다.`;
+            riskIndex = Math.min(riskIndex, 55);
+        } else {
+            marketRegimeKey = "debasement-bubble";
+            marketRegimeLabel = "Stage 6: 화폐 몰락형 특수 버블 (Debasement Bubble)";
+            marketRegimeReason = `원/달러 ${Math.round(fx)}원과 과열 이격이 겹쳤지만 F_support ${Math.round(fundamentalSupportScore)}점이 부족해 특수 버블 경계로 강화했습니다.`;
+            riskIndex = Math.max(riskIndex, 85);
+            isDebasement = true;
+        }
+    }
+
+    marketData.rawRiskIndex = rawRiskIndex;
+    marketData.supportOffsetPoints = supportOffsetPoints;
+    marketData.marketRegimeKey = marketRegimeKey;
+    marketData.marketRegimeLabel = marketRegimeLabel;
+    marketData.marketRegimeReason = marketRegimeReason;
+    marketData.debasementAlert = isDebasement;
+
     const cycleLeg = resolveCycleLeg(marketData.previousRiskIndex, riskIndex, marketData.cycleLeg);
     const trapResult = calculateBullTrapScore({ ...marketData, riskIndex, cycleLeg });
     const stage = resolveCycleStage(riskIndex, vix, cycleLeg, trapResult.trapScore);
@@ -269,8 +300,12 @@ function calculateCycle() {
         stageOverrideReason = `Bull Trap ${trapResult.trapScore}/20으로 하락 2단계(불안·부인)로 오버라이드했습니다.`;
     } else if (trapResult.trapScore >= 10) {
         stageOverrideReason = `Bull Trap ${trapResult.trapScore}/20으로 하락 1단계(안도·자만)로 오버라이드했습니다.`;
+    } else if (marketRegimeKey === "secular-expansion") {
+        stageOverrideReason = marketRegimeReason;
     } else if (isDebasement) {
-        stageOverrideReason = "환율·유동성 왜곡 신호로 P-Index 하단을 환희 구간으로 보정했습니다.";
+        stageOverrideReason = marketRegimeReason;
+    } else if (supportOffsetPoints > 0) {
+        stageOverrideReason = `지지력 보정: raw P ${Math.round(rawRiskIndex)} -> adjusted P ${Math.round(riskIndex)} · F_support ${Math.round(fundamentalSupportScore)}점`;
     }
     marketData.stageOverrideReason = stageOverrideReason;
 
@@ -292,7 +327,7 @@ function calculateCycle() {
     cycleTrapNote.style.color = marketData.trapScore >= 14 ? "#f87171" : marketData.trapScore >= 10 ? "#fb923c" : "#94a3b8";
 
     const cycleScoreNote = document.getElementById("cycle-score-note");
-    cycleScoreNote.innerText = stageOverrideReason || "원형 링의 점 포인터는 현재 단계 내 위치를 표시합니다.";
+    cycleScoreNote.innerText = stageOverrideReason || `raw P ${Math.round(rawRiskIndex)} -> adjusted P ${Math.round(riskIndex)} · F_support ${Math.round(fundamentalSupportScore)} (-${supportOffsetPoints.toFixed(1)})`;
 
     // 코스톨라니 6단계 매핑 — cycleLeg + riskIndex 기반
     const kostolanyMapping = resolveKostolanyStage(cycleLeg, riskIndex, marketData.bullRatio);

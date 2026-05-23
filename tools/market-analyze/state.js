@@ -19,7 +19,10 @@ function createDefaultMarketStatus() {
         anchor: {
             export: createStatusEntry("missing", "artifact", "수출 모멘텀 결과 대기 중"),
             earnings: createStatusEntry("missing", "artifact", "실적 breadth 결과 대기 중"),
-            broadening: createStatusEntry("missing", "artifact", "확산 결과 대기 중")
+            broadening: createStatusEntry("missing", "artifact", "확산 결과 대기 중"),
+            sectorBreadth: createStatusEntry("missing", "artifact", "비반도체 업종 확산 결과 대기 중"),
+            valuation: createStatusEntry("missing", "artifact", "밸류에이션 안정도 결과 대기 중"),
+            support: createStatusEntry("missing", "artifact", "펀더멘털 지지력 결과 대기 중")
         }
     };
 }
@@ -27,13 +30,24 @@ function createDefaultMarketStatus() {
 function createDefaultMarketResultMeta() {
     return {
         resultDate: "",
+        latestDate: "",
         generatedAt: "",
         schemaVersion: "",
         loadedFile: "",
         loadState: "idle",
         loadMessage: "생성 결과 아티팩트를 기다리는 중입니다.",
         sourceLabel: "아티팩트 대기",
-        fallbackUsed: false
+        fallbackUsed: false,
+        availableDates: [],
+        requestedResultDate: "latest",
+        resolvedResultDate: "",
+        loadTargetLabel: "최신 생성본"
+    };
+}
+
+function createDefaultArtifactViewSettings() {
+    return {
+        selectedResultDate: "latest"
     };
 }
 
@@ -45,6 +59,10 @@ let marketData = {
     disparity: 100,
     bullRatio: 50,
     marginSlope: 0,
+    rawRiskIndex: null,
+    macroStressScore: null,
+    greedScore: null,
+    equityOverboughtScore: null,
     riskIndex: null,
     previousRiskIndex: null,
     cycleLeg: "rising",
@@ -82,9 +100,13 @@ let marketData = {
     reflexivitySynergyPoints: 0,
     reflexivityState: "normal",
     debasementAlert: false,
+    supportOffsetPoints: 0,
     fundamentalAnchorScore: null,
     fundamentalAnchorState: "neutral",
     fundamentalAnchorReason: "펀더멘털 앵커 대기 중",
+    fundamentalSupportScore: null,
+    fundamentalSupportState: "neutral",
+    fundamentalSupportReason: "펀더멘털 지지력 대기 중",
     exportLatestMonth: "",
     exportValueUsd: null,
     exportYoY: null,
@@ -101,6 +123,17 @@ let marketData = {
     supportBreadth20d: null,
     supportBreadth60d: null,
     supportPositiveReturnBreadth: null,
+    nonSemiconductorMomentum: null,
+    nonSemiconductorMomentumCoverageCount: 0,
+    nonSemiconductorMomentumPassCount: 0,
+    marketValuationStability: null,
+    marketValuationScore: null,
+    marketValuationCoverageCount: 0,
+    marketValuationForwardPerAvg: null,
+    marketValuationThreshold: 13,
+    marketRegimeKey: "standard",
+    marketRegimeLabel: "표준 레짐",
+    marketRegimeReason: "특수 레짐 조건 대기 중",
     wyckoffDistributionBreadth: null,
     marketEvaluationState: "neutral",
     marketEvaluationLabel: "판단 보류",
@@ -121,6 +154,7 @@ let marketData = {
 
 let marketStatus = createDefaultMarketStatus();
 let marketResultMeta = createDefaultMarketResultMeta();
+let artifactViewSettings = createDefaultArtifactViewSettings();
 
 let analysisSettings = {
     kosisApiKey: "",
@@ -149,6 +183,7 @@ function saveMarketData() {
     localStorage.setItem("marketAnalyzeData", JSON.stringify(marketData));
     localStorage.setItem("marketAnalyzeStatus", JSON.stringify(marketStatus));
     localStorage.setItem("marketAnalyzeResultMeta", JSON.stringify(marketResultMeta));
+    localStorage.setItem("marketAnalyzeViewSettings", JSON.stringify(artifactViewSettings));
     localStorage.setItem("portfolioAnalyzeData", JSON.stringify(portfolioData));
     localStorage.setItem("marketAnalyzeSettings", JSON.stringify(analysisSettings));
 }
@@ -157,6 +192,7 @@ function loadMarketData() {
     const savedMarket = localStorage.getItem("marketAnalyzeData");
     const savedStatus = localStorage.getItem("marketAnalyzeStatus");
     const savedResultMeta = localStorage.getItem("marketAnalyzeResultMeta");
+    const savedViewSettings = localStorage.getItem("marketAnalyzeViewSettings");
     const savedPortfolio = localStorage.getItem("portfolioAnalyzeData");
     const savedSettings = localStorage.getItem("marketAnalyzeSettings");
 
@@ -188,6 +224,15 @@ function loadMarketData() {
         }
     }
 
+    if (savedViewSettings) {
+        try {
+            const parsed = JSON.parse(savedViewSettings);
+            artifactViewSettings = { ...artifactViewSettings, ...parsed };
+        } catch (error) {
+            console.error("결과 로딩 설정 파싱 오류", error);
+        }
+    }
+
     if (savedPortfolio) {
         try {
             const parsed = JSON.parse(savedPortfolio);
@@ -206,5 +251,5 @@ function loadMarketData() {
         }
     }
 
-    return !!(savedMarket || savedStatus || savedResultMeta || savedPortfolio || savedSettings);
+    return !!(savedMarket || savedStatus || savedResultMeta || savedViewSettings || savedPortfolio || savedSettings);
 }

@@ -146,7 +146,10 @@ def main() -> int:
         "[market-analyze] anchor-status: "
         f"export={status['anchor']['export']['state']} / "
         f"earnings={status['anchor']['earnings']['state']} / "
-        f"broadening={status['anchor']['broadening']['state']}"
+        f"broadening={status['anchor']['broadening']['state']} / "
+        f"sectorBreadth={status['anchor']['sectorBreadth']['state']} / "
+        f"valuation={status['anchor']['valuation']['state']} / "
+        f"support={status['anchor']['support']['state']}"
     )
     return 0
 

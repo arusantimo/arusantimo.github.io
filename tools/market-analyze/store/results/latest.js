@@ -1,8 +1,8 @@
 window.__MARKET_ANALYZE_RESULT__ = {
   "meta": {
     "resultDate": "20260523",
-    "generatedAt": "2026-05-23T21:52:21+09:00",
-    "schemaVersion": "1.0.0"
+    "generatedAt": "2026-05-23T23:28:20+09:00",
+    "schemaVersion": "1.1.0"
   },
   "data": {
     "fx": 1507.658018,
@@ -197,9 +197,28 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "supportBreadth20d": 0.7357336641737794,
     "supportBreadth60d": 0.9416250799299397,
     "supportPositiveReturnBreadth": 0.6821843694106964,
+    "nonSemiconductorMomentum": 0.0,
+    "nonSemiconductorMomentumCoverageCount": 1,
+    "nonSemiconductorMomentumPassCount": 0,
+    "marketValuationStability": false,
+    "marketValuationScore": 0,
+    "marketValuationCoverageCount": 25,
+    "marketValuationForwardPerAvg": 32.215952224232794,
+    "marketValuationThreshold": 13.0,
     "fundamentalAnchorScore": 82.0,
     "fundamentalAnchorState": "validated",
-    "fundamentalAnchorReason": "수출 17/35 · 실적 35/35 · 확산 30/30"
+    "fundamentalAnchorReason": "수출 17/35 · 실적 35/35 · 확산 30/30",
+    "fundamentalSupportScore": 25,
+    "fundamentalSupportState": "fragile",
+    "fundamentalSupportReason": "업종 확산 25/50 · 밸류에이션 0/50 · 업종 확산 커버리지 1개로 중립값 · 가중 Fwd PER 32.2배 > 13.0배",
+    "supportOffsetPoints": 7.5,
+    "macroStressScore": 70,
+    "equityOverboughtScore": 100,
+    "greedScore": 82.4,
+    "rawRiskIndex": 62.400000000000006,
+    "marketRegimeKey": "debasement-bubble",
+    "marketRegimeLabel": "Stage 6: 화폐 몰락형 특수 버블 (Debasement Bubble)",
+    "marketRegimeReason": "원/달러 1508원과 과열 이격이 겹쳤지만 F_support 25점이 부족해 특수 버블 경계로 강화했습니다."
   },
   "status": {
     "fx": {
@@ -266,12 +285,27 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "earnings": {
         "state": "partial",
         "source": "store/cache/anchor_earnings.json · opendart.fss.or.kr · finance.naver.com",
-        "message": "실적 breadth 수집 실패 (DART 재무 데이터 확보 실패) · 최근 성공 캐시 사용 (2026-05-23T21:44:10+09:00)"
+        "message": "실적 breadth 수집 실패 (DART 재무 데이터 확보 실패) · 최근 성공 캐시 사용 (2026-05-23T23:19:18+09:00)"
       },
       "broadening": {
         "state": "partial",
         "source": "store/cache/anchor_broadening.json · finance.naver.com/sise_quant · store/market_analyze_data.json · finance.naver.com/fchart 20건",
-        "message": "확산 수집 실패 (비주도주 차트 시계열 확보 실패 (18건)) · 최근 성공 캐시 사용 (2026-05-23T21:44:10+09:00)"
+        "message": "확산 수집 실패 (비주도주 차트 시계열 확보 실패 (18건)) · 최근 성공 캐시 사용 (2026-05-23T23:19:18+09:00)"
+      },
+      "sectorBreadth": {
+        "state": "partial",
+        "source": "store/cache/anchor_sector_breadth.json · https://finance.naver.com/sise/sise_group.naver?type=upjong",
+        "message": "비반도체 업종 확산 수집 실패 (업종 페이지 수집 실패 (<urlopen error [Errno 8] nodename nor servname provided, or not known>)) · 최근 성공 캐시 사용 (2026-05-23T23:19:19+09:00)"
+      },
+      "valuation": {
+        "state": "partial",
+        "source": "store/cache/anchor_valuation.json · finance.naver.com",
+        "message": "밸류에이션 안정도 수집 실패 (유효 Fwd PER 없음) · 최근 성공 캐시 사용 (2026-05-23T23:19:25+09:00)"
+      },
+      "support": {
+        "state": "partial",
+        "source": "store/cache/anchor_sector_breadth.json · https://finance.naver.com/sise/sise_group.naver?type=upjong · store/cache/anchor_valuation.json · finance.naver.com",
+        "message": "업종 확산 25/50 · 밸류에이션 0/50 · 업종 확산 커버리지 1개로 중립값 · 가중 Fwd PER 32.2배 > 13.0배"
       }
     }
   }
