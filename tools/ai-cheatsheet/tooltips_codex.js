@@ -165,9 +165,9 @@ window.CODEX_TIPS = {
     "example": "codex mcp-server\ncodex mcp-server --stdio"
   },
   "codex remote-control": {
-    "title": "codex remote-control — 헤드리스 원격 제어용 서버",
-    "desc": "헤드리스 원격 제어용 app-server를 시작합니다. 다른 환경(UI나 에이전트 등)에서 백그라운드의 Codex를 원격 제어할 수 있습니다.",
-    "example": "codex remote-control"
+    "title": "codex remote-control — 원격 제어 포그라운드 대기 및 데몬 관리",
+    "desc": "포그라운드 모드로 실행되어 준비 상태를 대기하고 머신 상태를 보고합니다. 백그라운드 구동을 위해 데몬 스타일 start/stop 커맨드도 지원합니다.",
+    "example": "codex remote-control\ncodex remote-control start\ncodex remote-control stop"
   },
   "codex cloud exec --env ENV_ID": {
     "title": "codex cloud exec — 클라우드 환경에서 실행",
@@ -590,8 +590,8 @@ window.CODEX_TIPS = {
     "example": "deny-read = [\"env.*\", \"secrets/*\"]"
   },
   "/goal": {
-    "title": "/goal — 장기 목표 워크플로",
-    "desc": "app-server API와 연동하여 영구적으로 유지되는 장기 목표(goal)를 관리합니다. 일시정지, 재개, 초기화 등 TUI 컨트롤을 지원합니다.",
+    "title": "/goal — 장기 목표 워크플로 (기본 활성화)",
+    "desc": "기본적으로 활성화되어 작동하는 장기 목표(goal)를 관리합니다. 전용 데이터베이스 스토리지에 백업되며 일시정지, 재개, 초기화 등 TUI 컨트롤을 지원합니다.",
     "example": "/goal\n/goal pause\n/goal resume"
   }
 }

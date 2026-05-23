@@ -9,41 +9,62 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.132.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-20</span>
+        <span class="meta-version">v0.133.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-21</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.132.0)</span>
+        <span>📋 최근 변경사항 (v0.133.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Python SDK 인증 지원 (v0.132.0)"
-            data-tt-desc="Python SDK에 API 키 로그인, ChatGPT 브라우저 및 디바이스 코드 플로우, 계정 확인 및 로그아웃 API가 지원됩니다."
-            data-tt-example="">Python SDK 인증 확장 — API 키, ChatGPT, 디바이스 코드 플로우 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="codex exec resume --output-schema (v0.132.0)"
-            data-tt-desc="codex exec resume에 --output-schema 옵션이 추가되었습니다. 세션 컨텍스트를 유지하면서 구조화된 JSON 출력을 강제할 수 있습니다."
-            data-tt-example="codex exec resume --output-schema schema.json"><code>codex exec resume --output-schema</code> 옵션 추가 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="TUI 시작 속도 개선 (v0.132.0)"
-            data-tt-desc="TUI 시작 시 터미널 성능 프로브가 일괄 처리되어 첫 번째 인터랙티브 프레임 이전에 여러 시리얼 채크를 기다리는 시간이 없어졌습니다."
-            data-tt-example="">TUI 시작 속도 개선 — 터미널 프로브 일괄 처리 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="원격 실행기 인증 단순화 (v0.132.0)"
-            data-tt-desc="원격 실행기 등록 시 별도 레지스트리 커넥션 플로우 없이 Codex 표준 인증을 사용할 수 있습니다."
-            data-tt-example="">원격 실행기 등록에 Codex 표준 인증 사용 가능 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Windows 안정성 개선 (v0.132.0)"
-            data-tt-desc="codex doctor가 npm 관리 설치를 올바르게 감지하며, MSVC 릴리스 바이너리가 별도 VC++ 런타임 DLL 없이 실행됩니다."
-            data-tt-example="">Windows: <code>codex doctor</code> npm 감지 수정 및 MSVC 정적 링크 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="메모리 요약 버전 관리 (v0.132.0)"
-            data-tt-desc="메모리 요약이 버전이 지정되어 저장 형식이 오래되면 자동으로 재생성됩니다."
-            data-tt-example="">메모리 요약 버전 관리 — 오래된 형식 자동 재생성 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="장기 목표(Goals) 기능 기본 활성화 (v0.133.0)"
+            data-tt-desc="장기 목표(Goals) 기능이 기본적으로 활성화되었습니다. 전용 데이터베이스 스토리지에 백업되며 활성 턴 전반에 걸쳐 진행 상황을 추적합니다."
+            data-tt-example="">장기 목표(Goals) 기능 기본 활성화 및 전용 스토리지 백업 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex remote-control 포그라운드 전환 (v0.133.0)"
+            data-tt-desc="remote-control 명령어가 이제 포그라운드 모드로 실행되어 준비 상태를 대기하고 머신 상태를 보고합니다. 백그라운드 구동을 위한 명시적인 데몬 스타일 start/stop 커맨드가 제공됩니다."
+            data-tt-example="codex remote-control"><code>codex remote-control</code> — 포그라운드 전환 및 데몬 스타일 start/stop 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="권한 프로필(Permission profiles) 기능 강화 (v0.133.0)"
+            data-tt-desc="권한 프로필에 list API가 추가되었고 상속 메커니즘이 도입되었습니다. managed requirements.toml 지원 및 런타임 새로고침, Windows 샌드박스 통합이 강화되었습니다."
+            data-tt-example="codex permissions list">권한 프로필(Permission Profiles) list API, 상속, requirements.toml 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="플러그인 탐색(Plugin Discovery) 개선 (v0.133.0)"
+            data-tt-desc="플러그인 검색 및 조회가 한층 쉬워졌습니다. 마켓플레이스 정보를 반영한 표(tabular) 형식 리스트 출력, 설치 버전 및 마켓플레이스 루트 표시, 원격 플러그인 컬렉션 지원이 추가되었습니다."
+            data-tt-example="codex plugins list">플러그인 디스커버리 개선 — 표 형식 출력 및 원격 컬렉션 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="확장 기능 생명주기 이벤트 확장 (v0.133.0)"
+            data-tt-desc="Codex 확장이 서브에이전트 시작/종료, 도구 실행, 턴 메타데이터, 비동기 승인 및 턴 프로세싱 등 다양한 생명주기 이벤트를 관찰할 수 있도록 지원합니다."
+            data-tt-example="">확장(Extensions) 생명주기 관찰 지원 — 서브에이전트 제어, 비동기 승인 이벤트 등 (v0.133.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.132.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Python SDK 인증 지원 (v0.132.0)"
+                data-tt-desc="Python SDK에 API 키 로그인, ChatGPT 브라우저 및 디바이스 코드 플로우, 계정 확인 및 로그아웃 API가 지원됩니다."
+                data-tt-example="">Python SDK 인증 확장 — API 키, ChatGPT, 디바이스 코드 플로우</li>
+              <li class="cl-tip" data-tt-title="codex exec resume --output-schema (v0.132.0)"
+                data-tt-desc="codex exec resume에 --output-schema 옵션이 추가되었습니다. 세션 컨텍스트를 유지하면서 구조화된 JSON 출력을 강제할 수 있습니다."
+                data-tt-example="codex exec resume --output-schema schema.json"><code>codex exec resume --output-schema</code> 옵션 추가</li>
+              <li class="cl-tip" data-tt-title="TUI 시작 속도 개선 (v0.132.0)"
+                data-tt-desc="TUI 시작 시 터미널 성능 프로브가 일괄 처리되어 첫 번째 인터랙티브 프레임 이전에 여러 시리얼 채크를 기다리는 시간이 없어졌습니다."
+                data-tt-example="">TUI 시작 속도 개선 — 터미널 프로브 일괄 처리</li>
+              <li class="cl-tip" data-tt-title="원격 실행기 인증 단순화 (v0.132.0)"
+                data-tt-desc="원격 실행기 등록 시 별도 레지스트리 커넥션 플로우 없이 Codex 표준 인증을 사용할 수 있습니다."
+                data-tt-example="">원격 실행기 등록에 Codex 표준 인증 사용 가능</li>
+              <li class="cl-tip" data-tt-title="Windows 안정성 개선 (v0.132.0)"
+                data-tt-desc="codex doctor가 npm 관리 설치를 올바르게 감지하며, MSVC 릴리스 바이너리가 별도 VC++ 런타임 DLL 없이 실행됩니다."
+                data-tt-example="">Windows: <code>codex doctor</code> npm 감지 수정 및 MSVC 정적 링크</li>
+              <li class="cl-tip" data-tt-title="메모리 요약 버전 관리 (v0.132.0)"
+                data-tt-desc="메모리 요약이 버전이 지정되어 저장 형식이 오래되면 자동으로 재생성됩니다."
+                data-tt-example="">메모리 요약 버전 관리 — 오래된 형식 자동 재생성</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.131.0</summary>
@@ -204,7 +225,7 @@ const codexContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>codex exec resume --output-schema</code></div>
-                <div class="row-desc">세션 재개 + 구조화 출력 강제 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">세션 재개 + 구조화 출력 강제</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>codex resume --last</code></div>
@@ -333,8 +354,8 @@ const codexContent = `
                 <div class="row-desc">Codex 자체를 MCP 서버로 실행</div>
               </div>
               <div class="row cl-tip">
-                <div class="row-key"><code>codex remote-control</code></div>
-                <div class="row-desc">헤드리스 원격 제어용 서버 시작</div>
+                <div class="row-key"><code>codex remote-control</code> <span class="badge-new">NEW</span></div>
+                <div class="row-desc">포그라운드 대기 및 데몬식 start/stop 지원</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>codex cloud exec --env ENV_ID</code></div>

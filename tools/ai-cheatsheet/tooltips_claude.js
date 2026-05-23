@@ -1,8 +1,8 @@
 window.CLAUDE_TIPS = {
-  "/simplify": {
-    "title": "/simplify — 병렬 코드 리뷰",
-    "desc": "병렬 에이전트 3개가 동시에 코드를 분석해 단순화·개선 제안을 제공합니다. 코드 복잡도 감소와 가독성 개선에 특화된 내장 스킬입니다.",
-    "example": "/simplify\n/simplify src/auth.ts  # 특정 파일 지정"
+  "/code-review": {
+    "title": "/code-review — 코드 리뷰 스킬",
+    "desc": "코드를 분석해 지정한 effort 레벨(e.g., /code-review high)에 맞춰 검토 결과를 보고하며, --comment 플래그로 GitHub PR에 인라인 코멘트로 결과를 달 수 있습니다. 기존의 /simplify가 변경되었습니다.",
+    "example": "/code-review\n/code-review high --comment"
   },
   "/batch": {
     "title": "/batch — 대규모 병렬 변경",
@@ -475,8 +475,8 @@ window.CLAUDE_TIPS = {
     "example": "/remote-control\n/remote-control my-session-name"
   },
   "/usage": {
-    "title": "/usage — 플랜 한도 & 상태",
-    "desc": "현재 플랜의 사용량, 남은 한도, 리셋 시간 등을 표시합니다. Pro/Max/Team 사용자의 5시간·7일 한도를 확인합니다.",
+    "title": "/usage — 플랜 한도 & 상세 비용 분석",
+    "desc": "현재 플랜의 사용량, 남은 한도, 리셋 시간 및 limits 사용을 유발하는 카테고리별(skills, subagents, plugins, MCP-server) 비용 세분화 분석을 표시합니다.",
     "example": "/usage"
   },
   "/schedule": {
