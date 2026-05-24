@@ -2,7 +2,10 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
+import shutil
+import subprocess
 from dataclasses import dataclass
 from typing import Any, Dict, Iterable, List, Optional
 from urllib.error import HTTPError, URLError
@@ -16,6 +19,8 @@ USER_AGENT = (
 
 NAVER_ENCODING = "euc-kr"
 FLOW_WINDOW_DAYS = 10
+CURL_PATH = shutil.which("curl")
+CURL_FALLBACK_ENABLED = os.environ.get("MARKET_ANALYZE_DISABLE_CURL_FALLBACK", "").strip().lower() not in {"1", "true", "yes"}
 
 
 @dataclass
@@ -28,10 +33,93 @@ def status_entry(state: str, source: str, message: str) -> Dict[str, str]:
     return {"state": state, "source": source, "message": message}
 
 
-def make_request(url: str, timeout: int = 10) -> bytes:
+def normalize_request_error(error: Any) -> str:
+    raw = str(error or "").strip()
+    normalized = re.sub(r"^<urlopen error\s*", "", raw, flags=re.IGNORECASE).rstrip(">").strip()
+    if not normalized:
+        normalized = raw or "요청 실패"
+
+    while True:
+        deduped = re.sub(r"^DNS 해석 실패 \((DNS 해석 실패 .*)\)$", r"\1", normalized, flags=re.IGNORECASE)
+        if deduped == normalized:
+            break
+        normalized = deduped
+
+    if normalized.startswith("DNS 해석 실패"):
+        return normalized
+
+    if re.search(r"nodename nor servname provided|name or service not known|temporary failure in name resolution", normalized, flags=re.IGNORECASE):
+        return f"DNS 해석 실패 ({normalized})"
+    if re.search(r"Could not resolve host", normalized, flags=re.IGNORECASE):
+        return f"DNS 해석 실패 ({normalized})"
+    return normalized
+
+
+def make_urllib_request(url: str, timeout: int = 10) -> bytes:
     request = Request(url, headers={"User-Agent": USER_AGENT})
     with urlopen(request, timeout=timeout) as response:
         return response.read()
+
+
+def make_curl_request(url: str, timeout: int = 10) -> bytes:
+    if not CURL_PATH or not CURL_FALLBACK_ENABLED:
+        raise URLError("curl fallback unavailable")
+
+    command = [
+        CURL_PATH,
+        "--fail",
+        "--silent",
+        "--show-error",
+        "--location",
+        "--compressed",
+        "--connect-timeout",
+        str(max(3, int(timeout))),
+        "--max-time",
+        str(max(5, int(timeout) + 3)),
+        "--retry",
+        "1",
+        "--retry-delay",
+        "1",
+        "--user-agent",
+        USER_AGENT,
+        url,
+    ]
+    completed = subprocess.run(
+        command,
+        check=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=False,
+    )
+    return completed.stdout
+
+
+def make_request(url: str, timeout: int = 10) -> bytes:
+    primary_error: Optional[Exception] = None
+    try:
+        return make_urllib_request(url, timeout=timeout)
+    except (HTTPError, URLError, TimeoutError, OSError, ValueError) as error:
+        primary_error = error
+
+    if CURL_PATH and CURL_FALLBACK_ENABLED:
+        try:
+            return make_curl_request(url, timeout=timeout)
+        except (subprocess.CalledProcessError, OSError, URLError) as curl_error:
+            curl_message = ""
+            if isinstance(curl_error, subprocess.CalledProcessError):
+                stderr = (curl_error.stderr or b"").decode("utf-8", errors="ignore").strip()
+                curl_message = stderr or f"exit {curl_error.returncode}"
+            else:
+                curl_message = str(curl_error)
+            raise URLError(
+                f"{normalize_request_error(primary_error)}; curl 우회 실패 ({normalize_request_error(curl_message)})"
+            ) from curl_error
+
+    if primary_error is None:
+        raise URLError("알 수 없는 요청 실패")
+    if isinstance(primary_error, URLError):
+        raise primary_error
+    raise URLError(str(primary_error)) from primary_error
 
 
 def fetch_text(url: str, *, timeout: int = 10, encodings: Optional[Iterable[str]] = None) -> str:
@@ -145,9 +233,9 @@ def collect_fx(base_data: Dict[str, Any]) -> CollectorResult:
         if safe_number(base_data.get("fx")) is not None:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"환율 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"환율 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "open.er-api.com", f"환율 수집 실패 ({error})"))
+        return CollectorResult({}, status_entry("error", "open.er-api.com", f"환율 수집 실패 ({normalize_request_error(error)})"))
 
 
 def collect_vix(base_data: Dict[str, Any]) -> CollectorResult:
@@ -164,9 +252,9 @@ def collect_vix(base_data: Dict[str, Any]) -> CollectorResult:
         if safe_number(base_data.get("vix")) is not None:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"VIX 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"VIX 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"VIX 수집 실패 ({error})"))
+        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"VIX 수집 실패 ({normalize_request_error(error)})"))
 
 
 def collect_gold(base_data: Dict[str, Any]) -> CollectorResult:
@@ -183,9 +271,9 @@ def collect_gold(base_data: Dict[str, Any]) -> CollectorResult:
         if safe_number(base_data.get("gold")) is not None:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"금 시세 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"금 시세 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"금 시세 수집 실패 ({error})"))
+        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"금 시세 수집 실패 ({normalize_request_error(error)})"))
 
 
 def collect_disparity(base_data: Dict[str, Any]) -> CollectorResult:
@@ -205,9 +293,9 @@ def collect_disparity(base_data: Dict[str, Any]) -> CollectorResult:
         if safe_number(base_data.get("disparity")) is not None:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"이격도 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"이격도 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"이격도 수집 실패 ({error})"))
+        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"이격도 수집 실패 ({normalize_request_error(error)})"))
 
 
 def parse_investor_flow_bizdate(html: str) -> Optional[str]:
@@ -302,9 +390,9 @@ def collect_flow(base_data: Dict[str, Any]) -> CollectorResult:
         if flow_available:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"시장 수급 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"시장 수급 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "finance.naver.com", f"시장 수급 수집 실패 ({error})"))
+        return CollectorResult({}, status_entry("error", "finance.naver.com", f"시장 수급 수집 실패 ({normalize_request_error(error)})"))
 
 
 def parse_margin_history_rows(html: str, limit: int = 20) -> List[Dict[str, Optional[float]]]:
@@ -405,9 +493,9 @@ def collect_margin(base_data: Dict[str, Any]) -> CollectorResult:
         if margin_available:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"신용/예탁금 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"신용/예탁금 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "finance.naver.com", f"신용/예탁금 수집 실패 ({error})"))
+        return CollectorResult({}, status_entry("error", "finance.naver.com", f"신용/예탁금 수집 실패 ({normalize_request_error(error)})"))
 
 
 def collect_export_indicator(base_data: Dict[str, Any]) -> CollectorResult:
@@ -442,6 +530,6 @@ def collect_export_indicator(base_data: Dict[str, Any]) -> CollectorResult:
         if export_available:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"수출 지표 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"수출 지표 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("missing", "kosis.kr", f"수출 지표 미수집 ({error})"))
+        return CollectorResult({}, status_entry("missing", "kosis.kr", f"수출 지표 미수집 ({normalize_request_error(error)})"))

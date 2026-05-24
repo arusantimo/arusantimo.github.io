@@ -21,6 +21,7 @@ from .collectors import (
     has_value,
     make_request,
     normalize_date_key,
+    normalize_request_error,
     parse_signed_number,
     safe_number,
     status_entry,
@@ -92,6 +93,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 STORE_DIR = ROOT_DIR / "store"
 CACHE_DIR = STORE_DIR / "cache"
 RESULTS_DIR = STORE_DIR / "results"
+EXPORT_SEED_PATH = STORE_DIR / "export_seed.json"
 DART_CORP_MAP_CACHE_PATH = CACHE_DIR / "dart_corp_map.json"
 DART_CORP_MAP_META_PATH = CACHE_DIR / "dart_corp_map_meta.json"
 ANCHOR_COMPONENT_CACHE_PATHS = {
@@ -274,6 +276,31 @@ def load_anchor_component_cache(component: str) -> Optional[Dict[str, Any]]:
     return payload
 
 
+def load_export_seed_payload() -> Optional[Dict[str, Any]]:
+    if not EXPORT_SEED_PATH.exists():
+        return None
+    try:
+        payload = json.loads(EXPORT_SEED_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    data_patch = {
+        "exportLatestMonth": str(payload.get("exportLatestMonth") or ""),
+        "exportValueUsd": safe_number(payload.get("exportValueUsd")),
+        "exportYoY": safe_number(payload.get("exportYoY")),
+        "exportYoYDelta": safe_number(payload.get("exportYoYDelta")),
+        "export3mAvgYoY": safe_number(payload.get("export3mAvgYoY")),
+    }
+    if not anchor_component_has_values("export", data_patch):
+        return None
+    return {
+        "savedAt": str(payload.get("savedAt") or ""),
+        "source": str(payload.get("source") or to_store_relative(EXPORT_SEED_PATH)),
+        "dataPatch": data_patch,
+    }
+
+
 def extract_anchor_component_patch(component: str, data: Dict[str, Any]) -> Dict[str, Any]:
     if component == "export":
         return {
@@ -396,6 +423,22 @@ def build_cached_component_result(component: str, live_error_message: str) -> Op
         status_entry(
             "partial",
             " · ".join(part for part in source_parts if part),
+            f"{live_error_message}{suffix}",
+        ),
+    )
+
+
+def build_export_seed_result(live_error_message: str) -> Optional[CollectorResult]:
+    payload = load_export_seed_payload()
+    if not payload:
+        return None
+    saved_at = str(payload.get("savedAt") or "")
+    suffix = f" · 기본 수출 시드 사용 ({saved_at})" if saved_at else " · 기본 수출 시드 사용"
+    return CollectorResult(
+        dict(payload.get("dataPatch") or {}),
+        status_entry(
+            "partial",
+            str(payload.get("source") or to_store_relative(EXPORT_SEED_PATH)),
             f"{live_error_message}{suffix}",
         ),
     )
@@ -828,7 +871,7 @@ def collect_export_from_tradingeconomics(page_data: Optional[Dict[str, Any]] = N
                     "partial",
                     "kosis.kr",
                     (f"{reason} · " if reason else "")
-                    + f"TradingEconomics 보완도 실패 ({error}) · 최신 발표월/레벨만 반영",
+                    + f"TradingEconomics 보완도 실패 ({normalize_request_error(error)}) · 최신 발표월/레벨만 반영",
                 ),
             )
         return None
@@ -863,6 +906,9 @@ def collect_export_momentum(base_data: Dict[str, Any], settings: Optional[Dict[s
         cached_result = build_cached_component_result("export", "KOSIS API 키 미입력 · TradingEconomics 보완 실패")
         if cached_result:
             return cached_result
+        seed_result = build_export_seed_result("KOSIS API 키 미입력 · TradingEconomics 보완 실패")
+        if seed_result:
+            return seed_result
         return CollectorResult(
             merge_export_patch_with_cache(build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd"))),
             status_entry(
@@ -901,16 +947,19 @@ def collect_export_momentum(base_data: Dict[str, Any], settings: Optional[Dict[s
         save_anchor_component_cache("export", result.data_patch, result.status.get("source", ""))
         return result
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
-        te_result = collect_export_from_tradingeconomics(page_data, f"KOSIS 시계열 조회 실패 ({error})")
+        te_result = collect_export_from_tradingeconomics(page_data, f"KOSIS 시계열 조회 실패 ({normalize_request_error(error)})")
         if te_result:
             return te_result
-        cached_result = build_cached_component_result("export", f"수출 모멘텀 수집 실패 ({error})")
+        cached_result = build_cached_component_result("export", f"수출 모멘텀 수집 실패 ({normalize_request_error(error)})")
         if cached_result:
             return cached_result
+        seed_result = build_export_seed_result(f"수출 모멘텀 수집 실패 ({normalize_request_error(error)})")
+        if seed_result:
+            return seed_result
         if page_data.get("latestMonth") or page_data.get("exportValueUsd") is not None:
             return CollectorResult(
                 merge_export_patch_with_cache(build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd"))),
-                status_entry("partial", "kosis.kr", f"KOSIS 시계열 조회 실패 ({error}) · 최신 발표월/레벨만 반영"),
+                status_entry("partial", "kosis.kr", f"KOSIS 시계열 조회 실패 ({normalize_request_error(error)}) · 최신 발표월/레벨만 반영"),
             )
 
         export_available = bool(base_data.get("exportLatestMonth")) or has_value(
@@ -925,10 +974,10 @@ def collect_export_momentum(base_data: Dict[str, Any], settings: Optional[Dict[s
                 status_entry(
                     "partial",
                     "store/market_analyze_data.json",
-                    f"수출 모멘텀 수집 실패 ({error}) · 기존 스냅샷 유지",
+                    f"수출 모멘텀 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지",
                 ),
             )
-        return CollectorResult(build_export_patch(), status_entry("error", "kosis.kr/openapi", f"수출 모멘텀 수집 실패 ({error})"))
+        return CollectorResult(build_export_patch(), status_entry("error", "kosis.kr/openapi", f"수출 모멘텀 수집 실패 ({normalize_request_error(error)})"))
 
 
 def dedupe_candidates(candidates: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -2280,18 +2329,18 @@ def collect_earnings_breadth(
         naver_result = collect_earnings_from_naver(
             target_universe,
             total_trading_value,
-            f"OpenDART 수집 실패 ({error})",
+            f"OpenDART 수집 실패 ({normalize_request_error(error)})",
         )
         if naver_result:
             return naver_result
         fnguide_result = collect_earnings_from_fnguide(
             target_universe,
             total_trading_value,
-            f"OpenDART 수집 실패 ({error}) · 네이버 기업실적분석 보완 실패",
+            f"OpenDART 수집 실패 ({normalize_request_error(error)}) · 네이버 기업실적분석 보완 실패",
         )
         if fnguide_result:
             return fnguide_result
-        cached_result = build_cached_component_result("earnings", f"실적 breadth 수집 실패 ({error})")
+        cached_result = build_cached_component_result("earnings", f"실적 breadth 수집 실패 ({normalize_request_error(error)})")
         if cached_result:
             return cached_result
         earnings_available = (base_data.get("earningsCoverageCount") or 0) > 0 or has_value(
@@ -2303,9 +2352,9 @@ def collect_earnings_breadth(
         if earnings_available:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"실적 breadth 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"실적 breadth 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult(build_neutral_earnings_patch(), status_entry("error", "opendart.fss.or.kr", f"실적 breadth 수집 실패 ({error})"))
+        return CollectorResult(build_neutral_earnings_patch(), status_entry("error", "opendart.fss.or.kr", f"실적 breadth 수집 실패 ({normalize_request_error(error)})"))
 
 
 def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
@@ -2374,7 +2423,7 @@ def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
         save_anchor_component_cache("sectorBreadth", result.data_patch, result.status.get("source", ""))
         return result
     except (HTTPError, URLError, TimeoutError, ValueError) as error:
-        cached_result = build_cached_component_result("sectorBreadth", f"비반도체 업종 확산 수집 실패 ({error})")
+        cached_result = build_cached_component_result("sectorBreadth", f"비반도체 업종 확산 수집 실패 ({normalize_request_error(error)})")
         if cached_result:
             return cached_result
         sector_available = (base_data.get("nonSemiconductorMomentumCoverageCount") or 0) > 0 or has_value(
@@ -2383,11 +2432,11 @@ def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
         if sector_available:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"비반도체 업종 확산 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"비반도체 업종 확산 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
         return CollectorResult(
             build_neutral_sector_breadth_patch(),
-            status_entry("error", "finance.naver.com/sise_group", f"비반도체 업종 확산 수집 실패 ({error})"),
+            status_entry("error", "finance.naver.com/sise_group", f"비반도체 업종 확산 수집 실패 ({normalize_request_error(error)})"),
         )
 
 
@@ -2657,7 +2706,7 @@ def collect_broadening(
         save_anchor_component_cache("broadening", result.data_patch, result.status.get("source", ""))
         return result
     except (HTTPError, URLError, TimeoutError, ValueError) as error:
-        cached_result = build_cached_component_result("broadening", f"확산 수집 실패 ({error})")
+        cached_result = build_cached_component_result("broadening", f"확산 수집 실패 ({normalize_request_error(error)})")
         if cached_result:
             return cached_result
         broadening_available = has_value(
@@ -2669,7 +2718,7 @@ def collect_broadening(
         if broadening_available:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"확산 수집 실패 ({error}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"확산 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
         universes = universes or {}
         return CollectorResult(
@@ -2677,7 +2726,7 @@ def collect_broadening(
             status_entry(
                 "error",
                 universes.get("historyAttemptSourceSummary") or "finance.naver.com/fchart · query1.finance.yahoo.com",
-                f"확산 수집 실패 ({error})",
+                f"확산 수집 실패 ({normalize_request_error(error)})",
             ),
         )
 

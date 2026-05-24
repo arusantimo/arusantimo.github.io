@@ -69,6 +69,9 @@ function compactStatusMessage(message, options = {}) {
         .replace(/\s+/g, " ")
         .replace(/최근 성공 캐시 사용 \([^)]*\)/g, "최근 성공 캐시 사용")
         .replace(/기존 스냅샷 유지 \([^)]*\)/g, "기존 스냅샷 유지")
+        .replace(/DNS 해석 실패 \(\[Errno \d+\][^)]+\)/gi, "DNS 해석 실패")
+        .replace(/curl 우회 실패 \(DNS 해석 실패 \([^)]+\)\)/gi, "curl 우회 실패")
+        .replace(/curl 우회 실패 \([^)]+\)/gi, "curl 우회 실패")
         .replace(/\(<urlopen error[^>]*>\)/gi, "네트워크 연결 오류")
         .replace(/<urlopen error[^>]*>/gi, "네트워크 연결 오류")
         .replace(/\[Errno \d+\][^)·]+/gi, "네트워크 연결 오류")
@@ -94,6 +97,53 @@ function compactStatusMessage(message, options = {}) {
     return text || fallback;
 }
 
+function formatStatusLabelList(labels, limit = 4) {
+    const uniqueLabels = [...new Set((labels || []).filter(Boolean))];
+    if (!uniqueLabels.length) return "";
+    if (uniqueLabels.length <= limit) return uniqueLabels.join(", ");
+    return `${uniqueLabels.slice(0, limit).join(", ")} 외 ${uniqueLabels.length - limit}개`;
+}
+
+function buildStatusOverviewMessage(statusItems = [], options = {}) {
+    const okMessage = options.okMessage || "핵심 모델 근거가 모두 채워진 상태입니다.";
+    const emptyMessage = options.emptyMessage || "상태 정보가 없습니다.";
+    const labelLimit = Number.isFinite(options.labelLimit) ? options.labelLimit : 4;
+    const items = statusItems
+        .map((item, index) => {
+            if (!item) return null;
+            if (item.entry) {
+                return {
+                    label: item.label || `항목 ${index + 1}`,
+                    entry: normalizeStatusEntry(item.entry)
+                };
+            }
+            return {
+                label: item.label || `항목 ${index + 1}`,
+                entry: normalizeStatusEntry(item)
+            };
+        })
+        .filter(Boolean);
+
+    if (!items.length) return emptyMessage;
+
+    const problems = items.filter(item => item.entry.state !== "ok");
+    if (!problems.length) return okMessage;
+
+    const missingOrError = problems.filter(item => item.entry.state === "missing" || item.entry.state === "error");
+    const partial = problems.filter(item => item.entry.state === "partial");
+    const hasOfflineFallback = problems.some(item => /DNS\/네트워크 프리플라이트 실패|최근 성공 (스냅샷|캐시|생성본) 사용|기존 스냅샷 기준|라이브 수집 건너뜀/.test(String(item.entry.message || "")));
+    const parts = [];
+
+    if (missingOrError.length) {
+        parts.push(`직접 확인 필요: ${formatStatusLabelList(missingOrError.map(item => item.label), labelLimit)}`);
+    }
+    if (partial.length) {
+        parts.push(`${hasOfflineFallback ? "최근 성공 데이터 기준" : "부분 근거"}: ${formatStatusLabelList(partial.map(item => item.label), labelLimit)}`);
+    }
+
+    return parts.join(" · ") || okMessage;
+}
+
 function getStatusBadgeClass(state) {
     if (state === "ok") return "panel-status-badge is-ok";
     if (state === "partial") return "panel-status-badge is-partial";
@@ -114,13 +164,13 @@ function setStatusBadge(targetId, statusEntry) {
     if (!target || !statusEntry) return;
     target.className = getStatusBadgeClass(statusEntry.state);
     target.innerText = getStatusStateLabel(statusEntry.state);
-    target.title = statusEntry.message || "";
+    target.title = compactStatusMessage(statusEntry.message, { maxLength: 140, maxClauses: 3, fallback: "" });
 }
 
 function setStatusMessage(targetId, statusEntry, fallbackMessage = "-") {
     const target = document.getElementById(targetId);
     if (!target) return;
-    target.innerText = statusEntry?.message || fallbackMessage;
+    target.innerText = compactStatusMessage(statusEntry?.message, { maxLength: 120, maxClauses: 3, fallback: fallbackMessage });
 }
 
 function setMetricDisplay(targetId, text, className) {
@@ -308,7 +358,7 @@ function renderDataLoadStatus() {
             <span class="${getStatusBadgeClass(entry.state)}">${getStatusStateLabel(entry.state)}</span>
             <div>
                 <div class="artifact-problem-label">${entry.label}</div>
-                <div class="artifact-problem-message">${escapeHtml(entry.message)}</div>
+                <div class="artifact-problem-message">${escapeHtml(compactStatusMessage(entry.message, { maxLength: 120, maxClauses: 3, fallback: "-" }))}</div>
             </div>
         </div>
     `).join("");
@@ -868,13 +918,21 @@ function renderMarketEvaluationView() {
     const statusMessageEl = document.getElementById("market-evaluation-status-message");
     const anchorStatusSummary = summarizeAnchorDisplayStatus();
     const supportStatusSummary = summarizeSupportDisplayStatus();
+    const coreStatusItems = [
+        { label: "소로스", entry: marketStatus.soros },
+        { label: "민스키", entry: marketStatus.minsky },
+        { label: "코스톨라니", entry: marketStatus.kostolany },
+        { label: "와이코프", entry: marketStatus.wyckoff },
+        { label: "펀더멘털 앵커", entry: anchorStatusSummary }
+    ];
     const coreStatusSummary = summarizeStatusEntries([
-        marketStatus.soros,
-        marketStatus.minsky,
-        marketStatus.kostolany,
-        marketStatus.wyckoff,
-        anchorStatusSummary
+        ...coreStatusItems.map(item => item.entry)
     ]);
+    const coreStatusMessage = buildStatusOverviewMessage(coreStatusItems, {
+        okMessage: "핵심 모델 근거가 모두 채워진 상태입니다.",
+        emptyMessage: "일부 모델은 부분/누락 근거로 계산됩니다.",
+        labelLimit: 4
+    });
     const problemSummary = getProblemSummaryText();
 
     labelEl.innerText = marketData.marketEvaluationLabel || "판단 보류";
@@ -883,9 +941,7 @@ function renderMarketEvaluationView() {
     narrativeEl.innerText = marketData.marketFlowNarrative || "생성된 결과 아티팩트를 바탕으로 현재 시장 흐름을 정리합니다.";
     if (statusBadgeEl) setStatusBadge("market-evaluation-status", coreStatusSummary);
     if (statusMessageEl) {
-        statusMessageEl.innerText = coreStatusSummary.state === "ok"
-            ? "핵심 모델 근거가 모두 채워진 상태입니다."
-            : coreStatusSummary.message || "일부 모델은 부분/누락 근거로 계산됩니다.";
+        statusMessageEl.innerText = coreStatusMessage;
     }
     chipsEl.innerHTML = [
         buildMarketChipHtml(
