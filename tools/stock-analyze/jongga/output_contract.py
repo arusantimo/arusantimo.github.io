@@ -13,6 +13,12 @@ try:
 except ZoneInfoNotFoundError:
     KST = timezone(timedelta(hours=9), name="KST")
 STRATEGY_ORDER = ("pullback", "momentum", "reversal", "swing")
+VARIANT_STABLE = "stable"
+VARIANT_CANARY = "canary"
+VARIANT_LABELS = {
+    VARIANT_STABLE: "현재 버전",
+    VARIANT_CANARY: "카나리",
+}
 
 
 def resolve_analysis_date(value: str | None = None) -> date:
@@ -27,25 +33,47 @@ def compact_date(value: date | str) -> str:
     return value.strftime("%Y%m%d")
 
 
-def build_daily_output_paths(out_dir: str | Path, analysis_date: date) -> tuple[Path, Path]:
+def normalize_variant(value: str | None = None) -> str:
+    text = str(value or VARIANT_STABLE).strip().lower()
+    return VARIANT_CANARY if text == VARIANT_CANARY else VARIANT_STABLE
+
+
+def variant_label(value: str | None = None) -> str:
+    return VARIANT_LABELS[normalize_variant(value)]
+
+
+def variant_suffix(value: str | None = None) -> str:
+    variant = normalize_variant(value)
+    return "" if variant == VARIANT_STABLE else f"_{variant}"
+
+
+def bridge_namespace(value: str | None = None) -> str:
+    variant = normalize_variant(value)
+    return "window.JONGGA_DAILY_DATA" if variant == VARIANT_STABLE else "window.JONGGA_CANARY_DAILY_DATA"
+
+
+def build_daily_output_paths(out_dir: str | Path, analysis_date: date, *, variant: str = VARIANT_STABLE) -> tuple[Path, Path]:
     directory = Path(out_dir)
     compact = compact_date(analysis_date)
-    return directory / f"latest_{compact}.json", directory / f"jongga_data_{compact}.js"
+    suffix = variant_suffix(variant)
+    return directory / f"latest_{compact}{suffix}.json", directory / f"jongga_data_{compact}{suffix}.js"
 
 
-def payload_with_analysis_date(payload: dict[str, Any], analysis_date: date) -> dict[str, Any]:
+def payload_with_analysis_date(payload: dict[str, Any], analysis_date: date, *, variant: str = VARIANT_STABLE) -> dict[str, Any]:
     next_payload = deepcopy(payload)
     next_payload["analysisDate"] = analysis_date.isoformat()
+    next_payload["variant"] = normalize_variant(variant)
     return next_payload
 
 
-def render_daily_bridge_js(payload: dict[str, Any]) -> str:
+def render_daily_bridge_js(payload: dict[str, Any], *, variant: str | None = None) -> str:
     analysis_date = str(payload.get("analysisDate") or "").strip()
     if not analysis_date:
         raise ValueError("payload.analysisDate is required")
+    namespace = bridge_namespace(variant or str(payload.get("variant") or ""))
     return (
-        "window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};\n"
-        f"window.JONGGA_DAILY_DATA[{json.dumps(analysis_date)}] = "
+        f"{namespace} = {namespace} || {{}};\n"
+        f"{namespace}[{json.dumps(analysis_date)}] = "
         f"{json.dumps(payload, ensure_ascii=False, indent=2)};\n"
     )
 
@@ -82,11 +110,15 @@ def build_history_entry(
     daily_js_path: str | Path,
     daily_json_path: str | Path,
     *,
+    variant: str | None = None,
     top_limit: int = 10,
 ) -> dict[str, Any]:
     quality = payload.get("dataQuality") if isinstance(payload.get("dataQuality"), dict) else {}
+    resolved_variant = normalize_variant(variant or str(payload.get("variant") or ""))
     return {
         "date": str(payload.get("analysisDate") or ""),
+        "variant": resolved_variant,
+        "variantLabel": variant_label(resolved_variant),
         "jsFile": web_path(daily_js_path),
         "jsonFile": web_path(daily_json_path),
         "generatedAt": payload.get("generatedAt") or "",
@@ -98,9 +130,20 @@ def build_history_entry(
 
 def update_history_index(existing: list[dict[str, Any]], entry: dict[str, Any]) -> list[dict[str, Any]]:
     target_date = entry.get("date")
-    merged = [item for item in existing if item.get("date") != target_date]
+    target_variant = normalize_variant(str(entry.get("variant") or ""))
+    merged = [
+        item for item in existing
+        if item.get("date") != target_date or normalize_variant(str(item.get("variant") or "")) != target_variant
+    ]
     merged.append(entry)
-    return sorted(merged, key=lambda item: str(item.get("date") or ""), reverse=True)
+    return sorted(
+        merged,
+        key=lambda item: (
+            str(item.get("date") or ""),
+            1 if normalize_variant(str(item.get("variant") or "")) == VARIANT_STABLE else 0,
+        ),
+        reverse=True,
+    )
 
 
 def write_daily_outputs(
@@ -108,20 +151,22 @@ def write_daily_outputs(
     out_dir: str | Path,
     history_js_path: str | Path,
     *,
+    variant: str | None = None,
     top_limit: int = 10,
 ) -> tuple[Path, Path, Path]:
     raw_date = payload.get("analysisDate")
     analysis_date = resolve_analysis_date(str(raw_date) if raw_date else None)
-    json_path, js_path = build_daily_output_paths(out_dir, analysis_date)
+    resolved_variant = normalize_variant(variant or str(payload.get("variant") or ""))
+    json_path, js_path = build_daily_output_paths(out_dir, analysis_date, variant=resolved_variant)
     history_path = Path(history_js_path)
 
     json_path.parent.mkdir(parents=True, exist_ok=True)
     history_path.parent.mkdir(parents=True, exist_ok=True)
 
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    js_path.write_text(render_daily_bridge_js(payload), encoding="utf-8")
+    js_path.write_text(render_daily_bridge_js(payload, variant=resolved_variant), encoding="utf-8")
 
-    entry = build_history_entry(payload, js_path, json_path, top_limit=top_limit)
+    entry = build_history_entry(payload, js_path, json_path, variant=resolved_variant, top_limit=top_limit)
     history = update_history_index(read_history_index(history_path), entry)
     history_path.write_text(render_history_bridge_js(history), encoding="utf-8")
     return json_path, js_path, history_path

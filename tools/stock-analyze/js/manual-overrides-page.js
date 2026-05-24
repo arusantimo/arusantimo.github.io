@@ -105,8 +105,10 @@ function summarizeManualOverrideEntry(entry) {
 
 function getGeneratedPayload() {
   const dateKey = typeof getJonggaKstTodayKey === 'function' ? getJonggaKstTodayKey() : '';
-  const dailyPayload = dateKey && globalThis.JONGGA_DAILY_DATA && typeof globalThis.JONGGA_DAILY_DATA === 'object'
-    ? globalThis.JONGGA_DAILY_DATA[dateKey]
+  const variant = typeof getJonggaActiveVariant === 'function' ? getJonggaActiveVariant() : 'stable';
+  const namespace = variant === 'canary' ? 'JONGGA_CANARY_DAILY_DATA' : 'JONGGA_DAILY_DATA';
+  const dailyPayload = dateKey && globalThis[namespace] && typeof globalThis[namespace] === 'object'
+    ? globalThis[namespace][dateKey]
     : null;
   if (dailyPayload && typeof dailyPayload === 'object') return dailyPayload;
   return globalThis.JONGGA_DATA && typeof globalThis.JONGGA_DATA === 'object' ? globalThis.JONGGA_DATA : null;
@@ -327,15 +329,19 @@ function collectRecommendedManualEntries() {
 
 function renderGeneratedMeta() {
   const target = document.getElementById('override-generated-meta');
+  const variantTarget = document.getElementById('override-active-variant');
   if (!target) return;
+  const variant = typeof getJonggaActiveVariant === 'function' ? getJonggaActiveVariant() : 'stable';
+  const variantLabel = typeof getJonggaVariantLabel === 'function' ? getJonggaVariantLabel(variant) : variant;
+  if (variantTarget) variantTarget.textContent = variantLabel;
   const payload = getGeneratedPayload();
   if (!payload) {
     const dateKey = typeof getJonggaKstTodayKey === 'function' ? getJonggaKstTodayKey() : '오늘';
-    target.textContent = `${dateKey} 기준 Jongga 데이터 파일을 찾지 못했습니다. 최신 데이터를 먼저 생성해주세요.`;
+    target.textContent = `${variantLabel} / ${dateKey} 기준 Jongga 데이터 파일을 찾지 못했습니다. 최신 데이터를 먼저 생성해주세요.`;
     return;
   }
   const status = payload?.dataQuality?.status || 'unknown';
-  target.textContent = `기준 데이터: ${payload.analysisDate || '날짜 미확인'} / ${formatGeneratedAt(payload.generatedAt)} | 데이터 품질: ${status}`;
+  target.textContent = `기준 데이터: ${variantLabel} / ${payload.analysisDate || '날짜 미확인'} / ${formatGeneratedAt(payload.generatedAt)} | 데이터 품질: ${status}`;
 }
 
 function renderRecommendedList() {
@@ -348,8 +354,10 @@ function renderRecommendedList() {
   count.textContent = String(overrideRecommendedEntries.length);
 
   if (!overrideRecommendedEntries.length) {
+    const variant = typeof getJonggaActiveVariant === 'function' ? getJonggaActiveVariant() : 'stable';
+    const variantLabel = typeof getJonggaVariantLabel === 'function' ? getJonggaVariantLabel(variant) : variant;
     list.innerHTML = '';
-    empty.textContent = '현재 latest 데이터 기준으로 추가 입력이 필요한 추천 종목이 없습니다.';
+    empty.textContent = `${variantLabel} 데이터 기준으로 추가 입력이 필요한 추천 종목이 없습니다.`;
     empty.hidden = false;
     return;
   }
@@ -483,11 +491,13 @@ function importManualOverrideFile(file) {
 async function loadGeneratedPayloadForManualOverridePage() {
   if (typeof loadJonggaDailyScript !== 'function' || typeof getJonggaKstTodayKey !== 'function') return;
   const dateKey = getJonggaKstTodayKey();
+  const variant = typeof getJonggaActiveVariant === 'function' ? getJonggaActiveVariant() : 'stable';
   try {
-    await loadJonggaDailyScript(dateKey);
+    await loadJonggaDailyScript(dateKey, variant);
   } catch (error) {
     console.warn(error);
-    setOverrideStatus(`${dateKey} 기준 Jongga 데이터 파일을 찾지 못했습니다.`);
+    const variantLabel = typeof getJonggaVariantLabel === 'function' ? getJonggaVariantLabel(variant) : variant;
+    setOverrideStatus(`${variantLabel} / ${dateKey} 기준 Jongga 데이터 파일을 찾지 못했습니다.`);
   }
 }
 

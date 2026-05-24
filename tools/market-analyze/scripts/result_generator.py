@@ -17,6 +17,7 @@ from .anchor_collectors import (
     collect_broadening,
     collect_earnings_breadth,
     collect_export_momentum,
+    collect_leader_stocks,
     collect_market_valuation,
     collect_sector_breadth,
 )
@@ -34,7 +35,7 @@ from .collectors import (
 )
 
 
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.1.1"
 RESULT_VAR_NAME = "window.__MARKET_ANALYZE_RESULT__"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -565,18 +566,29 @@ def generate_result(
         ("gold", collect_gold),
         ("disparity", collect_disparity),
         ("flow", collect_flow),
-        ("margin", collect_margin),
     ]
 
     if not skip_remote:
         if preflight_warning:
-            emit_progress(progress_callback, f"프리플라이트 경고 -> {preflight_warning} · curl/개별 대체 경로를 포함해 라이브 수집 계속 시도")
+            emit_progress(progress_callback, f"프리플라이트 경고 -> {preflight_warning} · curl/Playwright/개별 대체 경로를 포함해 라이브 수집 계속 시도")
         for status_key, collector in collectors:
             emit_progress(progress_callback, f"{status_key} 수집 시작")
             result = collector(data)
             merge_patch(data, result.data_patch)
             set_status_value(statuses, status_key, result)
             emit_progress(progress_callback, f"{status_key} 수집 완료 -> {summarize_collector_result(result)}")
+
+        emit_progress(progress_callback, "leaders 수집 시작")
+        leaders_result = collect_leader_stocks(data)
+        merge_patch(data, leaders_result.data_patch)
+        set_status_value(statuses, "leaders", leaders_result)
+        emit_progress(progress_callback, f"leaders 수집 완료 -> {summarize_collector_result(leaders_result)}")
+
+        emit_progress(progress_callback, "margin 수집 시작")
+        margin_result = collect_margin(data)
+        merge_patch(data, margin_result.data_patch)
+        set_status_value(statuses, "margin", margin_result)
+        emit_progress(progress_callback, f"margin 수집 완료 -> {summarize_collector_result(margin_result)}")
 
         emit_progress(progress_callback, "anchor.export 수집 시작")
         export_result = collect_export_momentum(data, settings)

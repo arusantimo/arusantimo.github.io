@@ -98,7 +98,10 @@
                         </div>
                         <div
                             class="flex justify-between items-center bg-slate-900/60 p-3 rounded-lg border border-slate-700/50">
-                            <span class="text-sm text-slate-400">💳 신용잔고 5일 기울기</span>
+                            <div>
+                                <div class="text-sm text-slate-400">💳 신용잔고 5일 선형기울기</div>
+                                <div class="text-[10px] text-slate-500">단위: 억/일</div>
+                            </div>
                             <span id="val-margin-slope" class="font-mono font-bold text-slate-100 text-lg">-</span>
                         </div>
                         <div>
@@ -419,7 +422,7 @@
                                         <div class="anchor-detail-card-title">밸류에이션 안정도</div>
                                         <div class="anchor-detail-list">
                                             <div class="anchor-detail-row"><span class="anchor-detail-label">안정 판정</span><span id="anchor-valuation-stability" class="anchor-detail-value">-</span></div>
-                                            <div class="anchor-detail-row"><span class="anchor-detail-label">가중 Fwd PER</span><span id="anchor-valuation-forward-per" class="anchor-detail-value">-</span></div>
+                                            <div class="anchor-detail-row"><span id="anchor-valuation-forward-per-label" class="anchor-detail-label">가중 Fwd PER</span><span id="anchor-valuation-forward-per" class="anchor-detail-value">-</span></div>
                                         </div>
                                         <div id="anchor-valuation-reason" class="anchor-detail-reason">-</div>
                                     </div>
@@ -567,9 +570,9 @@
                         </p>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
-                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용잔고 5일 기울기</div>
+                                <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용잔고 5일 선형기울기</div>
                                 <div id="minsky-margin-slope" class="text-2xl font-mono font-bold text-slate-100">-</div>
-                                <div class="text-[10px] text-slate-500">상승 = 폰지 누적 / 하락 = 청산</div>
+                                <div id="minsky-margin-slope-state" class="text-[10px] text-slate-500">단위: 억/일 · 양수는 최근 5영업일 레버리지 증가</div>
                             </div>
                             <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4 space-y-1">
                                 <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">신용잔고 / 고객예탁금 비율</div>

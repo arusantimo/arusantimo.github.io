@@ -25,7 +25,7 @@ else
   exit 127
 fi
 
-"$python_cmd" -m jongga.generate_latest --out "jongga/output/latest.json" --bridge-js "jongga/output/jongga_data.js"
+"$python_cmd" -m jongga.generate_latest --out-dir "jongga/output" --history-js "jongga/output/jongga_history.js" --out "jongga/output/latest.json" --bridge-js "jongga/output/jongga_data.js"
 exit_code=$?
 
 if [[ $exit_code -ne 0 ]]; then
@@ -40,6 +40,11 @@ fi
 
 echo
 echo "Generated files:"
+echo "  jongga/output/latest_YYYYMMDD.json"
+echo "  jongga/output/jongga_data_YYYYMMDD.js"
+echo "  jongga/output/latest_YYYYMMDD_canary.json"
+echo "  jongga/output/jongga_data_YYYYMMDD_canary.js"
+echo "  jongga/output/jongga_history.js"
 echo "  jongga/output/latest.json"
 echo "  jongga/output/jongga_data.js"
 

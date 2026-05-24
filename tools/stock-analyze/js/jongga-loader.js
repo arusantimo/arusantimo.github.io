@@ -2,6 +2,17 @@ let jonggaLastPayload = null;
 let jonggaLastValidation = null;
 let jonggaLastLoadMeta = null;
 
+function getJonggaPayloadVariant(payload = jonggaLastPayload, meta = jonggaLastLoadMeta) {
+  return String(payload?.variant || meta?.variant || payload?.dataQuality?.channel || 'stable');
+}
+
+function getJonggaPayloadVariantLabel(payload = jonggaLastPayload, meta = jonggaLastLoadMeta) {
+  if (typeof getJonggaVariantLabel === 'function') {
+    return getJonggaVariantLabel(getJonggaPayloadVariant(payload, meta));
+  }
+  return getJonggaPayloadVariant(payload, meta);
+}
+
 function getJonggaQuality(payload = {}) {
   const source = payload && typeof payload === 'object' ? payload : {};
   return source.dataQuality || source.quality || {};
@@ -21,6 +32,12 @@ function getJonggaCollectionLog(payload = {}) {
   const source = payload && typeof payload === 'object' ? payload : {};
   const rows = source.collectionLog || source.dataQuality?.collectionLog || [];
   return Array.isArray(rows) ? rows : [];
+}
+
+function getJonggaFailedKeys(payload = {}) {
+  const source = payload && typeof payload === 'object' ? payload : {};
+  const rows = source.failedKeys || source.dataQuality?.failedKeys || [];
+  return Array.isArray(rows) ? rows.map(item => String(item || '').trim()).filter(Boolean) : [];
 }
 
 function getJonggaQualityBadgeMeta(payload = jonggaLastPayload) {
@@ -97,16 +114,20 @@ function renderJonggaQualityPanel() {
   const quality = getJonggaQuality(jonggaLastPayload);
   const health = getJonggaProviderHealth(jonggaLastPayload);
   const fallbackUsage = getJonggaFallbackUsage(jonggaLastPayload);
+  const failedKeys = getJonggaFailedKeys(jonggaLastPayload);
   const collectionLog = getJonggaCollectionLog(jonggaLastPayload);
   const validation = jonggaLastValidation || { errors: [], warnings: [], safetyBlocks: [], summary: {} };
   const counts = quality.counts || {};
   const manualOverrideCount = typeof getJonggaManualOverrideCount === 'function' ? getJonggaManualOverrideCount() : 0;
   const generatedAtText = getJonggaGeneratedAtText(jonggaLastPayload);
+  const variantLabel = getJonggaPayloadVariantLabel();
 
   panel.innerHTML = `
+    <div class="quality-line info">데이터 채널: ${escapeHtml(variantLabel)}</div>
     <div class="quality-line muted">수집 시각: ${escapeHtml(generatedAtText)}</div>
     <div class="quality-grid">
       <div class="quality-card"><strong>${validation.summary?.buyCount || 0}</strong><span>매수 후보</span></div>
+      <div class="quality-card error"><strong>${failedKeys.length}</strong><span>실패 지표</span></div>
       <div class="quality-card"><strong>${counts.fallback || 0}</strong><span>fallback</span></div>
       <div class="quality-card"><strong>${counts.stale || 0}</strong><span>stale cache</span></div>
       <div class="quality-card"><strong>${manualOverrideCount}</strong><span>수동 입력</span></div>
@@ -114,6 +135,7 @@ function renderJonggaQualityPanel() {
     </div>
     ${manualOverrideCount ? `<div class="quality-line info">브라우저 수동 입력 ${manualOverrideCount}건이 현재 JSON에 겹쳐 적용됩니다.</div>` : ''}
     ${renderJonggaValidationList(validation)}
+    ${renderJonggaFailedKeyList(failedKeys)}
     ${renderJonggaHealthList(health)}
     ${renderJonggaFallbackList(fallbackUsage)}
     ${renderJonggaCollectionLogSection(collectionLog)}
@@ -151,6 +173,18 @@ function renderJonggaHealthList(health) {
           <b>fail ${Number(info.failed || info.fail || 0)}</b>
         </span>
       `).join('')}
+    </div>
+  `;
+}
+
+function renderJonggaFailedKeyList(failedKeys) {
+  const rows = asJonggaArray(failedKeys);
+  if (!rows.length) return '<div class="quality-line ok">실패 지표 없음</div>';
+  return `
+    <div class="quality-section-label">Failed Indicators</div>
+    <div class="quality-list">
+      ${rows.slice(0, 12).map(message => `<div class="quality-line error strong">${escapeHtml(message)}</div>`).join('')}
+      ${rows.length > 12 ? `<div class="quality-line warn">외 ${rows.length - 12}건 생략</div>` : ''}
     </div>
   `;
 }
@@ -230,14 +264,27 @@ function loadJonggaPayload(payload, meta = {}) {
   renderAll();
   restoreAnalysisArchiveState();
   renderJonggaQualityPanel();
-  log(`✅ Jongga JSON 적용 완료. (매수 후보 ${totalBuy}개, 안전 차단 ${validation.safetyBlocks.length}건)`);
-  if (typeof getJonggaManualOverrideCount === 'function' && getJonggaManualOverrideCount() > 0) {
+  const variantLabel = getJonggaPayloadVariantLabel(effectivePayload, jonggaLastLoadMeta);
+  if (typeof log === 'function') {
+    log(`✅ ${variantLabel} Jongga JSON 적용 완료. (매수 후보 ${totalBuy}개, 안전 차단 ${validation.safetyBlocks.length}건)`);
+  }
+  if (typeof log === 'function' && typeof getJonggaManualOverrideCount === 'function' && getJonggaManualOverrideCount() > 0) {
     log(`ℹ️ 브라우저 수동 입력 ${getJonggaManualOverrideCount()}건을 현재 JSON 위에 반영했습니다.`);
   }
-  if (validation.safetyBlocks.length) {
+  if (typeof log === 'function' && validation.safetyBlocks.length) {
     log(`<span style="color:var(--text-warning)">⚠️ 핵심 Gate/갭/품질 근거 부족 후보는 자동매수 금지로 낮춰 표시했습니다.</span>`);
   }
   return validation;
+}
+
+function clearJonggaLoadedState(meta = {}) {
+  jonggaLastPayload = null;
+  jonggaLastValidation = { ok: true, errors: [], warnings: [], safetyBlocks: [], summary: { slots: 0, buyCount: 0 } };
+  jonggaLastLoadMeta = { ...meta, clearedAt: new Date().toISOString() };
+  applyJonggaResultToState({ schemaVersion: 'jongga_result.v1', generatedAt: '', slots: [] });
+  renderAll();
+  restoreAnalysisArchiveState();
+  renderJonggaQualityPanel();
 }
 
 function bindJonggaLoaderControls() {
@@ -249,7 +296,8 @@ function bindJonggaLoaderControls() {
 
 function loadInitialJonggaData() {
   if (typeof loadJonggaDailyData === 'function') {
-    loadJonggaDailyData();
+    const variant = typeof getJonggaActiveVariant === 'function' ? getJonggaActiveVariant() : 'stable';
+    loadJonggaDailyData(undefined, variant);
     return;
   }
   log('<span style="color:var(--text-danger)">날짜별 Jongga 로더를 찾지 못했습니다. js/jongga-daily.js 로드 순서를 확인하세요.</span>');

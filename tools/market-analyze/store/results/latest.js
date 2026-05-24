@@ -1,15 +1,15 @@
 window.__MARKET_ANALYZE_RESULT__ = {
   "meta": {
     "resultDate": "20260524",
-    "generatedAt": "2026-05-24T09:16:51+09:00",
-    "schemaVersion": "1.1.0"
+    "generatedAt": "2026-05-24T14:25:26+09:00",
+    "schemaVersion": "1.1.1"
   },
   "data": {
-    "fx": 1517.038803,
-    "vix": 18.06,
+    "fx": 1516.188387,
+    "vix": 16.7,
     "sentiment": 58,
     "gold": 4483.4,
-    "disparity": 155.59985138246282,
+    "disparity": 167.70798123524523,
     "bullRatio": 50,
     "marginSlope": 379.5,
     "riskIndex": 85,
@@ -218,28 +218,31 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "rawRiskIndex": 62.96924999999999,
     "marketRegimeKey": "debasement-bubble",
     "marketRegimeLabel": "Stage 6: 화폐 몰락형 특수 버블 (Debasement Bubble)",
-    "marketRegimeReason": "원/달러 1517원과 과열 이격이 겹쳤지만 F_support 25점이 부족해 특수 버블 경계로 강화했습니다."
+    "marketRegimeReason": "원/달러 1516원과 과열 이격이 겹쳤지만 F_support 25점이 부족해 특수 버블 경계로 강화했습니다.",
+    "marginSlope5dChangePct": -6.893056259503294,
+    "marginSlopeStartDate": "260514",
+    "marginSlopeEndDate": "260520"
   },
   "status": {
     "fx": {
       "state": "ok",
       "source": "open.er-api.com",
-      "message": "원/달러 환율 1,517.039원 수집"
+      "message": "원/달러 환율 1,516.188원 수집"
     },
     "vix": {
       "state": "partial",
-      "source": "store/market_analyze_data.json",
-      "message": "VIX 수집 실패 (HTTP Error 429: Too Many Requests; curl 우회 실패 (curl: (56) The requested URL returned error: 429)) · 기존 스냅샷 유지"
+      "source": "cdn.cboe.com",
+      "message": "Yahoo 차트 실패 후 CBOE CSV 폴백으로 VIX 16.70 수집"
     },
     "gold": {
       "state": "partial",
       "source": "store/market_analyze_data.json",
-      "message": "금 시세 수집 실패 (HTTP Error 429: Too Many Requests; curl 우회 실패 (curl: (56) The requested URL returned error: 429)) · 기존 스냅샷 유지"
+      "message": "금 시세 수집 실패 (Yahoo 차트 다중 엔드포인트 실패 (query1.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query2.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query1.finance.yahoo.com: Yahoo spark JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests)) · 기존 스냅샷 유지"
     },
     "disparity": {
       "state": "partial",
-      "source": "store/market_analyze_data.json",
-      "message": "이격도 수집 실패 (HTTP Error 429: Too Many Requests; curl 우회 실패 (curl: (56) The requested URL returned error: 429)) · 기존 스냅샷 유지"
+      "source": "finance.naver.com/sise_index_day",
+      "message": "Yahoo 차트 실패 후 네이버 일별 지수 폴백으로 코스피 200일 이격도 167.71% 수집"
     },
     "flow": {
       "state": "ok",
@@ -258,7 +261,7 @@ window.__MARKET_ANALYZE_RESULT__ = {
     },
     "soros": {
       "state": "partial",
-      "source": "store/market_analyze_data.json",
+      "source": "finance.naver.com/sise_index_day",
       "message": "소로스 입력은 일부만 최신화되었습니다."
     },
     "minsky": {
@@ -279,8 +282,8 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "anchor": {
       "export": {
         "state": "partial",
-        "source": "store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · store/results/result-20260524.js · bootstrap seed · tradingeconomics.com",
-        "message": "수출 모멘텀 수집 실패 (유효하지 않은 인증KEY입니다.) · 최근 성공 생성본 사용 (2026-05-24T09:13:54+09:00)"
+        "source": "store/results/result-20260524.js",
+        "message": "수출 모멘텀 수집 실패 (유효하지 않은 인증KEY입니다.) · 최근 성공 생성본 사용 (2026-05-24T14:24:19+09:00)"
       },
       "earnings": {
         "state": "partial",
@@ -293,9 +296,9 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "message": "비주도주 확산 20/20종목 반영"
       },
       "sectorBreadth": {
-        "state": "missing",
+        "state": "partial",
         "source": "https://finance.naver.com/sise/sise_group.naver?type=upjong",
-        "message": "비반도체 업종 확산 0/1업종 통과 · 상위 5개 중 1개 분석 · 실패 4개"
+        "message": "비반도체 업종 확산 0/1업종 통과 · 상위 5개 중 1개 분석 · 실패 4개 · 커버리지 부족으로 보수적 판정"
       },
       "valuation": {
         "state": "ok",
@@ -305,7 +308,7 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "support": {
         "state": "partial",
         "source": "https://finance.naver.com/sise/sise_group.naver?type=upjong · finance.naver.com",
-        "message": "업종 확산 25/50 · 밸류에이션 0/50 · 업종 확산 커버리지 1개로 중립값 · 가중 Fwd PER 32.2배 > 13.0배 · 일부 항목 중립값 반영 (https://finance.naver.com/sise/sise_group.naver?type=upjong missing)"
+        "message": "업종 확산 25/50 · 밸류에이션 0/50 · 업종 확산 커버리지 1개로 중립값 · 가중 Fwd PER 32.2배 > 13.0배"
       }
     }
   }

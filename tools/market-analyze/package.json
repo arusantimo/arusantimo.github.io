@@ -1,0 +1,8 @@
+{
+  "name": "market-analyze-scraper",
+  "private": true,
+  "description": "Node helpers for market-analyze scraping fallbacks",
+  "dependencies": {
+    "playwright-core": "1.60.0"
+  }
+}

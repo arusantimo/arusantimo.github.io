@@ -176,12 +176,18 @@ async function fetchLiveFinanceData() {
 
         if (marginResult.status === "fulfilled") {
             marketData.marginSlope = marginResult.value.marginSlope;
+            marketData.marginSlope5dChangePct = marginResult.value.marginSlope5dChangePct ?? null;
+            marketData.marginSlopeStartDate = marginResult.value.marginSlopeStartDate ?? "";
+            marketData.marginSlopeEndDate = marginResult.value.marginSlopeEndDate ?? "";
             setMetricDisplay(
                 "val-margin-slope",
-                `${marketData.marginSlope > 0 ? "+" : ""}${marketData.marginSlope.toFixed(2)}`,
+                `${marketData.marginSlope > 0 ? "+" : ""}${marketData.marginSlope.toFixed(1)}억/일`,
                 `font-mono font-bold text-lg ${marketData.marginSlope > 0 ? "text-rose-400" : "text-cyan-400"}`
             );
-            log(`[DEPOSIT] <span class='text-emerald-400 font-bold'>성공:</span> 신용잔고 기울기 ➜ <b>${marketData.marginSlope.toFixed(2)}</b>`);
+            const marginTrendLabel = Number.isFinite(marketData.marginSlope5dChangePct)
+                ? ` / 최근 5영업일 변화율 ${marketData.marginSlope5dChangePct > 0 ? "+" : ""}${marketData.marginSlope5dChangePct.toFixed(1)}%`
+                : "";
+            log(`[DEPOSIT] <span class='text-emerald-400 font-bold'>성공:</span> 신용잔고 선형기울기 ➜ <b>${marketData.marginSlope.toFixed(1)}억/일</b>${marginTrendLabel}`);
             marketData.marginBalanceToday = marginResult.value.marginHistory[0]?.balance ?? null;
             marketData.customerDeposit = marginResult.value.customerDepositToday ?? null;
             marketData.customerDepositSlope = marginResult.value.customerDepositSlope ?? null;

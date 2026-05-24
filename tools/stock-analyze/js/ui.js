@@ -722,7 +722,7 @@ function setActiveTab(tab) {
 }
 
 function updateTabUI() {
-  document.querySelectorAll('.tab-button').forEach(button => {
+  document.querySelectorAll('.tab-button[data-tab]').forEach(button => {
     button.classList.toggle('active', button.dataset.tab === activeTab);
   });
   document.querySelectorAll('.tab-panel').forEach(panel => {

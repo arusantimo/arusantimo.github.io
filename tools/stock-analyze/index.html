@@ -23,6 +23,10 @@
           <div class="action-row">
             <a href="manual-overrides.html" class="btn btn-secondary">🧩 수동 입력 레이어</a>
             <div class="daily-data-toolbar">
+              <div class="tab-switcher channel-switcher" role="tablist" aria-label="Jongga 데이터 채널">
+                <button class="tab-button active" type="button" data-jongga-variant="stable">현재 버전</button>
+                <button class="tab-button" type="button" data-jongga-variant="canary">카나리</button>
+              </div>
               <span id="jongga-today-status" class="today-data-status unknown">금일 데이터 확인 중</span>
               <button id="btn-open-jongga-json-modal" type="button" class="btn btn-secondary small is-hidden">직접 JSON 입력</button>
               <button id="btn-open-jongga-history-modal" type="button" class="btn btn-secondary small">이전 분석 보기</button>
@@ -256,11 +260,11 @@
 
   <div id="jongga-history-overlay" class="modal-overlay">
     <div class="modal guide-modal" id="jongga-history-modal">
-      <div class="modal-header">
-        <div class="modal-header-info">
-          <div class="modal-stock-name">이전 분석 보기</div>
-          <div class="modal-stock-sub"><span>히스토리 manifest 기준 요약이며 메인 화면에는 적용하지 않습니다.</span></div>
-        </div>
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-stock-name">이전 분석 보기</div>
+          <div class="modal-stock-sub"><span>활성 데이터 채널 기준 히스토리 manifest 요약이며 메인 화면에는 적용하지 않습니다.</span></div>
+          </div>
         <button class="modal-close" id="jongga-history-close-btn">✕</button>
       </div>
       <div class="modal-body" id="jongga-history-body"></div>

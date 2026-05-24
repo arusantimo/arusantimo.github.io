@@ -31,6 +31,12 @@ function formatSignedPercent(value, digits = 1) {
     return `${sign}${value.toFixed(digits)}%`;
 }
 
+function formatMarginSlope(value, digits = 1) {
+    if (value === null || value === undefined || Number.isNaN(value)) return "-";
+    const sign = value > 0 ? "+" : "";
+    return `${sign}${Number(value).toFixed(digits)}억/일`;
+}
+
 function formatNullable(value, suffix = "", digits = 2) {
     if (value === null || value === undefined || Number.isNaN(value)) return "-";
     const num = Number(value);
@@ -178,6 +184,23 @@ function setMetricDisplay(targetId, text, className) {
     if (!target) return;
     target.innerText = text;
     target.className = className;
+}
+
+function formatOptionalBizDateLabel(raw) {
+    if (!raw) return "";
+    if (typeof formatFlowBizDateLabel === "function") {
+        return formatFlowBizDateLabel(raw);
+    }
+    const normalized = String(raw).replace(/\D/g, "");
+    if (normalized.length !== 8) return String(raw);
+    return `${normalized.slice(0, 4)}.${normalized.slice(4, 6)}.${normalized.slice(6, 8)}`;
+}
+
+function buildMarginSlopeWindowLabel() {
+    const startLabel = formatOptionalBizDateLabel(marketData.marginSlopeStartDate);
+    const endLabel = formatOptionalBizDateLabel(marketData.marginSlopeEndDate);
+    if (startLabel && endLabel) return `${startLabel}~${endLabel}`;
+    return "";
 }
 
 function isAnchorComputed() {
@@ -551,7 +574,7 @@ function updateDashboardUI() {
     const slope = marketData.marginSlope;
     setMetricDisplay(
         "val-margin-slope",
-        Number.isFinite(slope) ? `${slope > 0 ? "+" : ""}${slope.toFixed(2)}` : "-",
+        Number.isFinite(slope) ? formatMarginSlope(slope, 1) : "-",
         `font-mono font-bold text-lg ${marketStatus.margin?.state === "ok" ? (slope > 0 ? "text-rose-400" : slope < 0 ? "text-cyan-400" : "text-slate-300") : getMetricValueToneClass(marketStatus.margin, "text-slate-300")}`
     );
 
@@ -653,11 +676,11 @@ document.getElementById("file-import")?.addEventListener("change", event => {
                 fallbackUsed: true
             });
 
-            marketData = { ...marketData, ...dataToLoad };
+            marketData = { ...createDefaultMarketData(), ...dataToLoad };
             marketStatus = normalizeMarketStatus(statusToLoad);
-            marketResultMeta = { ...marketResultMeta, ...metaToLoad };
+            marketResultMeta = { ...createDefaultMarketResultMeta(), ...metaToLoad };
             if (parsed.artifactViewSettings) {
-                artifactViewSettings = { ...artifactViewSettings, ...parsed.artifactViewSettings };
+                artifactViewSettings = { ...createDefaultArtifactViewSettings(), ...parsed.artifactViewSettings };
             }
             if (parsed.portfolioData) {
                 portfolioData = { ...portfolioData, ...parsed.portfolioData };
@@ -807,6 +830,16 @@ function getValuationStabilityLabel(value) {
     if (value === true) return "안정";
     if (value === false) return "불안정";
     return "-";
+}
+
+function getValuationMetricLabel() {
+    return marketData.marketValuationMethod === "forward" ? "가중 Fwd PER" : "가중 PER";
+}
+
+function getSectorMomentumSummaryLabel() {
+    if (!Number.isFinite(marketData.nonSemiconductorMomentum)) return "-";
+    const prefix = marketData.nonSemiconductorMomentumProxy ? "프록시 " : "";
+    return `${prefix}${Math.round(marketData.nonSemiconductorMomentum)}%`;
 }
 
 function getMarketRegimeCompactLabel(regimeKey, regimeLabel) {
@@ -988,7 +1021,7 @@ function renderMarketEvaluationView() {
         ),
         buildMarketChipHtml(
             "펀더멘털 지지력",
-            `${getAnchorStateLabel(marketData.fundamentalSupportState)} · ${Number.isFinite(marketData.nonSemiconductorMomentum) ? `${Math.round(marketData.nonSemiconductorMomentum)}%` : "-"} / ${getValuationStabilityLabel(marketData.marketValuationStability)}`,
+            `${getAnchorStateLabel(marketData.fundamentalSupportState)} · ${getSectorMomentumSummaryLabel()} / ${getValuationStabilityLabel(marketData.marketValuationStability)}`,
             tone.chip,
             supportStatusSummary
         )
@@ -1045,13 +1078,13 @@ function renderMarketEvaluationView() {
         evidenceParts.push(`비주도주 60일선 ${(marketData.supportBreadth60d * 100).toFixed(0)}%`);
     }
     if (Number.isFinite(marketData.nonSemiconductorMomentum)) {
-        evidenceParts.push(`업종 확산 ${Math.round(marketData.nonSemiconductorMomentum)}%`);
+        evidenceParts.push(`${marketData.nonSemiconductorMomentumProxy ? "업종 프록시 확산" : "업종 확산"} ${Math.round(marketData.nonSemiconductorMomentum)}%`);
     }
     if (marketData.marketValuationStability === true || marketData.marketValuationStability === false) {
         evidenceParts.push(`밸류에이션 ${getValuationStabilityLabel(marketData.marketValuationStability)}`);
     }
     if (Number.isFinite(marketData.marketValuationForwardPerAvg)) {
-        evidenceParts.push(`가중 Fwd PER ${marketData.marketValuationForwardPerAvg.toFixed(1)}배`);
+        evidenceParts.push(`${getValuationMetricLabel()} ${marketData.marketValuationForwardPerAvg.toFixed(1)}배`);
     }
 
     const evidenceBase = evidenceParts.join(" · ");
@@ -1258,10 +1291,16 @@ function renderFundamentalAnchorPanel() {
         ? supportDisplaySummary.message
         : marketData.marketRegimeReason || marketData.fundamentalSupportReason || "지지력 계산 대기";
 
+    const valuationMetricLabelEl = document.getElementById("anchor-valuation-forward-per-label");
+    if (valuationMetricLabelEl) {
+        valuationMetricLabelEl.innerText = getValuationMetricLabel();
+    }
     document.getElementById("anchor-nonsemi-momentum").innerText = formatNullable(marketData.nonSemiconductorMomentum, '%', 0);
-    document.getElementById("anchor-nonsemi-coverage").innerText = marketData.nonSemiconductorMomentumCoverageCount
-        ? `${marketData.nonSemiconductorMomentumPassCount || 0}/${marketData.nonSemiconductorMomentumCoverageCount}`
-        : "-";
+    document.getElementById("anchor-nonsemi-coverage").innerText = marketData.nonSemiconductorMomentumProxy
+        ? "프록시"
+        : marketData.nonSemiconductorMomentumCoverageCount
+            ? `${marketData.nonSemiconductorMomentumPassCount || 0}/${marketData.nonSemiconductorMomentumCoverageCount}`
+            : "-";
     document.getElementById("anchor-valuation-stability").innerText = getValuationStabilityLabel(marketData.marketValuationStability);
     document.getElementById("anchor-valuation-forward-per").innerText = Number.isFinite(marketData.marketValuationForwardPerAvg)
         ? `${marketData.marketValuationForwardPerAvg.toFixed(1)}배`
@@ -1406,10 +1445,21 @@ function renderWyckoffPanel() {
 function renderMinskyPanel() {
     const slopeEl = document.getElementById('minsky-margin-slope');
     if (!slopeEl) return;
+    const slopeStateEl = document.getElementById('minsky-margin-slope-state');
     const minskySummary = renderPanelStatus("minsky-panel-status", [marketStatus.minsky, marketStatus.margin], "minsky-panel-status-message");
     const slope = marketData.marginSlope;
-    slopeEl.innerText = Number.isFinite(slope) ? `${slope > 0 ? '+' : ''}${slope.toFixed(2)}` : '-';
+    slopeEl.innerText = Number.isFinite(slope) ? formatMarginSlope(slope, 1) : '-';
     slopeEl.style.color = slope > 0 ? '#f87171' : slope < 0 ? '#22d3ee' : '#cbd5e1';
+    if (slopeStateEl) {
+        const windowLabel = buildMarginSlopeWindowLabel();
+        if (Number.isFinite(marketData.marginSlope5dChangePct)) {
+            slopeStateEl.innerText = `${windowLabel ? `${windowLabel} ` : ''}변화율 ${formatSignedPercent(marketData.marginSlope5dChangePct, 1)}`;
+        } else if (windowLabel) {
+            slopeStateEl.innerText = `${windowLabel} 기준 · 단위: 억/일`;
+        } else {
+            slopeStateEl.innerText = '단위: 억/일 · 양수는 최근 5영업일 레버리지 증가';
+        }
+    }
 
     const ratio = marketData.depositMarginRatio;
     const ratioEl = document.getElementById('minsky-deposit-ratio');
@@ -1466,9 +1516,9 @@ initializeWyckoffHelpModal();
 
 async function reloadArtifactData() {
     const artifactBundle = await loadMarketArtifact(artifactViewSettings.selectedResultDate || "latest");
-    marketData = { ...marketData, ...(artifactBundle.data || {}) };
+    marketData = { ...createDefaultMarketData(), ...(artifactBundle.data || {}) };
     marketStatus = normalizeMarketStatus(artifactBundle.status || {});
-    marketResultMeta = { ...marketResultMeta, ...(artifactBundle.meta || {}) };
+    marketResultMeta = { ...createDefaultMarketResultMeta(), ...(artifactBundle.meta || {}) };
     updateDashboardUI();
     calculateCycle();
     saveMarketData();
@@ -1507,6 +1557,7 @@ async function initData() {
         await reloadArtifactData();
     } catch (err) {
         console.error("초기 데이터 로드 중 오류:", err);
+        restoreRuntimeStateFromLocalStorage();
         marketStatus = inferMarketStatusFromData(marketData, "local_state");
         marketResultMeta = createResultMetaPatch({
             loadedFile: "localStorage",

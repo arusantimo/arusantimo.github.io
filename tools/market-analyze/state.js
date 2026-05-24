@@ -51,106 +51,117 @@ function createDefaultArtifactViewSettings() {
     };
 }
 
-let marketData = {
-    fx: 1350,
-    vix: 15.0,
-    sentiment: 50,
-    gold: 2300,
-    disparity: 100,
-    bullRatio: 50,
-    marginSlope: 0,
-    rawRiskIndex: null,
-    macroStressScore: null,
-    greedScore: null,
-    equityOverboughtScore: null,
-    riskIndex: null,
-    previousRiskIndex: null,
-    cycleLeg: "rising",
-    cycleStageKey: "skepticism",
-    cycleStageLabel: "상승 3: 회의",
-    stageOverrideReason: "",
-    retailNetToday: null,
-    foreignNetToday: null,
-    institutionNetToday: null,
-    retailNet10dCum: null,
-    foreignNet10dCum: null,
-    institutionNet10dCum: null,
-    retailNet10dAbsAvg: null,
-    retailNet10dAbsSum: null,
-    flowBizDate: "",
-    flowBonus: 0,
-    flowReason: "수급 데이터 대기 중 (중립 처리)",
-    trapScore: 0,
-    trapState: "neutral",
-    trapReason: "트랩 데이터 대기 중 (중립 처리)",
-    trapFlowScore: 0,
-    trapMarginScore: 0,
-    trapFirstShockScore: 0,
-    trapThreeDayScore: 0,
-    trapRecoveryScore: 0,
-    leaderSnapshotDate: "",
-    leaderStocks: [],
-    shockAnchorDate: "",
-    marginBalanceToday: null,
-    marginBalanceBeforeShock: null,
-    marginShockChangePct: null,
-    customerDeposit: null,
-    customerDepositSlope: null,
-    depositMarginRatio: null,
-    reflexivitySynergyPoints: 0,
-    reflexivityState: "normal",
-    debasementAlert: false,
-    supportOffsetPoints: 0,
-    fundamentalAnchorScore: null,
-    fundamentalAnchorState: "neutral",
-    fundamentalAnchorReason: "펀더멘털 앵커 대기 중",
-    fundamentalSupportScore: null,
-    fundamentalSupportState: "neutral",
-    fundamentalSupportReason: "펀더멘털 지지력 대기 중",
-    exportLatestMonth: "",
-    exportValueUsd: null,
-    exportYoY: null,
-    exportYoYDelta: null,
-    export3mAvgYoY: null,
-    earningsCoverageCount: 0,
-    earningsSnapshotQuarter: "",
-    opIncomeBreadth: null,
-    netIncomeBreadth: null,
-    turnaroundBreadth: null,
-    positiveRoeBreadth: null,
-    broadeningScore: null,
-    broadeningState: "neutral",
-    supportBreadth20d: null,
-    supportBreadth60d: null,
-    supportPositiveReturnBreadth: null,
-    nonSemiconductorMomentum: null,
-    nonSemiconductorMomentumCoverageCount: 0,
-    nonSemiconductorMomentumPassCount: 0,
-    marketValuationStability: null,
-    marketValuationScore: null,
-    marketValuationCoverageCount: 0,
-    marketValuationForwardPerAvg: null,
-    marketValuationThreshold: 13,
-    marketRegimeKey: "standard",
-    marketRegimeLabel: "표준 레짐",
-    marketRegimeReason: "특수 레짐 조건 대기 중",
-    wyckoffDistributionBreadth: null,
-    marketEvaluationState: "neutral",
-    marketEvaluationLabel: "판단 보류",
-    marketFlowTitle: "데이터 대기 중",
-    marketFlowNarrative: "생성된 결과 아티팩트를 읽어 현재 시장 흐름을 한 문장으로 정리합니다.",
-    marketAdviceBias: 2,
-    marketAdviceStance: "균형 유지",
-    marketAdviceReason: "시장 판단 전 기본값",
-    marketAdviceActions: {
-        now: "최신 생성본을 불러오면 현재 행동 가이드가 표시됩니다.",
-        watch: "누락 지표가 있으면 부분 근거 상태와 함께 표시됩니다.",
-        break: "리스크 모델이 겹치면 방어 강도가 자동으로 높아집니다."
-    },
-    kostolanyStage: "B2",
-    kostolanyDivergenceNote: "",
-    lastSyncTime: ""
-};
+function createDefaultMarketData() {
+    return {
+        fx: 1350,
+        vix: 15.0,
+        sentiment: 50,
+        gold: 2300,
+        disparity: 100,
+        bullRatio: 50,
+        marginSlope: 0,
+        marginSlope5dChangePct: null,
+        marginSlopeStartDate: "",
+        marginSlopeEndDate: "",
+        rawRiskIndex: null,
+        macroStressScore: null,
+        greedScore: null,
+        equityOverboughtScore: null,
+        riskIndex: null,
+        previousRiskIndex: null,
+        cycleLeg: "rising",
+        cycleStageKey: "skepticism",
+        cycleStageLabel: "상승 3: 회의",
+        stageOverrideReason: "",
+        retailNetToday: null,
+        foreignNetToday: null,
+        institutionNetToday: null,
+        retailNet10dCum: null,
+        foreignNet10dCum: null,
+        institutionNet10dCum: null,
+        retailNet10dAbsAvg: null,
+        retailNet10dAbsSum: null,
+        flowBizDate: "",
+        flowBonus: 0,
+        flowReason: "수급 데이터 대기 중 (중립 처리)",
+        trapScore: 0,
+        trapState: "neutral",
+        trapReason: "트랩 데이터 대기 중 (중립 처리)",
+        trapFlowScore: 0,
+        trapMarginScore: 0,
+        trapFirstShockScore: 0,
+        trapThreeDayScore: 0,
+        trapRecoveryScore: 0,
+        leaderSnapshotDate: "",
+        leaderStocks: [],
+        shockAnchorDate: "",
+        marginBalanceToday: null,
+        marginBalanceBeforeShock: null,
+        marginShockChangePct: null,
+        customerDeposit: null,
+        customerDepositSlope: null,
+        depositMarginRatio: null,
+        reflexivitySynergyPoints: 0,
+        reflexivityState: "normal",
+        debasementAlert: false,
+        supportOffsetPoints: 0,
+        fundamentalAnchorScore: null,
+        fundamentalAnchorState: "neutral",
+        fundamentalAnchorReason: "펀더멘털 앵커 대기 중",
+        fundamentalSupportScore: null,
+        fundamentalSupportState: "neutral",
+        fundamentalSupportReason: "펀더멘털 지지력 대기 중",
+        exportLatestMonth: "",
+        exportValueUsd: null,
+        exportYoY: null,
+        exportYoYDelta: null,
+        export3mAvgYoY: null,
+        earningsCoverageCount: 0,
+        earningsSnapshotQuarter: "",
+        opIncomeBreadth: null,
+        netIncomeBreadth: null,
+        turnaroundBreadth: null,
+        positiveRoeBreadth: null,
+        broadeningScore: null,
+        broadeningState: "neutral",
+        supportBreadth20d: null,
+        supportBreadth60d: null,
+        supportPositiveReturnBreadth: null,
+        nonSemiconductorMomentum: null,
+        nonSemiconductorMomentumCoverageCount: 0,
+        nonSemiconductorMomentumPassCount: 0,
+        nonSemiconductorMomentumProxy: false,
+        nonSemiconductorMomentumProxyReason: "",
+        marketValuationStability: null,
+        marketValuationScore: null,
+        marketValuationCoverageCount: 0,
+        marketValuationForwardPerAvg: null,
+        marketValuationThreshold: 13,
+        marketValuationMethod: "forward",
+        marketValuationProxyCount: 0,
+        marketRegimeKey: "standard",
+        marketRegimeLabel: "표준 레짐",
+        marketRegimeReason: "특수 레짐 조건 대기 중",
+        wyckoffDistributionBreadth: null,
+        marketEvaluationState: "neutral",
+        marketEvaluationLabel: "판단 보류",
+        marketFlowTitle: "데이터 대기 중",
+        marketFlowNarrative: "생성된 결과 아티팩트를 읽어 현재 시장 흐름을 한 문장으로 정리합니다.",
+        marketAdviceBias: 2,
+        marketAdviceStance: "균형 유지",
+        marketAdviceReason: "시장 판단 전 기본값",
+        marketAdviceActions: {
+            now: "최신 생성본을 불러오면 현재 행동 가이드가 표시됩니다.",
+            watch: "누락 지표가 있으면 부분 근거 상태와 함께 표시됩니다.",
+            break: "리스크 모델이 겹치면 방어 강도가 자동으로 높아집니다."
+        },
+        kostolanyStage: "B2",
+        kostolanyDivergenceNote: "",
+        lastSyncTime: ""
+    };
+}
+
+let marketData = createDefaultMarketData();
 
 let marketStatus = createDefaultMarketStatus();
 let marketResultMeta = createDefaultMarketResultMeta();
@@ -189,49 +200,8 @@ function saveMarketData() {
 }
 
 function loadMarketData() {
-    const savedMarket = localStorage.getItem("marketAnalyzeData");
-    const savedStatus = localStorage.getItem("marketAnalyzeStatus");
-    const savedResultMeta = localStorage.getItem("marketAnalyzeResultMeta");
-    const savedViewSettings = localStorage.getItem("marketAnalyzeViewSettings");
     const savedPortfolio = localStorage.getItem("portfolioAnalyzeData");
     const savedSettings = localStorage.getItem("marketAnalyzeSettings");
-
-    if (savedMarket) {
-        try {
-            const parsed = JSON.parse(savedMarket);
-            marketData = { ...marketData, ...parsed };
-        } catch (error) {
-            console.error("시장 데이터 파싱 오류", error);
-        }
-    }
-
-    if (savedStatus) {
-        try {
-            const parsed = JSON.parse(savedStatus);
-            marketStatus = { ...createDefaultMarketStatus(), ...parsed };
-            marketStatus.anchor = { ...createDefaultMarketStatus().anchor, ...(parsed.anchor || {}) };
-        } catch (error) {
-            console.error("시장 상태 파싱 오류", error);
-        }
-    }
-
-    if (savedResultMeta) {
-        try {
-            const parsed = JSON.parse(savedResultMeta);
-            marketResultMeta = { ...marketResultMeta, ...parsed };
-        } catch (error) {
-            console.error("결과 메타 파싱 오류", error);
-        }
-    }
-
-    if (savedViewSettings) {
-        try {
-            const parsed = JSON.parse(savedViewSettings);
-            artifactViewSettings = { ...artifactViewSettings, ...parsed };
-        } catch (error) {
-            console.error("결과 로딩 설정 파싱 오류", error);
-        }
-    }
 
     if (savedPortfolio) {
         try {
@@ -251,5 +221,39 @@ function loadMarketData() {
         }
     }
 
-    return !!(savedMarket || savedStatus || savedResultMeta || savedViewSettings || savedPortfolio || savedSettings);
+    return !!(savedPortfolio || savedSettings);
+}
+
+function restoreRuntimeStateFromLocalStorage() {
+    const savedMarket = localStorage.getItem("marketAnalyzeData");
+    const savedStatus = localStorage.getItem("marketAnalyzeStatus");
+    const savedResultMeta = localStorage.getItem("marketAnalyzeResultMeta");
+
+    if (savedMarket) {
+        try {
+            const parsed = JSON.parse(savedMarket);
+            marketData = { ...createDefaultMarketData(), ...parsed };
+        } catch (error) {
+            console.error("시장 데이터 파싱 오류", error);
+        }
+    }
+
+    if (savedStatus) {
+        try {
+            marketStatus = normalizeMarketStatus(JSON.parse(savedStatus));
+        } catch (error) {
+            console.error("시장 상태 파싱 오류", error);
+        }
+    }
+
+    if (savedResultMeta) {
+        try {
+            const parsed = JSON.parse(savedResultMeta);
+            marketResultMeta = { ...createDefaultMarketResultMeta(), ...parsed };
+        } catch (error) {
+            console.error("결과 메타 파싱 오류", error);
+        }
+    }
+
+    return !!(savedMarket || savedStatus || savedResultMeta);
 }

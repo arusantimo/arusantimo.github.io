@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import re
+import shutil
 import socket
 import sys
 from pathlib import Path
@@ -12,6 +13,8 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent
 DEFAULT_SETTINGS_PATH = ROOT_DIR / "store" / "analysis_settings.local.json"
+NODE_FETCH_WORKER_PATH = ROOT_DIR / "scripts" / "node_fetch_worker.mjs"
+PLAYWRIGHT_MODULE_PATH = ROOT_DIR / "node_modules" / "playwright-core"
 DIAGNOSTIC_HOSTS = [
     "kosis.kr",
     "opendart.fss.or.kr",
@@ -183,13 +186,13 @@ class ProgressLogger:
             ]
 
         network_failure_match = re.match(
-            r"^네트워크 프리플라이트 실패\. 라이브 수집 대상 호스트의 DNS/네트워크 확인이 필요하지만 수집은 계속 시도합니다\. (.+)$",
+            r"^네트워크 프리플라이트 실패\. 라이브 수집 대상 호스트의 DNS/네트워크 확인이 필요하지만 .+ 수집은 계속 시도합니다\. (.+)$",
             message,
         )
         if network_failure_match:
             return [
                 "네트워크 프리플라이트 실패",
-                f"{self.CONTINUATION_INDENT}{self._paint('reason', 'dim')}: DNS/네트워크 경고가 있지만 curl/개별 fallback을 포함해 수집을 계속 시도합니다.",
+                f"{self.CONTINUATION_INDENT}{self._paint('reason', 'dim')}: DNS/네트워크 경고가 있지만 Node DNS 우회/curl/Playwright fallback을 포함해 수집을 계속 시도합니다.",
                 f"{self.CONTINUATION_INDENT}{self._paint('hosts', 'dim')}: {self._paint(self._truncate(network_failure_match.group(1), 140), 'dim')}",
             ]
 
@@ -222,6 +225,23 @@ class ProgressLogger:
         if anchor_match:
             return [f"{self._paint('anchor-status', 'blue', 'bold')}: {self._style_state_tokens(anchor_match.group(1))}"]
 
+        final_status_summary_match = re.match(
+            r"^final-status-summary: total=(\d+) / error=(\d+) / missing=(\d+) / partial=(\d+)$",
+            message,
+        )
+        if final_status_summary_match:
+            total, error_count, missing_count, partial_count = final_status_summary_match.groups()
+            return [
+                f"최종 실패 요약 {self._paint(f'({total}건)', 'bold')}",
+                f"{self.CONTINUATION_INDENT}{self._paint('error', 'dim')}: {self._paint(error_count, 'red', 'bold')}",
+                f"{self.CONTINUATION_INDENT}{self._paint('missing', 'dim')}: {self._paint(missing_count, 'dim', 'bold')}",
+                f"{self.CONTINUATION_INDENT}{self._paint('partial', 'dim')}: {self._paint(partial_count, 'yellow', 'bold')}",
+            ]
+
+        final_status_ok_match = re.match(r"^final-status-summary: ok$", message)
+        if final_status_ok_match:
+            return ["최종 실패 요약 없음 (모든 수집 상태 ok)"]
+
         return [self._style_state_tokens(message)]
 
     def _format_message(self, message: str) -> list[str]:
@@ -233,7 +253,7 @@ class ProgressLogger:
             )
 
         component_result_match = re.match(
-            r"^(?P<component>[\w.-]+)\s+(?P<action>수집 완료|오프라인 대체 완료)\s+->\s+(?P<detail>.+)$",
+            r"^(?P<component>[\w.-]+)\s+(?P<action>수집 완료|오프라인 대체 완료|최종 상태)\s+->\s+(?P<detail>.+)$",
             message,
         )
         if component_result_match:
@@ -349,6 +369,27 @@ def run_network_diagnostics() -> list[tuple[str, str]]:
     return failures
 
 
+def report_playwright_runtime() -> None:
+    if PLAYWRIGHT_MODULE_PATH.exists():
+        LOGGER.success("Playwright fallback 모듈 확인 완료 (node_modules/playwright-core 존재)")
+        return
+    LOGGER.warn(
+        "Playwright fallback 준비 안 됨. "
+        f"{ROOT_DIR / '.npmrc'} 에서 npm registry 를 npmjs 로 고정했습니다. "
+        "tools/market-analyze 에서 npm install 이 필요합니다."
+    )
+
+
+def report_node_fetch_runtime() -> None:
+    if not shutil.which("node"):
+        LOGGER.warn("Node fetch fallback 준비 안 됨. node 실행 파일을 찾지 못했습니다.")
+        return
+    if NODE_FETCH_WORKER_PATH.exists():
+        LOGGER.success("Node DNS 우회 worker 확인 완료 (scripts/node_fetch_worker.mjs)")
+        return
+    LOGGER.warn(f"Node DNS 우회 worker 누락 ({NODE_FETCH_WORKER_PATH})")
+
+
 LOGGER = ProgressLogger()
 
 
@@ -374,6 +415,68 @@ def log_progress(message: str) -> None:
         LOGGER.info(message)
 
 
+def iter_status_entries(statuses: object, prefix: str = "") -> list[tuple[str, dict[str, str]]]:
+    collected: list[tuple[str, dict[str, str]]] = []
+    if isinstance(statuses, dict):
+        if {"state", "source", "message"} <= set(statuses.keys()):
+            collected.append((prefix or "status", statuses))
+        else:
+            for key, value in statuses.items():
+                next_prefix = f"{prefix}.{key}" if prefix else str(key)
+                collected.extend(iter_status_entries(value, next_prefix))
+    elif isinstance(statuses, list):
+        for index, value in enumerate(statuses):
+            next_prefix = f"{prefix}[{index}]"
+            collected.extend(iter_status_entries(value, next_prefix))
+    return collected
+
+
+def status_priority(state: str) -> int:
+    return {"error": 0, "missing": 1, "partial": 2, "ok": 3}.get(str(state or "").lower(), 9)
+
+
+def collect_problem_statuses(statuses: dict[str, object]) -> list[tuple[str, dict[str, str]]]:
+    problems = [
+        (component, entry)
+        for component, entry in iter_status_entries(statuses)
+        if str(entry.get("state") or "").lower() in {"error", "missing", "partial"}
+    ]
+    return sorted(
+        problems,
+        key=lambda item: (
+            status_priority(str(item[1].get("state") or "")),
+            item[0],
+        ),
+    )
+
+
+def log_final_status_summary(statuses: dict[str, object]) -> None:
+    problems = collect_problem_statuses(statuses)
+    if not problems:
+        LOGGER.success("final-status-summary: ok")
+        return
+
+    counts = {"error": 0, "missing": 0, "partial": 0}
+    for _, entry in problems:
+        state = str(entry.get("state") or "").lower()
+        if state in counts:
+            counts[state] += 1
+
+    LOGGER.warn(
+        "final-status-summary: "
+        f"total={len(problems)} / error={counts['error']} / missing={counts['missing']} / partial={counts['partial']}"
+    )
+    for component, entry in problems:
+        source = re.sub(r"\s+", " ", str(entry.get("source", "") or "")).strip()
+        message = re.sub(r"\s+", " ", str(entry.get("message", "") or "")).strip()
+        LOGGER.warn(
+            f"{component} 최종 상태 -> "
+            f"state={entry.get('state', 'missing')} | "
+            f"source={source} | "
+            f"message={message}"
+        )
+
+
 def main() -> int:
     args = parse_args()
     settings_file = Path(args.settings_file).expanduser()
@@ -385,6 +488,8 @@ def main() -> int:
         f"(settingsFile={settings_file}, KOSIS={'yes' if settings['kosisApiKey'] else 'no'}, "
         f"DART={'yes' if settings['dartApiKey'] else 'no'})"
     )
+    report_node_fetch_runtime()
+    report_playwright_runtime()
     network_failures: list[tuple[str, str]] = []
     if not args.skip_remote:
         LOGGER.info("네트워크 프리플라이트 시작")
@@ -393,7 +498,7 @@ def main() -> int:
             summary = ", ".join(f"{host} ({reason})" for host, reason in network_failures)
             LOGGER.warn(
                 "네트워크 프리플라이트 실패. "
-                "라이브 수집 대상 호스트의 DNS/네트워크 확인이 필요하지만 수집은 계속 시도합니다. "
+                "라이브 수집 대상 호스트의 DNS/네트워크 확인이 필요하지만 Node DNS 우회/curl/Playwright 우회를 포함해 수집은 계속 시도합니다. "
                 f"{summary}"
             )
         else:
@@ -429,6 +534,7 @@ def main() -> int:
         f"valuation={status['anchor']['valuation']['state']} / "
         f"support={status['anchor']['support']['state']}"
     )
+    log_final_status_summary(status)
     return 0
 
 

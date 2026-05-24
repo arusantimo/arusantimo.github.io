@@ -21,6 +21,8 @@ echo.
 echo Generated files:
 echo   jongga\output\latest_YYYYMMDD.json
 echo   jongga\output\jongga_data_YYYYMMDD.js
+echo   jongga\output\latest_YYYYMMDD_canary.json
+echo   jongga\output\jongga_data_YYYYMMDD_canary.js
 echo   jongga\output\jongga_history.js
 
 popd

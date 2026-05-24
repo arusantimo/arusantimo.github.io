@@ -1,8 +1,10 @@
+import io
 import unittest
+from contextlib import redirect_stdout
 from datetime import date
 
-from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_top_trading_value_gate, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload, select_top_trading_value_codes
-from jongga.output_contract import build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
+from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_top_trading_value_gate, emit_cli_failures, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload, select_top_trading_value_codes
+from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
 from tempfile import TemporaryDirectory
 
 
@@ -122,21 +124,34 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIn("TOP40", blocked["note"])
 
     def test_daily_output_paths_use_compact_date(self):
-        json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22))
+        json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_STABLE)
         self.assertEqual(json_path.as_posix(), "jongga/output/latest_20260522.json")
         self.assertEqual(js_path.as_posix(), "jongga/output/jongga_data_20260522.js")
 
+    def test_canary_output_paths_use_suffix(self):
+        json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_CANARY)
+        self.assertEqual(json_path.as_posix(), "jongga/output/latest_20260522_canary.json")
+        self.assertEqual(js_path.as_posix(), "jongga/output/jongga_data_20260522_canary.js")
+
     def test_daily_bridge_uses_date_key(self):
-        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22))
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
         bridge = render_daily_bridge_js(payload)
         self.assertIn("window.JONGGA_DAILY_DATA", bridge)
         self.assertIn('"2026-05-22"', bridge)
         self.assertNotIn("window.JONGGA_DATA =", bridge)
 
+    def test_canary_bridge_uses_separate_namespace(self):
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_CANARY)
+        bridge = render_daily_bridge_js(payload)
+        self.assertIn("window.JONGGA_CANARY_DAILY_DATA", bridge)
+        self.assertIn('"variant": "canary"', bridge)
+
     def test_history_entry_extracts_top_recommendations(self):
-        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22))
-        entry = build_history_entry(payload, "jongga/output/jongga_data_20260522.js", "jongga/output/latest_20260522.json", top_limit=1)
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
+        entry = build_history_entry(payload, "jongga/output/jongga_data_20260522.js", "jongga/output/latest_20260522.json", variant=VARIANT_STABLE, top_limit=1)
         self.assertEqual(entry["date"], "2026-05-22")
+        self.assertEqual(entry["variant"], "stable")
+        self.assertEqual(entry["variantLabel"], "현재 버전")
         self.assertEqual(entry["status"], "partial")
         self.assertEqual(entry["buyCount"], 2)
         self.assertEqual(entry["topRecommendations"][0]["code"], "000020")
@@ -149,17 +164,54 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual([entry["date"] for entry in entries], ["2026-05-22", "2026-05-21"])
         self.assertEqual(entries[0]["buyCount"], 3)
 
+    def test_history_update_keeps_stable_and_canary_same_date(self):
+        entries = update_history_index(
+            [{"date": "2026-05-22", "variant": "stable", "buyCount": 2}],
+            {"date": "2026-05-22", "variant": "canary", "buyCount": 4},
+        )
+        self.assertEqual([(entry["date"], entry["variant"]) for entry in entries], [("2026-05-22", "stable"), ("2026-05-22", "canary")])
+
     def test_write_daily_outputs_writes_manifest_without_duplicates(self):
-        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22))
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
         with TemporaryDirectory() as tmp:
             history_path = f"{tmp}/jongga_history.js"
-            write_daily_outputs(payload, tmp, history_path)
-            write_daily_outputs(payload, tmp, history_path)
+            write_daily_outputs(payload, tmp, history_path, variant=VARIANT_STABLE)
+            write_daily_outputs(payload, tmp, history_path, variant=VARIANT_STABLE)
             with open(history_path, encoding="utf-8") as handle:
                 history_js = handle.read()
             self.assertEqual(history_js.count('"date": "2026-05-22"'), 1)
+            self.assertEqual(history_js.count('"variant": "stable"'), 1)
             with open(f"{tmp}/jongga_data_20260522.js", encoding="utf-8") as handle:
                 self.assertIn('window.JONGGA_DAILY_DATA["2026-05-22"]', handle.read())
+
+    def test_write_daily_outputs_keeps_stable_and_canary_variants(self):
+        stable_payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
+        canary_payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_CANARY)
+        with TemporaryDirectory() as tmp:
+            history_path = f"{tmp}/jongga_history.js"
+            write_daily_outputs(stable_payload, tmp, history_path, variant=VARIANT_STABLE)
+            write_daily_outputs(canary_payload, tmp, history_path, variant=VARIANT_CANARY)
+            with open(history_path, encoding="utf-8") as handle:
+                history_js = handle.read()
+            self.assertIn('"variant": "stable"', history_js)
+            self.assertIn('"variant": "canary"', history_js)
+            with open(f"{tmp}/jongga_data_20260522_canary.js", encoding="utf-8") as handle:
+                self.assertIn('window.JONGGA_CANARY_DAILY_DATA["2026-05-22"]', handle.read())
+
+    def test_emit_cli_failures_prints_explicit_items(self):
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            emit_cli_failures(
+                "종목 상세 스냅샷 수집 실패",
+                [
+                    "000660 SK하이닉스: timeout",
+                    "005930 삼성전자: parser missing",
+                ],
+                max_lines=1,
+            )
+        output = buffer.getvalue()
+        self.assertIn("[FAIL] 종목 상세 스냅샷 수집 실패 · 000660 SK하이닉스: timeout", output)
+        self.assertIn("[FAIL] 종목 상세 스냅샷 수집 실패 · 외 1건", output)
 
     def _sample_payload(self):
         return {

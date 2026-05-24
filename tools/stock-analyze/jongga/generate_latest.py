@@ -4,7 +4,9 @@ import argparse
 import concurrent.futures
 import json
 import math
+import os
 import re
+import sys
 from time import perf_counter
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
@@ -13,7 +15,15 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from jongga.output_contract import payload_with_analysis_date, resolve_analysis_date, write_daily_outputs
+from jongga.output_contract import (
+    VARIANT_CANARY,
+    VARIANT_STABLE,
+    normalize_variant,
+    payload_with_analysis_date,
+    resolve_analysis_date,
+    variant_label,
+    write_daily_outputs,
+)
 
 
 USER_AGENT = "Mozilla/5.0 jongga-live-generator/1.0"
@@ -29,10 +39,117 @@ KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업
 KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
 TOP_TRADING_VALUE_LIMIT = 40
 NAVER_MARKET_VALUE_API_TEMPLATE = "https://m.stock.naver.com/api/stocks/marketValue/{market}?page={page}&pageSize={page_size}"
+CHROME_EXECUTABLE_CANDIDATES = [
+    lambda: os.getenv("MARKET_ANALYZE_PLAYWRIGHT_EXECUTABLE_PATH", ""),
+    lambda: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    lambda: "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary",
+    lambda: "/usr/bin/google-chrome",
+    lambda: "/usr/bin/google-chrome-stable",
+    lambda: "/snap/bin/chromium",
+    lambda: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    lambda: "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+]
+ANSI_RESET = "\033[0m"
+ANSI_STYLES = {
+    "muted": "\033[90m",
+    "blue": "\033[94m",
+    "cyan": "\033[96m",
+    "green": "\033[92m",
+    "yellow": "\033[93m",
+    "red": "\033[91m",
+    "bold": "\033[1m",
+}
 
 
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+
+
+def supports_ansi() -> bool:
+    if os.getenv("NO_COLOR"):
+        return False
+    if os.getenv("FORCE_COLOR"):
+        return True
+    return bool(getattr(sys.stdout, "isatty", lambda: False)())
+
+
+def style_text(text: str, *styles: str) -> str:
+    if not supports_ansi():
+        return text
+    prefix = "".join(ANSI_STYLES[style] for style in styles if style in ANSI_STYLES)
+    return f"{prefix}{text}{ANSI_RESET}" if prefix else text
+
+
+def emit_cli_log(label: str, message: str, *, tone: str = "blue") -> None:
+    label_text = style_text(f"[{label}]", tone, "bold")
+    print(f"{label_text} {message}")
+
+
+def step_tone(status: str) -> str:
+    if status == "ok":
+        return "green"
+    if status in {"partial", "fallback", "warning"}:
+        return "yellow"
+    if status in {"failed", "error"}:
+        return "red"
+    return "blue"
+
+
+def print_variant_header(variant: str, analysis_date: date) -> None:
+    emit_cli_log("RUN", f"{variant_label(variant)} 생성 시작 · {analysis_date.isoformat()} · variant={variant}", tone="cyan")
+
+
+def summarize_top_recommendations(payload: dict[str, Any], *, limit: int = 3) -> list[str]:
+    slot = (payload.get("slots") or [{}])[0]
+    entries = slot.get("entries") if isinstance(slot, dict) else {}
+    rows: list[dict[str, Any]] = []
+    for strategy in ("pullback", "momentum", "reversal"):
+        for entry in entries.get(strategy) or []:
+            if isinstance(entry, dict):
+                rows.append({
+                    "strategy": strategy,
+                    "name": entry.get("name") or "-",
+                    "code": entry.get("code") or "-",
+                    "score": parse_float(entry.get("score")),
+                    "grade": entry.get("grade") or "-",
+                })
+    rows.sort(key=lambda item: item["score"], reverse=True)
+    return [
+        f"{index}. {row['name']} ({row['code']}) · {row['strategy']} · {row['score']:.1f}점 · {row['grade']}"
+        for index, row in enumerate(rows[:limit], start=1)
+    ]
+
+
+def print_variant_summary(run: dict[str, Any], analysis_date: date) -> None:
+    payload = run["payload"]
+    quality = payload.get("dataQuality") if isinstance(payload.get("dataQuality"), dict) else {}
+    status = str(quality.get("status") or "unknown")
+    status_tone = step_tone(status.lower())
+    buy_count = len(payload["slots"][0]["entries"]["pullback"]) + len(payload["slots"][0]["entries"]["momentum"]) + len(payload["slots"][0]["entries"]["reversal"])
+    emit_cli_log(
+        "DONE",
+        (
+            f"{variant_label(run['variant'])} 완료 · {analysis_date.isoformat()} · "
+            f"품질 {style_text(status, status_tone, 'bold')} · 추천 {buy_count}개"
+        ),
+        tone=status_tone,
+    )
+    emit_cli_log("FILE", f"JS  {run['jsPath']}", tone="muted")
+    emit_cli_log("FILE", f"JSON {run['jsonPath']}", tone="muted")
+    emit_cli_log("FILE", f"HIST {run['historyPath']}", tone="muted")
+    for line in summarize_top_recommendations(payload):
+        emit_cli_log("TOP", line, tone="blue")
+
+
+def emit_cli_failures(label: str, failures: list[str], *, max_lines: int = 8) -> None:
+    visible_failures = [str(failure).strip() for failure in failures if str(failure).strip()]
+    if not visible_failures:
+        return
+    for failure in visible_failures[:max_lines]:
+        emit_cli_log("FAIL", f"{label} · {failure}", tone="red")
+    remaining = len(visible_failures) - max_lines
+    if remaining > 0:
+        emit_cli_log("FAIL", f"{label} · 외 {remaining}건", tone="red")
 
 
 def parse_int(value: Any) -> int:
@@ -322,6 +439,62 @@ def build_kind_event_filter_from_rows(rows: list[dict[str, str]], today: date | 
     return None
 
 
+def iter_browser_executable_candidates() -> list[str]:
+    resolved: list[str] = []
+    seen: set[str] = set()
+    for factory in CHROME_EXECUTABLE_CANDIDATES:
+        candidate = str(factory() or "").strip()
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        if Path(candidate).exists():
+            resolved.append(candidate)
+    return resolved
+
+
+def launch_browser_context(playwright: Any, *, mode: str) -> tuple[Any, Any, dict[str, Any]]:
+    resolved_mode = normalize_variant(mode)
+    launch_notes: list[str] = []
+    launch_attempts: list[str] = []
+
+    if resolved_mode == VARIANT_CANARY:
+        for executable_path in iter_browser_executable_candidates():
+            launch_attempts.append(executable_path)
+            try:
+                browser = playwright.chromium.launch(
+                    headless=True,
+                    executable_path=executable_path,
+                    chromium_sandbox=False,
+                    args=["--disable-blink-features=AutomationControlled", "--lang=ko-KR"],
+                )
+                context = browser.new_context(
+                    viewport={"width": 1440, "height": 1600},
+                    user_agent=BROWSER_USER_AGENT,
+                    locale="ko-KR",
+                )
+                return browser, context, {
+                    "browserSource": f"chrome:{Path(executable_path).name}",
+                    "launchNotes": launch_notes,
+                    "launchAttempts": launch_attempts,
+                }
+            except Exception as error:  # noqa: BLE001
+                launch_notes.append(f"chrome launch failed ({executable_path}): {error}")
+        if not launch_attempts:
+            launch_notes.append("chrome executable unavailable")
+
+    browser = playwright.chromium.launch(headless=True)
+    context = browser.new_context(
+        viewport={"width": 1440, "height": 1600},
+        user_agent=BROWSER_USER_AGENT,
+        locale="ko-KR",
+    )
+    return browser, context, {
+        "browserSource": "playwright-chromium",
+        "launchNotes": launch_notes,
+        "launchAttempts": launch_attempts,
+    }
+
+
 def configure_browser_page(page: Any) -> None:
     page.route(
         "**/*",
@@ -395,19 +568,26 @@ def fetch_kind_event_filter_with_browser(context: Any, code: str, company_name: 
         page.close()
 
 
-def fetch_browser_candidate_enrichments(candidates: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+def fetch_browser_candidate_enrichments(
+    candidates: list[dict[str, Any]],
+    *,
+    mode: str = VARIANT_STABLE,
+) -> tuple[dict[str, dict[str, Any]], list[str], dict[str, Any]]:
     if not candidates:
-        return {}, []
+        return {}, [], {"browserSource": "", "launchNotes": [], "launchAttempts": []}
     try:
         from playwright.sync_api import sync_playwright
     except Exception as error:  # noqa: BLE001
-        return {}, [f"playwright unavailable: {error}"]
+        return {}, [f"playwright unavailable: {error}"], {
+            "browserSource": "unavailable",
+            "launchNotes": [f"playwright unavailable: {error}"],
+            "launchAttempts": [],
+        }
 
     enrichments: dict[str, dict[str, Any]] = {}
     errors: list[str] = []
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={"width": 1440, "height": 1600}, user_agent=BROWSER_USER_AGENT, locale="ko-KR")
+        browser, context, meta = launch_browser_context(p, mode=mode)
         for candidate in candidates:
             code = str(candidate["code"])
             name = str(candidate.get("name") or "")
@@ -430,7 +610,7 @@ def fetch_browser_candidate_enrichments(candidates: list[dict[str, Any]]) -> tup
                 errors.extend(enrichment["errors"])
             enrichments[code] = enrichment
         browser.close()
-    return enrichments, errors
+    return enrichments, errors, meta
 
 
 def is_entry_field_satisfied(entry: dict[str, Any], field_key: str) -> bool:
@@ -448,6 +628,15 @@ def is_entry_field_satisfied(entry: dict[str, Any], field_key: str) -> bool:
     if field_key == "eventFilter":
         return bool(event_filter.get("blocked")) or bool(normalize_text(event_filter.get("note"))) or event_filter.get("earningsDays") is not None or event_filter.get("corporateActionDays") is not None
     return False
+
+
+def is_snapshot_field_satisfied(snapshot: "StockSnapshot", field_key: str) -> bool:
+    entry = {
+        "toss": snapshot.toss or {},
+        "orderbook": snapshot.orderbook or {},
+        "eventFilter": snapshot.event_filter or {},
+    }
+    return is_entry_field_satisfied(entry, field_key)
 
 
 def normalize_text(value: Any) -> str:
@@ -516,6 +705,18 @@ def apply_browser_enrichment_to_entry(entry: dict[str, Any], strategy: str, enri
         entry["statusLabel"] = reversal_status_label(entry.get("grade", "C"), context["regimeLabel"], context["gapScore"]["code"], filters, entry.get("gates") or [])
     sync_entry_manual_input(entry)
     rebuild_entry_notes(entry, strategy)
+
+
+def apply_browser_enrichment_to_snapshot(snapshot: "StockSnapshot", enrichment: dict[str, Any]) -> None:
+    toss = enrichment.get("toss")
+    orderbook = enrichment.get("orderbook")
+    event_filter = enrichment.get("eventFilter")
+    if isinstance(toss, dict):
+        snapshot.toss = {**(snapshot.toss or {}), **toss}
+    if isinstance(orderbook, dict):
+        snapshot.orderbook = {**(snapshot.orderbook or {}), **orderbook}
+    if isinstance(event_filter, dict):
+        snapshot.event_filter = {**(snapshot.event_filter or {}), **event_filter}
 
 
 def parse_cnbc_quote_html(html: str) -> dict[str, float]:
@@ -784,6 +985,8 @@ class StockSnapshot:
     volume_avg_20d: float
     intraday_30m: dict[str, Any]
     event_filter: dict[str, Any] | None
+    toss: dict[str, Any] | None = None
+    orderbook: dict[str, Any] | None = None
 
 
 def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
@@ -863,6 +1066,8 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
         volume_avg_20d=(sum(volume_history[1:21]) / 20) if len(volume_history) > 20 else sum(volume_history) / len(volume_history),
         intraday_30m=intraday_30m,
         event_filter=event_filter,
+        toss=None,
+        orderbook=None,
     )
 
 
@@ -1239,17 +1444,11 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
     toss_order_url = f"https://www.tossinvest.com/stocks/A{snapshot.code}/order"
     toss_chart_url = f"https://www.tossinvest.com/stocks/A{snapshot.code}/chart"
     kind_disclosure_url = "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain"
-    auto_event_filter_ready = bool(
-        snapshot.event_filter
-        and (
-            snapshot.event_filter.get("blocked")
-            or snapshot.event_filter.get("earningsDays") is not None
-            or snapshot.event_filter.get("corporateActionDays") is not None
-        )
-    )
+    auto_event_filter_ready = is_snapshot_field_satisfied(snapshot, "eventFilter")
     if strategy == "momentum":
-        return [
-            {
+        fields: list[dict[str, Any]] = []
+        if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
+            fields.append({
                 "fieldKey": "toss.avgStrength",
                 "label": "당일 평균 체결강도 (%)",
                 "sourceName": "토스증권 주문 화면",
@@ -1260,8 +1459,9 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                     "체결강도 영역에서 당일 평균 값을 확인합니다.",
                     "예: 112.5 처럼 숫자만 붙여넣습니다.",
                 ],
-            },
-            {
+            })
+        if not is_snapshot_field_satisfied(snapshot, "toss.intradayAbove100Ratio"):
+            fields.append({
                 "fieldKey": "toss.intradayAbove100Ratio",
                 "label": "100% 이상 유지 비율 (%)",
                 "sourceName": "토스증권 체결강도 분봉 화면",
@@ -1272,8 +1472,9 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                     "당일 분봉에서 체결강도 100% 이상 구간 비율을 계산하거나 표시값을 확인합니다.",
                     "예: 73.0 처럼 퍼센트 숫자만 붙여넣습니다.",
                 ],
-            },
-            {
+            })
+        if not is_snapshot_field_satisfied(snapshot, "orderbook.bidAskRatio"):
+            fields.append({
                 "fieldKey": "orderbook.bidAskRatio",
                 "label": "매수/매도 호가잔량 비율",
                 "sourceName": "토스증권 호가창",
@@ -1284,11 +1485,12 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                     "총 매수잔량과 총 매도잔량을 확인합니다.",
                     "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25",
                 ],
-            },
-        ]
+            })
+        return fields
     if strategy == "reversal":
-        fields = [
-            {
+        fields = []
+        if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
+            fields.append({
                 "fieldKey": "toss.avgStrength",
                 "label": "당일 평균 체결강도 (%)",
                 "sourceName": "토스증권 주문 화면",
@@ -1299,8 +1501,9 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                     "체결강도 영역의 당일 평균 값을 확인합니다.",
                     "예: 94.2 처럼 숫자만 붙여넣습니다.",
                 ],
-            },
-            {
+            })
+        if not is_snapshot_field_satisfied(snapshot, "toss.lastHourAvgStrength"):
+            fields.append({
                 "fieldKey": "toss.lastHourAvgStrength",
                 "label": "마지막 1시간 평균 체결강도 (%)",
                 "sourceName": "토스증권 체결강도 분봉 화면",
@@ -1311,8 +1514,9 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                     "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
                     "예: 101.0 처럼 숫자만 붙여넣습니다.",
                 ],
-            },
-            {
+            })
+        if not is_snapshot_field_satisfied(snapshot, "orderbook.bidAskRatio"):
+            fields.append({
                 "fieldKey": "orderbook.bidAskRatio",
                 "label": "매수/매도 호가잔량 비율",
                 "sourceName": "토스증권 호가창",
@@ -1323,8 +1527,7 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                     "총 매수잔량과 총 매도잔량을 확인합니다.",
                     "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08",
                 ],
-            },
-        ]
+            })
         if not auto_event_filter_ready:
             fields.append({
                 "fieldKey": "eventFilter",
@@ -1376,7 +1579,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "pullback")
     trade_plan = build_trade_plan("pullback", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
-    return {
+    entry = {
         "rank": 0,
         "name": snapshot.name,
         "code": snapshot.code,
@@ -1398,6 +1601,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
         "source": "jongga-live",
     }
+    return entry
 
 
 def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_top10: bool, kospi_return_5d: float, kospi_return_20d: float) -> dict[str, Any]:
@@ -1421,7 +1625,7 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "momentum")
     trade_plan = build_trade_plan("momentum", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
-    return {
+    entry = {
         "rank": 0,
         "name": snapshot.name,
         "code": snapshot.code,
@@ -1437,12 +1641,16 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
         "keyPoint": f"상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
-        "notes": ["토스 체결강도·호가잔량 미반영"],
+        "notes": [],
+        "toss": snapshot.toss or {},
+        "orderbook": snapshot.orderbook or {},
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
         "source": "jongga-live",
     }
+    rebuild_entry_notes(entry, "momentum")
+    return entry
 
 
 def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
@@ -1489,12 +1697,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     final_score = round(raw_score * reversal_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "reversal")
     trade_plan = build_trade_plan("reversal", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
-    notes = ["토스 체결강도·호가잔량 미반영"]
-    if not auto_event_filter:
-        notes.append("기업 이벤트 필터는 미반영")
-    if not intraday_signal.get("available"):
-        notes.append("30분봉 데이터 미반영")
-    return {
+    entry = {
         "rank": 0,
         "name": snapshot.name,
         "code": snapshot.code,
@@ -1511,14 +1714,18 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
         "keyPoint": f"20일 고점 대비 {drawdown_20d:.1f}% 조정 후 안정화 패턴 여부를 점검했습니다.",
-        "notes": notes,
+        "notes": [],
         "manualInput": manual_input,
         "eventFilter": auto_event_filter,
         "intraday30m": intraday_signal,
+        "toss": snapshot.toss or {},
+        "orderbook": snapshot.orderbook or {},
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
         "source": "jongga-live",
     }
+    rebuild_entry_notes(entry, "reversal")
+    return entry
 
 
 def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1527,21 +1734,30 @@ def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return entries
 
 
-def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, Any]:
+def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str = VARIANT_STABLE) -> dict[str, Any]:
+    resolved_mode = normalize_variant(mode)
     collection_log: list[dict[str, Any]] = []
 
     def log_step(step: str, label: str, started_at: float, *, status: str = "ok", detail: str = "", count: int | None = None) -> None:
+        duration_ms = round((perf_counter() - started_at) * 1000, 1)
         entry: dict[str, Any] = {
             "step": step,
             "label": label,
             "status": status,
-            "durationMs": round((perf_counter() - started_at) * 1000, 1),
+            "durationMs": duration_ms,
         }
         if detail:
             entry["detail"] = detail
         if count is not None:
             entry["count"] = count
         collection_log.append(entry)
+        detail_suffix = f" · {detail}" if detail else ""
+        count_suffix = f" · {count}건" if count is not None else ""
+        emit_cli_log(
+            status.upper(),
+            f"{variant_label(resolved_mode)} · {label} · {duration_ms:.1f}ms{count_suffix}{detail_suffix}",
+            tone=step_tone(status.lower()),
+        )
 
     started_at = perf_counter()
     vkospi_quote = fetch_vkospi_quote()
@@ -1635,6 +1851,8 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, 
         detail=f"성공 {len(snapshots)} / 실패 {len(errors)}",
         count=len(snapshots),
     )
+    if errors:
+        emit_cli_failures("종목 상세 스냅샷 수집 실패", errors)
 
     if not snapshots:
         raise RuntimeError(f"no stock snapshots collected: {' | '.join(errors)}")
@@ -1643,6 +1861,40 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, 
     kospi_return_5d = ((context["kospiClose"] - parse_float(kospi_history[5].get("closePrice"))) / parse_float(kospi_history[5].get("closePrice"))) * 100 if len(kospi_history) > 5 and parse_float(kospi_history[5].get("closePrice")) else 0.0
     kospi_return_20d = ((context["kospiClose"] - parse_float(kospi_history[20].get("closePrice"))) / parse_float(kospi_history[20].get("closePrice"))) * 100 if len(kospi_history) > 20 and parse_float(kospi_history[20].get("closePrice")) else 0.0
     universe_returns = [(snapshot.code, snapshot.return_20d) for snapshot in snapshots]
+
+    browser_enrichments: dict[str, dict[str, Any]] = {}
+    browser_errors: list[str] = []
+    browser_meta: dict[str, Any] = {"browserSource": "", "launchNotes": [], "launchAttempts": []}
+    if resolved_mode == VARIANT_CANARY:
+        canary_browser_candidates = [
+            {"code": snapshot.code, "name": snapshot.name, "needsEventFilter": True}
+            for snapshot in snapshots
+        ]
+        started_at = perf_counter()
+        browser_enrichments, browser_errors, browser_meta = fetch_browser_candidate_enrichments(
+            canary_browser_candidates,
+            mode=resolved_mode,
+        )
+        for snapshot in snapshots:
+            enrichment = browser_enrichments.get(snapshot.code)
+            if enrichment:
+                apply_browser_enrichment_to_snapshot(snapshot, enrichment)
+        launch_note = browser_meta.get("browserSource") or "browser unavailable"
+        log_step(
+            "browser_enrichment",
+            "카나리 브라우저 우회 수집",
+            started_at,
+            status="partial" if browser_errors else "ok",
+            detail=(
+                f"{launch_note} · "
+                f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / "
+                f"호가 {sum(1 for item in browser_enrichments.values() if item.get('orderbook'))} / "
+                f"KIND {sum(1 for item in browser_enrichments.values() if item.get('eventFilter'))}"
+            ),
+            count=len(canary_browser_candidates),
+        )
+        if browser_errors:
+            emit_cli_failures("카나리 브라우저 우회 실패", browser_errors)
 
     started_at = perf_counter()
     pullback_entries = sorted((build_pullback_entry(snapshot, context) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
@@ -1656,41 +1908,50 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, 
         count=len(pullback_entries) + len(momentum_entries) + len(reversal_entries),
     )
 
-    browser_candidates: list[dict[str, Any]] = []
-    seen_browser_codes: set[str] = set()
-    for entry in momentum_entries:
-        if entry["code"] in seen_browser_codes:
-            continue
-        browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": False})
-        seen_browser_codes.add(entry["code"])
-    for entry in reversal_entries:
-        if entry["code"] in seen_browser_codes:
-            for candidate in browser_candidates:
-                if candidate["code"] == entry["code"]:
-                    candidate["needsEventFilter"] = True
-                    break
-            continue
-        browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": True})
-        seen_browser_codes.add(entry["code"])
+    if resolved_mode == VARIANT_STABLE:
+        browser_candidates: list[dict[str, Any]] = []
+        seen_browser_codes: set[str] = set()
+        for entry in momentum_entries:
+            if entry["code"] in seen_browser_codes:
+                continue
+            browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": False})
+            seen_browser_codes.add(entry["code"])
+        for entry in reversal_entries:
+            if entry["code"] in seen_browser_codes:
+                for candidate in browser_candidates:
+                    if candidate["code"] == entry["code"]:
+                        candidate["needsEventFilter"] = True
+                        break
+                continue
+            browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": True})
+            seen_browser_codes.add(entry["code"])
 
-    started_at = perf_counter()
-    browser_enrichments, browser_errors = fetch_browser_candidate_enrichments(browser_candidates)
-    for entry in momentum_entries:
-        enrichment = browser_enrichments.get(entry["code"])
-        if enrichment:
-            apply_browser_enrichment_to_entry(entry, "momentum", enrichment, context)
-    for entry in reversal_entries:
-        enrichment = browser_enrichments.get(entry["code"])
-        if enrichment:
-            apply_browser_enrichment_to_entry(entry, "reversal", enrichment, context)
-    log_step(
-        "browser_enrichment",
-        "브라우저 보강 수집",
-        started_at,
-        status="partial" if browser_errors else "ok",
-        detail=f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / 호가 {sum(1 for item in browser_enrichments.values() if item.get('orderbook'))} / KIND {sum(1 for item in browser_enrichments.values() if item.get('eventFilter'))}",
-        count=len(browser_candidates),
-    )
+        started_at = perf_counter()
+        browser_enrichments, browser_errors, browser_meta = fetch_browser_candidate_enrichments(browser_candidates, mode=resolved_mode)
+        for entry in momentum_entries:
+            enrichment = browser_enrichments.get(entry["code"])
+            if enrichment:
+                apply_browser_enrichment_to_entry(entry, "momentum", enrichment, context)
+        for entry in reversal_entries:
+            enrichment = browser_enrichments.get(entry["code"])
+            if enrichment:
+                apply_browser_enrichment_to_entry(entry, "reversal", enrichment, context)
+        launch_note = browser_meta.get("browserSource") or "playwright-chromium"
+        log_step(
+            "browser_enrichment",
+            "브라우저 보강 수집",
+            started_at,
+            status="partial" if browser_errors else "ok",
+            detail=(
+                f"{launch_note} · "
+                f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / "
+                f"호가 {sum(1 for item in browser_enrichments.values() if item.get('orderbook'))} / "
+                f"KIND {sum(1 for item in browser_enrichments.values() if item.get('eventFilter'))}"
+            ),
+            count=len(browser_candidates),
+        )
+        if browser_errors:
+            emit_cli_failures("브라우저 보강 실패", browser_errors)
 
     all_entries = pullback_entries + momentum_entries + reversal_entries
     missing_public_metrics = sum(1 for entry in all_entries if entry.get("notes"))
@@ -1710,6 +1971,7 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, 
     payload = {
         "schemaVersion": "jongga_result.v1",
         "generatedAt": utc_now_iso(),
+        "variant": resolved_mode,
         "dataQuality": {
             "status": data_quality_status,
             "counts": {
@@ -1746,12 +2008,24 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT) -> dict[str, 
                 }
             ] if fallback_keys else [],
             "collectionLog": collection_log,
-            "note": "CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 토스 공개 체결강도는 Playwright로, 호가 잔량 비율은 Naver 호가 10단계를 브라우저로 읽어 보강하며, Naver 일정이 없을 때는 KIND 최근공시를 Playwright로 조회해 이벤트 필터를 확장합니다.",
+            "note": (
+                f"{variant_label(resolved_mode)} 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. "
+                "역추세 30분봉은 Yahoo 30분봉으로 계산합니다. "
+                + (
+                    "카나리는 Chrome 실행 파일을 우선 시도하고, 실패 시 Playwright Chromium으로 토스 체결강도·호가·KIND 공시를 더 넓은 후보군에 우회 수집합니다."
+                    if resolved_mode == VARIANT_CANARY
+                    else "현재 버전은 Playwright 기반 브라우저 보강을 상위 추천 후보에 한해 적용합니다."
+                )
+            ),
+            "channel": resolved_mode,
+            "channelLabel": variant_label(resolved_mode),
+            "browserSource": browser_meta.get("browserSource") or "",
+            "browserLaunchNotes": browser_meta.get("launchNotes") or [],
         },
         "slots": [
             {
                 "slotId": "slotA",
-                "sourceId": "live-public-run",
+                "sourceId": f"live-public-run-{resolved_mode}",
                 "regime": build_regime_block(context),
                 "gapScore": gap_score,
                 "entries": {
@@ -1783,6 +2057,7 @@ def write_outputs(payload: dict[str, Any], output_path: str | Path, bridge_js_pa
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Generate dated jongga JSON/JS from live public data")
     parser.add_argument("--date", help="Analysis date in YYYY-MM-DD. Defaults to Asia/Seoul today")
+    parser.add_argument("--variant", choices=["all", VARIANT_STABLE, VARIANT_CANARY], default="all", help="Output channel to generate. Defaults to both stable and canary")
     parser.add_argument("--out-dir", default="jongga/output", help="Daily output directory")
     parser.add_argument("--history-js", default="jongga/output/jongga_history.js", help="History manifest JS path")
     parser.add_argument("--out", help="Legacy latest.json output path")
@@ -1794,15 +2069,37 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
     analysis_date = resolve_analysis_date(args.date)
-    payload = payload_with_analysis_date(collect_live_payload(top_limit=args.top_limit), analysis_date)
-    json_path, js_path, history_path = write_daily_outputs(payload, args.out_dir, args.history_js)
+    variants = [VARIANT_STABLE, VARIANT_CANARY] if args.variant == "all" else [normalize_variant(args.variant)]
+    generated_runs: list[dict[str, Any]] = []
+
+    for variant in variants:
+        print_variant_header(variant, analysis_date)
+        payload = payload_with_analysis_date(
+            collect_live_payload(top_limit=args.top_limit, mode=variant),
+            analysis_date,
+            variant=variant,
+        )
+        json_path, js_path, history_path = write_daily_outputs(payload, args.out_dir, args.history_js, variant=variant)
+        generated_runs.append({
+            "variant": variant,
+            "payload": payload,
+            "jsonPath": json_path,
+            "jsPath": js_path,
+            "historyPath": history_path,
+        })
+
     if args.out or args.bridge_js:
         if not args.out:
             raise SystemExit("--out is required when --bridge-js is used")
-        write_outputs(payload, args.out, args.bridge_js)
-    buy_count = len(payload["slots"][0]["entries"]["pullback"]) + len(payload["slots"][0]["entries"]["momentum"]) + len(payload["slots"][0]["entries"]["reversal"])
-    print(f"generated {js_path} and {json_path} for {analysis_date.isoformat()} with {buy_count} entries")
-    print(f"updated {history_path}")
+        stable_run = next((item for item in generated_runs if item["variant"] == VARIANT_STABLE), None)
+        target_run = stable_run or generated_runs[0]
+        write_outputs(target_run["payload"], args.out, args.bridge_js)
+        emit_cli_log("FILE", f"LEGACY JSON {args.out}", tone="muted")
+        if args.bridge_js:
+            emit_cli_log("FILE", f"LEGACY JS   {args.bridge_js}", tone="muted")
+
+    for run in generated_runs:
+        print_variant_summary(run, analysis_date)
     return 0
 
 

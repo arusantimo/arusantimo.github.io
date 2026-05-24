@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
 from io import BytesIO
 from pathlib import Path
+from threading import RLock
 from typing import Any, Dict, Iterable, List, Optional
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
@@ -22,6 +23,7 @@ from .collectors import (
     make_request,
     normalize_date_key,
     normalize_request_error,
+    parse_json_text,
     parse_signed_number,
     safe_number,
     status_entry,
@@ -52,7 +54,14 @@ LEADER_FETCH_CONCURRENCY = 4
 LEADER_SCREEN_LIMIT = 60
 LEADER_HISTORY_FETCH_COUNT = 160
 LEADER_PICK_COUNT = 4
+LEADER_PRIMARY_HISTORY_LIMIT = 12
+LEADER_FALLBACK_HISTORY_LIMIT = 8
+LEADER_RECENT_HISTORY_DAYS = 15
 LEADER_WYCKOFF_HISTORY_DAYS = 120
+WYCKOFF_MIN_HISTORY_DAYS = 30
+WYCKOFF_PRICE_WINDOW_DAYS = 120
+WYCKOFF_SHORT_FLOW_DAYS = 10
+WYCKOFF_MID_FLOW_DAYS = 20
 SECTOR_MOMENTUM_TARGET_COUNT = 5
 SECTOR_HISTORY_REQUIRED_DAYS = 20
 SECTOR_GROUP_URL_CANDIDATES = [
@@ -96,6 +105,11 @@ RESULTS_DIR = STORE_DIR / "results"
 EXPORT_SEED_PATH = STORE_DIR / "export_seed.json"
 DART_CORP_MAP_CACHE_PATH = CACHE_DIR / "dart_corp_map.json"
 DART_CORP_MAP_META_PATH = CACHE_DIR / "dart_corp_map_meta.json"
+LEADER_STOCKS_CACHE_PATH = CACHE_DIR / "leader_stocks.json"
+LEADER_HISTORY_CACHE_PATH = CACHE_DIR / "leader_history.json"
+LEADER_INVESTOR_CACHE_PATH = CACHE_DIR / "leader_investor_series.json"
+SECTOR_HISTORY_CACHE_PATH = CACHE_DIR / "sector_history.json"
+SECTOR_CANDIDATE_CACHE_PATH = CACHE_DIR / "sector_group_candidates.json"
 ANCHOR_COMPONENT_CACHE_PATHS = {
     "export": CACHE_DIR / "anchor_export.json",
     "earnings": CACHE_DIR / "anchor_earnings.json",
@@ -103,6 +117,7 @@ ANCHOR_COMPONENT_CACHE_PATHS = {
     "sectorBreadth": CACHE_DIR / "anchor_sector_breadth.json",
     "valuation": CACHE_DIR / "anchor_valuation.json",
 }
+CACHE_FILE_LOCK = RLock()
 MONTH_NAME_TO_NUMBER = {
     "jan": 1,
     "feb": 2,
@@ -117,6 +132,44 @@ MONTH_NAME_TO_NUMBER = {
     "nov": 11,
     "dec": 12,
 }
+
+
+def now_local_iso() -> str:
+    return datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+def load_cache_file(cache_path: Path) -> Dict[str, Any]:
+    with CACHE_FILE_LOCK:
+        if not cache_path.exists():
+            return {}
+        try:
+            payload = json.loads(cache_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return {}
+        return payload if isinstance(payload, dict) else {}
+
+
+def save_cache_file(cache_path: Path, payload: Dict[str, Any]) -> None:
+    with CACHE_FILE_LOCK:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def get_cache_entry(cache_path: Path, key: str) -> Optional[Dict[str, Any]]:
+    payload = load_cache_file(cache_path)
+    entry = payload.get(str(key) or "")
+    return entry if isinstance(entry, dict) else None
+
+
+def set_cache_entry(cache_path: Path, key: str, entry: Dict[str, Any]) -> None:
+    normalized_key = str(key or "").strip()
+    if not normalized_key:
+        return
+    with CACHE_FILE_LOCK:
+        payload = load_cache_file(cache_path)
+        payload[normalized_key] = entry
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        cache_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def clamp(value: float, min_value: float, max_value: float) -> float:
@@ -332,6 +385,8 @@ def extract_anchor_component_patch(component: str, data: Dict[str, Any]) -> Dict
             "nonSemiconductorMomentum": data.get("nonSemiconductorMomentum"),
             "nonSemiconductorMomentumCoverageCount": data.get("nonSemiconductorMomentumCoverageCount"),
             "nonSemiconductorMomentumPassCount": data.get("nonSemiconductorMomentumPassCount"),
+            "nonSemiconductorMomentumProxy": data.get("nonSemiconductorMomentumProxy"),
+            "nonSemiconductorMomentumProxyReason": data.get("nonSemiconductorMomentumProxyReason"),
         }
     if component == "valuation":
         return {
@@ -340,6 +395,8 @@ def extract_anchor_component_patch(component: str, data: Dict[str, Any]) -> Dict
             "marketValuationCoverageCount": data.get("marketValuationCoverageCount"),
             "marketValuationForwardPerAvg": data.get("marketValuationForwardPerAvg"),
             "marketValuationThreshold": data.get("marketValuationThreshold"),
+            "marketValuationMethod": data.get("marketValuationMethod"),
+            "marketValuationProxyCount": data.get("marketValuationProxyCount"),
         }
     if component == "support":
         return {
@@ -416,13 +473,14 @@ def build_cached_component_result(component: str, live_error_message: str) -> Op
         original_source = str(payload.get("originalSource") or "")
         if original_source:
             source_parts.append(original_source)
+    deduped_source_parts = [part for part in dict.fromkeys(part.strip() for part in source_parts if part and str(part).strip())]
     saved_at = str(payload.get("savedAt") or "")
     suffix = f" · {suffix_label} ({saved_at})" if saved_at else f" · {suffix_label}"
     return CollectorResult(
         dict(payload.get("dataPatch") or {}),
         status_entry(
             "partial",
-            " · ".join(part for part in source_parts if part),
+            " · ".join(deduped_source_parts),
             f"{live_error_message}{suffix}",
         ),
     )
@@ -989,12 +1047,18 @@ def dedupe_candidates(candidates: Iterable[Dict[str, Any]]) -> List[Dict[str, An
         previous = deduped.get(code)
         current_value = safe_number(candidate.get("todayTradingValue")) or 0
         previous_value = safe_number(previous.get("todayTradingValue")) if previous else None
-        if previous is None or current_value > (previous_value or 0):
-            deduped[code] = {
-                "code": code,
-                "name": str(candidate.get("name") or "").strip(),
-                "todayTradingValue": current_value,
-            }
+        merged = dict(previous or {})
+        for key, value in candidate.items():
+            if key in {"code", "name", "todayTradingValue"}:
+                continue
+            if value is not None and value != "":
+                merged[key] = value
+            elif key not in merged:
+                merged[key] = value
+        merged["code"] = code
+        merged["name"] = str(candidate.get("name") or merged.get("name") or "").strip()
+        merged["todayTradingValue"] = current_value if previous is None or current_value > (previous_value or 0) else (previous_value or 0)
+        deduped[code] = merged
     return list(deduped.values())
 
 
@@ -1045,7 +1109,68 @@ def parse_leader_candidate_rows(html: str, trading_value_index: int, minimum_td_
 
 
 def parse_market_sum_rows(html: str) -> List[Dict[str, Any]]:
-    return parse_leader_candidate_rows(html, 7, 12)
+    header_labels: List[str] = []
+    rows: List[Dict[str, Any]] = []
+
+    def header_index(label_matchers: Iterable[str]) -> int:
+        for index, label in enumerate(header_labels):
+            normalized_label = normalize_whitespace(label)
+            if any(matcher in normalized_label for matcher in label_matchers):
+                return index
+        return -1
+
+    for tr_content in re.findall(r"<tr[\s\S]*?<\/tr>", str(html or ""), flags=re.IGNORECASE):
+        cell_objects = parse_html_row_cell_objects(tr_content)
+        cell_texts = [cell["text"] for cell in cell_objects]
+        if not cell_texts:
+            continue
+        if "종목명" in cell_texts and any("거래대금" in text for text in cell_texts):
+            header_labels = cell_texts
+            continue
+        if '/item/main.naver?code=' not in tr_content:
+            continue
+
+        code_match = re.search(r"/item/main\.naver\?code=([A-Z0-9]+)", tr_content)
+        name_match = re.search(r'class="tltle">([^<]+)<', tr_content)
+        td_matches = re.findall(r"<td[^>]*>([\s\S]*?)<\/td>", tr_content, flags=re.IGNORECASE)
+        if not code_match or not name_match or len(td_matches) < 10:
+            continue
+
+        trading_value = None
+        per_value = None
+        roe_value = None
+
+        trading_index = header_index(("거래대금",))
+        per_index = header_index(("PER",))
+        roe_index = header_index(("ROE",))
+        if 0 <= trading_index < len(cell_texts):
+            trading_value = parse_signed_number(cell_texts[trading_index])
+        if 0 <= per_index < len(cell_texts):
+            per_value = parse_signed_number(cell_texts[per_index])
+        if 0 <= roe_index < len(cell_texts):
+            roe_value = parse_signed_number(cell_texts[roe_index])
+
+        if trading_value is None and len(td_matches) > 7:
+            trading_value = parse_signed_number(td_matches[7])
+        if per_value is None and len(td_matches) >= 2:
+            per_value = parse_signed_number(td_matches[-2])
+        if roe_value is None and len(td_matches) >= 1:
+            roe_value = parse_signed_number(td_matches[-1])
+
+        if safe_number(trading_value) is None:
+            continue
+
+        rows.append(
+            {
+                "code": code_match.group(1),
+                "name": strip_html(name_match.group(1)),
+                "todayTradingValue": trading_value,
+                "marketSumPer": per_value if is_valid_forward_per(per_value) else None,
+                "marketSumRoe": roe_value,
+            }
+        )
+
+    return rows
 
 
 def parse_quant_rows(html: str) -> List[Dict[str, Any]]:
@@ -1115,6 +1240,20 @@ def create_snapshot_fallback_candidates(base_data: Dict[str, Any]) -> List[Dict[
     return candidates
 
 
+def dedupe_leader_metrics(items: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    deduped: Dict[str, Dict[str, Any]] = {}
+    for item in items:
+        code = str(item.get("code") or "")
+        if not code:
+            continue
+        previous = deduped.get(code)
+        current_value = safe_number(item.get("cum15dTradingValue")) or 0
+        previous_value = safe_number(previous.get("cum15dTradingValue")) if previous else None
+        if previous is None or current_value > (previous_value or 0):
+            deduped[code] = item
+    return list(deduped.values())
+
+
 def is_leader_excluded(candidate: Dict[str, Any]) -> bool:
     return bool(LEADER_EXCLUDE_REGEX.search(str(candidate.get("name") or ""))) or not bool(
         re.fullmatch(r"\d{6}", str(candidate.get("code") or ""))
@@ -1161,19 +1300,215 @@ def parse_leader_chart_rows(xml_text: str) -> List[Dict[str, Any]]:
     return ordered[-max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS) :]
 
 
-def parse_yahoo_leader_history_rows(closes: Iterable[Any]) -> List[Dict[str, Any]]:
+def format_epoch_date_key(timestamp: Any) -> str:
+    timestamp_value = safe_number(timestamp)
+    if timestamp_value is None:
+        return ""
+    try:
+        return datetime.utcfromtimestamp(int(timestamp_value)).strftime("%Y%m%d")
+    except (OverflowError, OSError, ValueError):
+        return ""
+
+
+def parse_yahoo_leader_history_rows(quote: Dict[str, Any]) -> List[Dict[str, Any]]:
     rows: List[Dict[str, Any]] = []
-    for index, close in enumerate(closes or []):
-        close_value = safe_number(close)
+    series = quote.get("ohlcvSeries") if isinstance(quote, dict) else None
+    for index, row in enumerate(series or []):
+        close_value = safe_number(row.get("close"))
         if close_value is None:
             continue
+        open_value = safe_number(row.get("open"))
+        high_value = safe_number(row.get("high"))
+        low_value = safe_number(row.get("low"))
+        volume_value = safe_number(row.get("volume"))
+        resolved_open = open_value if open_value is not None else close_value
+        resolved_high = high_value if high_value is not None else close_value
+        resolved_low = low_value if low_value is not None else close_value
+        resolved_volume = volume_value if volume_value is not None else 0.0
+        trading_value = ((resolved_open + resolved_high + resolved_low + close_value) / 4) * resolved_volume / 1_000_000
+        date_key = format_epoch_date_key(row.get("timestamp")) or f"Y{index:04d}"
         rows.append(
             {
-                "dateKey": f"Y{index:04d}",
+                "dateKey": date_key,
+                "open": resolved_open,
+                "high": resolved_high,
+                "low": resolved_low,
                 "close": close_value,
+                "volume": resolved_volume,
+                "tradingValue": trading_value,
             }
         )
-    return rows[-max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS) :]
+    deduped = {row["dateKey"]: row for row in rows}
+    return [deduped[key] for key in sorted(deduped)][-max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS) :]
+
+
+def load_cached_leader_history(code: str, minimum_days: int = 60) -> Optional[Dict[str, Any]]:
+    payload = get_cache_entry(LEADER_HISTORY_CACHE_PATH, code)
+    if not payload:
+        return None
+    history = payload.get("history")
+    if not isinstance(history, list) or len(history) < minimum_days:
+        return None
+    return {
+        "history": history[-max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS) :],
+        "historySource": to_store_relative(LEADER_HISTORY_CACHE_PATH),
+        "historyFallbackReason": str(payload.get("fallbackReason") or ""),
+        "historyCachedAt": str(payload.get("savedAt") or ""),
+        "historyOriginalSource": str(payload.get("source") or ""),
+    }
+
+
+def save_cached_leader_history(code: str, history: List[Dict[str, Any]], source: str) -> None:
+    if not code or len(history) < 10:
+        return
+    set_cache_entry(
+        LEADER_HISTORY_CACHE_PATH,
+        code,
+        {
+            "savedAt": now_local_iso(),
+            "source": source,
+            "history": history[-max(LEADER_HISTORY_FETCH_COUNT, LEADER_WYCKOFF_HISTORY_DAYS) :],
+        },
+    )
+
+
+def load_cached_leader_investor_series(code: str) -> Optional[Dict[str, Any]]:
+    payload = get_cache_entry(LEADER_INVESTOR_CACHE_PATH, code)
+    if not payload:
+        return None
+    foreign_net = payload.get("foreignNet") if isinstance(payload.get("foreignNet"), list) else []
+    inst_net = payload.get("instNet") if isinstance(payload.get("instNet"), list) else []
+    retail_net = payload.get("retailNet") if isinstance(payload.get("retailNet"), list) else []
+    if not foreign_net and not inst_net and not retail_net:
+        return None
+    return {
+        "foreignNet": foreign_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+        "instNet": inst_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+        "retailNet": retail_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+        "available": True,
+        "reason": "투자자 수급 캐시 사용",
+        "source": to_store_relative(LEADER_INVESTOR_CACHE_PATH),
+        "cached": True,
+    }
+
+
+def save_cached_leader_investor_series(code: str, payload: Dict[str, Any], source: str) -> None:
+    if not code:
+        return
+    foreign_net = payload.get("foreignNet") if isinstance(payload.get("foreignNet"), list) else []
+    inst_net = payload.get("instNet") if isinstance(payload.get("instNet"), list) else []
+    retail_net = payload.get("retailNet") if isinstance(payload.get("retailNet"), list) else []
+    if not foreign_net and not inst_net and not retail_net:
+        return
+    set_cache_entry(
+        LEADER_INVESTOR_CACHE_PATH,
+        code,
+        {
+            "savedAt": now_local_iso(),
+            "source": source,
+            "foreignNet": foreign_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+            "instNet": inst_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+            "retailNet": retail_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+        },
+    )
+
+
+def load_cached_sector_history(candidate: Dict[str, Any], minimum_days: int) -> Optional[Dict[str, Any]]:
+    cache_key = str(candidate.get("detailUrl") or candidate.get("name") or "")
+    payload = get_cache_entry(SECTOR_HISTORY_CACHE_PATH, cache_key)
+    if not payload:
+        return None
+    source = str(payload.get("source") or "").strip().lower()
+    if any(marker in source for marker in ("test-source", "mock", "fixture")):
+        return None
+    history = payload.get("history")
+    if not isinstance(history, list) or len(history) < minimum_days:
+        return None
+    return {
+        "history": history[-minimum_days:],
+        "historySource": to_store_relative(SECTOR_HISTORY_CACHE_PATH),
+        "historyOriginalSource": str(payload.get("source") or ""),
+        "historyCachedAt": str(payload.get("savedAt") or ""),
+    }
+
+
+def save_cached_sector_history(candidate: Dict[str, Any], history: List[Dict[str, Any]], source: str) -> None:
+    cache_key = str(candidate.get("detailUrl") or candidate.get("name") or "").strip()
+    if not cache_key or len(history) < 5:
+        return
+    set_cache_entry(
+        SECTOR_HISTORY_CACHE_PATH,
+        cache_key,
+        {
+            "savedAt": now_local_iso(),
+            "source": source,
+            "history": history,
+        },
+    )
+
+
+def load_cached_sector_group_candidates() -> Optional[Dict[str, Any]]:
+    if not SECTOR_CANDIDATE_CACHE_PATH.exists():
+        return None
+    try:
+        payload = json.loads(SECTOR_CANDIDATE_CACHE_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+
+    rows = payload.get("rows")
+    if not isinstance(rows, list):
+        return None
+
+    normalized_rows: List[Dict[str, Any]] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        name = normalize_whitespace(row.get("name"))
+        detail_url = str(row.get("detailUrl") or "").strip()
+        if not name or not detail_url:
+            continue
+        normalized_rows.append(
+            {
+                "name": name,
+                "detailUrl": detail_url,
+                "todayTradingValue": safe_number(row.get("todayTradingValue")) or 0,
+                "sourceUrl": str(row.get("sourceUrl") or ""),
+            }
+        )
+
+    if not normalized_rows:
+        return None
+
+    return {
+        "rows": normalized_rows[:SECTOR_MOMENTUM_TARGET_COUNT],
+        "source": to_store_relative(SECTOR_CANDIDATE_CACHE_PATH),
+        "originalSource": str(payload.get("source") or ""),
+        "savedAt": str(payload.get("savedAt") or ""),
+    }
+
+
+def save_cached_sector_group_candidates(rows: List[Dict[str, Any]], source: str) -> None:
+    if not rows:
+        return
+    normalized_rows = [
+        {
+            "name": normalize_whitespace(row.get("name")),
+            "detailUrl": str(row.get("detailUrl") or "").strip(),
+            "todayTradingValue": safe_number(row.get("todayTradingValue")) or 0,
+            "sourceUrl": str(row.get("sourceUrl") or ""),
+        }
+        for row in rows
+        if isinstance(row, dict) and normalize_whitespace(row.get("name")) and str(row.get("detailUrl") or "").strip()
+    ]
+    if not normalized_rows:
+        return
+    payload = {
+        "savedAt": now_local_iso(),
+        "source": source,
+        "rows": normalized_rows[:SECTOR_MOMENTUM_TARGET_COUNT],
+    }
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    SECTOR_CANDIDATE_CACHE_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def fetch_yahoo_leader_history(candidate: Dict[str, Any]) -> Dict[str, Any]:
@@ -1181,7 +1516,7 @@ def fetch_yahoo_leader_history(candidate: Dict[str, Any]) -> Dict[str, Any]:
     for symbol in create_yahoo_equity_symbols(str(candidate.get("code") or "")):
         try:
             quote = fetch_yahoo_chart(symbol, "1y")
-            history = parse_yahoo_leader_history_rows(quote.get("closes") or [])
+            history = parse_yahoo_leader_history_rows(quote)
             if len(history) < 60:
                 raise ValueError(f"{symbol} 60영업일 부족 ({len(history)}건)")
             return {
@@ -1203,17 +1538,639 @@ def fetch_leader_history(candidate: Dict[str, Any]) -> Dict[str, Any]:
         history = parse_leader_chart_rows(xml_text)
         if len(history) < 60:
             raise ValueError(f"네이버 차트 60영업일 부족 ({len(history)}건)")
-        return {
+        payload = {
             "history": history,
             "historySource": "finance.naver.com/fchart",
         }
+        save_cached_leader_history(code, history, payload["historySource"])
+        return payload
     except Exception as naver_error:  # noqa: BLE001
         try:
             yahoo_payload = fetch_yahoo_leader_history(candidate)
             yahoo_payload["historyFallbackReason"] = str(naver_error)
+            save_cached_leader_history(code, yahoo_payload.get("history") or [], yahoo_payload["historySource"])
             return yahoo_payload
         except Exception as yahoo_error:  # noqa: BLE001
+            cached_payload = load_cached_leader_history(code, minimum_days=60)
+            if cached_payload:
+                cached_payload["historyFallbackReason"] = f"Naver: {naver_error}; Yahoo: {yahoo_error}"
+                return cached_payload
             raise ValueError(f"{label} 차트 60영업일 확보 실패 (Naver: {naver_error}; Yahoo: {yahoo_error})")
+
+
+def parse_investor_value(value: Any) -> Optional[float]:
+    if isinstance(value, (int, float)):
+        return float(value) if math.isfinite(value) else None
+    if isinstance(value, str):
+        cleaned = value.replace(",", "").strip()
+        if not cleaned:
+            return None
+        parsed = safe_number(cleaned)
+        return parsed
+    return None
+
+
+def normalize_investor_key(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]", "", str(value or "").lower())
+
+
+def flatten_investor_entries(value: Any, prefix: str = "") -> List[tuple[str, Any]]:
+    if not isinstance(value, dict):
+        return []
+    entries: List[tuple[str, Any]] = []
+    for key, child in value.items():
+        next_key = f"{prefix}.{key}" if prefix else str(key)
+        if isinstance(child, dict):
+            entries.extend(flatten_investor_entries(child, next_key))
+        else:
+            entries.append((next_key, child))
+    return entries
+
+
+def pick_investor_number(row: Dict[str, Any], keys: Iterable[str], fallback_token_groups: Iterable[Iterable[str]]) -> Optional[float]:
+    for key in keys:
+        if key in row:
+            value = parse_investor_value(row.get(key))
+            if value is not None:
+                return value
+
+    flattened = flatten_investor_entries(row)
+    if not flattened:
+        return None
+
+    for raw_key, raw_value in flattened:
+        normalized_key = normalize_investor_key(raw_key)
+        matched = any(all(token in normalized_key for token in token_group) for token_group in fallback_token_groups)
+        if not matched:
+            continue
+        value = parse_investor_value(raw_value)
+        if value is not None:
+            return value
+    return None
+
+
+def fetch_leader_investor_series(candidate: Dict[str, Any]) -> Dict[str, Any]:
+    code = str(candidate.get("code") or "").strip()
+    try:
+        raw_text = fetch_text(
+            f"https://m.stock.naver.com/api/stock/{code}/integration",
+            timeout=12,
+            encodings=("utf-8", "euc-kr"),
+        )
+        payload = parse_json_text(raw_text, context=f"{code} 투자자 수급")
+        deals = payload.get("dealTrendInfos") if isinstance(payload, dict) else []
+        if not isinstance(deals, list) or not deals:
+            raise ValueError("투자자 수급 시계열 없음")
+
+        ordered = list(reversed(deals))[-LEADER_WYCKOFF_HISTORY_DAYS:]
+        foreign_net = [
+            value
+            for value in (
+                pick_investor_number(
+                    row,
+                    ["foreignerPureBuyQuant", "foreignPureBuyQuant", "foreignerNetBuyQuant"],
+                    [["foreigner", "buy"], ["foreign", "buy"], ["foreigner", "net"], ["foreign", "net"]],
+                )
+                for row in ordered
+            )
+            if value is not None
+        ]
+        inst_net = [
+            value
+            for value in (
+                pick_investor_number(
+                    row,
+                    ["organPureBuyQuant", "institutionPureBuyQuant", "organNetBuyQuant"],
+                    [["organ", "buy"], ["institution", "buy"], ["organ", "net"], ["institution", "net"]],
+                )
+                for row in ordered
+            )
+            if value is not None
+        ]
+        retail_net = [
+            value
+            for value in (
+                pick_investor_number(
+                    row,
+                    ["individualPureBuyQuant", "retailPureBuyQuant", "individualNetBuyQuant"],
+                    [["individual", "buy"], ["retail", "buy"], ["individual", "net"], ["retail", "net"]],
+                )
+                for row in ordered
+            )
+            if value is not None
+        ]
+
+        available = bool(foreign_net or inst_net or retail_net)
+        result = {
+            "foreignNet": foreign_net,
+            "instNet": inst_net,
+            "retailNet": retail_net,
+            "available": available,
+            "reason": "" if available else "투자자 수급 필드/형식 미확인",
+            "source": "m.stock.naver.com/api",
+            "cached": False,
+        }
+        if available:
+            save_cached_leader_investor_series(code, result, result["source"])
+        return result
+    except Exception as error:  # noqa: BLE001
+        cached_payload = load_cached_leader_investor_series(code)
+        if cached_payload:
+            cached_payload["reason"] = f"투자자 수급 라이브 실패 ({normalize_request_error(error)}) · 캐시 사용"
+            return cached_payload
+        return {
+            "foreignNet": [],
+            "instNet": [],
+            "retailNet": [],
+            "available": False,
+            "reason": f"투자자 수급 조회 실패 ({normalize_request_error(error)})",
+            "source": "m.stock.naver.com/api",
+            "cached": False,
+        }
+
+
+def tail(values: List[Any], size: int) -> List[Any]:
+    return values[max(0, len(values) - size) :]
+
+
+def mean(values: Iterable[Any]) -> float:
+    normalized = [safe_number(value) or 0 for value in values]
+    return (sum(normalized) / len(normalized)) if normalized else 0.0
+
+
+def stddev(values: Iterable[Any]) -> float:
+    normalized = [safe_number(value) or 0 for value in values]
+    if len(normalized) < 2:
+        return 0.0
+    avg = mean(normalized)
+    return math.sqrt(mean((value - avg) ** 2 for value in normalized))
+
+
+def sum_numbers(values: Iterable[Any]) -> float:
+    return sum(safe_number(value) or 0 for value in values)
+
+
+def classify_wyckoff_phase(input_data: Dict[str, Any]) -> Dict[str, Any]:
+    ohlcv = input_data.get("ohlcv") if isinstance(input_data.get("ohlcv"), list) else []
+    foreign_net = input_data.get("foreignNet") if isinstance(input_data.get("foreignNet"), list) else []
+    inst_net = input_data.get("instNet") if isinstance(input_data.get("instNet"), list) else []
+
+    if len(ohlcv) < WYCKOFF_MIN_HISTORY_DAYS:
+        return {
+            "phase": "NEUTRAL",
+            "confidence": 0.3,
+            "reason": "와이코프용 시계열 부족 (중립)",
+            "candidatePhase": "NEUTRAL",
+            "candidateReason": "표본 부족으로 후보 단계 산출 보류",
+            "metrics": {},
+        }
+
+    window = tail(ohlcv, WYCKOFF_PRICE_WINDOW_DAYS)
+    price_window_days = len(window)
+    flow_window_days = min(max(len(foreign_net), len(inst_net)), WYCKOFF_PRICE_WINDOW_DAYS)
+    closes = [safe_number(row.get("close")) or 0 for row in window]
+    highs = [safe_number(row.get("high")) or 0 for row in window]
+    lows = [safe_number(row.get("low")) or 0 for row in window]
+    volumes = [safe_number(row.get("volume")) or 0 for row in window]
+
+    last = window[-1]
+    high_window = max(highs) if highs else 0
+    low_candidates = [value for value in lows if value > 0]
+    low_window = min(low_candidates) if low_candidates else 0
+    drawdown_pct = ((safe_number(last.get("close")) or 0) / high_window - 1) * 100 if high_window > 0 else 0
+    range_pct = ((high_window / low_window) - 1) * 100 if low_window > 0 else 0
+
+    vol10_avg = mean(tail(volumes, 10))
+    vol30_prev_avg = mean(volumes[-30:-10])
+    vol_ratio_10_vs_30 = vol10_avg / vol30_prev_avg if vol30_prev_avg > 0 else 1
+
+    close20_std = stddev(tail(closes, 20))
+    close_window_std = stddev(closes)
+    volatility_ratio = close20_std / close_window_std if close_window_std > 0 else 1
+
+    high60_recent = max(tail(highs, 5)) if highs else 0
+    new_high_breakout = high60_recent >= high_window * 0.999 if high_window > 0 else False
+
+    foreign_cum_window = sum_numbers(tail(foreign_net, flow_window_days or WYCKOFF_PRICE_WINDOW_DAYS))
+    inst_cum_window = sum_numbers(tail(inst_net, flow_window_days or WYCKOFF_PRICE_WINDOW_DAYS))
+    foreign_cum_10 = sum_numbers(tail(foreign_net, WYCKOFF_SHORT_FLOW_DAYS))
+    inst_cum_10 = sum_numbers(tail(inst_net, WYCKOFF_SHORT_FLOW_DAYS))
+    foreign_cum_20 = sum_numbers(tail(foreign_net, WYCKOFF_MID_FLOW_DAYS))
+    inst_cum_20 = sum_numbers(tail(inst_net, WYCKOFF_MID_FLOW_DAYS))
+    smart_cum_window = foreign_cum_window + inst_cum_window
+    smart_cum_10 = foreign_cum_10 + inst_cum_10
+    smart_cum_20 = foreign_cum_20 + inst_cum_20
+    window_label = f"{price_window_days}일"
+    flow_label = f"{flow_window_days or price_window_days}일"
+    candidate_scores: List[Dict[str, Any]] = []
+
+    if drawdown_pct >= -10 and smart_cum_10 < 0:
+        return {
+            "phase": "E",
+            "confidence": 0.76 if drawdown_pct >= -6 else 0.68,
+            "reason": f"{window_label} 고점 부근({drawdown_pct:.1f}%)에서 외인+기관 {WYCKOFF_SHORT_FLOW_DAYS}일 누적 {smart_cum_10:.0f} 분배",
+            "candidatePhase": "E",
+            "candidateReason": "신고가 부근 분배",
+            "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window, "smartCum10": smart_cum_10},
+        }
+    candidate_scores.append(
+        {
+            "phase": "E",
+            "score": clamp((max(0, 10 + drawdown_pct) / 10) * 0.42 + (0.32 if smart_cum_10 < 0 else 0) + (0.1 if vol_ratio_10_vs_30 >= 0.95 else 0), 0, 0.76),
+            "reason": f"고점 거리 {drawdown_pct:.1f}% · 최근 {WYCKOFF_SHORT_FLOW_DAYS}일 스마트머니 {smart_cum_10:.0f}",
+        }
+    )
+
+    near_high_breakout = drawdown_pct >= -6
+    if near_high_breakout and smart_cum_10 > 0 and vol_ratio_10_vs_30 >= 0.95:
+        return {
+            "phase": "D",
+            "confidence": 0.78 if new_high_breakout and vol_ratio_10_vs_30 >= 1.05 else 0.66,
+            "reason": f"{window_label} 고점 부근 유지 + 외인+기관 {WYCKOFF_SHORT_FLOW_DAYS}일 누적 {smart_cum_10:.0f} + 거래량 {(vol_ratio_10_vs_30 * 100):.0f}%",
+            "candidatePhase": "D",
+            "candidateReason": "고점 돌파 추세 지속",
+            "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window, "smartCum10": smart_cum_10},
+        }
+    candidate_scores.append(
+        {
+            "phase": "D",
+            "score": clamp((0.3 if near_high_breakout else 0) + (0.22 if smart_cum_10 > 0 else 0) + clamp((vol_ratio_10_vs_30 - 0.9) * 0.35, 0, 0.18), 0, 0.76),
+            "reason": f"고점 거리 {drawdown_pct:.1f}% · 최근 {WYCKOFF_SHORT_FLOW_DAYS}일 스마트머니 {smart_cum_10:.0f}",
+        }
+    )
+
+    recovery_rate = (
+        clamp(((safe_number(last.get("close")) or 0) - (safe_number(last.get("low")) or 0)) / ((safe_number(last.get("high")) or 0) - (safe_number(last.get("low")) or 0)), 0, 1)
+        if (safe_number(last.get("high")) or 0) > (safe_number(last.get("low")) or 0)
+        else 1
+    )
+    low_probe_min = min(tail(lows, 20)) if lows else 0
+    probed_and_recovered = (safe_number(last.get("low")) or 0) <= low_probe_min * 1.02 and recovery_rate >= 0.5 if low_probe_min > 0 else False
+    today_foreign_net = foreign_net[-1] if foreign_net else 0
+    today_inst_net = inst_net[-1] if inst_net else 0
+    if probed_and_recovered and volatility_ratio <= 0.8 and (safe_number(today_foreign_net) or 0) + (safe_number(today_inst_net) or 0) >= 0:
+        return {
+            "phase": "C",
+            "confidence": 0.7 if recovery_rate >= 0.6 else 0.6,
+            "reason": f"박스권 하단 테스트 후 종가 {(recovery_rate * 100):.0f}% 회복 + 당일 외인·기관 매수 전환",
+            "candidatePhase": "C",
+            "candidateReason": "Spring 신호",
+            "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window, "smartCum10": smart_cum_10},
+        }
+    candidate_scores.append(
+        {
+            "phase": "C",
+            "score": clamp((0.32 if probed_and_recovered else 0) + (0.18 if recovery_rate >= 0.6 else recovery_rate * 0.18) + (0.1 if (safe_number(today_foreign_net) or 0) + (safe_number(today_inst_net) or 0) >= 0 else 0), 0, 0.72),
+            "reason": f"회복률 {(recovery_rate * 100):.0f}% · 당일 스마트머니 {((safe_number(today_foreign_net) or 0) + (safe_number(today_inst_net) or 0)):.0f}",
+        }
+    )
+
+    is_range = volatility_ratio <= 0.92 and -35 <= drawdown_pct <= -5 and range_pct <= 120
+    smart_flow_support = smart_cum_window > 0 or smart_cum_20 > 0
+    if is_range and smart_flow_support and 0.55 <= vol_ratio_10_vs_30 <= 1.45:
+        return {
+            "phase": "B",
+            "confidence": 0.68 if smart_cum_window > 0 and smart_cum_20 > 0 else 0.6,
+            "reason": f"박스권(σ {(volatility_ratio * 100):.0f}%) + 외인+기관 {flow_label} 누적 {smart_cum_window:.0f} + 최근 {WYCKOFF_MID_FLOW_DAYS}일 {smart_cum_20:.0f}",
+            "candidatePhase": "B",
+            "candidateReason": "매집 박스권",
+            "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window, "smartCumWindow": smart_cum_window, "smartCum20": smart_cum_20},
+        }
+    candidate_scores.append(
+        {
+            "phase": "B",
+            "score": clamp((0.32 if is_range else 0) + (0.18 if smart_cum_window > 0 else 0) + (0.12 if smart_cum_20 > 0 else 0) + (0.1 if 0.55 <= vol_ratio_10_vs_30 <= 1.45 else 0), 0, 0.76),
+            "reason": f"박스권 {'유사' if is_range else '아님'} · {flow_label} 스마트머니 {smart_cum_window:.0f}",
+        }
+    )
+
+    deep_drawdown = drawdown_pct <= -12
+    volume_dried = vol_ratio_10_vs_30 <= 0.85
+    expected_foreign_10 = foreign_cum_window * (WYCKOFF_SHORT_FLOW_DAYS / flow_window_days) if flow_window_days > 0 else 0
+    foreign_turning = foreign_cum_window <= 0 and foreign_cum_10 >= expected_foreign_10 * 0.5
+    if deep_drawdown and volume_dried and foreign_turning:
+        return {
+            "phase": "A",
+            "confidence": 0.62 if drawdown_pct <= -20 and vol_ratio_10_vs_30 <= 0.7 else 0.54,
+            "reason": f"{window_label} 고점 대비 {drawdown_pct:.1f}% + 거래량 {(vol_ratio_10_vs_30 * 100):.0f}% + 외인 매도 수렴",
+            "candidatePhase": "A",
+            "candidateReason": "하락 정지 초기",
+            "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window},
+        }
+    candidate_scores.append(
+        {
+            "phase": "A",
+            "score": clamp((0.34 if deep_drawdown else 0) + (0.18 if volume_dried else 0) + (0.18 if foreign_turning else 0), 0, 0.76),
+            "reason": f"낙폭 {drawdown_pct:.1f}% · 거래량 {(vol_ratio_10_vs_30 * 100):.0f}%",
+        }
+    )
+
+    best_candidate = sorted(candidate_scores, key=lambda item: item.get("score") or 0, reverse=True)[0] if candidate_scores else {"phase": "NEUTRAL", "score": 0.25, "reason": "우세한 후보 단계 없음"}
+    neutral_signals = [
+        "스마트머니 우세" if smart_cum_window > 0 else ("단기 수급 개선" if smart_cum_20 > 0 else "스마트머니 혼조/이탈"),
+        "박스권 유사" if is_range else "추세 구조 우세",
+        "거래량 수축" if vol_ratio_10_vs_30 <= 0.7 else ("거래량 확대" if vol_ratio_10_vs_30 >= 1.1 else "거래량 중립"),
+    ]
+    if best_candidate.get("phase") != "NEUTRAL" and (best_candidate.get("score") or 0) >= 0.48:
+        return {
+            "phase": best_candidate["phase"],
+            "confidence": clamp(best_candidate["score"], 0.45, 0.62),
+            "reason": f"후보 구조 우세 ({' · '.join(neutral_signals)})",
+            "candidatePhase": best_candidate["phase"],
+            "candidateReason": best_candidate["reason"],
+            "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window, "smartCum10": smart_cum_10, "smartCum20": smart_cum_20},
+        }
+
+    return {
+        "phase": "NEUTRAL",
+        "confidence": max(0.3, min(0.45, best_candidate.get("score") or 0)),
+        "reason": f"명확한 와이코프 단계 패턴 없음 ({' · '.join(neutral_signals)})",
+        "candidatePhase": best_candidate.get("phase") or "NEUTRAL",
+        "candidateReason": best_candidate.get("reason") or "우세한 후보 단계 없음",
+        "metrics": {"foreignCumWindow": foreign_cum_window, "instCumWindow": inst_cum_window, "smartCum10": smart_cum_10, "smartCum20": smart_cum_20},
+    }
+
+
+def compute_shock_metrics(history: List[Dict[str, Any]]) -> Dict[str, Optional[float]]:
+    rolling_high = 0.0
+    shock_start = max(0, len(history) - 5)
+    for index, row in enumerate(history):
+        rolling_high = max(rolling_high, safe_number(row.get("high")) or 0)
+        close_value = safe_number(row.get("close")) or 0
+        row["drawdownFromPeakPct"] = ((close_value / rolling_high) - 1) * 100 if rolling_high > 0 else 0
+
+    for index in range(shock_start, len(history)):
+        current = history[index]
+        previous = history[index - 1] if index > 0 else None
+        previous_close = safe_number(previous.get("close")) if isinstance(previous, dict) else None
+        current_close = safe_number(current.get("close"))
+        day_return_pct = ((current_close / previous_close) - 1) * 100 if current_close is not None and previous_close and previous_close > 0 else 0
+        if day_return_pct <= -6 or (safe_number(current.get("drawdownFromPeakPct")) or 0) <= -5:
+            prior_window = history[max(0, index - 5) : index]
+            baseline = mean((row.get("tradingValue") for row in prior_window)) if prior_window else None
+            high_value = safe_number(current.get("high"))
+            low_value = safe_number(current.get("low"))
+            recovery_rate = (
+                clamp(((current_close or 0) - (low_value or 0)) / ((high_value or 0) - (low_value or 0)), 0, 1)
+                if high_value is not None and low_value is not None and high_value > low_value
+                else 1
+            )
+            return {
+                "shockDate": str(current.get("dateKey") or ""),
+                "shockValueRatio": ((safe_number(current.get("tradingValue")) or 0) / baseline) if baseline and baseline > 0 else None,
+                "closeRecoveryRate": recovery_rate,
+            }
+    return {"shockDate": None, "shockValueRatio": None, "closeRecoveryRate": None}
+
+
+def compute_three_day_metrics(history: List[Dict[str, Any]]) -> Dict[str, Optional[float]]:
+    if len(history) < 6:
+        return {"threeDayDropPct": None, "threeDayValueRatio": None}
+    last_three = history[-3:]
+    if not all((safe_number(row.get("close")) or 0) < (safe_number(row.get("open")) or 0) for row in last_three):
+        return {"threeDayDropPct": None, "threeDayValueRatio": None}
+    previous_three = history[-6:-3]
+    start_price = safe_number(previous_three[-1].get("close")) if previous_three else safe_number(last_three[0].get("open"))
+    value_base = sum_numbers(row.get("tradingValue") for row in previous_three)
+    value_current = sum_numbers(row.get("tradingValue") for row in last_three)
+    last_close = safe_number(last_three[-1].get("close"))
+    return {
+        "threeDayDropPct": ((last_close / start_price) - 1) * 100 if last_close is not None and start_price and start_price > 0 else None,
+        "threeDayValueRatio": (value_current / value_base) if value_base > 0 else None,
+    }
+
+
+def compute_leader_metrics(candidate: Dict[str, Any], full_history: List[Dict[str, Any]], investor_series: Dict[str, Any]) -> Dict[str, Any]:
+    recent_history = full_history[-LEADER_RECENT_HISTORY_DAYS:]
+    wyckoff_history = full_history[-LEADER_WYCKOFF_HISTORY_DAYS:]
+    latest = recent_history[-1]
+    previous = recent_history[-2] if len(recent_history) >= 2 else None
+    highest_high = max((safe_number(row.get("high")) or 0 for row in recent_history), default=0)
+    shock_metrics = compute_shock_metrics(recent_history)
+    three_day_metrics = compute_three_day_metrics(recent_history)
+
+    foreign_net = investor_series.get("foreignNet") if isinstance(investor_series.get("foreignNet"), list) else []
+    inst_net = investor_series.get("instNet") if isinstance(investor_series.get("instNet"), list) else []
+    has_investor_series = investor_series.get("available") is not False and bool(foreign_net or inst_net)
+    investor_series_count = max(len(foreign_net), len(inst_net))
+    foreign_cum_wyckoff = sum_numbers(foreign_net[-LEADER_WYCKOFF_HISTORY_DAYS:]) if has_investor_series and foreign_net else None
+    inst_cum_wyckoff = sum_numbers(inst_net[-LEADER_WYCKOFF_HISTORY_DAYS:]) if has_investor_series and inst_net else None
+
+    wyckoff = {"phase": "NEUTRAL", "confidence": 0, "reason": "데이터 부족", "candidatePhase": "NEUTRAL", "candidateReason": ""}
+    if len(wyckoff_history) >= 10:
+        wyckoff = classify_wyckoff_phase({"ohlcv": wyckoff_history, "foreignNet": foreign_net, "instNet": inst_net})
+
+    latest_close = safe_number(latest.get("close"))
+    previous_close = safe_number(previous.get("close")) if previous else None
+    return {
+        "code": candidate.get("code"),
+        "name": candidate.get("name"),
+        "weight": 0,
+        "todayTradingValue": candidate.get("todayTradingValue"),
+        "history15dCount": len(recent_history),
+        "historyWyckoffCount": len(wyckoff_history),
+        "cum15dTradingValue": sum_numbers(row.get("tradingValue") for row in recent_history),
+        "dayReturnPct": ((latest_close / previous_close) - 1) * 100 if latest_close is not None and previous_close and previous_close > 0 else None,
+        "drawdown15dPct": ((latest_close / highest_high) - 1) * 100 if latest_close is not None and highest_high > 0 else None,
+        "shockValueRatio": shock_metrics.get("shockValueRatio"),
+        "threeDayDropPct": three_day_metrics.get("threeDayDropPct"),
+        "threeDayValueRatio": three_day_metrics.get("threeDayValueRatio"),
+        "closeRecoveryRate": shock_metrics.get("closeRecoveryRate"),
+        "shockDate": shock_metrics.get("shockDate"),
+        "latestDate": latest.get("dateKey"),
+        "investorSeriesCount": investor_series_count,
+        "foreignNetCumWyckoff": foreign_cum_wyckoff,
+        "instNetCumWyckoff": inst_cum_wyckoff,
+        "smartCumWyckoff": (foreign_cum_wyckoff + inst_cum_wyckoff) if foreign_cum_wyckoff is not None and inst_cum_wyckoff is not None else None,
+        "investorSeriesAvailable": has_investor_series,
+        "investorSeriesReason": investor_series.get("reason") or "",
+        "history60dCount": len(wyckoff_history),
+        "foreignNetCum60d": foreign_cum_wyckoff,
+        "instNetCum60d": inst_cum_wyckoff,
+        "smartCum60d": (foreign_cum_wyckoff + inst_cum_wyckoff) if foreign_cum_wyckoff is not None and inst_cum_wyckoff is not None else None,
+        "wyckoffPhase": wyckoff.get("phase") or "NEUTRAL",
+        "wyckoffConfidence": wyckoff.get("confidence") or 0,
+        "wyckoffReason": wyckoff.get("reason") or "",
+        "wyckoffCandidatePhase": wyckoff.get("candidatePhase") or "NEUTRAL",
+        "wyckoffCandidateReason": wyckoff.get("candidateReason") or "",
+        "historySource": "",
+        "investorSource": investor_series.get("source") or "",
+    }
+
+
+def build_leader_history_universe(candidates: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    filtered = sorted(
+        [candidate for candidate in candidates if not is_leader_excluded(candidate)],
+        key=lambda item: safe_number(item.get("todayTradingValue")) or 0,
+        reverse=True,
+    )
+    primary = filtered[: min(LEADER_PRIMARY_HISTORY_LIMIT, len(filtered))]
+    primary_codes = {str(candidate.get("code") or "") for candidate in primary}
+    fallback = [
+        candidate
+        for candidate in create_static_fallback_candidates()
+        if not is_leader_excluded(candidate) and str(candidate.get("code") or "") not in primary_codes
+    ][:LEADER_FALLBACK_HISTORY_LIMIT]
+    return {"filtered": filtered, "primary": primary, "fallback": fallback}
+
+
+def collect_leader_metrics(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    if not candidates:
+        return []
+
+    collected: List[Dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=min(LEADER_FETCH_CONCURRENCY, len(candidates))) as executor:
+        future_map = {
+            executor.submit(
+                lambda current: (
+                    fetch_leader_history(current),
+                    fetch_leader_investor_series(current),
+                ),
+                candidate,
+            ): candidate
+            for candidate in candidates
+        }
+        for future in as_completed(future_map):
+            candidate = future_map[future]
+            try:
+                history_payload, investor_payload = future.result()
+                metrics = compute_leader_metrics(candidate, history_payload.get("history") or [], investor_payload)
+                metrics["historySource"] = history_payload.get("historySource") or ""
+                collected.append(metrics)
+            except Exception:
+                continue
+    return collected
+
+
+def load_cached_leader_stocks() -> Optional[Dict[str, Any]]:
+    if not LEADER_STOCKS_CACHE_PATH.exists():
+        return None
+    try:
+        payload = json.loads(LEADER_STOCKS_CACHE_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    data_patch = payload.get("dataPatch")
+    if not isinstance(data_patch, dict) or not data_patch.get("leaderStocks"):
+        return None
+    return payload
+
+
+def save_cached_leader_stocks(data_patch: Dict[str, Any], source: str = "") -> None:
+    if not data_patch.get("leaderStocks"):
+        return
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    LEADER_STOCKS_CACHE_PATH.write_text(
+        json.dumps(
+            {
+                "savedAt": now_local_iso(),
+                "source": source,
+                "dataPatch": data_patch,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
+def collect_leader_stocks(base_data: Dict[str, Any]) -> CollectorResult:
+    gathered: List[Dict[str, Any]] = []
+    sources: List[str] = []
+
+    try:
+        quant_candidates = fetch_quant_candidates()
+        if quant_candidates:
+            gathered.extend(quant_candidates)
+            sources.append("finance.naver.com/sise_quant")
+    except Exception:
+        pass
+
+    if len(gathered) < LEADER_SCREEN_LIMIT:
+        try:
+            market_sum_candidates = fetch_market_sum_candidates()
+            if market_sum_candidates:
+                gathered.extend(market_sum_candidates)
+                sources.append("finance.naver.com/sise_market_sum")
+        except Exception:
+            pass
+
+    snapshot_candidates = create_snapshot_fallback_candidates(base_data)
+    if snapshot_candidates:
+        gathered.extend(snapshot_candidates)
+        sources.append("store/market_analyze_data.json")
+
+    if len(dedupe_candidates(gathered)) < LEADER_PICK_COUNT:
+        gathered.extend(create_static_fallback_candidates())
+        sources.append("static_fallback")
+
+    candidates = dedupe_candidates(gathered)
+    universe = build_leader_history_universe(candidates)
+    primary_metrics = collect_leader_metrics(universe["primary"])
+    metrics = primary_metrics
+
+    if len(metrics) < LEADER_PICK_COUNT and universe["fallback"]:
+        metrics = dedupe_leader_metrics(metrics + collect_leader_metrics(universe["fallback"]))
+
+    leader_stocks = sorted(metrics, key=lambda item: safe_number(item.get("cum15dTradingValue")) or 0, reverse=True)[:LEADER_PICK_COUNT]
+    if leader_stocks:
+        total_weight = sum(safe_number(stock.get("cum15dTradingValue")) or 0 for stock in leader_stocks) or 1
+        for stock in leader_stocks:
+            stock["weight"] = (safe_number(stock.get("cum15dTradingValue")) or 0) / total_weight
+
+        leader_snapshot_date = sorted(str(stock.get("latestDate") or "") for stock in leader_stocks if stock.get("latestDate"))[-1] if any(stock.get("latestDate") for stock in leader_stocks) else ""
+        yahoo_count = sum(1 for stock in leader_stocks if str(stock.get("historySource") or "").startswith("query1.finance.yahoo.com"))
+        cached_history_count = sum(1 for stock in leader_stocks if str(stock.get("historySource") or "").startswith("store/cache/leader_history.json"))
+        cached_investor_count = sum(1 for stock in leader_stocks if str(stock.get("investorSource") or "").startswith("store/cache/leader_investor_series.json"))
+        investor_missing_count = sum(1 for stock in leader_stocks if not stock.get("investorSeriesAvailable"))
+        partial_reasons = yahoo_count > 0 or cached_history_count > 0 or cached_investor_count > 0 or investor_missing_count > 0 or len(leader_stocks) < LEADER_PICK_COUNT
+        status_message = f"대표주 {len(leader_stocks)}/{LEADER_PICK_COUNT}종목 갱신"
+        if yahoo_count > 0:
+            status_message += f" · Yahoo 차트 보완 {yahoo_count}종목"
+        if cached_history_count > 0:
+            status_message += f" · 차트 캐시 보완 {cached_history_count}종목"
+        if cached_investor_count > 0:
+            status_message += f" · 수급 캐시 보완 {cached_investor_count}종목"
+        if investor_missing_count > 0:
+            status_message += f" · 투자자 수급 미연동 {investor_missing_count}종목"
+        if len(metrics) < len(universe["primary"]):
+            status_message += f" · 1차 확보 {len(metrics)}건"
+
+        source_parts = list(dict.fromkeys(
+            [part for part in sources if part]
+            + [str(stock.get("historySource") or "") for stock in leader_stocks if stock.get("historySource")]
+            + [str(stock.get("investorSource") or "") for stock in leader_stocks if stock.get("investorSource")]
+        ))
+        data_patch = {
+            "leaderSnapshotDate": leader_snapshot_date,
+            "leaderStocks": leader_stocks,
+        }
+        save_cached_leader_stocks(data_patch, " · ".join(source_parts))
+        return CollectorResult(
+            data_patch,
+            status_entry("partial" if partial_reasons else "ok", " · ".join(source_parts), status_message),
+        )
+
+    cached_payload = load_cached_leader_stocks()
+    if cached_payload:
+        saved_at = str(cached_payload.get("savedAt") or "")
+        suffix = f" · 최근 성공 캐시 사용 ({saved_at})" if saved_at else " · 최근 성공 캐시 사용"
+        return CollectorResult(
+            dict(cached_payload.get("dataPatch") or {}),
+            status_entry(
+                "partial",
+                " · ".join(part for part in [to_store_relative(LEADER_STOCKS_CACHE_PATH), str(cached_payload.get("source") or "")] if part),
+                f"대표주 수집 실패{suffix}",
+            ),
+        )
+
+    if base_data.get("leaderStocks"):
+        return CollectorResult(
+            {},
+            status_entry("partial", "store/market_analyze_data.json", "대표주 수집 실패 · 기존 스냅샷 유지"),
+        )
+
+    return CollectorResult({"leaderSnapshotDate": "", "leaderStocks": []}, status_entry("error", "finance.naver.com", "대표주 수집 실패"))
 
 
 def build_anchor_universes(base_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -1223,16 +2180,18 @@ def build_anchor_universes(base_data: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         quant_candidates = fetch_quant_candidates()
-        gathered.extend(quant_candidates)
-        sources.append("finance.naver.com/sise_quant")
+        if quant_candidates:
+            gathered.extend(quant_candidates)
+            sources.append("finance.naver.com/sise_quant")
     except Exception:
         pass
 
     if len(gathered) < LEADER_SCREEN_LIMIT:
         try:
             market_sum_candidates = fetch_market_sum_candidates()
-            gathered.extend(market_sum_candidates)
-            sources.append("finance.naver.com/sise_market_sum")
+            if market_sum_candidates:
+                gathered.extend(market_sum_candidates)
+                sources.append("finance.naver.com/sise_market_sum")
         except Exception:
             pass
 
@@ -1366,6 +2325,7 @@ def fetch_sector_group_candidates() -> Dict[str, Any]:
             html_text = fetch_text(source_url, timeout=12, encodings=("euc-kr", "utf-8"))
             rows = parse_sector_group_rows(html_text, source_url)
             if rows:
+                save_cached_sector_group_candidates(rows, source_url)
                 return {
                     "rows": rows[:SECTOR_MOMENTUM_TARGET_COUNT],
                     "source": source_url,
@@ -1374,6 +2334,10 @@ def fetch_sector_group_candidates() -> Dict[str, Any]:
         except Exception as error:  # noqa: BLE001
             last_error = error
             continue
+    cached_payload = load_cached_sector_group_candidates()
+    if cached_payload:
+        cached_payload["fallbackReason"] = str(last_error or "")
+        return cached_payload
     raise ValueError(f"업종 페이지 수집 실패 ({last_error})")
 
 
@@ -1396,26 +2360,38 @@ def parse_sector_history_rows(raw_html: str) -> List[Dict[str, Any]]:
     return [deduped[key] for key in sorted(deduped)]
 
 
-def fetch_sector_history(candidate: Dict[str, Any], days: int = SECTOR_HISTORY_REQUIRED_DAYS) -> List[Dict[str, Any]]:
+def fetch_sector_history(candidate: Dict[str, Any], days: int = SECTOR_HISTORY_REQUIRED_DAYS) -> Dict[str, Any]:
     detail_url = str(candidate.get("detailUrl") or "")
     if not detail_url:
         raise ValueError("업종 상세 링크 없음")
 
     history_rows: List[Dict[str, Any]] = []
-    for page in range(1, 4):
-        page_html = fetch_text(create_sector_history_page_url(detail_url, page), timeout=12, encodings=("euc-kr", "utf-8"))
-        parsed_rows = parse_sector_history_rows(page_html)
-        if not parsed_rows:
-            continue
-        history_rows.extend(parsed_rows)
-        deduped = {row["dateKey"]: row for row in history_rows}
-        history_rows = [deduped[key] for key in sorted(deduped)]
-        if len(history_rows) >= days + 1:
-            break
+    try:
+        for page in range(1, 7):
+            page_html = fetch_text(create_sector_history_page_url(detail_url, page), timeout=12, encodings=("euc-kr", "utf-8"))
+            parsed_rows = parse_sector_history_rows(page_html)
+            if not parsed_rows:
+                continue
+            history_rows.extend(parsed_rows)
+            deduped = {row["dateKey"]: row for row in history_rows}
+            history_rows = [deduped[key] for key in sorted(deduped)]
+            if len(history_rows) >= days + 1:
+                break
 
-    if len(history_rows) < days + 1:
-        raise ValueError(f"업종 일봉 {days + 1}영업일 부족 ({len(history_rows)}건)")
-    return history_rows[-(days + 1) :]
+        if len(history_rows) < days + 1:
+            raise ValueError(f"업종 일봉 {days + 1}영업일 부족 ({len(history_rows)}건)")
+        history_rows = history_rows[-(days + 1) :]
+        save_cached_sector_history(candidate, history_rows, detail_url)
+        return {
+            "history": history_rows,
+            "historySource": detail_url,
+        }
+    except Exception as live_error:  # noqa: BLE001
+        cached_payload = load_cached_sector_history(candidate, minimum_days=days + 1)
+        if cached_payload:
+            cached_payload["historyFallbackReason"] = str(live_error)
+            return cached_payload
+        raise
 
 
 def get_current_month_fingerprint(settings: Optional[Dict[str, str]] = None) -> Dict[str, str]:
@@ -1587,6 +2563,25 @@ def build_neutral_sector_breadth_patch() -> Dict[str, Any]:
         "nonSemiconductorMomentum": None,
         "nonSemiconductorMomentumCoverageCount": 0,
         "nonSemiconductorMomentumPassCount": 0,
+        "nonSemiconductorMomentumProxy": False,
+        "nonSemiconductorMomentumProxyReason": "",
+    }
+
+
+def build_sector_breadth_proxy_patch(base_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    positive_return_breadth = safe_number(base_data.get("supportPositiveReturnBreadth"))
+    above_sma20_breadth = safe_number(base_data.get("supportBreadth20d"))
+    proxy_inputs = [value for value in (positive_return_breadth, above_sma20_breadth) if value is not None]
+    if len(proxy_inputs) < 2:
+        return None
+
+    proxy_momentum = clamp((sum(proxy_inputs) / len(proxy_inputs)) * 100, 0, 100)
+    return {
+        "nonSemiconductorMomentum": proxy_momentum,
+        "nonSemiconductorMomentumCoverageCount": 0,
+        "nonSemiconductorMomentumPassCount": 0,
+        "nonSemiconductorMomentumProxy": True,
+        "nonSemiconductorMomentumProxyReason": "비주도주 20일 수익률/20일선 breadth 기반 업종 프록시",
     }
 
 
@@ -1597,6 +2592,8 @@ def build_neutral_valuation_patch() -> Dict[str, Any]:
         "marketValuationCoverageCount": 0,
         "marketValuationForwardPerAvg": None,
         "marketValuationThreshold": MARKET_VALUATION_THRESHOLD,
+        "marketValuationMethod": "forward",
+        "marketValuationProxyCount": 0,
     }
 
 
@@ -2366,18 +3363,26 @@ def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
 
         analyzed: List[Dict[str, Any]] = []
         failures: List[str] = []
+        cached_count = 0
+        used_cached_candidates = str(sector_payload.get("source") or "").startswith(to_store_relative(SECTOR_CANDIDATE_CACHE_PATH))
         with ThreadPoolExecutor(max_workers=min(LEADER_FETCH_CONCURRENCY, len(sector_candidates))) as executor:
             future_map = {executor.submit(fetch_sector_history, candidate): candidate for candidate in sector_candidates}
             for future in as_completed(future_map):
                 candidate = future_map[future]
                 try:
-                    history = future.result()
+                    history_payload = future.result()
+                    history = history_payload.get("history") if isinstance(history_payload, dict) else None
+                    if not isinstance(history, list):
+                        raise ValueError("업종 시계열 형식 이상")
                     latest_close = safe_number(history[-1].get("close"))
                     previous_close = safe_number(history[-2].get("close")) if len(history) >= 2 else None
                     sma20 = compute_moving_average(history, SECTOR_HISTORY_REQUIRED_DAYS)
                     if latest_close is None or previous_close is None or previous_close <= 0 or sma20 is None:
                         raise ValueError("업종 종가/SMA20 계산 실패")
                     day_return_pct = ((latest_close / previous_close) - 1) * 100
+                    history_source = str(history_payload.get("historySource") or "")
+                    if history_source.startswith("store/cache/sector_history.json"):
+                        cached_count += 1
                     analyzed.append(
                         {
                             "name": candidate["name"],
@@ -2389,6 +3394,21 @@ def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
 
         coverage_count = len(analyzed)
         if coverage_count <= 0:
+            proxy_patch = build_sector_breadth_proxy_patch(base_data)
+            if proxy_patch:
+                message = "업종 시계열 확보 실패로 비주도주 확산 프록시 사용"
+                if failures:
+                    message += f" · 실패 {len(failures)}개"
+                result = CollectorResult(
+                    proxy_patch,
+                    status_entry(
+                        "partial",
+                        f"{sector_payload.get('source') or 'finance.naver.com/sise_group'} · broadening-proxy",
+                        f"{message} · {proxy_patch.get('nonSemiconductorMomentumProxyReason')}",
+                    ),
+                )
+                save_anchor_component_cache("sectorBreadth", result.data_patch, result.status.get("source", ""))
+                return result
             raise ValueError(f"업종 확산 분석 실패 ({'; '.join(failures[:2]) or '유효 시계열 없음'})")
 
         pass_count = sum(1 for item in analyzed if item.get("passed"))
@@ -2397,20 +3417,46 @@ def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
             "nonSemiconductorMomentum": momentum,
             "nonSemiconductorMomentumCoverageCount": coverage_count,
             "nonSemiconductorMomentumPassCount": pass_count,
+            "nonSemiconductorMomentumProxy": False,
+            "nonSemiconductorMomentumProxyReason": "",
         }
 
-        if coverage_count >= SECTOR_MOMENTUM_TARGET_COUNT:
+        minimum_live_coverage = max(3, min(SECTOR_MOMENTUM_TARGET_COUNT, len(sector_candidates)))
+        if coverage_count >= SECTOR_MOMENTUM_TARGET_COUNT and not used_cached_candidates and cached_count == 0:
             status_state = "ok"
-        elif coverage_count >= 3:
-            status_state = "partial"
         else:
-            status_state = "missing"
+            status_state = "partial"
 
         message = f"비반도체 업종 확산 {pass_count}/{coverage_count}업종 통과"
         if coverage_count < len(sector_candidates):
             message += f" · 상위 {len(sector_candidates)}개 중 {coverage_count}개 분석"
         if failures:
             message += f" · 실패 {len(failures)}개"
+        if cached_count:
+            message += f" · 섹터 캐시 보완 {cached_count}개"
+        if used_cached_candidates:
+            message += " · 업종 후보 캐시 사용"
+        if coverage_count < minimum_live_coverage:
+            proxy_patch = build_sector_breadth_proxy_patch(base_data)
+            if proxy_patch:
+                proxy_message = (
+                    f"업종 실측 {pass_count}/{coverage_count}개로 부족 · 비주도주 확산 프록시 {round(proxy_patch['nonSemiconductorMomentum'])}% 사용"
+                )
+                if failures:
+                    proxy_message += f" · 실패 {len(failures)}개"
+                if cached_count:
+                    proxy_message += f" · 섹터 캐시 보완 {cached_count}개"
+                result = CollectorResult(
+                    proxy_patch,
+                    status_entry(
+                        "partial",
+                        f"{sector_payload.get('source') or 'finance.naver.com/sise_group'} · broadening-proxy",
+                        f"{proxy_message} · {proxy_patch.get('nonSemiconductorMomentumProxyReason')}",
+                    ),
+                )
+                save_anchor_component_cache("sectorBreadth", result.data_patch, result.status.get("source", ""))
+                return result
+            message += " · 커버리지 부족으로 보수적 판정"
 
         result = CollectorResult(
             patch,
@@ -2423,6 +3469,18 @@ def collect_sector_breadth(base_data: Dict[str, Any]) -> CollectorResult:
         save_anchor_component_cache("sectorBreadth", result.data_patch, result.status.get("source", ""))
         return result
     except (HTTPError, URLError, TimeoutError, ValueError) as error:
+        proxy_patch = build_sector_breadth_proxy_patch(base_data)
+        if proxy_patch:
+            result = CollectorResult(
+                proxy_patch,
+                status_entry(
+                    "partial",
+                    "broadening-proxy",
+                    f"비반도체 업종 확산 수집 실패 ({normalize_request_error(error)}) · 업종 페이지 대신 비주도주 확산 프록시 사용 · {proxy_patch.get('nonSemiconductorMomentumProxyReason')}",
+                ),
+            )
+            save_anchor_component_cache("sectorBreadth", result.data_patch, result.status.get("source", ""))
+            return result
         cached_result = build_cached_component_result("sectorBreadth", f"비반도체 업종 확산 수집 실패 ({normalize_request_error(error)})")
         if cached_result:
             return cached_result
@@ -2466,6 +3524,7 @@ def collect_market_valuation(
                     "weight": (safe_number(candidate.get("todayTradingValue")) or 0) / total_trading_value,
                     "forwardPer": naver_value,
                     "source": "finance.naver.com",
+                    "valuationMethod": "forward",
                 }
         except Exception as error:  # noqa: BLE001
             naver_error = error
@@ -2479,11 +3538,22 @@ def collect_market_valuation(
                     "weight": (safe_number(candidate.get("todayTradingValue")) or 0) / total_trading_value,
                     "forwardPer": fnguide_value,
                     "source": "comp.fnguide.com",
+                    "valuationMethod": "forward",
                 }
         except Exception as error:  # noqa: BLE001
             if naver_error:
                 raise ValueError(f"Naver {naver_error}; FnGuide {error}") from error
             raise
+
+        market_sum_per = safe_number(candidate.get("marketSumPer"))
+        if is_valid_forward_per(market_sum_per):
+            return {
+                "code": code,
+                "weight": (safe_number(candidate.get("todayTradingValue")) or 0) / total_trading_value,
+                "forwardPer": market_sum_per,
+                "source": "finance.naver.com/sise_market_sum",
+                "valuationMethod": "trailing-proxy",
+            }
 
         if naver_error:
             raise ValueError(f"Naver {naver_error}; FnGuide 유효 Fwd PER 없음")
@@ -2524,9 +3594,17 @@ def collect_market_valuation(
     valid_weight_sum = sum(safe_number(item.get("weight")) or 0 for item in results) or 1
     weighted_forward_per = sum((safe_number(item.get("weight")) or 0) * (safe_number(item.get("forwardPer")) or 0) for item in results) / valid_weight_sum
     coverage_count = len(results)
+    proxy_count = sum(1 for item in results if str(item.get("valuationMethod") or "") == "trailing-proxy")
+    forward_count = max(0, coverage_count - proxy_count)
     stability = None
     if coverage_count >= 10:
         stability = weighted_forward_per <= MARKET_VALUATION_THRESHOLD
+
+    valuation_method = "forward"
+    if proxy_count > 0 and forward_count == 0:
+        valuation_method = "trailing-proxy"
+    elif proxy_count > 0:
+        valuation_method = "mixed-proxy"
 
     score = 25 if stability is None else (50 if stability else 0)
     patch = {
@@ -2535,10 +3613,15 @@ def collect_market_valuation(
         "marketValuationCoverageCount": coverage_count,
         "marketValuationForwardPerAvg": weighted_forward_per,
         "marketValuationThreshold": MARKET_VALUATION_THRESHOLD,
+        "marketValuationMethod": valuation_method,
+        "marketValuationProxyCount": proxy_count,
     }
     source_parts = list(dict.fromkeys(item["source"] for item in results if item.get("source")))
-    status_state = "ok" if coverage_count >= 10 else "partial"
-    status_message = f"Fwd PER {coverage_count}/{len(target_universe)}종목 확보 · 가중 평균 {weighted_forward_per:.1f}배"
+    status_state = "ok" if coverage_count >= 10 and proxy_count == 0 else "partial"
+    metric_label = "Fwd PER" if proxy_count == 0 else "PER"
+    status_message = f"{metric_label} {coverage_count}/{len(target_universe)}종목 확보 · 가중 평균 {weighted_forward_per:.1f}배"
+    if proxy_count > 0:
+        status_message += f" · trailing PER 프록시 {proxy_count}종목"
     if stability is True:
         status_message += f" · 안정 기준 {MARKET_VALUATION_THRESHOLD:.1f}배 이하"
     elif stability is False:
@@ -2803,11 +3886,14 @@ def calculate_fundamental_support_values(data: Dict[str, Any]) -> Dict[str, Any]
     sector_momentum = safe_number(data.get("nonSemiconductorMomentum"))
     sector_coverage = int(data.get("nonSemiconductorMomentumCoverageCount") or 0)
     sector_pass_count = int(data.get("nonSemiconductorMomentumPassCount") or 0)
-    has_sector_measurement = sector_coverage >= 3 and sector_momentum is not None
+    sector_proxy = bool(data.get("nonSemiconductorMomentumProxy"))
+    sector_proxy_reason = str(data.get("nonSemiconductorMomentumProxyReason") or "").strip()
+    has_sector_measurement = sector_momentum is not None and (sector_coverage >= 3 or sector_proxy)
     sector_support_points = clamp((sector_momentum or 0) * 0.5, 0, 50) if has_sector_measurement else 25
 
     valuation_threshold = safe_number(data.get("marketValuationThreshold")) or MARKET_VALUATION_THRESHOLD
     valuation_stability = normalize_boolean_flag(data.get("marketValuationStability"))
+    valuation_method = str(data.get("marketValuationMethod") or "forward").strip().lower()
     if valuation_stability is True:
         valuation_support_points = 50
     elif valuation_stability is False:
@@ -2824,6 +3910,9 @@ def calculate_fundamental_support_values(data: Dict[str, Any]) -> Dict[str, Any]
         support_state = "fragile"
 
     sector_reason = (
+        f"업종 프록시 확산 {round(sector_momentum)}% ({sector_proxy_reason or '비주도주 breadth 기반'})"
+        if sector_proxy and sector_momentum is not None
+        else
         f"업종 확산 {sector_pass_count}/{sector_coverage}개 통과"
         if has_sector_measurement
         else f"업종 확산 커버리지 {sector_coverage}개로 중립값"
@@ -2831,10 +3920,11 @@ def calculate_fundamental_support_values(data: Dict[str, Any]) -> Dict[str, Any]
         else "업종 확산 중립값"
     )
     valuation_forward_per = safe_number(data.get("marketValuationForwardPerAvg"))
+    valuation_label = "가중 Fwd PER" if valuation_method == "forward" else "가중 PER"
     if valuation_stability is True:
-        valuation_reason = f"가중 Fwd PER {valuation_forward_per:.1f}배 <= {valuation_threshold:.1f}배" if valuation_forward_per is not None else f"가중 Fwd PER <= {valuation_threshold:.1f}배"
+        valuation_reason = f"{valuation_label} {valuation_forward_per:.1f}배 <= {valuation_threshold:.1f}배" if valuation_forward_per is not None else f"{valuation_label} <= {valuation_threshold:.1f}배"
     elif valuation_stability is False:
-        valuation_reason = f"가중 Fwd PER {valuation_forward_per:.1f}배 > {valuation_threshold:.1f}배" if valuation_forward_per is not None else f"가중 Fwd PER > {valuation_threshold:.1f}배"
+        valuation_reason = f"{valuation_label} {valuation_forward_per:.1f}배 > {valuation_threshold:.1f}배" if valuation_forward_per is not None else f"{valuation_label} > {valuation_threshold:.1f}배"
     else:
         valuation_reason = "밸류에이션 중립값"
 

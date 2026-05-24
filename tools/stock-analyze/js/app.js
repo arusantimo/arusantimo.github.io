@@ -100,7 +100,7 @@ document.getElementById('btn-add-swing').addEventListener('click', () => {
 
 document.getElementById('btn-buy-guide').addEventListener('click', openGuideModal);
 
-document.querySelectorAll('.tab-button').forEach(button => {
+document.querySelectorAll('.tab-button[data-tab]').forEach(button => {
   button.addEventListener('click', () => setActiveTab(button.dataset.tab));
 });
 
