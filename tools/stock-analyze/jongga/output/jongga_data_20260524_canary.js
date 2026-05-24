@@ -1,22 +1,19 @@
 window.JONGGA_CANARY_DAILY_DATA = window.JONGGA_CANARY_DAILY_DATA || {};
 window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-05-24T06:37:33+00:00",
+  "generatedAt": "2026-05-24T11:40:26+00:00",
   "variant": "canary",
   "dataQuality": {
     "status": "partial",
     "counts": {
-      "total": 21,
-      "failed": 1,
+      "total": 22,
+      "failed": 0,
       "stale": 0,
       "manual": 9,
       "fallback": 0,
       "slots": 1
     },
-    "failedKeys": [
-      "477850 마키나락스: insufficient history for 477850",
-      "playwright unavailable: No module named 'playwright'"
-    ],
+    "failedKeys": [],
     "staleKeys": [],
     "manualKeys": [
       "toss_metrics",
@@ -25,28 +22,28 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
     "fallbackKeys": [],
     "providerHealth": {
       "naver_mobile": {
-        "ok": 21
+        "ok": 22
       },
       "naver_chart": {
-        "ok": 21
+        "ok": 22
       },
       "naver_integration_schedule": {
-        "ok": 1
+        "ok": 7
       },
       "yahoo_chart": {
         "ok": 5
       },
       "yahoo_intraday_30m": {
-        "ok": 21
+        "ok": 22
       },
       "toss_playwright_strength": {
-        "ok": 0
+        "ok": 22
       },
       "naver_orderbook_browser": {
-        "ok": 0
+        "ok": 20
       },
       "kind_playwright_disclosure": {
-        "ok": 0
+        "ok": 7
       },
       "cnbc_quote": {
         "ok": 1
@@ -58,7 +55,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1405.8,
+        "durationMs": 1164.8,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -66,7 +63,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 1237.4,
+        "durationMs": 1278.4,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -74,50 +71,50 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
         "step": "gap_score",
         "label": "갭 스코어 계산",
         "status": "ok",
-        "durationMs": 0.1,
+        "durationMs": 0.0,
         "detail": "G-A 🟢"
       },
       {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 79.8,
+        "durationMs": 78.0,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 0.5
+        "durationMs": 0.2
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 4183.3,
+        "durationMs": 3925.4,
         "count": 22
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
-        "status": "partial",
-        "durationMs": 1587.6,
-        "detail": "성공 21 / 실패 1",
-        "count": 21
+        "status": "ok",
+        "durationMs": 1522.8,
+        "detail": "성공 22 / 실패 0",
+        "count": 22
       },
       {
         "step": "browser_enrichment",
         "label": "카나리 브라우저 우회 수집",
-        "status": "partial",
-        "durationMs": 6.0,
-        "detail": "unavailable · 토스 0 / 호가 0 / KIND 0",
-        "count": 21
+        "status": "ok",
+        "durationMs": 276975.5,
+        "detail": "chrome:chrome.exe · 토스 22 / 호가 20 / KIND 7",
+        "count": 22
       },
       {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 4.0,
+        "durationMs": 6.4,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       }
@@ -125,10 +122,8 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
     "note": "카나리 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 카나리는 Chrome 실행 파일을 우선 시도하고, 실패 시 Playwright Chromium으로 토스 체결강도·호가·KIND 공시를 더 넓은 후보군에 우회 수집합니다.",
     "channel": "canary",
     "channelLabel": "카나리",
-    "browserSource": "unavailable",
-    "browserLaunchNotes": [
-      "playwright unavailable: No module named 'playwright'"
-    ]
+    "browserSource": "chrome:chrome.exe",
+    "browserLaunchNotes": []
   },
   "slots": [
     {
@@ -743,27 +738,26 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
             "entryMeta": "당일 종가 기준",
             "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 109,256주 / 기관 74,631주.",
             "notes": [
-              "토스 체결강도 미반영",
-              "체결강도 100% 유지 비율 미반영",
-              "호가잔량 미반영"
+              "체결강도 100% 유지 비율 미반영"
             ],
-            "toss": {},
-            "orderbook": {},
+            "toss": {
+              "avgStrength": 113.3,
+              "note": "토스 공개 체결강도 113.3%",
+              "source": "toss_playwright_response",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
+              "asOf": "2026-05-22T09:00:14Z"
+            },
+            "orderbook": {
+              "bidAskRatio": 0.4676,
+              "bidTotal": 26139,
+              "askTotal": 55901,
+              "note": "Naver 호가잔량합계 매수 26,139 / 매도 55,901",
+              "source": "naver_orderbook_browser",
+              "sourceUrl": "https://finance.naver.com/item/main.naver?code=036930"
+            },
             "manualInput": {
               "required": true,
               "fields": [
-                {
-                  "fieldKey": "toss.avgStrength",
-                  "label": "당일 평균 체결강도 (%)",
-                  "sourceName": "토스증권 주문 화면",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
-                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 주성엔지니어링 (036930) 주문 화면을 엽니다.",
-                    "체결강도 영역에서 당일 평균 값을 확인합니다.",
-                    "예: 112.5 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
                 {
                   "fieldKey": "toss.intradayAbove100Ratio",
                   "label": "100% 이상 유지 비율 (%)",
@@ -775,24 +769,10 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                     "당일 분봉에서 체결강도 100% 이상 구간 비율을 계산하거나 표시값을 확인합니다.",
                     "예: 73.0 처럼 퍼센트 숫자만 붙여넣습니다."
                   ]
-                },
-                {
-                  "fieldKey": "orderbook.bidAskRatio",
-                  "label": "매수/매도 호가잔량 비율",
-                  "sourceName": "토스증권 호가창",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
-                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 주성엔지니어링 (036930) 호가창을 엽니다.",
-                    "총 매수잔량과 총 매도잔량을 확인합니다.",
-                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25"
-                  ]
                 }
               ],
               "missingFieldCodes": [
-                "toss.avgStrength",
-                "toss.intradayAbove100Ratio",
-                "orderbook.bidAskRatio"
+                "toss.intradayAbove100Ratio"
               ],
               "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
               "source": "browser_manual_override"
@@ -916,27 +896,20 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
             "entryMeta": "당일 종가 기준",
             "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 5,816,074주 / 기관 3,679주.",
             "notes": [
-              "토스 체결강도 미반영",
               "체결강도 100% 유지 비율 미반영",
               "호가잔량 미반영"
             ],
-            "toss": {},
+            "toss": {
+              "avgStrength": 127.7,
+              "note": "토스 공개 체결강도 127.7%",
+              "source": "toss_playwright_response",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A069540/order",
+              "asOf": "2026-05-22T09:00:30Z"
+            },
             "orderbook": {},
             "manualInput": {
               "required": true,
               "fields": [
-                {
-                  "fieldKey": "toss.avgStrength",
-                  "label": "당일 평균 체결강도 (%)",
-                  "sourceName": "토스증권 주문 화면",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A069540/order",
-                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 빛과전자 (069540) 주문 화면을 엽니다.",
-                    "체결강도 영역에서 당일 평균 값을 확인합니다.",
-                    "예: 112.5 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
                 {
                   "fieldKey": "toss.intradayAbove100Ratio",
                   "label": "100% 이상 유지 비율 (%)",
@@ -963,7 +936,6 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                 }
               ],
               "missingFieldCodes": [
-                "toss.avgStrength",
                 "toss.intradayAbove100Ratio",
                 "orderbook.bidAskRatio"
               ],
@@ -1089,27 +1061,26 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
             "entryMeta": "당일 종가 기준",
             "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 10,236주 / 기관 -67,764주.",
             "notes": [
-              "토스 체결강도 미반영",
-              "체결강도 100% 유지 비율 미반영",
-              "호가잔량 미반영"
+              "체결강도 100% 유지 비율 미반영"
             ],
-            "toss": {},
-            "orderbook": {},
+            "toss": {
+              "avgStrength": 101.0,
+              "note": "토스 공개 체결강도 101.0%",
+              "source": "toss_playwright_response",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A009150/order",
+              "asOf": "2026-05-22T10:59:59Z"
+            },
+            "orderbook": {
+              "bidAskRatio": 0.9905,
+              "bidTotal": 10663,
+              "askTotal": 10765,
+              "note": "Naver 호가잔량합계 매수 10,663 / 매도 10,765",
+              "source": "naver_orderbook_browser",
+              "sourceUrl": "https://finance.naver.com/item/main.naver?code=009150"
+            },
             "manualInput": {
               "required": true,
               "fields": [
-                {
-                  "fieldKey": "toss.avgStrength",
-                  "label": "당일 평균 체결강도 (%)",
-                  "sourceName": "토스증권 주문 화면",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A009150/order",
-                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 삼성전기 (009150) 주문 화면을 엽니다.",
-                    "체결강도 영역에서 당일 평균 값을 확인합니다.",
-                    "예: 112.5 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
                 {
                   "fieldKey": "toss.intradayAbove100Ratio",
                   "label": "100% 이상 유지 비율 (%)",
@@ -1121,24 +1092,10 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                     "당일 분봉에서 체결강도 100% 이상 구간 비율을 계산하거나 표시값을 확인합니다.",
                     "예: 73.0 처럼 퍼센트 숫자만 붙여넣습니다."
                   ]
-                },
-                {
-                  "fieldKey": "orderbook.bidAskRatio",
-                  "label": "매수/매도 호가잔량 비율",
-                  "sourceName": "토스증권 호가창",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A009150/order",
-                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 삼성전기 (009150) 호가창을 엽니다.",
-                    "총 매수잔량과 총 매도잔량을 확인합니다.",
-                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25"
-                  ]
                 }
               ],
               "missingFieldCodes": [
-                "toss.avgStrength",
-                "toss.intradayAbove100Ratio",
-                "orderbook.bidAskRatio"
+                "toss.intradayAbove100Ratio"
               ],
               "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
               "source": "browser_manual_override"
@@ -1291,26 +1248,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
             "entryMeta": "당일 종가 기준",
             "keyPoint": "20일 고점 대비 -6.5% 조정 후 안정화 패턴 여부를 점검했습니다.",
             "notes": [
-              "토스 체결강도 미반영",
               "마지막 1시간 체결강도 미반영",
-              "호가잔량 미반영",
               "기업 이벤트 필터는 미반영"
             ],
             "manualInput": {
               "required": true,
               "fields": [
-                {
-                  "fieldKey": "toss.avgStrength",
-                  "label": "당일 평균 체결강도 (%)",
-                  "sourceName": "토스증권 주문 화면",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A036540/order",
-                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 SFA반도체 (036540) 주문 화면을 엽니다.",
-                    "체결강도 영역의 당일 평균 값을 확인합니다.",
-                    "예: 94.2 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
                 {
                   "fieldKey": "toss.lastHourAvgStrength",
                   "label": "마지막 1시간 평균 체결강도 (%)",
@@ -1321,18 +1264,6 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                     "토스증권에서 SFA반도체 (036540) 차트 화면을 엽니다.",
                     "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
                     "예: 101.0 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
-                {
-                  "fieldKey": "orderbook.bidAskRatio",
-                  "label": "매수/매도 호가잔량 비율",
-                  "sourceName": "토스증권 호가창",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A036540/order",
-                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 SFA반도체 (036540) 호가창을 엽니다.",
-                    "총 매수잔량과 총 매도잔량을 확인합니다.",
-                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
                   ]
                 },
                 {
@@ -1349,9 +1280,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                 }
               ],
               "missingFieldCodes": [
-                "toss.avgStrength",
                 "toss.lastHourAvgStrength",
-                "orderbook.bidAskRatio",
                 "eventFilter"
               ],
               "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
@@ -1368,8 +1297,21 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
               "latestClose": 10250.0,
               "previousClose": 10270.0
             },
-            "toss": {},
-            "orderbook": {},
+            "toss": {
+              "avgStrength": 100.5,
+              "note": "토스 공개 체결강도 100.5%",
+              "source": "toss_playwright_response",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A036540/order",
+              "asOf": "2026-05-22T09:00:04Z"
+            },
+            "orderbook": {
+              "bidAskRatio": 1.5675,
+              "bidTotal": 235237,
+              "askTotal": 150072,
+              "note": "Naver 호가잔량합계 매수 235,237 / 매도 150,072",
+              "source": "naver_orderbook_browser",
+              "sourceUrl": "https://finance.naver.com/item/main.naver?code=036540"
+            },
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
@@ -1424,8 +1366,8 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
               },
               {
                 "code": "F3",
-                "status": "⚠️",
-                "note": "실적/배당/분할 일정 수동 확인 필요"
+                "status": "⛔",
+                "note": "KIND 최근공시 2026-05-18 기업설명회(IR) 개최"
               },
               {
                 "code": "F4",
@@ -1502,26 +1444,11 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
             "entryMeta": "당일 종가 기준",
             "keyPoint": "20일 고점 대비 -13.3% 조정 후 안정화 패턴 여부를 점검했습니다.",
             "notes": [
-              "토스 체결강도 미반영",
-              "마지막 1시간 체결강도 미반영",
-              "호가잔량 미반영",
-              "기업 이벤트 필터는 미반영"
+              "마지막 1시간 체결강도 미반영"
             ],
             "manualInput": {
               "required": true,
               "fields": [
-                {
-                  "fieldKey": "toss.avgStrength",
-                  "label": "당일 평균 체결강도 (%)",
-                  "sourceName": "토스증권 주문 화면",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A050890/order",
-                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 쏠리드 (050890) 주문 화면을 엽니다.",
-                    "체결강도 영역의 당일 평균 값을 확인합니다.",
-                    "예: 94.2 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
                 {
                   "fieldKey": "toss.lastHourAvgStrength",
                   "label": "마지막 1시간 평균 체결강도 (%)",
@@ -1533,42 +1460,21 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                     "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
                     "예: 101.0 처럼 숫자만 붙여넣습니다."
                   ]
-                },
-                {
-                  "fieldKey": "orderbook.bidAskRatio",
-                  "label": "매수/매도 호가잔량 비율",
-                  "sourceName": "토스증권 호가창",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A050890/order",
-                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 쏠리드 (050890) 호가창을 엽니다.",
-                    "총 매수잔량과 총 매도잔량을 확인합니다.",
-                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
-                  ]
-                },
-                {
-                  "fieldKey": "eventFilter",
-                  "label": "실적/기업행사 필터",
-                  "sourceName": "KIND 공시",
-                  "sourceUrl": "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain",
-                  "copyHint": "실적 발표와 분할/합병/배당락까지 남은 일수만 입력하거나 차단을 체크합니다.",
-                  "instructions": [
-                    "KIND 공시에서 쏠리드 (050890) 종목 공시를 조회합니다.",
-                    "실적 발표 예정일, 분할/합병/배당락 일정을 확인합니다.",
-                    "남은 일수를 입력하거나 위험 이벤트가 임박했으면 차단을 체크합니다."
-                  ]
                 }
               ],
               "missingFieldCodes": [
-                "toss.avgStrength",
-                "toss.lastHourAvgStrength",
-                "orderbook.bidAskRatio",
-                "eventFilter"
+                "toss.lastHourAvgStrength"
               ],
               "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
               "source": "browser_manual_override"
             },
-            "eventFilter": null,
+            "eventFilter": {
+              "blocked": true,
+              "earningsDays": null,
+              "corporateActionDays": null,
+              "note": "KIND 최근공시 2026-05-18 기업설명회(IR) 개최",
+              "source": "kind_playwright_recent_disclosure"
+            },
             "intraday30m": {
               "available": true,
               "signal": false,
@@ -1579,8 +1485,21 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
               "latestClose": 18130.0,
               "previousClose": 18040.0
             },
-            "toss": {},
-            "orderbook": {},
+            "toss": {
+              "avgStrength": 121.4,
+              "note": "토스 공개 체결강도 121.4%",
+              "source": "toss_playwright_response",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A050890/order",
+              "asOf": "2026-05-22T09:00:11Z"
+            },
+            "orderbook": {
+              "bidAskRatio": 2.6285,
+              "bidTotal": 50975,
+              "askTotal": 19393,
+              "note": "Naver 호가잔량합계 매수 50,975 / 매도 19,393",
+              "source": "naver_orderbook_browser",
+              "sourceUrl": "https://finance.naver.com/item/main.naver?code=050890"
+            },
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
@@ -1713,26 +1632,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
             "entryMeta": "당일 종가 기준",
             "keyPoint": "20일 고점 대비 -16.3% 조정 후 안정화 패턴 여부를 점검했습니다.",
             "notes": [
-              "토스 체결강도 미반영",
               "마지막 1시간 체결강도 미반영",
-              "호가잔량 미반영",
               "기업 이벤트 필터는 미반영"
             ],
             "manualInput": {
               "required": true,
               "fields": [
-                {
-                  "fieldKey": "toss.avgStrength",
-                  "label": "당일 평균 체결강도 (%)",
-                  "sourceName": "토스증권 주문 화면",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A064400/order",
-                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 LG씨엔에스 (064400) 주문 화면을 엽니다.",
-                    "체결강도 영역의 당일 평균 값을 확인합니다.",
-                    "예: 94.2 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
                 {
                   "fieldKey": "toss.lastHourAvgStrength",
                   "label": "마지막 1시간 평균 체결강도 (%)",
@@ -1743,18 +1648,6 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                     "토스증권에서 LG씨엔에스 (064400) 차트 화면을 엽니다.",
                     "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
                     "예: 101.0 처럼 숫자만 붙여넣습니다."
-                  ]
-                },
-                {
-                  "fieldKey": "orderbook.bidAskRatio",
-                  "label": "매수/매도 호가잔량 비율",
-                  "sourceName": "토스증권 호가창",
-                  "sourceUrl": "https://www.tossinvest.com/stocks/A064400/order",
-                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
-                  "instructions": [
-                    "토스증권에서 LG씨엔에스 (064400) 호가창을 엽니다.",
-                    "총 매수잔량과 총 매도잔량을 확인합니다.",
-                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
                   ]
                 },
                 {
@@ -1771,9 +1664,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
                 }
               ],
               "missingFieldCodes": [
-                "toss.avgStrength",
                 "toss.lastHourAvgStrength",
-                "orderbook.bidAskRatio",
                 "eventFilter"
               ],
               "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
@@ -1790,8 +1681,21 @@ window.JONGGA_CANARY_DAILY_DATA["2026-05-24"] = {
               "latestClose": 83200.0,
               "previousClose": 82800.0
             },
-            "toss": {},
-            "orderbook": {},
+            "toss": {
+              "avgStrength": 108.0,
+              "note": "토스 공개 체결강도 108.0%",
+              "source": "toss_playwright_response",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A064400/order",
+              "asOf": "2026-05-22T10:59:59Z"
+            },
+            "orderbook": {
+              "bidAskRatio": 1.6432,
+              "bidTotal": 34495,
+              "askTotal": 20992,
+              "note": "Naver 호가잔량합계 매수 34,495 / 매도 20,992",
+              "source": "naver_orderbook_browser",
+              "sourceUrl": "https://finance.naver.com/item/main.naver?code=064400"
+            },
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",

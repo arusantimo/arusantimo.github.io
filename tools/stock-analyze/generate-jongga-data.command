@@ -9,6 +9,9 @@ fi
 
 script_dir=${0:A:h}
 
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+
 pushd "$script_dir" >/dev/null || exit 1
 
 if command -v python3 >/dev/null 2>&1; then

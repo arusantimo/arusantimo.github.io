@@ -80,9 +80,31 @@ def style_text(text: str, *styles: str) -> str:
     return f"{prefix}{text}{ANSI_RESET}" if prefix else text
 
 
+def safe_console_text(text: str) -> str:
+    encoding = getattr(sys.stdout, "encoding", None)
+    if not encoding:
+        return text
+    try:
+        text.encode(encoding)
+        return text
+    except UnicodeEncodeError:
+        return text.encode(encoding, errors="replace").decode(encoding, errors="replace")
+
+
+def prepare_console_output() -> None:
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if not callable(reconfigure):
+            continue
+        try:
+            reconfigure(encoding="utf-8", errors="replace")
+        except Exception:  # noqa: BLE001
+            continue
+
+
 def emit_cli_log(label: str, message: str, *, tone: str = "blue") -> None:
     label_text = style_text(f"[{label}]", tone, "bold")
-    print(f"{label_text} {message}")
+    print(safe_console_text(f"{label_text} {message}"))
 
 
 def step_tone(status: str) -> str:
@@ -141,15 +163,17 @@ def print_variant_summary(run: dict[str, Any], analysis_date: date) -> None:
         emit_cli_log("TOP", line, tone="blue")
 
 
-def emit_cli_failures(label: str, failures: list[str], *, max_lines: int = 8) -> None:
+def emit_cli_failures(label: str, failures: list[str], *, max_lines: int = 8, level: str = "fail") -> None:
     visible_failures = [str(failure).strip() for failure in failures if str(failure).strip()]
     if not visible_failures:
         return
+    normalized_level = str(level or "fail").strip().upper() or "FAIL"
+    tone = "red" if normalized_level == "FAIL" else "yellow" if normalized_level in {"WARN", "WARNING"} else "blue"
     for failure in visible_failures[:max_lines]:
-        emit_cli_log("FAIL", f"{label} · {failure}", tone="red")
+        emit_cli_log(normalized_level, f"{label} · {failure}", tone=tone)
     remaining = len(visible_failures) - max_lines
     if remaining > 0:
-        emit_cli_log("FAIL", f"{label} · 외 {remaining}건", tone="red")
+        emit_cli_log(normalized_level, f"{label} · 외 {remaining}건", tone=tone)
 
 
 def parse_int(value: Any) -> int:
@@ -578,7 +602,7 @@ def fetch_browser_candidate_enrichments(
     try:
         from playwright.sync_api import sync_playwright
     except Exception as error:  # noqa: BLE001
-        return {}, [f"playwright unavailable: {error}"], {
+        return {}, [], {
             "browserSource": "unavailable",
             "launchNotes": [f"playwright unavailable: {error}"],
             "launchAttempts": [],
@@ -878,6 +902,12 @@ def moving_average(values: list[float], period: int, offset: int = 0) -> float |
     return sum(window) / period
 
 
+def average_or_default(values: list[float], default: float = 0.0) -> float:
+    if not values:
+        return default
+    return sum(values) / len(values)
+
+
 def ema_series(values: list[float], period: int) -> list[float]:
     if not values:
         return []
@@ -994,8 +1024,8 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
     basic = request_json(f"https://m.stock.naver.com/api/stock/{code}/basic", timeout=20.0)
     integration = request_json(f"https://m.stock.naver.com/api/stock/{code}/integration", timeout=20.0)
     history_rows = fetch_naver_price_history(code, 130)
-    if len(history_rows) < 30:
-        raise RuntimeError(f"insufficient history for {code}")
+    if not history_rows:
+        raise RuntimeError(f"price history unavailable for {code}")
 
     close_history = [float(parse_int(row["closePrice"])) for row in history_rows]
     high_history = [float(parse_int(row["highPrice"])) for row in history_rows]
@@ -1006,9 +1036,10 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
     today_deal = deals[0] if deals else {}
     previous_deal = deals[1] if len(deals) > 1 else {}
 
-    high_52w = parse_float(find_total_info(total_infos, "highPriceOf52Weeks")) or max(high_history[:120])
+    history_high_window = high_history[:120] or [parse_float(basic.get("highPrice") or basic.get("closePrice") or basic.get("stockPrice")) or 0.0]
+    high_52w = parse_float(find_total_info(total_infos, "highPriceOf52Weeks")) or max(history_high_window)
     current_price = parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
-    prev_close = parse_float(find_total_info(total_infos, "lastClosePrice")) or close_history[1]
+    prev_close = parse_float(find_total_info(total_infos, "lastClosePrice")) or (close_history[1] if len(close_history) > 1 else current_price)
     open_price = parse_float(find_total_info(total_infos, "openPrice")) or parse_float(history_rows[0]["openPrice"])
     high_price = parse_float(find_total_info(total_infos, "highPrice")) or parse_float(history_rows[0]["highPrice"])
     low_price = parse_float(find_total_info(total_infos, "lowPrice")) or parse_float(history_rows[0]["lowPrice"])
@@ -1056,14 +1087,14 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
         ma60_prev=ma60_prev,
         weekly_rsi=weekly_rsi,
         macd_hist=compute_macd_histogram(close_history),
-        high_20d=max(high_history[:20]),
-        low_5d=min(low_history[:5]),
+        high_20d=max(high_history[:20] or [high_price or current_price]),
+        low_5d=min(low_history[:5] or [low_price or current_price]),
         high_52w=high_52w,
         return_5d=return_5d,
         return_20d=return_20d,
         return_21d=return_21d,
-        volume_avg_5d=(sum(volume_history[1:6]) / 5) if len(volume_history) > 5 else volume_history[0],
-        volume_avg_20d=(sum(volume_history[1:21]) / 20) if len(volume_history) > 20 else sum(volume_history) / len(volume_history),
+        volume_avg_5d=average_or_default(volume_history[1:6], volume_history[0]),
+        volume_avg_20d=average_or_default(volume_history[1:21], volume_history[0]),
         intraday_30m=intraday_30m,
         event_filter=event_filter,
         toss=None,
@@ -1884,7 +1915,7 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
             "browser_enrichment",
             "카나리 브라우저 우회 수집",
             started_at,
-            status="partial" if browser_errors else "ok",
+            status="warning" if browser_meta.get("browserSource") == "unavailable" else "partial" if browser_errors else "ok",
             detail=(
                 f"{launch_note} · "
                 f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / "
@@ -1941,7 +1972,7 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
             "browser_enrichment",
             "브라우저 보강 수집",
             started_at,
-            status="partial" if browser_errors else "ok",
+            status="warning" if browser_meta.get("browserSource") == "unavailable" else "partial" if browser_errors else "ok",
             detail=(
                 f"{launch_note} · "
                 f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / "
@@ -2067,6 +2098,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    prepare_console_output()
     args = build_parser().parse_args()
     analysis_date = resolve_analysis_date(args.date)
     variants = [VARIANT_STABLE, VARIANT_CANARY] if args.variant == "all" else [normalize_variant(args.variant)]

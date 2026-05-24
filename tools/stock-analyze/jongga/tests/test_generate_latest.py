@@ -2,8 +2,9 @@ import io
 import unittest
 from contextlib import redirect_stdout
 from datetime import date
+from unittest import mock
 
-from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_top_trading_value_gate, emit_cli_failures, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload, select_top_trading_value_codes
+from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_stock_snapshot, build_top_trading_value_gate, emit_cli_failures, fetch_browser_candidate_enrichments, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
 from tempfile import TemporaryDirectory
 
@@ -212,6 +213,102 @@ class GenerateLatestTest(unittest.TestCase):
         output = buffer.getvalue()
         self.assertIn("[FAIL] 종목 상세 스냅샷 수집 실패 · 000660 SK하이닉스: timeout", output)
         self.assertIn("[FAIL] 종목 상세 스냅샷 수집 실패 · 외 1건", output)
+
+    def test_emit_cli_failures_can_print_warning_level(self):
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            emit_cli_failures(
+                "브라우저 보강 건너뜀",
+                ["playwright unavailable: No module named 'playwright'"],
+                level="warning",
+            )
+        output = buffer.getvalue()
+        self.assertIn("[WARNING] 브라우저 보강 건너뜀 · playwright unavailable: No module named 'playwright'", output)
+
+    @mock.patch("jongga.generate_latest.build_auto_event_filter", return_value=None)
+    @mock.patch("jongga.generate_latest.fetch_reversal_intraday_signal", return_value={"available": False, "signal": False, "candles": []})
+    @mock.patch("jongga.generate_latest.fetch_naver_price_history")
+    @mock.patch("jongga.generate_latest.request_json")
+    def test_build_stock_snapshot_accepts_short_history(self, request_json_mock, price_history_mock, _intraday_mock, _event_filter_mock):
+        request_json_mock.side_effect = [
+            {"closePrice": "1020", "stockPrice": "1020", "sosok": "KOSDAQ"},
+            {
+                "totalInfos": [
+                    {"code": "lastClosePrice", "value": "1000"},
+                    {"code": "openPrice", "value": "1010"},
+                    {"code": "highPrice", "value": "1030"},
+                    {"code": "lowPrice", "value": "990"},
+                    {"code": "accumulatedTradingVolume", "value": "123456"},
+                    {"code": "accumulatedTradingValue", "value": "12,345,678,900"},
+                    {"code": "marketValue", "value": "1조 2,000억"},
+                ],
+                "dealTrendInfos": [],
+            },
+        ]
+        price_history_mock.return_value = [
+            {
+                "closePrice": "1020",
+                "highPrice": "1030",
+                "lowPrice": "990",
+                "openPrice": "1010",
+                "accumulatedTradingVolume": "123456",
+            },
+            {
+                "closePrice": "1000",
+                "highPrice": "1010",
+                "lowPrice": "980",
+                "openPrice": "990",
+                "accumulatedTradingVolume": "100000",
+            },
+            {
+                "closePrice": "995",
+                "highPrice": "1005",
+                "lowPrice": "970",
+                "openPrice": "980",
+                "accumulatedTradingVolume": "90000",
+            },
+        ]
+
+        snapshot = build_stock_snapshot((1, "477850", "마키나락스"))
+
+        self.assertEqual(snapshot.code, "477850")
+        self.assertEqual(snapshot.current_price, 1020.0)
+        self.assertEqual(snapshot.prev_close, 1000.0)
+        self.assertEqual(snapshot.high_20d, 1030.0)
+        self.assertEqual(snapshot.low_5d, 970.0)
+        self.assertEqual(snapshot.volume_avg_20d, (100000.0 + 90000.0) / 2)
+
+    def test_fetch_browser_candidate_enrichments_treats_missing_playwright_as_note(self):
+        import builtins
+
+        original_import = builtins.__import__
+
+        def raising_import(name, *args, **kwargs):
+            if name == "playwright.sync_api":
+                raise ModuleNotFoundError("No module named 'playwright'")
+            return original_import(name, *args, **kwargs)
+
+        with mock.patch("builtins.__import__", side_effect=raising_import):
+            enrichments, errors, meta = fetch_browser_candidate_enrichments([{"code": "005930", "name": "삼성전자", "needsEventFilter": False}])
+
+        self.assertEqual(enrichments, {})
+        self.assertEqual(errors, [])
+        self.assertEqual(meta["browserSource"], "unavailable")
+        self.assertIn("playwright unavailable", meta["launchNotes"][0])
+
+    def test_safe_console_text_replaces_unencodable_characters(self):
+        stdout = mock.Mock()
+        stdout.encoding = "cp949"
+        with mock.patch("sys.stdout", stdout):
+            self.assertEqual(safe_console_text("G-A 🟢"), "G-A ?")
+
+    def test_prepare_console_output_prefers_utf8_when_supported(self):
+        stdout = mock.Mock()
+        stderr = mock.Mock()
+        with mock.patch("sys.stdout", stdout), mock.patch("sys.stderr", stderr):
+            prepare_console_output()
+        stdout.reconfigure.assert_called_once_with(encoding="utf-8", errors="replace")
+        stderr.reconfigure.assert_called_once_with(encoding="utf-8", errors="replace")
 
     def _sample_payload(self):
         return {
