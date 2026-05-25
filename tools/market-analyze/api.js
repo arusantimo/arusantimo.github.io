@@ -94,7 +94,11 @@ async function fetchLiveFinanceData() {
             const fearKeywords = ["하락", "폭락", "손절", "한강", "망", "끝", "도망", "개미", "지옥", "곡소리", "파멸", "던져"];
             const fearScore = titles.reduce((sum, title) => sum + fearKeywords.filter(keyword => title.includes(keyword)).length, 0);
             marketData.sentiment = Math.max(0, 50 - (fearScore * 3));
-            setMetricDisplay("val-sent", `${marketData.sentiment}점 (AI추정)`, "font-mono text-cyan-400 font-bold text-lg");
+            marketData.sentimentSource = "live-ai";
+            const sentimentLabel = typeof getSentimentSourceLabel === "function"
+                ? getSentimentSourceLabel(marketData.sentimentSource, true)
+                : "AI추정";
+            setMetricDisplay("val-sent", `${marketData.sentiment}점 (${sentimentLabel})`, "font-mono text-cyan-400 font-bold text-lg");
             document.getElementById("input-sent").value = marketData.sentiment;
             log(`[SENT] <span class='text-emerald-400 font-bold'>성공:</span> 대중 투심 ➜ <b>${marketData.sentiment}점</b>`);
         } catch (err) {

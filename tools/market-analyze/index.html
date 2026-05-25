@@ -238,6 +238,7 @@
                         <div id="theory-subtab-bar" class="theory-subtab-bar">
                             <button class="theory-subtab-btn is-active" data-subtab="cycle">하워드 막스</button>
                             <button class="theory-subtab-btn" data-subtab="anchor">펀더멘털 앵커</button>
+                            <button class="theory-subtab-btn" data-subtab="bubble">버블 엔진</button>
                             <button class="theory-subtab-btn" data-subtab="soros">소로스</button>
                             <button class="theory-subtab-btn" data-subtab="minsky">민스키</button>
                             <button class="theory-subtab-btn" data-subtab="kostolany">코스톨라니</button>
@@ -435,6 +436,24 @@
                                         <div id="anchor-support-detail-reason" class="anchor-detail-reason">-</div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="theory-subtab-panel" data-subtab-panel="bubble">
+                        <div class="theory-panel-header">
+                            <div class="theory-panel-classifier is-scored">오버레이 경고 · 4대 버블 플래그</div>
+                            <span id="bubble-panel-status" class="panel-status-badge is-missing">미수집</span>
+                        </div>
+                        <p id="bubble-panel-status-message" class="theory-panel-status-text">버블 엔진 입력 결과 대기 중</p>
+                        <p class="theory-panel-intro">
+                            버블 엔진은 기존 P-Index와 사이클 링을 대체하지 않고, 신용매수·IPO·적자 혁신주·연준 브레이크 네 플래그로 파국 임계기만 별도로 감시합니다.
+                        </p>
+                        <div class="bubble-panel-layout">
+                            <div id="bubble-summary-card" class="bubble-summary-card"></div>
+                            <div class="bubble-flag-shell">
+                                <div id="bubble-flag-tab-bar" class="bubble-flag-tab-bar" role="tablist" aria-label="버블 플래그"></div>
+                                <div id="bubble-flag-panel" class="bubble-flag-panel"></div>
                             </div>
                         </div>
                     </div>
@@ -769,6 +788,7 @@
         </div>
     </div>
 
+    <script src="sentiment-source.js"></script>
     <script src="state.js"></script>
     <script src="cycle-config.js"></script>
     <script src="wyckoff.js"></script>
@@ -779,8 +799,10 @@
     <script src="bull-trap.js"></script>
     <script src="portfolio-range.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="regime-policy.js"></script>
     <script src="fundamental-anchor.js"></script>
     <script src="artifact-loader.js"></script>
+    <script src="bubble-ui.js"></script>
     <script src="engine.js"></script>
     <script src="main.js"></script>
 </body>

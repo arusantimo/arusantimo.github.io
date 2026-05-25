@@ -146,6 +146,7 @@ const PORTFOLIO_STANCE_TARGETS = {
     "비중 조절": { cashTarget: 55, aggressiveTarget: 30 },
     "현금 우선": { cashTarget: 80, aggressiveTarget: 10 }
 };
+const ANCHOR_BUFFERED_CYCLE_KEY = "anchor-buffered-overheat";
 
 function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
@@ -159,15 +160,26 @@ function getCycleLegLabel(leg) {
     return leg === "falling" ? "하락 레그" : "상승 레그";
 }
 
-function resolveCycleLeg(previousRiskIndex, riskIndex, previousLeg = "rising") {
+function shouldBufferCycleLeg(options = {}) {
+    return String(options.marketRegimeKey || "") === ANCHOR_BUFFERED_CYCLE_KEY
+        && !options.bubbleCriticalTrigger
+        && !(Number(options.trapScore) >= 10);
+}
+
+function resolveCycleLeg(previousRiskIndex, riskIndex, previousLeg = "rising", options = {}) {
+    let nextLeg = previousLeg || "rising";
     if (!Number.isFinite(previousRiskIndex)) {
-        return previousLeg || "rising";
+        nextLeg = previousLeg || "rising";
+    } else {
+        const delta = riskIndex - previousRiskIndex;
+        if (delta >= 2) nextLeg = "rising";
+        else if (delta <= -2) nextLeg = "falling";
     }
 
-    const delta = riskIndex - previousRiskIndex;
-    if (delta >= 2) return "rising";
-    if (delta <= -2) return "falling";
-    return previousLeg || "rising";
+    if (shouldBufferCycleLeg(options)) {
+        return "rising";
+    }
+    return nextLeg || "rising";
 }
 
 function getRiskDeltaLabel(previousRiskIndex, riskIndex) {
@@ -233,5 +245,20 @@ function getPortfolioTargets(stageKey, isDebasement = false) {
     return {
         cashTarget: stanceTargets?.cashTarget ?? stage.cashTarget,
         aggressiveTarget: stanceTargets?.aggressiveTarget ?? stage.aggressiveTarget
+    };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        CYCLE_STAGES,
+        ANCHOR_BUFFERED_CYCLE_KEY,
+        getCycleStage,
+        getCycleLegLabel,
+        resolveCycleLeg,
+        getRiskDeltaLabel,
+        getStageProgress,
+        getStageTone,
+        resolveCycleStage,
+        getPortfolioTargets
     };
 }

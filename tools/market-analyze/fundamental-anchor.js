@@ -5,10 +5,27 @@
     const FUNDAMENTAL_CORP_CACHE_MONTH_KEY = "marketAnalyzeDartCorpMapMonth";
     const FUNDAMENTAL_CORP_CACHE_FINGERPRINT_KEY = "marketAnalyzeDartCorpMapFingerprint";
     const KOSIS_EXPORT_INDICATOR_URL = "https://kosis.kr/visual/nsportalStats/detailContents.do?listId=B&statJipyoId=3660&vStatJipyoId=5193";
+    const TRADING_ECONOMICS_EXPORT_URL = "https://tradingeconomics.com/south-korea/exports";
+    const TRADING_ECONOMICS_EXPORT_YOY_URL = "https://tradingeconomics.com/south-korea/exports-yoy";
     const KOSIS_EXPORT_SERIES_CONFIG = {
         orgId: "360",
         tblId: "DT_1R11001_FRM101",
         lookbackMonths: 26
+    };
+    const MONTH_NAME_REGEX = "(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)";
+    const MONTH_NAME_TO_NUMBER = {
+        jan: 1,
+        feb: 2,
+        mar: 3,
+        apr: 4,
+        may: 5,
+        jun: 6,
+        jul: 7,
+        aug: 8,
+        sep: 9,
+        oct: 10,
+        nov: 11,
+        dec: 12
     };
 
     function clampLocal(value, min, max) {
@@ -78,6 +95,96 @@
             export3mAvgYoY: null,
             state: "neutral",
             score: 17,
+            reason
+        };
+    }
+
+    function getMonthNumber(monthName) {
+        return MONTH_NAME_TO_NUMBER[String(monthName || "").replace(/[^A-Za-z]/g, "").slice(0, 3).toLowerCase()] ?? null;
+    }
+
+    function monthNameToKey(monthName, year) {
+        const monthNumber = getMonthNumber(monthName);
+        const yearValue = Number(year);
+        if (!monthNumber || !Number.isFinite(yearValue)) return "";
+        return `${yearValue}${String(monthNumber).padStart(2, "0")}`;
+    }
+
+    function inferLatestMonthKey(latestMonthName, previousMonthName, previousYear) {
+        const latestMonthNumber = getMonthNumber(latestMonthName);
+        const previousMonthNumber = getMonthNumber(previousMonthName);
+        const yearValue = Number(previousYear);
+        if (!latestMonthNumber || !previousMonthNumber || !Number.isFinite(yearValue)) return "";
+        return monthNameToKey(latestMonthName, latestMonthNumber < previousMonthNumber ? yearValue + 1 : yearValue);
+    }
+
+    function htmlToCompactText(rawHtml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(String(rawHtml || ""), "text/html");
+        const text = doc.body?.textContent || doc.documentElement?.textContent || "";
+        return text.replace(/\s+/g, " ").trim();
+    }
+
+    function extractJsStringArray(rawHtml, variableName) {
+        const match = String(rawHtml || "").match(new RegExp(`var\\s+${variableName}\\s*=\\s*\\[(.*?)\\]\\s*;`, "is"));
+        if (!match) return [];
+        return match[1]
+            .split(",")
+            .map(token => token.trim().replace(/^['"]|['"]$/g, ""))
+            .filter(Boolean);
+    }
+
+    function hasExportCoreMetrics(payload = {}) {
+        return Boolean(normalizeMonthKey(payload.latestMonth || "")) && Number.isFinite(payload.exportYoY) && Number.isFinite(payload.exportYoYDelta);
+    }
+
+    function mergeExportData(primary = {}, secondary = {}) {
+        const merged = { ...primary };
+        Object.entries(secondary || {}).forEach(([key, value]) => {
+            if ((merged[key] === null || merged[key] === "" || merged[key] === undefined) && value !== null && value !== "" && value !== undefined) {
+                merged[key] = value;
+            }
+        });
+        return merged;
+    }
+
+    function buildExportData(payload = {}, fallbackReason = "공개 수출 소스 수집 실패") {
+        const latestMonth = normalizeMonthKey(payload.latestMonth || "");
+        const exportValueUsd = Number.isFinite(payload.exportValueUsd) ? payload.exportValueUsd : null;
+        const exportYoY = Number.isFinite(payload.exportYoY) ? payload.exportYoY : null;
+        const exportYoYDelta = Number.isFinite(payload.exportYoYDelta) ? payload.exportYoYDelta : null;
+        const export3mAvgYoY = Number.isFinite(payload.export3mAvgYoY) ? payload.export3mAvgYoY : null;
+        const hasLevel = Boolean(latestMonth) || Number.isFinite(exportValueUsd);
+
+        let state = "supportive";
+        let score = 24;
+        if (Number.isFinite(exportYoY) && exportYoY > 5 && Number.isFinite(exportYoYDelta) && exportYoYDelta > 0) {
+            state = "validated";
+            score = 35;
+        } else if (Number.isFinite(exportYoY) && exportYoY <= 0 && Number.isFinite(exportYoYDelta) && exportYoYDelta < 0) {
+            state = "fragile";
+            score = 10;
+        } else if (!Number.isFinite(exportYoY) && !Number.isFinite(export3mAvgYoY)) {
+            state = hasLevel ? "neutral" : "neutral";
+            score = hasLevel ? 17 : 17;
+        }
+
+        const reason = [
+            latestMonth ? `최신 발표월 ${formatMonthLabel(latestMonth)}` : null,
+            Number.isFinite(exportYoY) ? `수출 YoY ${formatSignedPercentText(exportYoY)}` : null,
+            Number.isFinite(exportYoYDelta) ? `가속도 ${formatSignedPercentText(exportYoYDelta, 1, "%p")}` : null,
+            Number.isFinite(export3mAvgYoY) ? `3개월 평균 ${formatSignedPercentText(export3mAvgYoY)}` : null,
+            !hasExportCoreMetrics({ latestMonth, exportYoY, exportYoYDelta }) && hasLevel ? "최신 발표월/레벨 반영" : null
+        ].filter(Boolean).join(" · ") || fallbackReason;
+
+        return {
+            latestMonth,
+            exportValueUsd,
+            exportYoY,
+            exportYoYDelta,
+            export3mAvgYoY,
+            state,
+            score,
             reason
         };
     }
@@ -329,13 +436,81 @@
         };
     }
 
+    function parseIndicatorPageExportData(html) {
+        const valueMatch = String(html || "").match(/현재값[^<]*<\/dt>\s*<dd[^>]*>([\d,.-]+)<\/dd>/i);
+        const monthMatch = String(html || "").match(/기준일[^<]*<\/dt>\s*<dd[^>]*>([\d.]+)<\/dd>/i);
+        const latestMonth = normalizeMonthKey(monthMatch?.[1] || "") || normalizeMonthKey(extractJsStringArray(html, "vPrdDeArry").at(-1) || "");
+        return {
+            latestMonth,
+            exportValueUsd: parseSignedAmount(valueMatch?.[1] || "")
+        };
+    }
+
     async function fetchIndicatorPageExportData() {
         const html = await fetchWithProxyFallback(KOSIS_EXPORT_INDICATOR_URL, "수출액", { timeoutMs: 12000 });
-        const valueMatch = html.match(/현재값[^<]*<\/dt>\s*<dd[^>]*>([\d,.-]+)<\/dd>/i);
-        const monthMatch = html.match(/기준일[^<]*<\/dt>\s*<dd[^>]*>([\d.]+)<\/dd>/i);
+        return parseIndicatorPageExportData(html);
+    }
+
+    function parseTradingEconomicsExportSummary(rawHtml) {
+        const text = htmlToCompactText(rawHtml);
+        const patterns = [
+            new RegExp(`Exports in South Korea .*? to ([\\d,.\\-]+) USD (Million|Billion) in (${MONTH_NAME_REGEX}) from ([\\d,.\\-]+) USD (Million|Billion) in (${MONTH_NAME_REGEX})(?: of)? (\\d{4})`, "i"),
+            new RegExp(`Exports in South Korea .*? to ([\\d,.\\-]+) in (${MONTH_NAME_REGEX}) from ([\\d,.\\-]+) in (${MONTH_NAME_REGEX})(?: of)? (\\d{4})`, "i"),
+            new RegExp(`South Korea.?s exports .*? to ([\\d,.\\-]+) USD (Million|Billion) in (${MONTH_NAME_REGEX}) from ([\\d,.\\-]+) USD (Million|Billion) in (${MONTH_NAME_REGEX})(?: of)? (\\d{4})`, "i"),
+            new RegExp(`South Korea.?s exports .*? to ([\\d,.\\-]+) in (${MONTH_NAME_REGEX}) from ([\\d,.\\-]+) in (${MONTH_NAME_REGEX})(?: of)? (\\d{4})`, "i")
+        ];
+
+        for (const pattern of patterns) {
+            const match = text.match(pattern);
+            if (!match) continue;
+            if (match.length >= 8) {
+                const exportValue = parseSignedAmount(match[1]);
+                return {
+                    latestMonth: inferLatestMonthKey(match[3], match[6], match[7]),
+                    exportValueUsd: String(match[2] || "").toLowerCase() === "billion" && Number.isFinite(exportValue)
+                        ? exportValue * 1000
+                        : exportValue
+                };
+            }
+            return {
+                latestMonth: inferLatestMonthKey(match[2], match[4], match[5]),
+                exportValueUsd: parseSignedAmount(match[1])
+            };
+        }
+        throw new Error("TradingEconomics 수출 레벨 요약을 해석하지 못했습니다.");
+    }
+
+    function parseTradingEconomicsExportYoY(rawHtml) {
+        const text = htmlToCompactText(rawHtml);
+        const summaryMatch = text.match(
+            new RegExp(`Exports YoY in South Korea .*? to ([\\d,.\\-]+) percent in (${MONTH_NAME_REGEX}) from ([\\d,.\\-]+) percent in (${MONTH_NAME_REGEX})(?: of)? (\\d{4})`, "i")
+        );
+        if (!summaryMatch) {
+            throw new Error("TradingEconomics 수출 YoY 요약을 해석하지 못했습니다.");
+        }
+        const latestYoy = parseSignedAmount(summaryMatch[1]);
+        const previousYoy = parseSignedAmount(summaryMatch[3]);
         return {
-            latestMonth: normalizeMonthKey(monthMatch?.[1] || ""),
-            exportValueUsd: parseSignedAmount(valueMatch?.[1] || "")
+            latestMonth: inferLatestMonthKey(summaryMatch[2], summaryMatch[4], summaryMatch[5]),
+            exportYoY: latestYoy,
+            exportYoYDelta: Number.isFinite(latestYoy) && Number.isFinite(previousYoy) ? latestYoy - previousYoy : null,
+            export3mAvgYoY: null
+        };
+    }
+
+    async function fetchTradingEconomicsExportData() {
+        const [summaryHtml, yoyHtml] = await Promise.all([
+            fetchWithProxyFallback(TRADING_ECONOMICS_EXPORT_URL, "South Korea Exports", { timeoutMs: 15000 }),
+            fetchWithProxyFallback(TRADING_ECONOMICS_EXPORT_YOY_URL, "South Korea Exports YoY", { timeoutMs: 15000 })
+        ]);
+        const summary = parseTradingEconomicsExportSummary(summaryHtml);
+        const yoy = parseTradingEconomicsExportYoY(yoyHtml);
+        return {
+            latestMonth: yoy.latestMonth || summary.latestMonth || "",
+            exportValueUsd: summary.exportValueUsd,
+            exportYoY: yoy.exportYoY,
+            exportYoYDelta: yoy.exportYoYDelta,
+            export3mAvgYoY: yoy.export3mAvgYoY
         };
     }
 
@@ -348,45 +523,55 @@
             pageData = null;
         }
 
-        if (!apiKey) {
-            if (pageData?.latestMonth && Number.isFinite(pageData.exportValueUsd)) {
-                return {
-                    ...buildNeutralExportData("KOSIS 키 미입력 · 최신 수출 레벨만 반영"),
-                    latestMonth: pageData.latestMonth,
-                    exportValueUsd: pageData.exportValueUsd
-                };
-            }
-            return buildNeutralExportData("KOSIS 키 미입력");
+        let publicData = null;
+        try {
+            publicData = buildExportData(mergeExportData(pageData || {}, await fetchTradingEconomicsExportData()));
+        } catch (error) {
+            publicData = null;
         }
 
-        try {
-            const series = await fetchKosisExportSeries(apiKey);
-            const momentum = calculateExportMomentumFromSeries(series);
-            return {
-                latestMonth: momentum.latestMonth || pageData?.latestMonth || "",
-                exportValueUsd: Number.isFinite(momentum.exportValueUsd) ? momentum.exportValueUsd : pageData?.exportValueUsd ?? null,
-                exportYoY: momentum.exportYoY,
-                exportYoYDelta: momentum.exportYoYDelta,
-                export3mAvgYoY: momentum.export3mAvgYoY,
-                state: momentum.state,
-                score: momentum.score,
-                reason: momentum.reason
-            };
-        } catch (error) {
-            if (pageData?.latestMonth && Number.isFinite(pageData.exportValueUsd)) {
-                return {
-                    latestMonth: pageData.latestMonth,
-                    exportValueUsd: pageData.exportValueUsd,
-                    exportYoY: null,
-                    exportYoYDelta: null,
-                    export3mAvgYoY: null,
-                    state: "neutral",
-                    score: 17,
-                    reason: `KOSIS 시계열 조회 실패 (${error.message}) · 최신 발표월 레벨만 반영`
-                };
+        if (hasExportCoreMetrics(publicData || {})) {
+            if (apiKey) {
+                try {
+                    const series = await fetchKosisExportSeries(apiKey);
+                    const momentum = calculateExportMomentumFromSeries(series);
+                    publicData = buildExportData(mergeExportData(publicData, {
+                        latestMonth: momentum.latestMonth || pageData?.latestMonth || "",
+                        exportValueUsd: Number.isFinite(momentum.exportValueUsd) ? momentum.exportValueUsd : pageData?.exportValueUsd ?? null,
+                        exportYoY: momentum.exportYoY,
+                        exportYoYDelta: momentum.exportYoYDelta,
+                        export3mAvgYoY: momentum.export3mAvgYoY
+                    }), publicData.reason);
+                } catch (error) {
+                    // 공개 소스가 충분하면 KOSIS 보강 실패는 무시합니다.
+                }
             }
-            return buildNeutralExportData(`수출 모멘텀 조회 실패 (${error.message})`);
+            return publicData;
         }
+
+        if (apiKey) {
+            try {
+                const series = await fetchKosisExportSeries(apiKey);
+                const momentum = calculateExportMomentumFromSeries(series);
+                return buildExportData(
+                    mergeExportData(publicData || pageData || {}, {
+                        latestMonth: momentum.latestMonth || pageData?.latestMonth || "",
+                        exportValueUsd: Number.isFinite(momentum.exportValueUsd) ? momentum.exportValueUsd : pageData?.exportValueUsd ?? null,
+                        exportYoY: momentum.exportYoY,
+                        exportYoYDelta: momentum.exportYoYDelta,
+                        export3mAvgYoY: momentum.export3mAvgYoY
+                    })
+                );
+            } catch (error) {
+                // 공개 소스로 충분하면 그대로 사용하고, 아니면 아래 페이지 레벨/중립으로 내려갑니다.
+            }
+        }
+
+        if (publicData) return publicData;
+        if (pageData?.latestMonth || Number.isFinite(pageData?.exportValueUsd)) {
+            return buildExportData(pageData, "KOSIS 공개 페이지 기준 최신 발표월/레벨 반영");
+        }
+        return buildNeutralExportData("공개 수출 소스 수집 실패");
     }
 
     function getCurrentMonthFingerprint(settings = {}) {
@@ -776,6 +961,25 @@
 
     function buildAdviceActions(finalState, stance, context = {}) {
         const exportLabel = formatMonthLabel(context.exportLatestMonth);
+        const anchorBufferedAdvance = finalState === "validated-overheat"
+            && context.marketRegimeKey === "anchor-buffered-overheat"
+            && !context.bubbleCriticalTrigger
+            && (Number(context.trapScore) || 0) < 10;
+        const peakConfirmed = context.cycleStageKey === "euphoria";
+        if (anchorBufferedAdvance) {
+            if (peakConfirmed) {
+                return {
+                    now: "정점 확인 전까지는 현금 비중을 급하게 늘리지 말고, 기존 주도 포지션만 선별 유지합니다.",
+                    watch: "환희 고착, Bull Trap, 버블 Critical 전환처럼 꼭지 확인 신호가 붙는지 점검합니다.",
+                    break: "정점 신호가 확인되면 그때부터 분할 익절과 현금 비중 확대를 시작합니다."
+                };
+            }
+            return {
+                now: "현금 비중을 서둘러 늘리기보다 주도주와 실적 개선 축 중심으로 공격 비중을 유지합니다.",
+                watch: "탐욕이 환희로 넘어가는지, 아니면 수출·실적이 계속 따라오는지 구분합니다.",
+                break: "꼭지 확인이나 Bull Trap 신호가 나오면 그때부터 분할 익절과 현금화로 전환합니다."
+            };
+        }
         const actions = {
             "분할 확대": {
                 now: "투매나 조정이 확대될 때 분할 매수 계획을 기계적으로 실행합니다.",
@@ -890,6 +1094,10 @@
         const marketRegimeKey = data.marketRegimeKey || "standard";
         const marketRegimeLabel = data.marketRegimeLabel || "표준 레짐";
         const marketRegimeReason = data.marketRegimeReason || "특수 레짐 조건 없음";
+        const anchorBufferedOverheat = marketRegimeKey === "anchor-buffered-overheat";
+        const bubbleCriticalTrigger = !!data.bubbleCriticalTrigger;
+        const bubbleRegimeLabel = data.bubbleRegimeLabel || "표준 버블 경계";
+        const bubbleCriticalReason = data.bubbleCriticalReason || "Critical Trigger 미발동";
         const hotPsychology = stageKey === "greed" || stageKey === "euphoria";
         const lowCycle = ["panic", "capitulation", "pessimism"].includes(stageKey);
         const anchorStrong = anchorState === "validated";
@@ -913,7 +1121,16 @@
         let state = "balanced";
         let label = "균형 국면";
 
-        if (wyckoffDistributionBreadth >= 0.5 || trapScore >= 10 || minskyWarning) {
+        if (bubbleCriticalTrigger) {
+            state = "critical-bubble";
+            label = "버블 파국 임계";
+        } else if (trapScore >= 10) {
+            state = "distribution-risk";
+            label = "분배/하락 전환 경계";
+        } else if (anchorBufferedOverheat) {
+            state = "validated-overheat";
+            label = "과열이지만 정당화됨";
+        } else if (wyckoffDistributionBreadth >= 0.5 || minskyWarning) {
             state = "distribution-risk";
             label = "분배/하락 전환 경계";
         } else if (lowCycle && anchorSupportive) {
@@ -933,7 +1150,7 @@
             label = "구조 강세 연장";
         }
 
-        if (marketRegimeKey === "secular-expansion" && state !== "distribution-risk") {
+        if (marketRegimeKey === "secular-expansion" && state !== "distribution-risk" && state !== "critical-bubble") {
             if (anchorStrong && broadeningSupportive) {
                 state = "structural-bull";
                 label = "구조 강세 연장";
@@ -941,6 +1158,9 @@
                 state = "validated-overheat";
                 label = "과열이지만 정당화됨";
             }
+        } else if (anchorBufferedOverheat && state !== "distribution-risk" && state !== "critical-bubble") {
+            state = "validated-overheat";
+            label = "과열이지만 정당화됨";
         }
 
         const baseBiasMap = {
@@ -955,6 +1175,9 @@
             denial: 4
         };
         let marketAdviceBias = baseBiasMap[stageKey] ?? 2;
+        if (bubbleCriticalTrigger) {
+            marketAdviceBias = 4;
+        }
         if (hotPsychology && anchorStrong && broadeningStrong) {
             marketAdviceBias = Math.max(0, marketAdviceBias - 1);
         }
@@ -974,6 +1197,14 @@
             marketAdviceBias = Math.min(4, marketAdviceBias + 1);
             marketAdviceBias = Math.max(3, marketAdviceBias);
         }
+        if (anchorBufferedOverheat && !bubbleCriticalTrigger && trapScore < 10) {
+            marketAdviceBias = stageKey === "euphoria"
+                ? Math.min(marketAdviceBias, 2)
+                : Math.min(marketAdviceBias, 1);
+        }
+        if (state === "critical-bubble") {
+            marketAdviceBias = 4;
+        }
         if (state === "distribution-risk") {
             marketAdviceBias = Math.max(marketAdviceBias, 3);
         }
@@ -989,12 +1220,25 @@
         let title = "모델별 신호를 하나의 흐름으로 묶으면 아직 혼합 국면입니다.";
         let narrative = `하워드 막스는 ${marksView}, 소로스는 ${sorosView}, 민스키는 ${minskyView}, 코스톨라니는 ${kostolanyView}, 와이코프는 ${wyckoffView}, 펀더멘털 앵커는 ${anchorView}, 지지력 인덱스는 ${supportView}로 읽힙니다. 현재 레짐은 ${regimePhrase}이며, 심리와 가치 근거가 얼마나 함께 움직이는지 계속 대조해야 합니다.`;
 
-        if (state === "structural-bull") {
+        if (state === "critical-bubble") {
+            title = "버블 엔진이 파국 임계기를 감지했습니다.";
+            narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 민스키 ${minskyView}, 와이코프 ${wyckoffView} 위에 버블 엔진 ${bubbleRegimeLabel}가 겹쳤습니다. ${bubbleCriticalReason} 상태이므로 기존 P-Index와 별도로 현금 우선, 신규 추격 금지, 익절/방어 강화를 최우선으로 둡니다.`;
+        } else if (state === "structural-bull") {
             title = "상단 심리는 뜨겁지만, 종합 평가는 아직 강세 연장 쪽입니다.";
             narrative = `하워드 막스 ${marksView}, 코스톨라니 ${kostolanyView}가 상단 심리를 가리켜도 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}가 이를 받치고 있습니다. ${marketRegimeKey === "secular-expansion" ? `${marketRegimeLabel}로 분류되는 만큼, 환율 부담보다 실적 정당화 신호를 더 비중 있게 봅니다.` : `현재 레짐은 ${regimePhrase}이며, 아직은 고점 체류나 추가 오버슈팅까지 열어둘 만한 조합입니다.`}`;
         } else if (state === "validated-overheat") {
-            title = "과열 경고와 정당화 근거가 함께 공존하는 구간입니다.";
-            narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 코스톨라니 ${kostolanyView}가 뜨거움을 보여주지만, 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}가 아직 완전히 꺾이지 않았습니다. 레짐은 ${regimePhrase}이며, 민스키 ${minskyView}와 와이코프 ${wyckoffView}가 더 나빠지는지 확인하면서 속도 조절이 맞는 장면입니다.`;
+            if (anchorBufferedOverheat) {
+                title = "리스크 경고는 남아 있지만, 메인 평가는 정당화 과열로 완충됩니다.";
+                const stanceNarrative = marketAdviceStance === "선별 유지"
+                    ? "따라서 통합 포트폴리오 가이드는 현금을 서둘러 늘리기보다 선별 보유와 공격 비중 유지에 무게를 둡니다."
+                    : marketAdviceStance === "균형 유지"
+                        ? "따라서 통합 포트폴리오 가이드는 꼭지 확인 전까지는 추세를 존중하되, 정점 확인 시 분할 익절을 준비하는 쪽으로 맞춥니다."
+                        : "따라서 메인 평가는 방어 전환보다 속도 조절에 무게를 둡니다.";
+                narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 민스키 ${minskyView}, 와이코프 ${wyckoffView}가 상단 경고를 내더라도 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}, 버블 엔진 ${bubbleRegimeLabel}는 아직 파국 임계기가 아님을 보여줍니다. ${marketRegimeReason} ${stanceNarrative}`;
+            } else {
+                title = "과열 경고와 정당화 근거가 함께 공존하는 구간입니다.";
+                narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 코스톨라니 ${kostolanyView}가 뜨거움을 보여주지만, 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}가 아직 완전히 꺾이지 않았습니다. 레짐은 ${regimePhrase}이며, 민스키 ${minskyView}와 와이코프 ${wyckoffView}가 더 나빠지는지 확인하면서 속도 조절이 맞는 장면입니다.`;
+            }
         } else if (state === "overheat-only") {
             title = "상승 심리는 앞서가지만 근거 모델의 합치는 약합니다.";
             narrative = `하워드 막스 ${marksView}, 소로스 ${sorosView}, 코스톨라니 ${kostolanyView}가 상단 심리를 가리키는 반면 펀더멘털 앵커 ${anchorView}, 확산 ${broadeningView}, 지지력 ${supportView}는 충분한 합의를 만들지 못하고 있습니다. ${marketRegimeKey === "debasement-bubble" ? `${marketRegimeLabel}로 분류되는 만큼 환율 급등과 고이격이 가치보다 앞서가는지 더 엄격하게 봐야 합니다.` : `현재 레짐은 ${regimePhrase}이며, 추가 경고가 겹치면 방어 강도가 빠르게 높아질 수 있습니다.`}`;
@@ -1013,7 +1257,7 @@
             marketFlowNarrative: narrative,
             marketAdviceBias,
             marketAdviceStance,
-            marketAdviceReason: `막스 ${marksView} · 소로스 ${sorosView} · 민스키 ${minskyView} · 코스톨라니 ${kostolanyView} · 와이코프 ${wyckoffView} · 앵커 ${anchorView} · 확산 ${broadeningView} · 지지력 ${supportView} · 레짐 ${regimePhrase} · 리스크 ${riskSignals}개`,
+            marketAdviceReason: `막스 ${marksView} · 소로스 ${sorosView} · 민스키 ${minskyView} · 코스톨라니 ${kostolanyView} · 와이코프 ${wyckoffView} · 앵커 ${anchorView} · 확산 ${broadeningView} · 지지력 ${supportView} · 레짐 ${regimePhrase} · 버블 ${bubbleRegimeLabel} · 리스크 ${riskSignals}개`,
             marketAdviceActions: actions
         };
     }

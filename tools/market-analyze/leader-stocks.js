@@ -1,12 +1,15 @@
-const LEADER_PICK_COUNT = 4;
+const LEADER_PICK_COUNT = 6;
 const LEADER_SCREEN_LIMIT = 60;
-const LEADER_PRIMARY_HISTORY_LIMIT = 12;
-const LEADER_FALLBACK_HISTORY_LIMIT = 8;
+const LEADER_PRIMARY_HISTORY_LIMIT = 18;
+const LEADER_FALLBACK_HISTORY_LIMIT = 12;
 const LEADER_RECENT_HISTORY_DAYS = 15;
 const LEADER_WYCKOFF_HISTORY_DAYS = 120;
 const LEADER_HISTORY_FETCH_COUNT = 160;
 const LEADER_FETCH_CONCURRENCY = 4;
 const LEADER_EXCLUDE_REGEX = /(ETF|ETN|KODEX|TIGER|KOSEF|ARIRANG|KBSTAR|HANARO|ACE|SOL|RISE|PLUS|TIMEFOLIO|인버스|레버리지)/i;
+const LEADER_PREFERRED_SUFFIX_REGEX = /\s*\d*우(?:[A-Z]+)?(?:\([^)]*\))?$/i;
+const LEADER_SECTOR_MAX_COUNT = 2;
+const LEADER_WEIGHT_CAP = 0.35;
 
 function stripLeaderHtml(raw) {
     return String(raw || "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, "").trim();
@@ -35,6 +38,134 @@ function dedupeLeaderCandidates(candidates) {
 
 function dedupeLeaderMetrics(items) {
     return [...new Map(items.map(item => [item.code, item])).values()];
+}
+
+function normalizeLeaderIssuerName(name) {
+    const normalizedName = stripLeaderHtml(name);
+    const issuerName = normalizedName.replace(LEADER_PREFERRED_SUFFIX_REGEX, "").trim();
+    return issuerName || normalizedName;
+}
+
+function getLeaderIssuerKey(candidate) {
+    const issuerName = normalizeLeaderIssuerName(candidate?.name);
+    return issuerName ? issuerName.replace(/\s+/g, "").toUpperCase() : String(candidate?.code || "").trim();
+}
+
+function isPreferredLeaderCandidate(candidate) {
+    const normalizedName = stripLeaderHtml(candidate?.name);
+    return !!normalizedName && normalizeLeaderIssuerName(normalizedName) !== normalizedName;
+}
+
+function pickBetterLeaderItem(current, challenger, valueKey = "cum15dTradingValue") {
+    if (!current) return challenger;
+    if (!challenger) return current;
+
+    const currentPreferred = isPreferredLeaderCandidate(current);
+    const challengerPreferred = isPreferredLeaderCandidate(challenger);
+    if (currentPreferred !== challengerPreferred) {
+        return challengerPreferred ? current : challenger;
+    }
+
+    const currentValue = Number(current?.[valueKey]) || 0;
+    const challengerValue = Number(challenger?.[valueKey]) || 0;
+    return challengerValue > currentValue ? challenger : current;
+}
+
+function selectLeaderStocksWithIssuerCap(items, limit = LEADER_PICK_COUNT) {
+    const perIssuer = new Map();
+    items.forEach(item => {
+        const code = String(item?.code || "").trim();
+        if (!code) return;
+        const issuerKey = getLeaderIssuerKey(item) || code;
+        perIssuer.set(
+            issuerKey,
+            pickBetterLeaderItem(perIssuer.get(issuerKey), item, "cum15dTradingValue")
+        );
+    });
+
+    return [...perIssuer.values()]
+        .sort((left, right) => (Number(right?.cum15dTradingValue) || 0) - (Number(left?.cum15dTradingValue) || 0))
+        .slice(0, limit);
+}
+
+function getLeaderSectorKey(item) {
+    const sectorKey = String(item?.industryCode || "").trim();
+    return sectorKey || "";
+}
+
+function selectLeaderStocksWithSectorCap(items, limit = LEADER_PICK_COUNT, sectorMaxCount = LEADER_SECTOR_MAX_COUNT) {
+    const selected = [];
+    const sectorCounts = new Map();
+    const skippedBySector = [];
+    const sortedItems = [...items].sort((left, right) => (Number(right?.cum15dTradingValue) || 0) - (Number(left?.cum15dTradingValue) || 0));
+
+    sortedItems.forEach(item => {
+        if (selected.length >= limit) return;
+        const sectorKey = getLeaderSectorKey(item);
+        if (sectorKey) {
+            const nextCount = Number(sectorCounts.get(sectorKey) || 0);
+            if (nextCount >= sectorMaxCount) {
+                skippedBySector.push(item);
+                return;
+            }
+            sectorCounts.set(sectorKey, nextCount + 1);
+        }
+        selected.push(item);
+    });
+
+    return { selected, skippedBySector };
+}
+
+function applyLeaderWeightCap(items, maxWeight = LEADER_WEIGHT_CAP) {
+    const normalizedItems = items.map(item => ({ ...item }));
+    const totalTradingValue = normalizedItems.reduce((sum, item) => sum + (Number(item?.cum15dTradingValue) || 0), 0);
+    if (!totalTradingValue || !normalizedItems.length) return normalizedItems;
+
+    normalizedItems.forEach(item => {
+        item.rawWeight = (Number(item?.cum15dTradingValue) || 0) / totalTradingValue;
+    });
+
+    const weights = new Map();
+    let remainingItems = normalizedItems.slice();
+    let remainingWeight = 1;
+
+    while (remainingItems.length) {
+        const remainingTradingValue = remainingItems.reduce((sum, item) => sum + (Number(item?.cum15dTradingValue) || 0), 0);
+        if (remainingTradingValue <= 0 || remainingWeight <= 0) {
+            remainingItems.forEach(item => weights.set(item.code, 0));
+            break;
+        }
+
+        const overweightItems = remainingItems.filter(item => {
+            const provisionalWeight = remainingWeight * ((Number(item?.cum15dTradingValue) || 0) / remainingTradingValue);
+            return provisionalWeight > maxWeight;
+        });
+
+        if (!overweightItems.length) {
+            remainingItems.forEach(item => {
+                const finalWeight = remainingWeight * ((Number(item?.cum15dTradingValue) || 0) / remainingTradingValue);
+                weights.set(item.code, finalWeight);
+            });
+            break;
+        }
+
+        overweightItems.forEach(item => {
+            weights.set(item.code, maxWeight);
+        });
+        remainingWeight -= overweightItems.length * maxWeight;
+        const overweightCodes = new Set(overweightItems.map(item => item.code));
+        remainingItems = remainingItems.filter(item => !overweightCodes.has(item.code));
+    }
+
+    const normalizedWeightSum = [...weights.values()].reduce((sum, value) => sum + value, 0) || 1;
+    return normalizedItems.map(item => {
+        const weight = (weights.get(item.code) || 0) / normalizedWeightSum;
+        return {
+            ...item,
+            weight,
+            weightCapApplied: weight + 1e-9 < (item.rawWeight || 0)
+        };
+    });
 }
 
 function isLeaderExcluded(candidate) {
@@ -131,6 +262,8 @@ async function fetchLeaderInvestorSeries(candidate) {
                 foreignNet: [],
                 instNet: [],
                 retailNet: [],
+                industryCode: String(json?.industryCode || "").trim(),
+                industryPeerCount: Array.isArray(json?.industryCompareInfo) ? json.industryCompareInfo.length : 0,
                 available: false,
                 reason: "투자자 수급 시계열 없음"
             };
@@ -202,6 +335,8 @@ async function fetchLeaderInvestorSeries(candidate) {
             foreignNet,
             instNet,
             retailNet,
+            industryCode: String(json?.industryCode || "").trim(),
+            industryPeerCount: Array.isArray(json?.industryCompareInfo) ? json.industryCompareInfo.length : 0,
             available,
             reason: available ? "" : "투자자 수급 필드/형식 미확인"
         };
@@ -210,6 +345,8 @@ async function fetchLeaderInvestorSeries(candidate) {
             foreignNet: [],
             instNet: [],
             retailNet: [],
+            industryCode: String(candidate?.industryCode || "").trim(),
+            industryPeerCount: Number(candidate?.industryPeerCount) || 0,
             available: false,
             reason: "투자자 수급 조회 실패"
         };
@@ -321,6 +458,8 @@ function computeLeaderMetrics(candidate, fullHistory, investorSeries = null) {
         shockDate: shockMetrics.shockDate,
         latestDate: latest.dateKey,
         investorSeriesCount,
+        industryCode: String(investorSeries?.industryCode || candidate?.industryCode || "").trim(),
+        industryPeerCount: Number(investorSeries?.industryPeerCount) || Number(candidate?.industryPeerCount) || 0,
         foreignNetCumWyckoff: foreignCumWyckoff,
         instNetCumWyckoff: instCumWyckoff,
         smartCumWyckoff: Number.isFinite(foreignCumWyckoff) && Number.isFinite(instCumWyckoff) ? foreignCumWyckoff + instCumWyckoff : null,
@@ -395,9 +534,9 @@ async function fetchLeaderStocksData(options = {}) {
         ]);
     }
 
-    const leaderStocks = histories
-        .sort((left, right) => right.cum15dTradingValue - left.cum15dTradingValue)
-        .slice(0, LEADER_PICK_COUNT);
+    const issuerSelected = selectLeaderStocksWithIssuerCap(histories, LEADER_PICK_COUNT * 2);
+    const sectorSelection = selectLeaderStocksWithSectorCap(issuerSelected, LEADER_PICK_COUNT, LEADER_SECTOR_MAX_COUNT);
+    const leaderStocks = applyLeaderWeightCap(sectorSelection.selected, LEADER_WEIGHT_CAP);
 
     if (!leaderStocks.length) {
         throw new Error("대표주 차트 히스토리 기반 산출 실패");
@@ -407,16 +546,34 @@ async function fetchLeaderStocksData(options = {}) {
         log(`<span class='text-amber-400'>[LEADER]</span> 대표주 ${leaderStocks.length}종목만 확보되어 부분 데이터로 진행합니다.`);
     }
 
-    const totalWeight = leaderStocks.reduce((sum, stock) => sum + stock.cum15dTradingValue, 0) || 1;
-    leaderStocks.forEach(stock => {
-        stock.weight = stock.cum15dTradingValue / totalWeight;
-    });
-
     const leaderSnapshotDate = leaderStocks.map(stock => stock.latestDate).sort().at(-1) || "";
     log(`[LEADER] 최종 대표주 - ${leaderStocks.map(stock => `${stock.name} ${(stock.weight * 100).toFixed(0)}%`).join(", ")}`);
 
     return {
         leaderSnapshotDate,
-        leaderStocks
+        leaderStocks,
+        leaderSelectionMeta: {
+            issuerDedupedCount: Math.max(0, histories.length - issuerSelected.length),
+            sectorDedupedCount: sectorSelection.skippedBySector.length,
+            weightCappedCount: leaderStocks.filter(stock => stock.weightCapApplied).length,
+            weightCap: LEADER_WEIGHT_CAP,
+            sectorMaxCount: LEADER_SECTOR_MAX_COUNT
+        }
+    };
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        LEADER_PICK_COUNT,
+        LEADER_SECTOR_MAX_COUNT,
+        LEADER_WEIGHT_CAP,
+        normalizeLeaderIssuerName,
+        getLeaderIssuerKey,
+        getLeaderSectorKey,
+        isPreferredLeaderCandidate,
+        pickBetterLeaderItem,
+        selectLeaderStocksWithIssuerCap,
+        selectLeaderStocksWithSectorCap,
+        applyLeaderWeightCap
     };
 }

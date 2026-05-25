@@ -1,9 +1,31 @@
 const inputSent = document.getElementById("input-sent");
+
+function getSentimentMetricText() {
+    const value = Number.isFinite(Number(marketData.sentiment)) ? `${Math.round(Number(marketData.sentiment))}점` : "-";
+    const label = typeof getSentimentSourceLabel === "function"
+        ? getSentimentSourceLabel(marketData.sentimentSource, Number.isFinite(Number(marketData.sentiment)))
+        : "저장본";
+    return `${value} (${label})`;
+}
+
+function syncSorosRuntimeStatus() {
+    if (!marketData || !marketStatus) return;
+    const hasSentiment = Number.isFinite(Number(marketData.sentiment));
+    if (typeof normalizeSentimentSource === "function") {
+        marketData.sentimentSource = normalizeSentimentSource(marketData.sentimentSource, hasSentiment);
+    }
+    if (typeof resolveSorosStatusEntry === "function") {
+        marketStatus.soros = resolveSorosStatusEntry(marketStatus.disparity, marketData.sentimentSource, hasSentiment);
+    }
+}
+
 if (inputSent) {
     inputSent.addEventListener("input", (event) => {
         marketData.sentiment = parseInt(event.target.value, 10);
+        marketData.sentimentSource = "manual-confirmed";
+        syncSorosRuntimeStatus();
         const sentValueEl = document.getElementById("val-sent");
-        if (sentValueEl) sentValueEl.innerText = `${marketData.sentiment}점 (수동/AI)`;
+        if (sentValueEl) sentValueEl.innerText = getSentimentMetricText();
         saveMarketData();
         calculateCycle();
     });
@@ -545,6 +567,7 @@ function updateLeaderTrapUI() {
 }
 
 function updateDashboardUI() {
+    syncSorosRuntimeStatus();
     setMetricDisplay(
         "val-fx",
         Number.isFinite(marketData.fx) ? `${marketData.fx.toLocaleString()} 원` : "-",
@@ -580,7 +603,7 @@ function updateDashboardUI() {
 
     setMetricDisplay(
         "val-sent",
-        `${marketData.sentiment}점 (수동/AI)`,
+        getSentimentMetricText(),
         "font-mono text-cyan-400 font-bold text-lg"
     );
     if (inputSent) inputSent.value = marketData.sentiment;
@@ -676,8 +699,10 @@ document.getElementById("file-import")?.addEventListener("change", event => {
                 fallbackUsed: true
             });
 
-            marketData = { ...createDefaultMarketData(), ...dataToLoad };
-            marketStatus = normalizeMarketStatus(statusToLoad);
+            const hydrated = hydrateLegacyBubbleBundle(dataToLoad, statusToLoad, file.name || "imported_json");
+            marketData = hydrated.data;
+            marketStatus = hydrated.status;
+            syncSorosRuntimeStatus();
             marketResultMeta = { ...createDefaultMarketResultMeta(), ...metaToLoad };
             if (parsed.artifactViewSettings) {
                 artifactViewSettings = { ...createDefaultArtifactViewSettings(), ...parsed.artifactViewSettings };
@@ -789,6 +814,7 @@ function initializeWyckoffHelpModal() {
 
 function getMarketEvaluationTone(state) {
     const tones = {
+        "critical-bubble": { accent: "#ef4444", chip: "bg-red-500/15 text-red-200 border-red-400/30" },
         "structural-bull": { accent: "#34d399", chip: "bg-emerald-500/15 text-emerald-300 border-emerald-400/30" },
         "validated-overheat": { accent: "#fbbf24", chip: "bg-amber-500/15 text-amber-200 border-amber-400/30" },
         "overheat-only": { accent: "#fb923c", chip: "bg-orange-500/15 text-orange-200 border-orange-400/30" },
@@ -821,7 +847,9 @@ function getAnchorStatePillClass(state) {
 }
 
 function getMarketRegimeTone(regimeKey) {
+    if (regimeKey === "critical-bubble") return "#ef4444";
     if (regimeKey === "secular-expansion") return "#34d399";
+    if (regimeKey === "anchor-buffered-overheat") return "#fbbf24";
     if (regimeKey === "debasement-bubble") return "#f87171";
     return "#94a3b8";
 }
@@ -843,7 +871,9 @@ function getSectorMomentumSummaryLabel() {
 }
 
 function getMarketRegimeCompactLabel(regimeKey, regimeLabel) {
+    if (regimeKey === "critical-bubble") return "Critical Bubble";
     if (regimeKey === "secular-expansion") return "Secular Expansion";
+    if (regimeKey === "anchor-buffered-overheat") return "Anchor Buffered Overheat";
     if (regimeKey === "debasement-bubble") return "Debasement Bubble";
     return regimeLabel || "표준 레짐";
 }
@@ -951,6 +981,15 @@ function renderMarketEvaluationView() {
     const statusMessageEl = document.getElementById("market-evaluation-status-message");
     const anchorStatusSummary = summarizeAnchorDisplayStatus();
     const supportStatusSummary = summarizeSupportDisplayStatus();
+    const bubbleStatusSummary = typeof summarizeBubbleDisplayStatus === "function"
+        ? summarizeBubbleDisplayStatus()
+        : summarizeStatusEntries([
+            marketStatus.bubble?.marginDebt,
+            marketStatus.bubble?.ipo,
+            marketStatus.bubble?.trash,
+            marketStatus.bubble?.fed,
+            marketStatus.bubble?.critical
+        ]);
     const coreStatusItems = [
         { label: "소로스", entry: marketStatus.soros },
         { label: "민스키", entry: marketStatus.minsky },
@@ -1024,6 +1063,12 @@ function renderMarketEvaluationView() {
             `${getAnchorStateLabel(marketData.fundamentalSupportState)} · ${getSectorMomentumSummaryLabel()} / ${getValuationStabilityLabel(marketData.marketValuationStability)}`,
             tone.chip,
             supportStatusSummary
+        ),
+        buildMarketChipHtml(
+            "Bubble Index",
+            `BI ${Number.isFinite(marketData.bubbleIndex) ? Math.round(marketData.bubbleIndex) : "-"} · ${marketData.bubbleCriticalTrigger ? "Critical ON" : "Critical OFF"} · active ${Number(marketData.bubbleActiveFlagCount || 0)}개`,
+            tone.chip,
+            bubbleStatusSummary
         )
     ].join("");
 
@@ -1042,7 +1087,10 @@ function renderMarketEvaluationView() {
         `코스톨라니 ${marketData.kostolanyStage || "-"}`,
         `와이코프 ${getWyckoffConsensusLabel()}`,
         `앵커 ${getAnchorStateLabel(marketData.fundamentalAnchorState)}`,
-        `지지력 ${getAnchorStateLabel(marketData.fundamentalSupportState)}`
+        `지지력 ${getAnchorStateLabel(marketData.fundamentalSupportState)}`,
+        `BI ${Number.isFinite(marketData.bubbleIndex) ? Math.round(marketData.bubbleIndex) : "-"}`,
+        `critical ${marketData.bubbleCriticalTrigger ? "on" : "off"}`,
+        `버블 active ${Number(marketData.bubbleActiveFlagCount || 0)}개`
     ];
     if (Number.isFinite(marketData.rawRiskIndex) || Number.isFinite(marketData.riskIndex)) {
         evidenceParts.push(`raw P ${Number.isFinite(marketData.rawRiskIndex) ? Math.round(marketData.rawRiskIndex) : "-"} -> adjusted P ${Number.isFinite(marketData.riskIndex) ? Math.round(marketData.riskIndex) : "-"}`);
@@ -1337,10 +1385,12 @@ function renderSorosPanel() {
     const meta = labels[state];
     stateLabel.innerText = meta.label;
     stateLabel.style.color = meta.color;
-    stateNote.innerText = marketStatus.soros.state === "ok" ? meta.note : marketStatus.soros.message;
+    stateNote.innerText = marketStatus.soros.state === "ok"
+        ? `${meta.note} · ${typeof getSentimentSourceMessage === "function" ? getSentimentSourceMessage(marketData.sentimentSource, Number.isFinite(Number(marketData.sentiment))) : "심리 입력은 최근 저장본 사용"}`
+        : marketStatus.soros.message;
 
     dispValue.innerText = formatNullable(marketData.disparity, '%', 2);
-    sentValue.innerText = formatNullable(marketData.sentiment, '점', 0);
+    sentValue.innerText = `${formatNullable(marketData.sentiment, '점', 0)} · ${typeof getSentimentSourceLabel === "function" ? getSentimentSourceLabel(marketData.sentimentSource, Number.isFinite(Number(marketData.sentiment))) : "저장본"}`;
     banner.classList.toggle('hidden', !marketData.debasementAlert);
 }
 
@@ -1506,6 +1556,7 @@ function renderTheorySubtabs() {
         "cycle-panel-status-message"
     );
     renderFundamentalAnchorPanel();
+    if (typeof renderBubblePanel === "function") renderBubblePanel();
     renderSorosPanel();
     renderKostolanyPanel();
     renderWyckoffPanel();
@@ -1516,8 +1567,10 @@ initializeWyckoffHelpModal();
 
 async function reloadArtifactData() {
     const artifactBundle = await loadMarketArtifact(artifactViewSettings.selectedResultDate || "latest");
-    marketData = { ...createDefaultMarketData(), ...(artifactBundle.data || {}) };
-    marketStatus = normalizeMarketStatus(artifactBundle.status || {});
+    const hydrated = hydrateLegacyBubbleBundle(artifactBundle.data || {}, artifactBundle.status || {}, artifactBundle.meta?.schemaVersion || artifactBundle.meta?.loadedFile || "artifact");
+    marketData = hydrated.data;
+    marketStatus = hydrated.status;
+    syncSorosRuntimeStatus();
     marketResultMeta = { ...createDefaultMarketResultMeta(), ...(artifactBundle.meta || {}) };
     updateDashboardUI();
     calculateCycle();

@@ -1,6 +1,35 @@
 // 전역 상태 변수 설정
+const BUBBLE_FLAG_KEYS = ["marginDebt", "ipo", "trash", "fed"];
+const BUBBLE_FLAG_LABELS = {
+    marginDebt: "신용매수 과열",
+    ipo: "공모주 광풍",
+    trash: "적자 혁신주 투기",
+    fed: "연준 브레이크"
+};
+
 function createStatusEntry(state = "missing", source = "artifact", message = "데이터 대기 중") {
     return { state, source, message };
+}
+
+function createDefaultBubbleSignal(flagKey, reason = "버블 플래그 대기 중") {
+    return {
+        score: 0,
+        state: "neutral",
+        critical: false,
+        label: BUBBLE_FLAG_LABELS[flagKey] || flagKey || "버블 플래그",
+        reason,
+        metrics: {},
+        updatedAt: ""
+    };
+}
+
+function createDefaultBubbleSignals() {
+    return {
+        marginDebt: createDefaultBubbleSignal("marginDebt"),
+        ipo: createDefaultBubbleSignal("ipo"),
+        trash: createDefaultBubbleSignal("trash"),
+        fed: createDefaultBubbleSignal("fed")
+    };
 }
 
 function createDefaultMarketStatus() {
@@ -23,6 +52,13 @@ function createDefaultMarketStatus() {
             sectorBreadth: createStatusEntry("missing", "artifact", "비반도체 업종 확산 결과 대기 중"),
             valuation: createStatusEntry("missing", "artifact", "밸류에이션 안정도 결과 대기 중"),
             support: createStatusEntry("missing", "artifact", "펀더멘털 지지력 결과 대기 중")
+        },
+        bubble: {
+            marginDebt: createStatusEntry("missing", "artifact", "버블-신용매수 결과 대기 중"),
+            ipo: createStatusEntry("missing", "artifact", "버블-IPO 결과 대기 중"),
+            trash: createStatusEntry("missing", "artifact", "버블-적자 혁신주 결과 대기 중"),
+            fed: createStatusEntry("missing", "artifact", "버블-Fed 결과 대기 중"),
+            critical: createStatusEntry("missing", "artifact", "버블 Critical Trigger 결과 대기 중")
         }
     };
 }
@@ -56,6 +92,7 @@ function createDefaultMarketData() {
         fx: 1350,
         vix: 15.0,
         sentiment: 50,
+        sentimentSource: "snapshot-fallback",
         gold: 2300,
         disparity: 100,
         bullRatio: 50,
@@ -142,6 +179,15 @@ function createDefaultMarketData() {
         marketRegimeKey: "standard",
         marketRegimeLabel: "표준 레짐",
         marketRegimeReason: "특수 레짐 조건 대기 중",
+        bubbleIndex: 0,
+        bubbleState: "standard",
+        bubbleRegimeLabel: "표준 버블 경계",
+        bubbleRegimeReason: "버블 엔진 대기 중",
+        bubbleCriticalTrigger: false,
+        bubbleCriticalReason: "Critical Trigger 대기 중",
+        bubbleActiveFlagCount: 0,
+        bubbleSignals: createDefaultBubbleSignals(),
+        bubblePanelSelectedKey: "marginDebt",
         wyckoffDistributionBreadth: null,
         marketEvaluationState: "neutral",
         marketEvaluationLabel: "판단 보류",
@@ -159,6 +205,73 @@ function createDefaultMarketData() {
         kostolanyDivergenceNote: "",
         lastSyncTime: ""
     };
+}
+
+function normalizeBubbleSignal(flagKey, signal) {
+    const fallback = createDefaultBubbleSignal(flagKey);
+    if (!signal || typeof signal !== "object") {
+        return { ...fallback };
+    }
+    return {
+        score: Number.isFinite(Number(signal.score)) ? Number(signal.score) : fallback.score,
+        state: signal.state || fallback.state,
+        critical: Boolean(signal.critical),
+        label: signal.label || fallback.label,
+        reason: signal.reason || fallback.reason,
+        metrics: signal.metrics && typeof signal.metrics === "object" ? { ...signal.metrics } : {},
+        updatedAt: signal.updatedAt || ""
+    };
+}
+
+function normalizeBubbleSignals(signals = {}) {
+    return {
+        marginDebt: normalizeBubbleSignal("marginDebt", signals.marginDebt),
+        ipo: normalizeBubbleSignal("ipo", signals.ipo),
+        trash: normalizeBubbleSignal("trash", signals.trash),
+        fed: normalizeBubbleSignal("fed", signals.fed)
+    };
+}
+
+function normalizeBubbleFlagKey(flagKey) {
+    return BUBBLE_FLAG_KEYS.includes(flagKey) ? flagKey : "marginDebt";
+}
+
+function normalizeMarketData(data = {}) {
+    const defaults = createDefaultMarketData();
+    return {
+        ...defaults,
+        ...data,
+        sentimentSource: typeof normalizeSentimentSource === "function"
+            ? normalizeSentimentSource(data.sentimentSource, Number.isFinite(Number(data.sentiment)))
+            : (data.sentimentSource || defaults.sentimentSource),
+        marketAdviceActions: {
+            ...defaults.marketAdviceActions,
+            ...(data.marketAdviceActions && typeof data.marketAdviceActions === "object" ? data.marketAdviceActions : {})
+        },
+        bubbleSignals: normalizeBubbleSignals(data.bubbleSignals),
+        bubblePanelSelectedKey: normalizeBubbleFlagKey(data.bubblePanelSelectedKey)
+    };
+}
+
+function hydrateLegacyBubbleBundle(data = {}, status = {}, source = "legacy") {
+    const normalizedData = normalizeMarketData(data);
+    const normalizedStatus = normalizeMarketStatus(status);
+    const hasBubbleSignalPayload = data?.bubbleSignals && typeof data.bubbleSignals === "object" && Object.keys(data.bubbleSignals).length > 0;
+    const hasBubbleStatusPayload = status?.bubble && typeof status.bubble === "object" && Object.keys(status.bubble).length > 0;
+    if (hasBubbleSignalPayload || hasBubbleStatusPayload) {
+        return { data: normalizedData, status: normalizedStatus };
+    }
+
+    const fallbackSource = source || "legacy";
+    const fallbackMessage = `${fallbackSource}에 bubble 필드가 없어 중립 기본값으로 채웠습니다.`;
+    normalizedStatus.bubble = {
+        marginDebt: createStatusEntry("partial", fallbackSource, fallbackMessage),
+        ipo: createStatusEntry("partial", fallbackSource, fallbackMessage),
+        trash: createStatusEntry("partial", fallbackSource, fallbackMessage),
+        fed: createStatusEntry("partial", fallbackSource, fallbackMessage),
+        critical: createStatusEntry("partial", fallbackSource, fallbackMessage)
+    };
+    return { data: normalizedData, status: normalizedStatus };
 }
 
 let marketData = createDefaultMarketData();
@@ -229,20 +342,15 @@ function restoreRuntimeStateFromLocalStorage() {
     const savedStatus = localStorage.getItem("marketAnalyzeStatus");
     const savedResultMeta = localStorage.getItem("marketAnalyzeResultMeta");
 
-    if (savedMarket) {
+    if (savedMarket || savedStatus) {
         try {
-            const parsed = JSON.parse(savedMarket);
-            marketData = { ...createDefaultMarketData(), ...parsed };
+            const parsedMarket = savedMarket ? JSON.parse(savedMarket) : {};
+            const parsedStatus = savedStatus ? JSON.parse(savedStatus) : {};
+            const hydrated = hydrateLegacyBubbleBundle(parsedMarket, parsedStatus, "local_state");
+            marketData = hydrated.data;
+            marketStatus = hydrated.status;
         } catch (error) {
-            console.error("시장 데이터 파싱 오류", error);
-        }
-    }
-
-    if (savedStatus) {
-        try {
-            marketStatus = normalizeMarketStatus(JSON.parse(savedStatus));
-        } catch (error) {
-            console.error("시장 상태 파싱 오류", error);
+            console.error("시장 데이터/상태 파싱 오류", error);
         }
     }
 

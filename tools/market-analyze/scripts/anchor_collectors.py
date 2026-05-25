@@ -29,6 +29,8 @@ from .collectors import (
     status_entry,
     strip_html,
 )
+from .cycle_policy import calculate_cycle_runtime_values
+from .regime_policy import resolve_hot_zone_market_regime, summarize_bubble_overlay
 
 
 FUNDAMENTAL_EARNINGS_UNIVERSE_COUNT = 12
@@ -53,9 +55,9 @@ MONTH_NAME_REGEX = (
 LEADER_FETCH_CONCURRENCY = 4
 LEADER_SCREEN_LIMIT = 60
 LEADER_HISTORY_FETCH_COUNT = 160
-LEADER_PICK_COUNT = 4
-LEADER_PRIMARY_HISTORY_LIMIT = 12
-LEADER_FALLBACK_HISTORY_LIMIT = 8
+LEADER_PICK_COUNT = 6
+LEADER_PRIMARY_HISTORY_LIMIT = 18
+LEADER_FALLBACK_HISTORY_LIMIT = 12
 LEADER_RECENT_HISTORY_DAYS = 15
 LEADER_WYCKOFF_HISTORY_DAYS = 120
 WYCKOFF_MIN_HISTORY_DAYS = 30
@@ -75,6 +77,9 @@ LEADER_EXCLUDE_REGEX = re.compile(
     r"(ETF|ETN|KODEX|TIGER|KOSEF|ARIRANG|KBSTAR|HANARO|ACE|SOL|RISE|PLUS|TIMEFOLIO|인버스|레버리지)",
     re.IGNORECASE,
 )
+LEADER_PREFERRED_SUFFIX_REGEX = re.compile(r"\s*\d*우(?:[A-Z]+)?(?:\([^)]*\))?$", re.IGNORECASE)
+LEADER_SECTOR_MAX_COUNT = 2
+LEADER_WEIGHT_CAP = 0.35
 LEADER_STATIC_FALLBACK_CODES = [
     ("005930", "삼성전자"),
     ("000660", "SK하이닉스"),
@@ -745,14 +750,37 @@ def calculate_export_momentum_from_series(series: Dict[str, Any]) -> Dict[str, A
     }
 
 
-def fetch_indicator_page_export_data() -> Dict[str, Any]:
-    html = fetch_text(KOSIS_EXPORT_INDICATOR_URL, timeout=12)
-    value_match = re.search(r"현재값[^<]*<\/dt>\s*<dd[^>]*>([\d,.\-]+)<\/dd>", html, flags=re.IGNORECASE)
-    month_match = re.search(r"기준일[^<]*<\/dt>\s*<dd[^>]*>([\d.]+)<\/dd>", html, flags=re.IGNORECASE)
+def extract_js_string_array(raw_html: str, variable_name: str) -> List[str]:
+    match = re.search(
+        rf"var\s+{re.escape(variable_name)}\s*=\s*\[(.*?)\]\s*;",
+        raw_html,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if not match:
+        return []
+    return [
+        token.strip().strip("'\"")
+        for token in re.split(r"\s*,\s*", match.group(1).strip())
+        if token.strip().strip("'\"")
+    ]
+
+
+def parse_indicator_page_export_data(raw_html: str) -> Dict[str, Any]:
+    value_match = re.search(r"현재값[^<]*<\/dt>\s*<dd[^>]*>([\d,.\-]+)<\/dd>", raw_html, flags=re.IGNORECASE)
+    month_match = re.search(r"기준일[^<]*<\/dt>\s*<dd[^>]*>([\d.]+)<\/dd>", raw_html, flags=re.IGNORECASE)
+    latest_month = normalize_month_key(month_match.group(1) if month_match else "")
+    if not latest_month:
+        month_candidates = extract_js_string_array(raw_html, "vPrdDeArry")
+        latest_month = normalize_month_key(month_candidates[-1] if month_candidates else "")
     return {
-        "latestMonth": normalize_month_key(month_match.group(1) if month_match else ""),
+        "latestMonth": latest_month,
         "exportValueUsd": parse_signed_amount(value_match.group(1) if value_match else ""),
     }
+
+
+def fetch_indicator_page_export_data() -> Dict[str, Any]:
+    html = fetch_text(KOSIS_EXPORT_INDICATOR_URL, timeout=12)
+    return parse_indicator_page_export_data(html)
 
 
 def parse_tradingeconomics_export_summary(raw_html: str) -> Dict[str, Any]:
@@ -765,6 +793,16 @@ def parse_tradingeconomics_export_summary(raw_html: str) -> Dict[str, Any]:
         ),
         re.compile(
             rf"Exports in South Korea .*? to ([\d,.\-]+) in ({MONTH_NAME_REGEX}) "
+            rf"from ([\d,.\-]+) in ({MONTH_NAME_REGEX})(?: of)? (\d{{4}})",
+            flags=re.IGNORECASE,
+        ),
+        re.compile(
+            rf"South Korea.?s exports .*? to ([\d,.\-]+) USD (Million|Billion) in ({MONTH_NAME_REGEX}) "
+            rf"from ([\d,.\-]+) USD (Million|Billion) in ({MONTH_NAME_REGEX})(?: of)? (\d{{4}})",
+            flags=re.IGNORECASE,
+        ),
+        re.compile(
+            rf"South Korea.?s exports .*? to ([\d,.\-]+) in ({MONTH_NAME_REGEX}) "
             rf"from ([\d,.\-]+) in ({MONTH_NAME_REGEX})(?: of)? (\d{{4}})",
             flags=re.IGNORECASE,
         ),
@@ -899,15 +937,70 @@ def build_export_patch_from_payload(payload: Dict[str, Any], page_data: Optional
     }
 
 
+def count_patch_fields(patch: Optional[Dict[str, Any]]) -> int:
+    if not isinstance(patch, dict):
+        return 0
+    return sum(1 for value in patch.values() if value not in (None, "", []))
+
+
+def export_patch_has_level(patch: Optional[Dict[str, Any]]) -> bool:
+    if not isinstance(patch, dict):
+        return False
+    return bool(patch.get("exportLatestMonth")) or safe_number(patch.get("exportValueUsd")) is not None
+
+
+def export_patch_has_core_momentum(patch: Optional[Dict[str, Any]]) -> bool:
+    if not isinstance(patch, dict):
+        return False
+    return (
+        bool(patch.get("exportLatestMonth"))
+        and safe_number(patch.get("exportYoY")) is not None
+        and safe_number(patch.get("exportYoYDelta")) is not None
+    )
+
+
+def load_best_export_result_patch(current_month: str = "") -> Dict[str, Any]:
+    best_patch: Dict[str, Any] = {}
+    best_score = -1
+    for path in sorted(RESULTS_DIR.glob("result-*.js"), key=lambda item: item.name, reverse=True):
+        try:
+            raw_text = path.read_text(encoding="utf-8")
+            trimmed = re.sub(r"^\s*window\.__MARKET_ANALYZE_RESULT__\s*=\s*", "", raw_text, count=1)
+            payload = json.loads(trimmed.rstrip(";\n "))
+            data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+            patch = extract_anchor_component_patch("export", data)
+            if not anchor_component_has_values("export", patch):
+                continue
+            patch_month = str(patch.get("exportLatestMonth") or "")
+            if current_month and patch_month and current_month != patch_month:
+                continue
+            patch_score = count_patch_fields(patch)
+            if patch_score > best_score:
+                best_patch = patch
+                best_score = patch_score
+        except (OSError, json.JSONDecodeError, TypeError):
+            continue
+    return best_patch
+
+
 def merge_export_patch_with_cache(patch: Dict[str, Any]) -> Dict[str, Any]:
-    cached_payload = load_anchor_component_cache("export") or load_anchor_component_from_results("export")
-    cached_patch = dict((cached_payload or {}).get("dataPatch") or {})
-    if not cached_patch:
-        return patch
     current_month = str(patch.get("exportLatestMonth") or "")
-    cached_month = str(cached_patch.get("exportLatestMonth") or "")
-    if current_month and cached_month and current_month != cached_month:
+    cached_candidates = [
+        dict((payload or {}).get("dataPatch") or {}) for payload in [load_anchor_component_cache("export")]
+    ]
+    result_patch = load_best_export_result_patch(current_month)
+    if result_patch:
+        cached_candidates.append(result_patch)
+    compatible_candidates = []
+    for cached_patch in cached_candidates:
+        cached_month = str(cached_patch.get("exportLatestMonth") or "")
+        if current_month and cached_month and current_month != cached_month:
+            continue
+        if cached_patch:
+            compatible_candidates.append(cached_patch)
+    if not compatible_candidates:
         return patch
+    cached_patch = max(compatible_candidates, key=count_patch_fields)
     merged = dict(cached_patch)
     for key, value in patch.items():
         if value not in (None, "", []):
@@ -915,33 +1008,95 @@ def merge_export_patch_with_cache(patch: Dict[str, Any]) -> Dict[str, Any]:
     return merged
 
 
-def collect_export_from_tradingeconomics(page_data: Optional[Dict[str, Any]] = None, reason: str = "") -> Optional[CollectorResult]:
+def merge_export_source_labels(*labels: str) -> str:
+    return " · ".join(dict.fromkeys(label.strip() for label in labels if label and label.strip()))
+
+
+def build_export_partial_reason(patch: Dict[str, Any], fallback_message: str = "최신 발표월/레벨만 반영") -> str:
+    labels: List[str] = []
+    if export_patch_has_level(patch):
+        labels.append("최신 발표월/레벨")
+    if safe_number(patch.get("exportYoY")) is not None:
+        labels.append("YoY")
+    if safe_number(patch.get("exportYoYDelta")) is not None:
+        labels.append("가속도")
+    if safe_number(patch.get("export3mAvgYoY")) is not None:
+        labels.append("3개월 평균")
+    if not labels:
+        return fallback_message
+    return f"공개 소스 기준 {' / '.join(labels)} 반영"
+
+
+def build_export_status_from_patch(
+    patch: Dict[str, Any],
+    source: str,
+    partial_reason: str = "최신 발표월/레벨만 반영",
+) -> Dict[str, str]:
+    latest_month = str(patch.get("exportLatestMonth") or "")
+    if export_patch_has_core_momentum(patch):
+        return status_entry(
+            "ok",
+            source,
+            f"수출 모멘텀 {latest_month} 기준 갱신" if latest_month else "수출 모멘텀 갱신",
+        )
+    return status_entry("partial", source, partial_reason)
+
+
+def merge_export_data_patch(primary_patch: Dict[str, Any], secondary_patch: Dict[str, Any]) -> Dict[str, Any]:
+    merged = dict(primary_patch or {})
+    for key, value in (secondary_patch or {}).items():
+        if merged.get(key) in (None, "", []) and value not in (None, "", []):
+            merged[key] = value
+    return merge_export_patch_with_cache(merged)
+
+
+def collect_export_from_kosis_openapi(api_key: str, page_data: Optional[Dict[str, Any]] = None) -> CollectorResult:
+    page_data = page_data or {}
+    raw_text = fetch_text(build_kosis_export_url(api_key), timeout=15)
+    payload = parse_kosis_payload(raw_text)
+    series = select_best_kosis_export_series(payload)
+    momentum = calculate_export_momentum_from_series(series)
+    patch = merge_export_patch_with_cache(
+        {
+            "exportLatestMonth": momentum["latestMonth"] or page_data.get("latestMonth", ""),
+            "exportValueUsd": momentum["exportValueUsd"]
+            if momentum["exportValueUsd"] is not None
+            else page_data.get("exportValueUsd"),
+            "exportYoY": momentum["exportYoY"],
+            "exportYoYDelta": momentum["exportYoYDelta"],
+            "export3mAvgYoY": momentum["export3mAvgYoY"],
+        }
+    )
+    return CollectorResult(
+        patch,
+        build_export_status_from_patch(patch, "kosis.kr/openapi", "KOSIS 시계열 보강 반영"),
+    )
+
+
+def collect_export_from_tradingeconomics(page_data: Optional[Dict[str, Any]] = None) -> Optional[CollectorResult]:
     try:
         export_data = fetch_tradingeconomics_export_data()
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
-        if page_data and (page_data.get("latestMonth") or page_data.get("exportValueUsd") is not None):
-            merged_patch = merge_export_patch_with_cache(
-                build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd"))
-            )
+        if page_data and export_patch_has_level(page_data):
+            merged_patch = merge_export_patch_with_cache(build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd")))
             return CollectorResult(
                 merged_patch,
                 status_entry(
                     "partial",
                     "kosis.kr",
-                    (f"{reason} · " if reason else "")
-                    + f"TradingEconomics 보완도 실패 ({normalize_request_error(error)}) · 최신 발표월/레벨만 반영",
+                    f"KOSIS 공개 페이지 기준 최신 발표월/레벨 반영 · TradingEconomics 보완 실패 ({normalize_request_error(error)})",
                 ),
             )
         return None
 
-    latest_month = str(export_data.get("latestMonth") or (page_data.get("latestMonth") if page_data else "") or "")
-    message_prefix = f"{reason} · " if reason else ""
-    message = f"{message_prefix}TradingEconomics 공개 페이지 기준 수출 모멘텀 보완"
-    if latest_month:
-        message = f"{message} ({latest_month})"
+    patch = merge_export_patch_with_cache(build_export_patch_from_payload(export_data, page_data))
+    source = merge_export_source_labels(
+        "tradingeconomics.com",
+        "kosis.kr" if page_data and export_patch_has_level(page_data) else "",
+    )
     result = CollectorResult(
-        build_export_patch_from_payload(export_data, page_data),
-        status_entry("partial", "tradingeconomics.com", message),
+        patch,
+        build_export_status_from_patch(patch, source, build_export_partial_reason(patch)),
     )
     save_anchor_component_cache("export", result.data_patch, result.status.get("source", ""))
     return result
@@ -957,85 +1112,72 @@ def collect_export_momentum(base_data: Dict[str, Any], settings: Optional[Dict[s
     except (HTTPError, URLError, TimeoutError, ValueError) as page_error:
         page_data = {"latestMonth": "", "exportValueUsd": None, "error": str(page_error)}
 
-    if not api_key:
-        te_result = collect_export_from_tradingeconomics(page_data, "KOSIS API 키 미입력")
-        if te_result:
-            return te_result
-        cached_result = build_cached_component_result("export", "KOSIS API 키 미입력 · TradingEconomics 보완 실패")
-        if cached_result:
-            return cached_result
-        seed_result = build_export_seed_result("KOSIS API 키 미입력 · TradingEconomics 보완 실패")
-        if seed_result:
-            return seed_result
+    public_result = collect_export_from_tradingeconomics(page_data)
+    if public_result and public_result.status.get("state") == "ok":
+        if api_key:
+            try:
+                kosis_result = collect_export_from_kosis_openapi(api_key, page_data)
+                merged = CollectorResult(
+                    merge_export_data_patch(public_result.data_patch, kosis_result.data_patch),
+                    build_export_status_from_patch(
+                        merge_export_data_patch(public_result.data_patch, kosis_result.data_patch),
+                        merge_export_source_labels(public_result.status.get("source", ""), kosis_result.status.get("source", "")),
+                    ),
+                )
+                save_anchor_component_cache("export", merged.data_patch, merged.status.get("source", ""))
+                return merged
+            except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError):
+                pass
+        return public_result
+
+    if api_key:
+        try:
+            kosis_result = collect_export_from_kosis_openapi(api_key, page_data)
+            if public_result:
+                merged_patch = merge_export_data_patch(public_result.data_patch, kosis_result.data_patch)
+                merged = CollectorResult(
+                    merged_patch,
+                    build_export_status_from_patch(
+                        merged_patch,
+                        merge_export_source_labels(public_result.status.get("source", ""), kosis_result.status.get("source", "")),
+                        build_export_partial_reason(merged_patch),
+                    ),
+                )
+                save_anchor_component_cache("export", merged.data_patch, merged.status.get("source", ""))
+                return merged
+            save_anchor_component_cache("export", kosis_result.data_patch, kosis_result.status.get("source", ""))
+            return kosis_result
+        except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError):
+            pass
+
+    if public_result:
+        return public_result
+    if export_patch_has_level(page_data):
+        patch = merge_export_patch_with_cache(build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd")))
         return CollectorResult(
-            merge_export_patch_with_cache(build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd"))),
-            status_entry(
-                "partial" if page_data.get("latestMonth") or page_data.get("exportValueUsd") is not None else "missing",
-                "kosis.kr",
-                "KOSIS API 키 미입력"
-                + (" · 최신 발표월/레벨만 반영" if page_data.get("latestMonth") or page_data.get("exportValueUsd") is not None else ""),
-            ),
+            patch,
+            status_entry("partial", "kosis.kr", "KOSIS 공개 페이지 기준 최신 발표월/레벨 반영"),
         )
 
-    try:
-        raw_text = fetch_text(build_kosis_export_url(api_key), timeout=15)
-        payload = parse_kosis_payload(raw_text)
-        series = select_best_kosis_export_series(payload)
-        momentum = calculate_export_momentum_from_series(series)
-        result = CollectorResult(
-            {
-                "exportLatestMonth": momentum["latestMonth"] or page_data.get("latestMonth", ""),
-                "exportValueUsd": momentum["exportValueUsd"]
-                if momentum["exportValueUsd"] is not None
-                else page_data.get("exportValueUsd"),
-                "exportYoY": momentum["exportYoY"],
-                "exportYoYDelta": momentum["exportYoYDelta"],
-                "export3mAvgYoY": momentum["export3mAvgYoY"],
-            },
-            status_entry(
-                "ok",
-                "kosis.kr/openapi",
-                (
-                    f"수출 모멘텀 {momentum['latestMonth']} 기준 갱신"
-                    if momentum["latestMonth"]
-                    else "수출 모멘텀 갱신"
-                ),
-            ),
-        )
-        save_anchor_component_cache("export", result.data_patch, result.status.get("source", ""))
-        return result
-    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
-        te_result = collect_export_from_tradingeconomics(page_data, f"KOSIS 시계열 조회 실패 ({normalize_request_error(error)})")
-        if te_result:
-            return te_result
-        cached_result = build_cached_component_result("export", f"수출 모멘텀 수집 실패 ({normalize_request_error(error)})")
-        if cached_result:
-            return cached_result
-        seed_result = build_export_seed_result(f"수출 모멘텀 수집 실패 ({normalize_request_error(error)})")
-        if seed_result:
-            return seed_result
-        if page_data.get("latestMonth") or page_data.get("exportValueUsd") is not None:
-            return CollectorResult(
-                merge_export_patch_with_cache(build_export_patch(page_data.get("latestMonth", ""), page_data.get("exportValueUsd"))),
-                status_entry("partial", "kosis.kr", f"KOSIS 시계열 조회 실패 ({normalize_request_error(error)}) · 최신 발표월/레벨만 반영"),
-            )
+    cached_result = build_cached_component_result("export", "공개 수출 소스 수집 실패")
+    if cached_result:
+        return cached_result
+    seed_result = build_export_seed_result("공개 수출 소스 수집 실패")
+    if seed_result:
+        return seed_result
 
-        export_available = bool(base_data.get("exportLatestMonth")) or has_value(
-            base_data.get("exportValueUsd"),
-            base_data.get("exportYoY"),
-            base_data.get("exportYoYDelta"),
-            base_data.get("export3mAvgYoY"),
+    export_available = bool(base_data.get("exportLatestMonth")) or has_value(
+        base_data.get("exportValueUsd"),
+        base_data.get("exportYoY"),
+        base_data.get("exportYoYDelta"),
+        base_data.get("export3mAvgYoY"),
+    )
+    if export_available:
+        return CollectorResult(
+            {},
+            status_entry("partial", "store/market_analyze_data.json", "공개 수출 소스 수집 실패 · 기존 스냅샷 유지"),
         )
-        if export_available:
-            return CollectorResult(
-                {},
-                status_entry(
-                    "partial",
-                    "store/market_analyze_data.json",
-                    f"수출 모멘텀 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지",
-                ),
-            )
-        return CollectorResult(build_export_patch(), status_entry("error", "kosis.kr/openapi", f"수출 모멘텀 수집 실패 ({normalize_request_error(error)})"))
+    return CollectorResult(build_export_patch(), status_entry("error", "tradingeconomics.com · kosis.kr", "공개 수출 소스 수집 실패"))
 
 
 def dedupe_candidates(candidates: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -1060,6 +1202,24 @@ def dedupe_candidates(candidates: Iterable[Dict[str, Any]]) -> List[Dict[str, An
         merged["todayTradingValue"] = current_value if previous is None or current_value > (previous_value or 0) else (previous_value or 0)
         deduped[code] = merged
     return list(deduped.values())
+
+
+def normalize_leader_issuer_name(name: Any) -> str:
+    normalized_name = strip_html(str(name or "")).strip()
+    issuer_name = LEADER_PREFERRED_SUFFIX_REGEX.sub("", normalized_name).strip()
+    return issuer_name or normalized_name
+
+
+def get_leader_issuer_key(candidate: Dict[str, Any]) -> str:
+    issuer_name = normalize_leader_issuer_name(candidate.get("name"))
+    if issuer_name:
+        return re.sub(r"\s+", "", issuer_name).upper()
+    return str(candidate.get("code") or "").strip()
+
+
+def is_preferred_leader_candidate(candidate: Dict[str, Any]) -> bool:
+    normalized_name = strip_html(str(candidate.get("name") or "")).strip()
+    return bool(normalized_name) and normalize_leader_issuer_name(normalized_name) != normalized_name
 
 
 def create_market_sum_field_url(page: int = 1) -> str:
@@ -1235,6 +1395,8 @@ def create_snapshot_fallback_candidates(base_data: Dict[str, Any]) -> List[Dict[
                 "code": code,
                 "name": name,
                 "todayTradingValue": today_trading_value,
+                "industryCode": str(stock.get("industryCode") or "").strip(),
+                "industryPeerCount": int(safe_number(stock.get("industryPeerCount")) or 0),
             }
         )
     return candidates
@@ -1252,6 +1414,142 @@ def dedupe_leader_metrics(items: Iterable[Dict[str, Any]]) -> List[Dict[str, Any
         if previous is None or current_value > (previous_value or 0):
             deduped[code] = item
     return list(deduped.values())
+
+
+def pick_better_leader_item(
+    current: Optional[Dict[str, Any]],
+    challenger: Optional[Dict[str, Any]],
+    value_key: str = "cum15dTradingValue",
+) -> Optional[Dict[str, Any]]:
+    if current is None:
+        return challenger
+    if challenger is None:
+        return current
+
+    current_preferred = is_preferred_leader_candidate(current)
+    challenger_preferred = is_preferred_leader_candidate(challenger)
+    if current_preferred != challenger_preferred:
+        return current if not current_preferred else challenger
+
+    current_value = safe_number(current.get(value_key)) or 0
+    challenger_value = safe_number(challenger.get(value_key)) or 0
+    return challenger if challenger_value > current_value else current
+
+
+def select_leader_stocks_with_issuer_cap(
+    items: Iterable[Dict[str, Any]],
+    limit: int = LEADER_PICK_COUNT,
+) -> List[Dict[str, Any]]:
+    per_issuer: Dict[str, Dict[str, Any]] = {}
+    for item in items:
+        code = str(item.get("code") or "").strip()
+        if not code:
+            continue
+        issuer_key = get_leader_issuer_key(item) or code
+        per_issuer[issuer_key] = pick_better_leader_item(
+            per_issuer.get(issuer_key),
+            item,
+            "cum15dTradingValue",
+        ) or item
+    return sorted(
+        per_issuer.values(),
+        key=lambda item: safe_number(item.get("cum15dTradingValue")) or 0,
+        reverse=True,
+    )[:limit]
+
+
+def get_leader_sector_key(item: Dict[str, Any]) -> str:
+    return str(item.get("industryCode") or "").strip()
+
+
+def select_leader_stocks_with_sector_cap(
+    items: Iterable[Dict[str, Any]],
+    limit: int = LEADER_PICK_COUNT,
+    sector_max_count: int = LEADER_SECTOR_MAX_COUNT,
+) -> Dict[str, List[Dict[str, Any]]]:
+    selected: List[Dict[str, Any]] = []
+    skipped_by_sector: List[Dict[str, Any]] = []
+    sector_counts: Dict[str, int] = {}
+    sorted_items = sorted(
+        items,
+        key=lambda item: safe_number(item.get("cum15dTradingValue")) or 0,
+        reverse=True,
+    )
+
+    for item in sorted_items:
+        if len(selected) >= limit:
+            break
+        sector_key = get_leader_sector_key(item)
+        if sector_key:
+            next_count = int(sector_counts.get(sector_key) or 0)
+            if next_count >= sector_max_count:
+                skipped_by_sector.append(item)
+                continue
+            sector_counts[sector_key] = next_count + 1
+        selected.append(item)
+
+    return {"selected": selected, "skippedBySector": skipped_by_sector}
+
+
+def apply_leader_weight_cap(
+    items: Iterable[Dict[str, Any]],
+    max_weight: float = LEADER_WEIGHT_CAP,
+) -> List[Dict[str, Any]]:
+    normalized_items = [dict(item) for item in items]
+    total_trading_value = sum(safe_number(item.get("cum15dTradingValue")) or 0 for item in normalized_items)
+    if total_trading_value <= 0 or not normalized_items:
+        return normalized_items
+
+    for item in normalized_items:
+        item["rawWeight"] = (safe_number(item.get("cum15dTradingValue")) or 0) / total_trading_value
+
+    weights: Dict[str, float] = {}
+    remaining_items = normalized_items[:]
+    remaining_weight = 1.0
+
+    while remaining_items:
+        remaining_trading_value = sum(safe_number(item.get("cum15dTradingValue")) or 0 for item in remaining_items)
+        if remaining_trading_value <= 0 or remaining_weight <= 0:
+            for item in remaining_items:
+                weights[str(item.get("code") or "")] = 0.0
+            break
+
+        overweight_items = []
+        for item in remaining_items:
+            provisional_weight = remaining_weight * ((safe_number(item.get("cum15dTradingValue")) or 0) / remaining_trading_value)
+            if provisional_weight > max_weight:
+                overweight_items.append(item)
+
+        if not overweight_items:
+            for item in remaining_items:
+                weights[str(item.get("code") or "")] = remaining_weight * (
+                    (safe_number(item.get("cum15dTradingValue")) or 0) / remaining_trading_value
+                )
+            break
+
+        for item in overweight_items:
+            weights[str(item.get("code") or "")] = max_weight
+
+        remaining_weight -= len(overweight_items) * max_weight
+        overweight_codes = {str(item.get("code") or "") for item in overweight_items}
+        remaining_items = [
+            item
+            for item in remaining_items
+            if str(item.get("code") or "") not in overweight_codes
+        ]
+
+    normalized_weight_sum = sum(weights.values()) or 1.0
+    weighted_items: List[Dict[str, Any]] = []
+    for item in normalized_items:
+        weight = (weights.get(str(item.get("code") or ""), 0.0)) / normalized_weight_sum
+        weighted_items.append(
+            {
+                **item,
+                "weight": weight,
+                "weightCapApplied": weight + 1e-9 < (safe_number(item.get("rawWeight")) or 0),
+            }
+        )
+    return weighted_items
 
 
 def is_leader_excluded(candidate: Dict[str, Any]) -> bool:
@@ -1385,6 +1683,8 @@ def load_cached_leader_investor_series(code: str) -> Optional[Dict[str, Any]]:
         "foreignNet": foreign_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
         "instNet": inst_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
         "retailNet": retail_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+        "industryCode": str(payload.get("industryCode") or "").strip(),
+        "industryPeerCount": int(safe_number(payload.get("industryPeerCount")) or 0),
         "available": True,
         "reason": "투자자 수급 캐시 사용",
         "source": to_store_relative(LEADER_INVESTOR_CACHE_PATH),
@@ -1409,6 +1709,8 @@ def save_cached_leader_investor_series(code: str, payload: Dict[str, Any], sourc
             "foreignNet": foreign_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
             "instNet": inst_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
             "retailNet": retail_net[-LEADER_WYCKOFF_HISTORY_DAYS:],
+            "industryCode": str(payload.get("industryCode") or "").strip(),
+            "industryPeerCount": int(safe_number(payload.get("industryPeerCount")) or 0),
         },
     )
 
@@ -1611,6 +1913,8 @@ def pick_investor_number(row: Dict[str, Any], keys: Iterable[str], fallback_toke
 
 def fetch_leader_investor_series(candidate: Dict[str, Any]) -> Dict[str, Any]:
     code = str(candidate.get("code") or "").strip()
+    candidate_industry_code = str(candidate.get("industryCode") or "").strip()
+    candidate_industry_peer_count = int(safe_number(candidate.get("industryPeerCount")) or 0)
     try:
         raw_text = fetch_text(
             f"https://m.stock.naver.com/api/stock/{code}/integration",
@@ -1619,6 +1923,12 @@ def fetch_leader_investor_series(candidate: Dict[str, Any]) -> Dict[str, Any]:
         )
         payload = parse_json_text(raw_text, context=f"{code} 투자자 수급")
         deals = payload.get("dealTrendInfos") if isinstance(payload, dict) else []
+        industry_code = str(payload.get("industryCode") or candidate_industry_code).strip() if isinstance(payload, dict) else candidate_industry_code
+        industry_peer_count = (
+            len(payload.get("industryCompareInfo"))
+            if isinstance(payload, dict) and isinstance(payload.get("industryCompareInfo"), list)
+            else candidate_industry_peer_count
+        )
         if not isinstance(deals, list) or not deals:
             raise ValueError("투자자 수급 시계열 없음")
 
@@ -1665,6 +1975,8 @@ def fetch_leader_investor_series(candidate: Dict[str, Any]) -> Dict[str, Any]:
             "foreignNet": foreign_net,
             "instNet": inst_net,
             "retailNet": retail_net,
+            "industryCode": industry_code,
+            "industryPeerCount": industry_peer_count,
             "available": available,
             "reason": "" if available else "투자자 수급 필드/형식 미확인",
             "source": "m.stock.naver.com/api",
@@ -1677,11 +1989,17 @@ def fetch_leader_investor_series(candidate: Dict[str, Any]) -> Dict[str, Any]:
         cached_payload = load_cached_leader_investor_series(code)
         if cached_payload:
             cached_payload["reason"] = f"투자자 수급 라이브 실패 ({normalize_request_error(error)}) · 캐시 사용"
+            if not cached_payload.get("industryCode"):
+                cached_payload["industryCode"] = candidate_industry_code
+            if safe_number(cached_payload.get("industryPeerCount")) is None:
+                cached_payload["industryPeerCount"] = candidate_industry_peer_count
             return cached_payload
         return {
             "foreignNet": [],
             "instNet": [],
             "retailNet": [],
+            "industryCode": candidate_industry_code,
+            "industryPeerCount": candidate_industry_peer_count,
             "available": False,
             "reason": f"투자자 수급 조회 실패 ({normalize_request_error(error)})",
             "source": "m.stock.naver.com/api",
@@ -1953,6 +2271,9 @@ def compute_leader_metrics(candidate: Dict[str, Any], full_history: List[Dict[st
     inst_net = investor_series.get("instNet") if isinstance(investor_series.get("instNet"), list) else []
     has_investor_series = investor_series.get("available") is not False and bool(foreign_net or inst_net)
     investor_series_count = max(len(foreign_net), len(inst_net))
+    industry_peer_count = safe_number(investor_series.get("industryPeerCount"))
+    if industry_peer_count is None:
+        industry_peer_count = safe_number(candidate.get("industryPeerCount"))
     foreign_cum_wyckoff = sum_numbers(foreign_net[-LEADER_WYCKOFF_HISTORY_DAYS:]) if has_investor_series and foreign_net else None
     inst_cum_wyckoff = sum_numbers(inst_net[-LEADER_WYCKOFF_HISTORY_DAYS:]) if has_investor_series and inst_net else None
 
@@ -1979,6 +2300,8 @@ def compute_leader_metrics(candidate: Dict[str, Any], full_history: List[Dict[st
         "shockDate": shock_metrics.get("shockDate"),
         "latestDate": latest.get("dateKey"),
         "investorSeriesCount": investor_series_count,
+        "industryCode": str(investor_series.get("industryCode") or candidate.get("industryCode") or "").strip(),
+        "industryPeerCount": int(industry_peer_count or 0),
         "foreignNetCumWyckoff": foreign_cum_wyckoff,
         "instNetCumWyckoff": inst_cum_wyckoff,
         "smartCumWyckoff": (foreign_cum_wyckoff + inst_cum_wyckoff) if foreign_cum_wyckoff is not None and inst_cum_wyckoff is not None else None,
@@ -2112,12 +2435,14 @@ def collect_leader_stocks(base_data: Dict[str, Any]) -> CollectorResult:
     if len(metrics) < LEADER_PICK_COUNT and universe["fallback"]:
         metrics = dedupe_leader_metrics(metrics + collect_leader_metrics(universe["fallback"]))
 
-    leader_stocks = sorted(metrics, key=lambda item: safe_number(item.get("cum15dTradingValue")) or 0, reverse=True)[:LEADER_PICK_COUNT]
+    issuer_selected = select_leader_stocks_with_issuer_cap(metrics, LEADER_PICK_COUNT * 2)
+    sector_selection = select_leader_stocks_with_sector_cap(
+        issuer_selected,
+        LEADER_PICK_COUNT,
+        LEADER_SECTOR_MAX_COUNT,
+    )
+    leader_stocks = apply_leader_weight_cap(sector_selection["selected"], LEADER_WEIGHT_CAP)
     if leader_stocks:
-        total_weight = sum(safe_number(stock.get("cum15dTradingValue")) or 0 for stock in leader_stocks) or 1
-        for stock in leader_stocks:
-            stock["weight"] = (safe_number(stock.get("cum15dTradingValue")) or 0) / total_weight
-
         leader_snapshot_date = sorted(str(stock.get("latestDate") or "") for stock in leader_stocks if stock.get("latestDate"))[-1] if any(stock.get("latestDate") for stock in leader_stocks) else ""
         yahoo_count = sum(1 for stock in leader_stocks if str(stock.get("historySource") or "").startswith("query1.finance.yahoo.com"))
         cached_history_count = sum(1 for stock in leader_stocks if str(stock.get("historySource") or "").startswith("store/cache/leader_history.json"))
@@ -2125,6 +2450,15 @@ def collect_leader_stocks(base_data: Dict[str, Any]) -> CollectorResult:
         investor_missing_count = sum(1 for stock in leader_stocks if not stock.get("investorSeriesAvailable"))
         partial_reasons = yahoo_count > 0 or cached_history_count > 0 or cached_investor_count > 0 or investor_missing_count > 0 or len(leader_stocks) < LEADER_PICK_COUNT
         status_message = f"대표주 {len(leader_stocks)}/{LEADER_PICK_COUNT}종목 갱신"
+        issuer_deduped_count = max(0, len(metrics) - len(issuer_selected))
+        sector_deduped_count = len(sector_selection["skippedBySector"])
+        weight_capped_count = sum(1 for stock in leader_stocks if stock.get("weightCapApplied"))
+        if issuer_deduped_count > 0:
+            status_message += f" · issuer 중복 제거 {issuer_deduped_count}건"
+        if sector_deduped_count > 0:
+            status_message += f" · 업종 cap 적용 {sector_deduped_count}건"
+        if weight_capped_count > 0:
+            status_message += f" · weight cap {int(LEADER_WEIGHT_CAP * 100)}% 적용 {weight_capped_count}건"
         if yahoo_count > 0:
             status_message += f" · Yahoo 차트 보완 {yahoo_count}종목"
         if cached_history_count > 0:
@@ -2144,6 +2478,13 @@ def collect_leader_stocks(base_data: Dict[str, Any]) -> CollectorResult:
         data_patch = {
             "leaderSnapshotDate": leader_snapshot_date,
             "leaderStocks": leader_stocks,
+            "leaderSelectionMeta": {
+                "issuerDedupedCount": issuer_deduped_count,
+                "sectorDedupedCount": sector_deduped_count,
+                "weightCappedCount": weight_capped_count,
+                "weightCap": LEADER_WEIGHT_CAP,
+                "sectorMaxCount": LEADER_SECTOR_MAX_COUNT,
+            },
         }
         save_cached_leader_stocks(data_patch, " · ".join(source_parts))
         return CollectorResult(
@@ -4032,23 +4373,42 @@ def calculate_support_adjusted_cycle_values(data: Dict[str, Any]) -> Dict[str, A
     flow_patch = calculate_euphoria_flow_bonus_values(data)
     raw_risk_index = clamp(50 + (greed_score - macro_stress) + (safe_number(flow_patch.get("flowBonus")) or 0), 0, 100)
     risk_index = clamp(raw_risk_index - support_offset, 0, 100)
-    market_regime_key = "standard"
-    market_regime_label = "표준 레짐"
-    market_regime_reason = "특수 레짐 조건 없음"
-    debasement_alert = False
-
-    if fx >= 1450 and equity_overbought >= 75:
-        if support_score >= 70:
-            market_regime_key = "secular-expansion"
-            market_regime_label = "Stage 3.5: 실적 정당화형 구조적 확장기 (Secular Expansion)"
-            market_regime_reason = f"원/달러 {round(fx)}원과 과열 이격이 겹쳐도 F_support {round(support_score)}점이 높아 구조적 확장기로 완화했습니다."
-            risk_index = min(risk_index, 55)
-        else:
-            market_regime_key = "debasement-bubble"
-            market_regime_label = "Stage 6: 화폐 몰락형 특수 버블 (Debasement Bubble)"
-            market_regime_reason = f"원/달러 {round(fx)}원과 과열 이격이 겹쳤지만 F_support {round(support_score)}점이 부족해 특수 버블 경계로 강화했습니다."
-            risk_index = max(risk_index, 85)
-            debasement_alert = True
+    bubble_summary = summarize_bubble_overlay(data)
+    regime_patch = resolve_hot_zone_market_regime(
+        {
+            **data,
+            "bubbleSignals": bubble_summary["bubbleSignals"],
+            "bubbleIndex": bubble_summary["bubbleIndex"],
+            "bubbleActiveFlagCount": bubble_summary["bubbleActiveFlagCount"],
+            "bubbleCriticalTrigger": bubble_summary["bubbleCriticalTrigger"],
+            "bubbleSignalCoverageCount": bubble_summary["bubbleSignalCoverageCount"],
+        },
+        fx=fx,
+        equity_overbought=equity_overbought,
+        fundamental_support_score=support_score,
+        risk_index=risk_index,
+    )
+    cycle_patch = calculate_cycle_runtime_values(
+        {
+            **data,
+            "vix": vix,
+            "bullRatio": bull_ratio,
+            "flowBonus": safe_number(flow_patch.get("flowBonus")) or 0,
+            "flowReason": str(flow_patch.get("flowReason") or data.get("flowReason") or ""),
+            "rawRiskIndex": raw_risk_index,
+            "supportOffsetPoints": support_offset,
+            "riskIndex": regime_patch["riskIndex"],
+            "bubbleSignals": bubble_summary["bubbleSignals"],
+            "bubbleIndex": bubble_summary["bubbleIndex"],
+            "bubbleActiveFlagCount": bubble_summary["bubbleActiveFlagCount"],
+            "bubbleCriticalTrigger": bubble_summary["bubbleCriticalTrigger"],
+            "bubbleCriticalReason": bubble_summary["bubbleCriticalReason"],
+            "marketRegimeKey": regime_patch["marketRegimeKey"],
+            "marketRegimeLabel": regime_patch["marketRegimeLabel"],
+            "marketRegimeReason": regime_patch["marketRegimeReason"],
+            "debasementAlert": regime_patch["debasementAlert"],
+        }
+    )
 
     return {
         "flowBonus": safe_number(flow_patch.get("flowBonus")) or 0,
@@ -4058,11 +4418,17 @@ def calculate_support_adjusted_cycle_values(data: Dict[str, Any]) -> Dict[str, A
         "greedScore": greed_score,
         "rawRiskIndex": raw_risk_index,
         "supportOffsetPoints": support_offset,
-        "riskIndex": risk_index,
+        "riskIndex": regime_patch["riskIndex"],
         "reflexivitySynergyPoints": reflexivity_points,
         "reflexivityState": "runaway" if reflexivity_points >= 15 else "caution" if reflexivity_points >= 6 else "normal",
-        "marketRegimeKey": market_regime_key,
-        "marketRegimeLabel": market_regime_label,
-        "marketRegimeReason": market_regime_reason,
-        "debasementAlert": debasement_alert,
+        "bubbleSignals": bubble_summary["bubbleSignals"],
+        "bubbleIndex": bubble_summary["bubbleIndex"],
+        "bubbleActiveFlagCount": bubble_summary["bubbleActiveFlagCount"],
+        "bubbleCriticalTrigger": bubble_summary["bubbleCriticalTrigger"],
+        "bubbleCriticalReason": bubble_summary["bubbleCriticalReason"],
+        "marketRegimeKey": regime_patch["marketRegimeKey"],
+        "marketRegimeLabel": regime_patch["marketRegimeLabel"],
+        "marketRegimeReason": regime_patch["marketRegimeReason"],
+        "debasementAlert": regime_patch["debasementAlert"],
+        **cycle_patch,
     }

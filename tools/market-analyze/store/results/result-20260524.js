@@ -1,8 +1,8 @@
 window.__MARKET_ANALYZE_RESULT__ = {
   "meta": {
     "resultDate": "20260524",
-    "generatedAt": "2026-05-24T20:31:54+09:00",
-    "schemaVersion": "1.1.1"
+    "generatedAt": "2026-05-24T23:36:07+09:00",
+    "schemaVersion": "1.2.1"
   },
   "data": {
     "fx": 1516.188387,
@@ -12,12 +12,12 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "disparity": 167.707980895748,
     "bullRatio": 50,
     "marginSlope": 379.5,
-    "riskIndex": 85,
+    "riskIndex": 66,
     "previousRiskIndex": 85,
     "cycleLeg": "rising",
-    "cycleStageKey": "euphoria",
-    "cycleStageLabel": "정점: 환희",
-    "stageOverrideReason": "환율·유동성 왜곡 신호로 P-Index 하단을 환희 구간으로 보정했습니다.",
+    "cycleStageKey": "greed",
+    "cycleStageLabel": "상승 5: 탐욕",
+    "stageOverrideReason": "원/달러 1516원과 과열 이격이 겹쳤지만 펀더멘털 앵커 81점과 non-critical bubble(BI 34 / active 1개)가 완충해 펀더멘털 완충형 과열로 낮췄습니다.",
     "retailNetToday": 1862.0,
     "foreignNetToday": -13246.0,
     "institutionNetToday": 10593.0,
@@ -31,7 +31,7 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "flowReason": "가격 과열 구간(disparity>103)에서는 수급 보정을 비활성화했습니다 (중립 처리).",
     "trapScore": 0,
     "trapState": "neutral",
-    "trapReason": "상승 레그에서는 Bull Trap 오버라이드를 비활성화합니다.",
+    "trapReason": "대표주 급락 조건 미충족으로 눌림목/중립 처리.",
     "trapFlowScore": 0,
     "trapMarginScore": 0,
     "trapFirstShockScore": 0,
@@ -185,8 +185,8 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "depositMarginRatio": 0.002924134857215625,
     "reflexivitySynergyPoints": 25,
     "reflexivityState": "runaway",
-    "debasementAlert": true,
-    "kostolanyStage": "B3",
+    "debasementAlert": false,
+    "kostolanyStage": "B2",
     "kostolanyDivergenceNote": "거래량과 가격이 동행 (정상)",
     "lastSyncTime": "2026. 5. 20. 오후 5:47:35",
     "exportLatestMonth": "202604",
@@ -195,11 +195,11 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "exportYoYDelta": -1.2,
     "export3mAvgYoY": 41.97,
     "earningsCoverageCount": 12,
-    "earningsSnapshotQuarter": "2026.06",
-    "opIncomeBreadth": 0.9460249510415066,
-    "netIncomeBreadth": 0.9496681959079809,
-    "turnaroundBreadth": 0.008223808273416108,
-    "positiveRoeBreadth": 0.0,
+    "earningsSnapshotQuarter": "2026 1Q",
+    "opIncomeBreadth": 0.981729782561668,
+    "netIncomeBreadth": 0.9743888994443783,
+    "turnaroundBreadth": 0.014585477046436566,
+    "positiveRoeBreadth": 0.9326959478307405,
     "broadeningScore": 22,
     "broadeningState": "supportive",
     "supportBreadth20d": 0.5873738262170259,
@@ -224,16 +224,102 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "equityOverboughtScore": 100,
     "greedScore": 82.96924999999999,
     "rawRiskIndex": 62.96924999999999,
-    "marketRegimeKey": "debasement-bubble",
-    "marketRegimeLabel": "Stage 6: 화폐 몰락형 특수 버블 (Debasement Bubble)",
-    "marketRegimeReason": "원/달러 1516원과 과열 이격이 겹쳤지만 F_support 29점이 부족해 특수 버블 경계로 강화했습니다.",
+    "marketRegimeKey": "anchor-buffered-overheat",
+    "marketRegimeLabel": "Stage 3.2: 펀더멘털 완충형 과열 (Anchor Buffered Overheat)",
+    "marketRegimeReason": "원/달러 1516원과 과열 이격이 겹쳤지만 펀더멘털 앵커 81점과 non-critical bubble(BI 34 / active 1개)가 완충해 펀더멘털 완충형 과열로 낮췄습니다.",
     "marginSlope5dChangePct": -6.893056259503294,
     "marginSlopeStartDate": "260514",
     "marginSlopeEndDate": "260520",
     "nonSemiconductorMomentumProxy": true,
     "nonSemiconductorMomentumProxyReason": "비주도주 20일 수익률/20일선 breadth 기반 업종 프록시",
     "marketValuationMethod": "forward",
-    "marketValuationProxyCount": 0
+    "marketValuationProxyCount": 0,
+    "bubbleSignals": {
+      "marginDebt": {
+        "score": 100.0,
+        "state": "critical",
+        "critical": true,
+        "label": "신용매수 과열",
+        "reason": "미국 172%, 국내 148% trough 대비 상승으로 composite 160점입니다.",
+        "metrics": {
+          "usLatestMonth": "2026-04",
+          "usLatestValue": 1304281.0,
+          "usTroughMonth": "2020-03",
+          "usTroughValue": 479291.0,
+          "usGrowthPct": 172.13,
+          "krLatestDate": "260520",
+          "krLatestValue": 3674.0,
+          "krTroughDate": "260121",
+          "krTroughValue": 1484.0,
+          "krGrowthPct": 147.57,
+          "compositeGrowthPct": 159.85,
+          "availableRegions": 2
+        },
+        "updatedAt": "2026-05-24T14:35:05+00:00"
+      },
+      "ipo": {
+        "score": 36.12,
+        "state": "neutral",
+        "critical": false,
+        "label": "공모주 광풍",
+        "reason": "최근 32건 IPO의 수익률 프록시 평균 22.2%와 IPO ETF의 QQQ 대비 20일 초과수익 -1.3%를 반영했습니다. 적자 IPO 비중은 아직 자동 수집하지 않아 critical은 잠금 상태입니다.",
+        "metrics": {
+          "sampleWindowDays": 90,
+          "sampleCount": 32,
+          "avgFirstDayExcessReturnPct": 22.23,
+          "returnProxy": true,
+          "lossMakingRatioPct": null,
+          "ipoEtfPrice": 53.06,
+          "ipoVsQqq20dOutperformancePct": -1.26,
+          "ipoVsQqqRatio": 0.0739,
+          "ipoVsQqqRatioVsSma20Pct": 102.77
+        },
+        "updatedAt": "2026-05-24T14:35:06+00:00"
+      },
+      "trash": {
+        "score": 0.0,
+        "state": "neutral",
+        "critical": false,
+        "label": "적자 혁신주 투기",
+        "reason": "ARKK/QQQ 비율이 20일선 대비 96.3%이며 0일 연속 과열 상태입니다. 최근 20일 ARKK의 QQQ 대비 초과수익은 -8.2%p입니다.",
+        "metrics": {
+          "arkkPrice": 76.4,
+          "qqqPrice": 717.54,
+          "arkkQqqRatio": 0.1065,
+          "ratioSma20": 0.1106,
+          "overshootPct": 96.27,
+          "durationDays": 0,
+          "arkk20dReturnPct": -0.13,
+          "qqq20dReturnPct": 8.08,
+          "outperformancePct": -8.21
+        },
+        "updatedAt": "2026-05-24T14:35:09+00:00"
+      },
+      "fed": {
+        "score": 0.0,
+        "state": "neutral",
+        "critical": false,
+        "label": "연준 브레이크",
+        "reason": "실제 재인상 카운트는 0회입니다. FedWatch 다음 회의 확률은 아직 미연동이라 점수는 capped 상태로 유지합니다.",
+        "metrics": {
+          "fedRateTargetUpperBound": 3.75,
+          "lastChangeDate": "2025-12-11",
+          "lastHikeDate": "",
+          "recentPauseAnchorDate": "",
+          "rehikeCount": 0,
+          "nextHikeProbabilityPct": null,
+          "probabilityAvailable": false
+        },
+        "updatedAt": "2026-05-24T14:35:11+00:00"
+      }
+    },
+    "bubbleIndex": 34.03,
+    "bubbleActiveFlagCount": 1,
+    "bubbleCriticalTrigger": false,
+    "bubbleCriticalReason": "Critical Trigger 미발동 · BI 34 / active 1개",
+    "bubbleState": "gear-second",
+    "bubbleRegimeLabel": "펀더멘털 완충형 과열 경계",
+    "bubbleRegimeReason": "원/달러 1516원과 과열 이격이 겹쳤지만 펀더멘털 앵커 81점과 non-critical bubble(BI 34 / active 1개)가 완충해 펀더멘털 완충형 과열로 낮췄습니다. 버블 플래그 active 1개를 병렬로 추적합니다."
   },
   "status": {
     "fx": {
@@ -295,12 +381,12 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "export": {
         "state": "partial",
         "source": "store/results/result-20260524.js",
-        "message": "KOSIS API 키 미입력 · TradingEconomics 보완 실패 · 최근 성공 생성본 사용 (2026-05-24T15:40:40+09:00)"
+        "message": "수출 모멘텀 수집 실패 (유효하지 않은 인증KEY입니다.) · 최근 성공 생성본 사용 (2026-05-24T23:05:07+09:00)"
       },
       "earnings": {
         "state": "partial",
-        "source": "finance.naver.com",
-        "message": "OpenDART API 키 미입력 · 네이버 기업실적분석 기준 실적 breadth 12/12종목 반영 · 2026.06"
+        "source": "opendart.fss.or.kr · finance.naver.com",
+        "message": "실적 breadth 12/12종목 반영 · 2026 1Q · 네이버 보완 1종목"
       },
       "broadening": {
         "state": "ok",
@@ -321,6 +407,33 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "state": "partial",
         "source": "https://finance.naver.com/sise/sise_group.naver?type=upjong · broadening-proxy · finance.naver.com",
         "message": "업종 확산 29/50 · 밸류에이션 0/50 · 업종 프록시 확산 59% (비주도주 20일 수익률/20일선 breadth 기반 업종 프록시) · 가중 Fwd PER 32.2배 > 13.0배"
+      }
+    },
+    "bubble": {
+      "marginDebt": {
+        "state": "ok",
+        "source": "finra.org · finance.naver.com",
+        "message": "미국/국내 신용 trough 대비 상승률 계산 완료 · composite 160%"
+      },
+      "ipo": {
+        "state": "partial",
+        "source": "renaissancecapital.com · query1.finance.yahoo.com",
+        "message": "IPO 표본/ETF 상대강도는 계산했지만 적자 IPO 비중은 미연동입니다."
+      },
+      "trash": {
+        "state": "ok",
+        "source": "query1.finance.yahoo.com",
+        "message": "ARKK/QQQ 상대강도 계산 완료 · 오버슈트 96.3%"
+      },
+      "fed": {
+        "state": "partial",
+        "source": "fred.stlouisfed.org",
+        "message": "FRED 기반 실제 재인상 카운트만 반영했고 FedWatch 확률은 미연동입니다."
+      },
+      "critical": {
+        "state": "partial",
+        "source": "finra.org · finance.naver.com · renaissancecapital.com · query1.finance.yahoo.com · query1.finance.yahoo.com · fred.stlouisfed.org",
+        "message": "Critical Trigger 미발동 · BI 34 / active 1개"
       }
     }
   }

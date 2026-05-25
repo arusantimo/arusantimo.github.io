@@ -194,7 +194,41 @@ function calculateEuphoriaFlowBonus(data) {
     };
 }
 
+function calculateBubbleOverlayState() {
+    const bubbleOverlay = typeof decorateBubbleOverlay === "function"
+        ? decorateBubbleOverlay(marketData)
+        : {
+            bubbleSignals: marketData.bubbleSignals,
+            bubbleIndex: marketData.bubbleIndex,
+            bubbleActiveFlagCount: marketData.bubbleActiveFlagCount,
+            bubbleCriticalTrigger: marketData.bubbleCriticalTrigger,
+            bubbleCriticalReason: marketData.bubbleCriticalReason,
+            bubbleState: marketData.bubbleState,
+            bubbleRegimeLabel: marketData.bubbleRegimeLabel,
+            bubbleRegimeReason: marketData.bubbleRegimeReason
+        };
+
+    marketData.bubbleSignals = bubbleOverlay.bubbleSignals;
+    marketData.bubbleIndex = bubbleOverlay.bubbleIndex;
+    marketData.bubbleActiveFlagCount = bubbleOverlay.bubbleActiveFlagCount;
+    marketData.bubbleCriticalTrigger = bubbleOverlay.bubbleCriticalTrigger;
+    marketData.bubbleCriticalReason = bubbleOverlay.bubbleCriticalReason;
+    marketData.bubbleState = bubbleOverlay.bubbleState;
+    marketData.bubbleRegimeLabel = bubbleOverlay.bubbleRegimeLabel;
+    marketData.bubbleRegimeReason = bubbleOverlay.bubbleRegimeReason;
+
+    if (bubbleOverlay.bubbleCriticalTrigger) {
+        marketData.marketRegimeKey = "critical-bubble";
+        marketData.marketRegimeLabel = "Stage 4.0-CRITICAL: 버블 최정점 및 파국 임계기";
+        marketData.marketRegimeReason = bubbleOverlay.bubbleCriticalReason;
+        marketData.debasementAlert = true;
+    }
+}
+
 function calculateCycle() {
+    if (typeof syncSorosRuntimeStatus === "function") {
+        syncSorosRuntimeStatus();
+    }
     if (typeof hydrateFundamentalSupportData === "function") {
         Object.assign(marketData, hydrateFundamentalSupportData(marketData));
     }
@@ -248,35 +282,60 @@ function calculateCycle() {
         ? Number(marketData.supportOffsetPoints)
         : Number((fundamentalSupportScore * 0.3).toFixed(2));
     let riskIndex = clamp(rawRiskIndex - supportOffsetPoints, 0, 100);
+    const bubbleSummary = typeof summarizeBubbleOverlay === "function"
+        ? summarizeBubbleOverlay(marketData)
+        : {
+            bubbleSignals: marketData.bubbleSignals,
+            bubbleIndex: Number.isFinite(Number(marketData.bubbleIndex)) ? Number(marketData.bubbleIndex) : 0,
+            bubbleActiveFlagCount: Number(marketData.bubbleActiveFlagCount || 0),
+            bubbleCriticalTrigger: Boolean(marketData.bubbleCriticalTrigger),
+            bubbleCriticalReason: marketData.bubbleCriticalReason || "Critical Trigger 대기 중"
+        };
     let marketRegimeKey = "standard";
     let marketRegimeLabel = "표준 레짐";
     let marketRegimeReason = "특수 레짐 조건 없음";
     let isDebasement = false;
-
-    if (fx >= 1450 && i_disparity >= 75) {
-        if (fundamentalSupportScore >= 70) {
-            marketRegimeKey = "secular-expansion";
-            marketRegimeLabel = "Stage 3.5: 실적 정당화형 구조적 확장기 (Secular Expansion)";
-            marketRegimeReason = `원/달러 ${Math.round(fx)}원과 과열 이격이 겹쳐도 F_support ${Math.round(fundamentalSupportScore)}점이 높아 구조적 확장기로 완화했습니다.`;
-            riskIndex = Math.min(riskIndex, 55);
-        } else {
-            marketRegimeKey = "debasement-bubble";
-            marketRegimeLabel = "Stage 6: 화폐 몰락형 특수 버블 (Debasement Bubble)";
-            marketRegimeReason = `원/달러 ${Math.round(fx)}원과 과열 이격이 겹쳤지만 F_support ${Math.round(fundamentalSupportScore)}점이 부족해 특수 버블 경계로 강화했습니다.`;
-            riskIndex = Math.max(riskIndex, 85);
-            isDebasement = true;
-        }
+    const regimePatch = typeof resolveHotZoneMarketRegime === "function"
+        ? resolveHotZoneMarketRegime({
+            ...marketData,
+            bubbleSignals: bubbleSummary.bubbleSignals,
+            bubbleIndex: bubbleSummary.bubbleIndex,
+            bubbleActiveFlagCount: bubbleSummary.bubbleActiveFlagCount,
+            bubbleCriticalTrigger: bubbleSummary.bubbleCriticalTrigger,
+            riskIndex,
+            fx,
+            equityOverboughtScore: i_disparity,
+            fundamentalSupportScore
+        })
+        : null;
+    if (regimePatch) {
+        marketRegimeKey = regimePatch.marketRegimeKey;
+        marketRegimeLabel = regimePatch.marketRegimeLabel;
+        marketRegimeReason = regimePatch.marketRegimeReason;
+        riskIndex = regimePatch.riskIndex;
+        isDebasement = Boolean(regimePatch.debasementAlert);
     }
 
     marketData.rawRiskIndex = rawRiskIndex;
     marketData.supportOffsetPoints = supportOffsetPoints;
+    marketData.bubbleSignals = bubbleSummary.bubbleSignals;
+    marketData.bubbleIndex = bubbleSummary.bubbleIndex;
+    marketData.bubbleActiveFlagCount = bubbleSummary.bubbleActiveFlagCount;
+    marketData.bubbleCriticalTrigger = bubbleSummary.bubbleCriticalTrigger;
+    marketData.bubbleCriticalReason = bubbleSummary.bubbleCriticalReason;
     marketData.marketRegimeKey = marketRegimeKey;
     marketData.marketRegimeLabel = marketRegimeLabel;
     marketData.marketRegimeReason = marketRegimeReason;
     marketData.debasementAlert = isDebasement;
+    calculateBubbleOverlayState();
 
-    const cycleLeg = resolveCycleLeg(marketData.previousRiskIndex, riskIndex, marketData.cycleLeg);
-    const trapResult = calculateBullTrapScore({ ...marketData, riskIndex, cycleLeg });
+    const naturalCycleLeg = resolveCycleLeg(marketData.previousRiskIndex, riskIndex, marketData.cycleLeg);
+    const trapResult = calculateBullTrapScore({ ...marketData, riskIndex, cycleLeg: naturalCycleLeg });
+    const cycleLeg = resolveCycleLeg(marketData.previousRiskIndex, riskIndex, marketData.cycleLeg, {
+        marketRegimeKey,
+        bubbleCriticalTrigger: marketData.bubbleCriticalTrigger,
+        trapScore: trapResult.trapScore
+    });
     const stage = resolveCycleStage(riskIndex, vix, cycleLeg, trapResult.trapScore);
     const stageProgress = getStageProgress(stage, riskIndex, trapResult.trapScore);
 
@@ -300,7 +359,11 @@ function calculateCycle() {
         stageOverrideReason = `Bull Trap ${trapResult.trapScore}/20으로 하락 2단계(불안·부인)로 오버라이드했습니다.`;
     } else if (trapResult.trapScore >= 10) {
         stageOverrideReason = `Bull Trap ${trapResult.trapScore}/20으로 하락 1단계(안도·자만)로 오버라이드했습니다.`;
+    } else if (marketData.bubbleCriticalTrigger) {
+        stageOverrideReason = marketData.bubbleCriticalReason;
     } else if (marketRegimeKey === "secular-expansion") {
+        stageOverrideReason = marketRegimeReason;
+    } else if (marketRegimeKey === "anchor-buffered-overheat") {
         stageOverrideReason = marketRegimeReason;
     } else if (isDebasement) {
         stageOverrideReason = marketRegimeReason;
@@ -315,7 +378,10 @@ function calculateCycle() {
     document.getElementById("cycle-desc").innerHTML = `<b>진단:</b> ${stage.desc}`;
 
     const cycleRangeNote = document.getElementById("cycle-range-note");
-    cycleRangeNote.innerText = `${getCycleLegLabel(cycleLeg)} · ${getRiskDeltaLabel(marketData.previousRiskIndex, riskIndex)} · 현재 ${getStageTone(stageProgress)} (${stage.min}~${stage.max})`;
+    const cycleLegLabel = marketRegimeKey === "anchor-buffered-overheat" && !marketData.bubbleCriticalTrigger && marketData.trapScore < 10
+        ? `${getCycleLegLabel(cycleLeg)} 유지`
+        : getCycleLegLabel(cycleLeg);
+    cycleRangeNote.innerText = `${cycleLegLabel} · ${getRiskDeltaLabel(marketData.previousRiskIndex, riskIndex)} · 현재 ${getStageTone(stageProgress)} (${stage.min}~${stage.max})`;
     cycleRangeNote.style.color = stage.accent;
 
     const cycleFlowNote = document.getElementById("cycle-flow-note");
@@ -369,7 +435,7 @@ function calculateCycle() {
     if (typeof updateMarketFlowUI === "function") updateMarketFlowUI();
     if (typeof updateLeaderTrapUI === "function") updateLeaderTrapUI();
     if (typeof renderTheorySubtabs === "function") renderTheorySubtabs();
-    updatePortfolioRebalancing(marketData.marketAdviceStance, isDebasement);
+    updatePortfolioRebalancing(marketData.marketAdviceStance, isDebasement || marketData.bubbleCriticalTrigger);
 }
 
 function resolveKostolanyStage(cycleLeg, riskIndex, bullRatio) {

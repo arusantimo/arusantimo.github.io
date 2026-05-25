@@ -47,6 +47,13 @@ function normalizeMarketStatus(status = {}) {
             sectorBreadth: normalizeStatusEntry(status.anchor?.sectorBreadth, defaults.anchor.sectorBreadth),
             valuation: normalizeStatusEntry(status.anchor?.valuation, defaults.anchor.valuation),
             support: normalizeStatusEntry(status.anchor?.support, defaults.anchor.support)
+        },
+        bubble: {
+            marginDebt: normalizeStatusEntry(status.bubble?.marginDebt, defaults.bubble.marginDebt),
+            ipo: normalizeStatusEntry(status.bubble?.ipo, defaults.bubble.ipo),
+            trash: normalizeStatusEntry(status.bubble?.trash, defaults.bubble.trash),
+            fed: normalizeStatusEntry(status.bubble?.fed, defaults.bubble.fed),
+            critical: normalizeStatusEntry(status.bubble?.critical, defaults.bubble.critical)
         }
     };
 }
@@ -114,6 +121,11 @@ function flattenMarketStatus(status = marketStatus, options = {}) {
     addEntry("anchor.sectorBreadth", normalized.anchor.sectorBreadth, "앵커-업종 확산");
     addEntry("anchor.valuation", normalized.anchor.valuation, "앵커-밸류에이션");
     addEntry("anchor.support", normalized.anchor.support, "앵커-지지력");
+    addEntry("bubble.marginDebt", normalized.bubble.marginDebt, "버블-신용매수");
+    addEntry("bubble.ipo", normalized.bubble.ipo, "버블-IPO");
+    addEntry("bubble.trash", normalized.bubble.trash, "버블-적자 혁신주");
+    addEntry("bubble.fed", normalized.bubble.fed, "버블-Fed");
+    addEntry("bubble.critical", normalized.bubble.critical, "버블-Critical");
 
     return entries.sort((left, right) => getStatusPriority(right.state) - getStatusPriority(left.state));
 }
@@ -121,6 +133,10 @@ function flattenMarketStatus(status = marketStatus, options = {}) {
 function inferMarketStatusFromData(data = {}, source = "legacy_json") {
     const status = createDefaultMarketStatus();
     const sourceLabel = source || "legacy_json";
+    const sentimentAvailable = hasFiniteValue(data.sentiment);
+    const sentimentSource = typeof normalizeSentimentSource === "function"
+        ? normalizeSentimentSource(data.sentimentSource, sentimentAvailable)
+        : (sentimentAvailable ? "snapshot-fallback" : "");
 
     const useSnapshot = (hasValue, okMessage, missingMessage) => (
         hasValue
@@ -166,6 +182,11 @@ function inferMarketStatusFromData(data = {}, source = "legacy_json") {
         || hasFiniteValue(data.marketValuationForwardPerAvg, data.marketValuationScore);
     const supportAvailable = hasFiniteValue(data.fundamentalSupportScore, data.supportOffsetPoints)
         || ["validated", "supportive", "fragile"].includes(String(data.fundamentalSupportState || ""));
+    const bubbleSignals = data.bubbleSignals && typeof data.bubbleSignals === "object" ? data.bubbleSignals : {};
+    const bubbleSignalAvailable = (signalKey) => {
+        const signal = bubbleSignals[signalKey];
+        return hasFiniteValue(signal?.score) || !!signal?.updatedAt || !!signal?.reason;
+    };
     status.anchor.export = useSnapshot(exportAvailable, "수출 근거 확보", "수출 근거 없음");
     status.anchor.earnings = useSnapshot(earningsAvailable, "실적 breadth 확보", "실적 breadth 없음");
     status.anchor.broadening = useSnapshot(broadeningAvailable, "확산 근거 확보", "확산 근거 없음");
@@ -173,10 +194,25 @@ function inferMarketStatusFromData(data = {}, source = "legacy_json") {
     status.anchor.valuation = useSnapshot(valuationAvailable, "밸류에이션 근거 확보", "밸류에이션 근거 없음");
     status.anchor.support = useSnapshot(supportAvailable, "펀더멘털 지지력 확보", "펀더멘털 지지력 없음");
 
-    status.soros = useSnapshot(hasFiniteValue(data.disparity, data.sentiment), "이격도/심리 입력 확보", "소로스 입력 부족");
+    status.soros = typeof resolveSorosStatusEntry === "function"
+        ? resolveSorosStatusEntry(status.disparity, sentimentSource, sentimentAvailable)
+        : (
+            !sentimentAvailable
+                ? createStatusEntry("missing", "manual", "심리 입력 없음")
+                : createStatusEntry("partial", `${status.disparity.source} · snapshot`, "심리 입력 상태 재계산 helper 미연동")
+        );
     status.minsky = useSnapshot(marginAvailable, "신용/예탁금 입력 확보", "민스키 입력 부족");
     status.kostolany = useSnapshot(hasFiniteValue(data.riskIndex, data.bullRatio, data.customerDeposit), "P-Index/거래대금 입력 확보", "코스톨라니 입력 부족");
     status.wyckoff = useSnapshot(leadersAvailable, "대표주 구조 입력 확보", "와이코프 입력 부족");
+    status.bubble.marginDebt = useSnapshot(bubbleSignalAvailable("marginDebt"), "버블-신용매수 근거 확보", "버블-신용매수 근거 없음");
+    status.bubble.ipo = useSnapshot(bubbleSignalAvailable("ipo"), "버블-IPO 근거 확보", "버블-IPO 근거 없음");
+    status.bubble.trash = useSnapshot(bubbleSignalAvailable("trash"), "버블-적자 혁신주 근거 확보", "버블-적자 혁신주 근거 없음");
+    status.bubble.fed = useSnapshot(bubbleSignalAvailable("fed"), "버블-Fed 근거 확보", "버블-Fed 근거 없음");
+    status.bubble.critical = useSnapshot(
+        hasFiniteValue(data.bubbleIndex) || typeof data.bubbleCriticalTrigger === "boolean",
+        "버블 종합 근거 확보",
+        "버블 종합 근거 없음"
+    );
 
     return status;
 }
@@ -281,6 +317,10 @@ function resolveRequestedArtifact(manifest, preferredDate = "latest") {
     };
 }
 
+function hydrateLoadedBundle(rawData = {}, rawStatus = {}, source = "artifact") {
+    return hydrateLegacyBubbleBundle(rawData, rawStatus, source);
+}
+
 async function loadMarketArtifact(preferredDate = "latest") {
     delete window.__MARKET_ANALYZE_RESULT__;
 
@@ -297,10 +337,11 @@ async function loadMarketArtifact(preferredDate = "latest") {
         if (!payload || typeof payload !== "object") {
             throw new Error("결과 아티팩트 전역 객체 없음");
         }
+        const hydrated = hydrateLoadedBundle(payload.data || {}, payload.status || {}, payload.meta?.schemaVersion || selection.filePath);
 
         return {
-            data: payload.data || {},
-            status: normalizeMarketStatus(payload.status || {}),
+            data: hydrated.data,
+            status: hydrated.status,
             meta: createResultMetaPatch({
                 resultDate: payload.meta?.resultDate || selection.resolvedDate || manifest.latestDate || "",
                 latestDate: selection.latestDate || manifest.latestDate || "",
@@ -324,9 +365,10 @@ async function loadMarketArtifact(preferredDate = "latest") {
             if (!payload || typeof payload !== "object") {
                 throw new Error("latest.js 전역 객체 없음");
             }
+            const hydrated = hydrateLoadedBundle(payload.data || {}, payload.status || {}, payload.meta?.schemaVersion || "store/results/latest.js");
             return {
-                data: payload.data || {},
-                status: normalizeMarketStatus(payload.status || {}),
+                data: hydrated.data,
+                status: hydrated.status,
                 meta: createResultMetaPatch({
                     resultDate: payload.meta?.resultDate || "",
                     latestDate: payload.meta?.resultDate || "",
@@ -345,9 +387,10 @@ async function loadMarketArtifact(preferredDate = "latest") {
         } catch (latestError) {
         try {
             const fallbackData = await fetchJsonOrThrow("store/market_analyze_data.json");
+            const hydrated = hydrateLoadedBundle(fallbackData, inferMarketStatusFromData(fallbackData, "legacy_json"), "legacy_json");
             return {
-                data: fallbackData,
-                status: inferMarketStatusFromData(fallbackData, "legacy_json"),
+                data: hydrated.data,
+                status: hydrated.status,
                 meta: createResultMetaPatch({
                     loadedFile: "store/market_analyze_data.json",
                     loadState: "fallback",
@@ -360,9 +403,10 @@ async function loadMarketArtifact(preferredDate = "latest") {
                 })
             };
         } catch (fallbackError) {
+            const hydrated = hydrateLoadedBundle(marketData, inferMarketStatusFromData(marketData, "local_state"), "local_state");
             return {
-                data: { ...marketData },
-                status: inferMarketStatusFromData(marketData, "local_state"),
+                data: hydrated.data,
+                status: hydrated.status,
                 meta: createResultMetaPatch({
                     loadedFile: "localStorage",
                     loadState: "local",

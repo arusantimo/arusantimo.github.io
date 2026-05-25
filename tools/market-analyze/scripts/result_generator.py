@@ -21,6 +21,13 @@ from .anchor_collectors import (
     collect_market_valuation,
     collect_sector_breadth,
 )
+from .bubble_collectors import (
+    collect_fed_brake_flag,
+    collect_ipo_glut_flag,
+    collect_margin_debt_flag,
+    collect_trash_flag,
+)
+from .bubble_engine import calculate_bubble_values
 from .collectors import (
     CollectorResult,
     collect_disparity,
@@ -33,9 +40,15 @@ from .collectors import (
     safe_number,
     status_entry,
 )
+from .sentiment_policy import (
+    get_sentiment_source_message,
+    get_sentiment_status_source,
+    get_sentiment_status_state,
+    normalize_sentiment_source,
+)
 
 
-SCHEMA_VERSION = "1.1.1"
+SCHEMA_VERSION = "1.2.2"
 RESULT_VAR_NAME = "window.__MARKET_ANALYZE_RESULT__"
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -182,6 +195,13 @@ def infer_snapshot_statuses(data: Dict[str, Any], source: str = "store/market_an
         data.get("fundamentalSupportScore"),
         data.get("supportOffsetPoints"),
     ) or str(data.get("fundamentalSupportState") or "") in {"validated", "supportive", "fragile"}
+    bubble_signals = data.get("bubbleSignals") if isinstance(data.get("bubbleSignals"), dict) else {}
+
+    def bubble_signal_available(signal_key: str) -> bool:
+        signal = bubble_signals.get(signal_key)
+        if not isinstance(signal, dict):
+            return False
+        return has_value(signal.get("score")) or bool(signal.get("updatedAt")) or bool(signal.get("reason"))
 
     status = {
         "fx": snapshot_status(safe_number(data.get("fx")) is not None, "환율 값 확보", "환율 값 없음"),
@@ -210,6 +230,17 @@ def infer_snapshot_statuses(data: Dict[str, Any], source: str = "store/market_an
             "sectorBreadth": snapshot_status(sector_breadth_available, "업종 확산 근거 확보", "업종 확산 근거 없음"),
             "valuation": snapshot_status(valuation_available, "밸류에이션 근거 확보", "밸류에이션 근거 없음"),
             "support": snapshot_status(support_available, "펀더멘털 지지력 확보", "펀더멘털 지지력 없음"),
+        },
+        "bubble": {
+            "marginDebt": snapshot_status(bubble_signal_available("marginDebt"), "버블-신용매수 근거 확보", "버블-신용매수 근거 없음"),
+            "ipo": snapshot_status(bubble_signal_available("ipo"), "버블-IPO 근거 확보", "버블-IPO 근거 없음"),
+            "trash": snapshot_status(bubble_signal_available("trash"), "버블-적자 혁신주 근거 확보", "버블-적자 혁신주 근거 없음"),
+            "fed": snapshot_status(bubble_signal_available("fed"), "버블-Fed 근거 확보", "버블-Fed 근거 없음"),
+            "critical": snapshot_status(
+                has_value(data.get("bubbleIndex")) or isinstance(data.get("bubbleCriticalTrigger"), bool),
+                "버블 종합 근거 확보",
+                "버블 종합 근거 없음",
+            ),
         },
     }
     return status
@@ -410,15 +441,35 @@ def derive_model_statuses(data: Dict[str, Any], statuses: Dict[str, Any]) -> Non
     disparity_status = statuses["disparity"]
     margin_status = statuses["margin"]
     leaders_status = statuses["leaders"]
+    sentiment_available = safe_number(data.get("sentiment")) is not None
+    sentiment_source = normalize_sentiment_source(data.get("sentimentSource"), has_sentiment=sentiment_available)
+    data["sentimentSource"] = sentiment_source
 
-    if safe_number(data.get("sentiment")) is None:
-        statuses["soros"] = status_entry("missing", "manual", "수동 심리 입력 없음")
+    if not sentiment_available:
+        statuses["soros"] = status_entry("missing", "manual", "심리 입력 없음")
     elif disparity_status["state"] == "ok":
-        statuses["soros"] = status_entry("partial", f"{disparity_status['source']} · manual", "이격도는 최신 수집, 심리 입력은 수동/스냅샷 값 사용")
+        statuses["soros"] = status_entry(
+            get_sentiment_status_state(sentiment_source, has_sentiment=True),
+            f"{disparity_status['source']} · {get_sentiment_status_source(sentiment_source, has_sentiment=True)}",
+            f"이격도 최신 수집 · {get_sentiment_source_message(sentiment_source, has_sentiment=True)}",
+        )
     elif disparity_status["state"] == "partial":
-        statuses["soros"] = status_entry("partial", disparity_status["source"], "소로스 입력은 일부만 최신화되었습니다.")
+        statuses["soros"] = status_entry(
+            "partial",
+            f"{disparity_status['source']} · {get_sentiment_status_source(sentiment_source, has_sentiment=True)}",
+            f"이격도는 일부만 최신화 · {get_sentiment_source_message(sentiment_source, has_sentiment=True)}",
+        )
     else:
-        statuses["soros"] = summarize_statuses([disparity_status, status_entry("partial", "manual", "심리 입력은 수동/스냅샷 값 사용")])
+        statuses["soros"] = summarize_statuses(
+            [
+                disparity_status,
+                status_entry(
+                    get_sentiment_status_state(sentiment_source, has_sentiment=True),
+                    get_sentiment_status_source(sentiment_source, has_sentiment=True),
+                    get_sentiment_source_message(sentiment_source, has_sentiment=True),
+                ),
+            ]
+        )
 
     if margin_status["state"] in {"ok", "partial"}:
         statuses["minsky"] = margin_status
@@ -437,17 +488,43 @@ def derive_model_statuses(data: Dict[str, Any], statuses: Dict[str, Any]) -> Non
     statuses["wyckoff"] = leaders_status
 
 
+def derive_bubble_critical_status(data: Dict[str, Any], statuses: Dict[str, Any]) -> Dict[str, str]:
+    bubble_status = statuses.get("bubble", {})
+    entries = [
+        bubble_status.get("marginDebt"),
+        bubble_status.get("ipo"),
+        bubble_status.get("trash"),
+        bubble_status.get("fed"),
+    ]
+    summary = summarize_statuses([entry for entry in entries if entry])
+    bubble_index = safe_number(data.get("bubbleIndex"))
+    active_flags = int(data.get("bubbleActiveFlagCount") or 0)
+    reason = str(data.get("bubbleCriticalReason") or "").strip()
+    if not reason:
+        if bubble_index is None:
+            reason = "Critical Trigger 판정 대기 중"
+        else:
+            reason = f"Critical Trigger 미발동 · BI {round(bubble_index)} / active {active_flags}개"
+    return status_entry(summary["state"], summary["source"], reason)
+
+
 def set_status_value(statuses: Dict[str, Any], key: str, result: CollectorResult) -> None:
     if key.startswith("anchor."):
         _, anchor_key = key.split(".", 1)
         statuses["anchor"][anchor_key] = deepcopy(result.status)
+    elif key.startswith("bubble."):
+        _, bubble_key = key.split(".", 1)
+        statuses["bubble"][bubble_key] = deepcopy(result.status)
     else:
         statuses[key] = deepcopy(result.status)
 
 
 def merge_patch(target: Dict[str, Any], patch: Dict[str, Any]) -> None:
     for key, value in patch.items():
-        target[key] = value
+        if isinstance(value, dict) and isinstance(target.get(key), dict):
+            merge_patch(target[key], value)
+        else:
+            target[key] = value
 
 
 def build_result_payload(result_date: str, generated_at: str, data: Dict[str, Any], statuses: Dict[str, Any]) -> Dict[str, Any]:
@@ -548,9 +625,15 @@ def generate_result(
         else {}
     )
     data = {**deepcopy(base_data), **existing_latest_data}
-    for manual_key in ("sentiment", "bullRatio"):
-        if manual_key in base_data:
-            data[manual_key] = deepcopy(base_data.get(manual_key))
+    if "sentiment" in base_data:
+        data["sentiment"] = deepcopy(base_data.get("sentiment"))
+        data["sentimentSource"] = deepcopy(base_data.get("sentimentSource")) if "sentimentSource" in base_data else ""
+    if "bullRatio" in base_data:
+        data["bullRatio"] = deepcopy(base_data.get("bullRatio"))
+    data["sentimentSource"] = normalize_sentiment_source(
+        data.get("sentimentSource"),
+        has_sentiment=safe_number(data.get("sentiment")) is not None,
+    )
     settings = settings or {}
     preflight_warning = format_offline_reason(network_failures) if network_failures and not skip_remote else ""
     snapshot_source = str(manifest_payload.get("latestFile") or "store/market_analyze_data.json")
@@ -637,6 +720,19 @@ def generate_result(
         set_status_value(statuses, "anchor.valuation", valuation_result)
         emit_progress(progress_callback, f"anchor.valuation 수집 완료 -> {summarize_collector_result(valuation_result)}")
 
+        bubble_collectors = [
+            ("bubble.marginDebt", collect_margin_debt_flag),
+            ("bubble.ipo", collect_ipo_glut_flag),
+            ("bubble.trash", collect_trash_flag),
+            ("bubble.fed", collect_fed_brake_flag),
+        ]
+        for status_key, collector in bubble_collectors:
+            emit_progress(progress_callback, f"{status_key} 수집 시작")
+            result = collector(data)
+            merge_patch(data, result.data_patch)
+            set_status_value(statuses, status_key, result)
+            emit_progress(progress_callback, f"{status_key} 수집 완료 -> {summarize_collector_result(result)}")
+
         if anchor_universe_error and statuses["anchor"]["broadening"]["state"] == "error":
             statuses["anchor"]["broadening"] = status_entry(
                 "error",
@@ -658,18 +754,21 @@ def generate_result(
     else:
         emit_progress(progress_callback, "원격 수집을 건너뛰고 로컬 스냅샷만 사용합니다.")
 
-    emit_progress(progress_callback, "합성 지표 계산 시작 (anchor/support/cycle)")
+    emit_progress(progress_callback, "합성 지표 계산 시작 (anchor/support/cycle/bubble)")
     merge_patch(data, calculate_fundamental_anchor_values(data))
     merge_patch(data, calculate_fundamental_support_values(data))
     merge_patch(data, calculate_support_adjusted_cycle_values(data))
+    merge_patch(data, calculate_bubble_values(data))
     statuses["anchor"]["support"] = derive_anchor_support_status(data, statuses)
     derive_model_statuses(data, statuses)
+    statuses["bubble"]["critical"] = derive_bubble_critical_status(data, statuses)
     emit_progress(
         progress_callback,
         "합성 지표 계산 완료 "
         f"(riskIndex={data.get('riskIndex')}, "
         f"anchor={data.get('fundamentalAnchorScore')}, "
-        f"support={data.get('fundamentalSupportScore')})",
+        f"support={data.get('fundamentalSupportScore')}, "
+        f"bubble={data.get('bubbleIndex')})",
     )
     generated_at = now_local().isoformat(timespec="seconds")
     result_date = explicit_date or result_date_key()
