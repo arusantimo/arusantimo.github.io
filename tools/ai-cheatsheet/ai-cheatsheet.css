@@ -88,6 +88,13 @@ body {
   color: var(--text);
 }
 
+.tab-btn img {
+  height: 16px;
+  width: 16px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
 .tab-btn.claude-tab.active {
   color: #d4500a;
   border-bottom-color: #d4500a;
@@ -96,6 +103,16 @@ body {
 .tab-btn.codex-tab.active {
   color: #0f766e;
   border-bottom-color: #0f766e;
+}
+
+.tab-btn.cursor-tab.active {
+  color: #3b82f6;
+  border-bottom-color: #3b82f6;
+}
+
+.tab-btn.antigravity-tab.active {
+  color: #d97706;
+  border-bottom-color: #d97706;
 }
 
 .tab-ver {
@@ -151,12 +168,32 @@ body {
   --section-icon: #0f766e;
 }
 
+.cursor-pane {
+  --accent: #3b82f6;
+  --accent-bg: #eff6ff;
+  --section-icon: #3b82f6;
+}
+
+.antigravity-pane {
+  --accent: #d97706;
+  --accent-bg: #fffbeb;
+  --section-icon: #d97706;
+}
+
 .claude-pane code {
   color: #c2410c;
 }
 
 .codex-pane code {
   color: #0f766e;
+}
+
+.cursor-pane code {
+  color: #2563eb;
+}
+
+.antigravity-pane code {
+  color: #d97706;
 }
 
 /* ─── PAGE HEADER ─── */
@@ -168,6 +205,13 @@ body {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+.page-header img {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+  border-radius: 4px;
 }
 
 .page-header h1 {
@@ -226,6 +270,14 @@ body {
   background: rgba(15, 118, 110, 0.06);
 }
 
+.cursor-pane .changelog-toggle:hover {
+  background: rgba(59, 130, 246, 0.05);
+}
+
+.antigravity-pane .changelog-toggle:hover {
+  background: rgba(217, 119, 6, 0.05);
+}
+
 .changelog-toggle .arrow {
   font-size: 9px;
   transition: transform 0.2s;
@@ -268,6 +320,24 @@ body {
   font-family: 'Cascadia Code', 'Consolas', monospace;
   font-size: 10px;
   background: rgba(15, 118, 110, 0.08);
+  padding: 0 3px;
+  border-radius: 2px;
+  color: var(--accent);
+}
+
+.cursor-pane .changelog-body code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: rgba(59, 130, 246, 0.08);
+  padding: 0 3px;
+  border-radius: 2px;
+  color: var(--accent);
+}
+
+.antigravity-pane .changelog-body code {
+  font-family: 'Cascadia Code', 'Consolas', monospace;
+  font-size: 10px;
+  background: rgba(217, 119, 6, 0.08);
   padding: 0 3px;
   border-radius: 2px;
   color: var(--accent);

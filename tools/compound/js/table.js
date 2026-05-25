@@ -1,5 +1,5 @@
 (function (app) {
-    const { formatNumber, getMonthDate, hasNumericValue, formatKoreanCurrency } = app.utils;
+    const { formatNumber, getMonthDate, hasNumericValue, formatKoreanCurrency, getWorkingDaysInMonth } = app.utils;
 
     function getActualShortCumulative(state, month) {
         let actualShortCumulative = 0;
@@ -88,7 +88,11 @@
         const longTermRateText = longTermProfitRate !== null ? longTermProfitRate.toFixed(1) : null;
         const longTermRateColor = longTermRateText !== null && parseFloat(longTermRateText) >= 100 ? 'var(--accent-primary)' : '#ef4444';
         const rowDate = getMonthDate(state.globalSettings.startDate, row.month);
-        const isCurrentMonth = rowDate.getFullYear() === now.getFullYear() && rowDate.getMonth() === now.getMonth();
+        const year = rowDate.getFullYear();
+        const month = rowDate.getMonth();
+        const workingDays = getWorkingDaysInMonth(year, month);
+        const dailyShortTermProfit = workingDays > 0 ? row.shortTermProfit / workingDays : 0;
+        const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
         const rowClass = row.highlight ? 'highlight-row' : isCurrentMonth ? 'current-month-row' : '';
         const override = state.monthSettingsOverrides[row.month];
 
@@ -129,7 +133,10 @@
                     </div>
                 </td>
                 <td>
-                    <div class="number" style="color:var(--accent-warning);" data-tooltip="이번 달 단기 투자 목표 수익금입니다. (${formatKoreanCurrency(row.shortTermProfit)})">${formatNumber(row.shortTermProfit)}</div>
+                    <div class="number" style="color:var(--accent-warning);" data-tooltip="이번 달 단기 투자 목표 수익금입니다. (${formatKoreanCurrency(row.shortTermProfit)})">
+                        ${formatNumber(row.shortTermProfit)}
+                        <span style="font-size:10px; font-weight:normal; color:var(--text-secondary); margin-left:4px;" data-tooltip="이번 달 영업일(${workingDays}일) 기준 하루 평균 벌어야 하는 단기 수익금입니다. (${formatKoreanCurrency(dailyShortTermProfit)})">(${formatNumber(dailyShortTermProfit)}원)</span>
+                    </div>
                     <div style="font-size:9px; margin-top:4px; color:var(--text-secondary);" data-tooltip="현재까지의 단기 자산 총액 / 목표 단기 자산 총액 비율입니다.">
                         <span style="color:#00d9ff;">${formatNumber(prevActualShortInitPlusCumul)}</span> / ${formatNumber(prevTargetShortInitPlusCumul)}
                     </div>

@@ -5,6 +5,7 @@ const codexContent = `
 
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <img src="codex-logo.jpg" alt="Codex Logo">
         <h1>OpenAI <span>Codex Cheat Sheet</span></h1>
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
@@ -205,6 +206,123 @@ const codexContent = `
 
     <div class="main">
 
+      <div class="section">
+        <div class="section-title">⚡ 슬래시 명령어</div>
+        <div class="group">
+          <div class="group-label">세션 제어</div>
+          <div class="row">
+            <div class="row-key"><code>/clear</code></div>
+            <div class="row-desc">화면과 대화 초기화</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/new</code></div>
+            <div class="row-desc">새 대화 시작</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/resume</code></div>
+            <div class="row-desc">저장된 대화 재개</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/fork</code></div>
+            <div class="row-desc">현재 대화 분기</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/compact</code></div>
+            <div class="row-desc">컨텍스트 절약</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/copy</code></div>
+            <div class="row-desc">마지막 응답 복사</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/status</code></div>
+            <div class="row-desc">모델/권한/토큰 확인</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/debug-config</code></div>
+            <div class="row-desc">config 레이어 진단</div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/side</code></div>
+            <div class="row-desc">사이드 대화창 열기</div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>!</code></div>
+            <div class="row-desc">셸 명령 대기열 입력</div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/goal</code></div>
+            <div class="row-desc">장기 목표(goal) 워크플로 관리</div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-label">작업 흐름</div>
+          <div class="row">
+            <div class="row-key"><code>/plan</code></div>
+            <div class="row-desc">계획 모드 전환</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/diff</code></div>
+            <div class="row-desc">Git diff 검토</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/review</code></div>
+            <div class="row-desc">작업 트리 리뷰</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/mention</code></div>
+            <div class="row-desc">파일/폴더 첨부</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/agent</code></div>
+            <div class="row-desc">에이전트 스레드 전환</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/ps</code></div>
+            <div class="row-desc">백그라운드 터미널 상태</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/mcp [verbose]</code></div>
+            <div class="row-desc">MCP 도구 목록 및 상세 진단</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/apps</code></div>
+            <div class="row-desc">앱/커넥터 삽입</div>
+          </div>
+        </div>
+        <div class="group">
+          <div class="group-label">설정 전환</div>
+          <div class="row">
+            <div class="row-key"><code>/model</code></div>
+            <div class="row-desc">모델 및 추론 수준 변경</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/fast</code></div>
+            <div class="row-desc">Fast mode on/off/status</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/permissions</code></div>
+            <div class="row-desc">승인 정책 변경</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/personality</code></div>
+            <div class="row-desc">friendly / pragmatic / none</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/experimental</code></div>
+            <div class="row-desc">실험 기능 토글</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/statusline</code></div>
+            <div class="row-desc">하단 상태줄 항목 구성</div>
+          </div>
+          <div class="row">
+            <div class="row-key"><code>/logout</code></div>
+            <div class="row-desc">로그아웃</div>
+          </div>
+        </div>
+      </div>
+
       <div class="section wide">
         <div class="section-title">🖥️ CLI &amp; 플래그</div>
         <div class="cols2">
@@ -366,123 +484,6 @@ const codexContent = `
                 <div class="row-desc">데스크톱 앱 실행</div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">⚡ 슬래시 명령어</div>
-        <div class="group">
-          <div class="group-label">세션 제어</div>
-          <div class="row">
-            <div class="row-key"><code>/clear</code></div>
-            <div class="row-desc">화면과 대화 초기화</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/new</code></div>
-            <div class="row-desc">새 대화 시작</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/resume</code></div>
-            <div class="row-desc">저장된 대화 재개</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/fork</code></div>
-            <div class="row-desc">현재 대화 분기</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/compact</code></div>
-            <div class="row-desc">컨텍스트 절약</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/copy</code></div>
-            <div class="row-desc">마지막 응답 복사</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/status</code></div>
-            <div class="row-desc">모델/권한/토큰 확인</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/debug-config</code></div>
-            <div class="row-desc">config 레이어 진단</div>
-          </div>
-          <div class="row cl-tip">
-            <div class="row-key"><code>/side</code></div>
-            <div class="row-desc">사이드 대화창 열기</div>
-          </div>
-          <div class="row cl-tip">
-            <div class="row-key"><code>!</code></div>
-            <div class="row-desc">셸 명령 대기열 입력</div>
-          </div>
-          <div class="row cl-tip">
-            <div class="row-key"><code>/goal</code></div>
-            <div class="row-desc">장기 목표(goal) 워크플로 관리</div>
-          </div>
-        </div>
-        <div class="group">
-          <div class="group-label">작업 흐름</div>
-          <div class="row">
-            <div class="row-key"><code>/plan</code></div>
-            <div class="row-desc">계획 모드 전환</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/diff</code></div>
-            <div class="row-desc">Git diff 검토</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/review</code></div>
-            <div class="row-desc">작업 트리 리뷰</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/mention</code></div>
-            <div class="row-desc">파일/폴더 첨부</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/agent</code></div>
-            <div class="row-desc">에이전트 스레드 전환</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/ps</code></div>
-            <div class="row-desc">백그라운드 터미널 상태</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/mcp [verbose]</code></div>
-            <div class="row-desc">MCP 도구 목록 및 상세 진단</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/apps</code></div>
-            <div class="row-desc">앱/커넥터 삽입</div>
-          </div>
-        </div>
-        <div class="group">
-          <div class="group-label">설정 전환</div>
-          <div class="row">
-            <div class="row-key"><code>/model</code></div>
-            <div class="row-desc">모델 및 추론 수준 변경</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/fast</code></div>
-            <div class="row-desc">Fast mode on/off/status</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/permissions</code></div>
-            <div class="row-desc">승인 정책 변경</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/personality</code></div>
-            <div class="row-desc">friendly / pragmatic / none</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/experimental</code></div>
-            <div class="row-desc">실험 기능 토글</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/statusline</code></div>
-            <div class="row-desc">하단 상태줄 항목 구성</div>
-          </div>
-          <div class="row">
-            <div class="row-key"><code>/logout</code></div>
-            <div class="row-desc">로그아웃</div>
           </div>
         </div>
       </div>

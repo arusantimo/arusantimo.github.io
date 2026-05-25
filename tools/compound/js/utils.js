@@ -74,6 +74,19 @@
         return (num < 0 ? '-' : '') + result.trim() + '원';
     }
 
+    function getWorkingDaysInMonth(year, month) {
+        let count = 0;
+        const date = new Date(year, month, 1);
+        while (date.getMonth() === month) {
+            const day = date.getDay();
+            if (day !== 0 && day !== 6) {
+                count++;
+            }
+            date.setDate(date.getDate() + 1);
+        }
+        return count;
+    }
+
     app.utils = {
         formatNumber,
         getMonthsDifference,
@@ -81,6 +94,7 @@
         getMonthDate,
         normalizeRatios,
         hasNumericValue,
-        formatKoreanCurrency
+        formatKoreanCurrency,
+        getWorkingDaysInMonth
     };
 })(window.CompoundAsset = window.CompoundAsset || {});

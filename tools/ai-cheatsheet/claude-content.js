@@ -5,6 +5,7 @@ const claudeContent = `
 
     <div class="page-header">
       <div style="display:flex;align-items:center;gap:10px;">
+        <img src="claude-logo.png" alt="Claude Logo">
         <h1>Claude Code <span>Cheat Sheet</span></h1>
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
@@ -354,362 +355,6 @@ const claudeContent = `
       </div>
 
       <div class="section wide">
-        <div class="section-title">🖥️ CLI &amp; 플래그</div>
-        <div class="cols2">
-          <div>
-            <div class="group">
-              <div class="group-label">핵심 명령</div>
-              <div class="row">
-                <div class="row-key"><code>claude</code></div>
-                <div class="row-desc">대화형 시작</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>claude "q"</code></div>
-                <div class="row-desc">프롬프트와 함께 시작</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>claude -p "q"</code></div>
-                <div class="row-desc">헤드리스 (비대화형)</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>claude -c</code></div>
-                <div class="row-desc">마지막 대화 이어가기</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>claude -r "n"</code></div>
-                <div class="row-desc">이름으로 세션 재개</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>claude update</code></div>
-                <div class="row-desc">업데이트</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>claude project purge</code></div>
-                <div class="row-desc">프로젝트 데이터 삭제</div>
-              </div>
-            </div>
-            <div class="group">
-              <div class="group-label">내장 에이전트</div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>Explore</code></div>
-                <div class="row-desc">빠른 읽기 전용 (Haiku)</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>Plan</code></div>
-                <div class="row-desc">플랜 모드용 리서치</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>General</code></div>
-                <div class="row-desc">전체 도구, 복잡한 태스크</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>Bash</code></div>
-                <div class="row-desc">터미널 별도 컨텍스트</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>claude agents</code></div>
-                <div class="row-desc">서브에이전트 목록 확인</div>
-              </div>
-            </div>
-            <div class="group">
-              <div class="group-label">에이전트 프론트매터</div>
-              <div class="row">
-                <div class="row-key"><code>permissionMode</code></div>
-                <div class="row-desc">default/acceptEdits/plan/bypass</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>isolation: worktree</code></div>
-                <div class="row-desc">git 워크트리에서 실행</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>memory:</code></div>
-                <div class="row-desc">user|project|local 영구 메모리</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>background: true</code></div>
-                <div class="row-desc">백그라운드 태스크</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>maxTurns</code></div>
-                <div class="row-desc">에이전트 턴 제한</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>initialPrompt</code></div>
-                <div class="row-desc">첫 턴 자동 제출</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>SendMessage</code></div>
-                <div class="row-desc">에이전트 재개 (resume 대체)</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>@agent-name</code></div>
-                <div class="row-desc">하위 에이전트 멘션</div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="group">
-              <div class="group-label">주요 플래그</div>
-              <div class="row">
-                <div class="row-key"><code>--model</code></div>
-                <div class="row-desc">모델 지정</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>-w</code></div>
-                <div class="row-desc">Git 워크트리</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>-n / --name</code></div>
-                <div class="row-desc">세션 이름 지정</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--add-dir</code></div>
-                <div class="row-desc">작업 디렉터리 추가</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--plugin-url</code></div>
-                <div class="row-desc">원격 ZIP 플러그인 로드</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--agent</code></div>
-                <div class="row-desc">에이전트 사용</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--allowedTools</code></div>
-                <div class="row-desc">도구 사전 승인</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--output-format</code></div>
-                <div class="row-desc">json/stream 출력</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--json-schema</code></div>
-                <div class="row-desc">구조화 출력 스키마</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--max-turns</code></div>
-                <div class="row-desc">최대 턴 수 제한</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--max-budget-usd</code></div>
-                <div class="row-desc">비용 상한</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--console</code></div>
-                <div class="row-desc">Anthropic Console 인증</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--verbose</code></div>
-                <div class="row-desc">상세 로그</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--bare</code></div>
-                <div class="row-desc">최소 헤드리스 (훅/LSP 없음)</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--channels</code></div>
-                <div class="row-desc">권한 릴레이 / MCP 푸시</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>--remote</code></div>
-                <div class="row-desc">웹 세션 연결</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--effort</code></div>
-                <div class="row-desc">low/medium/high/xhigh/max</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--teleport</code></div>
-                <div class="row-desc">웹 세션을 터미널에서 재개</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--fork-session</code></div>
-                <div class="row-desc">재개 시 새 세션 ID 생성</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--permission-mode</code></div>
-                <div class="row-desc">plan/default/acceptEdits…</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--dangerously-skip-permissions</code></div>
-                <div class="row-desc">모든 프롬프트 생략 <span class="badge-warn">⚠️</span></div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--chrome</code></div>
-                <div class="row-desc">Chrome 연동</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--maintenance</code></div>
-                <div class="row-desc">유지보수 훅 실행</div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>--tmux</code></div>
-                <div class="row-desc">Worktree용 tmux 세션 생성</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section" style="padding:14px 16px 16px;">
-        <div class="section-title">⌨️ 키보드 단축키</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
-          <div>
-            <div class="group">
-              <div class="group-label">일반 제어</div>
-              <div class="row cl-tip" data-tt-title="Ctrl+C — 입력 취소"
-                data-tt-desc="현재 입력 중인 텍스트를 모두 지우거나, 실행 중인 AI의 응답 생성을 강제로 중단합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>C</kbd></div>
-                <div class="kdesc">입력/생성 취소</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+D — 세션 종료"
-                data-tt-desc="현재 작업을 저장하고 세션을 종료합니다. 터미널의 EOF 명령과 동일하게 동작합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>D</kbd></div>
-                <div class="kdesc">세션 종료</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+L — 화면 다시그리기"
-                data-tt-desc="화면의 모든 내용을 지우고 프롬프트를 맨 위로 올립니다. TUI 렌더링이 깨졌을 때 유용합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>L</kbd></div>
-                <div class="kdesc">입력 초기화 + 화면 다시그리기</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+O — 트랜스크립트 뷰어"
-                data-tt-desc="실행된 도구의 상세 입출력 로그(트랜스크립트)를 볼 수 있는 데이터 뷰어를 토글합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>O</kbd></div>
-                <div class="kdesc">트랜스크립트 뷰어 토글</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+U — 버퍼 지우기" data-tt-desc="입력 창에 작성된 모든 내용을 한 번에 지웁니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>U</kbd></div>
-                <div class="kdesc">전체 입력 버퍼 지우기</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+Y — 삭제 복원" data-tt-desc="Ctrl+U 등으로 지운 텍스트를 다시 불러옵니다. (Yank)">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>Y</kbd></div>
-                <div class="kdesc">지운 입력 복원</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+R — 히스토리 검색"
-                data-tt-desc="이전 세션에서 입력했던 프롬프트 기록을 역방향으로 검색합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>R</kbd></div>
-                <div class="kdesc">히스토리 검색</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+G — 편집기 열기"
-                data-tt-desc="시스템 기본 에디터(VS Code 등)를 열어 긴 프롬프트나 코드를 자유롭게 편집합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>G</kbd></div>
-                <div class="kdesc">프롬프트 편집기 열기</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+B — 백그라운드 전환"
-                data-tt-desc="현재 실행 중인 작업을 백그라운드로 돌리고 다른 명령을 입력할 수 있게 합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>B</kbd></div>
-                <div class="kdesc">백그라운드 실행</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+X Ctrl+K — 에이전트 중지"
-                data-tt-desc="실행 중인 모든 백그라운드 에이전트와 서브태스크를 즉시 강제 중지합니다.">
-                <div class="row-key"><code>Ctrl+X</code> <code>Ctrl+K</code></div>
-                <div class="kdesc">모든 백그라운드 에이전트 중지</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+T — 작업 목록" data-tt-desc="현재 진행 중이거나 대기 중인 모든 태스크 목록 창을 엽니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>T</kbd></div>
-                <div class="kdesc">태스크 목록 전환</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Ctrl+V — 이미지 첨부" data-tt-desc="클립보드의 이미지를 현재 프롬프트에 즉시 첨부합니다.">
-                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>V</kbd></div>
-                <div class="kdesc">이미지 붙여넣기</div>
-              </div>
-              <div class="row cl-tip" data-tt-title="Esc Esc — 요약 및 되감기"
-                data-tt-desc="현재 진행 과정을 중단하고 요약하거나, 최근 체크포인트로 되돌립니다.">
-                <div class="row-key"><kbd>Esc</kbd><kbd>Esc</kbd></div>
-                <div class="kdesc">되감기 / 요약</div>
-              </div>
-            </div>
-            <div class="group">
-              <div class="group-label">모드 전환</div>
-              <div class="krow">
-                <div class="kkey"><kbd>Shift</kbd><span class="plus">+</span><kbd>Tab</kbd></div>
-                <div class="kdesc">권한 모드 순환</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>P</kbd></div>
-                <div class="kdesc">모델 전환</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>T</kbd></div>
-                <div class="kdesc">Thinking 모드</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>O</kbd></div>
-                <div class="kdesc">빠른 모드</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><code>/tui</code></div>
-                <div class="kdesc">TUI 전체화면 전환</div>
-              </div>
-            </div>
-          </div>
-          <div>
-            <div class="group">
-              <div class="group-label">입력</div>
-              <div class="krow">
-                <div class="kkey"><kbd>\</kbd><kbd>Enter</kbd></div>
-                <div class="kdesc">줄바꿈 (빠른)</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>J</kbd></div>
-                <div class="kdesc">줄바꿈 (제어)</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>/</kbd></div>
-                <div class="kdesc">슬래시 명령어</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>!</kbd></div>
-                <div class="kdesc">직접 Bash 실행</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>@</kbd></div>
-                <div class="kdesc">파일 자동완성</div>
-              </div>
-            </div>
-            <div class="group">
-              <div class="group-label">세션 선택기</div>
-              <div class="krow">
-                <div class="kkey"><kbd>↑</kbd><kbd>↓</kbd></div>
-                <div class="kdesc">탐색</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>←</kbd><kbd>→</kbd></div>
-                <div class="kdesc">확장/축소</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>P</kbd></div>
-                <div class="kdesc">미리보기</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>R</kbd></div>
-                <div class="kdesc">이름 변경</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>/</kbd></div>
-                <div class="kdesc">검색</div>
-              </div>
-            </div>
-            <div class="group">
-              <div class="group-label">트랜스크립트 (Ctrl+O)</div>
-              <div class="krow">
-                <div class="kkey"><kbd>/</kbd></div>
-                <div class="kdesc">검색</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>N</kbd> / <kbd>⇧N</kbd></div>
-                <div class="kdesc">다음/이전</div>
-              </div>
-              <div class="krow">
-                <div class="kkey"><kbd>Q</kbd> / <kbd>Esc</kbd></div>
-                <div class="kdesc">종료</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section wide">
         <div class="section-title">⚡ 슬래시 명령어</div>
         <div class="cols3">
           <div>
@@ -942,6 +587,362 @@ const claudeContent = `
               <div class="row cl-tip">
                 <div class="row-key"><code>/tui fullscreen</code></div>
                 <div class="row-desc">전체화면 TUI</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="padding:14px 16px 16px;">
+        <div class="section-title">⌨️ 키보드 단축키</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px;">
+          <div>
+            <div class="group">
+              <div class="group-label">일반 제어</div>
+              <div class="row cl-tip" data-tt-title="Ctrl+C — 입력 취소"
+                data-tt-desc="현재 입력 중인 텍스트를 모두 지우거나, 실행 중인 AI의 응답 생성을 강제로 중단합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>C</kbd></div>
+                <div class="kdesc">입력/생성 취소</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+D — 세션 종료"
+                data-tt-desc="현재 작업을 저장하고 세션을 종료합니다. 터미널의 EOF 명령과 동일하게 동작합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>D</kbd></div>
+                <div class="kdesc">세션 종료</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+L — 화면 다시그리기"
+                data-tt-desc="화면의 모든 내용을 지우고 프롬프트를 맨 위로 올립니다. TUI 렌더링이 깨졌을 때 유용합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>L</kbd></div>
+                <div class="kdesc">입력 초기화 + 화면 다시그리기</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+O — 트랜스크립트 뷰어"
+                data-tt-desc="실행된 도구의 상세 입출력 로그(트랜스크립트)를 볼 수 있는 데이터 뷰어를 토글합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>O</kbd></div>
+                <div class="kdesc">트랜스크립트 뷰어 토글</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+U — 버퍼 지우기" data-tt-desc="입력 창에 작성된 모든 내용을 한 번에 지웁니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>U</kbd></div>
+                <div class="kdesc">전체 입력 버퍼 지우기</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+Y — 삭제 복원" data-tt-desc="Ctrl+U 등으로 지운 텍스트를 다시 불러옵니다. (Yank)">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>Y</kbd></div>
+                <div class="kdesc">지운 입력 복원</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+R — 히스토리 검색"
+                data-tt-desc="이전 세션에서 입력했던 프롬프트 기록을 역방향으로 검색합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>R</kbd></div>
+                <div class="kdesc">히스토리 검색</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+G — 편집기 열기"
+                data-tt-desc="시스템 기본 에디터(VS Code 등)를 열어 긴 프롬프트나 코드를 자유롭게 편집합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>G</kbd></div>
+                <div class="kdesc">프롬프트 편집기 열기</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+B — 백그라운드 전환"
+                data-tt-desc="현재 실행 중인 작업을 백그라운드로 돌리고 다른 명령을 입력할 수 있게 합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>B</kbd></div>
+                <div class="kdesc">백그라운드 실행</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+X Ctrl+K — 에이전트 중지"
+                data-tt-desc="실행 중인 모든 백그라운드 에이전트와 서브태스크를 즉시 강제 중지합니다.">
+                <div class="row-key"><code>Ctrl+X</code> <code>Ctrl+K</code></div>
+                <div class="kdesc">모든 백그라운드 에이전트 중지</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+T — 작업 목록" data-tt-desc="현재 진행 중이거나 대기 중인 모든 태스크 목록 창을 엽니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>T</kbd></div>
+                <div class="kdesc">태스크 목록 전환</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Ctrl+V — 이미지 첨부" data-tt-desc="클립보드의 이미지를 현재 프롬프트에 즉시 첨부합니다.">
+                <div class="row-key"><code>Ctrl</code><span class="plus">+</span><kbd>V</kbd></div>
+                <div class="kdesc">이미지 붙여넣기</div>
+              </div>
+              <div class="row cl-tip" data-tt-title="Esc Esc — 요약 및 되감기"
+                data-tt-desc="현재 진행 과정을 중단하고 요약하거나, 최근 체크포인트로 되돌립니다.">
+                <div class="row-key"><kbd>Esc</kbd><kbd>Esc</kbd></div>
+                <div class="kdesc">되감기 / 요약</div>
+              </div>
+            </div>
+            <div class="group">
+              <div class="group-label">모드 전환</div>
+              <div class="krow">
+                <div class="kkey"><kbd>Shift</kbd><span class="plus">+</span><kbd>Tab</kbd></div>
+                <div class="kdesc">권한 모드 순환</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>P</kbd></div>
+                <div class="kdesc">모델 전환</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>T</kbd></div>
+                <div class="kdesc">Thinking 모드</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>Alt</kbd><span class="plus">+</span><kbd>O</kbd></div>
+                <div class="kdesc">빠른 모드</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><code>/tui</code></div>
+                <div class="kdesc">TUI 전체화면 전환</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="group">
+              <div class="group-label">입력</div>
+              <div class="krow">
+                <div class="kkey"><kbd>\</kbd><kbd>Enter</kbd></div>
+                <div class="kdesc">줄바꿈 (빠른)</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>Ctrl</kbd><span class="plus">+</span><kbd>J</kbd></div>
+                <div class="kdesc">줄바꿈 (제어)</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>/</kbd></div>
+                <div class="kdesc">슬래시 명령어</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>!</kbd></div>
+                <div class="kdesc">직접 Bash 실행</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>@</kbd></div>
+                <div class="kdesc">파일 자동완성</div>
+              </div>
+            </div>
+            <div class="group">
+              <div class="group-label">세션 선택기</div>
+              <div class="krow">
+                <div class="kkey"><kbd>↑</kbd><kbd>↓</kbd></div>
+                <div class="kdesc">탐색</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>←</kbd><kbd>→</kbd></div>
+                <div class="kdesc">확장/축소</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>P</kbd></div>
+                <div class="kdesc">미리보기</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>R</kbd></div>
+                <div class="kdesc">이름 변경</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>/</kbd></div>
+                <div class="kdesc">검색</div>
+              </div>
+            </div>
+            <div class="group">
+              <div class="group-label">트랜스크립트 (Ctrl+O)</div>
+              <div class="krow">
+                <div class="kkey"><kbd>/</kbd></div>
+                <div class="kdesc">검색</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>N</kbd> / <kbd>⇧N</kbd></div>
+                <div class="kdesc">다음/이전</div>
+              </div>
+              <div class="krow">
+                <div class="kkey"><kbd>Q</kbd> / <kbd>Esc</kbd></div>
+                <div class="kdesc">종료</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section wide">
+        <div class="section-title">🖥️ CLI &amp; 플래그</div>
+        <div class="cols2">
+          <div>
+            <div class="group">
+              <div class="group-label">핵심 명령</div>
+              <div class="row">
+                <div class="row-key"><code>claude</code></div>
+                <div class="row-desc">대화형 시작</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude "q"</code></div>
+                <div class="row-desc">프롬프트와 함께 시작</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude -p "q"</code></div>
+                <div class="row-desc">헤드리스 (비대화형)</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude -c</code></div>
+                <div class="row-desc">마지막 대화 이어가기</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude -r "n"</code></div>
+                <div class="row-desc">이름으로 세션 재개</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude update</code></div>
+                <div class="row-desc">업데이트</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>claude project purge</code></div>
+                <div class="row-desc">프로젝트 데이터 삭제</div>
+              </div>
+            </div>
+            <div class="group">
+              <div class="group-label">내장 에이전트</div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>Explore</code></div>
+                <div class="row-desc">빠른 읽기 전용 (Haiku)</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>Plan</code></div>
+                <div class="row-desc">플랜 모드용 리서치</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>General</code></div>
+                <div class="row-desc">전체 도구, 복잡한 태스크</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>Bash</code></div>
+                <div class="row-desc">터미널 별도 컨텍스트</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>claude agents</code></div>
+                <div class="row-desc">서브에이전트 목록 확인</div>
+              </div>
+            </div>
+            <div class="group">
+              <div class="group-label">에이전트 프론트매터</div>
+              <div class="row">
+                <div class="row-key"><code>permissionMode</code></div>
+                <div class="row-desc">default/acceptEdits/plan/bypass</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>isolation: worktree</code></div>
+                <div class="row-desc">git 워크트리에서 실행</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>memory:</code></div>
+                <div class="row-desc">user|project|local 영구 메모리</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>background: true</code></div>
+                <div class="row-desc">백그라운드 태스크</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>maxTurns</code></div>
+                <div class="row-desc">에이전트 턴 제한</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>initialPrompt</code></div>
+                <div class="row-desc">첫 턴 자동 제출</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>SendMessage</code></div>
+                <div class="row-desc">에이전트 재개 (resume 대체)</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>@agent-name</code></div>
+                <div class="row-desc">하위 에이전트 멘션</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="group">
+              <div class="group-label">주요 플래그</div>
+              <div class="row">
+                <div class="row-key"><code>--model</code></div>
+                <div class="row-desc">모델 지정</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>-w</code></div>
+                <div class="row-desc">Git 워크트리</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>-n / --name</code></div>
+                <div class="row-desc">세션 이름 지정</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--add-dir</code></div>
+                <div class="row-desc">작업 디렉터리 추가</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--plugin-url</code></div>
+                <div class="row-desc">원격 ZIP 플러그인 로드</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--agent</code></div>
+                <div class="row-desc">에이전트 사용</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--allowedTools</code></div>
+                <div class="row-desc">도구 사전 승인</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--output-format</code></div>
+                <div class="row-desc">json/stream 출력</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--json-schema</code></div>
+                <div class="row-desc">구조화 출력 스키마</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--max-turns</code></div>
+                <div class="row-desc">최대 턴 수 제한</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--max-budget-usd</code></div>
+                <div class="row-desc">비용 상한</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--console</code></div>
+                <div class="row-desc">Anthropic Console 인증</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--verbose</code></div>
+                <div class="row-desc">상세 로그</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--bare</code></div>
+                <div class="row-desc">최소 헤드리스 (훅/LSP 없음)</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--channels</code></div>
+                <div class="row-desc">권한 릴레이 / MCP 푸시</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>--remote</code></div>
+                <div class="row-desc">웹 세션 연결</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--effort</code></div>
+                <div class="row-desc">low/medium/high/xhigh/max</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--teleport</code></div>
+                <div class="row-desc">웹 세션을 터미널에서 재개</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--fork-session</code></div>
+                <div class="row-desc">재개 시 새 세션 ID 생성</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--permission-mode</code></div>
+                <div class="row-desc">plan/default/acceptEdits…</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--dangerously-skip-permissions</code></div>
+                <div class="row-desc">모든 프롬프트 생략 <span class="badge-warn">⚠️</span></div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--chrome</code></div>
+                <div class="row-desc">Chrome 연동</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--maintenance</code></div>
+                <div class="row-desc">유지보수 훅 실행</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--tmux</code></div>
+                <div class="row-desc">Worktree용 tmux 세션 생성</div>
               </div>
             </div>
           </div>

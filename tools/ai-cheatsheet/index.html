@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI 치트시트 — Claude Code &amp; Codex CLI</title>
+  <title>AI 치트시트 — Claude Code, Codex, Cursor &amp; Antigravity</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="ai-cheatsheet.css">
 </head>
@@ -14,16 +14,22 @@
   <!-- SHARED TOP BANNER -->
   <div class="top-banner">
     <span class="win-badge">⊞ WINDOWS</span>
-    <span>AI 코딩 도구 치트시트 — Claude Code &amp; Codex CLI · Windows 기준</span>
+    <span>AI 코딩 도구 치트시트 — Claude, Codex, Cursor &amp; Antigravity · Windows 기준</span>
   </div>
 
   <!-- TAB BAR -->
   <div class="tab-bar">
     <button class="tab-btn claude-tab active" data-tab="claude" onclick="switchTab('claude')">
-      🤖 Claude Code <span class="tab-ver">v2.1.150</span>
+      <img src="claude-logo.png" alt="Claude Code"> Claude Code <span class="tab-ver">v2.1.150</span>
     </button>
     <button class="tab-btn codex-tab" data-tab="codex" onclick="switchTab('codex')">
-      ⬡ Codex CLI <span class="tab-ver">v0.133.0</span>
+      <img src="codex-logo.jpg" alt="Codex CLI"> Codex CLI <span class="tab-ver">v0.133.0</span>
+    </button>
+    <button class="tab-btn cursor-tab" data-tab="cursor" onclick="switchTab('cursor')">
+      <img src="cursor-logo.png" alt="Cursor AI"> Cursor AI <span class="tab-ver">v0.45.8</span>
+    </button>
+    <button class="tab-btn antigravity-tab" data-tab="antigravity" onclick="switchTab('antigravity')">
+      <img src="antigravity-logo.webp" alt="Antigravity"> Antigravity <span class="tab-ver">v2.0.0</span>
     </button>
     <div class="tab-spacer"></div>
     <button class="print-btn" onclick="window.print()">🖨️ 인쇄</button>
@@ -33,17 +39,25 @@
   <!-- Containers for dynamic loading -->
   <div id="claude-container"></div>
   <div id="codex-container"></div>
+  <div id="cursor-container"></div>
+  <div id="antigravity-container"></div>
 
   <script src="cheatsheet.js"></script>
   <script src="tooltips_claude.js"></script>
   <script src="tooltips_codex.js"></script>
+  <script src="tooltips_cursor.js"></script>
+  <script src="tooltips_antigravity.js"></script>
   <script src="claude-content.js"></script>
   <script src="codex-content.js"></script>
+  <script src="cursor-content.js"></script>
+  <script src="antigravity-content.js"></script>
   <script>
 
     // Load content dynamically
     document.getElementById('claude-container').outerHTML = claudeContent;
     document.getElementById('codex-container').outerHTML = codexContent;
+    document.getElementById('cursor-container').outerHTML = cursorContent;
+    document.getElementById('antigravity-container').outerHTML = antigravityContent;
 
     function switchTab(tab) {
       document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
@@ -56,11 +70,15 @@
     // URL hash support
     (function () {
       if (location.hash === '#codex') switchTab('codex');
+      if (location.hash === '#cursor') switchTab('cursor');
+      if (location.hash === '#antigravity') switchTab('antigravity');
     })();
 
     // Scoped tooltip apply (sync, data pre-loaded via script tag)
     applyTooltips(window.CLAUDE_TIPS, document.getElementById('tab-claude'));
     applyTooltips(window.CODEX_TIPS, document.getElementById('tab-codex'));
+    applyTooltips(window.CURSOR_TIPS, document.getElementById('tab-cursor'));
+    applyTooltips(window.ANTIGRAVITY_TIPS, document.getElementById('tab-antigravity'));
 
     function toggleHist(type) {
       const list = document.getElementById('hist-' + type);
