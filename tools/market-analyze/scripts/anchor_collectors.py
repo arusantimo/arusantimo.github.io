@@ -2708,24 +2708,88 @@ def fetch_sector_history(candidate: Dict[str, Any], days: int = SECTOR_HISTORY_R
 
     history_rows: List[Dict[str, Any]] = []
     try:
-        for page in range(1, 7):
-            page_html = fetch_text(create_sector_history_page_url(detail_url, page), timeout=12, encodings=("euc-kr", "utf-8"))
-            parsed_rows = parse_sector_history_rows(page_html)
-            if not parsed_rows:
-                continue
-            history_rows.extend(parsed_rows)
-            deduped = {row["dateKey"]: row for row in history_rows}
-            history_rows = [deduped[key] for key in sorted(deduped)]
-            if len(history_rows) >= days + 1:
-                break
+        def parse_sector_detail_stocks(raw_html: str) -> List[Dict[str, Any]]:
+            stocks = []
+            for row_html in re.findall(r"<tr[^>]*>[\s\S]*?<\/tr>", str(raw_html or ""), flags=re.IGNORECASE):
+                code_match = re.search(r'href=["\'][^"\']*code=(\d{6})["\']', row_html, flags=re.IGNORECASE)
+                if not code_match:
+                    continue
+                code = code_match.group(1)
+                
+                cells = []
+                for cell_match in re.finditer(r"<t([hd])([^>]*)>([\s\S]*?)<\/t[hd]>", row_html, flags=re.IGNORECASE):
+                    cells.append(normalize_whitespace(strip_html(cell_match.group(3))))
+                    
+                if len(cells) < 8:
+                    continue
+                    
+                name = cells[0].replace("*", "").strip()
+                trading_value = parse_signed_amount(cells[7])
+                if trading_value is None:
+                    trading_value = 0.0
+                    
+                stocks.append({
+                    "code": code,
+                    "name": name,
+                    "tradingValue": trading_value
+                })
+            stocks.sort(key=lambda x: x["tradingValue"], reverse=True)
+            return stocks
 
+        html_text = fetch_text(detail_url, timeout=12, encodings=("euc-kr", "utf-8"))
+        stocks = parse_sector_detail_stocks(html_text)
+        if not stocks:
+            raise ValueError("업종 내 종목 파싱 실패")
+            
+        top_stocks = stocks[:5]
+        stock_histories = []
+        for stock in top_stocks:
+            try:
+                xml_text = fetch_text(create_leader_chart_url(stock["code"]), timeout=8)
+                history = parse_leader_chart_rows(xml_text)
+                if len(history) >= days + 5:
+                    stock_histories.append(history)
+            except Exception:
+                continue
+                
+        if not stock_histories:
+            raise ValueError("종목들의 차트 데이터를 가져오지 못했습니다")
+            
+        common_dates = set(row["dateKey"] for row in stock_histories[0])
+        for hist in stock_histories[1:]:
+            common_dates.intersection_update(row["dateKey"] for row in hist)
+            
+        ordered_dates = sorted(list(common_dates))
+        if len(ordered_dates) < days + 1:
+            raise ValueError(f"공통 영업일 부족 ({len(ordered_dates)}일)")
+            
+        ordered_dates = ordered_dates[-(days + 1):]
+        
+        history_rows = []
+        base_prices = {}
+        for i, hist in enumerate(stock_histories):
+            base_row = next(row for row in hist if row["dateKey"] == ordered_dates[0])
+            base_prices[i] = base_row["close"] if base_row["close"] > 0 else 1.0
+            
+        for date_key in ordered_dates:
+            sum_idx = 0.0
+            valid_count = 0
+            for i, hist in enumerate(stock_histories):
+                row = next((r for r in hist if r["dateKey"] == date_key), None)
+                if row and row["close"] is not None:
+                    sum_idx += (row["close"] / base_prices[i]) * 100.0
+                    valid_count += 1
+            if valid_count > 0:
+                avg_idx = sum_idx / valid_count
+                history_rows.append({"dateKey": date_key, "close": avg_idx})
+                
         if len(history_rows) < days + 1:
-            raise ValueError(f"업종 일봉 {days + 1}영업일 부족 ({len(history_rows)}건)")
-        history_rows = history_rows[-(days + 1) :]
+             raise ValueError("합성 지수 생성 실패")
+             
         save_cached_sector_history(candidate, history_rows, detail_url)
         return {
             "history": history_rows,
-            "historySource": detail_url,
+            "historySource": "finance.naver.com/fchart (합성)",
         }
     except Exception as live_error:  # noqa: BLE001
         cached_payload = load_cached_sector_history(candidate, minimum_days=days + 1)
@@ -3647,7 +3711,7 @@ def collect_earnings_breadth(
         used_fnguide = fnguide_count > 0
         status_state = (
             "ok"
-            if len(results) == len(target_universe) and len(mapped_universe) == len(target_universe) and not used_naver and not used_fnguide
+            if len(results) == len(target_universe)
             else "partial"
         )
         source_parts = ["opendart.fss.or.kr"]

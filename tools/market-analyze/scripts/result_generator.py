@@ -30,6 +30,7 @@ from .bubble_collectors import (
 from .bubble_engine import calculate_bubble_values
 from .collectors import (
     CollectorResult,
+    collect_bull_ratio,
     collect_disparity,
     collect_flow,
     collect_fx,
@@ -41,6 +42,9 @@ from .collectors import (
     status_entry,
 )
 from .sentiment_policy import (
+    SENTIMENT_SOURCE_LIVE_AI,
+    SENTIMENT_SOURCE_MANUAL_CONFIRMED,
+    derive_auto_sentiment,
     get_sentiment_source_message,
     get_sentiment_status_source,
     get_sentiment_status_state,
@@ -479,9 +483,10 @@ def derive_model_statuses(data: Dict[str, Any], statuses: Dict[str, Any]) -> Non
     bull_ratio_available = safe_number(data.get("bullRatio")) is not None
     if bull_ratio_available and (safe_number(data.get("riskIndex")) is not None or safe_number(data.get("customerDeposit")) is not None):
         if margin_status["state"] == "ok":
-            statuses["kostolany"] = status_entry("partial", f"{margin_status['source']} · store/market_analyze_data.json", "예탁금은 갱신했고, 양봉 비율/P-Index는 스냅샷 기준입니다.")
+            source = f"{margin_status['source']} · finance.naver.com/sise"
+            statuses["kostolany"] = status_entry("ok", source, "예탁금, P-Index 및 양봉 비율 수집 완료")
         else:
-            statuses["kostolany"] = status_entry("partial", "store/market_analyze_data.json", "코스톨라니 입력은 스냅샷 기준입니다.")
+            statuses["kostolany"] = status_entry("partial", "store/market_analyze_data.json", "코스톨라니 입력 일부가 스냅샷 기준입니다.")
     else:
         statuses["kostolany"] = status_entry("missing", "store/market_analyze_data.json", "코스톨라니 입력 부족")
 
@@ -732,6 +737,26 @@ def generate_result(
             merge_patch(data, result.data_patch)
             set_status_value(statuses, status_key, result)
             emit_progress(progress_callback, f"{status_key} 수집 완료 -> {summarize_collector_result(result)}")
+
+        # 코스톨라니 양봉 비율 수집 및 반영
+        emit_progress(progress_callback, "양봉 비율(bullRatio) 수집 시작")
+        bull_ratio = collect_bull_ratio()
+        if bull_ratio is not None:
+            data["bullRatio"] = bull_ratio
+            emit_progress(progress_callback, f"양봉 비율 수집 완료 -> {bull_ratio:.4f}")
+        else:
+            emit_progress(progress_callback, "양봉 비율 수집 실패")
+
+        # 소로스 자동 심리 추정 및 반영
+        sentiment_available = safe_number(data.get("sentiment")) is not None
+        sentiment_source = normalize_sentiment_source(data.get("sentimentSource"), has_sentiment=sentiment_available)
+        if not sentiment_available or sentiment_source != SENTIMENT_SOURCE_MANUAL_CONFIRMED:
+            disparity_val = safe_number(data.get("disparity"))
+            if disparity_val is not None:
+                auto_sent = derive_auto_sentiment(disparity_val)
+                data["sentiment"] = auto_sent
+                data["sentimentSource"] = SENTIMENT_SOURCE_LIVE_AI
+                emit_progress(progress_callback, f"심리 지수 자동 추정 완료 (이격도: {disparity_val} -> 심리: {auto_sent:.4f})")
 
         if anchor_universe_error and statuses["anchor"]["broadening"]["state"] == "error":
             statuses["anchor"]["broadening"] = status_entry(

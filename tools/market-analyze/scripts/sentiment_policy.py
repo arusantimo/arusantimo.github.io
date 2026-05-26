@@ -57,3 +57,14 @@ def get_sentiment_status_state(value: Any, *, has_sentiment: bool = False) -> st
 def get_sentiment_status_source(value: Any, *, has_sentiment: bool = False) -> str:
     source = normalize_sentiment_source(value, has_sentiment=has_sentiment)
     return SENTIMENT_SOURCE_STATUS_SOURCES.get(source, "manual")
+
+
+def derive_auto_sentiment(disparity: Any) -> float:
+    from .collectors import safe_number
+    num = safe_number(disparity)
+    if num is None or num <= 0:
+        return 0.5
+    diff = num - 100.0
+    val = 0.5 + (diff * 0.02)
+    return max(0.1, min(0.9, val))
+

@@ -547,6 +547,9 @@ def collect_trash_flag(base_data: Dict[str, Any]) -> CollectorResult:
         return build_failure_result(base_data, "trash", "query1.finance.yahoo.com", f"적자 혁신주 투기 수집 실패 ({normalize_request_error(error)})")
 
 
+FRED_DGS2_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2"
+
+
 def collect_fed_brake_flag(base_data: Dict[str, Any]) -> CollectorResult:
     updated_at = utc_now_iso()
     try:
@@ -555,16 +558,43 @@ def collect_fed_brake_flag(base_data: Dict[str, Any]) -> CollectorResult:
         events = compress_rate_change_events(rows)
         rehike_metrics = derive_rehike_metrics(events)
         latest_rate = rows[-1]["rate"]
-        raw_score = min(100.0, rehike_metrics["rehikeCount"] * 20)
-        score = min(60.0, raw_score)
+
+        # 2년물 국채 금리 가져오기 및 스프레드 계산
+        dgs2_csv = fetch_text(FRED_DGS2_URL, timeout=16, encodings=("utf-8",))
+        dgs2_rows = []
+        for item in csv.DictReader(StringIO(dgs2_csv)):
+            rate = safe_number(item.get("DGS2"))
+            if rate is not None:
+                dgs2_rows.append(rate)
+
+        latest_dgs2 = dgs2_rows[-1] if dgs2_rows else None
+
+        next_hike_prob = 0.0
+        prob_available = False
+        spread_text = ""
+        if latest_dgs2 is not None:
+            spread = latest_dgs2 - latest_rate
+            prob_available = True
+            spread_text = f" (2년물 국채 {latest_dgs2:.2f}% - 기준금리 {latest_rate:.2f}%, 스프레드 {spread:+.2f}%p)"
+            if spread >= 0:
+                next_hike_prob = round(min(100.0, max(0.0, (spread / 0.25) * 100.0)), 2)
+            else:
+                next_hike_prob = 0.0
+
+        raw_score = min(100.0, (rehike_metrics["rehikeCount"] * 20) + (next_hike_prob * 0.4))
+        score = min(100.0 if next_hike_prob >= 50 else 80.0, raw_score)
+
+        critical = bool(next_hike_prob >= 70 and rehike_metrics["rehikeCount"] >= 1)
+
         reason = (
-            f"실제 재인상 카운트는 {rehike_metrics['rehikeCount']}회입니다. "
-            "FedWatch 다음 회의 확률은 아직 미연동이라 점수는 capped 상태로 유지합니다."
+            f"실제 재인상 카운트는 {rehike_metrics['rehikeCount']}회이며, "
+            f"이격도 기반 다음 회의 인상 확률은 {next_hike_prob:.1f}%입니다.{spread_text}"
         )
+
         signal = build_bubble_signal(
             "연준 브레이크",
             score,
-            critical=False,
+            critical=critical,
             reason=reason,
             metrics={
                 "fedRateTargetUpperBound": latest_rate,
@@ -572,14 +602,15 @@ def collect_fed_brake_flag(base_data: Dict[str, Any]) -> CollectorResult:
                 "lastHikeDate": rehike_metrics["lastHikeDate"],
                 "recentPauseAnchorDate": rehike_metrics["recentPauseAnchorDate"],
                 "rehikeCount": rehike_metrics["rehikeCount"],
-                "nextHikeProbabilityPct": None,
-                "probabilityAvailable": False,
+                "nextHikeProbabilityPct": next_hike_prob,
+                "probabilityAvailable": prob_available,
             },
             updated_at=updated_at,
         )
         return CollectorResult(
             {"bubbleSignals": {"fed": signal}},
-            status_entry("partial", "fred.stlouisfed.org", "FRED 기반 실제 재인상 카운트만 반영했고 FedWatch 확률은 미연동입니다."),
+            status_entry("ok", "fred.stlouisfed.org", f"FRED 기준금리 및 2년물 국채 스프레드 기반 인상 확률 {next_hike_prob:.1f}% 계산 완료"),
         )
     except (HTTPError, URLError, TimeoutError, ValueError, csv.Error) as error:
         return build_failure_result(base_data, "fed", "fred.stlouisfed.org", f"연준 브레이크 수집 실패 ({normalize_request_error(error)})")
+

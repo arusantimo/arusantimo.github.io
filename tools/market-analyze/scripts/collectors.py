@@ -1416,3 +1416,30 @@ def collect_export_indicator(base_data: Dict[str, Any]) -> CollectorResult:
                 status_entry("partial", "store/market_analyze_data.json", f"수출 지표 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
         return CollectorResult({}, status_entry("missing", "kosis.kr", f"수출 지표 미수집 ({normalize_request_error(error)})"))
+
+
+def collect_bull_ratio() -> Optional[float]:
+    try:
+        url = "https://finance.naver.com/sise/"
+        html_text = fetch_text(url, encodings=("euc-kr", "utf-8"))
+        
+        rise_match = re.search(r'sise_rise\.(naver|nhn)\?sosok=0?[\'"][^>]*>([\s\S]*?)<\/a>', html_text, flags=re.IGNORECASE)
+        fall_match = re.search(r'sise_fall\.(naver|nhn)\?sosok=0?[\'"][^>]*>([\s\S]*?)<\/a>', html_text, flags=re.IGNORECASE)
+        
+        if not rise_match or not fall_match:
+            # ?sosok=0이 안 붙은 경우도 매칭 시도
+            rise_match = re.search(r'sise_rise\.(naver|nhn)[\'"][^>]*>([\s\S]*?)<\/a>', html_text, flags=re.IGNORECASE)
+            fall_match = re.search(r'sise_fall\.(naver|nhn)[\'"][^>]*>([\s\S]*?)<\/a>', html_text, flags=re.IGNORECASE)
+
+        if rise_match and fall_match:
+            rise_nums = re.findall(r'\d+', rise_match.group(2))
+            fall_nums = re.findall(r'\d+', fall_match.group(2))
+            if rise_nums and fall_nums:
+                rise = float(rise_nums[0])
+                fall = float(fall_nums[0])
+                if rise + fall > 0:
+                    return rise / (rise + fall)
+    except Exception:
+        pass
+    return None
+
