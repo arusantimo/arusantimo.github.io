@@ -4,7 +4,7 @@ from contextlib import redirect_stdout
 from datetime import date
 from unittest import mock
 
-from jongga.generate_latest import analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_stock_snapshot, build_top_trading_value_gate, emit_cli_failures, fetch_browser_candidate_enrichments, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_stock_price_detail_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, emit_cli_failures, fetch_browser_candidate_enrichments, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
 from tempfile import TemporaryDirectory
 
@@ -74,7 +74,35 @@ class GenerateLatestTest(unittest.TestCase):
         })
         self.assertIsNotNone(parsed)
         self.assertEqual(parsed["avgStrength"], 107.0)
-        self.assertEqual(parsed["source"], "toss_playwright_response")
+        self.assertEqual(parsed["source"], "toss_http_detail")
+
+    def test_parse_toss_quotes_payload_reads_bid_ask_ratio(self):
+        parsed = parse_toss_quotes_payload({
+            "result": {
+                "offerVolume": 73406,
+                "bidVolume": 20026,
+            }
+        }, "042660")
+        self.assertIsNotNone(parsed)
+        self.assertAlmostEqual(parsed["bidAskRatio"], 20026 / 73406, places=4)
+        self.assertEqual(parsed["source"], "toss_quotes_api")
+
+    def test_parse_toss_ticks_strength_payload_builds_proxy_metrics(self):
+        parsed = parse_toss_ticks_strength_payload({
+            "result": [
+                {"time": "15:30:01", "volume": 100, "tradeType": "BUY"},
+                {"time": "15:30:20", "volume": 50, "tradeType": "SELL"},
+                {"time": "15:31:10", "volume": 80, "tradeType": "BUY"},
+                {"time": "15:31:50", "volume": 20, "tradeType": "SELL"},
+                {"time": "15:32:10", "volume": 70, "tradeType": "SELL"},
+                {"time": "15:32:40", "volume": 30, "tradeType": "BUY"},
+            ]
+        })
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed["source"], "toss_ticks_api_proxy")
+        self.assertEqual(parsed["observedMinutes"], 3)
+        self.assertAlmostEqual(parsed["intradayAbove100Ratio"], 66.7, places=1)
+        self.assertAlmostEqual(parsed["lastHourAvgStrength"], 181.0, places=1)
 
     def test_parse_naver_orderbook_ratio_html_reads_total_row(self):
         parsed = parse_naver_orderbook_ratio_html(
@@ -277,6 +305,8 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(snapshot.high_20d, 1030.0)
         self.assertEqual(snapshot.low_5d, 970.0)
         self.assertEqual(snapshot.volume_avg_20d, (100000.0 + 90000.0) / 2)
+        self.assertEqual(snapshot.industry_code, "")
+        self.assertIsNone(snapshot.industry_compare_change_pct)
 
     def test_fetch_browser_candidate_enrichments_treats_missing_playwright_as_note(self):
         import builtins
@@ -309,6 +339,371 @@ class GenerateLatestTest(unittest.TestCase):
             prepare_console_output()
         stdout.reconfigure.assert_called_once_with(encoding="utf-8", errors="replace")
         stderr.reconfigure.assert_called_once_with(encoding="utf-8", errors="replace")
+
+    def test_build_pullback_entry_marks_c3_when_industry_outperforms_kospi(self):
+        snapshot = StockSnapshot(
+            rank=3,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9900.0,
+            high_price=10100.0,
+            low_price=9700.0,
+            volume=150.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=10.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9500.0, 9400.0, 9300.0],
+            high_history=[10100.0, 10050.0, 9950.0, 9850.0, 9750.0, 9650.0, 9550.0],
+            low_history=[9700.0, 9600.0, 9500.0, 9400.0, 9300.0, 9200.0, 9100.0],
+            volume_history=[150.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=11500.0,
+            low_5d=9300.0,
+            high_52w=12000.0,
+            return_5d=6.0,
+            return_20d=12.0,
+            return_21d=12.5,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.2,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+        )
+        context = {
+            "regimeLabel": "박스권 ⚠️",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "vkospiLabel": "VKOSPI",
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+
+        self.assertIn("C3", [rule["code"] for rule in entry["matchedRules"]])
+        self.assertNotIn("C3", [rule["code"] for rule in entry["unmatchedRules"]])
+        c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
+        self.assertIn("outperform", c3_rule["note"])
+
+    def test_build_pullback_entry_explains_c3_when_industry_data_missing(self):
+        snapshot = StockSnapshot(
+            rank=3,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9900.0,
+            high_price=10100.0,
+            low_price=9700.0,
+            volume=150.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=10.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9500.0, 9400.0, 9300.0],
+            high_history=[10100.0, 10050.0, 9950.0, 9850.0, 9750.0, 9650.0, 9550.0],
+            low_history=[9700.0, 9600.0, 9500.0, 9400.0, 9300.0, 9200.0, 9100.0],
+            volume_history=[150.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=11500.0,
+            low_5d=9300.0,
+            high_52w=12000.0,
+            return_5d=6.0,
+            return_20d=12.0,
+            return_21d=12.5,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=None,
+            industry_compare_count=0,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+        )
+        context = {
+            "regimeLabel": "박스권 ⚠️",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "vkospiLabel": "VKOSPI",
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+
+        c3_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C3")
+        self.assertEqual(c3_rule["note"], "동종업종 비교 데이터 부족")
+        self.assertIn("동종업종 비교 데이터 부족", entry["notes"])
+
+    def test_build_momentum_entry_marks_s2_and_c3_from_browser_metrics(self):
+        snapshot = StockSnapshot(
+            rank=5,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9700.0,
+            high_price=10100.0,
+            low_price=9650.0,
+            volume=300.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=10.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9500.0, 9400.0, 9300.0, 9200.0, 9100.0, 9000.0, 8900.0, 8800.0, 8700.0, 8600.0, 8500.0, 8400.0, 8300.0, 8200.0, 8100.0, 8000.0, 7900.0],
+            high_history=[10100.0] * 21,
+            low_history=[9600.0] * 21,
+            volume_history=[300.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 15.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=10100.0,
+            low_5d=9600.0,
+            high_52w=10500.0,
+            return_5d=7.0,
+            return_20d=25.0,
+            return_21d=26.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={"avgStrength": 114.0, "intradayAbove100Ratio": 82.0},
+            orderbook={"bidAskRatio": 1.34},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+        }
+
+        entry = build_momentum_entry(snapshot, context, True, 1.0, 5.0)
+
+        matched_codes = [rule["code"] for rule in entry["matchedRules"]]
+        self.assertIn("S2", matched_codes)
+        self.assertIn("C3", matched_codes)
+        s2_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "S2")
+        c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
+        self.assertIn("114.0%", s2_rule["note"])
+        self.assertIn("1.34", c3_rule["note"])
+
+    def test_build_momentum_entry_explains_missing_browser_metrics(self):
+        snapshot = StockSnapshot(
+            rank=5,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9700.0,
+            high_price=10100.0,
+            low_price=9650.0,
+            volume=300.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=10.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9500.0, 9400.0, 9300.0, 9200.0, 9100.0, 9000.0, 8900.0, 8800.0, 8700.0, 8600.0, 8500.0, 8400.0, 8300.0, 8200.0, 8100.0, 8000.0, 7900.0],
+            high_history=[10100.0] * 21,
+            low_history=[9600.0] * 21,
+            volume_history=[300.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 15.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=10100.0,
+            low_5d=9600.0,
+            high_52w=10500.0,
+            return_5d=7.0,
+            return_20d=25.0,
+            return_21d=26.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={"avgStrength": 114.0},
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+        }
+
+        entry = build_momentum_entry(snapshot, context, True, 1.0, 5.0)
+
+        s2_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "S2")
+        c3_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C3")
+        self.assertIn("100% 유지 비율 데이터 부족", s2_rule["note"])
+        self.assertEqual(c3_rule["note"], "호가잔량 데이터 부족")
+
+    def test_build_reversal_entry_marks_c2_and_c3_from_browser_and_intraday_data(self):
+        snapshot = StockSnapshot(
+            rank=7,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9700.0,
+            high_price=10100.0,
+            low_price=9600.0,
+            volume=300.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=35.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=-100.0,
+            institution_previous=-50.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9300.0, 9400.0, 9300.0, 9200.0, 9100.0, 9000.0, 8900.0, 8800.0, 8700.0, 8600.0, 8500.0, 8400.0, 8300.0, 8200.0, 8100.0, 8000.0, 7900.0],
+            high_history=[10100.0] * 21,
+            low_history=[9500.0] * 21,
+            volume_history=[300.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 15.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=12000.0,
+            low_5d=9300.0,
+            high_52w=12500.0,
+            return_5d=7.0,
+            return_20d=25.0,
+            return_21d=35.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True, "note": "직전 30분봉 종가 10,000, 전봉 종가 9,800"},
+            event_filter={"blocked": False, "note": "이벤트 필터 통과"},
+            toss={"avgStrength": 94.0},
+            orderbook={"bidAskRatio": 1.08},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+        }
+
+        entry = build_reversal_entry(snapshot, context)
+
+        matched_codes = [rule["code"] for rule in entry["matchedRules"]]
+        self.assertIn("C2", matched_codes)
+        self.assertIn("C3", matched_codes)
+        c2_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C2")
+        c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
+        self.assertIn("1.08", c2_rule["note"])
+        self.assertIn("30분봉", c3_rule["note"])
+
+    def test_build_reversal_entry_explains_missing_last_hour_strength(self):
+        snapshot = StockSnapshot(
+            rank=7,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9700.0,
+            high_price=10100.0,
+            low_price=9600.0,
+            volume=300.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=35.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=-100.0,
+            institution_previous=-50.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9300.0, 9400.0, 9300.0, 9200.0, 9100.0, 9000.0, 8900.0, 8800.0, 8700.0, 8600.0, 8500.0, 8400.0, 8300.0, 8200.0, 8100.0, 8000.0, 7900.0],
+            high_history=[10100.0] * 21,
+            low_history=[9500.0] * 21,
+            volume_history=[300.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 15.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=12000.0,
+            low_5d=9300.0,
+            high_52w=12500.0,
+            return_5d=7.0,
+            return_20d=25.0,
+            return_21d=35.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": False, "note": "직전 30분봉 종가 9,700, 전봉 종가 9,800"},
+            event_filter={"blocked": False, "note": "이벤트 필터 통과"},
+            toss={"avgStrength": 94.0},
+            orderbook={"bidAskRatio": 0.92},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+        }
+
+        entry = build_reversal_entry(snapshot, context)
+
+        s2_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "S2")
+        c2_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C2")
+        c3_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C3")
+        self.assertIn("마지막 1시간 평균 데이터 부족", s2_rule["note"])
+        self.assertIn("0.92", c2_rule["note"])
+        self.assertIn("미달", c3_rule["note"])
 
     def _sample_payload(self):
         return {

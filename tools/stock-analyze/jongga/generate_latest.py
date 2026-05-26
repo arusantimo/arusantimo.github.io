@@ -29,6 +29,9 @@ from jongga.output_contract import (
 USER_AGENT = "Mozilla/5.0 jongga-live-generator/1.0"
 BROWSER_USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36"
 TOSS_ORDER_URL_TEMPLATE = "https://www.tossinvest.com/stocks/A{code}/order"
+TOSS_STOCK_DETAIL_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v3/stock-prices/details?productCodes=A{code}"
+TOSS_QUOTES_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v3/stock-prices/A{code}/quotes?viewType=krx_all&investMode=krx"
+TOSS_TICKS_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v2/stock-prices/A{code}/ticks?viewType=krx_all&count=120&investMode=krx"
 NAVER_ORDERBOOK_URL_TEMPLATE = "https://finance.naver.com/item/main.naver?code={code}"
 KIND_DISCLOSURE_SEARCH_URL = "https://kind.krx.co.kr/disclosureSimpleSearch.do?method=disclosureSimpleSearchMain"
 ETF_NAME_PATTERN = re.compile(
@@ -383,10 +386,103 @@ def parse_toss_stock_price_detail_payload(payload: Any) -> dict[str, Any] | None
     return {
         "avgStrength": round(strength, 1),
         "note": f"토스 공개 체결강도 {strength:.1f}%",
-        "source": "toss_playwright_response",
-        "sourceUrl": TOSS_ORDER_URL_TEMPLATE.format(code=str(row.get('code', '')).replace('A', '')),
+        "source": "toss_http_detail",
+        "sourceUrl": TOSS_STOCK_DETAIL_API_TEMPLATE.format(code=str(row.get('code', '')).replace('A', '')),
         "asOf": str(row.get("tradeDateTime") or ""),
     }
+
+
+def parse_toss_quotes_payload(payload: Any, code: str) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    row = payload.get("result")
+    if not isinstance(row, dict):
+        return None
+    ask_total = parse_float(row.get("offerVolume"))
+    bid_total = parse_float(row.get("bidVolume"))
+    if ask_total <= 0 or bid_total <= 0:
+        return None
+    ratio = bid_total / ask_total
+    return {
+        "bidAskRatio": round(ratio, 4),
+        "bidTotal": int(bid_total),
+        "askTotal": int(ask_total),
+        "note": f"토스 호가잔량합계 매수 {int(bid_total):,} / 매도 {int(ask_total):,}",
+        "source": "toss_quotes_api",
+        "sourceUrl": TOSS_QUOTES_API_TEMPLATE.format(code=code),
+    }
+
+
+def parse_toss_tick_minute(value: Any) -> int | None:
+    match = re.match(r"^(\d{2}):(\d{2})(?::\d{2})?$", str(value or "").strip())
+    if not match:
+        return None
+    hour = int(match.group(1))
+    minute = int(match.group(2))
+    return hour * 60 + minute
+
+
+def capped_strength_from_tick_buckets(buy_volume: float, sell_volume: float) -> float | None:
+    if buy_volume <= 0 and sell_volume <= 0:
+        return None
+    if buy_volume > 0 and sell_volume <= 0:
+        return 300.0
+    if buy_volume <= 0:
+        return 0.0
+    return min((buy_volume / sell_volume) * 100.0, 300.0)
+
+
+def parse_toss_ticks_strength_payload(payload: Any) -> dict[str, Any] | None:
+    if not isinstance(payload, dict):
+        return None
+    rows = payload.get("result")
+    if not isinstance(rows, list) or not rows:
+        return None
+    minute_buckets: dict[int, dict[str, float]] = {}
+    latest_minute: int | None = None
+    earliest_minute: int | None = None
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        minute = parse_toss_tick_minute(row.get("time"))
+        if minute is None:
+            continue
+        latest_minute = minute if latest_minute is None else max(latest_minute, minute)
+        earliest_minute = minute if earliest_minute is None else min(earliest_minute, minute)
+        trade_type = normalize_text(row.get("tradeType")).upper()
+        volume = parse_float(row.get("volume"))
+        if volume <= 0:
+            continue
+        bucket = minute_buckets.setdefault(minute, {"buy": 0.0, "sell": 0.0})
+        if trade_type == "BUY":
+            bucket["buy"] += volume
+        elif trade_type == "SELL":
+            bucket["sell"] += volume
+    if not minute_buckets or latest_minute is None or earliest_minute is None:
+        return None
+    strengths: list[tuple[int, float]] = []
+    for minute, volumes in minute_buckets.items():
+        strength = capped_strength_from_tick_buckets(volumes["buy"], volumes["sell"])
+        if strength is not None:
+            strengths.append((minute, strength))
+    if not strengths:
+        return None
+    strengths.sort(key=lambda item: item[0])
+    observed_minutes = max(latest_minute - earliest_minute + 1, 1)
+    last_hour_start = latest_minute - 59
+    last_hour_strengths = [strength for minute, strength in strengths if minute >= last_hour_start]
+    intraday_above_100_ratio = sum(1 for _, strength in strengths if strength >= 100.0) / len(strengths) * 100.0
+    payload = {
+        "intradayAbove100Ratio": round(intraday_above_100_ratio, 1),
+        "observedMinutes": observed_minutes,
+        "observedTickCount": len(rows),
+        "source": "toss_ticks_api_proxy",
+        "coverageNote": f"최근 체결 {observed_minutes}분 프록시",
+    }
+    if last_hour_strengths:
+        payload["lastHourAvgStrength"] = round(sum(last_hour_strengths) / len(last_hour_strengths), 1)
+        payload["lastHourObservedMinutes"] = min(observed_minutes, 60)
+    return payload
 
 
 def parse_naver_orderbook_ratio_html(html: str, code: str) -> dict[str, Any] | None:
@@ -544,8 +640,18 @@ def fetch_toss_strength_with_browser(context: Any, code: str) -> dict[str, Any] 
 
     page.on("response", capture_response)
     try:
-        page.goto(TOSS_ORDER_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
-        page.wait_for_timeout(5000)
+        try:
+            with page.expect_response(lambda response: target_fragment in str(response.url), timeout=7000) as response_info:
+                page.goto(TOSS_ORDER_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
+            response = response_info.value
+            if response:
+                try:
+                    response_bodies.append(response.text())
+                except Exception:  # noqa: BLE001
+                    pass
+        except Exception:  # noqa: BLE001
+            page.goto(TOSS_ORDER_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
+            page.wait_for_timeout(1500)
         for body in reversed(response_bodies):
             parsed = parse_toss_stock_price_detail_payload(json.loads(body))
             if parsed:
@@ -571,7 +677,10 @@ def fetch_naver_orderbook_with_browser(context: Any, code: str) -> dict[str, Any
     configure_browser_page(page)
     try:
         page.goto(NAVER_ORDERBOOK_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
-        page.wait_for_timeout(1500)
+        try:
+            page.wait_for_selector("tr.total", timeout=5000)
+        except Exception:  # noqa: BLE001
+            page.wait_for_timeout(800)
         return parse_naver_orderbook_ratio_html(page.content(), code)
     finally:
         page.close()
@@ -583,13 +692,110 @@ def fetch_kind_event_filter_with_browser(context: Any, code: str, company_name: 
     try:
         page.goto(KIND_DISCLOSURE_SEARCH_URL, wait_until="domcontentloaded", timeout=30000)
         page.fill("#AKCKwdTop", code)
-        page.click("input.submit")
-        page.wait_for_timeout(4000)
+        try:
+            with page.expect_navigation(wait_until="domcontentloaded", timeout=7000):
+                page.click("input.submit")
+        except Exception:  # noqa: BLE001
+            page.click("input.submit")
+        try:
+            page.wait_for_selector("table.list.type-00 tbody tr", timeout=7000)
+        except Exception:  # noqa: BLE001
+            page.wait_for_timeout(1200)
+        try:
+            page.wait_for_load_state("domcontentloaded", timeout=5000)
+        except Exception:  # noqa: BLE001
+            pass
         rows = [text.strip() for text in page.locator("table.list.type-00 tbody tr").all_inner_texts() if text.strip()]
         parsed_rows = parse_kind_disclosure_rows(rows, company_name)
         return build_kind_event_filter_from_rows(parsed_rows)
     finally:
         page.close()
+
+
+def fetch_toss_metrics_with_http(code: str) -> dict[str, Any] | None:
+    detail = parse_toss_stock_price_detail_payload(request_json(TOSS_STOCK_DETAIL_API_TEMPLATE.format(code=code), timeout=10.0))
+    ticks = parse_toss_ticks_strength_payload(request_json(TOSS_TICKS_API_TEMPLATE.format(code=code), timeout=10.0))
+    if not detail and not ticks:
+        return None
+    merged: dict[str, Any] = {}
+    if detail:
+        merged.update(detail)
+    if ticks:
+        merged.update(ticks)
+    note_parts = [normalize_text((detail or {}).get("note")), normalize_text((ticks or {}).get("coverageNote"))]
+    merged["note"] = " / ".join(part for part in note_parts if part)
+    merged["source"] = "toss_http_combo" if detail and ticks else (detail or ticks or {}).get("source")
+    merged["sourceUrl"] = TOSS_ORDER_URL_TEMPLATE.format(code=code)
+    return merged
+
+
+def fetch_orderbook_with_http(code: str) -> dict[str, Any] | None:
+    return parse_toss_quotes_payload(request_json(TOSS_QUOTES_API_TEMPLATE.format(code=code), timeout=10.0), code)
+
+
+def fetch_http_candidate_enrichments(candidates: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    if not candidates:
+        return {}, []
+
+    def collect_one(candidate: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        code = str(candidate["code"])
+        enrichment = {"toss": None, "orderbook": None, "eventFilter": None, "errors": []}
+        try:
+            enrichment["toss"] = fetch_toss_metrics_with_http(code)
+        except Exception as error:  # noqa: BLE001
+            enrichment["errors"].append(f"toss {code}: {error}")
+        try:
+            enrichment["orderbook"] = fetch_orderbook_with_http(code)
+        except Exception as error:  # noqa: BLE001
+            enrichment["errors"].append(f"orderbook {code}: {error}")
+        return code, enrichment
+
+    max_workers = min(8, len(candidates)) or 1
+    enrichments: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(collect_one, candidate) for candidate in candidates]
+        for future in concurrent.futures.as_completed(futures):
+            code, enrichment = future.result()
+            enrichments[code] = enrichment
+            if enrichment["errors"]:
+                errors.extend(enrichment["errors"])
+    return enrichments, errors
+
+
+def fetch_kind_candidate_enrichments(
+    candidates: list[dict[str, Any]],
+    *,
+    mode: str = VARIANT_STABLE,
+) -> tuple[dict[str, dict[str, Any]], list[str], dict[str, Any]]:
+    if not candidates:
+        return {}, [], {"browserSource": "", "launchNotes": [], "launchAttempts": []}
+    try:
+        from playwright.sync_api import sync_playwright
+    except Exception as error:  # noqa: BLE001
+        return {}, [], {
+            "browserSource": "unavailable",
+            "launchNotes": [f"playwright unavailable: {error}"],
+            "launchAttempts": [],
+        }
+
+    enrichments: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
+    with sync_playwright() as p:
+        browser, context, meta = launch_browser_context(p, mode=mode)
+        for candidate in candidates:
+            code = str(candidate["code"])
+            name = str(candidate.get("name") or "")
+            enrichment = {"toss": None, "orderbook": None, "eventFilter": None, "errors": []}
+            try:
+                enrichment["eventFilter"] = fetch_kind_event_filter_with_browser(context, code, name)
+            except Exception as error:  # noqa: BLE001
+                enrichment["errors"].append(f"kind {code}: {error}")
+            if enrichment["errors"]:
+                errors.extend(enrichment["errors"])
+            enrichments[code] = enrichment
+        browser.close()
+    return enrichments, errors, meta
 
 
 def fetch_browser_candidate_enrichments(
@@ -642,13 +848,13 @@ def is_entry_field_satisfied(entry: dict[str, Any], field_key: str) -> bool:
     orderbook = entry.get("orderbook") or {}
     event_filter = entry.get("eventFilter") or {}
     if field_key == "toss.avgStrength":
-        return math.isfinite(parse_float(toss.get("avgStrength"))) and parse_float(toss.get("avgStrength")) > 0
+        return "avgStrength" in toss and math.isfinite(parse_float(toss.get("avgStrength"))) and parse_float(toss.get("avgStrength")) > 0
     if field_key == "toss.intradayAbove100Ratio":
-        return math.isfinite(parse_float(toss.get("intradayAbove100Ratio"))) and parse_float(toss.get("intradayAbove100Ratio")) > 0
+        return "intradayAbove100Ratio" in toss and math.isfinite(parse_float(toss.get("intradayAbove100Ratio"))) and parse_float(toss.get("intradayAbove100Ratio")) >= 0
     if field_key == "toss.lastHourAvgStrength":
-        return math.isfinite(parse_float(toss.get("lastHourAvgStrength"))) and parse_float(toss.get("lastHourAvgStrength")) > 0
+        return "lastHourAvgStrength" in toss and math.isfinite(parse_float(toss.get("lastHourAvgStrength"))) and parse_float(toss.get("lastHourAvgStrength")) >= 0
     if field_key == "orderbook.bidAskRatio":
-        return math.isfinite(parse_float(orderbook.get("bidAskRatio"))) and parse_float(orderbook.get("bidAskRatio")) > 0
+        return "bidAskRatio" in orderbook and math.isfinite(parse_float(orderbook.get("bidAskRatio"))) and parse_float(orderbook.get("bidAskRatio")) >= 0
     if field_key == "eventFilter":
         return bool(event_filter.get("blocked")) or bool(normalize_text(event_filter.get("note"))) or event_filter.get("earningsDays") is not None or event_filter.get("corporateActionDays") is not None
     return False
@@ -1013,6 +1219,9 @@ class StockSnapshot:
     return_21d: float
     volume_avg_5d: float
     volume_avg_20d: float
+    industry_code: str
+    industry_compare_change_pct: float | None
+    industry_compare_count: int
     intraday_30m: dict[str, Any]
     event_filter: dict[str, Any] | None
     toss: dict[str, Any] | None = None
@@ -1033,8 +1242,15 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
     volume_history = [float(parse_int(row["accumulatedTradingVolume"])) for row in history_rows]
     total_infos = integration.get("totalInfos", []) or []
     deals = integration.get("dealTrendInfos", []) or []
+    industry_compare_rows = integration.get("industryCompareInfo", []) or []
     today_deal = deals[0] if deals else {}
     previous_deal = deals[1] if len(deals) > 1 else {}
+    industry_change_values = [
+        parse_float(row.get("fluctuationsRatio"))
+        for row in industry_compare_rows
+        if isinstance(row, dict) and str(row.get("itemCode") or "").strip() != code and str(row.get("fluctuationsRatio") or "").strip()
+    ]
+    industry_compare_change_pct = average_or_default(industry_change_values) if industry_change_values else None
 
     history_high_window = high_history[:120] or [parse_float(basic.get("highPrice") or basic.get("closePrice") or basic.get("stockPrice")) or 0.0]
     high_52w = parse_float(find_total_info(total_infos, "highPriceOf52Weeks")) or max(history_high_window)
@@ -1095,6 +1311,9 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
         return_21d=return_21d,
         volume_avg_5d=average_or_default(volume_history[1:6], volume_history[0]),
         volume_avg_20d=average_or_default(volume_history[1:21], volume_history[0]),
+        industry_code=str(integration.get("industryCode") or ""),
+        industry_compare_change_pct=industry_compare_change_pct,
+        industry_compare_count=len(industry_change_values),
         intraday_30m=intraday_30m,
         event_filter=event_filter,
         toss=None,
@@ -1587,8 +1806,91 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
     }
 
 
+def evaluate_pullback_c3(snapshot: StockSnapshot, context: dict[str, Any]) -> tuple[float, str]:
+    industry_change_pct = snapshot.industry_compare_change_pct
+    kospi_change_pct = parse_float(context.get("kospiChangePct"))
+    if industry_change_pct is None:
+        return 0.0, "동종업종 비교 데이터 부족"
+    comparison_note = (
+        f"동종업종 평균 {signed_number(industry_change_pct, 2, '%')} / "
+        f"KOSPI {signed_number(kospi_change_pct, 2, '%')}"
+    )
+    if industry_change_pct > kospi_change_pct:
+        return 1.0, f"{comparison_note} outperform"
+    return 0.0, f"{comparison_note} underperform"
+
+
+def evaluate_momentum_s2(snapshot: StockSnapshot) -> tuple[float, str]:
+    toss = snapshot.toss or {}
+    avg_strength = parse_float(toss.get("avgStrength"))
+    intraday_ratio = parse_float(toss.get("intradayAbove100Ratio"))
+    has_avg_strength = avg_strength > 0
+    has_intraday_ratio = intraday_ratio > 0
+    if not has_avg_strength and not has_intraday_ratio:
+        return 0.0, "토스 체결강도 데이터 부족"
+    if not has_intraday_ratio:
+        return 0.0, f"당일 평균 체결강도 {avg_strength:.1f}% / 100% 유지 비율 데이터 부족"
+    if not has_avg_strength:
+        return 0.0, f"100% 유지 비율 {intraday_ratio:.1f}% / 당일 평균 체결강도 데이터 부족"
+    note = f"당일 평균 체결강도 {avg_strength:.1f}% / 100% 유지 비율 {intraday_ratio:.1f}%"
+    if avg_strength >= 110.0 and intraday_ratio >= 70.0:
+        return 1.0, f"{note} 충족"
+    return 0.0, f"{note} 미달"
+
+
+def evaluate_momentum_c3(snapshot: StockSnapshot) -> tuple[float, str]:
+    orderbook = snapshot.orderbook or {}
+    bid_ask_ratio = parse_float(orderbook.get("bidAskRatio"))
+    if bid_ask_ratio <= 0:
+        return 0.0, "호가잔량 데이터 부족"
+    note = f"매수/매도 호가잔량 비율 {bid_ask_ratio:.2f}"
+    if bid_ask_ratio >= 1.2:
+        return 1.0, f"{note} 충족"
+    return 0.0, f"{note} 미달"
+
+
+def evaluate_reversal_s2(snapshot: StockSnapshot) -> tuple[float, str]:
+    toss = snapshot.toss or {}
+    avg_strength = parse_float(toss.get("avgStrength"))
+    last_hour_strength = parse_float(toss.get("lastHourAvgStrength"))
+    has_avg_strength = avg_strength > 0
+    has_last_hour_strength = last_hour_strength > 0
+    if not has_avg_strength and not has_last_hour_strength:
+        return 0.0, "토스 체결강도 데이터 부족"
+    if not has_last_hour_strength:
+        return 0.0, f"당일 평균 체결강도 {avg_strength:.1f}% / 마지막 1시간 평균 데이터 부족"
+    if not has_avg_strength:
+        return 0.0, f"마지막 1시간 평균 {last_hour_strength:.1f}% / 당일 평균 체결강도 데이터 부족"
+    note = f"당일 평균 체결강도 {avg_strength:.1f}% / 마지막 1시간 평균 {last_hour_strength:.1f}%"
+    if avg_strength >= 90.0 and last_hour_strength >= 100.0:
+        return 1.0, f"{note} 충족"
+    return 0.0, f"{note} 미달"
+
+
+def evaluate_reversal_c2(snapshot: StockSnapshot) -> tuple[float, str]:
+    orderbook = snapshot.orderbook or {}
+    bid_ask_ratio = parse_float(orderbook.get("bidAskRatio"))
+    if bid_ask_ratio <= 0:
+        return 0.0, "호가잔량 데이터 부족"
+    note = f"매수/매도 호가잔량 비율 {bid_ask_ratio:.2f}"
+    if bid_ask_ratio >= 1.0:
+        return 1.0, f"{note} 충족"
+    return 0.0, f"{note} 미달"
+
+
+def evaluate_reversal_c3(snapshot: StockSnapshot) -> tuple[float, str]:
+    intraday_signal = snapshot.intraday_30m or {}
+    if not intraday_signal.get("available"):
+        return 0.0, normalize_text(intraday_signal.get("note")) or "30분봉 데이터 부족"
+    note = normalize_text(intraday_signal.get("note")) or "30분봉 안정화 신호"
+    if intraday_signal.get("signal"):
+        return 1.0, f"{note} 충족"
+    return 0.0, f"{note} 미달"
+
+
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
+    c3_score, c3_note = evaluate_pullback_c3(snapshot, context)
     gates = [
         build_top_trading_value_gate(snapshot.rank, "G0"),
         {"code": "G1", **to_status(bool(snapshot.ma5 and snapshot.ma20 and snapshot.ma60 and snapshot.ma5 > snapshot.ma20 > snapshot.ma60 and snapshot.ma5_prev and snapshot.ma5 > snapshot.ma5_prev), "5MA>20MA>60MA")},
@@ -1604,8 +1906,9 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "P2": 1.0 if any(ma and snapshot.current_price > ma for ma in [snapshot.ma5, snapshot.ma10, snapshot.ma20]) else 0.0,
         "C1": 1.0 if snapshot.current_price >= snapshot.open_price or lower_wick_ratio(snapshot) >= 1.0 else 0.0,
         "C2": 1.0 if snapshot.volume_avg_5d and 1.0 <= snapshot.volume / snapshot.volume_avg_5d <= 1.8 else 0.0,
-        "C3": 0.0,
+        "C3": c3_score,
     }
+    rule_notes = {"C3": c3_note}
     raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "pullback")
@@ -1619,14 +1922,14 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates),
         "strategy": "pullback",
         "gates": gates,
-        "matchedRules": [{"code": code, "note": "공개 데이터 충족"} for code, passed in score_items.items() if passed >= 1.0],
-        "unmatchedRules": [{"code": code, "note": "미충족 또는 공개 데이터 부족"} for code, passed in score_items.items() if passed < 1.0],
+        "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
+        "unmatchedRules": [{"code": code, "note": rule_notes.get(code, "미충족 또는 공개 데이터 부족")} for code, passed in score_items.items() if passed < 1.0],
         **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
         "keyPoint": f"5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
-        "notes": ["토스 체결강도·섹터 outperform은 미반영"] if score_items["C3"] == 0.0 else [],
+        "notes": ["동종업종 비교 데이터 부족"] if snapshot.industry_compare_change_pct is None else [],
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
@@ -1637,6 +1940,8 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
 
 def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_top10: bool, kospi_return_5d: float, kospi_return_20d: float) -> dict[str, Any]:
     manual_input = build_manual_input_meta("momentum", snapshot)
+    s2_score, s2_note = evaluate_momentum_s2(snapshot)
+    c3_score, c3_note = evaluate_momentum_c3(snapshot)
     gates = [
         {"code": "G1", **to_status(rs_top10, "3개월 상대강도 상위 10%")},
         {"code": "G2", **to_status(snapshot.return_5d - kospi_return_5d > 0 and snapshot.return_20d - kospi_return_20d > 0, "5일·20일 초과수익률")},
@@ -1645,13 +1950,14 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
     ]
     score_items = {
         "S1": 1.0 if snapshot.foreign_net > 0 and snapshot.institution_net > 0 else 0.0,
-        "S2": 0.0,
+        "S2": s2_score,
         "P1": 1.0 if snapshot.high_20d and snapshot.current_price >= snapshot.high_20d * 0.95 else 0.0,
         "P2": 1.0 if snapshot.volume_avg_20d and snapshot.volume >= snapshot.volume_avg_20d * 1.5 else 0.0,
         "C1": 1.0 if snapshot.high_price and snapshot.current_price >= snapshot.high_price * 0.95 else 0.0,
         "C2": 1.0 if candle_range(snapshot) > 0 and abs(snapshot.current_price - snapshot.open_price) >= candle_range(snapshot) * 0.7 and upper_wick_ratio(snapshot) <= 0.3 else 0.0,
-        "C3": 0.0,
+        "C3": c3_score,
     }
+    rule_notes = {"S2": s2_note, "C3": c3_note}
     raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "momentum")
@@ -1665,8 +1971,8 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates),
         "strategy": "momentum",
         "gates": gates,
-        "matchedRules": [{"code": code, "note": "공개 데이터 충족"} for code, passed in score_items.items() if passed >= 1.0],
-        "unmatchedRules": [{"code": code, "note": "토스 또는 추가 데이터 필요"} for code, passed in score_items.items() if passed < 1.0],
+        "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
+        "unmatchedRules": [{"code": code, "note": rule_notes.get(code, "토스 또는 추가 데이터 필요")} for code, passed in score_items.items() if passed < 1.0],
         **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
@@ -1688,6 +1994,9 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     manual_input = build_manual_input_meta("reversal", snapshot)
     auto_event_filter = snapshot.event_filter
     intraday_signal = snapshot.intraday_30m
+    s2_score, s2_note = evaluate_reversal_s2(snapshot)
+    c2_score, c2_note = evaluate_reversal_c2(snapshot)
+    c3_score, c3_note = evaluate_reversal_c3(snapshot)
     daily_returns = []
     for current, previous in zip(snapshot.close_history[:5], snapshot.close_history[1:6]):
         if previous:
@@ -1717,13 +2026,14 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     position_ratio = ((snapshot.current_price - snapshot.low_price) / (snapshot.high_price - snapshot.low_price) * 100) if snapshot.high_price > snapshot.low_price else 0.0
     score_items = {
         "S1": 1.0 if (snapshot.foreign_previous <= 0 < snapshot.foreign_net) or (snapshot.institution_previous <= 0 < snapshot.institution_net) else 0.0,
-        "S2": 0.0,
+        "S2": s2_score,
         "P1": 1.0 if snapshot.ma20 and snapshot.current_price > snapshot.ma20 else 0.0,
         "P2": 1.0 if position_ratio >= 50 else 0.0,
         "C1": 1.0 if snapshot.volume_avg_5d and snapshot.volume >= snapshot.volume_avg_5d * 2.0 else 0.0,
-        "C2": 1.0 if intraday_signal.get("available") and intraday_signal.get("signal") else 0.0,
-        "C3": 0.0,
+        "C2": c2_score,
+        "C3": c3_score,
     }
+    rule_notes = {"S2": s2_note, "C2": c2_note, "C3": c3_note}
     raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * reversal_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "reversal")
@@ -1738,8 +2048,8 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "strategy": "reversal",
         "filters": filters,
         "gates": gates,
-        "matchedRules": [{"code": code, "note": "공개 데이터 충족"} for code, passed in score_items.items() if passed >= 1.0],
-        "unmatchedRules": [{"code": code, "note": "토스·이벤트 데이터 필요"} for code, passed in score_items.items() if passed < 1.0],
+        "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
+        "unmatchedRules": [{"code": code, "note": rule_notes.get(code, "토스·이벤트 데이터 필요")} for code, passed in score_items.items() if passed < 1.0],
         **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
@@ -1893,96 +2203,81 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
     kospi_return_20d = ((context["kospiClose"] - parse_float(kospi_history[20].get("closePrice"))) / parse_float(kospi_history[20].get("closePrice"))) * 100 if len(kospi_history) > 20 and parse_float(kospi_history[20].get("closePrice")) else 0.0
     universe_returns = [(snapshot.code, snapshot.return_20d) for snapshot in snapshots]
 
-    browser_enrichments: dict[str, dict[str, Any]] = {}
+    http_enrichments: dict[str, dict[str, Any]] = {}
+    http_errors: list[str] = []
+    kind_enrichments: dict[str, dict[str, Any]] = {}
     browser_errors: list[str] = []
     browser_meta: dict[str, Any] = {"browserSource": "", "launchNotes": [], "launchAttempts": []}
-    if resolved_mode == VARIANT_CANARY:
-        canary_browser_candidates = [
-            {"code": snapshot.code, "name": snapshot.name, "needsEventFilter": True}
-            for snapshot in snapshots
-        ]
+    http_candidates = [
+        {
+            "code": snapshot.code,
+            "name": snapshot.name,
+        }
+        for snapshot in snapshots
+    ]
+    if http_candidates:
         started_at = perf_counter()
-        browser_enrichments, browser_errors, browser_meta = fetch_browser_candidate_enrichments(
-            canary_browser_candidates,
-            mode=resolved_mode,
-        )
+        http_enrichments, http_errors = fetch_http_candidate_enrichments(http_candidates)
         for snapshot in snapshots:
-            enrichment = browser_enrichments.get(snapshot.code)
+            enrichment = http_enrichments.get(snapshot.code)
             if enrichment:
                 apply_browser_enrichment_to_snapshot(snapshot, enrichment)
-        launch_note = browser_meta.get("browserSource") or "browser unavailable"
         log_step(
-            "browser_enrichment",
-            "카나리 브라우저 우회 수집",
+            "http_enrichment",
+            "토스 API 보강 수집",
             started_at,
-            status="warning" if browser_meta.get("browserSource") == "unavailable" else "partial" if browser_errors else "ok",
+            status="partial" if http_errors else "ok",
             detail=(
-                f"{launch_note} · "
-                f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / "
-                f"호가 {sum(1 for item in browser_enrichments.values() if item.get('orderbook'))} / "
-                f"KIND {sum(1 for item in browser_enrichments.values() if item.get('eventFilter'))}"
+                f"direct-http · "
+                f"체결강도 {sum(1 for item in http_enrichments.values() if item.get('toss'))} / "
+                f"호가 {sum(1 for item in http_enrichments.values() if item.get('orderbook'))} / "
+                f"틱프록시 {sum(1 for item in http_enrichments.values() if (item.get('toss') or {}).get('intradayAbove100Ratio') is not None or (item.get('toss') or {}).get('lastHourAvgStrength') is not None)}"
             ),
-            count=len(canary_browser_candidates),
+            count=len(http_candidates),
         )
-        if browser_errors:
-            emit_cli_failures("카나리 브라우저 우회 실패", browser_errors)
+        if http_errors:
+            emit_cli_failures("토스 API 보강 실패", http_errors)
 
-    started_at = perf_counter()
+    scoring_started_at = perf_counter()
     pullback_entries = sorted((build_pullback_entry(snapshot, context) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
     momentum_entries = sorted((build_momentum_entry(snapshot, context, relative_strength_rank(snapshot, universe_returns), kospi_return_5d, kospi_return_20d) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
     reversal_entries = sorted((build_reversal_entry(snapshot, context) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
+
     log_step(
         "entry_scoring",
         "전략별 후보 계산",
-        started_at,
+        scoring_started_at,
         detail=f"pullback {len(pullback_entries)}, momentum {len(momentum_entries)}, reversal {len(reversal_entries)}",
         count=len(pullback_entries) + len(momentum_entries) + len(reversal_entries),
     )
 
-    if resolved_mode == VARIANT_STABLE:
-        browser_candidates: list[dict[str, Any]] = []
-        seen_browser_codes: set[str] = set()
-        for entry in momentum_entries:
-            if entry["code"] in seen_browser_codes:
-                continue
-            browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": False})
-            seen_browser_codes.add(entry["code"])
-        for entry in reversal_entries:
-            if entry["code"] in seen_browser_codes:
-                for candidate in browser_candidates:
-                    if candidate["code"] == entry["code"]:
-                        candidate["needsEventFilter"] = True
-                        break
-                continue
-            browser_candidates.append({"code": entry["code"], "name": entry["name"], "needsEventFilter": True})
-            seen_browser_codes.add(entry["code"])
-
+    kind_candidates = [
+        {"code": entry["code"], "name": entry["name"], "needsEventFilter": True}
+        for entry in reversal_entries
+        if next((snapshot for snapshot in snapshots if snapshot.code == entry["code"] and snapshot.event_filter), None) is None
+    ]
+    if kind_candidates:
         started_at = perf_counter()
-        browser_enrichments, browser_errors, browser_meta = fetch_browser_candidate_enrichments(browser_candidates, mode=resolved_mode)
-        for entry in momentum_entries:
-            enrichment = browser_enrichments.get(entry["code"])
+        kind_enrichments, browser_errors, browser_meta = fetch_kind_candidate_enrichments(kind_candidates, mode=resolved_mode)
+        for snapshot in snapshots:
+            enrichment = kind_enrichments.get(snapshot.code)
             if enrichment:
-                apply_browser_enrichment_to_entry(entry, "momentum", enrichment, context)
+                apply_browser_enrichment_to_snapshot(snapshot, enrichment)
         for entry in reversal_entries:
-            enrichment = browser_enrichments.get(entry["code"])
+            enrichment = kind_enrichments.get(entry["code"])
             if enrichment:
                 apply_browser_enrichment_to_entry(entry, "reversal", enrichment, context)
-        launch_note = browser_meta.get("browserSource") or "playwright-chromium"
+        launch_note = browser_meta.get("browserSource") or "browser unavailable"
         log_step(
             "browser_enrichment",
-            "브라우저 보강 수집",
+            "카나리 KIND 브라우저 보강" if resolved_mode == VARIANT_CANARY else "KIND 브라우저 보강",
             started_at,
             status="warning" if browser_meta.get("browserSource") == "unavailable" else "partial" if browser_errors else "ok",
-            detail=(
-                f"{launch_note} · "
-                f"토스 {sum(1 for item in browser_enrichments.values() if item.get('toss'))} / "
-                f"호가 {sum(1 for item in browser_enrichments.values() if item.get('orderbook'))} / "
-                f"KIND {sum(1 for item in browser_enrichments.values() if item.get('eventFilter'))}"
-            ),
-            count=len(browser_candidates),
+            detail=f"{launch_note} · KIND {sum(1 for item in kind_enrichments.values() if item.get('eventFilter'))}",
+            count=len(kind_candidates),
         )
         if browser_errors:
-            emit_cli_failures("브라우저 보강 실패", browser_errors)
+            emit_cli_failures("카나리 KIND 브라우저 실패" if resolved_mode == VARIANT_CANARY else "KIND 브라우저 실패", browser_errors)
 
     all_entries = pullback_entries + momentum_entries + reversal_entries
     missing_public_metrics = sum(1 for entry in all_entries if entry.get("notes"))
@@ -1992,12 +2287,13 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
         manual_keys.append("toss_metrics")
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
-    data_quality_status = "partial" if errors or browser_errors or missing_public_metrics or fallback_keys else "complete"
+    data_quality_status = "partial" if errors or http_errors or browser_errors or missing_public_metrics or fallback_keys else "complete"
     intraday_ok = sum(1 for snapshot in snapshots if snapshot.intraday_30m.get("available"))
     event_schedule_ok = sum(1 for snapshot in snapshots if snapshot.event_filter)
-    toss_strength_ok = sum(1 for item in browser_enrichments.values() if item.get("toss"))
-    orderbook_ok = sum(1 for item in browser_enrichments.values() if item.get("orderbook"))
-    kind_browser_ok = sum(1 for item in browser_enrichments.values() if item.get("eventFilter"))
+    toss_strength_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("avgStrength") is not None)
+    toss_ticks_proxy_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("intradayAbove100Ratio") is not None or (item.get("toss") or {}).get("lastHourAvgStrength") is not None)
+    orderbook_ok = sum(1 for item in http_enrichments.values() if item.get("orderbook"))
+    kind_browser_ok = sum(1 for item in kind_enrichments.values() if item.get("eventFilter"))
 
     payload = {
         "schemaVersion": "jongga_result.v1",
@@ -2013,7 +2309,7 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
                 "fallback": len(fallback_keys),
                 "slots": 1,
             },
-            "failedKeys": errors + browser_errors,
+            "failedKeys": errors + http_errors + browser_errors,
             "staleKeys": [],
             "manualKeys": manual_keys,
             "fallbackKeys": fallback_keys,
@@ -2023,8 +2319,9 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
                 "naver_integration_schedule": {"ok": event_schedule_ok},
                 "yahoo_chart": {"ok": 5 + (1 if live_metrics["vkospi"]["isFallback"] else 0)},
                 "yahoo_intraday_30m": {"ok": intraday_ok},
-                "toss_playwright_strength": {"ok": toss_strength_ok},
-                "naver_orderbook_browser": {"ok": orderbook_ok},
+                "toss_http_strength": {"ok": toss_strength_ok},
+                "toss_ticks_strength_proxy": {"ok": toss_ticks_proxy_ok},
+                "toss_quotes_orderbook": {"ok": orderbook_ok},
                 "kind_playwright_disclosure": {"ok": kind_browser_ok},
                 "cnbc_quote": {"ok": 0 if live_metrics["vkospi"]["isFallback"] else 1},
             },
@@ -2043,9 +2340,9 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
                 f"{variant_label(resolved_mode)} 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. "
                 "역추세 30분봉은 Yahoo 30분봉으로 계산합니다. "
                 + (
-                    "카나리는 Chrome 실행 파일을 우선 시도하고, 실패 시 Playwright Chromium으로 토스 체결강도·호가·KIND 공시를 더 넓은 후보군에 우회 수집합니다."
+                    "카나리는 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 Chrome 실행 파일을 우선 시도해 표시 종목만 브라우저 보강합니다."
                     if resolved_mode == VARIANT_CANARY
-                    else "현재 버전은 Playwright 기반 브라우저 보강을 상위 추천 후보에 한해 적용합니다."
+                    else "현재 버전은 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 표시 종목만 Playwright로 보강합니다."
                 )
             ),
             "channel": resolved_mode,
