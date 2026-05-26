@@ -1,0 +1,89 @@
+# 매일 한국 시간(KST) 오전 07:40 평일(월~금)에 시가베팅 분석을 자동 실행하고 결과를 갱신하는 워크플로
+name: open-bet-schedule
+
+on:
+  schedule:
+    # KST 오전 07:40 월~금요일 실행
+    # UTC 기준으로는 전날 22:40 일~목요일 실행에 해당합니다. (07:40 - 9h = 22:40 / 월~금 - 1d = 일~목)
+    # cron 요일 지정: 0(일) - 4(목)
+    - cron: "40 22 * * 0-4"
+  workflow_dispatch: # 필요 시 깃허브 웹 UI에서 수동 실행 가능하도록 지원
+
+concurrency:
+  group: open-bet-schedule-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # 분석 결과를 저장소에 커밋/푸시하기 위해 쓰기 권한이 필요합니다.
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Python 환경 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Node.js 환경 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: tools/open-bet-analyze/package.json
+
+      - name: Node.js 의존성 패키지 설치
+        working-directory: tools/open-bet-analyze
+        run: npm install
+
+      - name: Playwright 브라우저 캐시 설정
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-openbet-${{ runner.os }}-${{ hashFiles('tools/open-bet-analyze/package.json') }}
+          restore-keys: |
+            playwright-openbet-${{ runner.os }}-
+
+      - name: Playwright Chromium 브라우저 및 시스템 종속성 설치 (캐시 미스 시)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: tools/open-bet-analyze
+        run: npx playwright install chromium --with-deps
+
+      - name: Playwright 시스템 종속성만 설치 (캐시 히트 시)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: tools/open-bet-analyze
+        run: npx playwright install-deps chromium
+
+      - name: 시가베팅 분석 파이프라인 실행
+        working-directory: tools/open-bet-analyze
+        env:
+          PYTHONUTF8: "1"
+          PYTHONIOENCODING: utf-8
+          OPEN_BET_FORCE_COLOR: "1"
+        run: python run_open_bet.py
+
+      - name: 분석 결과 깃허브 저장소에 커밋 및 푸시
+        run: |
+          set -euo pipefail
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          # 분석 결과 생성 디렉토리 추가
+          git add tools/open-bet-analyze/store/results/
+          
+          # 변경 사항이 없을 경우 커밋을 건너뜁니다.
+          if git diff --staged --quiet; then
+            echo "변경 없음 - 커밋 건너뜀"
+            exit 0
+          fi
+          
+          git commit -m "chore(open-bet): 시가베팅 분석 결과 자동 갱신" -m "GitHub Actions 스케줄러가 일일 분석 리포트(JS/JSON)를 최신화했습니다."
+          git push

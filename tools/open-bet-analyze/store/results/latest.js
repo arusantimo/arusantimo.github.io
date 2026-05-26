@@ -1,8 +1,8 @@
 window.__OPEN_BET_RESULT__ = {
   "schemaVersion": "open_bet_result.v1",
-  "tradeDate": "20260526",
+  "tradeDate": "20260527",
   "phase": "pre_ats",
-  "generatedAt": "2026-05-26T22:12:38+09:00",
+  "generatedAt": "2026-05-27T00:44:23+09:00",
   "executionSchedule": {
     "profile": "ats",
     "analysis": {
@@ -21,8 +21,8 @@ window.__OPEN_BET_RESULT__ = {
   },
   "krxLiquidationOrders": [],
   "regime": {
-    "label": "약세장 ⛔",
-    "openBetActive": false
+    "label": "강세장 ✅ (펀더·지수 정당)",
+    "openBetActive": true
   },
   "macro": {
     "gapGrade": "G-B",
@@ -105,10 +105,12 @@ window.__OPEN_BET_RESULT__ = {
       "global_gap_bundle": {
         "metric": "global_gap_bundle",
         "status": "ok",
-        "source": "fixture",
-        "confidence": 1.0,
-        "stale": false,
-        "errors": [],
+        "source": "fixture_fallback",
+        "confidence": 0.5,
+        "stale": true,
+        "errors": [
+          "macro quotes unavailable — fixture fallback"
+        ],
         "fallbackUsage": [],
         "filled": true
       },
@@ -135,10 +137,12 @@ window.__OPEN_BET_RESULT__ = {
       "overtime_single_board": {
         "metric": "overtime_single_board",
         "status": "ok",
-        "source": "fixture",
-        "confidence": 1.0,
-        "stale": false,
-        "errors": [],
+        "source": "fixture_fallback",
+        "confidence": 0.5,
+        "stale": true,
+        "errors": [
+          "naver error page — fixture fallback"
+        ],
         "fallbackUsage": [],
         "filled": true
       },
@@ -165,9 +169,9 @@ window.__OPEN_BET_RESULT__ = {
       "overnight_volume": {
         "metric": "overnight_volume",
         "status": "ok",
-        "source": "fixture",
-        "confidence": 1.0,
-        "stale": false,
+        "source": "fixture_fallback",
+        "confidence": 0.5,
+        "stale": true,
         "errors": [],
         "fallbackUsage": [],
         "filled": true

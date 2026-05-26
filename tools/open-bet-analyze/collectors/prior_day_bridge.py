@@ -103,9 +103,17 @@ def collect_eod_signals(trade_date: str | None = None) -> MetricEnvelope:
         )
 
     regime = _extract_regime(payload)
-    opening_label = str(regime.get("시가베팅") or regime.get("openingBet") or "")
+    slots = payload.get("slots") or []
+    macro_overlay = (slots[0].get("regime") or {}).get("macroOverlay") if slots else {}
+
+    if isinstance(macro_overlay, dict) and macro_overlay:
+        regime_label = str(macro_overlay.get("effectiveRegimeLabel") or macro_overlay.get("technicalRegimeLabel") or "")
+        opening_label = str(regime.get("시가베팅") or regime.get("openingBet") or "")
+    else:
+        regime_label = str(regime.get("적용 레짐") or regime.get("레짐") or regime.get("regime") or "")
+        opening_label = str(regime.get("시가베팅") or regime.get("openingBet") or "")
+
     open_active = "활성" in opening_label or "active" in opening_label.lower()
-    regime_label = str(regime.get("레짐") or regime.get("regime") or "")
 
     value = {
         "sourceFile": str(path.name),
@@ -114,7 +122,7 @@ def collect_eod_signals(trade_date: str | None = None) -> MetricEnvelope:
         "openingBetLabel": opening_label,
         "gapScore": _extract_gap_score(payload),
         "candidates": _extract_open_bet_candidates(payload),
-        "vkospi": regime.get("VKOSPI") or regime.get("vkospi"),
+        "vkospi": regime.get("VKOSPI") or regime.get("vkospi") or regime.get("vkospiValue"),
     }
     return MetricEnvelope(
         metric="eod_open_bet_signals",

@@ -1,0 +1,41 @@
+{
+  "metric": "overnight_volume",
+  "status": "ok",
+  "source": "fixture_fallback",
+  "confidence": 0.5,
+  "value": {
+    "rows": [
+      {
+        "code": "012450",
+        "name": "한화에어로스페이스",
+        "ahChangePct": 5.2,
+        "ahPrice": 925000,
+        "ahVolume": 12500,
+        "expectedOpen": 935000,
+        "strongOpen": true,
+        "expectedOpenGapPct": 1.08
+      },
+      {
+        "code": "000660",
+        "name": "SK하이닉스",
+        "ahChangePct": 4.5,
+        "ahPrice": 198500,
+        "ahVolume": 45000,
+        "expectedOpen": 200100,
+        "strongOpen": true,
+        "expectedOpenGapPct": 0.81
+      },
+      {
+        "code": "035420",
+        "name": "NAVER",
+        "ahChangePct": 6.1,
+        "ahPrice": 215000,
+        "ahVolume": 8000,
+        "strongOpen": false,
+        "expectedOpenGapPct": -0.3
+      }
+    ],
+    "count": 3
+  },
+  "errors": []
+}
