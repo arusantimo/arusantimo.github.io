@@ -70,6 +70,20 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
 - VKOSPI는 CNBC `.KSVKOSPI` 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 폴백합니다.
 - 토스 전용 지표와 이벤트 필터는 아직 수동 확인이 필요합니다.
 
+## market-analyze 보조 레짐 (3축)
+
+종가 JSON의 **기술 레짐**(KOSPI MA·VKOSPI)과 별도로 [`tools/market-analyze/store/results/latest.js`](../../market-analyze/store/results/latest.js)를 읽어 **적용 레짐**을 계산합니다.
+
+| 축 | 내용 |
+|----|------|
+| 펀더멘털·버블 | `fundamentalAnchorScore`·`bubbleCriticalTrigger`·`marketRegimeKey`로 상승 정당성 |
+| KOSPI | 종가·60/20MA 구조로 강세 확정·유지·약함 |
+| 적용 | 정당 + 지수 강세 시 `강세장 ✅ (펀더·지수 정당)`까지 상향 가능 |
+
+- 파이프라인·UI 모두 [`jongga/macro_overlay.py`](macro_overlay.py)와 [`js/market-analyze-bridge.js`](../js/market-analyze-bridge.js) 규칙을 공유합니다.
+- **당일 `latest.js`가 저장소에 있어야** GHA 생성 JSON에도 macro 완화가 반영됩니다. market-analyze를 먼저 갱신·커밋하세요.
+- UI는 기술 레짐 vs 적용 레짐·거시 패널을 표시하고, 배포된 JSON의 `statusLabel`을 브라우저에서 재계산합니다.
+
 ## HTML 연결
 
 `tools/stock-analyze/index.html`은 더 이상 Notion MD를 직접 읽지 않고 날짜별 `jongga_result.v1` JSON bridge를 읽습니다.

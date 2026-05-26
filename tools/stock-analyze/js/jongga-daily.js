@@ -293,6 +293,9 @@ async function loadJonggaDailyData(dateKey = getJonggaKstTodayKey(), variant = g
   const scriptPath = getJonggaDailyScriptPath(dateKey, resolvedVariant);
   setJonggaTodayStatus('loading', dateKey, '', '', resolvedVariant);
   try {
+    if (typeof loadMarketAnalyzeScriptOnce === 'function') {
+      await loadMarketAnalyzeScriptOnce().catch(error => console.warn('market-analyze latest.js load skipped:', error));
+    }
     const payload = await loadJonggaDailyScript(dateKey, resolvedVariant);
     if (!payload) throw new Error(`${scriptPath}에 ${dateKey} payload가 없습니다.`);
     if (payload.analysisDate !== dateKey) {

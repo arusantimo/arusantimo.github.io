@@ -1,6 +1,6 @@
 window.JONGGA_DATA = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-05-26T13:48:50+00:00",
+  "generatedAt": "2026-05-26T14:20:21+00:00",
   "variant": "stable",
   "dataQuality": {
     "status": "partial",
@@ -56,7 +56,7 @@ window.JONGGA_DATA = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1569.1,
+        "durationMs": 1772.3,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -64,7 +64,7 @@ window.JONGGA_DATA = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 563.0,
+        "durationMs": 1282.2,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -79,27 +79,28 @@ window.JONGGA_DATA = {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 1519.2,
+        "durationMs": 66.2,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 0.3
+        "durationMs": 3.5,
+        "detail": "강세장 ✅ (펀더·지수 정당)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 40425.9,
+        "durationMs": 3546.0,
         "count": 20
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 6091.5,
+        "durationMs": 1484.2,
         "detail": "성공 20 / 실패 0",
         "count": 20
       },
@@ -107,7 +108,7 @@ window.JONGGA_DATA = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 5032.2,
+        "durationMs": 434.1,
         "detail": "direct-http · 체결강도 20 / 호가 19 / 틱프록시 20",
         "count": 20
       },
@@ -115,7 +116,7 @@ window.JONGGA_DATA = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 3.6,
+        "durationMs": 2.9,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       },
@@ -123,7 +124,7 @@ window.JONGGA_DATA = {
         "step": "browser_enrichment",
         "label": "KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 20230.2,
+        "durationMs": 13842.9,
         "detail": "playwright-chromium · KIND 3",
         "count": 3
       }
@@ -141,8 +142,12 @@ window.JONGGA_DATA = {
       "regime": {
         "table": [
           {
-            "item": "레짐",
-            "value": "약세장 ⛔"
+            "item": "적용 레짐",
+            "value": "강세장 ✅ (펀더·지수 정당)"
+          },
+          {
+            "item": "기술 레짐",
+            "value": "박스권 ⚠️"
           },
           {
             "item": "KOSPI",
@@ -154,19 +159,19 @@ window.JONGGA_DATA = {
           },
           {
             "item": "진입 전략",
-            "value": "메인=없음 / 서브=없음"
+            "value": "메인=수급매집형 / 서브=눌림목"
           },
           {
             "item": "스윙 전환 활성도",
-            "value": "금지"
+            "value": "적극"
           },
           {
             "item": "시가베팅",
-            "value": "비활성"
+            "value": "활성"
           },
           {
             "item": "역추세 트랙",
-            "value": "비활성"
+            "value": "활성"
           },
           {
             "item": "갭 스코어",
@@ -200,17 +205,44 @@ window.JONGGA_DATA = {
           },
           {
             "item": "시장 맥락",
-            "value": "공개 데이터 기반 레짐 산출 / 갭 G-A 🟢",
-            "verdict": "약세장 ⛔"
+            "value": "펀더 앵커 89 · 버블 critical off · KOSPI 60/20MA 상향 · 펀더·버블 정당 + KOSPI 강세 확정 → 강세장 상향",
+            "verdict": "강세장 ✅ (펀더·지수 정당)"
+          },
+          {
+            "item": "거시 맥락",
+            "value": "Stage 3.2: 펀더멘털 완충형 과열 (Anchor Buffered Overheat) / RI 66",
+            "verdict": "✅"
           }
         ],
-        "alert": "CNBC VKOSPI 실측을 사용했습니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다."
+        "alert": "CNBC VKOSPI 실측을 사용했습니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다. 적용 레짐은 market-analyze·KOSPI 보조 신호로 조정되었습니다.",
+        "macroOverlay": {
+          "loaded": true,
+          "dateAligned": true,
+          "marketAnalyzeDate": "20260526",
+          "technicalRegimeLabel": "박스권 ⚠️",
+          "effectiveRegimeLabel": "강세장 ✅ (펀더·지수 정당)",
+          "regimeAdjustmentReason": "펀더 앵커 89 · 버블 critical off · KOSPI 60/20MA 상향 · 펀더·버블 정당 + KOSPI 강세 확정 → 강세장 상향",
+          "riseJustified": true,
+          "kospiBullTier": "strong",
+          "marketRegimeLabel": "Stage 3.2: 펀더멘털 완충형 과열 (Anchor Buffered Overheat)",
+          "marketRegimeKey": "anchor-buffered-overheat",
+          "fundamentalAnchorScore": 89.0,
+          "fundamentalAnchorState": "validated",
+          "bubbleIndex": 46.6,
+          "bubbleCriticalTrigger": false,
+          "bubbleRegimeLabel": "펀더멘털 완충형 과열 경계",
+          "riskIndex": 66,
+          "stageOverrideReason": "원/달러 1512원과 과열 이격이 겹쳤지만 펀더멘털 앵커 89점과 non-critical bubble(BI 47 / active 1개)가 완충해 펀더멘털 완충형 과열로 낮췄습니다."
+        },
+        "technicalRegimeLabel": "박스권 ⚠️",
+        "effectiveRegimeLabel": "강세장 ✅ (펀더·지수 정당)",
+        "regimeAdjustmentReason": "펀더 앵커 89 · 버블 critical off · KOSPI 60/20MA 상향 · 펀더·버블 정당 + KOSPI 강세 확정 → 강세장 상향"
       },
       "gapScore": {
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "+1.57%",
+            "actualValue": "+2.09%",
             "baseScore": "+2점",
             "weight": "×2.5",
             "formula": "+2 × 2.5 = +5.0점",
@@ -218,7 +250,7 @@ window.JONGGA_DATA = {
           },
           {
             "indicator": "VIX 수준",
-            "actualValue": "+16.86",
+            "actualValue": "+16.81",
             "baseScore": "+1점",
             "weight": "×2.0",
             "formula": "+1 × 2.0 = +2.0점",
@@ -226,23 +258,23 @@ window.JONGGA_DATA = {
           },
           {
             "indicator": "미국 10년 금리 전일비",
-            "actualValue": "-9.1bp",
-            "baseScore": "+2점",
+            "actualValue": "-7.9bp",
+            "baseScore": "+1점",
             "weight": "×1.5",
-            "formula": "+2 × 1.5 = +3.0점",
-            "weightedScore": "+3.0점"
+            "formula": "+1 × 1.5 = +1.5점",
+            "weightedScore": "+1.5점"
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "-4.55원",
-            "baseScore": "+0점",
+            "actualValue": "-5.13원",
+            "baseScore": "+1점",
             "weight": "×1.5",
-            "formula": "+0 × 1.5 = +0.0점",
-            "weightedScore": "+0.0점"
+            "formula": "+1 × 1.5 = +1.5점",
+            "weightedScore": "+1.5점"
           },
           {
             "indicator": "SOX 전일 변화율",
-            "actualValue": "+12.48%",
+            "actualValue": "+13.27%",
             "baseScore": "+2점",
             "weight": "×1.0",
             "formula": "+2 × 1.0 = +2.0점",
@@ -351,45 +383,45 @@ window.JONGGA_DATA = {
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
-                "condition": "+1.5% 도달",
+                "condition": "+3.0% 도달",
                 "quantity": "40% 익절",
-                "targetYield": "+1.5%",
-                "targetPrice": "699,335원"
+                "targetYield": "+3.0%",
+                "targetPrice": "709,670원"
               },
               {
                 "stage": "🔔 장초반",
-                "condition": "+2.5% 도달",
+                "condition": "+4.5% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+2.5%",
-                "targetPrice": "706,225원"
+                "targetYield": "+4.5%",
+                "targetPrice": "720,005원"
               },
               {
                 "stage": "📈 장중 1차",
-                "condition": "+3.0% 도달",
+                "condition": "+9.0% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+3.0%",
-                "targetPrice": "709,670원"
+                "targetYield": "+9.0%",
+                "targetPrice": "751,010원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+6.0%",
-                "targetPrice": "730,340원"
+                "targetYield": "+12.0%",
+                "targetPrice": "771,680원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+9.0%",
-                "targetPrice": "751,010원"
+                "targetYield": "+15.0%",
+                "targetPrice": "792,350원"
               },
               {
                 "stage": "🛑 손절",
-                "condition": "-1.5% 이탈",
+                "condition": "-3.0% 이탈",
                 "quantity": "전량",
-                "targetYield": "-1.5%",
-                "targetPrice": "678,665원"
+                "targetYield": "-3.0%",
+                "targetPrice": "668,330원"
               }
             ],
             "rr": "1 : 1.0",
@@ -487,45 +519,45 @@ window.JONGGA_DATA = {
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
-                "condition": "+1.5% 도달",
+                "condition": "+3.0% 도달",
                 "quantity": "40% 익절",
-                "targetYield": "+1.5%",
-                "targetPrice": "2,082,780원"
+                "targetYield": "+3.0%",
+                "targetPrice": "2,113,560원"
               },
               {
                 "stage": "🔔 장초반",
-                "condition": "+2.5% 도달",
+                "condition": "+4.5% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+2.5%",
-                "targetPrice": "2,103,300원"
+                "targetYield": "+4.5%",
+                "targetPrice": "2,144,340원"
               },
               {
                 "stage": "📈 장중 1차",
-                "condition": "+3.0% 도달",
+                "condition": "+9.0% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+3.0%",
-                "targetPrice": "2,113,560원"
+                "targetYield": "+9.0%",
+                "targetPrice": "2,236,680원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+6.0%",
-                "targetPrice": "2,175,120원"
+                "targetYield": "+12.0%",
+                "targetPrice": "2,298,240원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+9.0%",
-                "targetPrice": "2,236,680원"
+                "targetYield": "+15.0%",
+                "targetPrice": "2,359,800원"
               },
               {
                 "stage": "🛑 손절",
-                "condition": "-1.5% 이탈",
+                "condition": "-3.0% 이탈",
                 "quantity": "전량",
-                "targetYield": "-1.5%",
-                "targetPrice": "2,021,220원"
+                "targetYield": "-3.0%",
+                "targetPrice": "1,990,440원"
               }
             ],
             "rr": "1 : 1.0",
@@ -623,45 +655,45 @@ window.JONGGA_DATA = {
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
-                "condition": "+1.5% 도달",
+                "condition": "+3.0% 도달",
                 "quantity": "40% 익절",
-                "targetYield": "+1.5%",
-                "targetPrice": "303,485원"
+                "targetYield": "+3.0%",
+                "targetPrice": "307,970원"
               },
               {
                 "stage": "🔔 장초반",
-                "condition": "+2.5% 도달",
+                "condition": "+4.5% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+2.5%",
-                "targetPrice": "306,475원"
+                "targetYield": "+4.5%",
+                "targetPrice": "312,455원"
               },
               {
                 "stage": "📈 장중 1차",
-                "condition": "+3.0% 도달",
+                "condition": "+9.0% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+3.0%",
-                "targetPrice": "307,970원"
+                "targetYield": "+9.0%",
+                "targetPrice": "325,910원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+6.0%",
-                "targetPrice": "316,940원"
+                "targetYield": "+12.0%",
+                "targetPrice": "334,880원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+9.0%",
-                "targetPrice": "325,910원"
+                "targetYield": "+15.0%",
+                "targetPrice": "343,850원"
               },
               {
                 "stage": "🛑 손절",
-                "condition": "-1.5% 이탈",
+                "condition": "-3.0% 이탈",
                 "quantity": "전량",
-                "targetYield": "-1.5%",
-                "targetPrice": "294,515원"
+                "targetYield": "-3.0%",
+                "targetPrice": "290,030원"
               }
             ],
             "rr": "1 : 1.0",
@@ -772,45 +804,45 @@ window.JONGGA_DATA = {
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
-                "condition": "+2.0% 도달",
-                "quantity": "40% 익절",
-                "targetYield": "+2.0%",
-                "targetPrice": "759,900원"
-              },
-              {
-                "stage": "🔔 장초반",
                 "condition": "+4.0% 도달",
-                "quantity": "30% 익절",
+                "quantity": "40% 익절",
                 "targetYield": "+4.0%",
                 "targetPrice": "774,800원"
               },
               {
-                "stage": "📈 장중 1차",
-                "condition": "+5.0% 도달",
+                "stage": "🔔 장초반",
+                "condition": "+7.0% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+5.0%",
-                "targetPrice": "782,250원"
+                "targetYield": "+7.0%",
+                "targetPrice": "797,150원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+15.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+15.0%",
+                "targetPrice": "856,750원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+8.0%",
-                "targetPrice": "804,600원"
+                "targetYield": "+18.0%",
+                "targetPrice": "879,100원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+11.0%",
-                "targetPrice": "826,950원"
+                "targetYield": "+21.0%",
+                "targetPrice": "901,450원"
               },
               {
                 "stage": "🛑 손절",
-                "condition": "-2.0% 이탈",
+                "condition": "-4.0% 이탈",
                 "quantity": "전량",
-                "targetYield": "-2.0%",
-                "targetPrice": "730,100원"
+                "targetYield": "-4.0%",
+                "targetPrice": "715,200원"
               }
             ],
             "rr": "1 : 1.0",
@@ -919,45 +951,45 @@ window.JONGGA_DATA = {
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
-                "condition": "+2.0% 도달",
-                "quantity": "40% 익절",
-                "targetYield": "+2.0%",
-                "targetPrice": "137,394원"
-              },
-              {
-                "stage": "🔔 장초반",
                 "condition": "+4.0% 도달",
-                "quantity": "30% 익절",
+                "quantity": "40% 익절",
                 "targetYield": "+4.0%",
                 "targetPrice": "140,088원"
               },
               {
-                "stage": "📈 장중 1차",
-                "condition": "+5.0% 도달",
+                "stage": "🔔 장초반",
+                "condition": "+7.0% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+5.0%",
-                "targetPrice": "141,435원"
+                "targetYield": "+7.0%",
+                "targetPrice": "144,129원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+15.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+15.0%",
+                "targetPrice": "154,905원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+8.0%",
-                "targetPrice": "145,476원"
+                "targetYield": "+18.0%",
+                "targetPrice": "158,946원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+11.0%",
-                "targetPrice": "149,517원"
+                "targetYield": "+21.0%",
+                "targetPrice": "162,987원"
               },
               {
                 "stage": "🛑 손절",
-                "condition": "-2.0% 이탈",
+                "condition": "-4.0% 이탈",
                 "quantity": "전량",
-                "targetYield": "-2.0%",
-                "targetPrice": "132,006원"
+                "targetYield": "-4.0%",
+                "targetPrice": "129,312원"
               }
             ],
             "rr": "1 : 1.0",
@@ -1066,45 +1098,45 @@ window.JONGGA_DATA = {
             "tradePlanRows": [
               {
                 "stage": "🌅 프리마켓",
-                "condition": "+2.0% 도달",
-                "quantity": "40% 익절",
-                "targetYield": "+2.0%",
-                "targetPrice": "2,093,040원"
-              },
-              {
-                "stage": "🔔 장초반",
                 "condition": "+4.0% 도달",
-                "quantity": "30% 익절",
+                "quantity": "40% 익절",
                 "targetYield": "+4.0%",
                 "targetPrice": "2,134,080원"
               },
               {
-                "stage": "📈 장중 1차",
-                "condition": "+5.0% 도달",
+                "stage": "🔔 장초반",
+                "condition": "+7.0% 도달",
                 "quantity": "30% 익절",
-                "targetYield": "+5.0%",
-                "targetPrice": "2,154,600원"
+                "targetYield": "+7.0%",
+                "targetPrice": "2,195,640원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+15.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+15.0%",
+                "targetPrice": "2,359,800원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+8.0%",
-                "targetPrice": "2,216,160원"
+                "targetYield": "+18.0%",
+                "targetPrice": "2,421,360원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
-                "targetYield": "+11.0%",
-                "targetPrice": "2,277,720원"
+                "targetYield": "+21.0%",
+                "targetPrice": "2,482,920원"
               },
               {
                 "stage": "🛑 손절",
-                "condition": "-2.0% 이탈",
+                "condition": "-4.0% 이탈",
                 "quantity": "전량",
-                "targetYield": "-2.0%",
-                "targetPrice": "2,010,960원"
+                "targetYield": "-4.0%",
+                "targetPrice": "1,969,920원"
               }
             ],
             "rr": "1 : 1.0",

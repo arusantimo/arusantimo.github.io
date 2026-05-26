@@ -5,7 +5,7 @@ function normalizeRegimeGuideKey(value) {
     .replace(/\s+/g, ' ')
     .trim();
 
-  if (normalized === '시장 레짐' || normalized === '레짐') return '레짐';
+  if (normalized === '시장 레짐' || normalized === '레짐' || normalized === '적용 레짐' || normalized === '기술 레짐') return '레짐';
   if (normalized.includes('진입 전략')) return '진입 전략';
   if (normalized.includes('스윙 전환 활성도')) return '스윙 전환 활성도';
   if (normalized === '스윙 전환') return '스윙 전환';
@@ -66,6 +66,10 @@ function createEmptySnapshot() {
     regimeTable: [],
     regimeEvidence: [],
     regimeAlert: '',
+    macroOverlay: {},
+    technicalRegimeLabel: '',
+    effectiveRegimeLabel: '',
+    regimeAdjustmentReason: '',
     gapScore: createEmptyGapScore(),
     pullbackEntries: [],
     momentumEntries: [],

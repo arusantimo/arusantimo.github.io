@@ -72,6 +72,7 @@ function normalizeJonggaRegime(slot = {}, root = {}) {
   const source = slot.regime || root.regime || {};
   const table = asJonggaArray(source.table || source.rows || source.summary || slot.regimeTable);
   const evidence = asJonggaArray(source.evidence || slot.regimeEvidence);
+  const macroOverlay = source.macroOverlay && typeof source.macroOverlay === 'object' ? { ...source.macroOverlay } : {};
   return {
     regimeTable: table.map(row => ({
       item: String(pickJonggaValue(row, ['item', 'label', 'name'])),
@@ -82,7 +83,11 @@ function normalizeJonggaRegime(slot = {}, root = {}) {
       value: String(pickJonggaValue(row, ['value', 'status', 'result'])),
       verdict: String(pickJonggaValue(row, ['verdict', 'decision']))
     })).filter(row => row.item || row.value || row.verdict),
-    regimeAlert: String(source.alert || source.note || slot.regimeAlert || '')
+    regimeAlert: String(source.alert || source.note || slot.regimeAlert || ''),
+    technicalRegimeLabel: String(source.technicalRegimeLabel || macroOverlay.technicalRegimeLabel || ''),
+    effectiveRegimeLabel: String(source.effectiveRegimeLabel || macroOverlay.effectiveRegimeLabel || ''),
+    regimeAdjustmentReason: String(source.regimeAdjustmentReason || macroOverlay.regimeAdjustmentReason || ''),
+    macroOverlay
   };
 }
 
@@ -166,7 +171,10 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     dataQuality: effectiveRawEntry.dataQuality || null
   };
   if (!normalized.statusLabel) normalized.statusLabel = getBuyFinalStatusLabel(normalized.grade);
-  return applyJonggaSafety(normalized, context);
+  const withMacro = typeof applyMacroOverlayToEntry === 'function'
+    ? applyMacroOverlayToEntry(normalized, strategy, context)
+    : normalized;
+  return applyJonggaSafety(withMacro, context);
 }
 
 function normalizeJonggaSwingEntry(rawEntry, rank) {
@@ -186,14 +194,32 @@ function buildSnapshotFromJonggaSlot(slot, root = {}) {
   const collections = getJonggaEntryCollections(slot);
   const gapScore = normalizeJonggaGapScore(slot, root);
   const regime = normalizeJonggaRegime(slot, root);
+  const macroContext = typeof resolveMacroOverlayContext === 'function'
+    ? resolveMacroOverlayContext(slot, root, root.analysisDate || '')
+    : {};
   const context = {
     gapScore,
-    dataQuality: slot.dataQuality || root.dataQuality || {}
+    dataQuality: slot.dataQuality || root.dataQuality || {},
+    macroOverlay: {
+      ...regime.macroOverlay,
+      ...macroContext.macroOverlay,
+      technicalRegimeLabel: macroContext.technicalRegimeLabel || regime.technicalRegimeLabel,
+      effectiveRegimeLabel: macroContext.effectiveRegimeLabel || regime.effectiveRegimeLabel,
+      riseJustifiedByMacro: macroContext.riseJustifiedByMacro,
+      kospiBullTier: macroContext.kospiBullTier
+    },
+    effectiveRegimeLabel: macroContext.effectiveRegimeLabel || regime.effectiveRegimeLabel,
+    technicalRegimeLabel: macroContext.technicalRegimeLabel || regime.technicalRegimeLabel,
+    riseJustifiedByMacro: macroContext.riseJustifiedByMacro
   };
 
   snapshot.regimeTable = regime.regimeTable;
   snapshot.regimeEvidence = regime.regimeEvidence;
   snapshot.regimeAlert = regime.regimeAlert;
+  snapshot.macroOverlay = context.macroOverlay;
+  snapshot.technicalRegimeLabel = context.technicalRegimeLabel;
+  snapshot.effectiveRegimeLabel = context.effectiveRegimeLabel;
+  snapshot.regimeAdjustmentReason = regime.regimeAdjustmentReason || macroContext.regimeAdjustmentReason || '';
   snapshot.gapScore = gapScore;
   snapshot.pullbackEntries = collections.pullback.map((entry, index) => normalizeJonggaEntry(entry, 'pullback', index + 1, context));
   snapshot.momentumEntries = collections.momentum.map((entry, index) => normalizeJonggaEntry(entry, 'momentum', index + 1, context));

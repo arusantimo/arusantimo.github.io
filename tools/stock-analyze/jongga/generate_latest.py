@@ -15,6 +15,13 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from jongga.macro_overlay import (
+    apply_regime_fields_to_context,
+    build_macro_overlay_block,
+    load_market_analyze_snapshot,
+    reversal_status_label,
+    trend_status_label,
+)
 from jongga.output_contract import (
     VARIANT_CANARY,
     VARIANT_STABLE,
@@ -932,7 +939,14 @@ def apply_browser_enrichment_to_entry(entry: dict[str, Any], strategy: str, enri
             if row.get("code") == "F3":
                 row["status"] = "⛔" if event_filter.get("blocked") else "✅"
                 row["note"] = normalize_text(event_filter.get("note")) or ("KIND 최근공시 차단" if event_filter.get("blocked") else "이벤트 필터 통과")
-        entry["statusLabel"] = reversal_status_label(entry.get("grade", "C"), context["regimeLabel"], context["gapScore"]["code"], filters, entry.get("gates") or [])
+        entry["statusLabel"] = reversal_status_label(
+            entry.get("grade", "C"),
+            context["regimeLabel"],
+            context["gapScore"]["code"],
+            filters,
+            entry.get("gates") or [],
+            **macro_status_kwargs(context),
+        )
     sync_entry_manual_input(entry)
     rebuild_entry_notes(entry, strategy)
 
@@ -1510,6 +1524,7 @@ def grade_from_score(score: float, strategy: str) -> str:
 
 def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> tuple[str, str, str, str, str]:
     closes = [parse_float(row.get("closePrice")) for row in kospi_history]
+    current_close = closes[0] if closes else 0.0
     ma20 = moving_average(closes, 20)
     ma60 = moving_average(closes, 60)
     ma20_prev = moving_average(closes, 20, 1)
@@ -1517,8 +1532,12 @@ def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> t
     ma20_up = bool(ma20 and ma20_prev and ma20 > ma20_prev)
     ma60_up = bool(ma60 and ma60_prev and ma60 > ma60_prev)
     ma60_flat = bool(ma60 and ma60_prev and abs(ma60 - ma60_prev) / ma60 < 0.003)
-    if not ma60_up or vkospi_proxy > 30:
+    if ma60 and current_close < ma60 and vkospi_proxy > 28:
         return "약세장 ⛔", "none", "none", "금지", "비활성"
+    if not ma60_up and vkospi_proxy > 32:
+        return "약세장 ⛔", "none", "none", "금지", "비활성"
+    if vkospi_proxy > 30 and ma60 and current_close >= ma60:
+        return "박스권 ⚠️", "pullback", "momentum", "조건부", "활성"
     if ma60_up and ma20_up and vkospi_proxy < 20:
         return "강세장 ✅", "momentum", "pullback", "적극", "활성"
     if ma60_flat and vkospi_proxy <= 25:
@@ -1526,7 +1545,13 @@ def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> t
     return "박스권 ⚠️", "pullback", "momentum", "조건부", "활성"
 
 
-def build_market_context(kospi_history: list[dict[str, Any]], gap_score: dict[str, Any], vkospi_quote: dict[str, Any] | float) -> dict[str, Any]:
+def build_market_context(
+    kospi_history: list[dict[str, Any]],
+    gap_score: dict[str, Any],
+    vkospi_quote: dict[str, Any] | float,
+    analysis_date: str | date | None = None,
+    repo_root: Path | None = None,
+) -> dict[str, Any]:
     if isinstance(vkospi_quote, (int, float)):
         resolved_vkospi = {
             "current": float(vkospi_quote),
@@ -1545,8 +1570,12 @@ def build_market_context(kospi_history: list[dict[str, Any]], gap_score: dict[st
     change_pct = parse_float(kospi_history[0].get("fluctuationsRatio"))
     advances = sum(1 for row in kospi_history[:20] if parse_float(row.get("fluctuationsRatio")) > 0)
     declines = sum(1 for row in kospi_history[:20] if parse_float(row.get("fluctuationsRatio")) < 0)
+    ma20_up = bool(ma20 and moving_average(closes, 20, 1) and ma20 > moving_average(closes, 20, 1))
+    ma60_prev = moving_average(closes, 60, 1)
+    ma60_up = bool(ma60 and ma60_prev and ma60 > ma60_prev)
     regime_label, primary_strategy, secondary_strategy, swing_mode, reversal_track = decide_regime(kospi_history, resolved_vkospi["current"])
-    return {
+    context: dict[str, Any] = {
+        "technicalRegimeLabel": regime_label,
         "regimeLabel": regime_label,
         "primaryStrategy": primary_strategy,
         "secondaryStrategy": secondary_strategy,
@@ -1563,17 +1592,24 @@ def build_market_context(kospi_history: list[dict[str, Any]], gap_score: dict[st
         "kospiMa5": ma5,
         "kospiMa20": ma20,
         "kospiMa60": ma60,
+        "kospiMa20Up": ma20_up,
+        "kospiMa60Up": ma60_up,
         "breadthAdvances": advances,
         "breadthDeclines": declines,
         "gapScore": gap_score,
     }
+    snapshot = load_market_analyze_snapshot(repo_root)
+    return apply_regime_fields_to_context(context, snapshot, analysis_date)
 
 
-def build_regime_block(context: dict[str, Any]) -> dict[str, Any]:
+def build_regime_block(context: dict[str, Any], market_snapshot: dict[str, Any] | None = None) -> dict[str, Any]:
     primary = {"momentum": "수급매집형", "pullback": "눌림목", "none": "없음"}[context["primaryStrategy"]]
     secondary = {"momentum": "수급매집형", "pullback": "눌림목", "none": "없음"}[context["secondaryStrategy"]]
+    technical = str(context.get("technicalRegimeLabel") or context["regimeLabel"])
+    effective = str(context.get("effectiveRegimeLabel") or context["regimeLabel"])
     table = [
-        {"item": "레짐", "value": context["regimeLabel"]},
+        {"item": "적용 레짐", "value": effective},
+        {"item": "기술 레짐", "value": technical},
         {"item": "KOSPI", "value": f"{context['kospiClose']:.2f} ({signed_number(context['kospiChangePct'], 2, '%')})"},
         {"item": "VKOSPI", "value": f"{context['vkospiLabel']} {context['vkospiValue']:.2f}"},
         {"item": "진입 전략", "value": f"메인={primary} / 서브={secondary}"},
@@ -1588,12 +1624,35 @@ def build_regime_block(context: dict[str, Any]) -> dict[str, Any]:
         {"item": "KOSPI 20MA", "value": f"{context['kospiMa20']:.2f}", "verdict": "✅" if context['kospiClose'] >= context['kospiMa20'] else "❌"},
         {"item": "VKOSPI", "value": f"{context['vkospiLabel']} {context['vkospiValue']:.2f}", "verdict": "✅" if context['vkospiValue'] < 20 else "⚠️" if context['vkospiValue'] <= 30 else "❌"},
         {"item": "등락주", "value": f"상승 {context['breadthAdvances']} / 하락 {context['breadthDeclines']}", "verdict": "시장 내부 체력 참고"},
-        {"item": "시장 맥락", "value": f"공개 데이터 기반 레짐 산출 / 갭 {context['gapScore']['grade']}", "verdict": context['regimeLabel']},
+        {"item": "시장 맥락", "value": str(context.get("regimeAdjustmentReason") or f"갭 {context['gapScore']['grade']}"), "verdict": effective},
     ]
-    return {
+    if market_snapshot:
+        data = market_snapshot.get("data") if isinstance(market_snapshot.get("data"), dict) else {}
+        evidence.append(
+            {
+                "item": "거시 맥락",
+                "value": f"{data.get('marketRegimeLabel') or '-'} / RI {data.get('riskIndex', '-')}",
+                "verdict": "✅" if context.get("riseJustifiedByMacro") else "⚠️",
+            }
+        )
+    block: dict[str, Any] = {
         "table": table,
         "evidence": evidence,
         "alert": "CNBC VKOSPI 실측을 우선 사용하며 실패 시 VIX 프록시로 폴백합니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다." if context["vkospiIsFallback"] else "CNBC VKOSPI 실측을 사용했습니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다.",
+        "macroOverlay": build_macro_overlay_block(market_snapshot, context),
+        "technicalRegimeLabel": technical,
+        "effectiveRegimeLabel": effective,
+        "regimeAdjustmentReason": str(context.get("regimeAdjustmentReason") or ""),
+    }
+    if technical != effective:
+        block["alert"] = f"{block['alert']} 적용 레짐은 market-analyze·KOSPI 보조 신호로 조정되었습니다."
+    return block
+
+
+def macro_status_kwargs(context: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "rise_justified": bool(context.get("riseJustifiedByMacro")),
+        "technical_regime": str(context.get("technicalRegimeLabel") or context.get("regimeLabel") or ""),
     }
 
 
@@ -1645,37 +1704,6 @@ def build_trade_plan(strategy: str, entry_price: float, regime_label: str, gap_c
         rows.append({"stage": "📊 스윙 전환", "condition": "V 조건 충족 시", "quantity": "잔량 보유", "targetYield": signed_number(intraday + 6.0, 1, "%"), "targetPrice": target(intraday + 6.0)})
     rows.append({"stage": "🛑 손절", "condition": f"{signed_number(stop, 1, '%')} 이탈", "quantity": "전량", "targetYield": signed_number(stop, 1, "%"), "targetPrice": target(stop)})
     return rows
-
-
-def trend_status_label(grade: str, regime_label: str, gap_code: str, gates: list[dict[str, Any]]) -> str:
-    blocked = any(gate["status"] == "⛔" for gate in gates)
-    if blocked:
-        return "매매금지(핵심 Gate 미충족)"
-    if gap_code == "G-E":
-        return "매매금지(갭다운 경고)"
-    if regime_label.startswith("약세장"):
-        return "매매금지(약세장)" if grade != "S" else "강력매수(소액)"
-    if grade == "S":
-        return "강력매수"
-    if grade == "A":
-        return "매수추천"
-    if grade == "B":
-        return "관심후보"
-    return "제외"
-
-
-def reversal_status_label(grade: str, regime_label: str, gap_code: str, filters: list[dict[str, Any]], gates: list[dict[str, Any]]) -> str:
-    if any(row["status"] == "⛔" for row in filters + gates):
-        return "매매금지"
-    if regime_label.startswith("약세장") or gap_code in {"G-D", "G-E"}:
-        return "매매금지"
-    if grade == "S":
-        return "최우선 진입"
-    if grade == "A":
-        return "진입 가능"
-    if grade == "B":
-        return "매매금지"
-    return "제외"
 
 
 def rr_text(entry_price: float, stop_rate: float, target_rate: float) -> str:
@@ -1919,7 +1947,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "code": snapshot.code,
         "score": final_score,
         "grade": grade,
-        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates),
+        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "pullback",
         "gates": gates,
         "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
@@ -1968,7 +1996,7 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "code": snapshot.code,
         "score": final_score,
         "grade": grade,
-        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates),
+        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "momentum",
         "gates": gates,
         "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
@@ -2044,7 +2072,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "code": snapshot.code,
         "score": final_score,
         "grade": grade,
-        "statusLabel": reversal_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], filters, gates),
+        "statusLabel": reversal_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], filters, gates, **macro_status_kwargs(context)),
         "strategy": "reversal",
         "filters": filters,
         "gates": gates,
@@ -2075,7 +2103,12 @@ def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return entries
 
 
-def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str = VARIANT_STABLE) -> dict[str, Any]:
+def collect_live_payload(
+    top_limit: int = TOP_TRADING_VALUE_LIMIT,
+    *,
+    mode: str = VARIANT_STABLE,
+    analysis_date: str | date | None = None,
+) -> dict[str, Any]:
     resolved_mode = normalize_variant(mode)
     collection_log: list[dict[str, Any]] = []
 
@@ -2166,8 +2199,15 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
     log_step("kospi_history", "KOSPI 히스토리 수집", started_at, count=len(kospi_history))
 
     started_at = perf_counter()
-    context = build_market_context(kospi_history, gap_score, live_metrics["vkospi"])
-    log_step("market_context", "시장 레짐 계산", started_at, detail=str(context.get("regime") or ""))
+    resolved_analysis_date = analysis_date or resolve_analysis_date(None)
+    market_snapshot = load_market_analyze_snapshot()
+    context = build_market_context(kospi_history, gap_score, live_metrics["vkospi"], analysis_date=resolved_analysis_date)
+    log_step(
+        "market_context",
+        "시장 레짐 계산",
+        started_at,
+        detail=str(context.get("effectiveRegimeLabel") or context.get("regimeLabel") or ""),
+    )
 
     started_at = perf_counter()
     top_trading = fetch_top_trading_codes(top_limit)
@@ -2354,7 +2394,7 @@ def collect_live_payload(top_limit: int = TOP_TRADING_VALUE_LIMIT, *, mode: str 
             {
                 "slotId": "slotA",
                 "sourceId": f"live-public-run-{resolved_mode}",
-                "regime": build_regime_block(context),
+                "regime": build_regime_block(context, market_snapshot),
                 "gapScore": gap_score,
                 "entries": {
                     "pullback": assign_ranks(pullback_entries),
@@ -2404,7 +2444,7 @@ def main() -> int:
     for variant in variants:
         print_variant_header(variant, analysis_date)
         payload = payload_with_analysis_date(
-            collect_live_payload(top_limit=args.top_limit, mode=variant),
+            collect_live_payload(top_limit=args.top_limit, mode=variant, analysis_date=analysis_date),
             analysis_date,
             variant=variant,
         )

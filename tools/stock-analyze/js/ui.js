@@ -134,6 +134,47 @@ function renderSellDetailToCard(detail) {
   card.parentNode.replaceChild(newCard, card);
   newCard.addEventListener('click', () => openModal(stock.code, 'sell'));
 }
+
+function renderMacroRegimeSummary() {
+  const macro = notionSnapshot.macroOverlay || {};
+  const technical = notionSnapshot.technicalRegimeLabel || macro.technicalRegimeLabel || '';
+  const effective = notionSnapshot.effectiveRegimeLabel || macro.effectiveRegimeLabel || '';
+  const hasMacro = Boolean(
+    macro.marketRegimeLabel
+    || macro.fundamentalAnchorScore != null
+    || macro.bubbleCriticalTrigger != null
+    || technical
+    || effective
+  );
+  if (!hasMacro) return '';
+
+  const adjustmentNote = notionSnapshot.regimeAdjustmentReason || macro.regimeAdjustmentReason || '';
+  const cards = [
+    { label: '적용 레짐', value: effective || '-' },
+    { label: '기술 레짐', value: technical || '-' },
+    { label: '거시 레짐', value: macro.marketRegimeLabel || '-' },
+    { label: '펀더 앵커', value: macro.fundamentalAnchorScore != null ? `${Math.round(Number(macro.fundamentalAnchorScore))} (${macro.fundamentalAnchorState || '-'})` : '-' },
+    { label: '버블 엔진', value: `BI ${macro.bubbleIndex != null ? Math.round(Number(macro.bubbleIndex)) : '-'} · critical ${macro.bubbleCriticalTrigger ? 'ON' : 'OFF'}` },
+    { label: '리스크 지수', value: macro.riskIndex != null ? String(macro.riskIndex) : '-' }
+  ];
+
+  return `
+    <div class="macro-regime-panel">
+      <div class="gap-score-title">거시·지수 맥락 (market-analyze 보조)</div>
+      <div class="regime-summary-grid">
+        ${cards.map(card => `
+          <div class="regime-stat-card">
+            <div class="regime-stat-label"><span>${escapeHtml(card.label)}</span></div>
+            <div class="regime-stat-value">${escapeHtml(card.value)}</div>
+          </div>
+        `).join('')}
+      </div>
+      ${adjustmentNote ? `<div class="regime-stat-note">${escapeHtml(adjustmentNote)}</div>` : ''}
+      ${technical && effective && technical !== effective ? `<div class="regime-stat-note">기술 레짐과 적용 레짐이 다릅니다. 종목 라벨은 적용 레짐 기준으로 재계산됩니다.</div>` : ''}
+    </div>
+  `;
+}
+
 function renderRegimeSummary() {
   const container = document.getElementById('buy-regime-summary');
   if (!container) return;
@@ -177,6 +218,7 @@ function renderRegimeSummary() {
     </div>
     ` : ''}
     ${renderGapScoreSummary()}
+    ${renderMacroRegimeSummary()}
     ${notionSnapshot.regimeAlert ? `<div class="regime-alert">${escapeHtml(notionSnapshot.regimeAlert)}</div>` : ''}
   `;
 
@@ -793,17 +835,26 @@ function closeGapGuideModal() {
 
 function detectCurrentRegime() {
   const table = notionSnapshot.regimeTable;
-  if (!table.length) return null;
-  const getValue = key => (table.find(r => r.item === key) || {}).value || '';
+  if (!table.length && !notionSnapshot.effectiveRegimeLabel) return null;
+  const getValue = key => (table.find(row => row.item === key) || {}).value || '';
+  const regime = String(
+    notionSnapshot.effectiveRegimeLabel
+    || getValue('적용 레짐')
+    || getValue('레짐')
+    || getValue('기술 레짐')
+    || ''
+  ).trim();
+  if (!regime && !table.length) return null;
   return {
-    regime: getValue('레짐'),
+    regime,
+    technicalRegime: String(notionSnapshot.technicalRegimeLabel || getValue('기술 레짐') || getValue('레짐') || '').trim(),
     kospi: getValue('KOSPI'),
     vkospi: getValue('VKOSPI'),
-    ma60: getValue('60일선'),
-    ma20: getValue('20일선'),
-    swing: getValue('스윙 전환'),
+    ma60: getValue('60일선') || getValue('KOSPI 60MA'),
+    ma20: getValue('20일선') || getValue('KOSPI 20MA'),
+    swing: getValue('스윙 전환') || getValue('스윙 전환 활성도'),
     openBet: getValue('시가베팅'),
-    note: getValue('특이 사항'),
+    note: getValue('특이 사항') || notionSnapshot.regimeAdjustmentReason || '',
     correction: getValue('최종 보정')
   };
 }

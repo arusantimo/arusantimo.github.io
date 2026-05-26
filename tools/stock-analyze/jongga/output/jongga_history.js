@@ -5,7 +5,7 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/jongga_data_20260526.js",
     "jsonFile": "jongga/output/latest_20260526.json",
-    "generatedAt": "2026-05-26T13:48:50+00:00",
+    "generatedAt": "2026-05-26T14:20:21+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
@@ -89,7 +89,7 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/jongga_data_20260526_canary.js",
     "jsonFile": "jongga/output/latest_20260526_canary.json",
-    "generatedAt": "2026-05-26T13:50:09+00:00",
+    "generatedAt": "2026-05-26T14:20:40+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [

@@ -4,8 +4,10 @@ from contextlib import redirect_stdout
 from datetime import date
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, emit_cli_failures, fetch_browser_candidate_enrichments, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 
@@ -35,9 +37,37 @@ class GenerateLatestTest(unittest.TestCase):
         history = []
         base = 100.0
         for index in range(90):
-            history.append({"closePrice": f"{base - index * 0.2:.2f}", "fluctuationsRatio": "-0.5"})
+            history.append({"closePrice": f"{base - (89 - index) * 0.2:.2f}", "fluctuationsRatio": "-0.5"})
         context = build_market_context(history, {"grade": "G-D 🟠", "totalScore": "-3.5점", "entryAdjustment": "", "code": "G-D"}, {"current": 31.0, "label": "VKOSPI", "source": "cnbc_quote", "isFallback": False, "confidence": 0.85})
-        self.assertEqual(context["regimeLabel"], "약세장 ⛔")
+        self.assertEqual(context["technicalRegimeLabel"], "약세장 ⛔")
+
+    def test_decide_regime_uses_box_when_vkospi_high_but_price_above_ma60(self):
+        history = []
+        price = 3000.0
+        for index in range(90):
+            history.append({"closePrice": f"{price + (89 - index) * 2:.2f}", "fluctuationsRatio": "0.5"})
+        label, *_ = decide_regime(history, 31.0)
+        self.assertEqual(label, "박스권 ⚠️")
+
+    def test_build_market_context_can_upgrade_with_macro_snapshot(self):
+        history = []
+        price = 3000.0
+        for index in range(90):
+            history.append({"closePrice": f"{price + (89 - index) * 2:.2f}", "fluctuationsRatio": "0.5"})
+        context = build_market_context(
+            history,
+            {"grade": "G-A", "totalScore": "+1", "entryAdjustment": "", "code": "G-A"},
+            {"current": 31.0, "label": "VKOSPI", "source": "cnbc_quote", "isFallback": False, "confidence": 0.85},
+            analysis_date="20260526",
+        )
+        snapshot = load_market_analyze_snapshot(Path(__file__).resolve().parents[3])
+        if snapshot is None:
+            self.skipTest("latest.js not available")
+        enriched = apply_regime_fields_to_context(context, snapshot, "20260526")
+        if enriched.get("riseJustifiedByMacro"):
+            self.assertIn("강세", enriched["effectiveRegimeLabel"])
+            if enriched["kospiBullTier"] == "strong":
+                self.assertEqual(enriched["effectiveRegimeLabel"], REGIME_STRONG_BULL)
 
     def test_grade_from_score_thresholds(self):
         self.assertEqual(grade_from_score(8.6, "reversal"), "S")
