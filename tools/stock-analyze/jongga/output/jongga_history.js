@@ -1,5 +1,173 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-05-26",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/jongga_data_20260526.js",
+    "jsonFile": "jongga/output/latest_20260526.json",
+    "generatedAt": "2026-05-26T05:53:46+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 7.2,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 5.6,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 5.4,
+        "grade": "C",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "momentum",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "SFA반도체",
+        "code": "036540",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 4.5,
+        "grade": "C",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 4.5,
+        "grade": "C",
+        "statusLabel": "매매금지"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-26",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/jongga_data_20260526_canary.js",
+    "jsonFile": "jongga/output/latest_20260526_canary.json",
+    "generatedAt": "2026-05-26T05:53:55+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 7.2,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 5.6,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 5.4,
+        "grade": "C",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "momentum",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "SFA반도체",
+        "code": "036540",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 4.5,
+        "grade": "C",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 4.5,
+        "grade": "C",
+        "statusLabel": "매매금지"
+      }
+    ]
+  },
+  {
     "date": "2026-05-24",
     "variant": "stable",
     "variantLabel": "현재 버전",

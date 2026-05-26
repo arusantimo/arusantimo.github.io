@@ -1,0 +1,1835 @@
+window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
+window.JONGGA_DAILY_DATA["2026-05-26"] = {
+  "schemaVersion": "jongga_result.v1",
+  "generatedAt": "2026-05-26T05:53:46+00:00",
+  "variant": "stable",
+  "dataQuality": {
+    "status": "partial",
+    "counts": {
+      "total": 20,
+      "failed": 0,
+      "stale": 0,
+      "manual": 9,
+      "fallback": 0,
+      "slots": 1
+    },
+    "failedKeys": [],
+    "staleKeys": [],
+    "manualKeys": [
+      "toss_metrics",
+      "event_filters"
+    ],
+    "fallbackKeys": [],
+    "providerHealth": {
+      "naver_mobile": {
+        "ok": 20
+      },
+      "naver_chart": {
+        "ok": 20
+      },
+      "naver_integration_schedule": {
+        "ok": 1
+      },
+      "yahoo_chart": {
+        "ok": 5
+      },
+      "yahoo_intraday_30m": {
+        "ok": 20
+      },
+      "toss_playwright_strength": {
+        "ok": 0
+      },
+      "naver_orderbook_browser": {
+        "ok": 0
+      },
+      "kind_playwright_disclosure": {
+        "ok": 0
+      },
+      "cnbc_quote": {
+        "ok": 1
+      }
+    },
+    "fallbackUsage": [],
+    "collectionLog": [
+      {
+        "step": "vkospi_quote",
+        "label": "VKOSPI 수집",
+        "status": "ok",
+        "durationMs": 2170.1,
+        "detail": "VKOSPI",
+        "count": 1
+      },
+      {
+        "step": "macro_quotes",
+        "label": "글로벌 매크로 지표 수집",
+        "status": "ok",
+        "durationMs": 1450.5,
+        "detail": "Yahoo chart 5종",
+        "count": 5
+      },
+      {
+        "step": "gap_score",
+        "label": "갭 스코어 계산",
+        "status": "ok",
+        "durationMs": 0.1,
+        "detail": "G-A 🟢"
+      },
+      {
+        "step": "kospi_history",
+        "label": "KOSPI 히스토리 수집",
+        "status": "ok",
+        "durationMs": 98.3,
+        "count": 90
+      },
+      {
+        "step": "market_context",
+        "label": "시장 레짐 계산",
+        "status": "ok",
+        "durationMs": 0.7
+      },
+      {
+        "step": "top_trading",
+        "label": "거래대금 상위 종목 수집",
+        "status": "ok",
+        "durationMs": 4245.6,
+        "count": 20
+      },
+      {
+        "step": "stock_snapshots",
+        "label": "종목 상세 스냅샷 수집",
+        "status": "ok",
+        "durationMs": 2723.3,
+        "detail": "성공 20 / 실패 0",
+        "count": 20
+      },
+      {
+        "step": "entry_scoring",
+        "label": "전략별 후보 계산",
+        "status": "ok",
+        "durationMs": 3.0,
+        "detail": "pullback 3, momentum 3, reversal 3",
+        "count": 9
+      },
+      {
+        "step": "browser_enrichment",
+        "label": "브라우저 보강 수집",
+        "status": "warning",
+        "durationMs": 0.2,
+        "detail": "unavailable · 토스 0 / 호가 0 / KIND 0",
+        "count": 4
+      }
+    ],
+    "note": "현재 버전 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 현재 버전은 Playwright 기반 브라우저 보강을 상위 추천 후보에 한해 적용합니다.",
+    "channel": "stable",
+    "channelLabel": "현재 버전",
+    "browserSource": "unavailable",
+    "browserLaunchNotes": [
+      "playwright unavailable: No module named 'playwright'"
+    ]
+  },
+  "slots": [
+    {
+      "slotId": "slotA",
+      "sourceId": "live-public-run-stable",
+      "regime": {
+        "table": [
+          {
+            "item": "레짐",
+            "value": "약세장 ⛔"
+          },
+          {
+            "item": "KOSPI",
+            "value": "8078.46 (+2.94%)"
+          },
+          {
+            "item": "VKOSPI",
+            "value": "VKOSPI 68.77"
+          },
+          {
+            "item": "진입 전략",
+            "value": "메인=없음 / 서브=없음"
+          },
+          {
+            "item": "스윙 전환 활성도",
+            "value": "금지"
+          },
+          {
+            "item": "시가베팅",
+            "value": "비활성"
+          },
+          {
+            "item": "역추세 트랙",
+            "value": "비활성"
+          },
+          {
+            "item": "갭 스코어",
+            "value": "G-A 🟢 (+9.5점)"
+          },
+          {
+            "item": "갭 조정",
+            "value": "✅ 100% 진입 / ✅ 100% 진입"
+          }
+        ],
+        "evidence": [
+          {
+            "item": "KOSPI 60MA",
+            "value": "6262.44",
+            "verdict": "✅"
+          },
+          {
+            "item": "KOSPI 20MA",
+            "value": "7342.67",
+            "verdict": "✅"
+          },
+          {
+            "item": "VKOSPI",
+            "value": "VKOSPI 68.77",
+            "verdict": "❌"
+          },
+          {
+            "item": "등락주",
+            "value": "상승 14 / 하락 5",
+            "verdict": "시장 내부 체력 참고"
+          },
+          {
+            "item": "시장 맥락",
+            "value": "공개 데이터 기반 레짐 산출 / 갭 G-A 🟢",
+            "verdict": "약세장 ⛔"
+          }
+        ],
+        "alert": "CNBC VKOSPI 실측을 사용했습니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다."
+      },
+      "gapScore": {
+        "rows": [
+          {
+            "indicator": "NQ 선물 변화율",
+            "actualValue": "+1.42%",
+            "baseScore": "+1점",
+            "weight": "×2.5",
+            "formula": "+1 × 2.5 = +2.5점",
+            "weightedScore": "+2.5점"
+          },
+          {
+            "indicator": "VIX 수준",
+            "actualValue": "+16.59",
+            "baseScore": "+1점",
+            "weight": "×2.0",
+            "formula": "+1 × 2.0 = +2.0점",
+            "weightedScore": "+2.0점"
+          },
+          {
+            "indicator": "미국 10년 금리 전일비",
+            "actualValue": "-10.9bp",
+            "baseScore": "+2점",
+            "weight": "×1.5",
+            "formula": "+2 × 1.5 = +3.0점",
+            "weightedScore": "+3.0점"
+          },
+          {
+            "indicator": "원달러 환율 변화",
+            "actualValue": "-2.18원",
+            "baseScore": "+0점",
+            "weight": "×1.5",
+            "formula": "+0 × 1.5 = +0.0점",
+            "weightedScore": "+0.0점"
+          },
+          {
+            "indicator": "SOX 전일 변화율",
+            "actualValue": "+5.30%",
+            "baseScore": "+2점",
+            "weight": "×1.0",
+            "formula": "+2 × 1.0 = +2.0점",
+            "weightedScore": "+2.0점"
+          }
+        ],
+        "totalScore": "+9.5점",
+        "grade": "G-A 🟢",
+        "code": "G-A",
+        "entryAdjustment": "✅ 100% 진입 / ✅ 100% 진입",
+        "sellAdjustment": "기본 조건 유지 | 기본 손절폭 유지",
+        "swingAdjustment": "적극 허용",
+        "note": "실시간 공개 시세(Yahoo chart API) 기준입니다."
+      },
+      "entries": {
+        "pullback": [
+          {
+            "rank": 1,
+            "name": "현대차",
+            "code": "005380",
+            "score": 7.2,
+            "grade": "B",
+            "statusLabel": "매매금지(핵심 Gate 미충족)",
+            "strategy": "pullback",
+            "gates": [
+              {
+                "code": "G0",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 9"
+              },
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "5MA>20MA>60MA"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "종가 > 60MA"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "주봉 RSI 79.9"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "MACD 히스토그램"
+              },
+              {
+                "code": "G5",
+                "status": "⛔",
+                "note": "KOSPI>7644.47, VKOSPI 68.77"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "S2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C2",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "C3",
+                "note": "미충족 또는 공개 데이터 부족"
+              }
+            ],
+            "currentPrice": 688000,
+            "previousClose": 655000,
+            "dailyChange": 33000,
+            "dailyChangePct": 5.04,
+            "dailyDirection": "up",
+            "entryPriceText": "688,000원 (당일 종가 기준)",
+            "entryPrice": 688000,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 -176,731주 / 기관 72,357주.",
+            "notes": [
+              "토스 체결강도·섹터 outperform은 미반영"
+            ],
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+1.5% 도달",
+                "quantity": "40% 익절",
+                "targetYield": "+1.5%",
+                "targetPrice": "698,320원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+2.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+2.5%",
+                "targetPrice": "705,200원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+3.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "708,640원"
+              },
+              {
+                "stage": "📈 장중 2차",
+                "condition": "추세 유지 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+6.0%",
+                "targetPrice": "729,280원"
+              },
+              {
+                "stage": "📊 스윙 전환",
+                "condition": "V 조건 충족 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+9.0%",
+                "targetPrice": "749,920원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-1.5% 이탈",
+                "quantity": "전량",
+                "targetYield": "-1.5%",
+                "targetPrice": "677,680원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          },
+          {
+            "rank": 2,
+            "name": "SK하이닉스",
+            "code": "000660",
+            "score": 6.0,
+            "grade": "B",
+            "statusLabel": "매매금지(핵심 Gate 미충족)",
+            "strategy": "pullback",
+            "gates": [
+              {
+                "code": "G0",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 1"
+              },
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "5MA>20MA>60MA"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "종가 > 60MA"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "주봉 RSI 84.6"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "MACD 히스토그램"
+              },
+              {
+                "code": "G5",
+                "status": "⛔",
+                "note": "KOSPI>7644.47, VKOSPI 68.77"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "S2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C2",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "P1",
+                "note": "미충족 또는 공개 데이터 부족"
+              },
+              {
+                "code": "C3",
+                "note": "미충족 또는 공개 데이터 부족"
+              }
+            ],
+            "currentPrice": 2080000,
+            "previousClose": 1941000,
+            "dailyChange": 139000,
+            "dailyChangePct": 7.16,
+            "dailyDirection": "up",
+            "entryPriceText": "2,080,000원 (당일 종가 기준)",
+            "entryPrice": 2080000,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 -158,042주 / 기관 152,990주.",
+            "notes": [
+              "토스 체결강도·섹터 outperform은 미반영"
+            ],
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+1.5% 도달",
+                "quantity": "40% 익절",
+                "targetYield": "+1.5%",
+                "targetPrice": "2,111,200원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+2.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+2.5%",
+                "targetPrice": "2,132,000원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+3.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "2,142,400원"
+              },
+              {
+                "stage": "📈 장중 2차",
+                "condition": "추세 유지 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+6.0%",
+                "targetPrice": "2,204,800원"
+              },
+              {
+                "stage": "📊 스윙 전환",
+                "condition": "V 조건 충족 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+9.0%",
+                "targetPrice": "2,267,200원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-1.5% 이탈",
+                "quantity": "전량",
+                "targetYield": "-1.5%",
+                "targetPrice": "2,048,800원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          },
+          {
+            "rank": 3,
+            "name": "대한광통신",
+            "code": "010170",
+            "score": 5.6,
+            "grade": "C",
+            "statusLabel": "매매금지(핵심 Gate 미충족)",
+            "strategy": "pullback",
+            "gates": [
+              {
+                "code": "G0",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 12"
+              },
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "5MA>20MA>60MA"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "종가 > 60MA"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "주봉 RSI 80.4"
+              },
+              {
+                "code": "G4",
+                "status": "⛔",
+                "note": "MACD 히스토그램"
+              },
+              {
+                "code": "G5",
+                "status": "⛔",
+                "note": "KOSPI>7644.47, VKOSPI 68.77"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C2",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S1",
+                "note": "미충족 또는 공개 데이터 부족"
+              },
+              {
+                "code": "C3",
+                "note": "미충족 또는 공개 데이터 부족"
+              }
+            ],
+            "currentPrice": 27200,
+            "previousClose": 24300,
+            "dailyChange": 2900,
+            "dailyChangePct": 11.93,
+            "dailyDirection": "up",
+            "entryPriceText": "27,200원 (당일 종가 기준)",
+            "entryPrice": 27200,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 358,503주 / 기관 -4,541주.",
+            "notes": [
+              "토스 체결강도·섹터 outperform은 미반영"
+            ],
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+1.5% 도달",
+                "quantity": "40% 익절",
+                "targetYield": "+1.5%",
+                "targetPrice": "27,608원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+2.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+2.5%",
+                "targetPrice": "27,880원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+3.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "28,016원"
+              },
+              {
+                "stage": "📈 장중 2차",
+                "condition": "추세 유지 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+6.0%",
+                "targetPrice": "28,832원"
+              },
+              {
+                "stage": "📊 스윙 전환",
+                "condition": "V 조건 충족 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+9.0%",
+                "targetPrice": "29,648원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-1.5% 이탈",
+                "quantity": "전량",
+                "targetYield": "-1.5%",
+                "targetPrice": "26,792원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          }
+        ],
+        "momentum": [
+          {
+            "rank": 1,
+            "name": "주성엔지니어링",
+            "code": "036930",
+            "score": 4.8,
+            "grade": "C",
+            "statusLabel": "매매금지(핵심 Gate 미충족)",
+            "strategy": "momentum",
+            "gates": [
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "3개월 상대강도 상위 10%"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "5일·20일 초과수익률"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "52주 고가 대비 96.4%"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 7"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S2",
+                "note": "토스 또는 추가 데이터 필요"
+              },
+              {
+                "code": "C2",
+                "note": "토스 또는 추가 데이터 필요"
+              },
+              {
+                "code": "C3",
+                "note": "토스 또는 추가 데이터 필요"
+              }
+            ],
+            "currentPrice": 238000,
+            "previousClose": 224000,
+            "dailyChange": 14000,
+            "dailyChangePct": 6.25,
+            "dailyDirection": "up",
+            "entryPriceText": "238,000원 (당일 종가 기준)",
+            "entryPrice": 238000,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 109,256주 / 기관 74,631주.",
+            "notes": [
+              "토스 체결강도 미반영",
+              "체결강도 100% 유지 비율 미반영",
+              "호가잔량 미반영"
+            ],
+            "toss": {},
+            "orderbook": {},
+            "manualInput": {
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "toss.avgStrength",
+                  "label": "당일 평균 체결강도 (%)",
+                  "sourceName": "토스증권 주문 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
+                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 주성엔지니어링 (036930) 주문 화면을 엽니다.",
+                    "체결강도 영역에서 당일 평균 값을 확인합니다.",
+                    "예: 112.5 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "toss.intradayAbove100Ratio",
+                  "label": "100% 이상 유지 비율 (%)",
+                  "sourceName": "토스증권 체결강도 분봉 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/chart",
+                  "copyHint": "장중 체결강도가 100% 이상이었던 비율만 입력합니다.",
+                  "instructions": [
+                    "토스증권에서 주성엔지니어링 (036930) 차트 화면을 엽니다.",
+                    "당일 분봉에서 체결강도 100% 이상 구간 비율을 계산하거나 표시값을 확인합니다.",
+                    "예: 73.0 처럼 퍼센트 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 주성엔지니어링 (036930) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25"
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "toss.avgStrength",
+                "toss.intradayAbove100Ratio",
+                "orderbook.bidAskRatio"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+2.0% 도달",
+                "quantity": "40% 익절",
+                "targetYield": "+2.0%",
+                "targetPrice": "242,760원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+4.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+4.0%",
+                "targetPrice": "247,520원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+5.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+5.0%",
+                "targetPrice": "249,900원"
+              },
+              {
+                "stage": "📈 장중 2차",
+                "condition": "추세 유지 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+8.0%",
+                "targetPrice": "257,040원"
+              },
+              {
+                "stage": "📊 스윙 전환",
+                "condition": "V 조건 충족 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+11.0%",
+                "targetPrice": "264,180원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-2.0% 이탈",
+                "quantity": "전량",
+                "targetYield": "-2.0%",
+                "targetPrice": "233,240원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          },
+          {
+            "rank": 2,
+            "name": "한화오션",
+            "code": "042660",
+            "score": 4.8,
+            "grade": "C",
+            "statusLabel": "매매금지(핵심 Gate 미충족)",
+            "strategy": "momentum",
+            "gates": [
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "3개월 상대강도 상위 10%"
+              },
+              {
+                "code": "G2",
+                "status": "⛔",
+                "note": "5일·20일 초과수익률"
+              },
+              {
+                "code": "G3",
+                "status": "⛔",
+                "note": "52주 고가 대비 86.2%"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 20"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S2",
+                "note": "토스 또는 추가 데이터 필요"
+              },
+              {
+                "code": "C2",
+                "note": "토스 또는 추가 데이터 필요"
+              },
+              {
+                "code": "C3",
+                "note": "토스 또는 추가 데이터 필요"
+              }
+            ],
+            "currentPrice": 133400,
+            "previousClose": 122200,
+            "dailyChange": 11200,
+            "dailyChangePct": 9.17,
+            "dailyDirection": "up",
+            "entryPriceText": "133,400원 (당일 종가 기준)",
+            "entryPrice": 133400,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 103,059주 / 기관 166,233주.",
+            "notes": [
+              "토스 체결강도 미반영",
+              "체결강도 100% 유지 비율 미반영",
+              "호가잔량 미반영"
+            ],
+            "toss": {},
+            "orderbook": {},
+            "manualInput": {
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "toss.avgStrength",
+                  "label": "당일 평균 체결강도 (%)",
+                  "sourceName": "토스증권 주문 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A042660/order",
+                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 한화오션 (042660) 주문 화면을 엽니다.",
+                    "체결강도 영역에서 당일 평균 값을 확인합니다.",
+                    "예: 112.5 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "toss.intradayAbove100Ratio",
+                  "label": "100% 이상 유지 비율 (%)",
+                  "sourceName": "토스증권 체결강도 분봉 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A042660/chart",
+                  "copyHint": "장중 체결강도가 100% 이상이었던 비율만 입력합니다.",
+                  "instructions": [
+                    "토스증권에서 한화오션 (042660) 차트 화면을 엽니다.",
+                    "당일 분봉에서 체결강도 100% 이상 구간 비율을 계산하거나 표시값을 확인합니다.",
+                    "예: 73.0 처럼 퍼센트 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A042660/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 한화오션 (042660) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25"
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "toss.avgStrength",
+                "toss.intradayAbove100Ratio",
+                "orderbook.bidAskRatio"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+2.0% 도달",
+                "quantity": "40% 익절",
+                "targetYield": "+2.0%",
+                "targetPrice": "136,068원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+4.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+4.0%",
+                "targetPrice": "138,736원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+5.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+5.0%",
+                "targetPrice": "140,070원"
+              },
+              {
+                "stage": "📈 장중 2차",
+                "condition": "추세 유지 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+8.0%",
+                "targetPrice": "144,072원"
+              },
+              {
+                "stage": "📊 스윙 전환",
+                "condition": "V 조건 충족 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+11.0%",
+                "targetPrice": "148,074원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-2.0% 이탈",
+                "quantity": "전량",
+                "targetYield": "-2.0%",
+                "targetPrice": "130,732원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          },
+          {
+            "rank": 3,
+            "name": "SFA반도체",
+            "code": "036540",
+            "score": 4.8,
+            "grade": "C",
+            "statusLabel": "매매금지(핵심 Gate 미충족)",
+            "strategy": "momentum",
+            "gates": [
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "3개월 상대강도 상위 10%"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "5일·20일 초과수익률"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "52주 고가 대비 96.0%"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 30"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S2",
+                "note": "토스 또는 추가 데이터 필요"
+              },
+              {
+                "code": "C2",
+                "note": "토스 또는 추가 데이터 필요"
+              },
+              {
+                "code": "C3",
+                "note": "토스 또는 추가 데이터 필요"
+              }
+            ],
+            "currentPrice": 11170,
+            "previousClose": 10250,
+            "dailyChange": 920,
+            "dailyChangePct": 8.98,
+            "dailyDirection": "up",
+            "entryPriceText": "11,170원 (당일 종가 기준)",
+            "entryPrice": 11170,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 1,056,945주 / 기관 137,099주.",
+            "notes": [
+              "토스 체결강도 미반영",
+              "체결강도 100% 유지 비율 미반영",
+              "호가잔량 미반영"
+            ],
+            "toss": {},
+            "orderbook": {},
+            "manualInput": {
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "toss.avgStrength",
+                  "label": "당일 평균 체결강도 (%)",
+                  "sourceName": "토스증권 주문 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036540/order",
+                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 SFA반도체 (036540) 주문 화면을 엽니다.",
+                    "체결강도 영역에서 당일 평균 값을 확인합니다.",
+                    "예: 112.5 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "toss.intradayAbove100Ratio",
+                  "label": "100% 이상 유지 비율 (%)",
+                  "sourceName": "토스증권 체결강도 분봉 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036540/chart",
+                  "copyHint": "장중 체결강도가 100% 이상이었던 비율만 입력합니다.",
+                  "instructions": [
+                    "토스증권에서 SFA반도체 (036540) 차트 화면을 엽니다.",
+                    "당일 분봉에서 체결강도 100% 이상 구간 비율을 계산하거나 표시값을 확인합니다.",
+                    "예: 73.0 처럼 퍼센트 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036540/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 SFA반도체 (036540) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25"
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "toss.avgStrength",
+                "toss.intradayAbove100Ratio",
+                "orderbook.bidAskRatio"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+2.0% 도달",
+                "quantity": "40% 익절",
+                "targetYield": "+2.0%",
+                "targetPrice": "11,393원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+4.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+4.0%",
+                "targetPrice": "11,617원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+5.0% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+5.0%",
+                "targetPrice": "11,728원"
+              },
+              {
+                "stage": "📈 장중 2차",
+                "condition": "추세 유지 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+8.0%",
+                "targetPrice": "12,064원"
+              },
+              {
+                "stage": "📊 스윙 전환",
+                "condition": "V 조건 충족 시",
+                "quantity": "잔량 보유",
+                "targetYield": "+11.0%",
+                "targetPrice": "12,399원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-2.0% 이탈",
+                "quantity": "전량",
+                "targetYield": "-2.0%",
+                "targetPrice": "10,947원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          }
+        ],
+        "reversal": [
+          {
+            "rank": 1,
+            "name": "한화오션",
+            "code": "042660",
+            "score": 5.4,
+            "grade": "C",
+            "statusLabel": "매매금지",
+            "strategy": "reversal",
+            "filters": [
+              {
+                "code": "F1",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 20"
+              },
+              {
+                "code": "F2",
+                "status": "✅",
+                "note": "시총 40.9조"
+              },
+              {
+                "code": "F3",
+                "status": "⚠️",
+                "note": "실적/배당/분할 일정 수동 확인 필요"
+              },
+              {
+                "code": "F4",
+                "status": "⚠️",
+                "note": "최근 5거래일 재진입 이력 수동 확인 필요"
+              }
+            ],
+            "gates": [
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "1개월 수익률 -1.2%"
+              },
+              {
+                "code": "G2",
+                "status": "⛔",
+                "note": "20일 고점 대비 -4.5%"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "종가 > 60MA"
+              },
+              {
+                "code": "G4",
+                "status": "⛔",
+                "note": "최근 5거래일 -5% 급락 이력"
+              },
+              {
+                "code": "G5-a",
+                "status": "✅",
+                "note": "안정화 캔들"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "C1",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S2",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C2",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C3",
+                "note": "토스·이벤트 데이터 필요"
+              }
+            ],
+            "currentPrice": 133400,
+            "previousClose": 122200,
+            "dailyChange": 11200,
+            "dailyChangePct": 9.17,
+            "dailyDirection": "up",
+            "entryPriceText": "133,400원 (당일 종가 기준)",
+            "entryPrice": 133400,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "20일 고점 대비 -4.5% 조정 후 안정화 패턴 여부를 점검했습니다.",
+            "notes": [
+              "토스 체결강도 미반영",
+              "마지막 1시간 체결강도 미반영",
+              "호가잔량 미반영",
+              "기업 이벤트 필터는 미반영"
+            ],
+            "manualInput": {
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "toss.avgStrength",
+                  "label": "당일 평균 체결강도 (%)",
+                  "sourceName": "토스증권 주문 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A042660/order",
+                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 한화오션 (042660) 주문 화면을 엽니다.",
+                    "체결강도 영역의 당일 평균 값을 확인합니다.",
+                    "예: 94.2 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "toss.lastHourAvgStrength",
+                  "label": "마지막 1시간 평균 체결강도 (%)",
+                  "sourceName": "토스증권 체결강도 분봉 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A042660/chart",
+                  "copyHint": "마감 전 최근 1시간 평균 체결강도만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 한화오션 (042660) 차트 화면을 엽니다.",
+                    "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
+                    "예: 101.0 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A042660/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 한화오션 (042660) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
+                  ]
+                },
+                {
+                  "fieldKey": "eventFilter",
+                  "label": "실적/기업행사 필터",
+                  "sourceName": "KIND 공시",
+                  "sourceUrl": "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain",
+                  "copyHint": "실적 발표와 분할/합병/배당락까지 남은 일수만 입력하거나 차단을 체크합니다.",
+                  "instructions": [
+                    "KIND 공시에서 한화오션 (042660) 종목 공시를 조회합니다.",
+                    "실적 발표 예정일, 분할/합병/배당락 일정을 확인합니다.",
+                    "남은 일수를 입력하거나 위험 이벤트가 임박했으면 차단을 체크합니다."
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "toss.avgStrength",
+                "toss.lastHourAvgStrength",
+                "orderbook.bidAskRatio",
+                "eventFilter"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
+            },
+            "eventFilter": null,
+            "intraday30m": {
+              "available": true,
+              "signal": false,
+              "interval": "30m",
+              "source": "yahoo_chart",
+              "note": "직전 30분봉 종가 133200, 전봉 종가 133200",
+              "latestOpen": 133200.0,
+              "latestClose": 133200.0,
+              "previousClose": 133200.0
+            },
+            "toss": {},
+            "orderbook": {},
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+3.0% 도달",
+                "quantity": "50% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "137,402원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+4.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+4.5%",
+                "targetPrice": "139,403원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+8.0% 도달",
+                "quantity": "잔량 전량",
+                "targetYield": "+8.0%",
+                "targetPrice": "144,072원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-3.0% 이탈",
+                "quantity": "전량",
+                "targetYield": "-3.0%",
+                "targetPrice": "129,398원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          },
+          {
+            "rank": 2,
+            "name": "주성엔지니어링",
+            "code": "036930",
+            "score": 4.5,
+            "grade": "C",
+            "statusLabel": "매매금지",
+            "strategy": "reversal",
+            "filters": [
+              {
+                "code": "F1",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 7"
+              },
+              {
+                "code": "F2",
+                "status": "⛔",
+                "note": "시총 11.1조"
+              },
+              {
+                "code": "F3",
+                "status": "⚠️",
+                "note": "실적/배당/분할 일정 수동 확인 필요"
+              },
+              {
+                "code": "F4",
+                "status": "⚠️",
+                "note": "최근 5거래일 재진입 이력 수동 확인 필요"
+              }
+            ],
+            "gates": [
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "1개월 수익률 97.7%"
+              },
+              {
+                "code": "G2",
+                "status": "⛔",
+                "note": "20일 고점 대비 -3.6%"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "종가 > 60MA"
+              },
+              {
+                "code": "G4",
+                "status": "⛔",
+                "note": "최근 5거래일 -5% 급락 이력"
+              },
+              {
+                "code": "G5-a",
+                "status": "✅",
+                "note": "안정화 캔들"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S2",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C1",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C2",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C3",
+                "note": "토스·이벤트 데이터 필요"
+              }
+            ],
+            "currentPrice": 238000,
+            "previousClose": 224000,
+            "dailyChange": 14000,
+            "dailyChangePct": 6.25,
+            "dailyDirection": "up",
+            "entryPriceText": "238,000원 (당일 종가 기준)",
+            "entryPrice": 238000,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "20일 고점 대비 -3.6% 조정 후 안정화 패턴 여부를 점검했습니다.",
+            "notes": [
+              "토스 체결강도 미반영",
+              "마지막 1시간 체결강도 미반영",
+              "호가잔량 미반영",
+              "기업 이벤트 필터는 미반영"
+            ],
+            "manualInput": {
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "toss.avgStrength",
+                  "label": "당일 평균 체결강도 (%)",
+                  "sourceName": "토스증권 주문 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
+                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 주성엔지니어링 (036930) 주문 화면을 엽니다.",
+                    "체결강도 영역의 당일 평균 값을 확인합니다.",
+                    "예: 94.2 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "toss.lastHourAvgStrength",
+                  "label": "마지막 1시간 평균 체결강도 (%)",
+                  "sourceName": "토스증권 체결강도 분봉 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/chart",
+                  "copyHint": "마감 전 최근 1시간 평균 체결강도만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 주성엔지니어링 (036930) 차트 화면을 엽니다.",
+                    "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
+                    "예: 101.0 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A036930/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 주성엔지니어링 (036930) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
+                  ]
+                },
+                {
+                  "fieldKey": "eventFilter",
+                  "label": "실적/기업행사 필터",
+                  "sourceName": "KIND 공시",
+                  "sourceUrl": "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain",
+                  "copyHint": "실적 발표와 분할/합병/배당락까지 남은 일수만 입력하거나 차단을 체크합니다.",
+                  "instructions": [
+                    "KIND 공시에서 주성엔지니어링 (036930) 종목 공시를 조회합니다.",
+                    "실적 발표 예정일, 분할/합병/배당락 일정을 확인합니다.",
+                    "남은 일수를 입력하거나 위험 이벤트가 임박했으면 차단을 체크합니다."
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "toss.avgStrength",
+                "toss.lastHourAvgStrength",
+                "orderbook.bidAskRatio",
+                "eventFilter"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
+            },
+            "eventFilter": null,
+            "intraday30m": {
+              "available": true,
+              "signal": false,
+              "interval": "30m",
+              "source": "yahoo_chart",
+              "note": "직전 30분봉 종가 237500, 전봉 종가 237500",
+              "latestOpen": 237500.0,
+              "latestClose": 237500.0,
+              "previousClose": 237500.0
+            },
+            "toss": {},
+            "orderbook": {},
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+3.0% 도달",
+                "quantity": "50% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "245,140원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+4.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+4.5%",
+                "targetPrice": "248,710원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+8.0% 도달",
+                "quantity": "잔량 전량",
+                "targetYield": "+8.0%",
+                "targetPrice": "257,040원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-3.0% 이탈",
+                "quantity": "전량",
+                "targetYield": "-3.0%",
+                "targetPrice": "230,860원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          },
+          {
+            "rank": 3,
+            "name": "대한광통신",
+            "code": "010170",
+            "score": 4.5,
+            "grade": "C",
+            "statusLabel": "매매금지",
+            "strategy": "reversal",
+            "filters": [
+              {
+                "code": "F1",
+                "status": "✅",
+                "note": "거래대금 TOP40 순위 12"
+              },
+              {
+                "code": "F2",
+                "status": "⛔",
+                "note": "시총 4.2조"
+              },
+              {
+                "code": "F3",
+                "status": "⚠️",
+                "note": "실적/배당/분할 일정 수동 확인 필요"
+              },
+              {
+                "code": "F4",
+                "status": "⚠️",
+                "note": "최근 5거래일 재진입 이력 수동 확인 필요"
+              }
+            ],
+            "gates": [
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "1개월 수익률 78.7%"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "20일 고점 대비 -13.7%"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "종가 > 60MA"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "최근 5거래일 -5% 급락 이력"
+              },
+              {
+                "code": "G5-a",
+                "status": "✅",
+                "note": "안정화 캔들"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P1",
+                "note": "공개 데이터 충족"
+              },
+              {
+                "code": "P2",
+                "note": "공개 데이터 충족"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "S2",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C1",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C2",
+                "note": "토스·이벤트 데이터 필요"
+              },
+              {
+                "code": "C3",
+                "note": "토스·이벤트 데이터 필요"
+              }
+            ],
+            "currentPrice": 27200,
+            "previousClose": 24300,
+            "dailyChange": 2900,
+            "dailyChangePct": 11.93,
+            "dailyDirection": "up",
+            "entryPriceText": "27,200원 (당일 종가 기준)",
+            "entryPrice": 27200,
+            "entryMeta": "당일 종가 기준",
+            "keyPoint": "20일 고점 대비 -13.7% 조정 후 안정화 패턴 여부를 점검했습니다.",
+            "notes": [
+              "토스 체결강도 미반영",
+              "마지막 1시간 체결강도 미반영",
+              "호가잔량 미반영",
+              "기업 이벤트 필터는 미반영"
+            ],
+            "manualInput": {
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "toss.avgStrength",
+                  "label": "당일 평균 체결강도 (%)",
+                  "sourceName": "토스증권 주문 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A010170/order",
+                  "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 대한광통신 (010170) 주문 화면을 엽니다.",
+                    "체결강도 영역의 당일 평균 값을 확인합니다.",
+                    "예: 94.2 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "toss.lastHourAvgStrength",
+                  "label": "마지막 1시간 평균 체결강도 (%)",
+                  "sourceName": "토스증권 체결강도 분봉 화면",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A010170/chart",
+                  "copyHint": "마감 전 최근 1시간 평균 체결강도만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 대한광통신 (010170) 차트 화면을 엽니다.",
+                    "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
+                    "예: 101.0 처럼 숫자만 붙여넣습니다."
+                  ]
+                },
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A010170/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 대한광통신 (010170) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
+                  ]
+                },
+                {
+                  "fieldKey": "eventFilter",
+                  "label": "실적/기업행사 필터",
+                  "sourceName": "KIND 공시",
+                  "sourceUrl": "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain",
+                  "copyHint": "실적 발표와 분할/합병/배당락까지 남은 일수만 입력하거나 차단을 체크합니다.",
+                  "instructions": [
+                    "KIND 공시에서 대한광통신 (010170) 종목 공시를 조회합니다.",
+                    "실적 발표 예정일, 분할/합병/배당락 일정을 확인합니다.",
+                    "남은 일수를 입력하거나 위험 이벤트가 임박했으면 차단을 체크합니다."
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "toss.avgStrength",
+                "toss.lastHourAvgStrength",
+                "orderbook.bidAskRatio",
+                "eventFilter"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
+            },
+            "eventFilter": null,
+            "intraday30m": {
+              "available": true,
+              "signal": false,
+              "interval": "30m",
+              "source": "yahoo_chart",
+              "note": "직전 30분봉 종가 27300, 전봉 종가 27300",
+              "latestOpen": 27300.0,
+              "latestClose": 27300.0,
+              "previousClose": 27300.0
+            },
+            "toss": {},
+            "orderbook": {},
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "condition": "+3.0% 도달",
+                "quantity": "50% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "28,016원"
+              },
+              {
+                "stage": "🔔 장초반",
+                "condition": "+4.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+4.5%",
+                "targetPrice": "28,424원"
+              },
+              {
+                "stage": "📈 장중 1차",
+                "condition": "+8.0% 도달",
+                "quantity": "잔량 전량",
+                "targetYield": "+8.0%",
+                "targetPrice": "29,376원"
+              },
+              {
+                "stage": "🛑 손절",
+                "condition": "-3.0% 이탈",
+                "quantity": "전량",
+                "targetYield": "-3.0%",
+                "targetPrice": "26,384원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live"
+          }
+        ],
+        "swing": []
+      },
+      "dataQuality": {
+        "status": "partial",
+        "source": "live-public-run"
+      }
+    }
+  ],
+  "analysisDate": "2026-05-26"
+};
