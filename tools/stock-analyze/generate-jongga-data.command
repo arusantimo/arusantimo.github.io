@@ -1,16 +1,22 @@
 #!/bin/zsh
-
+# Finder 더블클릭 — 종가베팅 추천 데이터 전체 파이프라인
 setopt local_options no_unset
 
-pause_at_end=1
-if [[ "${1-}" == "--no-pause" ]]; then
-  pause_at_end=0
-fi
-
 script_dir=${0:A:h}
+pause_at_end=1
+args=()
+
+for arg in "$@"; do
+  if [[ "$arg" == "--no-pause" ]]; then
+    pause_at_end=0
+  else
+    args+=("$arg")
+  fi
+done
 
 export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
+export FORCE_COLOR=1
 
 pushd "$script_dir" >/dev/null || exit 1
 
@@ -28,31 +34,16 @@ else
   exit 127
 fi
 
-"$python_cmd" -m jongga.generate_latest --out-dir "jongga/output" --history-js "jongga/output/jongga_history.js" --out "jongga/output/latest.json" --bridge-js "jongga/output/jongga_data.js"
+"$python_cmd" "$script_dir/run_jongga_pipeline.py" "${args[@]}"
 exit_code=$?
 
 if [[ $exit_code -ne 0 ]]; then
   echo
-  echo "Failed to generate jongga output. Exit code: $exit_code"
-  popd >/dev/null || true
-  if [[ $pause_at_end -eq 1 ]]; then
-    read -r "?Press Enter to close..."
-  fi
-  exit $exit_code
+  echo "Pipeline failed. Exit code: $exit_code"
 fi
-
-echo
-echo "Generated files:"
-echo "  jongga/output/latest_YYYYMMDD.json"
-echo "  jongga/output/jongga_data_YYYYMMDD.js"
-echo "  jongga/output/latest_YYYYMMDD_canary.json"
-echo "  jongga/output/jongga_data_YYYYMMDD_canary.js"
-echo "  jongga/output/jongga_history.js"
-echo "  jongga/output/latest.json"
-echo "  jongga/output/jongga_data.js"
 
 popd >/dev/null || true
 if [[ $pause_at_end -eq 1 ]]; then
   read -r "?Press Enter to close..."
 fi
-exit 0
+exit $exit_code

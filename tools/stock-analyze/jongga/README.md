@@ -6,17 +6,63 @@
 
 `collectors/api/JsonApiCollector`는 KIS, Polygon, Alpha Vantage 같은 인증형 JSON API adapter의 공통 기반입니다. API 키가 없으면 `MissingCredentials`로 명확히 실패시키고 router가 다음 fallback으로 넘어갑니다.
 
-## 실행 예시
+## 실행 (종가베팅 추천 데이터 전체 파이프라인)
+
+장 마감 후 **한 번에** 환경 점검 → 라이브 수집·채점(stable+canary) → 산출물 검증까지 수행합니다.
+
+| 파일 | 용도 |
+|------|------|
+| **`generate-jongga-data.bat`** | Windows 일상 실행 (더블클릭·터미널) |
+| **`generate-jongga-data.command`** | macOS Finder 더블클릭 |
+| `generate-jongga-data.sh` | macOS / Linux 터미널 |
+| `run_jongga_pipeline.py` | 공통 Python 오케스트레이터 |
+
+```bat
+cd tools\stock-analyze
+generate-jongga-data.bat
+generate-jongga-data.bat --with-tests
+generate-jongga-data.bat --no-pause --date 2026-05-26
+```
+
+```bash
+cd tools/stock-analyze
+chmod +x generate-jongga-data.sh
+./generate-jongga-data.sh --with-tests
+```
+
+파이프라인이 생성하는 산출물:
+
+- `jongga/output/latest_YYYYMMDD.json` · `jongga_data_YYYYMMDD.js` (stable)
+- `latest_YYYYMMDD_canary.json` · `jongga_data_YYYYMMDD_canary.js` (canary)
+- `jongga/output/latest.json` · `jongga_data.js` (레거시 브리지)
+- `jongga/output/jongga_history.js`
+
+## GitHub Actions (평일 자동 스케줄)
+
+워크플로: [`.github/workflows/jongga-schedule.yml`](../../../.github/workflows/jongga-schedule.yml)
+
+| KST | UTC cron | 용도 |
+|-----|----------|------|
+| 14:50 | `50 5 * * 1-5` | 장마감 10분 전 1차 스냅샷 |
+| 15:00 | `0 6 * * 1-5` | 동시호가 직전 2차 |
+| 15:10 | `10 6 * * 1-5` | 마감·동시호가 반영 3차 |
+
+- 성공 시 `jongga/output/` 변경분을 커밋·푸시 → GitHub Pages에 반영됩니다.
+- **스케줄은 수 분 지연될 수 있습니다.** 15:00 정각 판단은 Actions만 믿지 말고, Pages에서 **「일괄 분석」** 또는 로컬 BAT를 병행하세요.
+- 공휴일(휴장)에도 월~금 cron은 동작합니다. 휴장일 스킵은 추후 거래일 캘린더로 확장 가능합니다.
+- 수동 실행: 저장소 **Actions** → **jongga-schedule** → **Run workflow** (`pre_close` / `at_close` / `post_close`).
+
+## 실행 예시 (개별 명령)
 
 ```powershell
 python -m unittest discover -s tools/stock-analyze/jongga/tests -p "test_*.py"
 ```
 
-공개 데이터로 앱이 읽는 JSON 생성:
+공개 데이터만 직접 생성할 때:
 
 ```powershell
 Set-Location "tools/stock-analyze"
-python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js"
+python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js" --out "jongga\output\latest.json" --bridge-js "jongga\output\jongga_data.js"
 ```
 
 - 공개 소스: 네이버 모바일 API, 네이버 차트, Yahoo chart API, CNBC quote page

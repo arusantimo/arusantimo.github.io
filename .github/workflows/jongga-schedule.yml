@@ -1,0 +1,98 @@
+# 종가베팅 jongga 데이터 — 평일 KST 14:50 / 15:00 / 15:10 자동 생성 후 Pages 배포용 커밋
+name: jongga-schedule
+
+on:
+  schedule:
+    # UTC = KST - 9h (한국은 서머타임 없음)
+    - cron: "50 5 * * 1-5" # KST 14:50 월~금
+    - cron: "0 6 * * 1-5"  # KST 15:00 월~금
+    - cron: "10 6 * * 1-5" # KST 15:10 월~금
+  workflow_dispatch:
+    inputs:
+      run_slot:
+        description: "실행 슬롯 (비우면 manual)"
+        required: false
+        default: manual
+        type: choice
+        options:
+          - manual
+          - pre_close
+          - at_close
+          - post_close
+
+concurrency:
+  group: jongga-schedule-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate-jongga:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Resolve run label (KST)
+        id: meta
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          INPUT_SLOT: ${{ github.event.inputs.run_slot }}
+        run: |
+          set -euo pipefail
+          label="수동 실행"
+          case "${SCHEDULE}" in
+            "50 5 * * 1-5") label="14:50 KST (장마감 10분 전)" ;;
+            "0 6 * * 1-5")  label="15:00 KST (동시호가 직전)" ;;
+            "10 6 * * 1-5") label="15:10 KST (마감·동시호가 반영)" ;;
+          esac
+          if [ "${INPUT_SLOT}" != "" ] && [ "${INPUT_SLOT}" != "manual" ]; then
+            case "${INPUT_SLOT}" in
+              pre_close)  label="14:50 KST (장마감 10분 전) [manual]" ;;
+              at_close)   label="15:00 KST (동시호가 직전) [manual]" ;;
+              post_close) label="15:10 KST (마감·동시호가 반영) [manual]" ;;
+            esac
+          fi
+          echo "label=${label}" >> "${GITHUB_OUTPUT}"
+          echo "Run slot: ${label}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tools/stock-analyze/requirements-ci.txt
+
+      - name: Install dependencies
+        working-directory: tools/stock-analyze
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-ci.txt
+          playwright install chromium --with-deps
+
+      - name: Run jongga pipeline
+        working-directory: tools/stock-analyze
+        env:
+          PYTHONUTF8: "1"
+          PYTHONIOENCODING: utf-8
+          FORCE_COLOR: "1"
+        run: python run_jongga_pipeline.py
+
+      - name: Commit and push jongga outputs
+        env:
+          RUN_LABEL: ${{ steps.meta.outputs.label }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/stock-analyze/jongga/output/
+          if git diff --staged --quiet; then
+            echo "No jongga output changes — skip commit"
+            exit 0
+          fi
+          git commit -m "chore(jongga): ${RUN_LABEL} 자동 갱신" -m "GitHub Actions jongga-schedule 워크플로가 종가베팅 추천 JSON/JS를 갱신했습니다."
+          git push

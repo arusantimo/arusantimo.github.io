@@ -1,34 +1,55 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 
 chcp 65001 >nul
 set "PYTHONUTF8=1"
 set "PYTHONIOENCODING=utf-8"
+set "FORCE_COLOR=1"
 
+set "SCRIPT_DIR=%~dp0"
 set "PAUSE_AT_END=1"
-if /i "%~1"=="--no-pause" set "PAUSE_AT_END="
+set "FORWARD_ARGS="
 
-pushd "%~dp0"
-
-python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js"
-set "EXITCODE=%ERRORLEVEL%"
-
-if not "%EXITCODE%"=="0" (
-  echo.
-  echo Failed to generate jongga output. Exit code: %EXITCODE%
-  popd
-  if defined PAUSE_AT_END pause
-  exit /b %EXITCODE%
+:parse_args
+if "%~1"=="" goto after_parse
+if /i "%~1"=="--no-pause" (
+  set "PAUSE_AT_END="
+  shift
+  goto parse_args
 )
+call set "FORWARD_ARGS=%%FORWARD_ARGS%% %1"
+shift
+goto parse_args
+
+:after_parse
+pushd "%SCRIPT_DIR%"
 
 echo.
-echo Generated files:
-echo   jongga\output\latest_YYYYMMDD.json
-echo   jongga\output\jongga_data_YYYYMMDD.js
-echo   jongga\output\latest_YYYYMMDD_canary.json
-echo   jongga\output\jongga_data_YYYYMMDD_canary.js
-echo   jongga\output\jongga_history.js
+echo  ============================================================
+echo    종가베팅 추천 데이터 파이프라인 (stock-analyze)
+echo    %DATE% %TIME%
+echo  ============================================================
+echo.
+echo  [1] 환경 점검
+echo  [2] jongga.generate_latest (stable + canary + 레거시 브리지)
+echo  [3] 산출물 검증
+echo  (단위 테스트: --with-tests)
+echo.
+
+python "%SCRIPT_DIR%run_jongga_pipeline.py"%FORWARD_ARGS%
+set "EXITCODE=%ERRORLEVEL%"
+
+echo.
+if "%EXITCODE%"=="0" (
+  echo  [BAT] 종료 코드: 0 ^(SUCCESS^)
+  echo  [BAT] 대시보드: index.html
+  echo  [BAT] 오늘 데이터: jongga\output\jongga_data_YYYYMMDD.js
+) else (
+  echo  [BAT] 종료 코드: %EXITCODE% ^(FAILED^)
+  echo  [BAT] 위 로그에서 FAIL / 누락 파일을 확인하세요.
+)
+echo.
 
 popd
 if defined PAUSE_AT_END pause
-exit /b 0
+exit /b %EXITCODE%
