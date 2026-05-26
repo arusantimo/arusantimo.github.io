@@ -4,7 +4,8 @@ from contextlib import redirect_stdout
 from datetime import date
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, grade_from_score, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
 from pathlib import Path
@@ -489,7 +490,67 @@ class GenerateLatestTest(unittest.TestCase):
 
         c3_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C3")
         self.assertEqual(c3_rule["note"], "동종업종 비교 데이터 부족")
+        self.assertEqual(c3_rule["evalStatus"], "data_missing")
         self.assertIn("동종업종 비교 데이터 부족", entry["notes"])
+
+    def test_build_pullback_entry_p1_not_met_vs_data_missing(self):
+        snapshot = StockSnapshot(
+            rank=2,
+            code="000660",
+            name="SK하이닉스",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9900.0,
+            high_price=10100.0,
+            low_price=9700.0,
+            volume=150.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=10.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0] + [9800.0 - i * 10 for i in range(24)],
+            high_history=[10100.0] + [10050.0 - i * 5 for i in range(24)],
+            low_history=[9700.0] * 25,
+            volume_history=[150.0] * 25,
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=10100.0,
+            low_5d=9700.0,
+            high_52w=12000.0,
+            return_5d=6.0,
+            return_20d=12.0,
+            return_21d=12.5,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.2,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+        )
+        context = {
+            "regimeLabel": "박스권 ⚠️",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+        p1_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "P1")
+        self.assertEqual(p1_rule["evalStatus"], "not_met")
+        self.assertIn("20일 고점 대비", p1_rule["note"])
+        self.assertIn("필요 -7%~-15%", p1_rule["note"])
 
     def test_build_momentum_entry_marks_s2_and_c3_from_browser_metrics(self):
         snapshot = StockSnapshot(
@@ -550,6 +611,8 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIn("C3", matched_codes)
         s2_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "S2")
         c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
+        self.assertEqual(s2_rule["evalStatus"], "met")
+        self.assertEqual(c3_rule["evalStatus"], "met")
         self.assertIn("114.0%", s2_rule["note"])
         self.assertIn("1.34", c3_rule["note"])
 
@@ -609,8 +672,10 @@ class GenerateLatestTest(unittest.TestCase):
 
         s2_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "S2")
         c3_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C3")
-        self.assertIn("100% 유지 비율 데이터 부족", s2_rule["note"])
-        self.assertEqual(c3_rule["note"], "호가잔량 데이터 부족")
+        self.assertEqual(s2_rule["evalStatus"], "manual_required")
+        self.assertEqual(c3_rule["evalStatus"], "manual_required")
+        self.assertIn("미입력", s2_rule["note"])
+        self.assertIn("미입력", c3_rule["note"])
 
     def test_build_reversal_entry_marks_c2_and_c3_from_browser_and_intraday_data(self):
         snapshot = StockSnapshot(
@@ -731,8 +796,12 @@ class GenerateLatestTest(unittest.TestCase):
         s2_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "S2")
         c2_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C2")
         c3_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "C3")
-        self.assertIn("마지막 1시간 평균 데이터 부족", s2_rule["note"])
+        self.assertEqual(s2_rule["evalStatus"], "manual_required")
+        self.assertIn("마지막 1시간", s2_rule["note"])
+        self.assertIn("미입력", s2_rule["note"])
+        self.assertEqual(c2_rule["evalStatus"], "not_met")
         self.assertIn("0.92", c2_rule["note"])
+        self.assertEqual(c3_rule["evalStatus"], "not_met")
         self.assertIn("미달", c3_rule["note"])
 
     def _sample_payload(self):

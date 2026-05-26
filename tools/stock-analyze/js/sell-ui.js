@@ -148,10 +148,9 @@ function renderSellUniverseControls() {
   `;
 }
 
-function getSellEmptyMessage(mode, type) {
+function getSellEmptyMessage(mode) {
   if (mode === 'actual') {
-    if (type === 'swing') return '스윙 보유 종목이 없습니다.';
-    return '실매수 추적 종목이 없습니다. 매수 후보 카드에서 매도 추적을 켜주세요.';
+    return '매도 추적을 켠 종목이 없습니다. 매수 후보 카드에서 매도 추적을 켜주세요.';
   }
   return '종목 데이터가 없습니다.';
 }
@@ -175,7 +174,7 @@ renderSellStockCards = function renderSellStockCardsOverride() {
     if (!container) return;
     container.innerHTML = '';
     if (!arr.length) {
-      container.innerHTML = `<div class="empty-state">${escapeHtml(getSellEmptyMessage(mode, type))}</div>`;
+      container.innerHTML = `<div class="empty-state">${escapeHtml(getSellEmptyMessage(mode))}</div>`;
       return;
     }
 
@@ -808,15 +807,17 @@ updateAnalyzeButtonState = function updateAnalyzeButtonStateOverride() {
 
 updateCurrentTime = function updateCurrentTimeOverride() {
   const now = new Date();
+  syncScheduledAnalyzerTab(now);
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
   const ss = now.getSeconds().toString().padStart(2, '0');
   const label = '통합 매도 분석 로직';
+  const scheduleHint = getAnalyzerTabScheduleHint(now);
   const el = document.getElementById('current-time-display');
   if (el) {
     el.innerHTML = activeTab === 'sell'
-      ? `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; 적용 로직: <strong style="color:var(--text-success)">${label}</strong>`
-      : '🧭 매수 탭에서는 상단 분석 시작 버튼으로 네이버 컨센서스를 일괄 최신화할 수 있습니다.';
+      ? `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; ${scheduleHint} &nbsp;|&nbsp; 적용 로직: <strong style="color:var(--text-success)">${label}</strong>`
+      : `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; ${scheduleHint} &nbsp;|&nbsp; 매수 탭에서는 상단 분석 시작 버튼으로 네이버 컨센서스를 일괄 최신화할 수 있습니다.`;
   }
 
   const analyzeBtn = document.getElementById('btn-analyze');

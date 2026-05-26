@@ -1,7 +1,8 @@
-window.JONGGA_DATA = {
+window.JONGGA_CANARY_DAILY_DATA = window.JONGGA_CANARY_DAILY_DATA || {};
+window.JONGGA_CANARY_DAILY_DATA["2026-05-27"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-05-26T15:07:57+00:00",
-  "variant": "stable",
+  "generatedAt": "2026-05-26T15:08:22+00:00",
+  "variant": "canary",
   "dataQuality": {
     "status": "partial",
     "counts": {
@@ -56,7 +57,7 @@ window.JONGGA_DATA = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1447.4,
+        "durationMs": 1642.3,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -64,7 +65,7 @@ window.JONGGA_DATA = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 1410.3,
+        "durationMs": 4638.0,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -79,28 +80,28 @@ window.JONGGA_DATA = {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 77.2,
+        "durationMs": 87.7,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 3.5,
+        "durationMs": 1.7,
         "detail": "강세장 ✅ (펀더·지수 정당)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 3605.6,
+        "durationMs": 3641.3,
         "count": 20
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 1511.0,
+        "durationMs": 1509.2,
         "detail": "성공 20 / 실패 0",
         "count": 20
       },
@@ -108,7 +109,7 @@ window.JONGGA_DATA = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 472.3,
+        "durationMs": 470.9,
         "detail": "direct-http · 체결강도 20 / 호가 19 / 틱프록시 20",
         "count": 20
       },
@@ -116,29 +117,29 @@ window.JONGGA_DATA = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 2.6,
+        "durationMs": 2.5,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       },
       {
         "step": "browser_enrichment",
-        "label": "KIND 브라우저 보강",
+        "label": "카나리 KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 15513.8,
-        "detail": "playwright-chromium · KIND 3",
+        "durationMs": 13245.8,
+        "detail": "chrome:chrome.exe · KIND 3",
         "count": 3
       }
     ],
-    "note": "현재 버전 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 현재 버전은 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 표시 종목만 Playwright로 보강합니다.",
-    "channel": "stable",
-    "channelLabel": "현재 버전",
-    "browserSource": "playwright-chromium",
+    "note": "카나리 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 카나리는 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 Chrome 실행 파일을 우선 시도해 표시 종목만 브라우저 보강합니다.",
+    "channel": "canary",
+    "channelLabel": "카나리",
+    "browserSource": "chrome:chrome.exe",
     "browserLaunchNotes": []
   },
   "slots": [
     {
       "slotId": "slotA",
-      "sourceId": "live-public-run-stable",
+      "sourceId": "live-public-run-canary",
       "regime": {
         "table": [
           {
@@ -247,7 +248,7 @@ window.JONGGA_DATA = {
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "+2.28%",
+            "actualValue": "+2.31%",
             "baseScore": "+2점",
             "weight": "×2.5",
             "formula": "+2 × 2.5 = +5.0점",
@@ -271,7 +272,7 @@ window.JONGGA_DATA = {
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "-3.10원",
+            "actualValue": "-3.18원",
             "baseScore": "+0점",
             "weight": "×1.5",
             "formula": "+0 × 1.5 = +0.0점",
@@ -279,7 +280,7 @@ window.JONGGA_DATA = {
           },
           {
             "indicator": "SOX 전일 변화율",
-            "actualValue": "+12.84%",
+            "actualValue": "+12.90%",
             "baseScore": "+2점",
             "weight": "×1.0",
             "formula": "+2 × 1.0 = +2.0점",

@@ -25,6 +25,23 @@ test('recalculateTrendStatusLabel respects effective bull regime', () => {
   assert.equal(label, '매수추천');
 });
 
+test('buildPullbackG5Gate warns for vkospi 68 when macro friendly', () => {
+  const ctx = loadBridgeContext();
+  const gate = ctx.buildPullbackG5Gate({
+    kospiClose: 8100,
+    kospiMa5: 7600,
+    vkospiValue: 68,
+    vkospiLabel: 'VKOSPI',
+    riseJustifiedByMacro: true,
+    effectiveRegimeLabel: '강세장 ✅ (펀더·지수 정당)'
+  });
+  assert.equal(gate.status, '⚠️');
+  const label = ctx.recalculateTrendStatusLabel('A', '강세장 ✅ (펀더·지수 정당)', 'G-A', [gate], {
+    riseJustifiedByMacro: true
+  });
+  assert.equal(label, '매수추천');
+});
+
 test('isRiseJustifiedByMacro rejects critical bubble', () => {
   const ctx = loadBridgeContext();
   const snapshot = {

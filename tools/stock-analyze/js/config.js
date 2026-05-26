@@ -10,6 +10,13 @@ const SELL_TRACKING_STATE_KEY = 'stockAnalyzeSellTrackingStateV1';
 const SAVED_NOTION_URLS_KEY = 'stockAnalyzeSavedNotionUrlsV2';
 const LEGACY_SAVED_NOTION_URL_KEY = 'savedNotionUrl';
 
+// Keep in sync with jongga/grade_policy.py
+const BUY_GRADE_MIN_SCORES = {
+  pullback: { S: 8.5, A: 7.0, B: 5.5 },
+  momentum: { S: 8.5, A: 7.0, B: 5.5 },
+  reversal: { S: 8.0, A: 6.5, B: 5.0 }
+};
+
 const RULE_GUIDE = {
   regimes: [
     {
@@ -38,16 +45,16 @@ const RULE_GUIDE = {
     }
   ],
   trendGrades: [
-    { grade: 'S', score: '9.0 ~ 10점', meaning: '레짐 무관 진입 가능' },
-    { grade: 'A', score: '7.5 ~ 8.9점', meaning: '강세장·순환매장·박스권 진입 가능' },
-    { grade: 'B', score: '6.0 ~ 7.4점', meaning: '매매 단계 노출, 진입 보류, 익일 재평가' },
-    { grade: 'C', score: '6.0점 미만', meaning: '출력 목록에서 제외' }
+    { grade: 'S', score: '8.5 ~ 10점', meaning: '레짐 무관 진입 가능' },
+    { grade: 'A', score: '7.0 ~ 8.4점', meaning: '강세장·순환매장·박스권 진입 가능' },
+    { grade: 'B', score: '5.5 ~ 6.9점', meaning: '매매 단계 노출, 진입 보류, 익일 재평가' },
+    { grade: 'C', score: '5.5점 미만', meaning: '출력 목록에서 제외' }
   ],
   reversalGrades: [
-    { grade: 'S', score: '8.5 ~ 10점', meaning: '최우선 진입' },
-    { grade: 'A', score: '7.0 ~ 8.4점', meaning: '진입 가능' },
-    { grade: 'B', score: '5.5 ~ 6.9점', meaning: '익일 재평가 (당일 진입 금지)' },
-    { grade: 'C', score: '5.5점 미만', meaning: '출력 제외' }
+    { grade: 'S', score: '8.0 ~ 10점', meaning: '최우선 진입' },
+    { grade: 'A', score: '6.5 ~ 7.9점', meaning: '진입 가능' },
+    { grade: 'B', score: '5.0 ~ 6.4점', meaning: '익일 재평가 (당일 진입 금지)' },
+    { grade: 'C', score: '5.0점 미만', meaning: '출력 제외' }
   ],
   permissions: [
     { regime: '강세장', s: '✅ 100% 진입', a: '✅ 100% 진입', b: '👀 모니터링' },
@@ -93,7 +100,7 @@ const RULE_GUIDE = {
         { code: 'G2', condition: '종가 > 60일선', source: '네이버 증권 일봉 차트' },
         { code: 'G3', condition: '주봉 RSI(14) ≥ 50', source: '네이버 증권 주봉 차트' },
         { code: 'G4', condition: '일봉 MACD 히스토그램이 음전환 후 3일 이내 OR 0선 위 회복 시도 중', source: '네이버 증권 일봉 차트' },
-        { code: 'G5', condition: 'KOSPI 5일선 위 + VKOSPI 수준 확인 → 점수 보정 적용', source: '네이버 증권 시장지표' }
+        { code: 'G5', condition: 'KOSPI 5일선 위 + VKOSPI (≤30 ✅ / 거시·강세·순환 시 30~70 ⚠️ / 70 초과 ⛔)', source: '네이버 증권 시장지표' }
       ],
       scores: [
         { code: 'S1', condition: '최근 2주 내 거래대금 30위권 진입 이력 3회 이상', source: '네이버 증권' },

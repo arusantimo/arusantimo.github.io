@@ -13,18 +13,6 @@ function loadBuyLiveContext() {
     formatWon: value => `${Math.round(Number(value) || 0).toLocaleString()}원`,
     formatSignedPercent: value => `${value >= 0 ? '+' : ''}${Number(value).toFixed(1)}%`,
     formatCompactDate: value => String(value ?? ''),
-    getBuyGradeFromScore(score, strategy = 'pullback') {
-      if (strategy === 'reversal') {
-        if (score >= 8.5) return 'S';
-        if (score >= 7.0) return 'A';
-        if (score >= 5.5) return 'B';
-        return 'C';
-      }
-      if (score >= 9) return 'S';
-      if (score >= 7.5) return 'A';
-      if (score >= 6) return 'B';
-      return 'C';
-    },
     getBuyVerdictClassFromGrade(grade) {
       if (String(grade ?? '').startsWith('S')) return 'strong';
       if (String(grade ?? '').startsWith('A')) return 'good';
@@ -33,6 +21,16 @@ function loadBuyLiveContext() {
     }
   };
   vm.createContext(context);
+  vm.runInContext(fs.readFileSync(new URL('./config.js', import.meta.url), 'utf8'), context);
+  vm.runInContext(`
+    function getBuyGradeFromScore(score, strategy = 'pullback') {
+      const thresholds = BUY_GRADE_MIN_SCORES[strategy] || BUY_GRADE_MIN_SCORES.pullback;
+      if (score >= thresholds.S) return 'S';
+      if (score >= thresholds.A) return 'A';
+      if (score >= thresholds.B) return 'B';
+      return 'C';
+    }
+  `, context);
   vm.runInContext(wyckoffCode, context);
   vm.runInContext(code, context);
   return context;

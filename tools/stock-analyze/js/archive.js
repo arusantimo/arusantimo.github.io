@@ -28,7 +28,9 @@ function normalizeArchiveEntryKey(entry, slotId) {
   if (!entry || typeof entry !== 'object') return entry;
   const next = { ...entry };
   next.slotId = normalizeSlotId(next.slotId || slotId);
-  next.entryKey = next.entryKey || buildEntryKey(next.slotId, next.code);
+  if (!next.entryKey) {
+    next.entryKey = buildEntryKey(next.slotId, next.code, next.strategy || next.type);
+  }
   return next;
 }
 
@@ -36,10 +38,17 @@ function normalizeSellArchiveDetail(detail, slotId) {
   if (!detail || typeof detail !== 'object') return detail;
   const normalizedSlotId = normalizeSlotId(detail.slotId || detail.stock?.slotId || slotId);
   const nextStock = ensureStockIdentity({ ...(detail.stock || {}) }, normalizedSlotId);
+  const strategy = normalizeEntryStrategyKey(nextStock.strategy || nextStock.type);
+  let entryKey = detail.entryKey || nextStock.entryKey;
+  const parsed = parseEntryKey(entryKey, normalizedSlotId);
+  if (strategy && parsed.code && !parsed.strategy) {
+    entryKey = buildEntryKey(normalizedSlotId, parsed.code, strategy);
+  }
+  nextStock.entryKey = entryKey;
   return {
     ...detail,
     slotId: normalizedSlotId,
-    entryKey: detail.entryKey || nextStock.entryKey || buildEntryKey(normalizedSlotId, detail.code || nextStock.code),
+    entryKey,
     stock: nextStock
   };
 }
@@ -317,12 +326,24 @@ function restoreBuyAnalysisArchive(archive) {
     const archiveItem = archive?.buy?.bySlot?.[slotId];
     if (!archiveItem?.entries?.length) return;
 
-    const entryMap = new Map(
-      archiveItem.entries.map(entry => [entry.entryKey || buildEntryKey(slotId, entry.code), entry.liveRefresh])
-    );
+    const entryMap = new Map();
+    archiveItem.entries.forEach(entry => {
+      const normalized = normalizeArchiveEntryKey(entry, slotId);
+      const refresh = normalized.liveRefresh;
+      if (!refresh) return;
+      entryMap.set(normalized.entryKey, refresh);
+      const parsed = parseEntryKey(normalized.entryKey, slotId);
+      if (parsed.code) {
+        entryMap.set(buildEntryKey(slotId, parsed.code), refresh);
+        entryMap.set(parsed.code, refresh);
+      }
+    });
 
     getVisibleBuyEntries(slotId).forEach(entry => {
-      const liveRefresh = entryMap.get(entry.entryKey) || entryMap.get(buildEntryKey(slotId, entry.code)) || entryMap.get(entry.code);
+      const liveRefresh = entryMap.get(entry.entryKey)
+        || entryMap.get(buildEntryKey(slotId, entry.code, entry.strategy || entry.type))
+        || entryMap.get(buildEntryKey(slotId, entry.code))
+        || entryMap.get(entry.code);
       if (!liveRefresh) return;
       entry.liveRefresh = normalizeBuyLiveRefresh(entry, liveRefresh) || liveRefresh;
       restored += 1;

@@ -169,6 +169,7 @@ test('sell tracking legacy scope는 slotA page scope로 승격되고 slot별로 
   context.rebuildSellStocksFromSnapshots();
 
   assert.equal(context.isBuyEntryTrackedForSell('slotA:005930', 'slotA'), true);
+  assert.equal(context.isBuyEntryTrackedForSell('slotA:pullback:005930', 'slotA'), true);
   assert.equal(context.isBuyEntryTrackedForSell('slotB:005930', 'slotB'), false);
   assert.equal(context.getVisibleSellStocksList('slotA', 'actual').length, 1);
   assert.equal(context.getVisibleSellStocksList('slotB', 'actual').length, 0);
@@ -176,6 +177,119 @@ test('sell tracking legacy scope는 slotA page scope로 승격되고 slot별로 
   const migratedStore = JSON.parse(context.localStorage.getItem(context.SELL_TRACKING_STATE_KEY));
   assert.ok(migratedStore['slotA:page-a']);
   assert.equal(migratedStore['page-a'], undefined);
+});
+
+test('실매수 모드는 매도 추적을 켠 종목만 표시한다', () => {
+  const context = loadSlotContext();
+  const snapshot = buildSnapshot('삼성전자');
+  snapshot.pullbackEntries[0].grade = 'S';
+  snapshot.swingEntries = [{
+    rank: 1,
+    name: '스윙종목',
+    code: '000660',
+    strategy: 'swing',
+    type: 'swing'
+  }];
+
+  context.setNotionPageState('slotA', {
+    notionPageId: 'page-a',
+    snapshot
+  });
+  context.rebuildSellStocksFromSnapshots();
+
+  assert.equal(context.getVisibleSellStocksList('slotA', 'actual').length, 0);
+  assert.equal(context.getVisibleSellStocksList('slotA', 'all').length, 2);
+
+  context.setBuyEntryTrackedForSell('slotA:pullback:005930', true, 'slotA');
+  const actual = context.getVisibleSellStocksList('slotA', 'actual');
+  assert.equal(actual.length, 1);
+  assert.equal(actual[0].code, '005930');
+  assert.equal(actual[0].strategy, 'pullback');
+});
+
+test('레거시 추적 키(slot:code) 해제 시 전략 카드에서도 추적이 꺼진다', () => {
+  const context = loadSlotContext({
+    stockAnalyzeSellTrackingStateV1: JSON.stringify({
+      'slotA:page-a': {
+        universeMode: 'actual',
+        trackedEntryKeys: ['slotA:005930']
+      }
+    })
+  });
+
+  context.setNotionPageState('slotA', {
+    notionPageId: 'page-a',
+    snapshot: buildSnapshot('삼성전자')
+  });
+  context.rebuildSellStocksFromSnapshots();
+  context.activeSellSlot = 'slotA';
+
+  assert.equal(context.isBuyEntryTrackedForSell('slotA:pullback:005930', 'slotA'), true);
+  context.setBuyEntryTrackedForSell('slotA:pullback:005930', false, 'slotA');
+  assert.equal(context.isBuyEntryTrackedForSell('slotA:pullback:005930', 'slotA'), false);
+  assert.equal(context.getVisibleSellStocksList('slotA', 'actual').length, 0);
+});
+
+test('같은 종목코드도 전략별로 매도 추적을 따로 등록한다', () => {
+  const context = loadSlotContext();
+  const snapshot = buildSnapshot('삼성전자');
+  snapshot.momentumEntries = [{
+    rank: 2,
+    name: '삼성전자',
+    code: '005930',
+    strategy: 'momentum',
+    type: 'momentum',
+    gates: [],
+    matchedRules: [],
+    unmatchedRules: [],
+    notes: [],
+    tradePlanRows: []
+  }];
+
+  context.setNotionPageState('slotA', { notionPageId: 'page-a', snapshot });
+  context.rebuildSellStocksFromSnapshots();
+  context.activeSellSlot = 'slotA';
+  context.setSellUniverseMode('actual', 'slotA');
+
+  context.setBuyEntryTrackedForSell('slotA:pullback:005930', true, 'slotA');
+  assert.equal(context.isBuyEntryTrackedForSell('slotA:pullback:005930', 'slotA'), true);
+  assert.equal(context.isBuyEntryTrackedForSell('slotA:momentum:005930', 'slotA'), false);
+  assert.equal(context.getVisibleSellStocksList('slotA', 'actual').length, 1);
+
+  context.setBuyEntryTrackedForSell('slotA:momentum:005930', true, 'slotA');
+  assert.equal(context.getVisibleSellStocksList('slotA', 'actual').length, 2);
+});
+
+test('통합 분석 대상은 현재 매도 화면(슬롯·universe)과 동일하다', () => {
+  const context = loadSlotContext();
+  const snapshot = buildSnapshot('삼성전자');
+  snapshot.momentumEntries = [{
+    rank: 2,
+    name: 'SK하이닉스',
+    code: '000660',
+    strategy: 'momentum',
+    type: 'momentum',
+    gates: [],
+    matchedRules: [],
+    unmatchedRules: [],
+    notes: [],
+    tradePlanRows: []
+  }];
+
+  context.setNotionPageState('slotA', { notionPageId: 'page-a', snapshot });
+  context.rebuildSellStocksFromSnapshots();
+  context.activeSellSlot = 'slotA';
+  context.setSellUniverseMode('actual', 'slotA');
+
+  assert.equal(context.getSellStocksForCurrentSellView(false, 'slotA').length, 0);
+  assert.equal(context.getAllSellStocksForAnalysis(false).length, 0);
+
+  context.setBuyEntryTrackedForSell('slotA:pullback:005930', true, 'slotA');
+  assert.equal(context.getSellStocksForCurrentSellView(false, 'slotA').length, 1);
+
+  context.setSellUniverseMode('all', 'slotA');
+  assert.equal(context.getSellStocksForCurrentSellView(false, 'slotA').length, 2);
+  assert.equal(context.getAllSellStocksForAnalysis(false).length, 2);
 });
 
 test('legacy archive shape는 buy/sell slotA 구조로 복원된다', () => {

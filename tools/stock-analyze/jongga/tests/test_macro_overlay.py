@@ -8,6 +8,7 @@ from jongga.macro_overlay import (
     REGIME_ROTATION_BUFFERED,
     REGIME_STRONG_BULL,
     apply_regime_fields_to_context,
+    build_pullback_g5_gate,
     classify_kospi_bull_tier,
     compute_effective_regime_label,
     is_rise_justified_by_macro,
@@ -92,6 +93,47 @@ class MacroOverlayTest(unittest.TestCase):
     def test_trend_status_label_softens_pure_bear(self):
         label = trend_status_label("A", "약세장 ⛔", "G-A", [], rise_justified=False, technical_regime="약세장 ⛔")
         self.assertEqual(label, "관심후보(약세·소액)")
+
+    def test_pullback_g5_warns_when_macro_friendly_and_vkospi_elevated(self):
+        gate = build_pullback_g5_gate(
+            {
+                "kospiClose": 8100.0,
+                "kospiMa5": 7600.0,
+                "vkospiValue": 68.0,
+                "vkospiLabel": "VKOSPI",
+                "riseJustifiedByMacro": True,
+                "regimeLabel": REGIME_STRONG_BULL,
+            }
+        )
+        self.assertEqual(gate["status"], "⚠️")
+        label = trend_status_label("A", REGIME_STRONG_BULL, "G-A", [gate], rise_justified=True)
+        self.assertEqual(label, "매수추천")
+
+    def test_pullback_g5_blocks_above_30_without_macro(self):
+        gate = build_pullback_g5_gate(
+            {
+                "kospiClose": 8100.0,
+                "kospiMa5": 7600.0,
+                "vkospiValue": 68.0,
+                "vkospiLabel": "VKOSPI",
+                "riseJustifiedByMacro": False,
+                "regimeLabel": "박스권 ⚠️",
+            }
+        )
+        self.assertEqual(gate["status"], "⛔")
+
+    def test_pullback_g5_blocks_above_macro_cap_even_when_friendly(self):
+        gate = build_pullback_g5_gate(
+            {
+                "kospiClose": 8100.0,
+                "kospiMa5": 7600.0,
+                "vkospiValue": 75.0,
+                "vkospiLabel": "VKOSPI",
+                "riseJustifiedByMacro": True,
+                "regimeLabel": REGIME_STRONG_BULL,
+            }
+        )
+        self.assertEqual(gate["status"], "⛔")
 
 
 if __name__ == "__main__":

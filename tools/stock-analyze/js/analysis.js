@@ -58,7 +58,21 @@ function getEntryByCode(codeOrEntryKey, slotId = null) {
   const entries = slotId || String(codeOrEntryKey ?? '').includes(':')
     ? getVisibleBuyEntries(parsed.slotId)
     : getAllBuyEntries();
-  return entries.find(entry => entry.entryKey === parsed.entryKey || entry.code === parsed.code) || null;
+  const exact = entries.find(entry => entry.entryKey === parsed.entryKey);
+  if (exact) return exact;
+  if (parsed.strategy) {
+    return entries.find(entry => (
+      entry.code === parsed.code
+      && normalizeEntryStrategyKey(entry.strategy || entry.type) === parsed.strategy
+    )) || null;
+  }
+  if (parsed.code && String(codeOrEntryKey ?? '').includes(':')) {
+    const parts = String(codeOrEntryKey).split(':');
+    if (parts.length === 2) {
+      return entries.find(entry => entry.code === parsed.code) || null;
+    }
+  }
+  return entries.find(entry => entry.code === parsed.code) || null;
 }
 
 function summarizeGateStatus(entry) {
@@ -70,16 +84,10 @@ function summarizeGateStatus(entry) {
 }
 
 function getBuyGradeFromScore(score, strategy = 'pullback') {
-  if (strategy === 'reversal') {
-    if (score >= 8.5) return 'S';
-    if (score >= 7.0) return 'A';
-    if (score >= 5.5) return 'B';
-    return 'C';
-  }
-
-  if (score >= 9) return 'S';
-  if (score >= 7.5) return 'A';
-  if (score >= 6) return 'B';
+  const thresholds = BUY_GRADE_MIN_SCORES[strategy] || BUY_GRADE_MIN_SCORES.pullback;
+  if (score >= thresholds.S) return 'S';
+  if (score >= thresholds.A) return 'A';
+  if (score >= thresholds.B) return 'B';
   return 'C';
 }
 

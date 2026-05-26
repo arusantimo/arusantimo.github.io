@@ -48,10 +48,16 @@ function loadContext() {
     createEmptyLiveGapState() {
       return { status: 'idle', score: createEmptySnapshot().gapScore, fetchedAt: '', source: '', error: '' };
     },
-    getBuyGradeFromScore(score) {
-      if (score >= 9) return 'S';
-      if (score >= 7.5) return 'A';
-      if (score >= 6) return 'B';
+    getBuyGradeFromScore(score, strategy = 'pullback') {
+      const maps = {
+        pullback: { S: 8.5, A: 7.0, B: 5.5 },
+        momentum: { S: 8.5, A: 7.0, B: 5.5 },
+        reversal: { S: 8.0, A: 6.5, B: 5.0 }
+      };
+      const thresholds = maps[strategy] || maps.pullback;
+      if (score >= thresholds.S) return 'S';
+      if (score >= thresholds.A) return 'A';
+      if (score >= thresholds.B) return 'B';
       return 'C';
     },
     getBuyFinalStatusLabel(grade) {

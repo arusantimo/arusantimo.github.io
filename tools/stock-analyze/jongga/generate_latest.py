@@ -15,12 +15,57 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import (
     apply_regime_fields_to_context,
     build_macro_overlay_block,
     load_market_analyze_snapshot,
     reversal_status_label,
     trend_status_label,
+)
+from jongga.rule_evaluation import (
+    evaluate_momentum_c1,
+    evaluate_momentum_c2,
+    evaluate_momentum_c3,
+    evaluate_momentum_g1,
+    evaluate_momentum_g2,
+    evaluate_momentum_g3,
+    evaluate_momentum_p1,
+    evaluate_momentum_p2,
+    evaluate_momentum_s1,
+    evaluate_momentum_s2,
+    evaluate_pullback_c1,
+    evaluate_pullback_c2,
+    evaluate_pullback_c3,
+    evaluate_pullback_g0,
+    evaluate_pullback_g1,
+    evaluate_pullback_g2,
+    evaluate_pullback_g3,
+    evaluate_pullback_g4,
+    evaluate_pullback_g5,
+    evaluate_pullback_p1,
+    evaluate_pullback_p2,
+    evaluate_pullback_s1,
+    evaluate_pullback_s2,
+    evaluate_reversal_c1,
+    evaluate_reversal_c2,
+    evaluate_reversal_c3,
+    evaluate_reversal_f1,
+    evaluate_reversal_f2,
+    evaluate_reversal_f3,
+    evaluate_reversal_f4,
+    evaluate_reversal_g1,
+    evaluate_reversal_g2,
+    evaluate_reversal_g3,
+    evaluate_reversal_g4,
+    evaluate_reversal_g5,
+    evaluate_reversal_p1,
+    evaluate_reversal_p2,
+    evaluate_reversal_s1,
+    evaluate_reversal_s2,
+    drawdown_from_high_20d,
+    gate_dict,
+    split_rule_lists,
 )
 from jongga.output_contract import (
     VARIANT_CANARY,
@@ -1504,24 +1549,6 @@ def reversal_vkospi_multiplier(vkospi_proxy: float) -> float:
     return 0.9
 
 
-def grade_from_score(score: float, strategy: str) -> str:
-    if strategy == "reversal":
-        if score >= 8.5:
-            return "S"
-        if score >= 7.0:
-            return "A"
-        if score >= 5.5:
-            return "B"
-        return "C"
-    if score >= 9.0:
-        return "S"
-    if score >= 7.5:
-        return "A"
-    if score >= 6.0:
-        return "B"
-    return "C"
-
-
 def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> tuple[str, str, str, str, str]:
     closes = [parse_float(row.get("closePrice")) for row in kospi_history]
     current_close = closes[0] if closes else 0.0
@@ -1834,109 +1861,27 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
     }
 
 
-def evaluate_pullback_c3(snapshot: StockSnapshot, context: dict[str, Any]) -> tuple[float, str]:
-    industry_change_pct = snapshot.industry_compare_change_pct
-    kospi_change_pct = parse_float(context.get("kospiChangePct"))
-    if industry_change_pct is None:
-        return 0.0, "동종업종 비교 데이터 부족"
-    comparison_note = (
-        f"동종업종 평균 {signed_number(industry_change_pct, 2, '%')} / "
-        f"KOSPI {signed_number(kospi_change_pct, 2, '%')}"
-    )
-    if industry_change_pct > kospi_change_pct:
-        return 1.0, f"{comparison_note} outperform"
-    return 0.0, f"{comparison_note} underperform"
-
-
-def evaluate_momentum_s2(snapshot: StockSnapshot) -> tuple[float, str]:
-    toss = snapshot.toss or {}
-    avg_strength = parse_float(toss.get("avgStrength"))
-    intraday_ratio = parse_float(toss.get("intradayAbove100Ratio"))
-    has_avg_strength = avg_strength > 0
-    has_intraday_ratio = intraday_ratio > 0
-    if not has_avg_strength and not has_intraday_ratio:
-        return 0.0, "토스 체결강도 데이터 부족"
-    if not has_intraday_ratio:
-        return 0.0, f"당일 평균 체결강도 {avg_strength:.1f}% / 100% 유지 비율 데이터 부족"
-    if not has_avg_strength:
-        return 0.0, f"100% 유지 비율 {intraday_ratio:.1f}% / 당일 평균 체결강도 데이터 부족"
-    note = f"당일 평균 체결강도 {avg_strength:.1f}% / 100% 유지 비율 {intraday_ratio:.1f}%"
-    if avg_strength >= 110.0 and intraday_ratio >= 70.0:
-        return 1.0, f"{note} 충족"
-    return 0.0, f"{note} 미달"
-
-
-def evaluate_momentum_c3(snapshot: StockSnapshot) -> tuple[float, str]:
-    orderbook = snapshot.orderbook or {}
-    bid_ask_ratio = parse_float(orderbook.get("bidAskRatio"))
-    if bid_ask_ratio <= 0:
-        return 0.0, "호가잔량 데이터 부족"
-    note = f"매수/매도 호가잔량 비율 {bid_ask_ratio:.2f}"
-    if bid_ask_ratio >= 1.2:
-        return 1.0, f"{note} 충족"
-    return 0.0, f"{note} 미달"
-
-
-def evaluate_reversal_s2(snapshot: StockSnapshot) -> tuple[float, str]:
-    toss = snapshot.toss or {}
-    avg_strength = parse_float(toss.get("avgStrength"))
-    last_hour_strength = parse_float(toss.get("lastHourAvgStrength"))
-    has_avg_strength = avg_strength > 0
-    has_last_hour_strength = last_hour_strength > 0
-    if not has_avg_strength and not has_last_hour_strength:
-        return 0.0, "토스 체결강도 데이터 부족"
-    if not has_last_hour_strength:
-        return 0.0, f"당일 평균 체결강도 {avg_strength:.1f}% / 마지막 1시간 평균 데이터 부족"
-    if not has_avg_strength:
-        return 0.0, f"마지막 1시간 평균 {last_hour_strength:.1f}% / 당일 평균 체결강도 데이터 부족"
-    note = f"당일 평균 체결강도 {avg_strength:.1f}% / 마지막 1시간 평균 {last_hour_strength:.1f}%"
-    if avg_strength >= 90.0 and last_hour_strength >= 100.0:
-        return 1.0, f"{note} 충족"
-    return 0.0, f"{note} 미달"
-
-
-def evaluate_reversal_c2(snapshot: StockSnapshot) -> tuple[float, str]:
-    orderbook = snapshot.orderbook or {}
-    bid_ask_ratio = parse_float(orderbook.get("bidAskRatio"))
-    if bid_ask_ratio <= 0:
-        return 0.0, "호가잔량 데이터 부족"
-    note = f"매수/매도 호가잔량 비율 {bid_ask_ratio:.2f}"
-    if bid_ask_ratio >= 1.0:
-        return 1.0, f"{note} 충족"
-    return 0.0, f"{note} 미달"
-
-
-def evaluate_reversal_c3(snapshot: StockSnapshot) -> tuple[float, str]:
-    intraday_signal = snapshot.intraday_30m or {}
-    if not intraday_signal.get("available"):
-        return 0.0, normalize_text(intraday_signal.get("note")) or "30분봉 데이터 부족"
-    note = normalize_text(intraday_signal.get("note")) or "30분봉 안정화 신호"
-    if intraday_signal.get("signal"):
-        return 1.0, f"{note} 충족"
-    return 0.0, f"{note} 미달"
-
-
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
-    c3_score, c3_note = evaluate_pullback_c3(snapshot, context)
-    gates = [
-        build_top_trading_value_gate(snapshot.rank, "G0"),
-        {"code": "G1", **to_status(bool(snapshot.ma5 and snapshot.ma20 and snapshot.ma60 and snapshot.ma5 > snapshot.ma20 > snapshot.ma60 and snapshot.ma5_prev and snapshot.ma5 > snapshot.ma5_prev), "5MA>20MA>60MA")},
-        {"code": "G2", **to_status(bool(snapshot.ma60 and snapshot.current_price > snapshot.ma60), "종가 > 60MA")},
-        {"code": "G3", **(to_status(bool(snapshot.weekly_rsi and snapshot.weekly_rsi >= 50), f"주봉 RSI {snapshot.weekly_rsi:.1f}" if snapshot.weekly_rsi else "") if snapshot.weekly_rsi is not None else warning_status("주봉 RSI 계산 데이터 제한"))},
-        {"code": "G4", **to_status(bool((snapshot.macd_hist[:1] and snapshot.macd_hist[0] >= 0) or recent_negative_cross(snapshot.macd_hist)), "MACD 히스토그램")},
-        {"code": "G5", **to_status(bool(context["kospiClose"] > context["kospiMa5"] and context["vkospiValue"] <= 30), f"KOSPI>{context['kospiMa5']:.2f}, {context['vkospiLabel']} {context['vkospiValue']:.2f}")},
-    ]
-    score_items = {
-        "S1": 1.0 if snapshot.rank <= 10 else 0.0,
-        "S2": 1.0 if snapshot.foreign_net > 0 or snapshot.institution_net > 0 else 0.0,
-        "P1": 1.0 if snapshot.high_20d and -15 <= ((snapshot.current_price - snapshot.high_20d) / snapshot.high_20d) * 100 <= -7 else 0.0,
-        "P2": 1.0 if any(ma and snapshot.current_price > ma for ma in [snapshot.ma5, snapshot.ma10, snapshot.ma20]) else 0.0,
-        "C1": 1.0 if snapshot.current_price >= snapshot.open_price or lower_wick_ratio(snapshot) >= 1.0 else 0.0,
-        "C2": 1.0 if snapshot.volume_avg_5d and 1.0 <= snapshot.volume / snapshot.volume_avg_5d <= 1.8 else 0.0,
-        "C3": c3_score,
+    score_map = {
+        "S1": evaluate_pullback_s1(snapshot),
+        "S2": evaluate_pullback_s2(snapshot),
+        "P1": evaluate_pullback_p1(snapshot),
+        "P2": evaluate_pullback_p2(snapshot),
+        "C1": evaluate_pullback_c1(snapshot, lower_wick_ratio),
+        "C2": evaluate_pullback_c2(snapshot),
+        "C3": evaluate_pullback_c3(snapshot, context),
     }
-    rule_notes = {"C3": c3_note}
+    gates = [
+        gate_dict("G0", evaluate_pullback_g0(snapshot)),
+        gate_dict("G1", evaluate_pullback_g1(snapshot)),
+        gate_dict("G2", evaluate_pullback_g2(snapshot)),
+        gate_dict("G3", evaluate_pullback_g3(snapshot)),
+        gate_dict("G4", evaluate_pullback_g4(snapshot, recent_negative_cross)),
+        evaluate_pullback_g5(context),
+    ]
+    matched_rules, unmatched_rules = split_rule_lists(score_map)
+    score_items = {code: result.score for code, result in score_map.items()}
     raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "pullback")
@@ -1950,14 +1895,14 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "pullback",
         "gates": gates,
-        "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
-        "unmatchedRules": [{"code": code, "note": rule_notes.get(code, "미충족 또는 공개 데이터 부족")} for code, passed in score_items.items() if passed < 1.0],
+        "matchedRules": matched_rules,
+        "unmatchedRules": unmatched_rules,
         **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
         "keyPoint": f"5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
-        "notes": ["동종업종 비교 데이터 부족"] if snapshot.industry_compare_change_pct is None else [],
+        "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
@@ -1968,24 +1913,23 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
 
 def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_top10: bool, kospi_return_5d: float, kospi_return_20d: float) -> dict[str, Any]:
     manual_input = build_manual_input_meta("momentum", snapshot)
-    s2_score, s2_note = evaluate_momentum_s2(snapshot)
-    c3_score, c3_note = evaluate_momentum_c3(snapshot)
-    gates = [
-        {"code": "G1", **to_status(rs_top10, "3개월 상대강도 상위 10%")},
-        {"code": "G2", **to_status(snapshot.return_5d - kospi_return_5d > 0 and snapshot.return_20d - kospi_return_20d > 0, "5일·20일 초과수익률")},
-        {"code": "G3", **to_status(bool(snapshot.high_52w and snapshot.current_price >= snapshot.high_52w * 0.92), f"52주 고가 대비 {snapshot.current_price / snapshot.high_52w * 100:.1f}%" if snapshot.high_52w else "")},
-        build_top_trading_value_gate(snapshot.rank, "G4"),
-    ]
-    score_items = {
-        "S1": 1.0 if snapshot.foreign_net > 0 and snapshot.institution_net > 0 else 0.0,
-        "S2": s2_score,
-        "P1": 1.0 if snapshot.high_20d and snapshot.current_price >= snapshot.high_20d * 0.95 else 0.0,
-        "P2": 1.0 if snapshot.volume_avg_20d and snapshot.volume >= snapshot.volume_avg_20d * 1.5 else 0.0,
-        "C1": 1.0 if snapshot.high_price and snapshot.current_price >= snapshot.high_price * 0.95 else 0.0,
-        "C2": 1.0 if candle_range(snapshot) > 0 and abs(snapshot.current_price - snapshot.open_price) >= candle_range(snapshot) * 0.7 and upper_wick_ratio(snapshot) <= 0.3 else 0.0,
-        "C3": c3_score,
+    score_map = {
+        "S1": evaluate_momentum_s1(snapshot),
+        "S2": evaluate_momentum_s2(snapshot),
+        "P1": evaluate_momentum_p1(snapshot),
+        "P2": evaluate_momentum_p2(snapshot),
+        "C1": evaluate_momentum_c1(snapshot),
+        "C2": evaluate_momentum_c2(snapshot, candle_range, upper_wick_ratio),
+        "C3": evaluate_momentum_c3(snapshot),
     }
-    rule_notes = {"S2": s2_note, "C3": c3_note}
+    gates = [
+        gate_dict("G1", evaluate_momentum_g1(rs_top10)),
+        gate_dict("G2", evaluate_momentum_g2(snapshot, kospi_return_5d, kospi_return_20d)),
+        gate_dict("G3", evaluate_momentum_g3(snapshot)),
+        gate_dict("G4", evaluate_pullback_g0(snapshot)),
+    ]
+    matched_rules, unmatched_rules = split_rule_lists(score_map)
+    score_items = {code: result.score for code, result in score_map.items()}
     raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "momentum")
@@ -1999,8 +1943,8 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "momentum",
         "gates": gates,
-        "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
-        "unmatchedRules": [{"code": code, "note": rule_notes.get(code, "토스 또는 추가 데이터 필요")} for code, passed in score_items.items() if passed < 1.0],
+        "matchedRules": matched_rules,
+        "unmatchedRules": unmatched_rules,
         **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
@@ -2022,46 +1966,35 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     manual_input = build_manual_input_meta("reversal", snapshot)
     auto_event_filter = snapshot.event_filter
     intraday_signal = snapshot.intraday_30m
-    s2_score, s2_note = evaluate_reversal_s2(snapshot)
-    c2_score, c2_note = evaluate_reversal_c2(snapshot)
-    c3_score, c3_note = evaluate_reversal_c3(snapshot)
-    daily_returns = []
-    for current, previous in zip(snapshot.close_history[:5], snapshot.close_history[1:6]):
-        if previous:
-            daily_returns.append(((current - previous) / previous) * 100)
-    drawdown_20d = ((snapshot.current_price - snapshot.high_20d) / snapshot.high_20d) * 100 if snapshot.high_20d else 0.0
+    drawdown_20d = drawdown_from_high_20d(snapshot) or 0.0
     bullish = snapshot.current_price > snapshot.open_price
     doji = candle_range(snapshot) > 0 and abs(snapshot.current_price - snapshot.open_price) <= candle_range(snapshot) * 0.3
     long_lower = lower_wick_ratio(snapshot) >= 1.5
-    g5_variant = "G5-a" if bullish else "G5-b" if long_lower else "G5-c" if doji else "G5"
+    g5_code, g5_result = evaluate_reversal_g5(snapshot, bullish, long_lower, doji, candle_range, lower_wick_ratio)
+    score_map = {
+        "S1": evaluate_reversal_s1(snapshot),
+        "S2": evaluate_reversal_s2(snapshot),
+        "P1": evaluate_reversal_p1(snapshot),
+        "P2": evaluate_reversal_p2(snapshot),
+        "C1": evaluate_reversal_c1(snapshot),
+        "C2": evaluate_reversal_c2(snapshot),
+        "C3": evaluate_reversal_c3(snapshot),
+    }
     filters = [
-        build_top_trading_value_gate(snapshot.rank, "F1"),
-        {"code": "F2", **to_status(snapshot.market_cap_trillion >= 30.0, f"시총 {snapshot.market_cap_trillion:.1f}조")},
-        {"code": "F3", **(
-            to_status(not auto_event_filter.get("blocked"), auto_event_filter.get("note") or "Naver 일정 기반 이벤트 필터")
-            if auto_event_filter
-            else warning_status("실적/배당/분할 일정 수동 확인 필요")
-        )},
-        {"code": "F4", **warning_status("최근 5거래일 재진입 이력 수동 확인 필요")},
+        gate_dict("F1", evaluate_reversal_f1(snapshot)),
+        gate_dict("F2", evaluate_reversal_f2(snapshot)),
+        gate_dict("F3", evaluate_reversal_f3(snapshot)),
+        gate_dict("F4", evaluate_reversal_f4()),
     ]
     gates = [
-        {"code": "G1", **to_status(snapshot.return_21d >= 30.0, f"1개월 수익률 {snapshot.return_21d:.1f}%")},
-        {"code": "G2", **to_status(-20.0 <= drawdown_20d <= -7.0, f"20일 고점 대비 {drawdown_20d:.1f}%")},
-        {"code": "G3", **to_status(bool(snapshot.ma60 and snapshot.current_price > snapshot.ma60), "종가 > 60MA")},
-        {"code": "G4", **to_status(any(value <= -5.0 for value in daily_returns), "최근 5거래일 -5% 급락 이력")},
-        {"code": g5_variant, **to_status(bullish or long_lower or doji, "안정화 캔들")},
+        gate_dict("G1", evaluate_reversal_g1(snapshot)),
+        gate_dict("G2", evaluate_reversal_g2(snapshot)),
+        gate_dict("G3", evaluate_reversal_g3(snapshot)),
+        gate_dict("G4", evaluate_reversal_g4(snapshot)),
+        gate_dict(g5_code, g5_result),
     ]
-    position_ratio = ((snapshot.current_price - snapshot.low_price) / (snapshot.high_price - snapshot.low_price) * 100) if snapshot.high_price > snapshot.low_price else 0.0
-    score_items = {
-        "S1": 1.0 if (snapshot.foreign_previous <= 0 < snapshot.foreign_net) or (snapshot.institution_previous <= 0 < snapshot.institution_net) else 0.0,
-        "S2": s2_score,
-        "P1": 1.0 if snapshot.ma20 and snapshot.current_price > snapshot.ma20 else 0.0,
-        "P2": 1.0 if position_ratio >= 50 else 0.0,
-        "C1": 1.0 if snapshot.volume_avg_5d and snapshot.volume >= snapshot.volume_avg_5d * 2.0 else 0.0,
-        "C2": c2_score,
-        "C3": c3_score,
-    }
-    rule_notes = {"S2": s2_note, "C2": c2_note, "C3": c3_note}
+    matched_rules, unmatched_rules = split_rule_lists(score_map)
+    score_items = {code: result.score for code, result in score_map.items()}
     raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * reversal_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "reversal")
@@ -2076,8 +2009,8 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "strategy": "reversal",
         "filters": filters,
         "gates": gates,
-        "matchedRules": [{"code": code, "note": rule_notes.get(code, "공개 데이터 충족")} for code, passed in score_items.items() if passed >= 1.0],
-        "unmatchedRules": [{"code": code, "note": rule_notes.get(code, "토스·이벤트 데이터 필요")} for code, passed in score_items.items() if passed < 1.0],
+        "matchedRules": matched_rules,
+        "unmatchedRules": unmatched_rules,
         **build_price_change_meta(snapshot),
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),

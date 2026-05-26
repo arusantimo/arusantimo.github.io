@@ -1,5 +1,173 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-05-27",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/jongga_data_20260527.js",
+    "jsonFile": "jongga/output/latest_20260527.json",
+    "generatedAt": "2026-05-26T15:07:57+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매수추천"
+      },
+      {
+        "strategy": "reversal",
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.8,
+        "grade": "B",
+        "statusLabel": "관심후보"
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 6.8,
+        "grade": "B",
+        "statusLabel": "관심후보"
+      },
+      {
+        "strategy": "momentum",
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "SK네트웍스",
+        "code": "001740",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "momentum",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 4.0,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-27",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/jongga_data_20260527_canary.js",
+    "jsonFile": "jongga/output/latest_20260527_canary.json",
+    "generatedAt": "2026-05-26T15:08:22+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매수추천"
+      },
+      {
+        "strategy": "reversal",
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.8,
+        "grade": "B",
+        "statusLabel": "관심후보"
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 6.8,
+        "grade": "B",
+        "statusLabel": "관심후보"
+      },
+      {
+        "strategy": "momentum",
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "SK네트웍스",
+        "code": "001740",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "momentum",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 4.0,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      }
+    ]
+  },
+  {
     "date": "2026-05-26",
     "variant": "stable",
     "variantLabel": "현재 버전",

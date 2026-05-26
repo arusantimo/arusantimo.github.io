@@ -2389,6 +2389,50 @@ body.modal-scroll-locked {
   font-family: 'Consolas', monospace;
   margin-top: 4px;
   padding: 3px 8px;
+}
+
+.modal-ind-eval-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.modal-ind-eval-badge.eval-met {
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.modal-ind-eval-badge.eval-not_met {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+}
+
+.modal-ind-eval-badge.eval-data_missing,
+.modal-ind-eval-badge.eval-manual_required {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fcd34d;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.modal-ind-card.eval-unavailable {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.22);
+}
+
+.modal-ind-card.eval-unavailable .modal-ind-result {
+  color: var(--text-warning);
+}
+
+.modal-ind-card.eval-not-met.triggered .modal-ind-result {
+  color: var(--text-danger);
+}
 
 .report-verdict {
   display: inline-flex;

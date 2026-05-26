@@ -17,6 +17,10 @@ REGIME_ROTATION_BUFFERED = "순환매장 🔄 (거시·지수 완충)"
 REGIME_BOX_MACRO = "박스권 ⚠️ (거시 완충)"
 REGIME_BOX_INDEX = "박스권 ⚠️ (지수 우선)"
 
+# pullback G5 — keep in sync with js/market-analyze-bridge.js
+PULLBACK_G5_VKOSPI_STRICT = 30
+PULLBACK_G5_VKOSPI_MACRO_CAP = 70
+
 
 def tools_root_from_jongga_module() -> Path:
     return Path(__file__).resolve().parents[2]
@@ -293,6 +297,31 @@ def reversal_status_label(
     return "제외"
 
 
+def is_macro_friendly_for_g5(context: dict[str, Any]) -> bool:
+    if bool(context.get("riseJustifiedByMacro")):
+        return True
+    regime = str(context.get("regimeLabel") or context.get("effectiveRegimeLabel") or "")
+    return regime.startswith("강세장") or regime.startswith("순환매장")
+
+
+def build_pullback_g5_gate(context: dict[str, Any]) -> dict[str, Any]:
+    kospi_close = float(context.get("kospiClose") or 0)
+    kospi_ma5 = float(context.get("kospiMa5") or 0)
+    vkospi = float(context.get("vkospiValue") or 0)
+    vkospi_label = str(context.get("vkospiLabel") or "VKOSPI")
+    note_base = f"KOSPI>{kospi_ma5:.2f}, {vkospi_label} {vkospi:.2f}" if kospi_ma5 > 0 else f"{vkospi_label} {vkospi:.2f}"
+
+    if kospi_ma5 <= 0 or kospi_close <= kospi_ma5:
+        return {"code": "G5", "status": "⛔", "note": note_base}
+
+    macro_friendly = is_macro_friendly_for_g5(context)
+    if vkospi <= PULLBACK_G5_VKOSPI_STRICT:
+        return {"code": "G5", "status": "✅", "note": note_base}
+    if macro_friendly and vkospi <= PULLBACK_G5_VKOSPI_MACRO_CAP:
+        return {"code": "G5", "status": "⚠️", "note": f"{note_base} · 거시·레짐 완화"}
+    return {"code": "G5", "status": "⛔", "note": f"{note_base} · VKOSPI 과열"}
+
+
 def build_macro_overlay_block(snapshot: dict[str, Any] | None, context: dict[str, Any]) -> dict[str, Any]:
     data = market_analyze_data(snapshot)
     overlay = context.get("macroOverlay") if isinstance(context.get("macroOverlay"), dict) else {}
@@ -307,4 +336,9 @@ def build_macro_overlay_block(snapshot: dict[str, Any] | None, context: dict[str
         "bubbleRegimeLabel": str(data.get("bubbleRegimeLabel") or ""),
         "riskIndex": data.get("riskIndex"),
         "stageOverrideReason": str(data.get("stageOverrideReason") or data.get("marketRegimeReason") or ""),
+        "kospiClose": context.get("kospiClose"),
+        "kospiMa5": context.get("kospiMa5"),
+        "vkospiValue": context.get("vkospiValue"),
+        "vkospiLabel": context.get("vkospiLabel"),
+        "riseJustifiedByMacro": bool(context.get("riseJustifiedByMacro")),
     }

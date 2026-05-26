@@ -14,10 +14,14 @@ function toJonggaNumber(value, fallback = null) {
 function normalizeJonggaRule(rule = {}) {
   const code = String(rule.code || '').trim().toUpperCase();
   const status = getJonggaRuleStatus(rule);
+  const passed = status === 'passed';
+  const evalStatus = normalizeRuleEvalStatus(rule.evalStatus || rule.eval_status)
+    || inferRuleEvalStatus(rule, passed);
   return {
     code,
     status: status === 'passed' ? '✅' : status === 'warning' ? '⚠️' : status === 'blocked' ? '⛔' : '미상',
-    note: String(rule.note || rule.reason || rule.message || rule.detail || '').trim()
+    note: String(rule.note || rule.reason || rule.message || rule.detail || '').trim(),
+    evalStatus
   };
 }
 
@@ -28,12 +32,15 @@ function normalizeJonggaRuleList(value, codes = null) {
   return codes.map(code => map.get(code) || { code, status: '미상', note: '근거 누락' });
 }
 
-function normalizeJonggaRuleCodes(value) {
+function normalizeJonggaRuleCodes(value, matched = false) {
   return normalizeJonggaRuleArray(value)
-    .map(rule => ({
-      code: String(rule.code || '').trim().toUpperCase(),
-      note: String(rule.note || rule.reason || rule.message || '').trim()
-    }))
+    .map(rule => {
+      const code = String(rule.code || '').trim().toUpperCase();
+      const note = String(rule.note || rule.reason || rule.message || '').trim();
+      const evalStatus = normalizeRuleEvalStatus(rule.evalStatus || rule.eval_status)
+        || inferRuleEvalStatus({ ...rule, note }, matched);
+      return { code, note, evalStatus };
+    })
     .filter(rule => rule.code);
 }
 
@@ -132,18 +139,28 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     : rawEntry;
   const code = getJonggaCode(effectiveRawEntry);
   const score = toJonggaNumber(pickJonggaValue(effectiveRawEntry, ['score', 'finalScore']), null);
+  const gradeFromJson = String(pickJonggaValue(effectiveRawEntry, ['grade', 'finalGrade'], '')).trim();
+  const grade = score === null
+    ? (gradeFromJson || '미산출')
+    : getBuyGradeFromScore(score, strategy);
   const required = JONGGA_REQUIRED_RULES[strategy] || [];
   const gates = normalizeJonggaRuleList(effectiveRawEntry.gates || effectiveRawEntry.rules, required.filter(code => code.startsWith('G')));
   const filters = normalizeJonggaRuleList(effectiveRawEntry.filters || effectiveRawEntry.rules, required.filter(code => code.startsWith('F')));
-  const matchedRules = normalizeJonggaRuleCodes(effectiveRawEntry.matchedRules || effectiveRawEntry.passedRules || effectiveRawEntry.matched);
-  const unmatchedRules = normalizeJonggaRuleCodes(effectiveRawEntry.unmatchedRules || effectiveRawEntry.failedRules || effectiveRawEntry.unmatched);
+  const matchedRules = normalizeJonggaRuleCodes(
+    effectiveRawEntry.matchedRules || effectiveRawEntry.passedRules || effectiveRawEntry.matched,
+    true
+  );
+  const unmatchedRules = normalizeJonggaRuleCodes(
+    effectiveRawEntry.unmatchedRules || effectiveRawEntry.failedRules || effectiveRawEntry.unmatched,
+    false
+  );
   const entryPrice = pickJonggaValue(effectiveRawEntry, ['entryPriceText', 'entryPrice', 'entry']);
   const normalized = {
     rank: Number(effectiveRawEntry.rank) || rank,
     name: getJonggaName(effectiveRawEntry),
     code,
     score,
-    grade: String(pickJonggaValue(effectiveRawEntry, ['grade', 'finalGrade'], score === null ? '미산출' : getBuyGradeFromScore(score, strategy))),
+    grade,
     scoreUnavailable: Boolean(effectiveRawEntry.scoreUnavailable) || score === null,
     scoreLabel: effectiveRawEntry.scoreLabel || (score === null ? '미산출' : ''),
     statusLabel: String(pickJonggaValue(effectiveRawEntry, ['statusLabel', 'decision', 'verdict'])),
@@ -197,6 +214,9 @@ function buildSnapshotFromJonggaSlot(slot, root = {}) {
   const macroContext = typeof resolveMacroOverlayContext === 'function'
     ? resolveMacroOverlayContext(slot, root, root.analysisDate || '')
     : {};
+  const marketMetrics = typeof readRegimeMarketMetrics === 'function'
+    ? readRegimeMarketMetrics(slot, root)
+    : {};
   const context = {
     gapScore,
     dataQuality: slot.dataQuality || root.dataQuality || {},
@@ -206,11 +226,19 @@ function buildSnapshotFromJonggaSlot(slot, root = {}) {
       technicalRegimeLabel: macroContext.technicalRegimeLabel || regime.technicalRegimeLabel,
       effectiveRegimeLabel: macroContext.effectiveRegimeLabel || regime.effectiveRegimeLabel,
       riseJustifiedByMacro: macroContext.riseJustifiedByMacro,
-      kospiBullTier: macroContext.kospiBullTier
+      kospiBullTier: macroContext.kospiBullTier,
+      kospiClose: marketMetrics.kospiClose,
+      kospiMa5: marketMetrics.kospiMa5,
+      vkospiValue: marketMetrics.vkospiValue,
+      vkospiLabel: marketMetrics.vkospiLabel
     },
     effectiveRegimeLabel: macroContext.effectiveRegimeLabel || regime.effectiveRegimeLabel,
     technicalRegimeLabel: macroContext.technicalRegimeLabel || regime.technicalRegimeLabel,
-    riseJustifiedByMacro: macroContext.riseJustifiedByMacro
+    riseJustifiedByMacro: macroContext.riseJustifiedByMacro,
+    kospiClose: marketMetrics.kospiClose,
+    kospiMa5: marketMetrics.kospiMa5,
+    vkospiValue: marketMetrics.vkospiValue,
+    vkospiLabel: marketMetrics.vkospiLabel
   };
 
   snapshot.regimeTable = regime.regimeTable;

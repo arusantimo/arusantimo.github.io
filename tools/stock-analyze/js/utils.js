@@ -202,3 +202,16 @@ function getGapComparisonBadge(comparison) {
     detail: comparison.summary
   };
 }
+
+/** 자정~13:59 매도, 14:00~23:59 매수 (로컬 시각) */
+const ANALYZER_SELL_TAB_END_HOUR = 14;
+
+function getDefaultAnalyzerTab(now = new Date()) {
+  return now.getHours() < ANALYZER_SELL_TAB_END_HOUR ? 'sell' : 'buy';
+}
+
+function getAnalyzerTabScheduleHint(now = new Date()) {
+  return getDefaultAnalyzerTab(now) === 'sell'
+    ? '00:00~13:59 기본: 매도 분석기'
+    : '14:00~23:59 기본: 매수 분석기';
+}

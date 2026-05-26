@@ -6,6 +6,9 @@ const REGIME_STRONG_BULL = '강세장 ✅ (펀더·지수 정당)';
 const REGIME_ROTATION_BUFFERED = '순환매장 🔄 (거시·지수 완충)';
 const REGIME_BOX_MACRO = '박스권 ⚠️ (거시 완충)';
 const REGIME_BOX_INDEX = '박스권 ⚠️ (지수 우선)';
+// pullback G5 — keep in sync with jongga/macro_overlay.py
+const PULLBACK_G5_VKOSPI_STRICT = 30;
+const PULLBACK_G5_VKOSPI_MACRO_CAP = 70;
 
 let marketAnalyzeScriptPromise = null;
 let marketAnalyzeCachedSnapshot = null;
@@ -99,6 +102,55 @@ function computeEffectiveRegimeLabel(technicalRegime, riseJustified, kospiTier) 
     return { effective: REGIME_BOX_INDEX, note: 'KOSPI 구조 강세 → 지수 우선 박스권' };
   }
   return { effective: technical, note: '기술 레짐 유지' };
+}
+
+function isMacroFriendlyForG5(context = {}) {
+  if (context.riseJustifiedByMacro) return true;
+  const regime = String(context.effectiveRegimeLabel || context.regimeLabel || '');
+  return regime.startsWith('강세장') || regime.startsWith('순환매장');
+}
+
+function readRegimeMarketMetrics(slot = {}, root = {}) {
+  const regime = slot.regime || root.regime || {};
+  const macro = regime.macroOverlay || {};
+  const table = asJonggaArray(regime.table || slot.regimeTable);
+  const kospiRow = table.find(row => String(row.item || '').includes('KOSPI'));
+  const vkospiRow = table.find(row => String(row.item || '').includes('VKOSPI'));
+  const kospiClose = Number(String(kospiRow?.value || '').split(' ')[0].replace(/,/g, ''));
+  const vkospiMatch = String(vkospiRow?.value || '').match(/([\d.]+)\s*$/);
+  return {
+    kospiClose: Number(macro.kospiClose ?? (Number.isFinite(kospiClose) ? kospiClose : null)),
+    kospiMa5: Number(macro.kospiMa5 ?? NaN),
+    vkospiValue: Number(macro.vkospiValue ?? (vkospiMatch ? Number(vkospiMatch[1]) : NaN)),
+    vkospiLabel: String(macro.vkospiLabel || 'VKOSPI')
+  };
+}
+
+function buildPullbackG5Gate(context = {}) {
+  const kospiClose = Number(context.kospiClose);
+  const kospiMa5 = Number(context.kospiMa5);
+  const vkospi = Number(context.vkospiValue);
+  const vkospiLabel = String(context.vkospiLabel || 'VKOSPI');
+  const noteBase = Number.isFinite(kospiMa5) && kospiMa5 > 0
+    ? `KOSPI>${kospiMa5.toFixed(2)}, ${vkospiLabel} ${vkospi.toFixed(2)}`
+    : `${vkospiLabel} ${vkospi.toFixed(2)}`;
+
+  if ((!Number.isFinite(kospiMa5) || kospiMa5 <= 0) && (!Number.isFinite(vkospi) || vkospi <= 0)) {
+    return { code: 'G5', status: '⚠️', note: `${noteBase} · KOSPI·VKOSPI 시장지표 부족`, evalStatus: 'data_missing' };
+  }
+  if (!Number.isFinite(kospiMa5) || kospiMa5 <= 0) {
+    return { code: 'G5', status: '⚠️', note: `${noteBase} · KOSPI 5일선 데이터 부족`, evalStatus: 'data_missing' };
+  }
+  if (!Number.isFinite(kospiClose) || kospiClose <= kospiMa5) {
+    return { code: 'G5', status: '⛔', note: noteBase, evalStatus: 'not_met' };
+  }
+  if (vkospi <= PULLBACK_G5_VKOSPI_STRICT) {
+    return { code: 'G5', status: '✅', note: noteBase, evalStatus: 'met' };
+  }
+  if (isMacroFriendlyForG5(context) && vkospi <= PULLBACK_G5_VKOSPI_MACRO_CAP) {
+    return { code: 'G5', status: '⚠️', note: `${noteBase} · 거시·레짐 완화`, evalStatus: 'not_met' };
+  }
+  return { code: 'G5', status: '⛔', note: `${noteBase} · VKOSPI 과열`, evalStatus: 'not_met' };
 }
 
 function buildKospiContextFromRegime(slot = {}, root = {}) {
@@ -211,11 +263,26 @@ function applyMacroOverlayToEntry(entry, strategy, context) {
   if (!regimeLabel) return entry;
   const gapCode = String(context.gapScore?.code || context.gapScore?.grade || '').trim().slice(0, 3);
   const grade = String(entry.grade || '').charAt(0);
+  const gateContext = {
+    ...context,
+    ...overlay,
+    effectiveRegimeLabel: regimeLabel,
+    riseJustifiedByMacro: Boolean(overlay.riseJustified ?? overlay.riseJustifiedByMacro ?? context.riseJustifiedByMacro)
+  };
   const next = { ...entry };
+  if (strategy === 'pullback') {
+    const g5Note = (next.gates || []).find(gate => gate.code === 'G5')?.note || '';
+    const ma5FromNote = g5Note.match(/KOSPI>([\d,.]+)/);
+    if (!Number.isFinite(gateContext.kospiMa5) && ma5FromNote) {
+      gateContext.kospiMa5 = Number(ma5FromNote[1].replace(/,/g, ''));
+    }
+    const g5 = buildPullbackG5Gate(gateContext);
+    next.gates = (next.gates || []).map(gate => (gate.code === 'G5' ? g5 : gate));
+  }
   if (strategy === 'reversal') {
-    next.statusLabel = recalculateReversalStatusLabel(grade, regimeLabel, gapCode, next.filters, next.gates, overlay);
+    next.statusLabel = recalculateReversalStatusLabel(grade, regimeLabel, gapCode, next.filters, next.gates, gateContext);
   } else {
-    next.statusLabel = recalculateTrendStatusLabel(grade, regimeLabel, gapCode, next.gates, overlay);
+    next.statusLabel = recalculateTrendStatusLabel(grade, regimeLabel, gapCode, next.gates, gateContext);
   }
   return next;
 }

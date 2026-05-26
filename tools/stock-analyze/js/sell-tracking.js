@@ -108,7 +108,27 @@ function getTrackedSellEntryKeys(slotId = activeSellSlot) {
 
 function isBuyEntryTrackedForSell(entryOrKey, slotId = null) {
   const normalizedSlotId = normalizeSlotId(slotId || (typeof entryOrKey === 'object' ? entryOrKey.slotId : activeSellSlot));
-  return getTrackedSellEntryKeys(normalizedSlotId).has(getEntryKey(entryOrKey, normalizedSlotId));
+  const tracked = getTrackedSellEntryKeys(normalizedSlotId);
+  const entryKey = getEntryKey(entryOrKey, normalizedSlotId);
+  if (tracked.has(entryKey)) return true;
+
+  const parsed = parseEntryKey(entryOrKey, normalizedSlotId);
+  if (parsed.strategy && parsed.code) {
+    const legacyKey = buildEntryKey(parsed.slotId, parsed.code);
+    if (tracked.has(legacyKey)) return true;
+  }
+  return false;
+}
+
+function removeTrackedKeysForEntry(nextKeys, entryKey, slotId) {
+  const parsed = parseEntryKey(entryKey, slotId);
+  nextKeys.delete(entryKey);
+  if (!parsed.code) return;
+  const legacyKey = buildEntryKey(parsed.slotId, parsed.code);
+  nextKeys.delete(legacyKey);
+  if (parsed.strategy) {
+    nextKeys.delete(buildEntryKey(parsed.slotId, parsed.code, parsed.strategy));
+  }
 }
 
 function setBuyEntryTrackedForSell(entryOrKey, tracked, slotId = null) {
@@ -118,8 +138,18 @@ function setBuyEntryTrackedForSell(entryOrKey, tracked, slotId = null) {
 
   return updateCurrentSellTrackingState(state => {
     const nextKeys = new Set(state.trackedEntryKeys);
-    if (tracked) nextKeys.add(entryKey);
-    else nextKeys.delete(entryKey);
+    if (tracked) {
+      const parsed = parseEntryKey(entryKey, normalizedSlotId);
+      if (parsed.code) {
+        const legacyKey = buildEntryKey(parsed.slotId, parsed.code);
+        if (nextKeys.has(legacyKey)) {
+          nextKeys.delete(legacyKey);
+        }
+      }
+      nextKeys.add(entryKey);
+    } else {
+      removeTrackedKeysForEntry(nextKeys, entryKey, normalizedSlotId);
+    }
     return {
       ...state,
       trackedEntryKeys: [...nextKeys]
@@ -134,24 +164,9 @@ function toggleBuyEntryTrackedForSell(entryOrKey, slotId = null) {
   return tracked;
 }
 
-function isAlwaysVisibleSellStock(stock) {
-  return Boolean(stock?.type === 'swing' || stock?.manual || stock?.source === 'manual');
-}
-
 function isSellStockVisible(stock, universeMode = getSellUniverseMode(stock?.slotId || activeSellSlot)) {
   if (!stock) return false;
-  if (isAlwaysVisibleSellStock(stock)) return true;
   if (universeMode === 'all') return true;
-
-  const entry = stock.type === 'swing' ? null : getEntryByCode(stock.entryKey || stock.code, stock.slotId);
-  if (entry) {
-    const presentation = typeof getBuyPresentation === 'function' ? getBuyPresentation(entry) : null;
-    const primaryGrade = presentation?.primaryGrade || entry.grade || '';
-    if (primaryGrade.startsWith('S') || primaryGrade.startsWith('A')) {
-      return true;
-    }
-  }
-
   return isBuyEntryTrackedForSell(stock.entryKey || stock.code, stock.slotId);
 }
 
@@ -188,8 +203,13 @@ function getSellStocksForAnalysis(isBefore0908, slotId = activeSellSlot, univers
   return [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
 }
 
+function getSellStocksForCurrentSellView(isBefore0908 = false, slotId = activeSellSlot) {
+  const universeMode = getSellUniverseMode(slotId);
+  return getSellStocksForAnalysis(isBefore0908, slotId, universeMode);
+}
+
 function getAllSellStocksForAnalysis(isBefore0908) {
-  return NOTION_SLOT_IDS.flatMap(slotId => getSellStocksForAnalysis(isBefore0908, slotId, getSellUniverseMode(slotId)));
+  return getSellStocksForCurrentSellView(isBefore0908, activeSellSlot);
 }
 
 function getVisibleSellCodeSet(slotId = activeSellSlot, isBefore0908 = null, universeMode = getSellUniverseMode(slotId)) {

@@ -67,6 +67,81 @@ function getJonggaRuleStatus(rule = {}) {
   return 'unknown';
 }
 
+const RULE_EVAL_STATUS_LABELS = {
+  met: '조건 충족',
+  not_met: '조건 미충족',
+  data_missing: '데이터 부족',
+  manual_required: '수동 입력 필요'
+};
+
+function normalizeRuleEvalStatus(value) {
+  const raw = String(value || '').trim().toLowerCase();
+  return Object.prototype.hasOwnProperty.call(RULE_EVAL_STATUS_LABELS, raw) ? raw : '';
+}
+
+function inferRuleEvalStatus(rule = {}, matched = false) {
+  const explicit = normalizeRuleEvalStatus(rule.evalStatus || rule.eval_status);
+  if (explicit) return explicit;
+  const note = String(rule.note || rule.reason || rule.message || '').trim();
+  if (/수동\s*(입력|확인)|토스|KIND|미입력|수동/.test(note)) return matched ? 'met' : 'manual_required';
+  if (/데이터\s*부족|조회\s*불가|산출\s*불가|일봉\s*\d+거래일\s*미만|시장지표\s*부족/.test(note)) return 'data_missing';
+  if (matched) return 'met';
+  return 'not_met';
+}
+
+function getStrategyRuleGuide(strategy, kind, code) {
+  const strategyGuide = RULE_GUIDE?.strategies?.[strategy] || {};
+  const list = kind === 'filter'
+    ? strategyGuide.filters
+    : kind === 'gate'
+      ? strategyGuide.gates
+      : strategyGuide.scores;
+  const guideList = Array.isArray(list) ? list : [];
+  return guideList.find(item => item.code === code) || { condition: '', source: '' };
+}
+
+function getRuleEvalPresentation(rule = {}, options = {}) {
+  const matched = Boolean(options.matched);
+  const kind = options.kind || 'score';
+  const evalStatus = inferRuleEvalStatus(rule, matched);
+  const typeLabel = RULE_EVAL_STATUS_LABELS[evalStatus] || '판정 불명';
+  const headlines = {
+    score: {
+      met: '채점 조건 충족',
+      not_met: '채점 조건 미충족',
+      data_missing: '채점 불가 (데이터 부족)',
+      manual_required: '채점 불가 (수동 입력 필요)'
+    },
+    gate: {
+      met: 'Gate 통과',
+      not_met: 'Gate 미충족',
+      data_missing: 'Gate 판정 불가 (데이터 부족)',
+      manual_required: 'Gate 확인 필요 (수동 입력)'
+    },
+    filter: {
+      met: '필터 통과',
+      not_met: '필터 미충족',
+      data_missing: '필터 판정 불가 (데이터 부족)',
+      manual_required: '필터 확인 필요 (수동 입력)'
+    }
+  };
+  const headline = headlines[kind]?.[evalStatus] || typeLabel;
+  const note = String(rule.note || rule.reason || rule.message || '').trim();
+  return {
+    evalStatus,
+    typeLabel,
+    headline,
+    note,
+    resultText: note ? `${headline} — ${note}` : headline
+  };
+}
+
+function ruleEvalStatusClass(evalStatus) {
+  if (evalStatus === 'data_missing' || evalStatus === 'manual_required') return 'eval-unavailable';
+  if (evalStatus === 'not_met') return 'eval-not-met';
+  return 'eval-met';
+}
+
 function getJonggaRuleMap(entry = {}) {
   const rules = [
     ...normalizeJonggaRuleArray(entry.filters),

@@ -724,19 +724,30 @@ function updateAnalyzeButtonState() {
   analyzeBtn.disabled = isAnalysisRunning || (activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks);
 }
 
+function syncScheduledAnalyzerTab(now = new Date(), { force = false } = {}) {
+  const period = getDefaultAnalyzerTab(now);
+  if (!force && lastScheduledAnalyzerPeriod === period) return;
+  lastScheduledAnalyzerPeriod = period;
+  if (activeTab !== period) {
+    setActiveTab(period);
+  }
+}
+
 function updateCurrentTime() {
   const now = new Date();
+  syncScheduledAnalyzerTab(now);
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
   const ss = now.getSeconds().toString().padStart(2, '0');
   const totalMins = now.getHours() * 60 + now.getMinutes();
   const isBefore = totalMins < (9 * 60 + 8);
   const label = isBefore ? '[1차 분석] 9:08 이전 (수급 매집형 손절 점검)' : '[2차 분석] 9:08 이후 (전체 매도/손절 분석)';
+  const scheduleHint = getAnalyzerTabScheduleHint(now);
   const el = document.getElementById('current-time-display');
   if (el) {
     el.innerHTML = activeTab === 'sell'
-      ? `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; 적용 로직: <strong style="color:${isBefore ? 'var(--text-warning)' : 'var(--text-success)'}">${label}</strong>`
-      : '🧭 매수 탭에서는 상단 분석 시작 버튼으로 네이버 컨센서스를 일괄 최신화할 수 있습니다.';
+      ? `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; ${scheduleHint} &nbsp;|&nbsp; 적용 로직: <strong style="color:${isBefore ? 'var(--text-warning)' : 'var(--text-success)'}">${label}</strong>`
+      : `🕒 현재 시각: <strong>${hh}:${mm}:${ss}</strong> &nbsp;|&nbsp; ${scheduleHint} &nbsp;|&nbsp; 매수 탭에서는 상단 분석 시작 버튼으로 네이버 컨센서스를 일괄 최신화할 수 있습니다.`;
   }
 
   const analyzeBtn = document.getElementById('btn-analyze');
@@ -1038,48 +1049,42 @@ function updateCardError(codeOrEntryKey) {
   indBox.innerHTML = '<div class="ind-item unknown">네이버 증권 데이터를 가져오는 데 실패했습니다.<br>잠시 후 다시 시도해주세요.</div>';
 }
 
-function renderRuleMatchList(entry) {
-  const scoreMap = Object.fromEntries(RULE_GUIDE.strategies[entry.strategy].scores.map(rule => [rule.code, rule]));
-  const renderRule = (ruleInfo, matched) => {
-    const guide = scoreMap[ruleInfo.code] || { condition: '', source: '' };
-    const note = ruleInfo.note ? ` - ${ruleInfo.note}` : '';
-    return `
-      <div class="modal-ind-card ${matched ? 'clear' : 'triggered'}">
-        <div class="modal-ind-icon">${matched ? '✅' : '⚠️'}</div>
-        <div class="modal-ind-content">
-          <div class="modal-ind-title">${escapeHtml(ruleInfo.code)} ${matched ? '일치' : '불일치'}</div>
-          <div class="modal-ind-criterion">${escapeHtml(guide.condition)}</div>
-          <div class="modal-ind-result">→ ${escapeHtml(`${matched ? '전략 데이터 충족' : '전략 데이터 미충족'}${note}`)}</div>
-          ${guide.source ? `<div class="modal-ind-value">출처: ${escapeHtml(guide.source)}</div>` : ''}
-        </div>
+function renderStrategyRuleCard(rule, entry, kind, matched) {
+  const guide = getStrategyRuleGuide(entry.strategy, kind, rule.code);
+  const presentation = getRuleEvalPresentation(rule, { matched, kind });
+  const statusClass = matched || rule.status === '✅' ? 'clear' : 'triggered';
+  const evalClass = ruleEvalStatusClass(presentation.evalStatus);
+  const icon = matched || rule.status === '✅' ? '✅' : presentation.evalStatus === 'data_missing' || presentation.evalStatus === 'manual_required' ? '📭' : rule.status === '⚠️' ? '⚠️' : '⚠️';
+  const titleSuffix = kind === 'score'
+    ? (matched ? '일치' : '불일치')
+    : (rule.status === '✅' ? '통과' : rule.status === '⚠️' ? '경계' : '제외');
+  return `
+    <div class="modal-ind-card ${statusClass} ${evalClass}">
+      <div class="modal-ind-icon">${icon}</div>
+      <div class="modal-ind-content">
+        <div class="modal-ind-title">${escapeHtml(rule.code)} ${titleSuffix}</div>
+        <div class="modal-ind-eval-badge eval-${presentation.evalStatus}">${escapeHtml(presentation.typeLabel)}</div>
+        <div class="modal-ind-criterion">${escapeHtml(guide.condition)}</div>
+        <div class="modal-ind-result">→ ${escapeHtml(presentation.resultText)}</div>
+        ${guide.source ? `<div class="modal-ind-value">출처: ${escapeHtml(guide.source)}</div>` : ''}
       </div>
-    `;
-  };
+    </div>
+  `;
+}
 
+function renderRuleMatchList(entry) {
   return [
-    ...entry.matchedRules.map(rule => renderRule(rule, true)),
-    ...entry.unmatchedRules.map(rule => renderRule(rule, false))
+    ...entry.matchedRules.map(rule => renderStrategyRuleCard(rule, entry, 'score', true)),
+    ...entry.unmatchedRules.map(rule => renderStrategyRuleCard(rule, entry, 'score', false))
   ].join('');
 }
 
 function renderGateList(entry) {
-  const guideMap = Object.fromEntries(RULE_GUIDE.strategies[entry.strategy].gates.map(gate => [gate.code, gate]));
-  return entry.gates.map(gate => {
-    const guide = guideMap[gate.code] || { condition: '', source: '' };
-    const statusClass = gate.status === '✅' ? 'clear' : 'triggered';
-    const statusLabel = gate.status === '✅' ? '통과' : gate.status === '⚠️' ? '경계' : '제외';
-    return `
-      <div class="modal-ind-card ${statusClass}">
-        <div class="modal-ind-icon">${escapeHtml(gate.status || '➖')}</div>
-        <div class="modal-ind-content">
-          <div class="modal-ind-title">${escapeHtml(gate.code)} ${statusLabel}</div>
-          <div class="modal-ind-criterion">${escapeHtml(guide.condition)}</div>
-          <div class="modal-ind-result">→ ${escapeHtml(gate.note || '전략 데이터 기준 판정')}</div>
-          ${guide.source ? `<div class="modal-ind-value">출처: ${escapeHtml(guide.source)}</div>` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
+  return (entry.gates || []).map(gate => renderStrategyRuleCard(gate, entry, 'gate', gate.status === '✅')).join('');
+}
+
+function renderFilterList(entry) {
+  return (entry.filters || []).map(filter => renderStrategyRuleCard(filter, entry, 'filter', filter.status === '✅')).join('');
 }
 
 function renderTradePlanTable(entry) {
@@ -1186,12 +1191,16 @@ function openModal(codeOrEntryKey, mode = 'sell') {
 
           <div>
             <div class="modal-stage-badge stage2">🧭 전략 데이터 기준 매수 판단</div>
+            ${entry.filters?.length ? `
+              <div class="modal-section-label">필터 (F) 일치 여부</div>
+              <div class="modal-ind-list">${renderFilterList(entry)}</div>
+            ` : ''}
             <div class="modal-section-label">Gate 일치 여부</div>
             <div class="modal-ind-list">${renderGateList(entry)}</div>
           </div>
 
           <div>
-            <div class="modal-section-label">채점 조건 일치 / 불일치</div>
+            <div class="modal-section-label">채점 조건 (S·P·C) 일치 / 불일치</div>
             <div class="modal-ind-list">${renderRuleMatchList(entry)}</div>
           </div>
         </div>

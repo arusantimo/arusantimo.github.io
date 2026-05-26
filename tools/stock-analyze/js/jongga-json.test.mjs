@@ -32,10 +32,16 @@ function loadJonggaContext() {
     createEmptyLiveGapState() {
       return { status: 'idle', score: createEmptySnapshot().gapScore, fetchedAt: '', source: '', error: '' };
     },
-    getBuyGradeFromScore(score) {
-      if (score >= 9) return 'S';
-      if (score >= 7.5) return 'A';
-      if (score >= 6) return 'B';
+    getBuyGradeFromScore(score, strategy = 'pullback') {
+      const maps = {
+        pullback: { S: 8.5, A: 7.0, B: 5.5 },
+        momentum: { S: 8.5, A: 7.0, B: 5.5 },
+        reversal: { S: 8.0, A: 6.5, B: 5.0 }
+      };
+      const thresholds = maps[strategy] || maps.pullback;
+      if (score >= thresholds.S) return 'S';
+      if (score >= thresholds.A) return 'A';
+      if (score >= thresholds.B) return 'B';
       return 'C';
     },
     getBuyFinalStatusLabel(grade) {
@@ -126,7 +132,7 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(count, 1);
   assert.equal(snapshot.regimeTable[0].value, '강세장');
   assert.equal(snapshot.gapScore.grade, 'G-B');
-  assert.equal(snapshot.momentumEntries[0].entryKey, 'slotA:005930');
+  assert.equal(snapshot.momentumEntries[0].entryKey, 'slotA:momentum:005930');
   assert.equal(snapshot.momentumEntries[0].source, 'jongga-json');
   assert.equal(snapshot.momentumEntries[0].dailyChangePct, 1.71);
   assert.equal(snapshot.momentumEntries[0].dailyChange, 1200);

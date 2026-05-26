@@ -24,15 +24,36 @@ function normalizeCodeKey(value) {
   return String(value ?? '').trim();
 }
 
-function buildEntryKey(slotId, code) {
+const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'momentum', 'reversal', 'swing']);
+
+function normalizeEntryStrategyKey(strategy) {
+  const text = String(strategy || '').trim().toLowerCase();
+  if (['pullback', 'trend_pullback', 'strategy1', 'strategy_1'].includes(text)) return 'pullback';
+  if (['momentum', 'supply_momentum', 'strategy2', 'strategy_2'].includes(text)) return 'momentum';
+  if (['reversal', 'leader_reversal', 'strategy3', 'strategy_3'].includes(text)) return 'reversal';
+  if (['swing', 'holding'].includes(text)) return 'swing';
+  return '';
+}
+
+function buildEntryKey(slotId, code, strategy = '') {
   const normalizedCode = normalizeCodeKey(code);
-  return normalizedCode ? `${normalizeSlotId(slotId)}:${normalizedCode}` : '';
+  const normalizedSlot = normalizeSlotId(slotId);
+  const normalizedStrategy = normalizeEntryStrategyKey(strategy);
+  if (!normalizedCode) return '';
+  if (normalizedStrategy) {
+    return `${normalizedSlot}:${normalizedStrategy}:${normalizedCode}`;
+  }
+  return `${normalizedSlot}:${normalizedCode}`;
 }
 
 function getEntryKey(target, fallbackSlotId = null) {
   if (target && typeof target === 'object') {
     if (target.entryKey) return String(target.entryKey);
-    return buildEntryKey(target.slotId || fallbackSlotId, target.code);
+    return buildEntryKey(
+      target.slotId || fallbackSlotId,
+      target.code,
+      target.strategy || target.type
+    );
   }
 
   if (typeof target === 'string' && target.includes(':')) {
@@ -47,15 +68,29 @@ function parseEntryKey(entryKey, fallbackSlotId = null) {
   if (!raw) {
     return {
       slotId: normalizeSlotId(fallbackSlotId),
+      strategy: '',
       code: '',
       entryKey: ''
     };
   }
 
   if (raw.includes(':')) {
-    const [slotPart, codePart] = raw.split(':');
+    const parts = raw.split(':');
+    if (parts.length >= 3 && ENTRY_STRATEGY_KEYS.has(parts[1])) {
+      const [slotPart, strategyPart, ...codeParts] = parts;
+      const code = normalizeCodeKey(codeParts.join(':'));
+      return {
+        slotId: normalizeSlotId(slotPart),
+        strategy: normalizeEntryStrategyKey(strategyPart),
+        code,
+        entryKey: buildEntryKey(slotPart, code, strategyPart)
+      };
+    }
+
+    const [slotPart, codePart] = parts;
     return {
       slotId: normalizeSlotId(slotPart),
+      strategy: '',
       code: normalizeCodeKey(codePart),
       entryKey: buildEntryKey(slotPart, codePart)
     };
@@ -64,6 +99,7 @@ function parseEntryKey(entryKey, fallbackSlotId = null) {
   const slotId = normalizeSlotId(fallbackSlotId);
   return {
     slotId,
+    strategy: '',
     code: normalizeCodeKey(raw),
     entryKey: buildEntryKey(slotId, raw)
   };
@@ -119,7 +155,8 @@ function ensureEntryIdentity(entry, slotId) {
   const normalizedSlotId = normalizeSlotId(slotId || entry.slotId);
   const next = entry;
   next.slotId = normalizedSlotId;
-  next.entryKey = buildEntryKey(normalizedSlotId, next.code);
+  next.strategy = normalizeEntryStrategyKey(next.strategy || next.type) || next.strategy || next.type;
+  next.entryKey = buildEntryKey(normalizedSlotId, next.code, next.strategy || next.type);
   next.slotLabel = getSlotLabel(normalizedSlotId);
   return next;
 }
@@ -129,7 +166,8 @@ function ensureStockIdentity(stock, slotId = null) {
   const normalizedSlotId = normalizeSlotId(slotId || stock.slotId || activeSellSlot);
   const next = stock;
   next.slotId = normalizedSlotId;
-  next.entryKey = buildEntryKey(normalizedSlotId, next.code);
+  next.strategy = normalizeEntryStrategyKey(next.strategy || next.type) || next.strategy || next.type;
+  next.entryKey = buildEntryKey(normalizedSlotId, next.code, next.strategy || next.type);
   next.slotLabel = getSlotLabel(normalizedSlotId);
   return next;
 }
@@ -182,7 +220,8 @@ function createStockCollections() {
   };
 }
 
-let activeTab = 'buy';
+let activeTab = typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzerTab() : 'buy';
+let lastScheduledAnalyzerPeriod = typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzerTab() : null;
 let activeBuySlot = 'slotA';
 let activeSellSlot = 'slotA';
 let stocks = createStockCollections();
@@ -284,5 +323,19 @@ function replaceStocksForSlot(slotId, nextCollections) {
 }
 
 function getStockDetailByKey(entryKey, slotId = null) {
-  return stockDetailMap[getEntryKey(entryKey, slotId)] || null;
+  const resolvedKey = getEntryKey(entryKey, slotId);
+  if (stockDetailMap[resolvedKey]) return stockDetailMap[resolvedKey];
+
+  const parsed = parseEntryKey(entryKey, slotId);
+  if (parsed.code && !parsed.strategy) {
+    return Object.values(stockDetailMap).find(detail => (
+      detail?.stock?.slotId === parsed.slotId && detail.stock?.code === parsed.code
+    )) || null;
+  }
+  if (parsed.strategy && parsed.code) {
+    return Object.values(stockDetailMap).find(detail => (
+      detail?.stock?.entryKey === resolvedKey
+    )) || null;
+  }
+  return null;
 }

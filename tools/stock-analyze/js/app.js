@@ -39,7 +39,7 @@ function handleSellSlotChange(slotId) {
 function handleManualAdd(type, nameInputId, codeInputId) {
   const name = document.getElementById(nameInputId).value.trim();
   const code = document.getElementById(codeInputId).value.trim();
-  const entryKey = buildEntryKey(activeSellSlot, code);
+  const entryKey = buildEntryKey(activeSellSlot, code, type);
 
   if (!name || !code) {
     alert('종목명과 종목코드(6자리)를 모두 입력해주세요.');
@@ -71,7 +71,7 @@ document.getElementById('btn-add-swing').addEventListener('click', () => {
   const name = document.getElementById('swing-name').value.trim();
   const code = document.getElementById('swing-code').value.trim();
   const entryPriceRaw = document.getElementById('swing-entry-price').value.trim();
-  const entryKey = buildEntryKey(activeSellSlot, code);
+  const entryKey = buildEntryKey(activeSellSlot, code, 'swing');
   if (!name || !code) { alert('종목명과 종목코드(6자리)를 모두 입력해주세요.'); return; }
   if (!/^\d{6}$/.test(code)) { alert('종목코드는 6자리 숫자여야 합니다.'); return; }
   const entryPrice = parseInt(entryPriceRaw.replace(/,/g, ''), 10) || 0;
@@ -162,24 +162,20 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
     log(`▶ [현재 시각: ${timeStr}] 매도 통합 분석을 시작합니다.`);
     await refreshLiveGapScore('매도 분석');
 
-    const allStocks = getAllSellStocksForAnalysis();
-    const visibleCollections = getUiSlotIds().map(slotId => ({
-      slotId,
-      label: getSlotLabel(slotId),
-      collections: getVisibleSellStockCollections(slotId, getSellUniverseMode(slotId))
-    }));
+    const universeMode = getSellUniverseMode(activeSellSlot);
+    const universeLabel = universeMode === 'all' ? '전체 후보' : '실매수 종목';
+    const stocksToAnalyze = getSellStocksForCurrentSellView(false, activeSellSlot);
+    const collections = getVisibleSellStockCollections(activeSellSlot, universeMode);
 
-    if (!allStocks.length) {
-      log('<span style="color:var(--text-warning)">ℹ️ 현재 분석할 매도 대상이 없습니다. 매수 카드에서 매도 추적을 켜거나 전체 후보 보기를 선택해주세요.</span>');
+    if (!stocksToAnalyze.length) {
+      log(`<span style="color:var(--text-warning)">ℹ️ [${universeLabel}] 분석할 매도 대상이 없습니다. ${universeMode === 'actual' ? '매수 카드에서 매도 추적을 켜거나' : ''} 전체 후보 보기를 확인해주세요.</span>`);
       return;
     }
 
-    visibleCollections.forEach(({ label, collections }) => {
-      const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
-      log(`ℹ️ ${label}: 분석 대상 ${sellCount}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
-    });
+    const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
+    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${sellCount}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
 
-    for (const stock of allStocks) {
+    for (const stock of stocksToAnalyze) {
       await analyzeStock(stock, false);
       await new Promise(resolve => setTimeout(resolve, 1500));
     }
@@ -197,6 +193,7 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
 });
 
 window.addEventListener('DOMContentLoaded', () => {
+  syncScheduledAnalyzerTab(new Date(), { force: true });
   syncSlotSwitchers();
 
   if (document.getElementById('jongga-quality-panel')) {

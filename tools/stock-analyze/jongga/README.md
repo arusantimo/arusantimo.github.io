@@ -83,6 +83,8 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
 - 파이프라인·UI 모두 [`jongga/macro_overlay.py`](macro_overlay.py)와 [`js/market-analyze-bridge.js`](../js/market-analyze-bridge.js) 규칙을 공유합니다.
 - **당일 `latest.js`가 저장소에 있어야** GHA 생성 JSON에도 macro 완화가 반영됩니다. market-analyze를 먼저 갱신·커밋하세요.
 - UI는 기술 레짐 vs 적용 레짐·거시 패널을 표시하고, 배포된 JSON의 `statusLabel`을 브라우저에서 재계산합니다.
+- **눌림목 G5**: 거시 정당·강세/순환 레짐이면 VKOSPI 30~70은 `⚠️`(매수 금지 아님), 30 이하는 `✅`, 70 초과만 `⛔`. 그 외는 VKOSPI 30 초과 시 `⛔`.
+- **매수 등급 하한** ([`grade_policy.py`](grade_policy.py), [`js/config.js`](../js/config.js) `BUY_GRADE_MIN_SCORES`): 추세·눌림목·수급매집 S≥8.5 / A≥7.0 / B≥5.5, 역추세 S≥8.0 / A≥6.5 / B≥5.0 (이전 대비 0.5~1.0점 완화).
 
 ## HTML 연결
 

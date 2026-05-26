@@ -12,16 +12,16 @@ function createDocument(ids = []) {
   };
 }
 
-function loadAnalysisContext(entryKey = 'slotB:005930') {
+function loadAnalysisContext(entryKey = 'slotB:pullback:005930') {
   const stateCode = fs.readFileSync(new URL('./state.js', import.meta.url), 'utf8');
   const analysisCode = fs.readFileSync(new URL('./analysis.js', import.meta.url), 'utf8');
   const document = createDocument([
-    'card-slotB-005930',
-    'price-row-slotB-005930',
-    'meta-slotB-005930',
-    'plan-slotB-005930',
-    'ind-slotB-005930',
-    'badge-slotB-005930'
+    'card-slotB-pullback-005930',
+    'price-row-slotB-pullback-005930',
+    'meta-slotB-pullback-005930',
+    'plan-slotB-pullback-005930',
+    'ind-slotB-pullback-005930',
+    'badge-slotB-pullback-005930'
   ]);
   const detailCalls = [];
   const context = {
