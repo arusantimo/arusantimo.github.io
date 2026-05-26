@@ -2,7 +2,7 @@ window.__OPEN_BET_RESULT__ = {
   "schemaVersion": "open_bet_result.v1",
   "tradeDate": "20260527",
   "phase": "pre_ats",
-  "generatedAt": "2026-05-27T00:44:23+09:00",
+  "generatedAt": "2026-05-27T08:45:58+09:00",
   "executionSchedule": {
     "profile": "ats",
     "analysis": {
