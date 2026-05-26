@@ -1,0 +1,21 @@
+{
+  "metric": "foreign_inst_flow",
+  "status": "ok",
+  "source": "naver_frgn",
+  "confidence": 0.75,
+  "value": {
+    "012450": {
+      "foreignNet": 51563401.0,
+      "instNet": null
+    },
+    "000660": {
+      "foreignNet": 712702365.0,
+      "instNet": null
+    },
+    "035420": {
+      "foreignNet": 156873776.0,
+      "instNet": null
+    }
+  },
+  "errors": []
+}

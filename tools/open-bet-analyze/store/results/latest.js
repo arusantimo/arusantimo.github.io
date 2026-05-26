@@ -1,0 +1,177 @@
+window.__OPEN_BET_RESULT__ = {
+  "schemaVersion": "open_bet_result.v1",
+  "tradeDate": "20260526",
+  "phase": "pre_ats",
+  "generatedAt": "2026-05-26T22:12:38+09:00",
+  "executionSchedule": {
+    "profile": "ats",
+    "analysis": {
+      "start": "07:30",
+      "deadline": "07:40",
+      "reviewUntil": "08:00",
+      "note": "07:40까지 배치 완료 → 07:40~08:00 직접 종목 검토·주문 준비(20분)"
+    },
+    "reviewWindow": "07:40~08:00",
+    "ats": {
+      "venueLabel": "대체거래소",
+      "entryWindow": "08:00~08:30",
+      "mustFlatBy": "08:30"
+    },
+    "krxLiquidationAt": "09:00"
+  },
+  "krxLiquidationOrders": [],
+  "regime": {
+    "label": "약세장 ⛔",
+    "openBetActive": false
+  },
+  "macro": {
+    "gapGrade": "G-B",
+    "gapTotalScore": 3.5,
+    "nq": 0.42,
+    "vix": 18.5,
+    "sox": 1.1,
+    "nightFuture": 0.42
+  },
+  "macroHalt": false,
+  "macroReasons": [],
+  "themes": [],
+  "trackCScanner": [
+    {
+      "code": "012450",
+      "name": "한화에어로스페이스",
+      "ahChangePct": 5.2,
+      "ahPrice": 925000,
+      "ahVolume": 12500,
+      "expectedOpen": 935000,
+      "strongOpen": true,
+      "expectedOpenGapPct": 1.081
+    },
+    {
+      "code": "000660",
+      "name": "SK하이닉스",
+      "ahChangePct": 4.5,
+      "ahPrice": 198500,
+      "ahVolume": 45000,
+      "expectedOpen": 200100,
+      "strongOpen": true,
+      "expectedOpenGapPct": 0.806
+    },
+    {
+      "code": "035420",
+      "name": "NAVER",
+      "ahChangePct": 6.1,
+      "ahPrice": 215000,
+      "ahVolume": 8000,
+      "strongOpen": false,
+      "expectedOpenGapPct": 0.0,
+      "expectedOpen": 215000.0
+    }
+  ],
+  "candidates": [],
+  "heldBack": [
+    {
+      "code": "012450",
+      "reason": "score_below_A"
+    },
+    {
+      "code": "000660",
+      "reason": "score_below_A"
+    },
+    {
+      "code": "035420",
+      "reason": "score_below_A"
+    }
+  ],
+  "dataQuality": {
+    "status": "complete",
+    "coverage": 1.0,
+    "requiredTotal": 8,
+    "requiredFilled": 8,
+    "missingRequired": [],
+    "criticalFailed": [],
+    "optionalIssues": [],
+    "fallbackUsage": [],
+    "metrics": {
+      "eod_open_bet_signals": {
+        "metric": "eod_open_bet_signals",
+        "status": "ok",
+        "source": "jongga_json_bridge",
+        "confidence": 1.0,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "global_gap_bundle": {
+        "metric": "global_gap_bundle",
+        "status": "ok",
+        "source": "fixture",
+        "confidence": 1.0,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "night_kospi_future": {
+        "metric": "night_kospi_future",
+        "status": "ok",
+        "source": "macro_proxy",
+        "confidence": 0.55,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "news_headlines": {
+        "metric": "news_headlines",
+        "status": "ok",
+        "source": "naver_news",
+        "confidence": 0.7,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "overtime_single_board": {
+        "metric": "overtime_single_board",
+        "status": "ok",
+        "source": "fixture",
+        "confidence": 1.0,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "foreign_inst_flow": {
+        "metric": "foreign_inst_flow",
+        "status": "ok",
+        "source": "naver_frgn",
+        "confidence": 0.75,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "expected_open": {
+        "metric": "expected_open",
+        "status": "ok",
+        "source": "premarket_enricher",
+        "confidence": 0.45,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      },
+      "overnight_volume": {
+        "metric": "overnight_volume",
+        "status": "ok",
+        "source": "fixture",
+        "confidence": 1.0,
+        "stale": false,
+        "errors": [],
+        "fallbackUsage": [],
+        "filled": true
+      }
+    }
+  }
+};

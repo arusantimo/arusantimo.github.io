@@ -1,0 +1,8 @@
+{
+  "name": "open-bet-analyze-scraper",
+  "private": true,
+  "description": "Node helpers for open-bet-analyze scraping fallbacks",
+  "dependencies": {
+    "playwright-core": "1.60.0"
+  }
+}

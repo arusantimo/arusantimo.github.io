@@ -1,0 +1,42 @@
+# 시가베팅 실행 프로필 — 대체거래소(ATS) 프리마켓 단타
+profile: ats
+
+analysis:
+  start: "07:30"
+  deadline: "07:40"
+  reviewUntil: "08:00"
+  note: "07:40까지 배치 완료 → 07:40~08:00 직접 종목 검토·주문 준비(20분)"
+
+ats:
+  venue: "ATS"
+  venueLabel: "대체거래소"
+  entryWindowStart: "08:00"
+  entryWindowEnd: "08:30"
+  mustFlatBy: "08:30"
+  orderTypes:
+    buy: "limit"
+    sell: "limit"
+
+intradayExits:
+  - time: "08:15"
+    label: "1차 익절"
+    sellRatio: 0.5
+    targetPct: 2.0
+    condition: "profit_or_momentum_fade"
+  - time: "08:30"
+    label: "ATS 구간 전량 청산"
+    sellRatio: 1.0
+    targetPct: 0.0
+    condition: "must_flat_before_krx_open"
+
+krxLiquidation:
+  at: "09:00"
+  venue: "KRX"
+  orderType: "limit"
+  label: "잔량 시스템 매도"
+  priceSource: "recommended_limit"
+  note: "08:30까지 못 판 수량을 추천 지정가로 예약·09:00 정규장 접수"
+
+legacy_krx_open:
+  enabled: false
+  entryAt: "09:00"

@@ -1,0 +1,14 @@
+{
+  "metric": "news_headlines",
+  "status": "ok",
+  "source": "naver_news",
+  "confidence": 0.7,
+  "value": {
+    "headlineCount": 1,
+    "themes": [],
+    "headlines": [
+      "Npay 증권"
+    ]
+  },
+  "errors": []
+}

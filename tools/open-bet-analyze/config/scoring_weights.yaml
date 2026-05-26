@@ -1,0 +1,17 @@
+fusion:
+  trackA: 0.35
+  trackB: 0.30
+  trackC: 0.35
+  overlapTwoTracks: 1.5
+  overlapThreeTracks: 3.0
+
+trackC:
+  ahChangeMin: 4.0
+  ahChangeMax: 7.0
+  volumeSurgeRatio: 0.05
+  idealOpenGapMax: 2.5
+  overheatOpenGap: 4.0
+
+grades:
+  S: 9.0
+  A: 7.5
