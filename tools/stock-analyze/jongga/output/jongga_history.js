@@ -5,7 +5,7 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/jongga_data_20260526.js",
     "jsonFile": "jongga/output/latest_20260526.json",
-    "generatedAt": "2026-05-26T09:35:54+00:00",
+    "generatedAt": "2026-05-26T13:48:50+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
@@ -75,8 +75,8 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "momentum",
-        "name": "삼성전기",
-        "code": "009150",
+        "name": "SK하이닉스",
+        "code": "000660",
         "score": 4.0,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
@@ -89,7 +89,7 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/jongga_data_20260526_canary.js",
     "jsonFile": "jongga/output/latest_20260526_canary.json",
-    "generatedAt": "2026-05-26T09:31:09+00:00",
+    "generatedAt": "2026-05-26T13:50:09+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
@@ -159,8 +159,8 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "momentum",
-        "name": "삼성전기",
-        "code": "009150",
+        "name": "SK하이닉스",
+        "code": "000660",
         "score": 4.0,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"

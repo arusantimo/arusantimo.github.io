@@ -1,7 +1,7 @@
 window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
 window.JONGGA_DAILY_DATA["2026-05-26"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-05-26T09:35:54+00:00",
+  "generatedAt": "2026-05-26T13:48:50+00:00",
   "variant": "stable",
   "dataQuality": {
     "status": "partial",
@@ -57,7 +57,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1330.8,
+        "durationMs": 1569.1,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -65,7 +65,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 1263.7,
+        "durationMs": 563.0,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -80,27 +80,27 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 100.9,
+        "durationMs": 1519.2,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 0.5
+        "durationMs": 0.3
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 6544.3,
+        "durationMs": 40425.9,
         "count": 20
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 1806.4,
+        "durationMs": 6091.5,
         "detail": "성공 20 / 실패 0",
         "count": 20
       },
@@ -108,7 +108,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 667.0,
+        "durationMs": 5032.2,
         "detail": "direct-http · 체결강도 20 / 호가 19 / 틱프록시 20",
         "count": 20
       },
@@ -116,7 +116,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 6.0,
+        "durationMs": 3.6,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       },
@@ -124,7 +124,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "step": "browser_enrichment",
         "label": "KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 13293.2,
+        "durationMs": 20230.2,
         "detail": "playwright-chromium · KIND 3",
         "count": 3
       }
@@ -171,7 +171,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
           },
           {
             "item": "갭 스코어",
-            "value": "G-A 🟢 (+9.5점)"
+            "value": "G-A 🟢 (+12.0점)"
           },
           {
             "item": "갭 조정",
@@ -211,15 +211,15 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "+1.46%",
-            "baseScore": "+1점",
+            "actualValue": "+1.57%",
+            "baseScore": "+2점",
             "weight": "×2.5",
-            "formula": "+1 × 2.5 = +2.5점",
-            "weightedScore": "+2.5점"
+            "formula": "+2 × 2.5 = +5.0점",
+            "weightedScore": "+5.0점"
           },
           {
             "indicator": "VIX 수준",
-            "actualValue": "+16.76",
+            "actualValue": "+16.86",
             "baseScore": "+1점",
             "weight": "×2.0",
             "formula": "+1 × 2.0 = +2.0점",
@@ -227,7 +227,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
           },
           {
             "indicator": "미국 10년 금리 전일비",
-            "actualValue": "-10.9bp",
+            "actualValue": "-9.1bp",
             "baseScore": "+2점",
             "weight": "×1.5",
             "formula": "+2 × 1.5 = +3.0점",
@@ -235,7 +235,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "-3.70원",
+            "actualValue": "-4.55원",
             "baseScore": "+0점",
             "weight": "×1.5",
             "formula": "+0 × 1.5 = +0.0점",
@@ -243,14 +243,14 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
           },
           {
             "indicator": "SOX 전일 변화율",
-            "actualValue": "+5.30%",
+            "actualValue": "+12.48%",
             "baseScore": "+2점",
             "weight": "×1.0",
             "formula": "+2 × 1.0 = +2.0점",
             "weightedScore": "+2.0점"
           }
         ],
-        "totalScore": "+9.5점",
+        "totalScore": "+12.0점",
         "grade": "G-A 🟢",
         "code": "G-A",
         "entryAdjustment": "✅ 100% 진입 / ✅ 100% 진입",
@@ -707,7 +707,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               },
               {
                 "code": "S2",
-                "note": "당일 평균 체결강도 178.0% / 100% 유지 비율 100.0% 충족"
+                "note": "당일 평균 체결강도 179.0% / 100% 유지 비율 100.0% 충족"
               },
               {
                 "code": "P1",
@@ -743,11 +743,11 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
             "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 7,017주 / 기관 108,521주.",
             "notes": [],
             "toss": {
-              "avgStrength": 178.0,
-              "note": "토스 공개 체결강도 178.0% / 최근 체결 40분 프록시",
+              "avgStrength": 179.0,
+              "note": "토스 공개 체결강도 179.0% / 최근 체결 40분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A329180/order",
-              "asOf": "2026-05-26T09:35:40Z",
+              "asOf": "2026-05-26T10:59:59Z",
               "intradayAbove100Ratio": 100.0,
               "observedMinutes": 40,
               "observedTickCount": 120,
@@ -868,7 +868,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
             "unmatchedRules": [
               {
                 "code": "S2",
-                "note": "당일 평균 체결강도 132.0% / 100% 유지 비율 25.0% 미달"
+                "note": "당일 평균 체결강도 134.0% / 100% 유지 비율 25.0% 미달"
               },
               {
                 "code": "C2",
@@ -890,11 +890,11 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
             "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 1,032,696주 / 기관 229,664주.",
             "notes": [],
             "toss": {
-              "avgStrength": 132.0,
-              "note": "토스 공개 체결강도 132.0% / 최근 체결 41분 프록시",
+              "avgStrength": 134.0,
+              "note": "토스 공개 체결강도 134.0% / 최근 체결 41분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A042660/order",
-              "asOf": "2026-05-26T09:35:40Z",
+              "asOf": "2026-05-26T10:59:59Z",
               "intradayAbove100Ratio": 25.0,
               "observedMinutes": 41,
               "observedTickCount": 120,
@@ -966,8 +966,8 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
           },
           {
             "rank": 3,
-            "name": "삼성전기",
-            "code": "009150",
+            "name": "SK하이닉스",
+            "code": "000660",
             "score": 4.0,
             "grade": "C",
             "statusLabel": "매매금지(핵심 Gate 미충족)",
@@ -986,12 +986,12 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               {
                 "code": "G3",
                 "status": "✅",
-                "note": "52주 고가 대비 97.6%"
+                "note": "52주 고가 대비 98.2%"
               },
               {
                 "code": "G4",
                 "status": "✅",
-                "note": "거래대금 TOP40 순위 4"
+                "note": "거래대금 TOP40 순위 1"
               }
             ],
             "matchedRules": [
@@ -1009,7 +1009,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               },
               {
                 "code": "C3",
-                "note": "매수/매도 호가잔량 비율 2.87 충족"
+                "note": "매수/매도 호가잔량 비율 39.27 충족"
               }
             ],
             "unmatchedRules": [
@@ -1019,43 +1019,43 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               },
               {
                 "code": "S2",
-                "note": "당일 평균 체결강도 99.0% / 100% 유지 비율 데이터 부족"
+                "note": "당일 평균 체결강도 134.0% / 100% 유지 비율 9.1% 미달"
               },
               {
                 "code": "C2",
                 "note": "토스 또는 추가 데이터 필요"
               }
             ],
-            "currentPrice": 1572000,
-            "previousClose": 1340000,
-            "dailyChange": 232000,
-            "dailyChangePct": 17.31,
+            "currentPrice": 2052000,
+            "previousClose": 1941000,
+            "dailyChange": 111000,
+            "dailyChangePct": 5.72,
             "dailyDirection": "up",
-            "entryPriceText": "1,572,000원 (당일 종가 기준)",
-            "entryPrice": 1572000,
+            "entryPriceText": "2,052,000원 (당일 종가 기준)",
+            "entryPrice": 2052000,
             "entryMeta": "당일 종가 기준",
-            "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 -131,003주 / 기관 -71,840주.",
+            "keyPoint": "상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 -108,495주 / 기관 386,967주.",
             "notes": [],
             "toss": {
-              "avgStrength": 99.0,
-              "note": "토스 공개 체결강도 99.0% / 최근 체결 34분 프록시",
+              "avgStrength": 134.0,
+              "note": "토스 공개 체결강도 134.0% / 최근 체결 41분 프록시",
               "source": "toss_http_combo",
-              "sourceUrl": "https://www.tossinvest.com/stocks/A009150/order",
-              "asOf": "2026-05-26T09:35:37Z",
-              "intradayAbove100Ratio": 0.0,
-              "observedMinutes": 34,
+              "sourceUrl": "https://www.tossinvest.com/stocks/A000660/order",
+              "asOf": "2026-05-26T10:59:59Z",
+              "intradayAbove100Ratio": 9.1,
+              "observedMinutes": 41,
               "observedTickCount": 120,
-              "coverageNote": "최근 체결 34분 프록시",
-              "lastHourAvgStrength": 3.4,
-              "lastHourObservedMinutes": 34
+              "coverageNote": "최근 체결 41분 프록시",
+              "lastHourAvgStrength": 12.1,
+              "lastHourObservedMinutes": 41
             },
             "orderbook": {
-              "bidAskRatio": 2.8671,
-              "bidTotal": 12776,
-              "askTotal": 4456,
-              "note": "토스 호가잔량합계 매수 12,776 / 매도 4,456",
+              "bidAskRatio": 39.2655,
+              "bidTotal": 132050,
+              "askTotal": 3363,
+              "note": "토스 호가잔량합계 매수 132,050 / 매도 3,363",
               "source": "toss_quotes_api",
-              "sourceUrl": "https://wts-info-api.tossinvest.com/api/v3/stock-prices/A009150/quotes?viewType=krx_all&investMode=krx"
+              "sourceUrl": "https://wts-info-api.tossinvest.com/api/v3/stock-prices/A000660/quotes?viewType=krx_all&investMode=krx"
             },
             "manualInput": {
               "required": false,
@@ -1070,42 +1070,42 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
                 "condition": "+2.0% 도달",
                 "quantity": "40% 익절",
                 "targetYield": "+2.0%",
-                "targetPrice": "1,603,440원"
+                "targetPrice": "2,093,040원"
               },
               {
                 "stage": "🔔 장초반",
                 "condition": "+4.0% 도달",
                 "quantity": "30% 익절",
                 "targetYield": "+4.0%",
-                "targetPrice": "1,634,880원"
+                "targetPrice": "2,134,080원"
               },
               {
                 "stage": "📈 장중 1차",
                 "condition": "+5.0% 도달",
                 "quantity": "30% 익절",
                 "targetYield": "+5.0%",
-                "targetPrice": "1,650,600원"
+                "targetPrice": "2,154,600원"
               },
               {
                 "stage": "📈 장중 2차",
                 "condition": "추세 유지 시",
                 "quantity": "잔량 보유",
                 "targetYield": "+8.0%",
-                "targetPrice": "1,697,760원"
+                "targetPrice": "2,216,160원"
               },
               {
                 "stage": "📊 스윙 전환",
                 "condition": "V 조건 충족 시",
                 "quantity": "잔량 보유",
                 "targetYield": "+11.0%",
-                "targetPrice": "1,744,920원"
+                "targetPrice": "2,277,720원"
               },
               {
                 "stage": "🛑 손절",
                 "condition": "-2.0% 이탈",
                 "quantity": "전량",
                 "targetYield": "-2.0%",
-                "targetPrice": "1,540,560원"
+                "targetPrice": "2,010,960원"
               }
             ],
             "rr": "1 : 1.0",
@@ -1177,7 +1177,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               },
               {
                 "code": "S2",
-                "note": "당일 평균 체결강도 178.0% / 마지막 1시간 평균 267.1% 충족"
+                "note": "당일 평균 체결강도 179.0% / 마지막 1시간 평균 267.1% 충족"
               },
               {
                 "code": "P1",
@@ -1237,11 +1237,11 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               "previousClose": 746000.0
             },
             "toss": {
-              "avgStrength": 178.0,
-              "note": "토스 공개 체결강도 178.0% / 최근 체결 40분 프록시",
+              "avgStrength": 179.0,
+              "note": "토스 공개 체결강도 179.0% / 최근 체결 40분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A329180/order",
-              "asOf": "2026-05-26T09:35:40Z",
+              "asOf": "2026-05-26T10:59:59Z",
               "intradayAbove100Ratio": 100.0,
               "observedMinutes": 40,
               "observedTickCount": 120,
@@ -1354,7 +1354,7 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               },
               {
                 "code": "S2",
-                "note": "당일 평균 체결강도 124.0% / 마지막 1시간 평균 215.1% 충족"
+                "note": "당일 평균 체결강도 128.0% / 마지막 1시간 평균 215.1% 충족"
               },
               {
                 "code": "P1",
@@ -1414,11 +1414,11 @@ window.JONGGA_DAILY_DATA["2026-05-26"] = {
               "previousClose": 687000.0
             },
             "toss": {
-              "avgStrength": 124.0,
-              "note": "토스 공개 체결강도 124.0% / 최근 체결 41분 프록시",
+              "avgStrength": 128.0,
+              "note": "토스 공개 체결강도 128.0% / 최근 체결 41분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A005380/order",
-              "asOf": "2026-05-26T09:35:39Z",
+              "asOf": "2026-05-26T10:59:59Z",
               "intradayAbove100Ratio": 69.2,
               "observedMinutes": 41,
               "observedTickCount": 120,
