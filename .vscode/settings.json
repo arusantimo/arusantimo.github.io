@@ -8,6 +8,8 @@
         "/^Set-Location \"c:\\\\Users\\\\USER\\\\git\\\\arusantimo\\.github\\.io\\\\tools\\\\stock-analyze\"; python -m http\\.server 8011$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "git rev-parse": true,
+        "git add": true
     }
 }
