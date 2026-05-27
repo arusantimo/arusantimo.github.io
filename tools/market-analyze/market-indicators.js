@@ -94,20 +94,7 @@ function parseNaverWorldDailyQuoteRows(html, limit = 7) {
 }
 
 async function fetchVixValue() {
-    try {
-        return await fetchYahooLatestQuote("^VIX");
-    } catch (yahooError) {
-        log("[VIX] Yahoo 차트 실패, CBOE CSV 폴백 시도...");
-        try {
-            const csvText = await fetchWithProxyFallback(
-                "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
-                "DATE,OPEN,HIGH,LOW,CLOSE"
-            );
-            return parseLatestVixCloseFromCsv(csvText);
-        } catch (cboeError) {
-            throw new Error(`Yahoo/CBOE 모두 실패 (${yahooError.message}; ${cboeError.message})`);
-        }
-    }
+    return await fetchYahooLatestQuote("^VIX");
 }
 
 async function fetchNaverWorldGoldValue() {
@@ -186,48 +173,17 @@ async function fetchNaverDomesticGoldUsdValue(fxRate) {
 }
 
 async function fetchGoldValue() {
-    try {
-        const quote = await fetchNaverWorldGoldValue();
-        if (quote.mode === "daily-close") {
-            const dateKey = String(quote.dateKey || "");
-            const dateLabel = dateKey.length === 8
-                ? `${dateKey.slice(0, 4)}.${dateKey.slice(4, 6)}.${dateKey.slice(6, 8)} 종가`
-                : "최근 종가";
-            log(`[GOLD] 네이버 국제금 일별시세 사용 (${dateLabel})`);
-        } else {
-            log("[GOLD] 네이버 국제금 현재가 사용");
-        }
-        return quote.value;
-    } catch (naverError) {
-        log("[GOLD] 네이버 국제금 실패, 국내 금 시세 환산 폴백 시도...");
-        try {
-            const quote = await fetchNaverDomesticGoldUsdValue(Number(marketData?.fx));
-            log(`[GOLD] 국내 금 시세 ${quote.domesticKrwPerGram.toLocaleString()}원/g 환산 폴백 성공`);
-            return quote.value;
-        } catch (domesticError) {
-            log("[GOLD] 네이버 금 시세 실패, Yahoo 금 선물 폴백 시도...");
-            try {
-                return await fetchYahooLatestQuote("GC=F");
-            } catch (shortRangeError) {
-                log("[GOLD] Yahoo 단기 차트 실패, 1개월 차트 재시도...");
-                try {
-                    const { closes, regularMarketPrice } = await fetchYahooChartSeries("GC=F", "1mo", "1d");
-                    const fallbackClose = extractLastFiniteNumber(closes);
-                    const value = Number.isFinite(regularMarketPrice) && regularMarketPrice > 0
-                        ? regularMarketPrice
-                        : fallbackClose;
-
-                    if (!Number.isFinite(value) || value <= 0) {
-                        throw new Error("GC=F 1개월 현재가 파싱 실패");
-                    }
-
-                    return value;
-                } catch (longRangeError) {
-                    throw new Error(`네이버/Yahoo 금 시세 모두 실패 (${naverError.message}; ${domesticError.message}; ${shortRangeError.message}; ${longRangeError.message})`);
-                }
-            }
-        }
+    const quote = await fetchNaverWorldGoldValue();
+    if (quote.mode === "daily-close") {
+        const dateKey = String(quote.dateKey || "");
+        const dateLabel = dateKey.length === 8
+            ? `${dateKey.slice(0, 4)}.${dateKey.slice(4, 6)}.${dateKey.slice(6, 8)} 종가`
+            : "최근 종가";
+        log(`[GOLD] 네이버 국제금 일별시세 사용 (${dateLabel})`);
+    } else {
+        log("[GOLD] 네이버 국제금 현재가 사용");
     }
+    return quote.value;
 }
 
 function calculateDisparityFromCloses(closes, order = "ascending", currentPrice = null) {
@@ -287,22 +243,13 @@ async function fetchKospiDisparityFromNaver() {
 }
 
 async function fetchKospiDisparityData() {
-    try {
-        const { closes, regularMarketPrice } = await fetchYahooChartSeries("^KS11", "1y", "1d");
-        const fallbackClose = extractLastFiniteNumber(closes);
-        return calculateDisparityFromCloses(
-            closes,
-            "ascending",
-            Number.isFinite(regularMarketPrice) && regularMarketPrice > 0 ? regularMarketPrice : fallbackClose
-        );
-    } catch (yahooError) {
-        log("[KOSPI] Yahoo 차트 실패, 네이버 일별 지수 폴백 시도...");
-        try {
-            return await fetchKospiDisparityFromNaver();
-        } catch (naverError) {
-            throw new Error(`Yahoo/네이버 모두 실패 (${yahooError.message}; ${naverError.message})`);
-        }
-    }
+    const { closes, regularMarketPrice } = await fetchYahooChartSeries("^KS11", "1y", "1d");
+    const fallbackClose = extractLastFiniteNumber(closes);
+    return calculateDisparityFromCloses(
+        closes,
+        "ascending",
+        Number.isFinite(regularMarketPrice) && regularMarketPrice > 0 ? regularMarketPrice : fallbackClose
+    );
 }
 
 function parseMarginHistoryRows(html, limit = 20) {

@@ -1059,14 +1059,6 @@ def collect_vix(base_data: Dict[str, Any]) -> CollectorResult:
             status_entry("ok", "query1.finance.yahoo.com", f"VIX {value:.2f} 수집"),
         )
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
-        try:
-            value = fetch_cboe_vix_close()
-            return CollectorResult(
-                {"vix": value},
-                status_entry("partial", "cdn.cboe.com", f"Yahoo 차트 실패 후 CBOE CSV 폴백으로 VIX {value:.2f} 수집"),
-            )
-        except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as fallback_error:
-            error = ValueError(f"Yahoo/CBOE 모두 실패 ({normalize_request_error(error)}; {normalize_request_error(fallback_error)})")
         if safe_number(base_data.get("vix")) is not None:
             return CollectorResult(
                 {},
@@ -1092,45 +1084,12 @@ def collect_gold(base_data: Dict[str, Any]) -> CollectorResult:
             status_entry("ok", str(quote.get("source") or "finance.naver.com"), message),
         )
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as naver_error:
-        try:
-            quote = fetch_naver_domestic_gold_usd_quote(base_data.get("fx"))
-            value = safe_number(quote.get("value"))
-            if value is None:
-                raise ValueError("네이버 국내 금 환산값이 없습니다.")
-            domestic_krw = safe_number(quote.get("domesticKrwPerGram"))
-            domestic_label = f"{domestic_krw:,.0f}원/g" if domestic_krw is not None else "국내 금 시세"
-            return CollectorResult(
-                {"gold": value},
-                status_entry(
-                    "partial",
-                    str(quote.get("source") or "finance.naver.com"),
-                    f"네이버 국제금 실패 후 국내 금 {domestic_label}을 환율로 환산해 금 시세 {value:,.1f} 수집",
-                ),
-            )
-        except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as domestic_error:
-            try:
-                try:
-                    quote = fetch_yahoo_chart("GC=F", "5d")
-                except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError):
-                    quote = fetch_yahoo_chart("GC=F", "1mo")
-                value = quote.get("regularMarketPrice") or last_finite(quote.get("closes", []))
-                if value is None:
-                    raise ValueError("금 현재가 없음")
-                return CollectorResult(
-                    {"gold": value},
-                    status_entry("partial", "query1.finance.yahoo.com", f"네이버 금 시세 실패 후 Yahoo 금 선물 {value:,.1f} 수집"),
-                )
-            except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as yahoo_error:
-                error = ValueError(
-                    "네이버/Yahoo 모두 실패 "
-                    f"({normalize_request_error(naver_error)}; {normalize_request_error(domestic_error)}; {normalize_request_error(yahoo_error)})"
-                )
         if safe_number(base_data.get("gold")) is not None:
             return CollectorResult(
                 {},
-                status_entry("partial", "store/market_analyze_data.json", f"금 시세 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
+                status_entry("partial", "store/market_analyze_data.json", f"금 시세 수집 실패 ({normalize_request_error(naver_error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"금 시세 수집 실패 ({normalize_request_error(error)})"))
+        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"금 시세 수집 실패 ({normalize_request_error(naver_error)})"))
 
 
 def collect_disparity(base_data: Dict[str, Any]) -> CollectorResult:
@@ -1147,18 +1106,6 @@ def collect_disparity(base_data: Dict[str, Any]) -> CollectorResult:
             ),
         )
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
-        try:
-            metrics = fetch_kospi_disparity_from_naver()
-            return CollectorResult(
-                {"disparity": metrics["disparity"]},
-                status_entry(
-                    "partial",
-                    "finance.naver.com/sise_index_day",
-                    f"Yahoo 차트 실패 후 네이버 일별 지수 폴백으로 코스피 200일 이격도 {metrics['disparity']:.2f}% 수집",
-                ),
-            )
-        except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as fallback_error:
-            error = ValueError(f"Yahoo/네이버 모두 실패 ({normalize_request_error(error)}; {normalize_request_error(fallback_error)})")
         if safe_number(base_data.get("disparity")) is not None:
             return CollectorResult(
                 {},
