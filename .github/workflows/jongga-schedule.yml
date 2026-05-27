@@ -2,11 +2,6 @@
 name: jongga-schedule
 
 on:
-  schedule:
-    # UTC = KST - 9h (한국은 서머타임 없음)
-    - cron: "50 5 * * 1-5" # KST 14:50 월~금
-    - cron: "0 6 * * 1-5"  # KST 15:00 월~금
-    - cron: "10 6 * * 1-5" # KST 15:10 월~금
   workflow_dispatch:
     inputs:
       run_slot:
