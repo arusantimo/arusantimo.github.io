@@ -5,15 +5,31 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/jongga_data_20260527.js",
     "jsonFile": "jongga/output/latest_20260527.json",
-    "generatedAt": "2026-05-27T05:52:01+00:00",
+    "generatedAt": "2026-05-27T06:07:14+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
       {
+        "strategy": "pullback",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
         "strategy": "reversal",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 5.9,
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 5.4,
         "grade": "B",
         "statusLabel": "매매금지"
       },
@@ -27,27 +43,11 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "reversal",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 5.0,
-        "grade": "B",
-        "statusLabel": "매매금지"
-      },
-      {
-        "strategy": "reversal",
-        "name": "SK네트웍스",
-        "code": "001740",
-        "score": 5.0,
-        "grade": "B",
-        "statusLabel": "매매금지"
-      },
-      {
-        "strategy": "pullback",
         "name": "현대차",
         "code": "005380",
-        "score": 4.8,
-        "grade": "C",
-        "statusLabel": "매매금지(핵심 Gate 미충족)"
+        "score": 5.0,
+        "grade": "B",
+        "statusLabel": "매매금지"
       },
       {
         "strategy": "pullback",
@@ -67,16 +67,16 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "momentum",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 4.0,
+        "name": "현대차",
+        "code": "005380",
+        "score": 4.4,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
       },
       {
         "strategy": "momentum",
-        "name": "현대모비스",
-        "code": "012330",
+        "name": "SK하이닉스",
+        "code": "000660",
         "score": 4.0,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
@@ -89,31 +89,23 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/jongga_data_20260527_canary.js",
     "jsonFile": "jongga/output/latest_20260527_canary.json",
-    "generatedAt": "2026-05-27T05:53:19+00:00",
+    "generatedAt": "2026-05-27T06:08:35+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
       {
-        "strategy": "pullback",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 5.2,
-        "grade": "C",
-        "statusLabel": "매매금지(핵심 Gate 미충족)"
-      },
-      {
         "strategy": "reversal",
-        "name": "현대차",
-        "code": "005380",
-        "score": 5.0,
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 6.3,
         "grade": "B",
         "statusLabel": "매매금지"
       },
       {
         "strategy": "reversal",
-        "name": "SK네트웍스",
-        "code": "001740",
-        "score": 5.0,
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.9,
         "grade": "B",
         "statusLabel": "매매금지"
       },
@@ -121,15 +113,31 @@ window.JONGGA_HISTORY_INDEX = [
         "strategy": "reversal",
         "name": "한온시스템",
         "code": "018880",
-        "score": 5.0,
+        "score": 5.9,
         "grade": "B",
         "statusLabel": "매매금지"
       },
       {
         "strategy": "pullback",
-        "name": "현대차",
-        "code": "005380",
-        "score": 4.8,
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.2,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
       },
@@ -151,17 +159,9 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "momentum",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 4.0,
-        "grade": "C",
-        "statusLabel": "매매금지(핵심 Gate 미충족)"
-      },
-      {
-        "strategy": "momentum",
-        "name": "현대모비스",
-        "code": "012330",
-        "score": 4.0,
+        "name": "현대차",
+        "code": "005380",
+        "score": 4.4,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
       }
