@@ -94,7 +94,11 @@ function parseNaverWorldDailyQuoteRows(html, limit = 7) {
 }
 
 async function fetchVixValue() {
-    return await fetchYahooLatestQuote("^VIX");
+    const csvText = await fetchWithProxyFallback(
+        "https://cdn.cboe.com/api/global/us_indices/daily_prices/VIX_History.csv",
+        "DATE,OPEN,HIGH,LOW,CLOSE"
+    );
+    return parseLatestVixCloseFromCsv(csvText);
 }
 
 async function fetchNaverWorldGoldValue() {
@@ -243,13 +247,7 @@ async function fetchKospiDisparityFromNaver() {
 }
 
 async function fetchKospiDisparityData() {
-    const { closes, regularMarketPrice } = await fetchYahooChartSeries("^KS11", "1y", "1d");
-    const fallbackClose = extractLastFiniteNumber(closes);
-    return calculateDisparityFromCloses(
-        closes,
-        "ascending",
-        Number.isFinite(regularMarketPrice) && regularMarketPrice > 0 ? regularMarketPrice : fallbackClose
-    );
+    return await fetchKospiDisparityFromNaver();
 }
 
 function parseMarginHistoryRows(html, limit = 20) {

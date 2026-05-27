@@ -1,7 +1,7 @@
 window.__MARKET_ANALYZE_RESULT__ = {
   "meta": {
     "resultDate": "20260527",
-    "generatedAt": "2026-05-27T05:15:57+00:00",
+    "generatedAt": "2026-05-27T14:57:02+09:00",
     "schemaVersion": "1.2.2"
   },
   "data": {
@@ -9,7 +9,7 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "vix": 17.01,
     "sentiment": 0.9,
     "gold": 4502.3,
-    "disparity": 176.15228099291292,
+    "disparity": 174.94116570797885,
     "bullRatio": 50,
     "marginSlope": -428.0,
     "riskIndex": 66,
@@ -18,20 +18,20 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "cycleStageKey": "greed",
     "cycleStageLabel": "상승 5: 탐욕",
     "stageOverrideReason": "원/달러 1506원과 과열 이격이 겹쳤지만 펀더멘털 앵커 89점과 non-critical bubble(BI 46 / active 1개)가 완충해 펀더멘털 완충형 과열로 낮췄습니다.",
-    "retailNetToday": 5372.0,
-    "foreignNetToday": -2773.0,
-    "institutionNetToday": -909.0,
-    "retailNet10dCum": 185424.0,
-    "foreignNet10dCum": -254577.0,
-    "institutionNet10dCum": 70395.0,
-    "retailNet10dAbsAvg": 25082.8,
-    "retailNet10dAbsSum": 250828.0,
+    "retailNetToday": 8695.0,
+    "foreignNetToday": -1500.0,
+    "institutionNetToday": -5693.0,
+    "retailNet10dCum": 188747.0,
+    "foreignNet10dCum": -253304.0,
+    "institutionNet10dCum": 65611.0,
+    "retailNet10dAbsAvg": 25415.1,
+    "retailNet10dAbsSum": 254151.0,
     "flowBizDate": "20260527",
     "flowBonus": 0,
     "flowReason": "가격 과열 구간(disparity>103)에서는 수급 보정을 비활성화했습니다 (중립 처리).",
     "trapScore": 3,
     "trapState": "neutral",
-    "trapReason": "수급 3 / 신용 0 / 첫 음봉 0 / 3일 음봉 0 / 회복 0 · 대표주 낙폭 -8.7%",
+    "trapReason": "수급 3 / 신용 0 / 첫 음봉 0 / 3일 음봉 0 / 회복 0 · 대표주 낙폭 -9.6%",
     "trapFlowScore": 3,
     "trapMarginScore": 0,
     "trapFirstShockScore": 0,
@@ -43,12 +43,12 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "code": "000660",
         "name": "SK하이닉스",
         "weight": 0.35,
-        "todayTradingValue": 12769365.0,
+        "todayTradingValue": 14303671.0,
         "history15dCount": 15,
         "historyWyckoffCount": 120,
-        "cum15dTradingValue": 165608319.39049995,
-        "dayReturnPct": 11.939571150097471,
-        "drawdown15dPct": -2.586938083121293,
+        "cum15dTradingValue": 167108558.05900002,
+        "dayReturnPct": 9.795321637426891,
+        "drawdown15dPct": -4.452926208651398,
         "shockValueRatio": 0.81150537066038,
         "threeDayDropPct": null,
         "threeDayValueRatio": null,
@@ -69,12 +69,12 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "smartCum60d": -1121771.0,
         "wyckoffPhase": "E",
         "wyckoffConfidence": 0.76,
-        "wyckoffReason": "120일 고점 부근(-2.6%)에서 외인+기관 10일 누적 -1121771 분배",
+        "wyckoffReason": "120일 고점 부근(-4.5%)에서 외인+기관 10일 누적 -1121771 분배",
         "wyckoffCandidatePhase": "E",
         "wyckoffCandidateReason": "신고가 부근 분배",
         "historySource": "finance.naver.com/fchart",
         "investorSource": "m.stock.naver.com/api",
-        "rawWeight": 0.48090435467573334,
+        "rawWeight": 0.48146659342050263,
         "weightCapApplied": true
       },
       {
@@ -84,9 +84,9 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "todayTradingValue": 9313317.0,
         "history15dCount": 15,
         "historyWyckoffCount": 120,
-        "cum15dTradingValue": 144137654.7331875,
-        "dayReturnPct": 5.100334448160537,
-        "drawdown15dPct": -2.7089783281733726,
+        "cum15dTradingValue": 145190835.6885,
+        "dayReturnPct": 3.8461538461538547,
+        "drawdown15dPct": -3.8699690402476783,
         "shockValueRatio": 0.9905490497345449,
         "threeDayDropPct": null,
         "threeDayValueRatio": null,
@@ -107,27 +107,27 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "smartCum60d": -4861922.0,
         "wyckoffPhase": "E",
         "wyckoffConfidence": 0.76,
-        "wyckoffReason": "120일 고점 부근(-2.7%)에서 외인+기관 10일 누적 -4861922 분배",
+        "wyckoffReason": "120일 고점 부근(-3.9%)에서 외인+기관 10일 누적 -4861922 분배",
         "wyckoffCandidatePhase": "E",
         "wyckoffCandidateReason": "신고가 부근 분배",
         "historySource": "finance.naver.com/fchart",
         "investorSource": "m.stock.naver.com/api",
-        "rawWeight": 0.41855642330679615,
+        "rawWeight": 0.41831811528250545,
         "weightCapApplied": true
       },
       {
         "code": "066570",
         "name": "LG전자",
-        "weight": 0.10705219074640238,
+        "weight": 0.10714059248207114,
         "todayTradingValue": 981163.0,
         "history15dCount": 15,
         "historyWyckoffCount": 120,
-        "cum15dTradingValue": 12354730.178100001,
-        "dayReturnPct": -2.713987473903967,
-        "drawdown15dPct": -12.570356472795496,
-        "shockValueRatio": 0.6764668252868014,
-        "threeDayDropPct": -0.8510638297872353,
-        "threeDayValueRatio": 0.7920910436554207,
+        "cum15dTradingValue": 12422222.818725001,
+        "dayReturnPct": -1.6701461377870541,
+        "drawdown15dPct": -11.63227016885553,
+        "shockValueRatio": 0.6764668252868011,
+        "threeDayDropPct": 0.21276595744681437,
+        "threeDayValueRatio": 0.8165385321279061,
         "closeRecoveryRate": 0.38513513513513514,
         "shockDate": "20260520",
         "latestDate": "20260527",
@@ -143,29 +143,29 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "foreignNetCum60d": -820672.0,
         "instNetCum60d": 602679.0,
         "smartCum60d": -217993.0,
-        "wyckoffPhase": "A",
-        "wyckoffConfidence": 0.52,
-        "wyckoffReason": "후보 구조 우세 (스마트머니 혼조/이탈 · 추세 구조 우세 · 거래량 확대)",
-        "wyckoffCandidatePhase": "A",
-        "wyckoffCandidateReason": "낙폭 -12.6% · 거래량 209%",
+        "wyckoffPhase": "NEUTRAL",
+        "wyckoffConfidence": 0.42000000000000004,
+        "wyckoffReason": "명확한 와이코프 단계 패턴 없음 (스마트머니 혼조/이탈 · 추세 구조 우세 · 거래량 확대)",
+        "wyckoffCandidatePhase": "E",
+        "wyckoffCandidateReason": "고점 거리 -11.6% · 최근 10일 스마트머니 -217993",
         "historySource": "finance.naver.com/fchart",
         "investorSource": "m.stock.naver.com/api",
-        "rawWeight": 0.0358764799096972,
+        "rawWeight": 0.035790418951076854,
         "weightCapApplied": false
       },
       {
         "code": "001440",
         "name": "대한전선",
-        "weight": 0.07584397438194881,
-        "todayTradingValue": 239045.0,
+        "weight": 0.07570405627139393,
+        "todayTradingValue": 247642.0,
         "history15dCount": 15,
         "historyWyckoffCount": 120,
-        "cum15dTradingValue": 8753037.49125,
-        "dayReturnPct": -6.191369606003749,
-        "drawdown15dPct": -34.12384716732543,
+        "cum15dTradingValue": 8777370.308475,
+        "dayReturnPct": -6.378986866791747,
+        "drawdown15dPct": -34.255599472990774,
         "shockValueRatio": 0.5937296864447047,
-        "threeDayDropPct": -10.71428571428571,
-        "threeDayValueRatio": 0.8753809927757696,
+        "threeDayDropPct": -10.892857142857137,
+        "threeDayValueRatio": 0.9077520788523689,
         "closeRecoveryRate": 0.3333333333333333,
         "shockDate": "20260520",
         "latestDate": "20260527",
@@ -183,27 +183,27 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "smartCum60d": -1461380.0,
         "wyckoffPhase": "A",
         "wyckoffConfidence": 0.62,
-        "wyckoffReason": "120일 고점 대비 -34.1% + 거래량 31% + 외인 매도 수렴",
+        "wyckoffReason": "120일 고점 대비 -34.3% + 거래량 31% + 외인 매도 수렴",
         "wyckoffCandidatePhase": "A",
         "wyckoffCandidateReason": "하락 정지 초기",
         "historySource": "finance.naver.com/fchart",
         "investorSource": "m.stock.naver.com/api",
-        "rawWeight": 0.025417647263580347,
+        "rawWeight": 0.025289013505338683,
         "weightCapApplied": false
       },
       {
         "code": "034020",
         "name": "두산에너빌리티",
-        "weight": 0.06649173401977514,
+        "weight": 0.06657098634681044,
         "todayTradingValue": 341863.0,
         "history15dCount": 15,
         "historyWyckoffCount": 120,
-        "cum15dTradingValue": 7673709.6846,
-        "dayReturnPct": -3.4635879218472443,
-        "drawdown15dPct": -21.91091954022989,
+        "cum15dTradingValue": 7718452.983175,
+        "dayReturnPct": -3.019538188277082,
+        "drawdown15dPct": -21.55172413793104,
         "shockValueRatio": 0.8690311866623918,
-        "threeDayDropPct": 0.2767527675276771,
-        "threeDayValueRatio": 0.8392587589664114,
+        "threeDayDropPct": 0.7380073800737907,
+        "threeDayValueRatio": 0.8787180395830819,
         "closeRecoveryRate": 0.21621621621621623,
         "shockDate": "20260520",
         "latestDate": "20260527",
@@ -221,27 +221,27 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "smartCum60d": -1455858.0,
         "wyckoffPhase": "A",
         "wyckoffConfidence": 0.54,
-        "wyckoffReason": "120일 고점 대비 -21.9% + 거래량 82% + 외인 매도 수렴",
+        "wyckoffReason": "120일 고점 대비 -21.6% + 거래량 83% + 외인 매도 수렴",
         "wyckoffCandidatePhase": "A",
         "wyckoffCandidateReason": "하락 정지 초기",
         "historySource": "finance.naver.com/fchart",
         "investorSource": "m.stock.naver.com/api",
-        "rawWeight": 0.022283424029802587,
+        "rawWeight": 0.022238102628912248,
         "weightCapApplied": false
       },
       {
         "code": "047040",
         "name": "대우건설",
-        "weight": 0.05061210085187374,
+        "weight": 0.05058436489972456,
         "todayTradingValue": 552752.0,
         "history15dCount": 15,
         "historyWyckoffCount": 120,
-        "cum15dTradingValue": 5841065.422499999,
-        "dayReturnPct": -9.33786078098472,
-        "drawdown15dPct": -28.6096256684492,
+        "cum15dTradingValue": 5864912.9836875005,
+        "dayReturnPct": -9.168081494057724,
+        "drawdown15dPct": -28.47593582887701,
         "shockValueRatio": 0.6659704668788182,
-        "threeDayDropPct": -5.820105820105825,
-        "threeDayValueRatio": 1.1895618972783415,
+        "threeDayDropPct": -5.64373897707231,
+        "threeDayValueRatio": 1.2153619941583467,
         "closeRecoveryRate": 0.5,
         "shockDate": "20260520",
         "latestDate": "20260527",
@@ -261,10 +261,10 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "wyckoffConfidence": 0.52,
         "wyckoffReason": "후보 구조 우세 (스마트머니 우세 · 추세 구조 우세 · 거래량 수축)",
         "wyckoffCandidatePhase": "A",
-        "wyckoffCandidateReason": "낙폭 -33.8% · 거래량 38%",
+        "wyckoffCandidateReason": "낙폭 -33.7% · 거래량 38%",
         "historySource": "finance.naver.com/fchart",
         "investorSource": "m.stock.naver.com/api",
-        "rawWeight": 0.01696167081439049,
+        "rawWeight": 0.01689775621166409,
         "weightCapApplied": false
       }
     ],
@@ -288,29 +288,29 @@ window.__MARKET_ANALYZE_RESULT__ = {
     "export3mAvgYoY": 41.97,
     "earningsCoverageCount": 12,
     "earningsSnapshotQuarter": "2026 1Q",
-    "opIncomeBreadth": 0.9765416627456796,
-    "netIncomeBreadth": 0.9622921011353882,
-    "turnaroundBreadth": 0.0593186099673307,
-    "positiveRoeBreadth": 0.9465379717129466,
+    "opIncomeBreadth": 0.9749764456235439,
+    "netIncomeBreadth": 0.9610072880730796,
+    "turnaroundBreadth": 0.057881603984458053,
+    "positiveRoeBreadth": 0.945895210252516,
     "broadeningScore": 30,
     "broadeningState": "validated",
-    "supportBreadth20d": 0.9124649934825587,
-    "supportBreadth60d": 0.9597380940414869,
-    "supportPositiveReturnBreadth": 0.9226434826124938,
+    "supportBreadth20d": 0.9165198035075931,
+    "supportBreadth60d": 0.9632011730283779,
+    "supportPositiveReturnBreadth": 0.9302884410136246,
     "nonSemiconductorMomentum": 80.0,
     "nonSemiconductorMomentumCoverageCount": 5,
     "nonSemiconductorMomentumPassCount": 4,
     "marketValuationStability": false,
     "marketValuationScore": 0,
     "marketValuationCoverageCount": 26,
-    "marketValuationForwardPerAvg": 31.84771434193491,
+    "marketValuationForwardPerAvg": 32.397242612441126,
     "marketValuationThreshold": 13.0,
     "fundamentalAnchorScore": 89.0,
     "fundamentalAnchorState": "validated",
     "fundamentalAnchorReason": "수출 24/35 · 실적 35/35 · 확산 30/30",
     "fundamentalSupportScore": 40.0,
     "fundamentalSupportState": "fragile",
-    "fundamentalSupportReason": "업종 확산 40/50 · 밸류에이션 0/50 · 업종 확산 4/5개 통과 · 가중 Fwd PER 31.8배 > 13.0배",
+    "fundamentalSupportReason": "업종 확산 40/50 · 밸류에이션 0/50 · 업종 확산 4/5개 통과 · 가중 Fwd PER 32.4배 > 13.0배",
     "supportOffsetPoints": 12.0,
     "macroStressScore": 70,
     "equityOverboughtScore": 100,
@@ -347,42 +347,41 @@ window.__MARKET_ANALYZE_RESULT__ = {
           "compositeGrowthPct": 153.14,
           "availableRegions": 2
         },
-        "updatedAt": "2026-05-27T05:14:53+00:00"
+        "updatedAt": "2026-05-27T05:54:36+00:00"
       },
       "ipo": {
-        "score": 42.99,
+        "score": 44.05,
         "state": "watch",
         "critical": false,
         "label": "공모주 광풍",
-        "reason": "최근 30건 IPO의 평균 초과수익률 18.1%와 적자/비수익 63.0% (27/30 커버), IPO ETF의 QQQ 대비 20일 초과수익 0.0%를 반영했습니다. 미커버 3건은 제외했습니다. 수익성 프록시는 StockAnalysis EPS 21건 · StockAnalysis Net Income 6건 기반입니다. IPO ETF 상대강도는 일부 미수집(Yahoo 차트 다중 엔드포인트 실패 (query1.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query2.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query1.finance.yahoo.com: Yahoo spark JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests)) 상태라 점수를 보수적으로 유지합니다.",
+        "reason": "최근 30건 IPO의 평균 초과수익률 18.1%와 적자/비수익 64.3% (28/30 커버), IPO ETF의 QQQ 대비 20일 초과수익 -0.6%를 반영했습니다. 미커버 2건은 제외했습니다. 수익성 프록시는 SEC companyfacts 8건 · StockAnalysis EPS 15건 · StockAnalysis Net Income 5건 기반입니다.",
         "metrics": {
           "sampleWindowDays": 90,
           "sampleCount": 30,
           "avgFirstDayExcessReturnPct": 18.12,
           "returnProxy": true,
-          "lossMakingRatioPct": 62.96,
-          "ipoEtfPrice": null,
-          "ipoVsQqq20dOutperformancePct": null,
-          "ipoVsQqqRatio": null,
-          "ipoVsQqqRatioVsSma20Pct": null,
-          "lossMakingCount": 17,
-          "profitabilityCoverageCount": 27,
-          "profitabilityMissingCount": 3,
-          "profitabilityCoverageRatioPct": 90.0,
-          "profitabilitySourceSummary": "StockAnalysis EPS 21건 · StockAnalysis Net Income 6건",
+          "lossMakingRatioPct": 64.29,
+          "ipoEtfPrice": 53.8,
+          "ipoVsQqq20dOutperformancePct": -0.64,
+          "ipoVsQqqRatio": 0.0737,
+          "ipoVsQqqRatioVsSma20Pct": 102.42,
+          "lossMakingCount": 18,
+          "profitabilityCoverageCount": 28,
+          "profitabilityMissingCount": 2,
+          "profitabilityCoverageRatioPct": 93.33,
+          "profitabilitySourceSummary": "SEC companyfacts 8건 · StockAnalysis EPS 15건 · StockAnalysis Net Income 5건",
           "profitabilitySourceBreakdown": {
-            "stockanalysis-eps": 21,
-            "sec-companyfacts": 7,
-            "stockanalysis-net-income": 6
+            "stockanalysis-eps": 15,
+            "sec-companyfacts": 8,
+            "stockanalysis-net-income": 5
           },
           "profitabilityMethod": "negative EPS/net income proxy",
           "profitabilityMissingTickers": [
-            "AIAI",
             "BXDC",
             "SUJA"
           ]
         },
-        "updatedAt": "2026-05-27T05:15:03+00:00"
+        "updatedAt": "2026-05-27T05:54:37+00:00"
       },
       "trash": {
         "score": 0.0,
@@ -391,24 +390,24 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "label": "적자 혁신주 투기",
         "reason": "ARKK/QQQ 비율이 20일선 대비 96.0%이며 0일 연속 과열 상태입니다. 최근 20일 ARKK의 QQQ 대비 초과수익은 -9.1%p입니다.",
         "metrics": {
-          "arkkPrice": 76.94,
-          "qqqPrice": 728.05,
-          "arkkQqqRatio": 0.1057,
+          "arkkPrice": 77.23,
+          "qqqPrice": 730.28,
+          "arkkQqqRatio": 0.1058,
           "ratioSma20": 0.1101,
-          "overshootPct": 95.96,
+          "overshootPct": 96.03,
           "durationDays": 0,
-          "arkk20dReturnPct": 0.51,
-          "qqq20dReturnPct": 9.61,
-          "outperformancePct": -9.1
+          "arkk20dReturnPct": 0.89,
+          "qqq20dReturnPct": 9.94,
+          "outperformancePct": -9.06
         },
-        "updatedAt": "2026-05-26T13:57:59+00:00"
+        "updatedAt": "2026-05-27T05:55:09+00:00"
       },
       "fed": {
         "score": 40.0,
         "state": "watch",
         "critical": false,
         "label": "연준 브레이크",
-        "reason": "실제 재인상 카운트는 0회이며, 이격도 기반 다음 회의 인상 확률은 100.0%입니다. (2년물 국채 4.08% - 기준금리 3.75%, 스프레드 +0.33%p)",
+        "reason": "실제 재인상 카운트는 0회이며, 이격도 기반 다음 회의 인상 확률은 100.0%입니다. (2년물 국채 4.13% - 기준금리 3.75%, 스프레드 +0.38%p)",
         "metrics": {
           "fedRateTargetUpperBound": 3.75,
           "lastChangeDate": "2025-12-11",
@@ -418,10 +417,10 @@ window.__MARKET_ANALYZE_RESULT__ = {
           "nextHikeProbabilityPct": 100.0,
           "probabilityAvailable": true
         },
-        "updatedAt": "2026-05-26T13:58:01+00:00"
+        "updatedAt": "2026-05-27T05:55:11+00:00"
       }
     },
-    "bubbleIndex": 45.75,
+    "bubbleIndex": 46.01,
     "bubbleActiveFlagCount": 1,
     "bubbleCriticalTrigger": false,
     "bubbleCriticalReason": "Critical Trigger 미발동 · BI 46 / active 1개",
@@ -444,9 +443,9 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "message": "원/달러 환율 1,506.205원 수집"
     },
     "vix": {
-      "state": "partial",
+      "state": "ok",
       "source": "cdn.cboe.com",
-      "message": "Yahoo 차트 실패 후 CBOE CSV 폴백으로 VIX 17.01 수집"
+      "message": "CBOE VIX 17.01 수집"
     },
     "gold": {
       "state": "ok",
@@ -454,9 +453,9 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "message": "네이버 국제금 일별시세로 금 시세 4,502.3 수집 (2026.05.26 종가)"
     },
     "disparity": {
-      "state": "partial",
+      "state": "ok",
       "source": "finance.naver.com/sise_index_day",
-      "message": "Yahoo 차트 실패 후 네이버 일별 지수 폴백으로 코스피 200일 이격도 176.15% 수집"
+      "message": "네이버 일별 지수로 코스피 200일 이격도 174.94% 수집"
     },
     "flow": {
       "state": "ok",
@@ -474,9 +473,9 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "message": "신용/예탁금 갱신 완료 · 충격 기준일 20260520"
     },
     "soros": {
-      "state": "partial",
+      "state": "ok",
       "source": "finance.naver.com/sise_index_day · finance.naver.com/item/board.naver (AI)",
-      "message": "이격도는 일부만 최신화 · 심리 입력은 종토방 AI 추정 최신값 사용"
+      "message": "이격도 최신 수집 · 심리 입력은 종토방 AI 추정 최신값 사용"
     },
     "minsky": {
       "state": "ok",
@@ -517,12 +516,12 @@ window.__MARKET_ANALYZE_RESULT__ = {
       "valuation": {
         "state": "ok",
         "source": "finance.naver.com",
-        "message": "Fwd PER 26/30종목 확보 · 가중 평균 31.8배 · 안정 기준 13.0배 초과 · 실패 4종목"
+        "message": "Fwd PER 26/30종목 확보 · 가중 평균 32.4배 · 안정 기준 13.0배 초과 · 실패 4종목"
       },
       "support": {
         "state": "ok",
         "source": "https://finance.naver.com/sise/sise_group.naver?type=upjong · finance.naver.com",
-        "message": "업종 확산 40/50 · 밸류에이션 0/50 · 업종 확산 4/5개 통과 · 가중 Fwd PER 31.8배 > 13.0배"
+        "message": "업종 확산 40/50 · 밸류에이션 0/50 · 업종 확산 4/5개 통과 · 가중 Fwd PER 32.4배 > 13.0배"
       }
     },
     "bubble": {
@@ -532,23 +531,23 @@ window.__MARKET_ANALYZE_RESULT__ = {
         "message": "미국/국내 신용 trough 대비 상승률 계산 완료 · composite 153%"
       },
       "ipo": {
-        "state": "partial",
-        "source": "renaissancecapital.com · stockanalysis.com",
-        "message": "IPO 표본 30건 · 적자 IPO 63.0% (27/30) · ETF 상대강도 미수집 (Yahoo 차트 다중 엔드포인트 실패 (query1.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query2.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query1.finance.yahoo.com: Yahoo spark JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests))"
+        "state": "ok",
+        "source": "renaissancecapital.com · sec.gov · stockanalysis.com · query1.finance.yahoo.com",
+        "message": "IPO 표본 30건 · 적자 IPO 64.3% (28/30) · ETF 상대강도 -0.6%"
       },
       "trash": {
-        "state": "partial",
-        "source": "store/results/latest.js",
-        "message": "적자 혁신주 투기 수집 실패 (Yahoo 차트 다중 엔드포인트 실패 (query1.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query2.finance.yahoo.com: Yahoo 차트 JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests / query1.finance.yahoo.com: Yahoo spark JSON 파싱 실패 (Expecting value: line 1 column 1 (char 0)) · 응답 시작: Too Many Requests)) · 기존 버블 스냅샷 유지"
+        "state": "ok",
+        "source": "query1.finance.yahoo.com",
+        "message": "ARKK/QQQ 상대강도 계산 완료 · 오버슈트 96.0%"
       },
       "fed": {
-        "state": "partial",
-        "source": "store/results/latest.js",
-        "message": "연준 브레이크 수집 실패 (The read operation timed out; curl 우회 실패 (curl: (92) HTTP/2 stream 1 was not closed cleanly: INTERNAL_ERROR (err 2)); Node DNS 우회 실패 (timeout); Playwright 우회 실패 (page.goto: Download is starting\nCall log:\n\u001b[2m  - navigating to \"https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFEDTARU\", waiting until \"domcontentloaded\"\u001b[22m)) · 기존 버블 스냅샷 유지"
+        "state": "ok",
+        "source": "fred.stlouisfed.org",
+        "message": "FRED 기준금리 및 2년물 국채 스프레드 기반 인상 확률 100.0% 계산 완료"
       },
       "critical": {
-        "state": "partial",
-        "source": "finra.org · finance.naver.com · renaissancecapital.com · stockanalysis.com · store/results/latest.js",
+        "state": "ok",
+        "source": "finra.org · finance.naver.com · renaissancecapital.com · sec.gov · stockanalysis.com · query1.finance.yahoo.com · query1.finance.yahoo.com · fred.stlouisfed.org",
         "message": "Critical Trigger 미발동 · BI 46 / active 1개"
       }
     }

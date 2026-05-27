@@ -1050,13 +1050,10 @@ def collect_fx(base_data: Dict[str, Any]) -> CollectorResult:
 
 def collect_vix(base_data: Dict[str, Any]) -> CollectorResult:
     try:
-        quote = fetch_yahoo_chart("^VIX", "5d")
-        value = quote.get("regularMarketPrice") or last_finite(quote.get("closes", []))
-        if value is None:
-            raise ValueError("VIX 현재가 없음")
+        value = fetch_cboe_vix_close()
         return CollectorResult(
             {"vix": value},
-            status_entry("ok", "query1.finance.yahoo.com", f"VIX {value:.2f} 수집"),
+            status_entry("ok", "cdn.cboe.com", f"CBOE VIX {value:.2f} 수집"),
         )
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
         if safe_number(base_data.get("vix")) is not None:
@@ -1064,7 +1061,7 @@ def collect_vix(base_data: Dict[str, Any]) -> CollectorResult:
                 {},
                 status_entry("partial", "store/market_analyze_data.json", f"VIX 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"VIX 수집 실패 ({normalize_request_error(error)})"))
+        return CollectorResult({}, status_entry("error", "cdn.cboe.com", f"VIX 수집 실패 ({normalize_request_error(error)})"))
 
 
 def collect_gold(base_data: Dict[str, Any]) -> CollectorResult:
@@ -1094,15 +1091,13 @@ def collect_gold(base_data: Dict[str, Any]) -> CollectorResult:
 
 def collect_disparity(base_data: Dict[str, Any]) -> CollectorResult:
     try:
-        quote = fetch_yahoo_chart("^KS11", "1y")
-        current_price = quote.get("regularMarketPrice") or last_finite(quote.get("closes", []))
-        metrics = calculate_disparity(quote.get("closes", []), current_price)
+        metrics = fetch_kospi_disparity_from_naver()
         return CollectorResult(
             {"disparity": metrics["disparity"]},
             status_entry(
                 "ok",
-                "query1.finance.yahoo.com",
-                f"코스피 200일 이격도 {metrics['disparity']:.2f}% 수집",
+                "finance.naver.com/sise_index_day",
+                f"네이버 일별 지수로 코스피 200일 이격도 {metrics['disparity']:.2f}% 수집",
             ),
         )
     except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as error:
@@ -1111,7 +1106,7 @@ def collect_disparity(base_data: Dict[str, Any]) -> CollectorResult:
                 {},
                 status_entry("partial", "store/market_analyze_data.json", f"이격도 수집 실패 ({normalize_request_error(error)}) · 기존 스냅샷 유지"),
             )
-        return CollectorResult({}, status_entry("error", "query1.finance.yahoo.com", f"이격도 수집 실패 ({normalize_request_error(error)})"))
+        return CollectorResult({}, status_entry("error", "finance.naver.com/sise_index_day", f"이격도 수집 실패 ({normalize_request_error(error)})"))
 
 
 def parse_investor_flow_bizdate(html: str) -> Optional[str]:
