@@ -58,27 +58,67 @@ def build_result(
             candidates_map[code]["name"] = name
         return candidates_map[code]
 
+    # Track C (시간외 단일가) 후보 등록 및 채점
     for row in track_c_rows:
         code = str(row.get("code") or "")
         if not code:
             continue
         item = ensure(code, str(row.get("name") or ""))
-        item["tracks"]["C"] = score_track_c(row, macro=macro)
+        flow_info = flows.get(code) or {}
+        prev_vol = flow_info.get("prevVolume")
+        item["tracks"]["C"] = score_track_c(row, macro=macro, prev_volume=prev_vol)
 
-    for cand in eod.get("candidates") or []:
+    # 종가 후보 미존재 시 expected_open에서 갭상승 종목 Fallback 발굴
+    eod_cands = eod.get("candidates") or []
+    if not eod_cands:
+        for row in expected:
+            code = str(row.get("code") or "")
+            ah_change = row.get("ahChangePct")
+            if code and ah_change is not None and float(ah_change) >= 0.5:
+                eod_cands.append({
+                    "code": code,
+                    "name": row.get("name") or "",
+                    "gates": {
+                        "G1": {"status": "passed"},
+                        "G2": {"status": "passed"},
+                        "G3": {"status": "passed"}
+                    }
+                })
+
+    # Track A (갭상승 돌파) 후보 등록 및 채점
+    for cand in eod_cands:
         code = str(cand.get("code") or "")
         if not code:
             continue
         ah_row = ah_by_code.get(code) or {}
         ah_change = ah_row.get("ahChangePct")
+        ah_volume = ah_row.get("ahVolume")
+        flow_info = flows.get(code) or {}
+        prev_vol = flow_info.get("prevVolume")
+        
+        # vkospi 파싱
+        vkospi_val = None
+        if eod.get("vkospi"):
+            try:
+                # 'VKOSPI 68.09' 형태에서 숫자 추출 시도
+                cleaned = "".join(c for c in str(eod.get("vkospi")) if c.isdigit() or c == ".")
+                if cleaned:
+                    vkospi_val = float(cleaned)
+            except ValueError:
+                pass
+
         item = ensure(code, str(cand.get("name") or ""))
         item["tracks"]["A"] = score_track_a(
             cand,
             flows=flows,
             ah_change=float(ah_change) if ah_change is not None else None,
             has_positive_news=bool(themes),
+            vkospi=vkospi_val,
+            prev_volume=prev_vol,
+            ah_volume=ah_volume,
         )
 
+    # Track B (테마) 채점
     theme_codes: set[str] = set()
     for theme in themes:
         for code in theme.get("stocks") or []:
@@ -87,64 +127,114 @@ def build_result(
         item = ensure(code)
         item["tracks"]["B"] = score_track_b_for_code(code, themes, macro=macro)
 
+    ranked_gap_break: list[dict[str, Any]] = []
+    ranked_overtime_follow: list[dict[str, Any]] = []
     held_back: list[dict[str, Any]] = []
-    ranked: list[dict[str, Any]] = []
 
+    # 각 종목별 전략 분리 평가
     for code, item in candidates_map.items():
         tracks = item["tracks"]
-        score_a = (tracks.get("A") or {}).get("score") or 0.0
-        score_b = (tracks.get("B") or {}).get("score") or 0.0
-        score_c = (tracks.get("C") or {}).get("score") or 0.0
-        active_tracks = sum(1 for t in ("A", "B", "C") if (tracks.get(t) or {}).get("eligible"))
-        overlap = 1.5 if active_tracks == 2 else 3.0 if active_tracks >= 3 else 0.0
-        final = score_a * 0.35 + score_b * 0.30 + score_c * 0.35 + overlap
-        final *= gate.get("weightScale", 1.0)
-        item["finalScore"] = round(final, 2)
-        item["grade"] = _grade(final)
-        item["primaryTrack"] = max(
-            ("A", score_a),
-            ("B", score_b),
-            ("C", score_c),
-            key=lambda pair: pair[1],
-        )[0]
-
+        track_a = tracks.get("A") or {}
+        track_c = tracks.get("C") or {}
+        
         ah_row = ah_by_code.get(code) or {}
         gap_pct = ah_row.get("expectedOpenGapPct")
-        item["gap"] = {
-            "expectedPct": gap_pct,
-            "band": (tracks.get("A") or {}).get("gapBand") or "unknown",
-            "policy": item["primaryTrack"],
-            "strongOpen": ah_row.get("strongOpen"),
-        }
-        item["gates"] = (tracks.get("A") or {}).get("gates") or {}
-        weight = gap_entry_weight(final, item["gap"]["band"])
-        ats_plan = build_ats_execution_plan(
-            ah_row=ah_row,
-            stop_loss_pct=-2.0,
-            tp1_pct=2.0,
-            entry_weight=weight,
-        )
-        item["entryPlan"] = ats_plan
-        item["entryPlan"]["entryWeight"] = weight
+        
+        # 1. 갭상승 돌파 전략 후보군 (Track A 기준)
+        if track_a.get("eligible") and track_a.get("score", 0.0) >= 5.0:
+            final_a = track_a["score"] * gate.get("weightScale", 1.0)
+            band = track_a.get("gapBand") or "unknown"
+            weight = gap_entry_weight(final_a, band)
+            
+            cand_item = {
+                "code": code,
+                "name": item["name"],
+                "strategy": "GapBreak",
+                "strategyScore": track_a["score"],
+                "finalScore": round(final_a, 2),
+                "grade": _grade(final_a),
+                "gap": {
+                    "expectedPct": gap_pct,
+                    "band": band,
+                    "policy": "A",
+                    "strongOpen": ah_row.get("strongOpen"),
+                },
+                "gates": track_a.get("gates") or {},
+                "volRatio": track_a.get("volRatio") or 0.0,
+                "entryPlan": build_ats_execution_plan(
+                    ah_row=ah_row,
+                    stop_loss_pct=-2.0,
+                    tp1_pct=2.0,
+                    entry_weight=weight,
+                ),
+            }
+            cand_item["entryPlan"]["entryWeight"] = weight
+            
+            if gate.get("openBetActive"):
+                ranked_gap_break.append(cand_item)
+            else:
+                held_back.append({"code": code, "strategy": "GapBreak", "reason": "macro_or_regime_halt"})
 
-        eligible = final >= 7.5 and gate.get("openBetActive") and quality["status"] != "incomplete"
-        track_c_hold = (tracks.get("C") or {}).get("heldReason")
-        if track_c_hold in {"gap_overheat", "ah_change_below_min"}:
-            eligible = False
-            held_back.append({"code": code, "reason": track_c_hold})
-        if not eligible:
-            if final < 7.5:
-                held_back.append({"code": code, "reason": "score_below_A"})
-            elif not gate.get("openBetActive"):
-                held_back.append({"code": code, "reason": "macro_or_regime_halt"})
-        else:
-            ranked.append(item)
+        # 2. 시간외 단일가 연계 전략 후보군 (Track C 기준)
+        if track_c.get("eligible") and track_c.get("score", 0.0) >= 4.0:
+            final_c = track_c["score"] * gate.get("weightScale", 1.0)
+            # 시간외의 경우도 적정 갭으로 매수 비중 산정
+            band = "ideal"
+            if gap_pct is not None:
+                if gap_pct > 4.0:
+                    band = "hold"
+                elif gap_pct > 3.0:
+                    band = "borderline"
+            weight = gap_entry_weight(final_c, band)
 
-    ranked.sort(key=lambda row: row["finalScore"], reverse=True)
-    top = ranked[:3]
+            cand_item = {
+                "code": code,
+                "name": item["name"],
+                "strategy": "OvertimeFollow",
+                "strategyScore": track_c["score"],
+                "finalScore": round(final_c, 2),
+                "grade": _grade(final_c),
+                "gap": {
+                    "expectedPct": gap_pct,
+                    "band": band,
+                    "policy": "C",
+                    "strongOpen": ah_row.get("strongOpen"),
+                },
+                "breakdown": track_c.get("breakdown") or {},
+                "volRatio": track_c.get("volRatio") or 0.0,
+                "entryPlan": build_ats_execution_plan(
+                    ah_row=ah_row,
+                    stop_loss_pct=-2.0,
+                    tp1_pct=2.0,
+                    entry_weight=weight,
+                ),
+            }
+            cand_item["entryPlan"]["entryWeight"] = weight
+            
+            track_c_hold = track_c.get("heldReason")
+            if track_c_hold in {"gap_overheat", "ah_change_below_min", "volume_surge_below_min"}:
+                held_back.append({"code": code, "strategy": "OvertimeFollow", "reason": track_c_hold})
+            elif gate.get("openBetActive"):
+                ranked_overtime_follow.append(cand_item)
+            else:
+                held_back.append({"code": code, "strategy": "OvertimeFollow", "reason": "macro_or_regime_halt"})
 
+    # 각각 정렬 후 최대 3종목 추천
+    ranked_gap_break.sort(key=lambda r: r["finalScore"], reverse=True)
+    top_gap_break = ranked_gap_break[:3]
+
+    ranked_overtime_follow.sort(key=lambda r: r["finalScore"], reverse=True)
+    top_overtime_follow = ranked_overtime_follow[:3]
+
+    # 하위 호환성용 통합 candidates 구성 (두 추천 종목의 합집합, 최대 3개)
+    combined = {c["code"]: c for c in (top_gap_break + top_overtime_follow)}
+    combined_list = list(combined.values())
+    combined_list.sort(key=lambda r: r["finalScore"], reverse=True)
+    legacy_candidates = combined_list[:3]
+
+    # 청산 예약 주문 생성
     liquidation_orders = []
-    for cand in top:
+    for cand in legacy_candidates:
         plan = cand.get("entryPlan") or {}
         liq = plan.get("krxLiquidation") or {}
         if liq.get("limitPrice"):
@@ -161,7 +251,7 @@ def build_result(
             )
 
     return {
-        "schemaVersion": "open_bet_result.v1",
+        "schemaVersion": "open_bet_result.v2",
         "tradeDate": trade_date,
         "phase": phase,
         "generatedAt": datetime.now(KST).isoformat(timespec="seconds"),
@@ -183,7 +273,9 @@ def build_result(
         "macroReasons": gate.get("reasons") or [],
         "themes": themes,
         "trackCScanner": track_c_rows,
-        "candidates": top if quality["status"] != "incomplete" else [],
+        "candidates": legacy_candidates,
+        "candidatesGapBreak": top_gap_break,
+        "candidatesOvertimeFollow": top_overtime_follow,
         "heldBack": held_back,
         "dataQuality": quality,
     }

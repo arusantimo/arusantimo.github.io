@@ -1,19 +1,10 @@
 {
   "metric": "global_gap_bundle",
-  "status": "ok",
-  "source": "fixture_fallback",
-  "confidence": 0.5,
-  "value": {
-    "rows": [],
-    "totalScore": 3.5,
-    "grade": "G-B",
-    "nq": 0.42,
-    "vix": 18.5,
-    "sox": 1.1,
-    "us10y": 0.05,
-    "usdkrw": -0.2
-  },
+  "status": "blocked",
+  "source": "yahoo_chart",
+  "confidence": 0.0,
+  "value": null,
   "errors": [
-    "macro quotes unavailable — fixture fallback"
+    "macro quotes unavailable"
   ]
 }

@@ -1,8 +1,8 @@
 {
-  "schemaVersion": "open_bet_result.v1",
+  "schemaVersion": "open_bet_result.v2",
   "tradeDate": "20260527",
-  "phase": "pre_ats",
-  "generatedAt": "2026-05-27T08:45:58+09:00",
+  "phase": "final",
+  "generatedAt": "2026-05-27T11:54:21+09:00",
   "executionSchedule": {
     "profile": "ats",
     "analysis": {
@@ -21,74 +21,39 @@
   },
   "krxLiquidationOrders": [],
   "regime": {
-    "label": "강세장 ✅ (펀더·지수 정당)",
+    "label": "강세장 ✅",
     "openBetActive": true
   },
   "macro": {
-    "gapGrade": "G-B",
-    "gapTotalScore": 3.5,
-    "nq": 0.42,
-    "vix": 18.5,
-    "sox": 1.1,
-    "nightFuture": 0.42
+    "gapGrade": null,
+    "gapTotalScore": null,
+    "nq": null,
+    "vix": null,
+    "sox": null,
+    "nightFuture": null
   },
   "macroHalt": false,
   "macroReasons": [],
   "themes": [],
-  "trackCScanner": [
-    {
-      "code": "012450",
-      "name": "한화에어로스페이스",
-      "ahChangePct": 5.2,
-      "ahPrice": 925000,
-      "ahVolume": 12500,
-      "expectedOpen": 935000,
-      "strongOpen": true,
-      "expectedOpenGapPct": 1.081
-    },
-    {
-      "code": "000660",
-      "name": "SK하이닉스",
-      "ahChangePct": 4.5,
-      "ahPrice": 198500,
-      "ahVolume": 45000,
-      "expectedOpen": 200100,
-      "strongOpen": true,
-      "expectedOpenGapPct": 0.806
-    },
-    {
-      "code": "035420",
-      "name": "NAVER",
-      "ahChangePct": 6.1,
-      "ahPrice": 215000,
-      "ahVolume": 8000,
-      "strongOpen": false,
-      "expectedOpenGapPct": 0.0,
-      "expectedOpen": 215000.0
-    }
-  ],
+  "trackCScanner": [],
   "candidates": [],
-  "heldBack": [
-    {
-      "code": "012450",
-      "reason": "score_below_A"
-    },
-    {
-      "code": "000660",
-      "reason": "score_below_A"
-    },
-    {
-      "code": "035420",
-      "reason": "score_below_A"
-    }
-  ],
+  "candidatesGapBreak": [],
+  "candidatesOvertimeFollow": [],
+  "heldBack": [],
   "dataQuality": {
-    "status": "complete",
-    "coverage": 1.0,
+    "status": "incomplete",
+    "coverage": 0.5,
     "requiredTotal": 8,
-    "requiredFilled": 8,
-    "missingRequired": [],
-    "criticalFailed": [],
+    "requiredFilled": 4,
+    "missingRequired": [
+      "global_gap_bundle",
+      "night_kospi_future",
+      "overtime_single_board",
+      "foreign_inst_flow"
+    ],
+    "criticalFailed": [
+      "overtime_single_board"
+    ],
     "optionalIssues": [],
     "fallbackUsage": [],
     "metrics": {
@@ -104,25 +69,27 @@
       },
       "global_gap_bundle": {
         "metric": "global_gap_bundle",
-        "status": "ok",
-        "source": "fixture_fallback",
-        "confidence": 0.5,
-        "stale": true,
+        "status": "blocked",
+        "source": "yahoo_chart",
+        "confidence": 0.0,
+        "stale": false,
         "errors": [
-          "macro quotes unavailable — fixture fallback"
+          "macro quotes unavailable"
         ],
         "fallbackUsage": [],
-        "filled": true
+        "filled": false
       },
       "night_kospi_future": {
         "metric": "night_kospi_future",
-        "status": "ok",
-        "source": "macro_proxy",
-        "confidence": 0.55,
+        "status": "blocked",
+        "source": "yahoo_proxy",
+        "confidence": 0.4,
         "stale": false,
-        "errors": [],
+        "errors": [
+          "night future proxy unavailable"
+        ],
         "fallbackUsage": [],
-        "filled": true
+        "filled": false
       },
       "news_headlines": {
         "metric": "news_headlines",
@@ -136,25 +103,27 @@
       },
       "overtime_single_board": {
         "metric": "overtime_single_board",
-        "status": "ok",
-        "source": "fixture_fallback",
-        "confidence": 0.5,
-        "stale": true,
+        "status": "blocked",
+        "source": "naver_html",
+        "confidence": 0.0,
+        "stale": false,
         "errors": [
-          "naver error page — fixture fallback"
+          "naver overtime unavailable (error page)"
         ],
         "fallbackUsage": [],
-        "filled": true
+        "filled": false
       },
       "foreign_inst_flow": {
         "metric": "foreign_inst_flow",
-        "status": "ok",
-        "source": "naver_frgn",
-        "confidence": 0.75,
+        "status": "blocked",
+        "source": "",
+        "confidence": 1.0,
         "stale": false,
-        "errors": [],
+        "errors": [
+          "no overtime codes"
+        ],
         "fallbackUsage": [],
-        "filled": true
+        "filled": false
       },
       "expected_open": {
         "metric": "expected_open",
@@ -169,9 +138,9 @@
       "overnight_volume": {
         "metric": "overnight_volume",
         "status": "ok",
-        "source": "fixture_fallback",
-        "confidence": 0.5,
-        "stale": true,
+        "source": "fixture",
+        "confidence": 1.0,
+        "stale": false,
         "errors": [],
         "fallbackUsage": [],
         "filled": true

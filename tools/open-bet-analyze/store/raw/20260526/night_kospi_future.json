@@ -1,11 +1,10 @@
 {
   "metric": "night_kospi_future",
-  "status": "ok",
-  "source": "macro_proxy",
-  "confidence": 0.55,
-  "value": {
-    "changePct": 0.42,
-    "sourceNote": "NQ proxy from macro bundle"
-  },
-  "errors": []
+  "status": "blocked",
+  "source": "yahoo_proxy",
+  "confidence": 0.4,
+  "value": null,
+  "errors": [
+    "night future proxy unavailable"
+  ]
 }

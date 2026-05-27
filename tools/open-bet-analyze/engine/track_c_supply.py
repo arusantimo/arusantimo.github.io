@@ -35,15 +35,23 @@ def score_track_c(
     *,
     theme_keywords: set[str] | None = None,
     macro: dict[str, Any] | None = None,
+    prev_volume: float | None = None,
 ) -> dict[str, Any]:
     w = _weights()
     ah = row.get("ahChangePct")
     score = 0.0
     breakdown: dict[str, float] = {}
     held_reason = None
+    vol_ratio = 0.0
 
     if ah is None:
-        return {"score": 0.0, "eligible": False, "heldReason": "missing_ah_change", "breakdown": {}}
+        return {
+            "score": 0.0,
+            "eligible": False,
+            "heldReason": "missing_ah_change",
+            "breakdown": {},
+            "volRatio": 0.0,
+        }
 
     ah_f = float(ah)
     if w["ahChangeMin"] <= ah_f <= w["ahChangeMax"]:
@@ -54,14 +62,30 @@ def score_track_c(
         score += 1.0
         held_reason = held_reason or "ah_change_above_max"
     else:
-        return {"score": 0.0, "eligible": False, "heldReason": "ah_change_below_min", "breakdown": {}}
+        return {
+            "score": 0.0,
+            "eligible": False,
+            "heldReason": "ah_change_below_min",
+            "breakdown": {},
+            "volRatio": 0.0,
+        }
 
-    if row.get("ahVolume"):
+    ah_vol = row.get("ahVolume")
+    if ah_vol:
         breakdown["S2"] = 2.0
         score += 2.0
+        
+        # volumeSurgeRatio 검증 (실측 전일 거래량 대비 비율)
+        if prev_volume:
+            vol_ratio = float(ah_vol) / float(prev_volume)
+            # volumeSurgeRatio (예: 0.05 = 5%)
+            if vol_ratio < w["volumeSurgeRatio"]:
+                held_reason = held_reason or "volume_surge_below_min"
     else:
         breakdown["S2"] = 1.0
         score += 1.0
+        if w["volumeSurgeRatio"] > 0:
+            held_reason = held_reason or "missing_ah_volume"
 
     if row.get("strongOpen"):
         breakdown["S3"] = 2.0
@@ -84,6 +108,7 @@ def score_track_c(
         breakdown["S6"] = 1.0
         score += 1.0
 
+    # volumeSurgeRatio 조건 미충족 시 eligible을 False로 설정
     eligible = held_reason is None or held_reason in {"weak_open"}
     return {
         "score": round(score, 2),
@@ -92,6 +117,7 @@ def score_track_c(
         "breakdown": breakdown,
         "ahChangePct": ah_f,
         "strongOpen": bool(row.get("strongOpen")),
+        "volRatio": round(vol_ratio * 100, 2),
     }
 
 
