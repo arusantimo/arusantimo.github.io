@@ -2,10 +2,7 @@
 name: market-analyze-schedule
 
 on:
-  schedule:
-    # UTC 기준이므로 KST 14:00은 UTC 05:00입니다. (14 - 9 = 5)
-    - cron: "0 5 * * *"
-  workflow_dispatch: # 필요 시 깃허브 웹 UI에서 수동 실행 가능하도록 지원
+  workflow_dispatch: # 외부 트리거(cron-job.org) 호출 또는 깃허브 웹 UI 수동 가동용
 
 concurrency:
   group: market-analyze-schedule-${{ github.ref }}
