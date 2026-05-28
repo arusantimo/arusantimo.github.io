@@ -234,12 +234,25 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('regime-report-overlay').addEventListener('click', event => {
     if (event.target === document.getElementById('regime-report-overlay')) closeRegimeReport();
   });
+
+  document.querySelectorAll('.strategy-info-btn').forEach(btn => {
+    btn.addEventListener('click', event => {
+      openStrategyInfoModal(event.currentTarget.dataset.strategy);
+    });
+  });
+
+  document.getElementById('strategy-info-close-btn').addEventListener('click', closeStrategyInfoModal);
+  document.getElementById('strategy-info-overlay').addEventListener('click', event => {
+    if (event.target === document.getElementById('strategy-info-overlay')) closeStrategyInfoModal();
+  });
+
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape') {
       closeModal();
       closeGuideModal();
       closeGapGuideModal();
       closeRegimeReport();
+      closeStrategyInfoModal();
       if (typeof closeJonggaJsonInputModal === 'function') closeJonggaJsonInputModal();
       if (typeof closeJonggaHistoryModal === 'function') closeJonggaHistoryModal();
     }

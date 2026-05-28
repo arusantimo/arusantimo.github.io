@@ -86,13 +86,19 @@
       </div>
       <div id="buy-regime-summary" class="is-collapsed"></div>
 
-      <div class="section-title">📊 눌림목 종가베팅</div>
+      <div class="section-title">📊 눌림목 종가베팅
+        <button class="icon-btn strategy-info-btn" data-strategy="pullback" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+      </div>
       <div id="buy-list-pullback" class="buy-grid"></div>
 
-      <div class="section-title">🔥 수급 매집형 종가베팅 TOP</div>
+      <div class="section-title">🔥 수급 매집형 종가베팅 TOP
+        <button class="icon-btn strategy-info-btn" data-strategy="momentum" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+      </div>
       <div id="buy-list-momentum" class="buy-grid"></div>
 
-      <div class="section-title">🔻 주도주 급락 반등 후보 (전략 ③)</div>
+      <div class="section-title">🔻 주도주 급락 반등 후보 (전략 ③)
+        <button class="icon-btn strategy-info-btn" data-strategy="reversal" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+      </div>
       <div id="buy-list-reversal" class="buy-grid"></div>
     </section>
 
@@ -125,7 +131,9 @@
       </div>
 
       <div class="section-title split-title">
-        <div>📊 눌림목 종가베팅 <span class="section-help">9:08 이후 매도/손절 분석</span></div>
+        <div>⚡ 눌림목 종가베팅 (전략 ①) <span class="section-help">9:08 이전 손절, 이후 모두 분석</span>
+          <button class="icon-btn strategy-info-btn" data-strategy="pullback" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+        </div>
         <div class="inline-inputs">
           <input type="text" id="pullback-name" placeholder="종목명">
           <input type="text" id="pullback-code" placeholder="코드(6자리)" maxlength="6">
@@ -137,7 +145,9 @@
       </div>
 
       <div class="section-title split-title">
-        <div>🔥 수급 매집형 종가베팅 <span class="section-help">9:08 이전 손절, 이후 모두 분석</span></div>
+        <div>🔥 수급 매집형 종가베팅 <span class="section-help">9:08 이전 손절, 이후 모두 분석</span>
+          <button class="icon-btn strategy-info-btn" data-strategy="momentum" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+        </div>
         <div class="inline-inputs">
           <input type="text" id="momentum-name" placeholder="종목명">
           <input type="text" id="momentum-code" placeholder="코드(6자리)" maxlength="6">
@@ -149,7 +159,9 @@
       </div>
 
       <div class="section-title split-title">
-        <div>🔻 주도주 급락 반등 (전략 ③) <span class="section-help">9:08 이전/이후 모두 분석</span></div>
+        <div>🔻 주도주 급락 반등 (전략 ③) <span class="section-help">9:08 이전/이후 모두 분석</span>
+          <button class="icon-btn strategy-info-btn" data-strategy="reversal" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+        </div>
         <div class="inline-inputs">
           <input type="text" id="reversal-name" placeholder="종목명">
           <input type="text" id="reversal-code" placeholder="코드(6자리)" maxlength="6">
@@ -273,6 +285,19 @@
         <button class="modal-close" id="jongga-history-close-btn">✕</button>
       </div>
       <div class="modal-body" id="jongga-history-body"></div>
+    </div>
+  </div>
+
+  <div id="strategy-info-overlay" class="modal-overlay">
+    <div class="modal" id="strategy-info-modal" style="max-width: 600px;">
+        <div class="modal-header">
+          <div class="modal-header-info">
+            <div class="modal-stock-name" id="strategy-info-title">전략 설명</div>
+            <div class="modal-stock-sub" id="strategy-info-subtitle"></div>
+          </div>
+        <button class="modal-close" id="strategy-info-close-btn">✕</button>
+      </div>
+      <div class="modal-body" id="strategy-info-body" style="line-height: 1.6; font-size: 14px; color: var(--text-secondary);"></div>
     </div>
   </div>
 

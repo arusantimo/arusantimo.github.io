@@ -174,8 +174,8 @@ function getJonggaSafetyIssues(entry = {}, context = {}) {
     const status = getJonggaRuleStatus(rule);
     if (!rule) {
       issues.push({ code, severity: 'block', message: `${code} 근거 누락` });
-    } else if (status === 'unknown') {
-      issues.push({ code, severity: 'block', message: `${code} 판정 미확인` });
+    } else if (status === 'unknown' || status === 'warning') {
+      // 수기 입력 지표 등은 보조 지표로 판단하기 위해 차단(block) 목록에 넣지 않음
     } else if (status === 'blocked') {
       issues.push({ code, severity: 'block', message: `${code} 미충족` });
     }

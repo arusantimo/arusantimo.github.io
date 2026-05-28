@@ -1374,3 +1374,79 @@ function closeModal() {
   document.getElementById('modal-overlay').classList.remove('open');
   syncBodyScrollLock();
 }
+
+const STRATEGY_INFO_CONTENT = {
+  pullback: {
+    title: '타입 1: 눌림목 종가베팅 (전략 ①)',
+    subtitle: '"잘 나가는 주식이 일시적으로 조정을 받고 반등할 때를 노린다"',
+    body: `
+      <p><strong>개념:</strong> 중장기적으로 우상향(정배열)하는 우량 주식이 단기적으로 조정을 받아 가격이 싸졌을 때, 반등 직전의 타이밍을 잡아서 종가에 매수하는 추세 추종형 전략입니다.</p>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
+      <ul style="padding-left: 20px; margin-top: 8px;">
+        <li><strong>정배열:</strong> 5일 이동평균선(MA)이 20일 이동평균선보다 위에 있고, 둘 다 우상향 중이어야 합니다.</li>
+        <li><strong>안전망:</strong> 주가가 60일 이동평균선 위에 있어 장기 추세가 무너지지 않은 상태여야 합니다.</li>
+        <li><strong>지표:</strong> 주봉 RSI(상대강도지수)가 50 이상이고, 일봉 MACD 히스토그램이 음전환 후 3일 이내이거나 0선 위로 회복 중이어야 합니다.</li>
+      </ul>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">채점 및 최종 선정:</div>
+      <ul style="padding-left: 20px; margin-top: 8px;">
+        <li>단기 고점 대비 -7% ~ -15% 수준으로 적당히 조정받았는지 평가합니다.</li>
+        <li>당일 외국인이나 기관이 다시 사기 시작했는지(수급 전환) 확인합니다.</li>
+        <li>당일 캔들이 양봉이거나 아래꼬리가 길게 달렸는지, 거래량은 적당히 진정되었는지(5일 평균의 100~180%)를 점수화하여 등급(S~A)을 매긴 후 상위 종목을 선정합니다.</li>
+      </ul>
+    `
+  },
+  momentum: {
+    title: '타입 2: 수급 매집형 종가베팅 (전략 ②)',
+    subtitle: '"시장의 대세 상승 주도주에 올라탄다"',
+    body: `
+      <p><strong>개념:</strong> 시장에서 가장 강한 상승 모멘텀을 보여주는 주도주가 전고점을 돌파하거나 신고가를 경신하기 직전/직후에 매수하는 돌파 매매 전략입니다.</p>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
+      <ul style="padding-left: 20px; margin-top: 8px;">
+        <li><strong>초강세:</strong> 3개월 기준 시장 대비 초과수익률(RS)이 상위 10% 이내여야 합니다.</li>
+        <li><strong>신고가 영역:</strong> 52주 신고가를 경신했거나, 52주 고점의 92% 이상 고가권에 위치해야 합니다.</li>
+        <li><strong>단기 상승세:</strong> 종가가 5일선 위에 있고 5일선이 위를 향하고 있어야 합니다.</li>
+      </ul>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">채점 및 최종 선정:</div>
+      <ul style="padding-left: 20px; margin-top: 8px;">
+        <li><strong>기관과 외국인이 동시에 강하게 매수(양매수)</strong>하고 있는지 봅니다.</li>
+        <li>토스 증권의 실시간 호가창 데이터를 통해 분당 체결강도 평균이 100% 이상으로 유지(매수세가 계속 유입)되는지 확인합니다.</li>
+        <li>돌파 당일 거래량이 평소(20일 평균)보다 150% 이상 폭발했는지 점수를 매겨 등급을 산출합니다.</li>
+      </ul>
+    `
+  },
+  reversal: {
+    title: '타입 3: 주도주 급락 반등 매매 (전략 ③ - 역추세 트랙)',
+    subtitle: '"초대형 우량주가 갑자기 폭락했을 때, 첫 반등의 꼬리를 잡는다"',
+    body: `
+      <p><strong>개념:</strong> 시장을 주도하던 초대형주(시총 30조 원 이상)가 단기 악재 등으로 패닉 셀링(급락)을 겪은 후, 매도가 멈추고 강한 매수세가 처음 유입되는 순간 진입하는 역추세(낙주) 매매입니다. (안정성을 위해 별도 트랙으로 격리 운용하며, 최대 3일만 보유하고 무조건 청산합니다.)</p>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
+      <ul style="padding-left: 20px; margin-top: 8px;">
+        <li><strong>시총 30조 원 이상:</strong> 망하지 않고 반등 확률이 매우 높은 초대형 우량주(삼성전자, SK하이닉스 등)만 대상으로 합니다.</li>
+        <li><strong>주도주 자격:</strong> 급락 전, 1개월 누적 상승률이 최소 +30% 이상이었던 핫한 종목이어야 합니다.</li>
+        <li><strong>급락 확인:</strong> 최근 5거래일 이내에 하루 만에 -5% 이상 급락한 이력이 있어야 합니다.</li>
+        <li><strong>지지선 사수:</strong> 급락했더라도 장기 지지선인 60일 이동평균선은 깨지 않고 버텨주어야 합니다.</li>
+        <li><strong>안정화 캔들:</strong> 당일 종가가 양봉으로 끝나거나, 아래꼬리가 몸통보다 1.5배 이상 길거나, 도지(Doji) 캔들로 하락세가 진정되었음을 증명해야 합니다.</li>
+      </ul>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">채점 및 최종 선정:</div>
+      <ul style="padding-left: 20px; margin-top: 8px;">
+        <li>외국인이나 기관 중 한쪽이라도 당일 순매수로 돌아섰는지 확인합니다.</li>
+        <li>토스 증권 기준 장 마감 직전 1시간 동안 체결강도가 100% 이상인지(막판에 저가 매수세가 적극 유입되었는지)를 확인하여 채점합니다.</li>
+      </ul>
+    `
+  }
+};
+
+function openStrategyInfoModal(strategy) {
+  const content = STRATEGY_INFO_CONTENT[strategy];
+  if (!content) return;
+  document.getElementById('strategy-info-title').innerText = content.title;
+  document.getElementById('strategy-info-subtitle').innerText = content.subtitle;
+  document.getElementById('strategy-info-body').innerHTML = content.body;
+  document.getElementById('strategy-info-overlay').classList.add('open');
+  syncBodyScrollLock();
+}
+
+function closeStrategyInfoModal() {
+  document.getElementById('strategy-info-overlay').classList.remove('open');
+  syncBodyScrollLock();
+}
