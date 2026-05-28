@@ -1,28 +1,26 @@
 {
   "metric": "foreign_inst_flow",
   "status": "ok",
-  "source": "neutral_fallback",
-  "confidence": 0.5,
-  "stale": true,
+  "source": "naver_frgn",
+  "confidence": 0.75,
+  "stale": false,
   "value": {
     "012450": {
-      "foreignNet": null,
-      "instNet": null,
-      "prevVolume": null
+      "foreignNet": 37577.0,
+      "instNet": -23499.0,
+      "prevVolume": 238820.0
     },
     "000660": {
-      "foreignNet": null,
-      "instNet": null,
-      "prevVolume": null
+      "foreignNet": -18203.0,
+      "instNet": 529897.0,
+      "prevVolume": 7545783.0
     },
     "035420": {
-      "foreignNet": null,
-      "instNet": null,
-      "prevVolume": null
+      "foreignNet": 93343.0,
+      "instNet": -121348.0,
+      "prevVolume": 912403.0
     }
   },
-  "errors": [
-    "no flow rows — neutral fallback"
-  ],
+  "errors": [],
   "fallbackUsage": []
 }

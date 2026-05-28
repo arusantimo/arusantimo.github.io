@@ -1,12 +1,13 @@
 {
   "metric": "night_kospi_future",
-  "status": "blocked",
+  "status": "ok",
   "source": "yahoo_proxy",
-  "confidence": 0.4,
+  "confidence": 0.5,
   "stale": false,
-  "value": null,
-  "errors": [
-    "night future proxy unavailable"
-  ],
+  "value": {
+    "changePct": 4.007,
+    "sourceNote": "NQ proxy"
+  },
+  "errors": [],
   "fallbackUsage": []
 }

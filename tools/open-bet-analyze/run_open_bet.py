@@ -32,6 +32,13 @@ LATEST_JS = RESULTS_DIR / "latest.js"
 LATEST_JSON = RESULTS_DIR / "latest.json"
 MANIFEST_PATH = RESULTS_DIR / "manifest.json"
 
+OVERTIME_CACHE_FILES = [
+    "overtime_single_board.json",
+    "overnight_volume.json",
+    "expected_open.json",
+]
+OVERTIME_PHASES = {"post_ah", "pre_ats", "final"}
+
 
 def trade_date_key() -> str:
     return datetime.now(KST).strftime("%Y%m%d")
@@ -263,6 +270,24 @@ def _configure_stdout() -> None:
             pass
 
 
+def clear_overtime_cache(trade_date: str, log: OpenBetProgressLogger) -> None:
+    """overtime 관련 raw 캐시 파일을 삭제하여 재수집을 강제합니다."""
+    raw_dir = ROOT_DIR / "store" / "raw" / trade_date
+    if not raw_dir.exists():
+        log.info(f"캐시 디렉토리 없음 — 건너뜀 (store/raw/{trade_date})")
+        return
+    cleared: list[str] = []
+    for fname in OVERTIME_CACHE_FILES:
+        fpath = raw_dir / fname
+        if fpath.exists():
+            fpath.unlink()
+            cleared.append(fname)
+    if cleared:
+        log.info(f"overtime 캐시 삭제 완료 → {', '.join(cleared)}")
+    else:
+        log.info("삭제할 캐시 파일 없음 (이미 초기화됨)")
+
+
 def main() -> int:
     _configure_stdout()
     log = OpenBetProgressLogger()
@@ -279,6 +304,12 @@ def main() -> int:
     parser.add_argument("--dry-run", action="store_true", help="파일 저장 없이 stdout")
     parser.add_argument("--fixture", action="store_true", help="샘플/fixture 폴백 사용")
     parser.add_argument("--quiet", action="store_true", help="컬러 로그 최소화")
+    parser.add_argument(
+        "--skip-clear-cache",
+        dest="skip_clear_cache",
+        action="store_true",
+        help="overtime 캐시 초기화를 건너뜁니다 (기본: 실행 전 자동 삭제)",
+    )
     args = parser.parse_args()
 
     if args.quiet:
@@ -312,6 +343,10 @@ def main() -> int:
 
     exit_code = 1
     try:
+        if not args.skip_clear_cache and args.phase in OVERTIME_PHASES:
+            log.section("overtime 캐시 초기화")
+            clear_overtime_cache(trade_date, log)
+
         log.section(f"Phase: {args.phase}")
         envelopes = collect_phase(args.phase, trade_date, log, use_fixture=args.fixture)
 
