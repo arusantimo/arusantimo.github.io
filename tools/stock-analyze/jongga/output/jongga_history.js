@@ -1,5 +1,173 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-05-28",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/jongga_data_20260528.js",
+    "jsonFile": "jongga/output/latest_20260528.json",
+    "generatedAt": "2026-05-28T05:52:01+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 4.0,
+        "grade": "C",
+        "statusLabel": "제외"
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 4.0,
+        "grade": "C",
+        "statusLabel": "제외"
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 3.6,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      }
+    ]
+  },
+  {
+    "date": "2026-05-28",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/jongga_data_20260528_canary.js",
+    "jsonFile": "jongga/output/latest_20260528_canary.json",
+    "generatedAt": "2026-05-28T05:53:28+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 4.0,
+        "grade": "C",
+        "statusLabel": "제외"
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 3.2,
+        "grade": "C",
+        "statusLabel": "제외"
+      },
+      {
+        "strategy": "momentum",
+        "name": "디앤디파마텍",
+        "code": "347850",
+        "score": 3.2,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      }
+    ]
+  },
+  {
     "date": "2026-05-27",
     "variant": "stable",
     "variantLabel": "현재 버전",
