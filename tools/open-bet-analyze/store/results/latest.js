@@ -2,7 +2,7 @@ window.__OPEN_BET_RESULT__ = {
   "schemaVersion": "open_bet_result.v2",
   "tradeDate": "20260528",
   "phase": "post_ah",
-  "generatedAt": "2026-05-28T13:49:05+09:00",
+  "generatedAt": "2026-05-28T16:05:57+09:00",
   "executionSchedule": {
     "profile": "ats",
     "analysis": {
@@ -276,7 +276,7 @@ window.__OPEN_BET_RESULT__ = {
         "confidence": 0.55,
         "stale": true,
         "errors": [
-          "naver overtime unavailable (error page) — snapshot 20260528 fallback"
+          "naver overtime unavailable (error page) — snapshot 20260527 fallback"
         ],
         "fallbackUsage": [],
         "filled": true

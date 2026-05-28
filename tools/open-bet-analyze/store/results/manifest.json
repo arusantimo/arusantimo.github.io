@@ -1,7 +1,7 @@
 {
   "schemaVersion": "open_bet_result.v2",
   "tradeDate": "20260528",
-  "generatedAt": "2026-05-28T13:49:05+09:00",
+  "generatedAt": "2026-05-28T16:05:57+09:00",
   "phase": "post_ah",
   "dataQualityStatus": "degraded",
   "candidateCount": 1

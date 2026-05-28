@@ -5,7 +5,7 @@
   "confidence": 1.0,
   "stale": false,
   "value": {
-    "sourceFile": "latest.json",
+    "sourceFile": "latest_20260528.json",
     "regime": "강세장 ✅ (펀더·지수 정당)",
     "openBetActive": true,
     "openingBetLabel": "활성",
@@ -13,31 +13,31 @@
       "rows": [
         {
           "indicator": "NQ 선물 변화율",
-          "actualValue": "+2.23%",
-          "baseScore": "+2점",
+          "actualValue": "+1.18%",
+          "baseScore": "+1점",
           "weight": "×2.5",
-          "formula": "+2 × 2.5 = +5.0점",
-          "weightedScore": "+5.0점"
+          "formula": "+1 × 2.5 = +2.5점",
+          "weightedScore": "+2.5점"
         },
         {
           "indicator": "VIX 수준",
-          "actualValue": "+17.01",
-          "baseScore": "+0점",
+          "actualValue": "+16.29",
+          "baseScore": "+1점",
           "weight": "×2.0",
-          "formula": "+0 × 2.0 = +0.0점",
-          "weightedScore": "+0.0점"
+          "formula": "+1 × 2.0 = +2.0점",
+          "weightedScore": "+2.0점"
         },
         {
           "indicator": "미국 10년 금리 전일비",
-          "actualValue": "-7.9bp",
-          "baseScore": "+1점",
+          "actualValue": "-10.5bp",
+          "baseScore": "+2점",
           "weight": "×1.5",
-          "formula": "+1 × 1.5 = +1.5점",
-          "weightedScore": "+1.5점"
+          "formula": "+2 × 1.5 = +3.0점",
+          "weightedScore": "+3.0점"
         },
         {
           "indicator": "원달러 환율 변화",
-          "actualValue": "+1.61원",
+          "actualValue": "+0.12원",
           "baseScore": "+0점",
           "weight": "×1.5",
           "formula": "+0 × 1.5 = +0.0점",
@@ -45,14 +45,14 @@
         },
         {
           "indicator": "SOX 전일 변화율",
-          "actualValue": "+13.93%",
+          "actualValue": "+12.35%",
           "baseScore": "+2점",
           "weight": "×1.0",
           "formula": "+2 × 1.0 = +2.0점",
           "weightedScore": "+2.0점"
         }
       ],
-      "totalScore": "+8.5점",
+      "totalScore": "+9.5점",
       "grade": "G-A 🟢",
       "code": "G-A",
       "entryAdjustment": "✅ 100% 진입 / ✅ 100% 진입",
@@ -61,7 +61,7 @@
       "note": "실시간 공개 시세(Yahoo chart API) 기준입니다."
     },
     "candidates": [],
-    "vkospi": "VKOSPI 71.40"
+    "vkospi": "VKOSPI 71.15"
   },
   "errors": [],
   "fallbackUsage": []

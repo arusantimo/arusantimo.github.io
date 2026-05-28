@@ -29,7 +29,7 @@
       },
       {
         "name": "USDKRW",
-        "raw": 0.187,
+        "raw": -0.094,
         "baseScore": 0,
         "weight": 1.5,
         "applied": 0.0
@@ -48,7 +48,7 @@
     "vix": 16.29,
     "sox": 12.354,
     "us10y": -2.29,
-    "usdkrw": 0.187
+    "usdkrw": -0.094
   },
   "errors": [],
   "fallbackUsage": []
