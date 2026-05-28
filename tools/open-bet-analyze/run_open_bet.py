@@ -46,8 +46,10 @@ def save_raw_envelopes(trade_date: str, envelopes: dict, log: OpenBetProgressLog
             "status": env.status,
             "source": env.source,
             "confidence": env.confidence,
+            "stale": env.stale,
             "value": env.value,
             "errors": env.errors,
+            "fallbackUsage": env.fallback_usage,
         }
         path = raw_dir / f"{name}.json"
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -174,6 +176,7 @@ def _print_final_summary(
     q_status = quality.get("status", "incomplete")
     coverage = quality.get("coverage", 0)
     missing = quality.get("missingRequired") or []
+    stale_required = quality.get("staleRequired") or []
     regime = result.get("regime") or {}
     candidates = result.get("candidates") or []
     held = result.get("heldBack") or []
@@ -184,7 +187,9 @@ def _print_final_summary(
         meta = (quality.get("metrics") or {}).get(name) or {}
         filled = meta.get("filled", False)
         m_status = meta.get("status", "blocked")
-        if filled and m_status == "ok":
+        if filled and meta.get("stale"):
+            metric_lines.append((name, "수집됨 (stale)", "warn"))
+        elif filled and m_status == "ok":
             metric_lines.append((name, "수집 성공", "ok"))
         elif filled:
             metric_lines.append((name, f"수집됨 ({m_status})", "warn"))
@@ -195,8 +200,13 @@ def _print_final_summary(
 
     fusion_level = "ok" if q_status == "complete" else "fail"
     fusion_text = f"{q_status} · coverage {coverage:.0%}"
-    if q_status != "complete":
+    if q_status != "complete" and missing:
         fusion_text += f" · 누락 {', '.join(missing[:4])}"
+    if stale_required:
+        fusion_level = "warn"
+        fusion_text += f" · stale {', '.join(stale_required[:3])}"
+    elif q_status == "degraded":
+        fusion_level = "warn"
 
     regime_level = "ok" if regime.get("openBetActive") else "warn"
     regime_text = f"{regime.get('label', '—')} · {'활성' if regime.get('openBetActive') else '비활성'}"
@@ -227,7 +237,7 @@ def _print_final_summary(
                 else f"{idx}. {cand.get('name')} ({cand.get('code')}) 점수 {cand.get('finalScore')}"
             )
 
-    run_ok = q_status == "complete"
+    run_ok = q_status in {"complete", "degraded"} and not quality.get("criticalFailed")
     if run_ok and not candidates and not regime.get("openBetActive"):
         msg = "분석 완료 · 레짐 비활성"
         log.final_outcome(True, msg)

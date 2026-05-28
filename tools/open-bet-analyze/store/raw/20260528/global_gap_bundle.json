@@ -1,0 +1,51 @@
+{
+  "metric": "global_gap_bundle",
+  "status": "ok",
+  "source": "market_snapshot_mix",
+  "confidence": 0.55,
+  "stale": false,
+  "value": {
+    "rows": [
+      {
+        "name": "NQ",
+        "baseScore": null,
+        "weight": 2.5,
+        "applied": null
+      },
+      {
+        "name": "VIX",
+        "raw": 17.01,
+        "baseScore": 0,
+        "weight": 2.0,
+        "applied": 0.0
+      },
+      {
+        "name": "US10Y",
+        "baseScore": null,
+        "weight": 1.5,
+        "applied": null
+      },
+      {
+        "name": "USDKRW",
+        "baseScore": null,
+        "weight": 1.5,
+        "applied": null
+      },
+      {
+        "name": "SOX",
+        "baseScore": null,
+        "weight": 1.0,
+        "applied": null
+      }
+    ],
+    "totalScore": 0.0,
+    "grade": "G-C",
+    "nq": null,
+    "vix": 17.01,
+    "sox": null,
+    "us10y": null,
+    "usdkrw": null
+  },
+  "errors": [],
+  "fallbackUsage": []
+}

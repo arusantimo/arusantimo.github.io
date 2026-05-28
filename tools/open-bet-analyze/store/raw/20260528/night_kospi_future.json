@@ -1,0 +1,12 @@
+{
+  "metric": "night_kospi_future",
+  "status": "blocked",
+  "source": "yahoo_proxy",
+  "confidence": 0.4,
+  "stale": false,
+  "value": null,
+  "errors": [
+    "night future proxy unavailable"
+  ],
+  "fallbackUsage": []
+}

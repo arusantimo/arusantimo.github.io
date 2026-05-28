@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
 from typing import Any
 from urllib.error import URLError
 
 from collectors._html import find_stock_code, parse_number, parse_tables
+from collectors._stale_fallback import load_recent_metric_snapshot
 from router.quality import MetricEnvelope
 from scripts.fetch_bridge import ROOT_DIR, fetch_text, make_playwright_request, normalize_request_error
 
@@ -74,6 +74,21 @@ def load_fixture_rows() -> list[dict[str, Any]]:
     return list(payload.get("rows") or [])
 
 
+def _load_stale_overtime_rows() -> tuple[list[dict[str, Any]], str] | tuple[None, None]:
+    snapshot = load_recent_metric_snapshot(
+        ROOT_DIR,
+        ["overtime_single_board", "overnight_volume", "expected_open"],
+        require_rows=True,
+    )
+    if not snapshot:
+        return None, None
+    payload = snapshot["payload"]
+    rows = list(((payload.get("value") or {}).get("rows") or []))
+    if not rows:
+        return None, None
+    return rows, str(snapshot.get("tradeDate") or "")
+
+
 def _fetch_overtime_html() -> tuple[str, str, list[str]]:
     errors: list[str] = []
     try:
@@ -108,6 +123,7 @@ def collect_overtime_board(
                 source="fixture",
                 confidence=1.0,
             )
+    stale_rows, stale_date = _load_stale_overtime_rows()
     fallback: list[str] = []
     try:
         html, source, errors = _fetch_overtime_html()
@@ -122,6 +138,16 @@ def collect_overtime_board(
                     confidence=0.5,
                     stale=True,
                     errors=["naver error page — fixture fallback"],
+                    fallback_usage=fallback,
+                )
+            if stale_rows:
+                return MetricEnvelope(
+                    metric="overtime_single_board",
+                    value={"rows": stale_rows, "count": len(stale_rows)},
+                    source="raw_snapshot",
+                    confidence=0.55,
+                    stale=True,
+                    errors=[f"naver overtime unavailable (error page) — snapshot {stale_date} fallback"],
                     fallback_usage=fallback,
                 )
             return MetricEnvelope(
@@ -157,6 +183,16 @@ def collect_overtime_board(
                 encoding="utf-8",
             )
         if not rows:
+            if stale_rows:
+                return MetricEnvelope(
+                    metric="overtime_single_board",
+                    value={"rows": stale_rows, "count": len(stale_rows)},
+                    source="raw_snapshot",
+                    confidence=0.55,
+                    stale=True,
+                    errors=[f"parsed 0 rows — snapshot {stale_date} fallback"],
+                    fallback_usage=fallback,
+                )
             return MetricEnvelope(
                 metric="overtime_single_board",
                 status="blocked",
@@ -173,6 +209,16 @@ def collect_overtime_board(
             fallback_usage=fallback,
         )
     except (URLError, OSError, TimeoutError) as error:
+        if stale_rows:
+            return MetricEnvelope(
+                metric="overtime_single_board",
+                value={"rows": stale_rows, "count": len(stale_rows)},
+                source="raw_snapshot",
+                confidence=0.55,
+                stale=True,
+                errors=[f"{normalize_request_error(error)} — snapshot {stale_date} fallback"],
+                fallback_usage=fallback,
+            )
         return MetricEnvelope(
             metric="overtime_single_board",
             status="blocked",

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 from urllib.error import URLError
 
+from collectors._stale_fallback import load_recent_metric_snapshot
 from router.quality import MetricEnvelope
 from scripts.fetch_bridge import ROOT_DIR, fetch_text, normalize_request_error
 
@@ -114,6 +115,19 @@ def collect_news_theme(*, trade_date: str = "", save_raw: bool = True) -> Metric
             confidence=0.7 if headlines else 0.3,
         )
     except (URLError, OSError, TimeoutError) as error:
+        snapshot = load_recent_metric_snapshot(ROOT_DIR, ["news_headlines"])
+        if snapshot:
+            payload = snapshot["payload"]
+            value = payload.get("value")
+            if isinstance(value, dict):
+                return MetricEnvelope(
+                    metric="news_headlines",
+                    value=value,
+                    source="raw_snapshot",
+                    confidence=0.55,
+                    stale=True,
+                    errors=[f"{normalize_request_error(error)} — snapshot {snapshot['tradeDate']} fallback"],
+                )
         return MetricEnvelope(
             metric="news_headlines",
             status="blocked",

@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Any
 from urllib.error import URLError
 
+from collectors._stale_fallback import load_market_analyze_latest_data, load_recent_metric_snapshot
 from router.quality import MetricEnvelope
-from scripts.fetch_bridge import fetch_json, normalize_request_error
+from scripts.fetch_bridge import fetch_json, fetch_text, normalize_request_error
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,11 +21,36 @@ SYMBOLS = {
 }
 
 
-def _yahoo_change_pct(symbol: str) -> float | None:
-    url = YAHOO_CHART.format(symbol=symbol)
+def _parse_json_fragment(text: str) -> Any:
+    start = text.find("{")
+    end = text.rfind("}")
+    if start < 0 or end <= start:
+        raise json.JSONDecodeError("JSON payload missing", text, 0)
+    return json.loads(text[start : end + 1])
+
+
+def _fetch_yahoo_chart_payload(symbol: str) -> dict[str, Any] | None:
+    encoded = str(symbol)
+    urls = [
+        f"https://query1.finance.yahoo.com/v8/finance/chart/{encoded}?interval=1d&range=5d",
+        f"https://query2.finance.yahoo.com/v8/finance/chart/{encoded}?interval=1d&range=5d",
+    ]
+    for url in urls:
+        try:
+            return fetch_json(url, timeout=12)
+        except (URLError, OSError, json.JSONDecodeError):
+            continue
     try:
-        payload = fetch_json(url, timeout=12)
+        text = fetch_text(f"https://r.jina.ai/http://query1.finance.yahoo.com/v8/finance/chart/{encoded}?interval=1d&range=5d", timeout=20, encoding="utf-8")
+        payload = _parse_json_fragment(text)
+        return payload if isinstance(payload, dict) else None
     except (URLError, OSError, json.JSONDecodeError):
+        return None
+
+
+def _yahoo_change_pct(symbol: str) -> float | None:
+    payload = _fetch_yahoo_chart_payload(symbol)
+    if not payload:
         return None
     result = (payload.get("chart") or {}).get("result") or []
     if not result:
@@ -52,14 +78,16 @@ def _gap_grade(total: float) -> str:
 def _gap_score_bundle() -> dict[str, Any]:
     nq = _yahoo_change_pct(SYMBOLS["nq"])
     vix_level = None
-    vix_payload = None
-    try:
-        vix_payload = fetch_json(YAHOO_CHART.format(symbol=SYMBOLS["vix"]), timeout=12)
+    vix_payload = _fetch_yahoo_chart_payload(SYMBOLS["vix"])
+    if vix_payload:
         result = (vix_payload.get("chart") or {}).get("result") or []
         if result:
             vix_level = (result[0].get("meta") or {}).get("regularMarketPrice")
-    except (URLError, OSError, json.JSONDecodeError):
-        pass
+    if vix_level is None:
+        market_data = load_market_analyze_latest_data(ROOT_DIR) or {}
+        vix_candidate = market_data.get("vix")
+        if isinstance(vix_candidate, (int, float)):
+            vix_level = float(vix_candidate)
 
     sox = _yahoo_change_pct(SYMBOLS["sox"])
     us10y = _yahoo_change_pct(SYMBOLS["us10y"])
@@ -129,6 +157,17 @@ def _load_macro_fixture() -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _load_recent_macro_snapshot() -> tuple[dict[str, Any], str] | tuple[None, None]:
+    snapshot = load_recent_metric_snapshot(ROOT_DIR, ["global_gap_bundle"])
+    if not snapshot:
+        return None, None
+    payload = snapshot["payload"]
+    value = payload.get("value")
+    if not isinstance(value, dict):
+        return None, None
+    return value, str(snapshot.get("tradeDate") or "")
+
+
 def collect_global_macro(*, use_fixture: bool = False) -> MetricEnvelope:
     if use_fixture:
         fixture = _load_macro_fixture()
@@ -139,6 +178,7 @@ def collect_global_macro(*, use_fixture: bool = False) -> MetricEnvelope:
                 source="fixture",
                 confidence=1.0,
             )
+    recent_snapshot, snapshot_date = _load_recent_macro_snapshot()
     try:
         bundle = _gap_score_bundle()
         if bundle.get("nq") is None and bundle.get("vix") is None:
@@ -152,6 +192,15 @@ def collect_global_macro(*, use_fixture: bool = False) -> MetricEnvelope:
                     stale=True,
                     errors=["macro quotes unavailable — fixture fallback"],
                 )
+            if recent_snapshot:
+                return MetricEnvelope(
+                    metric="global_gap_bundle",
+                    value=recent_snapshot,
+                    source="raw_snapshot",
+                    confidence=0.55,
+                    stale=True,
+                    errors=[f"macro quotes unavailable — snapshot {snapshot_date} fallback"],
+                )
             return MetricEnvelope(
                 metric="global_gap_bundle",
                 status="blocked",
@@ -159,11 +208,12 @@ def collect_global_macro(*, use_fixture: bool = False) -> MetricEnvelope:
                 confidence=0.0,
                 errors=["macro quotes unavailable"],
             )
+        confidence = 0.8 if bundle.get("nq") is not None else 0.55
         return MetricEnvelope(
             metric="global_gap_bundle",
             value=bundle,
-            source="yahoo_chart",
-            confidence=0.8,
+            source="yahoo_chart" if bundle.get("nq") is not None else "market_snapshot_mix",
+            confidence=confidence,
         )
     except (URLError, OSError, TimeoutError) as error:
         fixture = _load_macro_fixture()
@@ -175,6 +225,15 @@ def collect_global_macro(*, use_fixture: bool = False) -> MetricEnvelope:
                 confidence=0.5,
                 stale=True,
                 errors=[normalize_request_error(error)],
+            )
+        if recent_snapshot:
+            return MetricEnvelope(
+                metric="global_gap_bundle",
+                value=recent_snapshot,
+                source="raw_snapshot",
+                confidence=0.55,
+                stale=True,
+                errors=[f"{normalize_request_error(error)} — snapshot {snapshot_date} fallback"],
             )
         return MetricEnvelope(
             metric="global_gap_bundle",
@@ -188,6 +247,19 @@ def collect_night_future() -> MetricEnvelope:
     """KOSPI200 선물 프록시 — Yahoo NQ intraday as fallback when Naver blocked."""
     change = _yahoo_change_pct("%5ENDX")
     if change is None:
+        snapshot = load_recent_metric_snapshot(ROOT_DIR, ["night_kospi_future"])
+        if snapshot:
+            payload = snapshot["payload"]
+            value = payload.get("value")
+            if isinstance(value, dict) and value.get("changePct") is not None:
+                return MetricEnvelope(
+                    metric="night_kospi_future",
+                    value=value,
+                    source="raw_snapshot",
+                    confidence=0.5,
+                    stale=True,
+                    errors=[f"night future proxy unavailable — snapshot {snapshot['tradeDate']} fallback"],
+                )
         return MetricEnvelope(
             metric="night_kospi_future",
             status="blocked",

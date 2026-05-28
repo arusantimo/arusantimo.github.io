@@ -5,8 +5,9 @@ from typing import Any
 from urllib.error import URLError
 
 from collectors._html import parse_number, parse_tables
+from collectors._stale_fallback import load_recent_metric_snapshot
 from router.quality import MetricEnvelope
-from scripts.fetch_bridge import fetch_text, normalize_request_error
+from scripts.fetch_bridge import ROOT_DIR, fetch_text, normalize_request_error
 
 FRGN_URL = "https://finance.naver.com/item/frgn.naver?code={code}"
 
@@ -61,6 +62,34 @@ def collect_foreign_inst_flow_batch(codes: list[str]) -> MetricEnvelope:
         if flow:
             flows[code] = flow
     if not flows:
+        snapshot = load_recent_metric_snapshot(ROOT_DIR, ["foreign_inst_flow"])
+        if snapshot:
+            payload = snapshot["payload"]
+            stale_flows = payload.get("value") or {}
+            if stale_flows:
+                return MetricEnvelope(
+                    metric="foreign_inst_flow",
+                    value=stale_flows,
+                    source="raw_snapshot",
+                    confidence=0.65,
+                    stale=True,
+                    errors=[f"no flow rows — snapshot {snapshot['tradeDate']} fallback"],
+                )
+        if codes:
+            neutral_flows = {
+                str(code): {"foreignNet": None, "instNet": None, "prevVolume": None}
+                for code in codes[:20]
+                if str(code).strip()
+            }
+            if neutral_flows:
+                return MetricEnvelope(
+                    metric="foreign_inst_flow",
+                    value=neutral_flows,
+                    source="neutral_fallback",
+                    confidence=0.5,
+                    stale=True,
+                    errors=["no flow rows — neutral fallback"],
+                )
         return MetricEnvelope(
             metric="foreign_inst_flow",
             status="blocked",

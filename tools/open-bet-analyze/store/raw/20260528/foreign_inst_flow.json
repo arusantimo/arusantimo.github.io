@@ -1,0 +1,28 @@
+{
+  "metric": "foreign_inst_flow",
+  "status": "ok",
+  "source": "neutral_fallback",
+  "confidence": 0.5,
+  "stale": true,
+  "value": {
+    "012450": {
+      "foreignNet": null,
+      "instNet": null,
+      "prevVolume": null
+    },
+    "000660": {
+      "foreignNet": null,
+      "instNet": null,
+      "prevVolume": null
+    },
+    "035420": {
+      "foreignNet": null,
+      "instNet": null,
+      "prevVolume": null
+    }
+  },
+  "errors": [
+    "no flow rows — neutral fallback"
+  ],
+  "fallbackUsage": []
+}

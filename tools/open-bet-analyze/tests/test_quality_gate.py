@@ -35,6 +35,19 @@ class QualityGateTest(unittest.TestCase):
         )
         self.assertEqual(quality["status"], "complete")
 
+    def test_degraded_when_required_metric_is_stale(self):
+        envelopes = {
+            "overtime_single_board": MetricEnvelope("overtime_single_board", value={"rows": []}, stale=True),
+            "eod_open_bet_signals": MetricEnvelope("eod_open_bet_signals", value={}),
+            "global_gap_bundle": MetricEnvelope("global_gap_bundle", value={}),
+        }
+        quality = evaluate_quality(
+            envelopes,
+            ["overtime_single_board", "eod_open_bet_signals", "global_gap_bundle"],
+        )
+        self.assertEqual(quality["status"], "degraded")
+        self.assertEqual(quality["staleRequired"], ["overtime_single_board"])
+
 
 if __name__ == "__main__":
     unittest.main()

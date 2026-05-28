@@ -52,6 +52,7 @@ def evaluate_quality(
         for name, env in envelopes.items()
         if name not in required and env.status in {"blocked", "manual_required"}
     ]
+    stale_required = [name for name in filled if envelopes[name].stale]
 
     fallback_usage: list[str] = []
     for env in envelopes.values():
@@ -59,6 +60,8 @@ def evaluate_quality(
 
     if critical_failed or coverage < 0.85:
         status = "incomplete"
+    elif stale_required:
+        status = "degraded"
     elif coverage < 1.0:
         status = "degraded"
     elif optional_missing:
@@ -73,6 +76,7 @@ def evaluate_quality(
         "requiredFilled": len(filled),
         "missingRequired": missing,
         "criticalFailed": critical_failed,
+        "staleRequired": stale_required,
         "optionalIssues": optional_missing,
         "fallbackUsage": fallback_usage,
         "metrics": {name: env.to_dict() for name, env in envelopes.items()},
