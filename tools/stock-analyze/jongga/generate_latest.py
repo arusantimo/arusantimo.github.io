@@ -2260,7 +2260,7 @@ def collect_live_payload(
         manual_keys.append("toss_metrics")
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
-    data_quality_status = "partial" if errors or http_errors or browser_errors or missing_public_metrics or fallback_keys else "complete"
+    data_quality_status = "partial" if errors or http_errors or browser_errors or missing_public_metrics or fallback_keys else "success"
     intraday_ok = sum(1 for snapshot in snapshots if snapshot.intraday_30m.get("available"))
     event_schedule_ok = sum(1 for snapshot in snapshots if snapshot.event_filter)
     toss_strength_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("avgStrength") is not None)

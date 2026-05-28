@@ -127,7 +127,7 @@ class MacroOverlayTest(unittest.TestCase):
             {
                 "kospiClose": 8100.0,
                 "kospiMa5": 7600.0,
-                "vkospiValue": 75.0,
+                "vkospiValue": 85.0,
                 "vkospiLabel": "VKOSPI",
                 "riseJustifiedByMacro": True,
                 "regimeLabel": REGIME_STRONG_BULL,

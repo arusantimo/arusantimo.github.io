@@ -241,17 +241,20 @@ function setJonggaTodayStatus(state, dateKey = getJonggaKstTodayKey(), detail = 
   const button = document.getElementById('btn-open-jongga-json-modal');
   const statusTime = ['loaded', 'manual'].includes(state) ? formatJonggaStatusTime(timeValue) : '';
   const timeSuffix = statusTime ? ` ${statusTime}` : '';
-  const variantLabel = getJonggaVariantLabel(variant);
+  const isToday = dateKey === getJonggaKstTodayKey();
+  const variantLabel = isToday ? getJonggaVariantLabel(variant) : '이전 버전';
+  const effectiveState = (!isToday && state === 'loaded') ? 'previous' : state;
   const labels = {
     loading: `${variantLabel} 데이터 확인 중: ${dateKey}`,
     loaded: `${variantLabel} 데이터: ${dateKey}${timeSuffix} 로드 완료`,
+    previous: `${variantLabel} 데이터: ${dateKey}${timeSuffix} 로드 완료`,
     manual: `${variantLabel} 직접 입력 데이터 사용 중: ${dateKey}${timeSuffix}`,
     missing: `${variantLabel} 데이터 없음: ${dateKey}`,
     error: `${variantLabel} 데이터 오류: ${dateKey}`
   };
   if (target) {
-    target.textContent = labels[state] || labels.missing;
-    target.className = `today-data-status ${state || 'unknown'}`;
+    target.textContent = labels[effectiveState] || labels.missing;
+    target.className = `today-data-status ${effectiveState || 'unknown'}`;
     target.title = detail || '';
   }
   if (button) {
@@ -450,30 +453,88 @@ function renderJonggaHistoryModal() {
 function renderJonggaHistoryItem(entry) {
   const recommendations = Array.isArray(entry.topRecommendations) ? entry.topRecommendations : [];
   const variant = normalizeJonggaVariant(entry.variant || 'stable');
-  return `
-    <section class="history-item">
-      <div class="history-head">
-        <div>
-          <div class="history-date">
-            ${escapeHtml(entry.date || '날짜 없음')}
-            <span class="history-variant-badge ${escapeHtml(variant)}">${escapeHtml(entry.variantLabel || getJonggaVariantLabel(variant))}</span>
+  
+  const strategyGroups = {};
+  recommendations.forEach(item => {
+    const strat = item.strategy || 'unknown';
+    if (!strategyGroups[strat]) {
+      strategyGroups[strat] = [];
+    }
+    strategyGroups[strat].push(item);
+  });
+  
+  const isToday = entry.date === getJonggaKstTodayKey();
+  const displayVariantLabel = isToday ? (entry.variantLabel || getJonggaVariantLabel(variant)) : '이전 버전';
+  const badgeClass = isToday ? escapeHtml(variant) : 'previous';
+
+  const STRATEGY_LABELS = {
+    pullback: '⚡ 눌림목',
+    momentum: '🔥 수급매집',
+    reversal: '🔻 급락반등',
+    swing: '🔄 스윙'
+  };
+  
+  let recHtml = '';
+  if (recommendations.length) {
+    const order = ['pullback', 'momentum', 'reversal', 'swing'];
+    const presentStrategies = order.filter(s => strategyGroups[s] && strategyGroups[s].length);
+    Object.keys(strategyGroups).forEach(s => {
+      if (!order.includes(s)) presentStrategies.push(s);
+    });
+    
+    recHtml = `
+      <div class="history-recommendations-grouped">
+        ${presentStrategies.map(strat => `
+          <div class="history-strategy-group" style="margin-top: 8px;">
+            <div class="history-strategy-title" style="font-weight: bold; font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">${escapeHtml(STRATEGY_LABELS[strat] || strat)}</div>
+            <div class="history-strategy-items" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+              ${strategyGroups[strat].map(renderJonggaHistoryRecommendation).join('')}
+            </div>
           </div>
-          <div class="history-meta">생성 ${escapeHtml(formatJonggaHistoryDate(entry.generatedAt))} · 추천 ${Number(entry.buyCount || 0)}개</div>
-        </div>
-        <span class="quality-status ${escapeHtml(String(entry.status || 'unknown').toLowerCase())}">${escapeHtml(entry.status || 'unknown')}</span>
+        `).join('')}
       </div>
-      ${recommendations.length ? `<div class="history-recommendations">${recommendations.slice(0, 10).map(renderJonggaHistoryRecommendation).join('')}</div>` : '<div class="history-empty">상위 추천 요약 없음</div>'}
+    `;
+  } else {
+    recHtml = '<div class="history-empty">상위 추천 요약 없음</div>';
+  }
+
+  return `
+    <section class="history-item" style="border-bottom: 1px solid var(--border-color); padding: 12px 5px;">
+      <div class="history-head" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div class="history-date" style="font-weight: bold; font-size: 15px;">
+            ${escapeHtml(entry.date || '날짜 없음')}
+            <span class="history-variant-badge ${badgeClass}" style="font-size: 11px; margin-left: 4px; padding: 2px 6px; border-radius: 4px;">${escapeHtml(displayVariantLabel)}</span>
+          </div>
+          <div class="history-meta" style="font-size: 12px; color: var(--text-muted);">생성 ${escapeHtml(formatJonggaHistoryDate(entry.generatedAt))} · 추천 ${Number(entry.buyCount || 0)}개</div>
+        </div>
+        <div class="history-actions" style="display: flex; align-items: center; gap: 8px;">
+          <span class="quality-status ${escapeHtml(String(entry.status || 'unknown').toLowerCase())}" style="font-size: 12px; padding: 2px 6px; border-radius: 4px;">${escapeHtml(entry.status || 'unknown')}</span>
+          <button type="button" class="btn btn-primary btn-load-history-date small" data-date="${escapeHtml(entry.date)}" data-variant="${escapeHtml(variant)}">보기</button>
+        </div>
+      </div>
+      ${recHtml}
     </section>
   `;
 }
 
 function renderJonggaHistoryRecommendation(item) {
   const score = Number.isFinite(Number(item.score)) ? Number(item.score).toFixed(1) : '-';
-  const strategy = ({ pullback: '눌림목', momentum: '수급', reversal: '반등', swing: '스윙' })[item.strategy] || item.strategy || '-';
+  const priceText = item.currentPrice ? `${Number(item.currentPrice).toLocaleString()}원` : '-';
+  const strategyText = ({ pullback: '눌림목', momentum: '수급', reversal: '반등', swing: '스윙' })[item.strategy] || item.strategy || '-';
+  
   return `
-    <div class="history-rec">
-      <strong>${escapeHtml(item.name || '종목명 없음')} (${escapeHtml(item.code || '-')})</strong>
-      <span>${escapeHtml(strategy)} · ${score}점 · ${escapeHtml(item.grade || '-')} · ${escapeHtml(item.statusLabel || '-')}</span>
+    <div class="history-rec-card" style="display: flex; flex-direction: column; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background-color: rgba(255, 255, 255, 0.03); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+      <div style="font-weight: bold; font-size: 13px; margin-bottom: 2px;">${escapeHtml(item.name || '종목명 없음')}</div>
+      <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">${escapeHtml(item.code || '-')}</div>
+      <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <span style="font-weight: bold; color: var(--accent-primary, #00d9ff);">${score}점</span>
+        <span style="font-size: 10px; padding: 2px 4px; background: rgba(255,255,255,0.05); border-radius: 3px; border: 1px solid var(--border-color);">${escapeHtml(strategyText)} · ${escapeHtml(item.grade || '-')}</span>
+      </div>
+      <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--text-secondary);">${priceText}</span>
+        <span style="font-size: 10px; padding: 2px 4px; background: rgba(255,255,255,0.05); border-radius: 3px; border: 1px solid var(--border-color); color: var(--text-muted);">${escapeHtml(item.statusLabel || '-')}</span>
+      </div>
     </div>
   `;
 }
@@ -498,6 +559,16 @@ function bindJonggaDailyControls() {
     if (event.target === event.currentTarget) closeJonggaJsonInputModal();
   });
   document.getElementById('jongga-history-overlay')?.addEventListener('click', event => {
+    const btn = event.target.closest('.btn-load-history-date');
+    if (btn) {
+      const date = btn.dataset.date;
+      const variant = btn.dataset.variant;
+      if (date && variant) {
+        loadJonggaDailyData(date, variant);
+        closeJonggaHistoryModal();
+      }
+      return;
+    }
     if (event.target === event.currentTarget) closeJonggaHistoryModal();
   });
   document.querySelectorAll('[data-jongga-variant]').forEach(button => {

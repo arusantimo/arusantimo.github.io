@@ -19,7 +19,7 @@ REGIME_BOX_INDEX = "박스권 ⚠️ (지수 우선)"
 
 # pullback G5 — keep in sync with js/market-analyze-bridge.js
 PULLBACK_G5_VKOSPI_STRICT = 30
-PULLBACK_G5_VKOSPI_MACRO_CAP = 70
+PULLBACK_G5_VKOSPI_MACRO_CAP = 80
 
 
 def tools_root_from_jongga_module() -> Path:

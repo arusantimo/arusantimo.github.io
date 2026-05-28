@@ -189,6 +189,7 @@ def extract_top_recommendations(payload: dict[str, Any], *, limit: int = 10) -> 
             "score": entry.get("score"),
             "grade": entry.get("grade") or "",
             "statusLabel": entry.get("statusLabel") or entry.get("status") or "",
+            "currentPrice": entry.get("currentPrice"),
         })
     rows.sort(key=lambda item: _score_sort_value(item.get("score")), reverse=True)
     return rows[:limit]

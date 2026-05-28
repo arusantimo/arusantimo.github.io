@@ -8,7 +8,7 @@ const REGIME_BOX_MACRO = '박스권 ⚠️ (거시 완충)';
 const REGIME_BOX_INDEX = '박스권 ⚠️ (지수 우선)';
 // pullback G5 — keep in sync with jongga/macro_overlay.py
 const PULLBACK_G5_VKOSPI_STRICT = 30;
-const PULLBACK_G5_VKOSPI_MACRO_CAP = 70;
+const PULLBACK_G5_VKOSPI_MACRO_CAP = 80;
 
 let marketAnalyzeScriptPromise = null;
 let marketAnalyzeCachedSnapshot = null;
