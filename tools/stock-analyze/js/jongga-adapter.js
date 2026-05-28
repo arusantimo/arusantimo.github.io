@@ -120,16 +120,15 @@ function applyJonggaSafety(entry, context) {
     safety: { blocked: true, reasons: issues.map(issue => issue.message) },
     notes: [`안전차단: ${issues.map(issue => issue.message).join(', ')}`, ...entry.notes]
   };
-  if (!isJonggaAutoBuyCandidate(entry)) return next;
+  const isHighScore = entry.score !== null && entry.score !== undefined && Number(entry.score) >= 6.0;
+  const safetyLabel = isHighScore ? '매수주의' : '매수금지';
+
   return {
     ...next,
     sourceScore: entry.score,
     sourceGrade: entry.grade,
-    score: null,
-    grade: 'BLOCKED',
-    scoreUnavailable: true,
-    scoreLabel: '매수금지',
-    statusLabel: '자동매수 금지'
+    scoreLabel: safetyLabel,
+    statusLabel: safetyLabel
   };
 }
 

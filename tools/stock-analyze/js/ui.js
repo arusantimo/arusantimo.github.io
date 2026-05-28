@@ -672,7 +672,10 @@ function renderBuyStockCards() {
               <div class="buy-card-code">${escapeHtml(entry.code)}</div>
             </div>
             <div class="buy-card-scorebox">
-              <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">${escapeHtml(scoreDisplay)}</div>
+              <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">
+                ${escapeHtml(scoreDisplay)}
+                ${entry.safety?.blocked ? `<span style="color:${presentation.primaryStatusLabel.includes('주의') ? 'var(--text-warning)' : 'var(--text-danger)'}; font-size:14px; font-weight:700; margin-left:4px;">(${escapeHtml(presentation.primaryStatusLabel)})</span>` : ''}
+              </div>
               <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryGrade)}</div>
               <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
             </div>

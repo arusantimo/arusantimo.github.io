@@ -195,7 +195,12 @@ function getBuyPresentation(entry) {
   const hasLiveRefresh = Boolean(normalizedLiveRefresh);
   const primaryScore = normalizedLiveRefresh?.finalScore ?? strategyScore;
   const primaryGrade = normalizedLiveRefresh?.finalGrade ?? strategyGrade;
-  const primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? strategyStatusLabel;
+  let primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? strategyStatusLabel;
+
+  if (entry.safety?.blocked) {
+    const isHighScore = Number.isFinite(primaryScore) && primaryScore >= 6.0;
+    primaryStatusLabel = isHighScore ? '매수주의' : '매수금지';
+  }
 
   return {
     strategyScore,
@@ -220,7 +225,9 @@ function getBuyPresentation(entry) {
       : hasStrategyScore
         ? `전략 기준 ${strategyGrade}`
         : `전략 점수 ${getBuyUnavailableScoreLabel(entry)}`,
-    verdictClass: getBuyVerdictClassFromGrade(primaryGrade),
+    verdictClass: entry.safety?.blocked 
+      ? (primaryStatusLabel.includes('주의') ? 'watch' : 'exclude')
+      : getBuyVerdictClassFromGrade(primaryGrade),
     liveRefresh: normalizedLiveRefresh,
     hasLiveRefresh,
     changed: {
