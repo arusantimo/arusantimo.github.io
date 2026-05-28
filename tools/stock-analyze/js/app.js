@@ -164,18 +164,29 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
 
     const universeMode = getSellUniverseMode(activeSellSlot);
     const universeLabel = universeMode === 'all' ? '전체 후보' : '실매수 종목';
-    const stocksToAnalyze = getSellStocksForCurrentSellView(false, activeSellSlot);
+
+    // 실매수 종목 모드일 때는 매도 추적이 켜진 종목만 필터링
+    const allCandidates = getSellStocksForCurrentSellView(false, activeSellSlot);
+    const stocksToAnalyze = universeMode === 'actual'
+      ? allCandidates.filter(stock => isBuyEntryTrackedForSell(stock.entryKey || stock.code, stock.slotId))
+      : allCandidates;
+
     const collections = getVisibleSellStockCollections(activeSellSlot, universeMode);
 
     if (!stocksToAnalyze.length) {
-      log(`<span style="color:var(--text-warning)">ℹ️ [${universeLabel}] 분석할 매도 대상이 없습니다. ${universeMode === 'actual' ? '매수 카드에서 매도 추적을 켜거나' : ''} 전체 후보 보기를 확인해주세요.</span>`);
+      log(`<span style="color:var(--text-warning)">ℹ️ [${universeLabel}] 분석할 매도 대상이 없습니다. ${universeMode === 'actual' ? '매수 카드에서 매도 추적(🎯)을 켜주세요.' : '전체 후보 보기를 확인해주세요.'}</span>`);
       return;
     }
 
     const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
-    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${sellCount}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
+    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${stocksToAnalyze.length}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
 
     for (const stock of stocksToAnalyze) {
+      // 실매수 종목 모드에서는 추적 종목인지 한번 더 확인
+      if (universeMode === 'actual' && !isBuyEntryTrackedForSell(stock.entryKey || stock.code, stock.slotId)) {
+        log(`<span style="color:var(--text-tertiary)">⏭️ [${stock.name}] 매도 추적 미등록 — 건너뜀</span>`);
+        continue;
+      }
       await analyzeStock(stock, false);
       await new Promise(resolve => setTimeout(resolve, 1500));
     }
