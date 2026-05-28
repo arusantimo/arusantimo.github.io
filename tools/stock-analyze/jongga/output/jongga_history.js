@@ -5,25 +5,33 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/jongga_data_20260528.js",
     "jsonFile": "jongga/output/latest_20260528.json",
-    "generatedAt": "2026-05-28T05:52:01+00:00",
+    "generatedAt": "2026-05-28T06:07:14+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
       {
         "strategy": "reversal",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 7.2,
-        "grade": "A",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 8.1,
+        "grade": "S",
         "statusLabel": "매매금지"
       },
       {
         "strategy": "pullback",
         "name": "삼성전자",
         "code": "005930",
-        "score": 6.4,
-        "grade": "B",
+        "score": 7.2,
+        "grade": "A",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지"
       },
       {
         "strategy": "pullback",
@@ -35,16 +43,8 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "reversal",
-        "name": "삼성전기",
-        "code": "009150",
-        "score": 6.3,
-        "grade": "B",
-        "statusLabel": "매매금지"
-      },
-      {
-        "strategy": "reversal",
-        "name": "LG이노텍",
-        "code": "011070",
+        "name": "삼성SDI",
+        "code": "006400",
         "score": 6.3,
         "grade": "B",
         "statusLabel": "매매금지"
@@ -59,27 +59,27 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "momentum",
-        "name": "삼성전기",
-        "code": "009150",
-        "score": 4.0,
-        "grade": "C",
-        "statusLabel": "제외"
-      },
-      {
-        "strategy": "momentum",
-        "name": "삼화콘덴서",
-        "code": "001820",
-        "score": 4.0,
-        "grade": "C",
-        "statusLabel": "제외"
-      },
-      {
-        "strategy": "momentum",
-        "name": "삼성SDI",
-        "code": "006400",
+        "name": "LG에너지솔루션",
+        "code": "373220",
         "score": 3.6,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 3.2,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 3.2,
+        "grade": "C",
+        "statusLabel": "제외"
       }
     ]
   },
@@ -89,24 +89,40 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/jongga_data_20260528_canary.js",
     "jsonFile": "jongga/output/latest_20260528_canary.json",
-    "generatedAt": "2026-05-28T05:53:28+00:00",
+    "generatedAt": "2026-05-28T06:08:57+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
       {
         "strategy": "reversal",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 9.0,
+        "grade": "S",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
         "name": "삼성전기",
         "code": "009150",
-        "score": 7.2,
-        "grade": "A",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지"
+      },
+      {
+        "strategy": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 8.1,
+        "grade": "S",
         "statusLabel": "매매금지"
       },
       {
         "strategy": "pullback",
         "name": "삼성전자",
         "code": "005930",
-        "score": 6.4,
-        "grade": "B",
+        "score": 7.2,
+        "grade": "A",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
       },
       {
@@ -126,28 +142,12 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지(핵심 Gate 미충족)"
       },
       {
-        "strategy": "reversal",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 5.4,
-        "grade": "B",
-        "statusLabel": "매매금지"
-      },
-      {
-        "strategy": "reversal",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 5.4,
-        "grade": "B",
-        "statusLabel": "매매금지"
-      },
-      {
         "strategy": "momentum",
-        "name": "삼화콘덴서",
-        "code": "001820",
-        "score": 4.0,
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 3.2,
         "grade": "C",
-        "statusLabel": "제외"
+        "statusLabel": "매매금지(핵심 Gate 미충족)"
       },
       {
         "strategy": "momentum",
@@ -159,9 +159,9 @@ window.JONGGA_HISTORY_INDEX = [
       },
       {
         "strategy": "momentum",
-        "name": "디앤디파마텍",
-        "code": "347850",
-        "score": 3.2,
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 2.0,
         "grade": "C",
         "statusLabel": "매매금지(핵심 Gate 미충족)"
       }
