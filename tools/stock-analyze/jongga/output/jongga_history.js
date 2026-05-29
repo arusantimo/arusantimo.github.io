@@ -5,7 +5,7 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/jongga_data_20260529.js",
     "jsonFile": "jongga/output/latest_20260529.json",
-    "generatedAt": "2026-05-29T05:51:54+00:00",
+    "generatedAt": "2026-05-29T06:07:11+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
@@ -13,10 +13,28 @@ window.JONGGA_HISTORY_INDEX = [
         "strategy": "reversal",
         "name": "NAVER",
         "code": "035420",
+        "score": 9.0,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 233500
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG이노텍",
+        "code": "011070",
         "score": 8.1,
         "grade": "S",
         "statusLabel": "매매금지",
-        "currentPrice": 234500
+        "currentPrice": 1473000
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG",
+        "code": "003550",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 149000
       },
       {
         "strategy": "momentum",
@@ -25,25 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 7.2,
         "grade": "A",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 145800
-      },
-      {
-        "strategy": "reversal",
-        "name": "LG",
-        "code": "003550",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 145800
-      },
-      {
-        "strategy": "reversal",
-        "name": "삼성에스디에스",
-        "code": "018260",
-        "score": 6.3,
-        "grade": "B",
-        "statusLabel": "매매금지",
-        "currentPrice": 296500
+        "currentPrice": 149000
       },
       {
         "strategy": "pullback",
@@ -52,7 +52,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.0,
         "grade": "B",
         "statusLabel": "관심후보",
-        "currentPrice": 2118000
+        "currentPrice": 2116000
       },
       {
         "strategy": "pullback",
@@ -61,16 +61,16 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.0,
         "grade": "B",
         "statusLabel": "관심후보",
-        "currentPrice": 1463000
+        "currentPrice": 1473000
       },
       {
-        "strategy": "pullback",
-        "name": "NAVER",
-        "code": "035420",
+        "strategy": "momentum",
+        "name": "삼성SDI",
+        "code": "006400",
         "score": 6.0,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 234500
+        "currentPrice": 684000
       },
       {
         "strategy": "momentum",
@@ -82,13 +82,13 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 293000
       },
       {
-        "strategy": "momentum",
-        "name": "LG씨엔에스",
-        "code": "064400",
-        "score": 5.6,
-        "grade": "B",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 113800
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.2,
+        "grade": "C",
+        "statusLabel": "제외",
+        "currentPrice": 2317000
       }
     ]
   },
@@ -98,63 +98,72 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/jongga_data_20260529_canary.js",
     "jsonFile": "jongga/output/latest_20260529_canary.json",
-    "generatedAt": "2026-05-29T05:53:14+00:00",
+    "generatedAt": "2026-05-29T06:08:50+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
       {
         "strategy": "reversal",
-        "name": "삼성전기",
-        "code": "009150",
+        "name": "LG",
+        "code": "003550",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 149500
+      },
+      {
+        "strategy": "momentum",
+        "name": "LG",
+        "code": "003550",
         "score": 7.2,
         "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 2116000
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 149500
       },
       {
         "strategy": "reversal",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 1459000
-      },
-      {
-        "strategy": "reversal",
-        "name": "LG에너지솔루션",
-        "code": "373220",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 457500
-      },
-      {
-        "strategy": "pullback",
-        "name": "삼성전기",
-        "code": "009150",
-        "score": 6.0,
-        "grade": "B",
-        "statusLabel": "관심후보",
-        "currentPrice": 2116000
-      },
-      {
-        "strategy": "pullback",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 6.0,
-        "grade": "B",
-        "statusLabel": "관심후보",
-        "currentPrice": 1459000
-      },
-      {
-        "strategy": "pullback",
         "name": "NAVER",
         "code": "035420",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 233500
+      },
+      {
+        "strategy": "reversal",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 773000
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전기",
+        "code": "009150",
         "score": 6.0,
         "grade": "B",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 234000
+        "statusLabel": "관심후보",
+        "currentPrice": 2112000
+      },
+      {
+        "strategy": "pullback",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 1474000
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2112000
       },
       {
         "strategy": "momentum",
@@ -166,22 +175,13 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 293000
       },
       {
-        "strategy": "momentum",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 5.6,
-        "grade": "B",
-        "statusLabel": "관심후보",
-        "currentPrice": 1459000
-      },
-      {
-        "strategy": "momentum",
-        "name": "현대모비스",
-        "code": "012330",
-        "score": 5.6,
-        "grade": "B",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 773000
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.2,
+        "grade": "C",
+        "statusLabel": "제외",
+        "currentPrice": 2317000
       }
     ]
   },
