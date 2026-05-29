@@ -189,7 +189,7 @@ function getBuyPresentation(entry) {
   const strategyGrade = entry.grade || (hasStrategyScore ? getBuyGradeFromScore(strategyScore, entry.strategy) : '미산출');
   const strategyStatusLabel = entry.statusLabel || getBuyFinalStatusLabel(strategyGrade);
   
-  const isHistoryView = typeof jonggaLastLoadMeta !== 'undefined' && jonggaLastLoadMeta?.analysisDate && typeof getJonggaKstTodayKey === 'function' && jonggaLastLoadMeta.analysisDate !== getJonggaKstTodayKey();
+  const isHistoryView = typeof jonggaLastLoadMeta !== 'undefined' && jonggaLastLoadMeta?.analysisDate && typeof getJonggaEffectiveDateKey === 'function' && jonggaLastLoadMeta.analysisDate !== getJonggaEffectiveDateKey();
   const normalizedLiveRefresh = (hasStrategyScore && !isHistoryView) ? normalizeBuyLiveRefresh(entry, entry.liveRefresh) : null;
   
   const hasLiveRefresh = Boolean(normalizedLiveRefresh);
@@ -282,7 +282,7 @@ function buildBuyModalVerdictText(presentation) {
   return `${presentation.primaryGrade} 등급 · ${presentation.primaryStatusLabel}`;
 }
 function buildBuyVerificationHtml(entry) {
-  const isHistoryView = typeof jonggaLastLoadMeta !== 'undefined' && jonggaLastLoadMeta?.analysisDate && typeof getJonggaKstTodayKey === 'function' && jonggaLastLoadMeta.analysisDate !== getJonggaKstTodayKey();
+  const isHistoryView = typeof jonggaLastLoadMeta !== 'undefined' && jonggaLastLoadMeta?.analysisDate && typeof getJonggaEffectiveDateKey === 'function' && jonggaLastLoadMeta.analysisDate !== getJonggaEffectiveDateKey();
   if (isHistoryView) return '';
 
   const presentation = getBuyPresentation(entry);

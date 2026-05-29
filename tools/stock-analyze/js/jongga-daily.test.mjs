@@ -98,6 +98,19 @@ test('daily script paths use variant suffixes', () => {
   assert.equal(context.getJonggaDailyScriptPath('2026-05-22', 'canary'), 'jongga/output/jongga_data_20260522_canary.js');
 });
 
+test('getJonggaEffectiveDateKey returns yesterday before 14:00 KST and today at/after 14:00 KST', () => {
+  const context = loadDailyContext();
+  // 2026-05-29 13:59 KST = UTC 04:59 → 14시 이전이므로 어제(2026-05-28) 반환
+  const before14 = new Date('2026-05-29T04:59:00.000Z');
+  assert.equal(context.getJonggaEffectiveDateKey(before14), '2026-05-28');
+  // 2026-05-29 14:00 KST = UTC 05:00 → 14시 이후이므로 오늘(2026-05-29) 반환
+  const at14 = new Date('2026-05-29T05:00:00.000Z');
+  assert.equal(context.getJonggaEffectiveDateKey(at14), '2026-05-29');
+  // 2026-05-29 23:59 KST = UTC 14:59 → 14시 이후이므로 오늘(2026-05-29) 반환
+  const after14 = new Date('2026-05-29T14:59:00.000Z');
+  assert.equal(context.getJonggaEffectiveDateKey(after14), '2026-05-29');
+});
+
 test('manual JSON is saved and read by date and variant', () => {
   const context = loadDailyContext();
   context.saveJonggaManualJsonForDate('2026-05-22', samplePayload('2026-05-22', 'stable'), 'stable');
@@ -140,12 +153,19 @@ test('today status exposes channel label and direct input only when data is miss
   context.elements.set('jongga-today-status', status);
   context.elements.set('btn-open-jongga-json-modal', button);
 
-  context.setJonggaTodayStatus('loaded', '2026-05-22', '', '2026-05-22T04:46:24Z', 'stable');
-  assert.equal(status.textContent, '현재 버전 데이터: 2026-05-22 13:46 로드 완료');
+  // 현재 effective date key를 동적으로 결정해서 테스트 (오늘/어제 상관없이 정확히 검증)
+  const effectiveDateKey = context.getJonggaEffectiveDateKey();
+  context.setJonggaTodayStatus('loaded', effectiveDateKey, '', '2026-05-22T04:46:24Z', 'stable');
+  // effectiveDateKey가 getJonggaKstTodayKey()와 같으면 '현재 버전', 다르면 '어제 버전 (현재 버전)'
+  const todayKey = context.getJonggaKstTodayKey();
+  const isToday = effectiveDateKey === todayKey;
+  const expectedLabel = isToday ? '현재 버전 데이터' : `어제 버전 (현재 버전) 데이터`;
+  assert.match(status.textContent, new RegExp(expectedLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.equal(button.classList.contains('is-hidden'), true);
 
-  context.setJonggaTodayStatus('missing', '2026-05-22', '', '', 'canary');
-  assert.equal(status.textContent, '카나리 데이터 없음: 2026-05-22');
+  context.setJonggaTodayStatus('missing', effectiveDateKey, '', '', 'canary');
+  const expectedMissingLabel = isToday ? '카나리 데이터 없음' : `어제 버전 (카나리) 데이터 없음`;
+  assert.match(status.textContent, new RegExp(expectedMissingLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.equal(button.classList.contains('is-hidden'), false);
 });
 
@@ -154,8 +174,10 @@ test('history modal filters by active variant and renders variant badge', () => 
   const body = createElementStub();
   context.elements.set('jongga-history-body', body);
   context.setActiveJonggaVariant('canary', { reload: false });
+  // 히스토리 항목에 오늘 날짜를 동적으로 설정해서 canary 뱃지가 표시되도록 함
+  const todayKey = context.getJonggaKstTodayKey();
   context.window.JONGGA_HISTORY_INDEX = [{
-    date: '2026-05-22',
+    date: todayKey,
     variant: 'stable',
     variantLabel: '현재 버전',
     generatedAt: '2026-05-22T01:00:00Z',
@@ -163,7 +185,7 @@ test('history modal filters by active variant and renders variant badge', () => 
     buyCount: 1,
     topRecommendations: [{ strategy: 'momentum', name: '삼성전자', code: '005930', score: 8.4, grade: 'A', statusLabel: '매수추천' }]
   }, {
-    date: '2026-05-22',
+    date: todayKey,
     variant: 'canary',
     variantLabel: '카나리',
     generatedAt: '2026-05-22T01:10:00Z',

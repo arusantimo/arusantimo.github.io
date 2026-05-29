@@ -297,7 +297,11 @@ function bindJonggaLoaderControls() {
 function loadInitialJonggaData() {
   if (typeof loadJonggaDailyData === 'function') {
     const variant = typeof getJonggaActiveVariant === 'function' ? getJonggaActiveVariant() : 'stable';
-    loadJonggaDailyData(undefined, variant);
+    // 14시 이전이면 어제 날짜, 14시 이후면 오늘 날짜 데이터를 로드합니다.
+    const effectiveDateKey = typeof getJonggaEffectiveDateKey === 'function'
+      ? getJonggaEffectiveDateKey()
+      : undefined;
+    loadJonggaDailyData(effectiveDateKey, variant);
     return;
   }
   log('<span style="color:var(--text-danger)">날짜별 Jongga 로더를 찾지 못했습니다. js/jongga-daily.js 로드 순서를 확인하세요.</span>');

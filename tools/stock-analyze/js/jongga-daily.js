@@ -114,6 +114,26 @@ function getJonggaKstTodayKey(now = new Date()) {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
+/**
+ * KST 기준 14시 이전이면 어제 날짜를, 14시 이후면 오늘 날짜를 반환합니다.
+ * 종가 데이터는 당일 14시 이후에 확정되므로, 그 전에는 전일 데이터를 참조합니다.
+ */
+function getJonggaEffectiveDateKey(now = new Date()) {
+  const kstHour = Number(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Asia/Seoul',
+      hour: '2-digit',
+      hour12: false
+    }).formatToParts(now).find(p => p.type === 'hour')?.value ?? '0'
+  );
+  if (kstHour < 14) {
+    // 14시 이전 → 어제 날짜 사용
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    return getJonggaKstTodayKey(yesterday);
+  }
+  return getJonggaKstTodayKey(now);
+}
+
 function getJonggaCompactDate(dateKey) {
   return String(dateKey || '').replace(/-/g, '');
 }
@@ -236,14 +256,23 @@ function clearJonggaDailyNotice(dateKey, variant) {
   delete jonggaDailyNoticeState[buildJonggaVariantDateKey(dateKey, variant)];
 }
 
-function setJonggaTodayStatus(state, dateKey = getJonggaKstTodayKey(), detail = '', timeValue = '', variant = getJonggaActiveVariant()) {
+function setJonggaTodayStatus(state, dateKey = getJonggaEffectiveDateKey(), detail = '', timeValue = '', variant = getJonggaActiveVariant()) {
   const target = document.getElementById('jongga-today-status');
   const button = document.getElementById('btn-open-jongga-json-modal');
   const statusTime = ['loaded', 'manual'].includes(state) ? formatJonggaStatusTime(timeValue) : '';
   const timeSuffix = statusTime ? ` ${statusTime}` : '';
-  const isToday = dateKey === getJonggaKstTodayKey();
-  const variantLabel = isToday ? getJonggaVariantLabel(variant) : '이전 버전';
-  const effectiveState = (!isToday && state === 'loaded') ? 'previous' : state;
+  const todayKey = getJonggaKstTodayKey();
+  const effectiveDateKey = getJonggaEffectiveDateKey();
+  const isEffectiveToday = dateKey === effectiveDateKey;
+  const isCalendarToday = dateKey === todayKey;
+  // 14시 이전에 어제 날짜를 쓰는 경우 → "어제 버전" 표기
+  const isYesterdayMode = !isCalendarToday && isEffectiveToday;
+  const variantLabel = isCalendarToday
+    ? getJonggaVariantLabel(variant)
+    : isYesterdayMode
+      ? `어제 버전 (${getJonggaVariantLabel(variant)})`
+      : '이전 버전';
+  const effectiveState = (!isCalendarToday && state === 'loaded') ? 'previous' : state;
   const labels = {
     loading: `${variantLabel} 데이터 확인 중: ${dateKey}`,
     loaded: `${variantLabel} 데이터: ${dateKey}${timeSuffix} 로드 완료`,
@@ -575,5 +604,5 @@ function bindJonggaDailyControls() {
     button.addEventListener('click', () => setActiveJonggaVariant(button.dataset.jonggaVariant));
   });
   updateJonggaVariantControls();
-  setJonggaTodayStatus('loading', getJonggaKstTodayKey(), '', '', getJonggaActiveVariant());
+  setJonggaTodayStatus('loading', getJonggaEffectiveDateKey(), '', '', getJonggaActiveVariant());
 }
