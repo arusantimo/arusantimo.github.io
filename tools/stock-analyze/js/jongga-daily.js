@@ -115,8 +115,40 @@ function getJonggaKstTodayKey(now = new Date()) {
 }
 
 /**
- * KST 기준 14시 이전이면 어제 날짜를, 14시 이후면 오늘 날짜를 반환합니다.
- * 종가 데이터는 당일 14시 이후에 확정되므로, 그 전에는 전일 데이터를 참조합니다.
+ * KST 날짜 문자열('YYYY-MM-DD')로부터 요일(0=일, 1=월 ... 6=토)을 반환합니다.
+ * UTC 자정 기준으로 파싱하므로 KST 날짜 키와 정확히 일치합니다.
+ */
+function getKstDayOfWeek(dateKey) {
+  return new Date(`${dateKey}T00:00:00+09:00`).getDay();
+}
+
+/**
+ * 주어진 KST 날짜로부터 가장 최근 거래일(주말 건너뜀)을 반환합니다.
+ * - 일요일(0) → 금요일(-2일)
+ * - 토요일(6) → 금요일(-1일)
+ * - 월~금 → 그대로 반환
+ */
+function getJonggaPrevTradingDateKey(dateKey) {
+  const dow = getKstDayOfWeek(dateKey);
+  if (dow === 0) {
+    // 일요일 → 금요일
+    const d = new Date(`${dateKey}T00:00:00+09:00`);
+    d.setDate(d.getDate() - 2);
+    return getJonggaKstTodayKey(d);
+  }
+  if (dow === 6) {
+    // 토요일 → 금요일
+    const d = new Date(`${dateKey}T00:00:00+09:00`);
+    d.setDate(d.getDate() - 1);
+    return getJonggaKstTodayKey(d);
+  }
+  return dateKey;
+}
+
+/**
+ * KST 기준 14시 이전이면 이전 거래일 날짜를, 14시 이후면 오늘 날짜를 반환합니다.
+ * - 종가 데이터는 당일 14시 이후에 확정되므로, 그 전에는 전일 데이터를 참조합니다.
+ * - 월요일 14시 이전에는 금요일 데이터를 참조합니다 (주말 거래 없음).
  */
 function getJonggaEffectiveDateKey(now = new Date()) {
   const kstHour = Number(
@@ -127,9 +159,10 @@ function getJonggaEffectiveDateKey(now = new Date()) {
     }).formatToParts(now).find(p => p.type === 'hour')?.value ?? '0'
   );
   if (kstHour < 14) {
-    // 14시 이전 → 어제 날짜 사용
+    // 14시 이전 → 전일 날짜에서 주말을 건너뛴 가장 최근 거래일 사용
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    return getJonggaKstTodayKey(yesterday);
+    const yesterdayKey = getJonggaKstTodayKey(yesterday);
+    return getJonggaPrevTradingDateKey(yesterdayKey);
   }
   return getJonggaKstTodayKey(now);
 }
