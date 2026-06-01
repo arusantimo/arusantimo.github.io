@@ -10,6 +10,12 @@
             "matchCommandLine": true
         },
         "git rev-parse": true,
-        "git add": true
+        "git add": true,
+        "/^git remote -v && git fetch origin$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "git fetch": true,
+        "git pull": true
     }
 }
