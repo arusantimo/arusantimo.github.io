@@ -5,18 +5,36 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/jongga_data_20260601.js",
     "jsonFile": "jongga/output/latest_20260601.json",
-    "generatedAt": "2026-06-01T05:52:08+00:00",
+    "generatedAt": "2026-06-01T06:07:05+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
       {
         "strategy": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 9.0,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 272500
+      },
+      {
+        "strategy": "reversal",
+        "name": "로보티즈",
+        "code": "108490",
+        "score": 9.0,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 399500
+      },
+      {
+        "strategy": "reversal",
         "name": "삼성전자",
         "code": "005930",
-        "score": 7.2,
-        "grade": "A",
+        "score": 8.1,
+        "grade": "S",
         "statusLabel": "매매금지",
-        "currentPrice": 349500
+        "currentPrice": 353000
       },
       {
         "strategy": "pullback",
@@ -25,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.4,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 281500
+        "currentPrice": 272500
       },
       {
         "strategy": "pullback",
@@ -34,34 +52,16 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.4,
         "grade": "B",
         "statusLabel": "관심후보",
-        "currentPrice": 2001000
+        "currentPrice": 2021000
       },
       {
         "strategy": "pullback",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 6.4,
+        "name": "삼성에스디에스",
+        "code": "018260",
+        "score": 5.6,
         "grade": "B",
         "statusLabel": "관심후보",
-        "currentPrice": 1532000
-      },
-      {
-        "strategy": "reversal",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 6.3,
-        "grade": "B",
-        "statusLabel": "매매금지",
-        "currentPrice": 281500
-      },
-      {
-        "strategy": "reversal",
-        "name": "현대차",
-        "code": "005380",
-        "score": 6.3,
-        "grade": "B",
-        "statusLabel": "매매금지",
-        "currentPrice": 759000
+        "currentPrice": 352000
       },
       {
         "strategy": "momentum",
@@ -70,7 +70,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 5.6,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 349500
+        "currentPrice": 353000
       },
       {
         "strategy": "momentum",
@@ -79,7 +79,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 5.6,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 759000
+        "currentPrice": 755000
       },
       {
         "strategy": "momentum",
@@ -88,7 +88,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 5.6,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 143100
+        "currentPrice": 141500
       }
     ]
   },
@@ -98,10 +98,19 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/jongga_data_20260601_canary.js",
     "jsonFile": "jongga/output/latest_20260601_canary.json",
-    "generatedAt": "2026-06-01T05:53:41+00:00",
+    "generatedAt": "2026-06-01T06:08:38+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 353000
+      },
       {
         "strategy": "reversal",
         "name": "NAVER",
@@ -109,7 +118,16 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 8.1,
         "grade": "S",
         "statusLabel": "매매금지",
-        "currentPrice": 278500
+        "currentPrice": 273500
+      },
+      {
+        "strategy": "reversal",
+        "name": "로보티즈",
+        "code": "108490",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 399500
       },
       {
         "strategy": "pullback",
@@ -118,7 +136,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.4,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 278500
+        "currentPrice": 273500
       },
       {
         "strategy": "pullback",
@@ -127,7 +145,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.4,
         "grade": "B",
         "statusLabel": "관심후보",
-        "currentPrice": 2003000
+        "currentPrice": 2024000
       },
       {
         "strategy": "pullback",
@@ -136,25 +154,16 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 6.4,
         "grade": "B",
         "statusLabel": "관심후보",
-        "currentPrice": 1541000
+        "currentPrice": 1525000
       },
       {
-        "strategy": "reversal",
-        "name": "현대차",
-        "code": "005380",
-        "score": 6.3,
+        "strategy": "momentum",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.6,
         "grade": "B",
-        "statusLabel": "매매금지",
-        "currentPrice": 758000
-      },
-      {
-        "strategy": "reversal",
-        "name": "삼성에스디에스",
-        "code": "018260",
-        "score": 6.3,
-        "grade": "B",
-        "statusLabel": "매매금지",
-        "currentPrice": 360000
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 353000
       },
       {
         "strategy": "momentum",
@@ -163,7 +172,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 5.6,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 758000
+        "currentPrice": 754000
       },
       {
         "strategy": "momentum",
@@ -172,16 +181,7 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 5.6,
         "grade": "B",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 143150
-      },
-      {
-        "strategy": "momentum",
-        "name": "로보티즈",
-        "code": "108490",
-        "score": 5.6,
-        "grade": "B",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 402000
+        "currentPrice": 141700
       }
     ]
   },
