@@ -1,5 +1,191 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-01",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/jongga_data_20260601.js",
+    "jsonFile": "jongga/output/latest_20260601.json",
+    "generatedAt": "2026-06-01T05:52:08+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 349500
+      },
+      {
+        "strategy": "pullback",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 281500
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2001000
+      },
+      {
+        "strategy": "pullback",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 1532000
+      },
+      {
+        "strategy": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 281500
+      },
+      {
+        "strategy": "reversal",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 759000
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 349500
+      },
+      {
+        "strategy": "momentum",
+        "name": "현대차",
+        "code": "005380",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 759000
+      },
+      {
+        "strategy": "momentum",
+        "name": "LG씨엔에스",
+        "code": "064400",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 143100
+      }
+    ]
+  },
+  {
+    "date": "2026-06-01",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/jongga_data_20260601_canary.js",
+    "jsonFile": "jongga/output/latest_20260601_canary.json",
+    "generatedAt": "2026-06-01T05:53:41+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 278500
+      },
+      {
+        "strategy": "pullback",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 278500
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2003000
+      },
+      {
+        "strategy": "pullback",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 1541000
+      },
+      {
+        "strategy": "reversal",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 758000
+      },
+      {
+        "strategy": "reversal",
+        "name": "삼성에스디에스",
+        "code": "018260",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 360000
+      },
+      {
+        "strategy": "momentum",
+        "name": "현대차",
+        "code": "005380",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 758000
+      },
+      {
+        "strategy": "momentum",
+        "name": "LG씨엔에스",
+        "code": "064400",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 143150
+      },
+      {
+        "strategy": "momentum",
+        "name": "로보티즈",
+        "code": "108490",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 402000
+      }
+    ]
+  },
+  {
     "date": "2026-05-29",
     "variant": "stable",
     "variantLabel": "현재 버전",
