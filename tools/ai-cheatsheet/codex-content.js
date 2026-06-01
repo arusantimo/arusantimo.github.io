@@ -10,8 +10,8 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.133.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-21</span>
+        <span class="meta-version">v0.135.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-28</span>
       </div>
     </div>
 

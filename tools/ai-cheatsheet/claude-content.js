@@ -10,47 +10,65 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.150</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-23</span>
+        <span class="meta-version">v2.1.159</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-05-31</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.150)</span>
+        <span>📋 최근 변경사항 (v2.1.159)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="/code-review 명령어 도입 및 /simplify 대체 (v2.1.147)"
-            data-tt-desc="/simplify 명령어가 /code-review로 변경되었습니다. 선택한 effort 레벨에 맞춰 검토 결과를 보고하며, --comment 플래그로 GitHub PR에 인라인 코멘트를 작성할 수 있습니다. 기존의 cleanup-and-fix 동작은 제거되었습니다."
-            data-tt-example="/code-review high --comment"><code>/code-review</code> — /simplify 대체 및 GitHub PR 코멘트 지원 (v2.1.147) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="백그라운드 세션 생존성 개선 (v2.1.147)"
-            data-tt-desc="claude agents 내 고정된 백그라운드 세션(Ctrl+T)이 유휴 상태에서도 유지되며, Claude Code 업데이트 적용을 위해 제자리에서 재시작되도록 개선되었습니다."
-            data-tt-example="claude agents"><code>claude agents</code> — 고정된 백그라운드 세션(Ctrl+T) 생존 개선 (v2.1.147) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/usage 카테고리별 비용 세분화 (v2.1.149)"
-            data-tt-desc="/usage 명령어가 limits 사용을 유발하는 카테고리(skills, subagents, plugins, MCP-server)별 비용 분석을 세분화하여 표시합니다."
-            data-tt-example="/usage"><code>/usage</code> — limits 사용량 카테고리별 비용 분석 표시 (v2.1.149) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/diff 키보드 스크롤 조작 (v2.1.149)"
-            data-tt-desc="/diff 상세 뷰에서 키보드 화살표, j/k, PgUp/PgDn, Space, Home/End 키를 사용하여 스크롤을 조작할 수 있습니다."
-            data-tt-example="/diff"><code>/diff</code> — 상세 뷰에서 j/k 및 화살표 키보드 스크롤 지원 (v2.1.149) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="GFM 작업 목록 렌더링 지원 (v2.1.149)"
-            data-tt-desc="마크다운 출력 시 단순 글머리 기호 대신 GitHub Flavored Markdown(GFM)의 작업 목록 체크박스(- [ ] 또는 - [x])를 렌더링합니다."
-            data-tt-example="- [ ] 작업 항목">GFM 작업 목록 체크박스 (<code>- [ ]</code> / <code>- [x]</code>) 렌더링 지원 (v2.1.149) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="allowAllClaudeAiMcps 설정 추가 (v2.1.149)"
-            data-tt-desc="Enterprise 환경에서 managed-mcp.json과 함께 claude.ai 클라우드 MCP 커넥터를 동시에 로드할 수 있도록 허용하는 allowAllClaudeAiMcps 설정이 추가되었습니다."
-            data-tt-example="&quot;allowAllClaudeAiMcps&quot;: true"><code>allowAllClaudeAiMcps</code> 설정 추가 (claude.ai 클라우드 MCP 로드) (v2.1.149) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="🔒 PowerShell cd 함수 우회 보안 패치 (v2.1.149)"
-            data-tt-desc="내장 cd 함수(cd.., cd\, cd~, X:)가 탐지되지 않은 채 작업 디렉토리를 변경하여 이후 명령어가 워크스페이스 외부를 읽을 수 있던 보안 허점이 패치되었습니다."
-            data-tt-example="">🔒 PowerShell cd 함수 우회 보안 패치 (v2.1.149) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Internal infrastructure improvements (v2.1.150)"
+          <li class="cl-tip" data-tt-title=".claude/skills 자동 로드 (v2.1.157)"
+            data-tt-desc="플러그인이 .claude/skills 디렉터리에 있으면 마켓플레이스 등록 없이 자동으로 로드됩니다. claude plugin init &lt;name&gt; 명령으로 .claude/skills 하위에 새 플러그인을 스캐폴드할 수 있습니다."
+            data-tt-example="claude plugin init my-skill"><code>.claude/skills</code> 자동 로드 및 <code>claude plugin init &lt;name&gt;</code> 추가 (v2.1.157) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="VS Code/Cursor 통합터미널 붙여넣기 중복 버그 수정 (v2.1.157)"
+            data-tt-desc="우클릭 붙여넣기 시 클립보드 내용이 중복되던 버그가 VS Code, Cursor, Windsurf 통합 터미널에서 수정되었습니다."
+            data-tt-example="">VS Code/Cursor 통합터미널 우클릭 붙여넣기 중복 버그 수정 (v2.1.157) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/terminal-setup GPU 가속 비활성화 (v2.1.157)"
+            data-tt-desc="/terminal-setup 명령이 VS Code/Cursor/Windsurf 통합 터미널에서 텍스트 깨짐 현상을 방지하기 위해 GPU 가속을 자동으로 비활성화합니다."
+            data-tt-example="/terminal-setup"><code>/terminal-setup</code> — VS Code/Cursor 통합터미널 GPU 가속 자동 비활성화 (v2.1.157) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Auto 모드 Bedrock/Vertex/Foundry 지원 (v2.1.158)"
+            data-tt-desc="Auto 모드가 이제 Bedrock, Vertex, Foundry에서 Opus 4.7 및 Opus 4.8에 대해 사용 가능합니다. CLAUDE_CODE_ENABLE_AUTO_MODE=1 환경변수로 옵트인합니다."
+            data-tt-example="export CLAUDE_CODE_ENABLE_AUTO_MODE=1">Auto 모드 — Bedrock, Vertex, Foundry에서 Opus 4.7/4.8 지원 (<code>CLAUDE_CODE_ENABLE_AUTO_MODE=1</code>) (v2.1.158) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="내부 인프라 개선 (v2.1.159)"
             data-tt-desc="사용자 대면 변경사항이 없는 내부 인프라 개선이 진행되었습니다."
-            data-tt-example="">내부 인프라 개선 (v2.1.150) <span class="badge-new">NEW</span></li>
+            data-tt-example="">내부 인프라 개선 (v2.1.159) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.147~v2.1.150</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="/code-review 명령어 도입 및 /simplify 대체 (v2.1.147)"
+                data-tt-desc="/simplify 명령어가 /code-review로 변경되었습니다. 선택한 effort 레벨에 맞춰 검토 결과를 보고하며, --comment 플래그로 GitHub PR에 인라인 코멘트를 작성할 수 있습니다."
+                data-tt-example="/code-review high --comment"><code>/code-review</code> — /simplify 대체 및 GitHub PR 코멘트 지원 (v2.1.147)</li>
+              <li class="cl-tip" data-tt-title="/usage 카테고리별 비용 세분화 (v2.1.149)"
+                data-tt-desc="/usage 명령어가 limits 사용을 유발하는 카테고리(skills, subagents, plugins, MCP-server)별 비용 분석을 세분화하여 표시합니다."
+                data-tt-example="/usage"><code>/usage</code> — limits 사용량 카테고리별 비용 분석 표시 (v2.1.149)</li>
+              <li class="cl-tip" data-tt-title="/diff 키보드 스크롤 조작 (v2.1.149)"
+                data-tt-desc="/diff 상세 뷰에서 키보드 화살표, j/k, PgUp/PgDn, Space, Home/End 키를 사용하여 스크롤을 조작할 수 있습니다."
+                data-tt-example="/diff"><code>/diff</code> — 상세 뷰에서 j/k 및 화살표 키보드 스크롤 지원 (v2.1.149)</li>
+              <li class="cl-tip" data-tt-title="GFM 작업 목록 렌더링 지원 (v2.1.149)"
+                data-tt-desc="마크다운 출력 시 GitHub Flavored Markdown(GFM)의 작업 목록 체크박스(- [ ] 또는 - [x])를 렌더링합니다."
+                data-tt-example="- [ ] 작업 항목">GFM 작업 목록 체크박스 (<code>- [ ]</code> / <code>- [x]</code>) 렌더링 지원 (v2.1.149)</li>
+              <li class="cl-tip" data-tt-title="allowAllClaudeAiMcps 설정 추가 (v2.1.149)"
+                data-tt-desc="Enterprise 환경에서 managed-mcp.json과 함께 claude.ai 클라우드 MCP 커넥터를 동시에 로드할 수 있도록 허용하는 allowAllClaudeAiMcps 설정이 추가되었습니다."
+                data-tt-example="&quot;allowAllClaudeAiMcps&quot;: true"><code>allowAllClaudeAiMcps</code> 설정 추가 (v2.1.149)</li>
+              <li class="cl-tip" data-tt-title="🔒 PowerShell cd 함수 우회 보안 패치 (v2.1.149)"
+                data-tt-desc="내장 cd 함수가 탐지되지 않은 채 작업 디렉토리를 변경하여 워크스페이스 외부를 읽을 수 있던 보안 허점이 패치되었습니다."
+                data-tt-example="">🔒 PowerShell cd 함수 우회 보안 패치 (v2.1.149)</li>
+              <li class="cl-tip" data-tt-title="내부 인프라 개선 (v2.1.150)"
+                data-tt-desc="사용자 대면 변경사항이 없는 내부 인프라 개선."
+                data-tt-example="">내부 인프라 개선 (v2.1.150)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.141~v2.1.145</summary>
