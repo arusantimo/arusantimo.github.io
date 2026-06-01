@@ -22,18 +22,6 @@ const claudeContent = `
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title=".claude/skills 자동 로드 (v2.1.157)"
-            data-tt-desc="플러그인이 .claude/skills 디렉터리에 있으면 마켓플레이스 등록 없이 자동으로 로드됩니다. claude plugin init &lt;name&gt; 명령으로 .claude/skills 하위에 새 플러그인을 스캐폴드할 수 있습니다."
-            data-tt-example="claude plugin init my-skill"><code>.claude/skills</code> 자동 로드 및 <code>claude plugin init &lt;name&gt;</code> 추가 (v2.1.157) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="VS Code/Cursor 통합터미널 붙여넣기 중복 버그 수정 (v2.1.157)"
-            data-tt-desc="우클릭 붙여넣기 시 클립보드 내용이 중복되던 버그가 VS Code, Cursor, Windsurf 통합 터미널에서 수정되었습니다."
-            data-tt-example="">VS Code/Cursor 통합터미널 우클릭 붙여넣기 중복 버그 수정 (v2.1.157) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/terminal-setup GPU 가속 비활성화 (v2.1.157)"
-            data-tt-desc="/terminal-setup 명령이 VS Code/Cursor/Windsurf 통합 터미널에서 텍스트 깨짐 현상을 방지하기 위해 GPU 가속을 자동으로 비활성화합니다."
-            data-tt-example="/terminal-setup"><code>/terminal-setup</code> — VS Code/Cursor 통합터미널 GPU 가속 자동 비활성화 (v2.1.157) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Auto 모드 Bedrock/Vertex/Foundry 지원 (v2.1.158)"
-            data-tt-desc="Auto 모드가 이제 Bedrock, Vertex, Foundry에서 Opus 4.7 및 Opus 4.8에 대해 사용 가능합니다. CLAUDE_CODE_ENABLE_AUTO_MODE=1 환경변수로 옵트인합니다."
-            data-tt-example="export CLAUDE_CODE_ENABLE_AUTO_MODE=1">Auto 모드 — Bedrock, Vertex, Foundry에서 Opus 4.7/4.8 지원 (<code>CLAUDE_CODE_ENABLE_AUTO_MODE=1</code>) (v2.1.158) <span class="badge-new">NEW</span></li>
           <li class="cl-tip" data-tt-title="내부 인프라 개선 (v2.1.159)"
             data-tt-desc="사용자 대면 변경사항이 없는 내부 인프라 개선이 진행되었습니다."
             data-tt-example="">내부 인프라 개선 (v2.1.159) <span class="badge-new">NEW</span></li>
@@ -42,6 +30,30 @@ const claudeContent = `
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.158</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Auto 모드 Bedrock/Vertex/Foundry 지원 (v2.1.158)"
+                data-tt-desc="Auto 모드가 이제 Bedrock, Vertex, Foundry에서 Opus 4.7 및 Opus 4.8에 대해 사용 가능합니다. CLAUDE_CODE_ENABLE_AUTO_MODE=1 환경변수로 옵트인합니다."
+                data-tt-example="export CLAUDE_CODE_ENABLE_AUTO_MODE=1">Auto 모드 — Bedrock, Vertex, Foundry에서 Opus 4.7/4.8 지원 (<code>CLAUDE_CODE_ENABLE_AUTO_MODE=1</code>) (v2.1.158)</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.1.157</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title=".claude/skills 자동 로드 (v2.1.157)"
+                data-tt-desc="플러그인이 .claude/skills 디렉터리에 있으면 마켓플레이스 등록 없이 자동으로 로드됩니다. claude plugin init &lt;name&gt; 명령으로 .claude/skills 하위에 새 플러그인을 스캐폴드할 수 있습니다."
+                data-tt-example="claude plugin init my-skill"><code>.claude/skills</code> 자동 로드 및 <code>claude plugin init &lt;name&gt;</code> 추가 (v2.1.157)</li>
+              <li class="cl-tip" data-tt-title="VS Code/Cursor 통합터미널 붙여넣기 중복 버그 수정 (v2.1.157)"
+                data-tt-desc="우클릭 붙여넣기 시 클립보드 내용이 중복되던 버그가 VS Code, Cursor, Windsurf 통합 터미널에서 수정되었습니다."
+                data-tt-example="">VS Code/Cursor 통합터미널 우클릭 붙여넣기 중복 버그 수정 (v2.1.157)</li>
+              <li class="cl-tip" data-tt-title="/terminal-setup GPU 가속 비활성화 (v2.1.157)"
+                data-tt-desc="/terminal-setup 명령이 VS Code/Cursor/Windsurf 통합 터미널에서 텍스트 깨짐 현상을 방지하기 위해 GPU 가속을 자동으로 비활성화합니다."
+                data-tt-example="/terminal-setup"><code>/terminal-setup</code> — VS Code/Cursor 통합터미널 GPU 가속 자동 비활성화 (v2.1.157)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.147~v2.1.150</summary>

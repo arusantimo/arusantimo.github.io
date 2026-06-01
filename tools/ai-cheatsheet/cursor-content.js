@@ -25,23 +25,29 @@ const cursorContent = `
           <li class="cl-tip" data-tt-title="Auto-review Run Mode (v3.6)"
             data-tt-desc="Auto-review는 더 적은 승인 프롬프트와 더 안전한 실행으로 Cursor가 더 오래 작동할 수 있는 새 실행 모드입니다. Shell, MCP, Fetch 툰 콜에 적용되며, 허용된 콜은 즉시 실행하고 샌드박스에서 실행 가능한 콜은 샌드박스에서 실행됩니다. Settings > Cursor Settings > Agents > Run Mode에서 구성."
             data-tt-example="Settings > Cursor Settings > Agents > Run Mode">Auto-review Run Mode 추가 — 승인 프롬프트 최소화 + 안전 실행 (v3.6) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Shared Canvases (v3.5)"
-            data-tt-desc="에이전트가 생성한 인터랙티브 쮔트리팩트(리포트, 대시보드, 코드 UI 등)를 팀원과 공유할 수 있습니다. Pro, Teams, Enterprise 플랜에서 사용 가능."
-            data-tt-example="">Shared Canvases — 에이전트 생성 캔버스 팀 공유 (v3.5) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/loop 스킬 (v3.5)"
-            data-tt-desc="/loop로 Cursor가 로컈 스케줄에서 주기적으로 프롬프트를 실행하도록 할 수 있습니다. 실행 간격을 지정하지 않으면 에이전트가 스스로 웨이크업 시점을 결정합니다."
-            data-tt-example="/loop"><code>/loop</code> 스킬 — 로컈 렌투루 에이전트 (간격/시간/조건 지정) (v3.5) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Composer 2.5 (v3.5 설치 이후)"
-            data-tt-desc="Composer 2.5는 Composer 2에 비해 주목할 만한 지능 및 행동 개선이 이뤄어졌습니다. 장기 실행 작업, 복잡한 지시 수행에 더 우수합니다."
-            data-tt-example="">Composer 2.5 릴리스 — 장기 작업 및 복잡한 지시 수행 능력 개선 <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor in Jira (2026-05-19)"
-            data-tt-desc="Jira에서 Cursor를 슬렇하거나 @Cursor를 멘션하면 클라우드 에이전트가 케스크를 시작합니다. Cursor 관리자 권한 및 Jira Commercial Cloud + Rovo 권한이 필요합니다."
-            data-tt-example="@Cursor">Cursor in Jira 통합 — Jira 퓰에서 @Cursor 멘션으로 클라우드 에이전트 실행 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.5</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Shared Canvases (v3.5)"
+                data-tt-desc="에이전트가 생성한 인터랙티브 쮔트리팩트(리포트, 대시보드, 코드 UI 등)를 팀원과 공유할 수 있습니다. Pro, Teams, Enterprise 플랜에서 사용 가능."
+                data-tt-example="">Shared Canvases — 에이전트 생성 캔버스 팀 공유 (v3.5)</li>
+              <li class="cl-tip" data-tt-title="/loop 스킬 (v3.5)"
+                data-tt-desc="/loop로 Cursor가 로컈 스케줄에서 주기적으로 프롬프트를 실행하도록 할 수 있습니다. 실행 간격을 지정하지 않으면 에이전트가 스스로 웨이크업 시점을 결정합니다."
+                data-tt-example="/loop"><code>/loop</code> 스킬 — 로컈 렌투루 에이전트 (간격/시간/조건 지정) (v3.5)</li>
+              <li class="cl-tip" data-tt-title="Composer 2.5 (v3.5 설치 이후)"
+                data-tt-desc="Composer 2.5는 Composer 2에 비해 주목할 만한 지능 및 행동 개선이 이뤄어졌습니다. 장기 실행 작업, 복잡한 지시 수행에 더 우수합니다."
+                data-tt-example="">Composer 2.5 릴리스 — 장기 작업 및 복잡한 지시 수행 능력 개선</li>
+              <li class="cl-tip" data-tt-title="Cursor in Jira (2026-05-19)"
+                data-tt-desc="Jira에서 Cursor를 슬렇하거나 @Cursor를 멘션하면 클라우드 에이전트가 케스크를 시작합니다. Cursor 관리자 권한 및 Jira Commercial Cloud + Rovo 권한이 필요합니다."
+                data-tt-example="@Cursor">Cursor in Jira 통합 — Jira 퓰에서 @Cursor 멘션으로 클라우드 에이전트 실행</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.45.0~v0.45.8</summary>

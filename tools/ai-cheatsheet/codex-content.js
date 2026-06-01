@@ -18,30 +18,39 @@ const codexContent = `
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.133.0)</span>
+        <span>📋 최근 변경사항 (v0.135.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="장기 목표(Goals) 기능 기본 활성화 (v0.133.0)"
-            data-tt-desc="장기 목표(Goals) 기능이 기본적으로 활성화되었습니다. 전용 데이터베이스 스토리지에 백업되며 활성 턴 전반에 걸쳐 진행 상황을 추적합니다."
-            data-tt-example="">장기 목표(Goals) 기능 기본 활성화 및 전용 스토리지 백업 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="codex remote-control 포그라운드 전환 (v0.133.0)"
-            data-tt-desc="remote-control 명령어가 이제 포그라운드 모드로 실행되어 준비 상태를 대기하고 머신 상태를 보고합니다. 백그라운드 구동을 위한 명시적인 데몬 스타일 start/stop 커맨드가 제공됩니다."
-            data-tt-example="codex remote-control"><code>codex remote-control</code> — 포그라운드 전환 및 데몬 스타일 start/stop 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="권한 프로필(Permission profiles) 기능 강화 (v0.133.0)"
-            data-tt-desc="권한 프로필에 list API가 추가되었고 상속 메커니즘이 도입되었습니다. managed requirements.toml 지원 및 런타임 새로고침, Windows 샌드박스 통합이 강화되었습니다."
-            data-tt-example="codex permissions list">권한 프로필(Permission Profiles) list API, 상속, requirements.toml 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="플러그인 탐색(Plugin Discovery) 개선 (v0.133.0)"
-            data-tt-desc="플러그인 검색 및 조회가 한층 쉬워졌습니다. 마켓플레이스 정보를 반영한 표(tabular) 형식 리스트 출력, 설치 버전 및 마켓플레이스 루트 표시, 원격 플러그인 컬렉션 지원이 추가되었습니다."
-            data-tt-example="codex plugins list">플러그인 디스커버리 개선 — 표 형식 출력 및 원격 컬렉션 지원 (v0.133.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="확장 기능 생명주기 이벤트 확장 (v0.133.0)"
-            data-tt-desc="Codex 확장이 서브에이전트 시작/종료, 도구 실행, 턴 메타데이터, 비동기 승인 및 턴 프로세싱 등 다양한 생명주기 이벤트를 관찰할 수 있도록 지원합니다."
-            data-tt-example="">확장(Extensions) 생명주기 관찰 지원 — 서브에이전트 제어, 비동기 승인 이벤트 등 (v0.133.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="안정성 및 호환성 개선 (v0.135.0)"
+            data-tt-desc="내부 최적화 및 최신 릴리스 호환성을 위한 안정성 개선 업데이트가 반영되었습니다."
+            data-tt-example="">성능 및 안정성 향상 (v0.135.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.133.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="장기 목표(Goals) 기능 기본 활성화 (v0.133.0)"
+                data-tt-desc="장기 목표(Goals) 기능이 기본적으로 활성화되었습니다. 전용 데이터베이스 스토리지에 백업되며 활성 턴 전반에 걸쳐 진행 상황을 추적합니다."
+                data-tt-example="">장기 목표(Goals) 기능 기본 활성화 및 전용 스토리지 백업 지원 (v0.133.0)</li>
+              <li class="cl-tip" data-tt-title="codex remote-control 포그라운드 전환 (v0.133.0)"
+                data-tt-desc="remote-control 명령어가 이제 포그라운드 모드로 실행되어 준비 상태를 대기하고 머신 상태를 보고합니다. 백그라운드 구동을 위한 명시적인 데몬 스타일 start/stop 커맨드가 제공됩니다."
+                data-tt-example="codex remote-control"><code>codex remote-control</code> — 포그라운드 전환 및 데몬 스타일 start/stop 지원 (v0.133.0)</li>
+              <li class="cl-tip" data-tt-title="권한 프로필(Permission profiles) 기능 강화 (v0.133.0)"
+                data-tt-desc="권한 프로필에 list API가 추가되었고 상속 메커니즘이 도입되었습니다. managed requirements.toml 지원 및 런타임 새로고침, Windows 샌드박스 통합이 강화되었습니다."
+                data-tt-example="codex permissions list">권한 프로필(Permission Profiles) list API, 상속, requirements.toml 지원 (v0.133.0)</li>
+              <li class="cl-tip" data-tt-title="플러그인 탐색(Plugin Discovery) 개선 (v0.133.0)"
+                data-tt-desc="플러그인 검색 및 조회가 한층 쉬워졌습니다. 마켓플레이스 정보를 반영한 표(tabular) 형식 리스트 출력, 설치 버전 및 마켓플레이스 루트 표시, 원격 플러그인 컬렉션 지원이 추가되었습니다."
+                data-tt-example="codex plugins list">플러그인 디스커버리 개선 — 표 형식 출력 및 원격 컬렉션 지원 (v0.133.0)</li>
+              <li class="cl-tip" data-tt-title="확장 기능 생명주기 이벤트 확장 (v0.133.0)"
+                data-tt-desc="Codex 확장이 서브에이전트 시작/종료, 도구 실행, 턴 메타데이터, 비동기 승인 및 턴 프로세싱 등 다양한 생명주기 이벤트를 관찰할 수 있도록 지원합니다."
+                data-tt-example="">확장(Extensions) 생명주기 관찰 지원 — 서브에이전트 제어, 비동기 승인 이벤트 등 (v0.133.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.132.0</summary>
