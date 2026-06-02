@@ -1,5 +1,191 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-02",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/jongga_data_20260602.js",
+    "jsonFile": "jongga/output/latest_20260602.json",
+    "generatedAt": "2026-06-02T05:52:20+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 281000
+      },
+      {
+        "strategy": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 281000
+      },
+      {
+        "strategy": "reversal",
+        "name": "성호전자",
+        "code": "043260",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 47450
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2358000
+      },
+      {
+        "strategy": "pullback",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 762500
+      },
+      {
+        "strategy": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 1360000
+      },
+      {
+        "strategy": "momentum",
+        "name": "두산로보틱스",
+        "code": "454910",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 163500
+      },
+      {
+        "strategy": "momentum",
+        "name": "성호전자",
+        "code": "043260",
+        "score": 3.6,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 47450
+      },
+      {
+        "strategy": "momentum",
+        "name": "로보티즈",
+        "code": "108490",
+        "score": 3.6,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 406500
+      }
+    ]
+  },
+  {
+    "date": "2026-06-02",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/jongga_data_20260602_canary.js",
+    "jsonFile": "jongga/output/latest_20260602_canary.json",
+    "generatedAt": "2026-06-02T05:54:12+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "성호전자",
+        "code": "043260",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 47450
+      },
+      {
+        "strategy": "pullback",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 280250
+      },
+      {
+        "strategy": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 280250
+      },
+      {
+        "strategy": "reversal",
+        "name": "두산로보틱스",
+        "code": "454910",
+        "score": 6.3,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 162700
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.0,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2349000
+      },
+      {
+        "strategy": "pullback",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 763000
+      },
+      {
+        "strategy": "momentum",
+        "name": "두산로보틱스",
+        "code": "454910",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 162700
+      },
+      {
+        "strategy": "momentum",
+        "name": "성호전자",
+        "code": "043260",
+        "score": 4.4,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 47450
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 3.2,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 363500
+      }
+    ]
+  },
+  {
     "date": "2026-06-01",
     "variant": "stable",
     "variantLabel": "현재 버전",

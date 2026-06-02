@@ -1,4 +1,5 @@
-window.JONGGA_DATA = {
+window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
+window.JONGGA_DAILY_DATA["2026-06-02"] = {
   "schemaVersion": "jongga_result.v1",
   "generatedAt": "2026-06-02T05:52:20+00:00",
   "variant": "stable",
