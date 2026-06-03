@@ -161,27 +161,27 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertTrue(event_filter["blocked"])
         self.assertIn("배당 결정", event_filter["note"])
 
-    def test_select_top_trading_value_codes_keeps_raw_top40_only(self):
+    def test_select_top_trading_value_codes_keeps_raw_top100_only(self):
         rows = [
             {"itemCode": "069500", "stockName": "KODEX 200", "accumulatedTradingValueRaw": "100000"},
             {"itemCode": "000001", "stockName": "1위종목", "accumulatedTradingValueRaw": "99000"},
         ]
         rows.extend(
             {"itemCode": f"{index:06d}", "stockName": f"{index}위종목", "accumulatedTradingValueRaw": str(99000 - index)}
-            for index in range(3, 43)
+            for index in range(3, 103)
         )
-        selected = select_top_trading_value_codes(rows, limit=40)
+        selected = select_top_trading_value_codes(rows, limit=100)
         self.assertEqual(selected[0], (2, "000001", "1위종목"))
-        self.assertIn((40, "000040", "40위종목"), selected)
-        self.assertNotIn((41, "000041", "41위종목"), selected)
-        self.assertTrue(all(rank <= 40 for rank, _, _ in selected))
+        self.assertIn((100, "000100", "100위종목"), selected)
+        self.assertNotIn((101, "000101", "101위종목"), selected)
+        self.assertTrue(all(rank <= 100 for rank, _, _ in selected))
 
-    def test_top_trading_value_gate_blocks_rank_over_40(self):
-        passed = build_top_trading_value_gate(40, "G0")
-        blocked = build_top_trading_value_gate(41, "G0")
+    def test_top_trading_value_gate_blocks_rank_over_100(self):
+        passed = build_top_trading_value_gate(100, "G0")
+        blocked = build_top_trading_value_gate(101, "G0")
         self.assertEqual(passed["status"], "✅")
         self.assertEqual(blocked["status"], "⛔")
-        self.assertIn("TOP40", blocked["note"])
+        self.assertIn("TOP100", blocked["note"])
 
     def test_daily_output_paths_use_compact_date(self):
         json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_STABLE)
@@ -502,7 +502,7 @@ class GenerateLatestTest(unittest.TestCase):
             prev_close=9800.0,
             open_price=9900.0,
             high_price=10100.0,
-            low_price=9700.0,
+            low_price=9900.0,
             volume=150.0,
             trading_value_text="1,000억",
             market_cap_trillion=10.0,
@@ -549,8 +549,8 @@ class GenerateLatestTest(unittest.TestCase):
         entry = build_pullback_entry(snapshot, context)
         p1_rule = next(rule for rule in entry["unmatchedRules"] if rule["code"] == "P1")
         self.assertEqual(p1_rule["evalStatus"], "not_met")
-        self.assertIn("20일 고점 대비", p1_rule["note"])
-        self.assertIn("필요 -7%~-15%", p1_rule["note"])
+        self.assertIn("이평선 터치", p1_rule["note"])
+        self.assertIn("없음", p1_rule["note"])
 
     def test_build_momentum_entry_marks_s2_and_c3_from_browser_metrics(self):
         snapshot = StockSnapshot(
@@ -596,7 +596,7 @@ class GenerateLatestTest(unittest.TestCase):
             intraday_30m={"available": True, "signal": True},
             event_filter=None,
             toss={"avgStrength": 114.0, "intradayAbove100Ratio": 82.0},
-            orderbook={"bidAskRatio": 1.34},
+            orderbook={"bidAskRatio": 0.5},
         )
         context = {
             "regimeLabel": "강세장 ✅",
@@ -614,7 +614,7 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(s2_rule["evalStatus"], "met")
         self.assertEqual(c3_rule["evalStatus"], "met")
         self.assertIn("114.0%", s2_rule["note"])
-        self.assertIn("1.34", c3_rule["note"])
+        self.assertIn("0.5", c3_rule["note"])
 
     def test_build_momentum_entry_explains_missing_browser_metrics(self):
         snapshot = StockSnapshot(
@@ -721,7 +721,7 @@ class GenerateLatestTest(unittest.TestCase):
             intraday_30m={"available": True, "signal": True, "note": "직전 30분봉 종가 10,000, 전봉 종가 9,800"},
             event_filter={"blocked": False, "note": "이벤트 필터 통과"},
             toss={"avgStrength": 94.0},
-            orderbook={"bidAskRatio": 1.08},
+            orderbook={"bidAskRatio": 0.5},
         )
         context = {
             "regimeLabel": "강세장 ✅",
@@ -736,7 +736,7 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIn("C3", matched_codes)
         c2_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C2")
         c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
-        self.assertIn("1.08", c2_rule["note"])
+        self.assertIn("0.5", c2_rule["note"])
         self.assertIn("30분봉", c3_rule["note"])
 
     def test_build_reversal_entry_explains_missing_last_hour_strength(self):

@@ -27,9 +27,10 @@ from jongga.rule_evaluation import (
     evaluate_momentum_c1,
     evaluate_momentum_c2,
     evaluate_momentum_c3,
+    evaluate_momentum_g3,
+    evaluate_momentum_rs,
     evaluate_momentum_g1,
     evaluate_momentum_g2,
-    evaluate_momentum_g3,
     evaluate_momentum_p1,
     evaluate_momentum_p2,
     evaluate_momentum_s1,
@@ -92,7 +93,7 @@ ETF_NAME_PATTERN = re.compile(
 )
 KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업\(잠정\)실적|잠정실적|실적발표|결산실적", re.IGNORECASE)
 KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
-TOP_TRADING_VALUE_LIMIT = 40
+TOP_TRADING_VALUE_LIMIT = 100
 NAVER_MARKET_VALUE_API_TEMPLATE = "https://m.stock.naver.com/api/stocks/marketValue/{market}?page={page}&pageSize={page_size}"
 CHROME_EXECUTABLE_CANDIDATES = [
     lambda: os.getenv("MARKET_ANALYZE_PLAYWRIGHT_EXECUTABLE_PATH", ""),
@@ -1695,7 +1696,7 @@ def recent_negative_cross(macd_hist: list[float]) -> bool:
 
 def relative_strength_rank(snapshot: StockSnapshot, universe_returns: list[tuple[str, float]]) -> bool:
     ordered = sorted(universe_returns, key=lambda item: item[1], reverse=True)
-    top_count = max(1, math.ceil(len(ordered) * 0.1))
+    top_count = max(1, math.ceil(len(ordered) * 0.25))  # 방향 A: 상위 10% → 25% 완화
     return any(code == snapshot.code for code, _ in ordered[:top_count])
 
 
@@ -1914,6 +1915,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
 def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_top10: bool, kospi_return_5d: float, kospi_return_20d: float) -> dict[str, Any]:
     manual_input = build_manual_input_meta("momentum", snapshot)
     score_map = {
+        "RS": evaluate_momentum_rs(rs_top10),   # 3개월 상대강도 쭄점 항목
         "S1": evaluate_momentum_s1(snapshot),
         "S2": evaluate_momentum_s2(snapshot),
         "P1": evaluate_momentum_p1(snapshot),
@@ -1923,14 +1925,13 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "C3": evaluate_momentum_c3(snapshot),
     }
     gates = [
-        gate_dict("G1", evaluate_momentum_g1(rs_top10)),
-        gate_dict("G2", evaluate_momentum_g2(snapshot, kospi_return_5d, kospi_return_20d)),
-        gate_dict("G3", evaluate_momentum_g3(snapshot)),
-        gate_dict("G4", evaluate_pullback_g0(snapshot)),
+        gate_dict("G1", evaluate_momentum_g1(snapshot, kospi_return_5d, kospi_return_20d)),  # 구 G2
+        gate_dict("G2", evaluate_momentum_g2(snapshot)),                                     # 구 G3
+        gate_dict("G3", evaluate_momentum_g3(snapshot)),                                      # 구 G4 -> TOP100
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     score_items = {code: result.score for code, result in score_map.items()}
-    raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
+    raw_score = score_items["RS"] * 1.5 + score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
     final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
     grade = grade_from_score(final_score, "momentum")
     trade_plan = build_trade_plan("momentum", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
@@ -2363,7 +2364,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--history-js", default="jongga/output/jongga_history.js", help="History manifest JS path")
     parser.add_argument("--out", help="Legacy latest.json output path")
     parser.add_argument("--bridge-js", help="Legacy window.JONGGA_DATA bridge JS output path")
-    parser.add_argument("--top-limit", type=int, default=TOP_TRADING_VALUE_LIMIT, help="Universe size from Naver top trading-value list. Hard-capped at 40")
+    parser.add_argument("--top-limit", type=int, default=TOP_TRADING_VALUE_LIMIT, help="Universe size from Naver top trading-value list. Hard-capped at 100")
     return parser
 
 

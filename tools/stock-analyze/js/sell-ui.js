@@ -187,7 +187,7 @@ renderSellStockCards = function renderSellStockCardsOverride() {
         <div class="scard" id="${getCardDomId(stock.entryKey)}" data-entry-key="${escapeHtml(stock.entryKey)}">
           <div class="scard-head">
             <div>
-              <div class="scard-name">${escapeHtml(stock.name)}</div>
+              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
               <div class="scard-code">${escapeHtml(stock.code)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
             </div>
             <div class="scard-badges">
@@ -252,8 +252,8 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
           <div class="buy-card-head">
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
-              <div class="buy-card-name">${escapeHtml(entry.name)}</div>
-              <div class="buy-card-code">${escapeHtml(entry.code)}</div>
+              <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
+              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}</div>
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">

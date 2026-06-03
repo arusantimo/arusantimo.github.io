@@ -1,7 +1,7 @@
-window.JONGGA_DATA = {
+{
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-06-03T04:54:14+00:00",
-  "variant": "stable",
+  "generatedAt": "2026-06-03T04:54:33+00:00",
+  "variant": "canary",
   "dataQuality": {
     "status": "partial",
     "counts": {
@@ -57,7 +57,7 @@ window.JONGGA_DATA = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1517.0,
+        "durationMs": 1351.6,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -65,7 +65,7 @@ window.JONGGA_DATA = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 1317.3,
+        "durationMs": 1144.6,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -80,28 +80,28 @@ window.JONGGA_DATA = {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 103.4,
+        "durationMs": 74.0,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 3.4,
+        "durationMs": 1.7,
         "detail": "강세장 ✅ (펀더·지수 정당)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 3114.8,
+        "durationMs": 2924.6,
         "count": 19
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 1555.2,
+        "durationMs": 1463.4,
         "detail": "성공 19 / 실패 0",
         "count": 19
       },
@@ -109,7 +109,7 @@ window.JONGGA_DATA = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 528.5,
+        "durationMs": 525.7,
         "detail": "direct-http · 체결강도 19 / 호가 19 / 틱프록시 19",
         "count": 19
       },
@@ -117,29 +117,29 @@ window.JONGGA_DATA = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 2.6,
+        "durationMs": 2.4,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       },
       {
         "step": "browser_enrichment",
-        "label": "KIND 브라우저 보강",
+        "label": "카나리 KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 13539.4,
-        "detail": "playwright-chromium · KIND 0",
+        "durationMs": 11393.2,
+        "detail": "chrome:chrome.exe · KIND 0",
         "count": 3
       }
     ],
-    "note": "현재 버전 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 현재 버전은 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 표시 종목만 Playwright로 보강합니다.",
-    "channel": "stable",
-    "channelLabel": "현재 버전",
-    "browserSource": "playwright-chromium",
+    "note": "카나리 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 카나리는 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 Chrome 실행 파일을 우선 시도해 표시 종목만 브라우저 보강합니다.",
+    "channel": "canary",
+    "channelLabel": "카나리",
+    "browserSource": "chrome:chrome.exe",
     "browserLaunchNotes": []
   },
   "slots": [
     {
       "slotId": "slotA",
-      "sourceId": "live-public-run-stable",
+      "sourceId": "live-public-run-canary",
       "regime": {
         "table": [
           {
@@ -272,7 +272,7 @@ window.JONGGA_DATA = {
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "+15.52원",
+            "actualValue": "+15.77원",
             "baseScore": "-2점",
             "weight": "×1.5",
             "formula": "-2 × 1.5 = -3.0점",
@@ -1851,4 +1851,4 @@ window.JONGGA_DATA = {
     }
   ],
   "analysisDate": "2026-06-03"
-};
+}

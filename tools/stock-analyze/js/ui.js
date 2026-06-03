@@ -576,7 +576,7 @@ function renderSellStockCards() {
         <div class="scard" id="card-${stock.code}">
           <div class="scard-head">
             <div>
-              <div class="scard-name">${escapeHtml(stock.name)}</div>
+              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
               <div class="scard-code">${escapeHtml(stock.code)}</div>
             </div>
             <div class="scard-badges">
@@ -618,7 +618,7 @@ function renderSwingCards() {
       <div class="scard swing-card" id="card-${stock.code}">
         <div class="scard-head">
           <div>
-            <div class="scard-name">${escapeHtml(stock.name)}</div>
+            <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
             <div class="scard-code">${escapeHtml(stock.code)}</div>
           </div>
           <div class="scard-badges">
@@ -668,8 +668,8 @@ function renderBuyStockCards() {
           <div class="buy-card-head">
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}</div>
-              <div class="buy-card-name">${escapeHtml(entry.name)}</div>
-              <div class="buy-card-code">${escapeHtml(entry.code)}</div>
+              <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
+              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}</div>
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">

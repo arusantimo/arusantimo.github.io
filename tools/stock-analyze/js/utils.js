@@ -215,3 +215,40 @@ function getAnalyzerTabScheduleHint(now = new Date()) {
     ? '00:00~13:59 기본: 매도 분석기'
     : '14:00~23:59 기본: 매수 분석기';
 }
+
+function extractTradingValueRank(rules) {
+  if (!Array.isArray(rules)) return null;
+  for (const rule of rules) {
+    const code = String(rule.code || '').toUpperCase();
+    if (code === 'S1' || code === 'F1') {
+      const note = String(rule.note || '');
+      const m = note.match(/순위\s*(\d+)위/);
+      if (m) return Number(m[1]);
+    }
+  }
+  return null;
+}
+
+function getTradingValueRankBadgeHtml(entry) {
+  const allRules = [
+    ...(entry.matchedRules || []),
+    ...(entry.unmatchedRules || []),
+    ...(entry.gates || []),
+    ...(entry.filters || [])
+  ];
+  const rank = extractTradingValueRank(allRules);
+  if (!rank) return '';
+  const cls = rank <= 10 ? 'tv-rank-top10' : rank <= 30 ? 'tv-rank-top30' : 'tv-rank-other';
+  return `<span class="tv-rank-badge ${cls}">거래대금 ${rank}위</span>`;
+}
+
+function buildStockNameLinksHtml(name, code) {
+  const safeCode = escapeHtml(code);
+  const safeName = escapeHtml(name);
+  return `
+    <span class="scard-name-links">
+      <a class="scard-name-link" href="https://stock.naver.com/domestic/stock/${safeCode}/price" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${safeName}</a>
+      <a class="scard-name-link-toss" href="https://www.tossinvest.com/stocks/${safeCode}/order" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="토스 주문">T</a>
+    </span>
+  `.trim();
+}

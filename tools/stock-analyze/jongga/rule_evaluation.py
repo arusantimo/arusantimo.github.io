@@ -87,9 +87,20 @@ def signed_pct(value: float, digits: int = 1) -> str:
 
 
 def evaluate_pullback_g0(snapshot: Any) -> EvalResult:
-    rank = int(getattr(snapshot, "rank", 0) or 0)
-    note = f"거래대금 TOP{TOP_TRADING_VALUE_LIMIT} 순위 {rank}"
-    if rank <= TOP_TRADING_VALUE_LIMIT:
+    history = snapshot.volume_history or []
+    if len(history) < 21:
+        return eval_data_missing("20일 거래량 데이터 부족")
+    
+    past_20d = history[1:21]
+    if not past_20d:
+        return eval_not_met("과거 데이터 없음")
+    
+    max_vol = max(past_20d)
+    avg_20 = sum(past_20d) / len(past_20d)
+    
+    ratio = (max_vol / avg_20) if avg_20 > 0 else 0
+    note = f"최근 20일 최대 거래량 급증 {ratio*100:.0f}% (필요 ≥ 200%)"
+    if ratio >= 2.0:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -177,13 +188,16 @@ def evaluate_pullback_s2(snapshot: Any) -> EvalResult:
 
 
 def evaluate_pullback_p1(snapshot: Any) -> EvalResult:
-    if not has_history(snapshot, 20):
-        return eval_data_missing("20일 고점 산출에 필요한 일봉 20거래일 미만")
-    drawdown = drawdown_from_high_20d(snapshot)
-    if drawdown is None:
-        return eval_data_missing("20일 고점·종가 데이터 부족")
-    note = f"20일 고점 대비 {signed_pct(drawdown)} (필요 -7%~-15%)"
-    if -15 <= drawdown <= -7:
+    mas = [("5MA", snapshot.ma5), ("10MA", snapshot.ma10), ("20MA", snapshot.ma20)]
+    available = [(label, value) for label, value in mas if value is not None]
+    if not available:
+        return eval_data_missing("이동평균 산출 데이터 부족")
+    
+    # 저가가 이평선 중 하나라도 터치(1% 근접 하락)했는지
+    touched = [label for label, value in available if snapshot.low_price <= value * 1.01]
+    
+    note = f"저가 {snapshot.low_price:,.0f} · 이평선 터치: {', '.join(touched) or '없음'}"
+    if touched:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -215,8 +229,8 @@ def evaluate_pullback_c2(snapshot: Any) -> EvalResult:
     if not snapshot.volume_avg_5d:
         return eval_data_missing("5일 평균 거래량 산출 데이터 부족")
     ratio = snapshot.volume / snapshot.volume_avg_5d
-    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 100~180%)"
-    if 1.0 <= ratio <= 1.8:
+    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≤ 80%)"
+    if ratio <= 0.8:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -238,22 +252,25 @@ def evaluate_pullback_c3(snapshot: Any, context: dict[str, Any]) -> EvalResult:
 # --- Momentum ---
 
 
-def evaluate_momentum_g1(rs_top10: bool) -> EvalResult:
+def evaluate_momentum_rs(rs_top10: bool) -> EvalResult:
+    """3개월 상대강도 — 채점 항목 (상위 25% 충족 시 +1.5점)"""
     if rs_top10:
-        return eval_met("3개월 상대강도 상위 10%")
-    return eval_not_met("3개월 상대강도 상위 10% 밖")
+        return eval_met("3개월 상대강도 상위 25%")
+    return eval_not_met("3개월 상대강도 상위 25% 밖")
 
 
-def evaluate_momentum_g2(snapshot: Any, kospi_return_5d: float, kospi_return_20d: float) -> EvalResult:
+def evaluate_momentum_g1(snapshot: Any, kospi_return_5d: float, kospi_return_20d: float) -> EvalResult:
+    """구 G2 → 새 G1: 5일·20일 KOSPI 대비 초과 수익률 (둘 중 하나 이상)"""
     excess_5 = snapshot.return_5d - kospi_return_5d
     excess_20 = snapshot.return_20d - kospi_return_20d
     note = f"5일 초과 {signed_pct(excess_5)} / 20일 초과 {signed_pct(excess_20)}"
-    if excess_5 > 0 and excess_20 > 0:
+    if excess_5 > 0 or excess_20 > 0:
         return eval_met(note)
     return eval_not_met(note)
 
 
-def evaluate_momentum_g3(snapshot: Any) -> EvalResult:
+def evaluate_momentum_g2(snapshot: Any) -> EvalResult:
+    """구 G3 → 새 G2: 52주 고가 대비 92% 이상"""
     if not snapshot.high_52w:
         return eval_data_missing("52주 고가 데이터 부족")
     ratio = snapshot.current_price / snapshot.high_52w * 100
@@ -265,9 +282,9 @@ def evaluate_momentum_g3(snapshot: Any) -> EvalResult:
 
 def evaluate_momentum_s1(snapshot: Any) -> EvalResult:
     note = f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주"
-    if snapshot.foreign_net > 0 and snapshot.institution_net > 0:
-        return eval_met(f"{note} · 동시 순매수")
-    return eval_not_met(f"{note} · 동시 순매수 아님")
+    if snapshot.foreign_net > 0 or snapshot.institution_net > 0:
+        return eval_met(f"{note} · 외인/기관 중 순매수")
+    return eval_not_met(f"{note} · 양매도 (단독 매수 없음)")
 
 
 def evaluate_momentum_p1(snapshot: Any) -> EvalResult:
@@ -337,8 +354,16 @@ def evaluate_momentum_c3(snapshot: Any) -> EvalResult:
     bid_ask_ratio = float(orderbook.get("bidAskRatio") or 0)
     if bid_ask_ratio <= 0:
         return eval_manual_required("호가잔량 비율 미입력 (토스 호가창 수동 입력)")
-    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≥ 1.2)"
-    if bid_ask_ratio >= 1.2:
+    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≤ 0.8)"
+    if bid_ask_ratio <= 0.8:
+        return eval_met(note)
+    return eval_not_met(note)
+
+def evaluate_momentum_g3(snapshot: Any) -> EvalResult:
+    """새 G3 (구 G4): 거래대금 TOP100"""
+    rank = int(getattr(snapshot, "rank", 0) or 0)
+    note = f"거래대금 TOP100 순위 {rank}"
+    if 0 < rank <= 100:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -347,7 +372,13 @@ def evaluate_momentum_c3(snapshot: Any) -> EvalResult:
 
 
 def evaluate_reversal_f1(snapshot: Any) -> EvalResult:
-    return evaluate_pullback_g0(snapshot)
+    if not snapshot.volume_avg_5d:
+        return eval_data_missing("5일 평균 거래량 산출 데이터 부족")
+    ratio = snapshot.volume / snapshot.volume_avg_5d
+    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≥ 200%)"
+    if ratio >= 2.0:
+        return eval_met(f"{note} · 투매 클라이맥스")
+    return eval_not_met(note)
 
 
 def evaluate_reversal_f2(snapshot: Any) -> EvalResult:
@@ -372,8 +403,8 @@ def evaluate_reversal_f4() -> EvalResult:
 
 
 def evaluate_reversal_g1(snapshot: Any) -> EvalResult:
-    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +30%)"
-    if snapshot.return_21d >= 30.0:
+    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +12%)"
+    if snapshot.return_21d >= 12.0:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -454,9 +485,9 @@ def evaluate_reversal_c1(snapshot: Any) -> EvalResult:
     if not snapshot.volume_avg_5d:
         return eval_data_missing("5일 평균 거래량 산출 데이터 부족")
     ratio = snapshot.volume / snapshot.volume_avg_5d
-    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≥ 200%)"
-    if ratio >= 2.0:
-        return eval_met(note)
+    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≥ 300%)"
+    if ratio >= 3.0:
+        return eval_met(f"{note} · 극단적 투매")
     return eval_not_met(note)
 
 
@@ -483,8 +514,8 @@ def evaluate_reversal_c2(snapshot: Any) -> EvalResult:
     bid_ask_ratio = float(orderbook.get("bidAskRatio") or 0)
     if bid_ask_ratio <= 0:
         return eval_manual_required("호가잔량 비율 미입력 (토스 호가창 수동 입력)")
-    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≥ 1.0)"
-    if bid_ask_ratio >= 1.0:
+    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≤ 0.8)"
+    if bid_ask_ratio <= 0.8:
         return eval_met(note)
     return eval_not_met(note)
 

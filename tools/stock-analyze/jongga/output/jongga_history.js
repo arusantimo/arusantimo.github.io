@@ -1,5 +1,191 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-03",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/jongga_data_20260603.js",
+    "jsonFile": "jongga/output/latest_20260603.json",
+    "generatedAt": "2026-06-03T04:54:14+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "LG에너지솔루션",
+        "code": "373220",
+        "score": 6.8,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 442500
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 2360000
+      },
+      {
+        "strategy": "pullback",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 280500
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 1813000
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 360500
+      },
+      {
+        "strategy": "momentum",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2360000
+      },
+      {
+        "strategy": "reversal",
+        "name": "두산로보틱스",
+        "code": "454910",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 166700
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG디스플레이",
+        "code": "034220",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 16690
+      },
+      {
+        "strategy": "momentum",
+        "name": "성호전자",
+        "code": "043260",
+        "score": 5.2,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 47500
+      }
+    ]
+  },
+  {
+    "date": "2026-06-03",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/jongga_data_20260603_canary.js",
+    "jsonFile": "jongga/output/latest_20260603_canary.json",
+    "generatedAt": "2026-06-03T04:54:33+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "name": "LG에너지솔루션",
+        "code": "373220",
+        "score": 6.8,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 442500
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 2360000
+      },
+      {
+        "strategy": "pullback",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 6.4,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 280500
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 1813000
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 360500
+      },
+      {
+        "strategy": "momentum",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.6,
+        "grade": "B",
+        "statusLabel": "관심후보",
+        "currentPrice": 2360000
+      },
+      {
+        "strategy": "reversal",
+        "name": "두산로보틱스",
+        "code": "454910",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 166700
+      },
+      {
+        "strategy": "reversal",
+        "name": "LG디스플레이",
+        "code": "034220",
+        "score": 5.4,
+        "grade": "B",
+        "statusLabel": "매매금지",
+        "currentPrice": 16690
+      },
+      {
+        "strategy": "momentum",
+        "name": "성호전자",
+        "code": "043260",
+        "score": 5.2,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 47500
+      }
+    ]
+  },
+  {
     "date": "2026-06-02",
     "variant": "stable",
     "variantLabel": "현재 버전",
