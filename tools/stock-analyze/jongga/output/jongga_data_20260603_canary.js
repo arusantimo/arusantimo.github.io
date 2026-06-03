@@ -1,7 +1,8 @@
-{
+window.JONGGA_CANARY_DAILY_DATA = window.JONGGA_CANARY_DAILY_DATA || {};
+window.JONGGA_CANARY_DAILY_DATA["2026-06-03"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-06-03T05:51:56+00:00",
-  "variant": "stable",
+  "generatedAt": "2026-06-03T05:53:15+00:00",
+  "variant": "canary",
   "dataQuality": {
     "status": "partial",
     "counts": {
@@ -57,7 +58,7 @@
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1525.8,
+        "durationMs": 1151.2,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -65,7 +66,7 @@
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 508.6,
+        "durationMs": 495.1,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -73,35 +74,35 @@
         "step": "gap_score",
         "label": "갭 스코어 계산",
         "status": "ok",
-        "durationMs": 0.1,
+        "durationMs": 0.0,
         "detail": "G-B 🔵"
       },
       {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 2030.6,
+        "durationMs": 1278.3,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 14.2,
+        "durationMs": 1.2,
         "detail": "강세장 ✅ (펀더·지수 정당)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 41228.0,
+        "durationMs": 40508.7,
         "count": 19
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 6276.5,
+        "durationMs": 6135.9,
         "detail": "성공 19 / 실패 0",
         "count": 19
       },
@@ -109,7 +110,7 @@
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 5469.7,
+        "durationMs": 5117.5,
         "detail": "direct-http · 체결강도 19 / 호가 19 / 틱프록시 19",
         "count": 19
       },
@@ -117,29 +118,29 @@
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 4.8,
+        "durationMs": 4.6,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       },
       {
         "step": "browser_enrichment",
-        "label": "KIND 브라우저 보강",
+        "label": "카나리 KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 17196.1,
-        "detail": "playwright-chromium · KIND 0",
+        "durationMs": 24648.5,
+        "detail": "chrome:google-chrome · KIND 0",
         "count": 3
       }
     ],
-    "note": "현재 버전 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 현재 버전은 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 표시 종목만 Playwright로 보강합니다.",
-    "channel": "stable",
-    "channelLabel": "현재 버전",
-    "browserSource": "playwright-chromium",
+    "note": "카나리 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. 역추세 30분봉은 Yahoo 30분봉으로 계산합니다. 카나리는 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 Chrome 실행 파일을 우선 시도해 표시 종목만 브라우저 보강합니다.",
+    "channel": "canary",
+    "channelLabel": "카나리",
+    "browserSource": "chrome:google-chrome",
     "browserLaunchNotes": []
   },
   "slots": [
     {
       "slotId": "slotA",
-      "sourceId": "live-public-run-stable",
+      "sourceId": "live-public-run-canary",
       "regime": {
         "table": [
           {
@@ -248,7 +249,7 @@
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "+0.99%",
+            "actualValue": "+1.00%",
             "baseScore": "+1점",
             "weight": "×2.5",
             "formula": "+1 × 2.5 = +2.5점",
@@ -272,7 +273,7 @@
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "+19.42원",
+            "actualValue": "+19.68원",
             "baseScore": "-2점",
             "weight": "×1.5",
             "formula": "-2 × 1.5 = -3.0점",
@@ -1852,4 +1853,4 @@
     }
   ],
   "analysisDate": "2026-06-03"
-}
+};
