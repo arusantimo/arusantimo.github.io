@@ -219,10 +219,9 @@ function getAnalyzerTabScheduleHint(now = new Date()) {
 function extractTradingValueRank(rules) {
   if (!Array.isArray(rules)) return null;
   for (const rule of rules) {
-    const code = String(rule.code || '').toUpperCase();
-    if (code === 'S1' || code === 'F1') {
-      const note = String(rule.note || '');
-      const m = note.match(/순위\s*(\d+)위/);
+    const note = String(rule.note || '');
+    if (note.includes('거래대금') && note.includes('순위')) {
+      const m = note.match(/순위\s*(\d+)/);
       if (m) return Number(m[1]);
     }
   }

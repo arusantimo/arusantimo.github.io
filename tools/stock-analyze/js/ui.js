@@ -577,7 +577,7 @@ function renderSellStockCards() {
           <div class="scard-head">
             <div>
               <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
-              <div class="scard-code">${escapeHtml(stock.code)}</div>
+              <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}</div>
             </div>
             <div class="scard-badges">
               <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
@@ -619,7 +619,7 @@ function renderSwingCards() {
         <div class="scard-head">
           <div>
             <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
-            <div class="scard-code">${escapeHtml(stock.code)}</div>
+            <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}</div>
           </div>
           <div class="scard-badges">
             <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
