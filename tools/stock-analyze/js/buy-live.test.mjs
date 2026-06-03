@@ -324,3 +324,35 @@ test('점수 미산출 항목은 실시간 보정을 만들지 않고 미산출 
   assert.equal(getBuyDisplayScore(entry, presentation.primaryScore), '미산출');
   assert.match(html, /전략 점수 미산출/);
 });
+
+test('안전 차단 항목도 카드 표시는 원래 전략 점수와 판정을 유지한다', () => {
+  const {
+    hasBuyStrategyScore,
+    getBuyPresentation,
+    getBuyDisplayScore,
+    buildBuyLivePillsHtml
+  } = loadBuyLiveContext();
+  const entry = {
+    score: 5.2,
+    scoreUnavailable: true,
+    scoreLabel: '자동매수 금지',
+    grade: 'C',
+    statusLabel: '자동매수 금지',
+    sourceScore: 5.2,
+    sourceGrade: 'C',
+    sourceStatusLabel: '관심후보',
+    strategy: 'momentum',
+    safety: { blocked: true, reasons: ['G2 미충족'] }
+  };
+
+  const presentation = getBuyPresentation(entry);
+  const pillsHtml = buildBuyLivePillsHtml(entry, presentation);
+
+  assert.equal(hasBuyStrategyScore(entry), false);
+  assert.equal(presentation.strategyScore, 5.2);
+  assert.equal(presentation.strategyGrade, 'C');
+  assert.equal(presentation.strategyStatusLabel, '관심후보');
+  assert.equal(presentation.primaryStatusLabel, '관심후보');
+  assert.equal(getBuyDisplayScore(entry, presentation.primaryScore), '5.2');
+  assert.match(pillsHtml, /전략 판정 관심후보/);
+});

@@ -1,7 +1,7 @@
 const JONGGA_SCHEMA_VERSION = 'jongga_result.v1';
 const JONGGA_BUY_STRATEGIES = ['pullback', 'momentum', 'reversal'];
 const JONGGA_REQUIRED_RULES = {
-  pullback: ['G1', 'G2', 'G3', 'G4', 'G5'],
+  pullback: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5'],
   momentum: ['G1', 'G2', 'G3'],  // G1=초과수익률(구G2), G2=52주고가(구G3), G3=거래대금(구G4) / RS는 채점 항목
   reversal: ['F1', 'F2', 'F3', 'F4', 'G1', 'G2', 'G3', 'G4', 'G5']
 };
@@ -174,7 +174,9 @@ function getJonggaSafetyIssues(entry = {}, context = {}) {
     const status = getJonggaRuleStatus(rule);
     if (!rule) {
       issues.push({ code, severity: 'block', message: `${code} 근거 누락` });
-    } else if (status === 'unknown' || status === 'warning') {
+    } else if (status === 'unknown') {
+      issues.push({ code, severity: 'block', message: `${code} 근거 누락` });
+    } else if (status === 'warning') {
       // 수기 입력 지표 등은 보조 지표로 판단하기 위해 차단(block) 목록에 넣지 않음
     } else if (status === 'blocked') {
       issues.push({ code, severity: 'block', message: `${code} 미충족` });

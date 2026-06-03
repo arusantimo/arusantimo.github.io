@@ -258,7 +258,6 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">
                 ${escapeHtml(scoreDisplay)}
-                ${entry.safety?.blocked ? `<span style="color:${presentation.primaryStatusLabel.includes('주의') ? 'var(--text-warning)' : 'var(--text-danger)'}; font-size:14px; font-weight:700; margin-left:4px;">(${escapeHtml(presentation.primaryStatusLabel)})</span>` : ''}
               </div>
               <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryGrade)}</div>
               <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
@@ -267,7 +266,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
           </div>
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
           <div class="buy-card-tags">
-            <span class="buy-tag strategy">전략 판정 ${escapeHtml(entry.statusLabel || presentation.strategyStatusLabel)}</span>
+            <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
             <span class="buy-tag">충족 ${entry.matchedRules.length}</span>
             <span class="buy-tag muted">미충족 ${entry.unmatchedRules.length}</span>

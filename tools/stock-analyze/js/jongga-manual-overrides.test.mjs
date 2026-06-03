@@ -115,7 +115,7 @@ test('momentum manual overrides promote score and matched rules', () => {
           statusLabel: '관심후보',
           toss: { avgStrength: 107, note: '자동 수집값' },
           orderbook: { bidAskRatio: 1.01, note: '자동 수집값' },
-          gates: validGateMap(['G1', 'G2', 'G3', 'G4']),
+          gates: validGateMap(['G1', 'G2', 'G3']),
           notes: ['토스 체결강도·호가잔량 미반영']
         }]
       }

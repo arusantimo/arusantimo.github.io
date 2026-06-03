@@ -120,13 +120,14 @@ function applyJonggaSafety(entry, context) {
     safety: { blocked: true, reasons: issues.map(issue => issue.message) },
     notes: [`안전차단: ${issues.map(issue => issue.message).join(', ')}`, ...entry.notes]
   };
-  const isHighScore = entry.score !== null && entry.score !== undefined && Number(entry.score) >= 6.0;
-  const safetyLabel = isHighScore ? '매수주의' : '매수금지';
+  const safetyLabel = '자동매수 금지';
 
   return {
     ...next,
     sourceScore: entry.score,
     sourceGrade: entry.grade,
+    sourceStatusLabel: entry.statusLabel,
+    scoreUnavailable: true,
     scoreLabel: safetyLabel,
     statusLabel: safetyLabel
   };

@@ -185,9 +185,16 @@ function buildBuyLiveRefreshPayload(entry, liveData) {
 
 function getBuyPresentation(entry) {
   const hasStrategyScore = hasBuyStrategyScore(entry);
-  const strategyScore = hasStrategyScore ? roundBuyScoreValue(entry.score) : null;
-  const strategyGrade = entry.grade || (hasStrategyScore ? getBuyGradeFromScore(strategyScore, entry.strategy) : '미산출');
-  const strategyStatusLabel = entry.statusLabel || getBuyFinalStatusLabel(strategyGrade);
+  const safetySourceScore = entry?.safety?.blocked && Number.isFinite(Number(entry?.sourceScore))
+    ? roundBuyScoreValue(entry.sourceScore)
+    : null;
+  const strategyScore = hasStrategyScore
+    ? roundBuyScoreValue(entry.score)
+    : safetySourceScore;
+  const strategyGrade = String(entry?.safety?.blocked ? (entry.sourceGrade || entry.grade || '') : (entry.grade || '')).trim()
+    || (strategyScore !== null ? getBuyGradeFromScore(strategyScore, entry.strategy) : '미산출');
+  const strategyStatusLabel = String(entry?.safety?.blocked ? (entry.sourceStatusLabel || entry.statusLabel || '') : (entry.statusLabel || '')).trim()
+    || getBuyFinalStatusLabel(strategyGrade);
   
   const isHistoryView = typeof jonggaLastLoadMeta !== 'undefined' && jonggaLastLoadMeta?.analysisDate && typeof getJonggaEffectiveDateKey === 'function' && jonggaLastLoadMeta.analysisDate !== getJonggaEffectiveDateKey();
   const normalizedLiveRefresh = (hasStrategyScore && !isHistoryView) ? normalizeBuyLiveRefresh(entry, entry.liveRefresh) : null;
@@ -196,11 +203,6 @@ function getBuyPresentation(entry) {
   const primaryScore = normalizedLiveRefresh?.finalScore ?? strategyScore;
   const primaryGrade = normalizedLiveRefresh?.finalGrade ?? strategyGrade;
   let primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? strategyStatusLabel;
-
-  if (entry.safety?.blocked) {
-    const isHighScore = Number.isFinite(primaryScore) && primaryScore >= 6.0;
-    primaryStatusLabel = isHighScore ? '매수주의' : '매수금지';
-  }
 
   return {
     strategyScore,
@@ -222,7 +224,7 @@ function getBuyPresentation(entry) {
       ? normalizedLiveRefresh.consensusUnavailable
         ? `최종 ${primaryGrade} · 컨센서스 미제공 · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
         : `최종 ${primaryGrade} · 컨센서스 ${formatBuySignedPoints(normalizedLiveRefresh.adjustment)} · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
-      : hasStrategyScore
+      : strategyScore !== null
         ? `전략 기준 ${strategyGrade}`
         : `전략 점수 ${getBuyUnavailableScoreLabel(entry)}`,
     verdictClass: entry.safety?.blocked 
@@ -245,8 +247,8 @@ function buildBuyLivePillsHtml(entry, presentation, options = {}) {
   const strategyScoreText = getBuyDisplayScore(entry, presentation.strategyScore);
   const pills = [`<span class="buy-live-pill strategy">전략 ${escapeHtml(strategyScoreText)} / ${escapeHtml(presentation.strategyGrade)}</span>`];
 
-  if (includeStrategyStatus && entry.statusLabel) {
-    pills.push(`<span class="buy-live-pill strategy">전략 판정 ${escapeHtml(entry.statusLabel)}</span>`);
+  if (includeStrategyStatus && presentation.strategyStatusLabel) {
+    pills.push(`<span class="buy-live-pill strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>`);
   }
 
   if (!liveRefresh) return pills.join('');

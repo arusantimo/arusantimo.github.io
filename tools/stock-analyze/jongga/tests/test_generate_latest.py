@@ -183,6 +183,65 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(blocked["status"], "⛔")
         self.assertIn("TOP100", blocked["note"])
 
+    def test_build_pullback_entry_accepts_one_rising_moving_average(self):
+        snapshot = StockSnapshot(
+            rank=3,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9900.0,
+            open_price=9950.0,
+            high_price=10050.0,
+            low_price=9800.0,
+            volume=100.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=40.0,
+            foreign_net=200.0,
+            institution_net=100.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0] * 70,
+            high_history=[10100.0] * 70,
+            low_history=[9800.0] * 70,
+            volume_history=[100.0] * 70,
+            ma5=10100.0,
+            ma10=10050.0,
+            ma20=9900.0,
+            ma60=9700.0,
+            ma5_prev=10100.0,
+            ma20_prev=9850.0,
+            ma60_prev=9700.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.2, 0.1, -0.1],
+            high_20d=10100.0,
+            low_5d=9800.0,
+            high_52w=12000.0,
+            return_5d=3.0,
+            return_20d=7.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.6,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+
+        g1_gate = next(rule for rule in entry["gates"] if rule["code"] == "G1")
+        self.assertEqual(g1_gate["status"], "✅")
+        self.assertIn("20MA", g1_gate["note"])
+
     def test_daily_output_paths_use_compact_date(self):
         json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_STABLE)
         self.assertEqual(json_path.as_posix(), "jongga/output/202605/latest_20260522.json")
@@ -596,7 +655,7 @@ class GenerateLatestTest(unittest.TestCase):
             intraday_30m={"available": True, "signal": True},
             event_filter=None,
             toss={"avgStrength": 114.0, "intradayAbove100Ratio": 82.0},
-            orderbook={"bidAskRatio": 0.5},
+            orderbook={"bidAskRatio": 1.5},
         )
         context = {
             "regimeLabel": "강세장 ✅",
@@ -614,7 +673,7 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(s2_rule["evalStatus"], "met")
         self.assertEqual(c3_rule["evalStatus"], "met")
         self.assertIn("114.0%", s2_rule["note"])
-        self.assertIn("0.5", c3_rule["note"])
+        self.assertIn("1.5", c3_rule["note"])
 
     def test_build_momentum_entry_explains_missing_browser_metrics(self):
         snapshot = StockSnapshot(
@@ -721,7 +780,7 @@ class GenerateLatestTest(unittest.TestCase):
             intraday_30m={"available": True, "signal": True, "note": "직전 30분봉 종가 10,000, 전봉 종가 9,800"},
             event_filter={"blocked": False, "note": "이벤트 필터 통과"},
             toss={"avgStrength": 94.0},
-            orderbook={"bidAskRatio": 0.5},
+            orderbook={"bidAskRatio": 1.1},
         )
         context = {
             "regimeLabel": "강세장 ✅",
@@ -736,7 +795,7 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIn("C3", matched_codes)
         c2_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C2")
         c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
-        self.assertIn("0.5", c2_rule["note"])
+        self.assertIn("1.1", c2_rule["note"])
         self.assertIn("30분봉", c3_rule["note"])
 
     def test_build_reversal_entry_explains_missing_last_hour_strength(self):

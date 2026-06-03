@@ -120,7 +120,7 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
           previousClose: 70000,
           dailyChange: 1200,
           dailyChangePct: 1.71,
-          gates: validGateMap(['G1', 'G2', 'G3', 'G4']),
+          gates: validGateMap(['G1', 'G2', 'G3']),
           matchedRules: [{ code: 'S1' }]
         }]
       }

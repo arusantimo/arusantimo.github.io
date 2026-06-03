@@ -272,7 +272,7 @@ function loadJonggaPayload(payload, meta = {}) {
     log(`ℹ️ 브라우저 수동 입력 ${getJonggaManualOverrideCount()}건을 현재 JSON 위에 반영했습니다.`);
   }
   if (typeof log === 'function' && validation.safetyBlocks.length) {
-    log(`<span style="color:var(--text-warning)">⚠️ 핵심 Gate/갭/품질 근거 부족 후보는 자동매수 금지로 낮춰 표시했습니다.</span>`);
+    log(`<span style="color:var(--text-warning)">⚠️ 핵심 Gate/갭/품질 근거 부족 후보는 안전 차단 대상으로 표시합니다.</span>`);
   }
   return validation;
 }

@@ -96,43 +96,44 @@ const RULE_GUIDE = {
   strategies: {
     pullback: {
       gates: [
-        { code: 'G1', condition: '동적 정배열: 5MA > 20MA > 60MA이면서 세 MA 모두 5일 변화율 > 0', source: '네이버 증권 일봉 차트' },
+        { code: 'G0', condition: '최근 20일 중 하루 이상 거래량 급증 (직전 20일 평균 대비 200% 이상)', source: '네이버 증권' },
+        { code: 'G1', condition: '동적 정배열: 5MA > 20MA > 60MA이면서 5MA/20MA/60MA 중 최소 1개가 최근 5일 상승', source: '네이버 증권 일봉 차트' },
         { code: 'G2', condition: '종가 > 60일선', source: '네이버 증권 일봉 차트' },
         { code: 'G3', condition: '주봉 RSI(14) ≥ 50', source: '네이버 증권 주봉 차트' },
         { code: 'G4', condition: '일봉 MACD 히스토그램이 음전환 후 3일 이내 OR 0선 위 회복 시도 중', source: '네이버 증권 일봉 차트' },
         { code: 'G5', condition: 'KOSPI 5일선 위 + VKOSPI (≤30 ✅ / 거시·강세·순환 시 30~70 ⚠️ / 70 초과 ⛔)', source: '네이버 증권 시장지표' }
       ],
       scores: [
-        { code: 'S1', condition: '최근 2주 내 거래대금 30위권 진입 이력 3회 이상', source: '네이버 증권' },
+        { code: 'S1', condition: '당일 거래대금 순위 30위 이내', source: '네이버 증권' },
         { code: 'S2', condition: '당일 외국인 OR 기관 순매수 전환 확인', source: '네이버 증권' },
-        { code: 'P1', condition: '단기 고점 대비 -7% ~ -15% 조정', source: '네이버 증권' },
+        { code: 'P1', condition: '당일 저가가 5일/10일/20일선 중 하나에 근접 및 지지 (1% 이내 터치)', source: '네이버 증권' },
         { code: 'P2', condition: '당일 종가가 5일/10일/20일선 중 최소 1개 위', source: '네이버 증권' },
         { code: 'C1', condition: '양봉 OR 아래꼬리:몸통 비율 ≥ 1:1', source: '네이버 증권' },
-        { code: 'C2', condition: '당일 거래량이 5일 평균의 100 ~ 180%', source: '네이버 증권' },
+        { code: 'C2', condition: '당일 거래량이 5일 평균의 80% 이하 (거래량 감소)', source: '네이버 증권' },
         { code: 'C3', condition: '해당 섹터 지수가 코스피 대비 당일 outperform', source: '네이버 증권' }
       ]
     },
     momentum: {
       gates: [
-        { code: 'G1', condition: 'RS 상위 10% 이내', source: '네이버 증권' },
-        { code: 'G2', condition: '5일 초과수익률 > 0 AND 20일 초과수익률 > 0', source: '네이버 증권' },
-        { code: 'G3', condition: '52주 고점의 92% 이상 위치 OR 52주 신고가 갱신', source: '네이버 증권' },
-        { code: 'G4', condition: '당일 거래대금 30위 이내', source: '네이버 증권' }
+        { code: 'G1', condition: '5일 또는 20일 KOSPI 대비 초과수익률 > 0', source: '네이버 증권' },
+        { code: 'G2', condition: '52주 고점의 92% 이상 위치 OR 52주 신고가 갱신', source: '네이버 증권' },
+        { code: 'G3', condition: '당일 거래대금 100위 이내', source: '네이버 증권' }
       ],
       scores: [
-        { code: 'S1', condition: '외국인 + 기관 동시 순매수', source: '네이버 증권' },
+        { code: 'S1', condition: '외국인 OR 기관 순매수', source: '네이버 증권' },
         { code: 'S2', condition: '분당 체결강도 평균 ≥ 100%가 장중 70% 이상 유지 + 당일 체결강도 평균 ≥ 110%', source: '토스 증권' },
         { code: 'P1', condition: '박스권 상단 OR 전고점 돌파 후 +5% 이내 자리', source: '네이버 증권' },
         { code: 'P2', condition: '돌파 당일 거래량이 20일 평균의 150% 이상', source: '네이버 증권' },
         { code: 'C1', condition: '종가 ≥ 당일 고가의 95%', source: '네이버 증권' },
         { code: 'C2', condition: '몸통이 전체 캔들의 70% 이상 + 윗꼬리 ≤ 몸통의 30%', source: '네이버 증권' },
-        { code: 'C3', condition: '매수호가 잔량 : 매도호가 잔량 ≥ 1.2 : 1', source: '토스 증권' }
+        { code: 'C3', condition: '매수호가 잔량 우위 (Bid/Ask 잔량 비율 ≥ 1.2, 돌파 추종 수요 확인)', source: '토스 증권' },
+        { code: 'RS', condition: '3개월 상대강도(RS) 상위 25% 이내 시 가점', source: '네이버 증권' }
       ]
     },
     reversal: {
       filters: [
-        { code: 'F1', condition: '거래대금 당일 30위 이내' },
-        { code: 'F2', condition: '시가총액 30조원 이상 (대형주 한정)' },
+        { code: 'F1', condition: '거래대금 당일 100위 이내' },
+        { code: 'F2', condition: '시가총액 20조원 이상 (대형·준대형 리더 우선)' },
         { code: 'F3', condition: '실적발표 D-2, 분할/합병/배당락 D-5 이내 제외' },
         { code: 'F4', condition: '동일 종목 본 전략 진입 후 5거래일 이내 재진입 금지' }
       ],
@@ -146,10 +147,10 @@ const RULE_GUIDE = {
       scores: [
         { code: 'S1', condition: '외국인 OR 기관 당일 순매수 전환 (전일 대비 부호 반전)', source: '네이버 증권' },
         { code: 'S2', condition: '토스 분당 체결강도 장중 마지막 1시간 평균 ≥ 100% + 당일 평균 ≥ 90%', source: '토스 증권' },
-        { code: 'P1', condition: '종가 > 20MA (중기 지지선 사수)', source: '네이버 증권' },
+        { code: 'P1', condition: '종가가 20MA의 98% 이상이면 충족 (완전 상향돌파 전 근접 회복 포함)', source: '네이버 증권' },
         { code: 'P2', condition: '종가 위치가 당일 고가-저가 레인지 상단 50% 이상', source: '네이버 증권' },
-        { code: 'C1', condition: '당일 거래량 5일 평균의 200% 이상 (셀링 클라이맥스 확인)', source: '네이버 증권' },
-        { code: 'C2', condition: '토스 호가창 매수잔량 : 매도잔량 ≥ 1:1 (매수세 균형 회복)', source: '토스 증권' },
+        { code: 'C1', condition: '당일 거래량 5일 평균의 200% 이상 (투매 클라이맥스 확인)', source: '네이버 증권' },
+        { code: 'C2', condition: '토스 호가창 매수/매도 잔량 비율 ≥ 1.0 (하방 흡수 확인)', source: '토스 증권' },
         { code: 'C3', condition: '장 마감 직전 30분봉이 양봉 또는 종가 ≥ 30분봉 시가', source: '네이버·토스' }
       ]
     }

@@ -94,8 +94,8 @@ test('daily script paths use variant suffixes', () => {
   const context = loadDailyContext();
   const date = new Date('2026-05-21T15:01:00.000Z');
   assert.equal(context.getJonggaKstTodayKey(date), '2026-05-22');
-  assert.equal(context.getJonggaDailyScriptPath('2026-05-22', 'stable'), 'jongga/output/jongga_data_20260522.js');
-  assert.equal(context.getJonggaDailyScriptPath('2026-05-22', 'canary'), 'jongga/output/jongga_data_20260522_canary.js');
+  assert.equal(context.getJonggaDailyScriptPath('2026-05-22', 'stable'), 'jongga/output/202605/jongga_data_20260522.js');
+  assert.equal(context.getJonggaDailyScriptPath('2026-05-22', 'canary'), 'jongga/output/202605/jongga_data_20260522_canary.js');
 });
 
 test('getJonggaEffectiveDateKey returns yesterday before 14:00 KST and today at/after 14:00 KST', () => {

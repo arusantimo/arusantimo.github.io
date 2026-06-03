@@ -109,9 +109,10 @@ def _compact_date(analysis_date: str | None) -> str:
 def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, dict[str, object]]:
     emit("STEP", "3/3 산출물 검증")
     compact = _compact_date(analysis_date)
+    month_folder = compact[:6]
     required: list[Path] = [
-        JONGGA_OUTPUT / f"latest_{compact}.json",
-        JONGGA_OUTPUT / f"jongga_data_{compact}.js",
+        JONGGA_OUTPUT / month_folder / f"latest_{compact}.json",
+        JONGGA_OUTPUT / month_folder / f"jongga_data_{compact}.js",
         JONGGA_OUTPUT / "jongga_history.js",
         JONGGA_OUTPUT / "latest.json",
         JONGGA_OUTPUT / "jongga_data.js",
@@ -119,8 +120,8 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
     if variant in {"all", "canary"}:
         required.extend(
             [
-                JONGGA_OUTPUT / f"latest_{compact}_canary.json",
-                JONGGA_OUTPUT / f"jongga_data_{compact}_canary.js",
+                JONGGA_OUTPUT / month_folder / f"latest_{compact}_canary.json",
+                JONGGA_OUTPUT / month_folder / f"jongga_data_{compact}_canary.js",
             ]
         )
     missing = [path for path in required if not path.exists()]
@@ -129,7 +130,7 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
             emit("FAIL", f"누락: {path.relative_to(ROOT)}")
         return 1, {}
 
-    stable_path = JONGGA_OUTPUT / f"latest_{compact}.json"
+    stable_path = JONGGA_OUTPUT / month_folder / f"latest_{compact}.json"
     payload = json.loads(stable_path.read_text(encoding="utf-8"))
     quality = payload.get("dataQuality") if isinstance(payload.get("dataQuality"), dict) else {}
     status = str(quality.get("status") or "unknown")
@@ -141,7 +142,7 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
         "reversal": len(entries.get("reversal") or []),
     }
     emit("OK", f"stable 품질={status} · 눌림목 {counts['pullback']} · 수급 {counts['momentum']} · 급락반등 {counts['reversal']}")
-    emit("FILE", f"jongga/output/jongga_data_{compact}.js")
+    emit("FILE", f"jongga/output/{month_folder}/jongga_data_{compact}.js")
     emit("FILE", "jongga/output/latest.json (레거시 브리지)")
     emit("UI", "tools/stock-analyze/index.html")
     if status != "complete":

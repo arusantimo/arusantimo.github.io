@@ -9,7 +9,7 @@ from jongga.macro_overlay import build_pullback_g5_gate, is_macro_friendly_for_g
 
 EvalStatus = Literal["met", "not_met", "data_missing", "manual_required"]
 
-TOP_TRADING_VALUE_LIMIT = 40
+TOP_TRADING_VALUE_LIMIT = 100
 
 
 @dataclass(frozen=True)
@@ -106,13 +106,26 @@ def evaluate_pullback_g0(snapshot: Any) -> EvalResult:
 
 
 def evaluate_pullback_g1(snapshot: Any) -> EvalResult:
-    ma5, ma20, ma60, ma5_prev = snapshot.ma5, snapshot.ma20, snapshot.ma60, snapshot.ma5_prev
-    if not all(value is not None for value in (ma5, ma20, ma60, ma5_prev)):
+    ma5, ma20, ma60 = snapshot.ma5, snapshot.ma20, snapshot.ma60
+    ma5_prev, ma20_prev, ma60_prev = snapshot.ma5_prev, snapshot.ma20_prev, snapshot.ma60_prev
+    if not all(value is not None for value in (ma5, ma20, ma60)):
         return eval_data_missing("5/20/60일 이동평균 산출 데이터 부족")
-    note = f"5MA {ma5:,.0f} > 20MA {ma20:,.0f} > 60MA {ma60:,.0f}"
-    if ma5 > ma20 > ma60 and ma5 > ma5_prev:
+    slope_labels: list[str] = []
+    if ma5_prev is not None and ma5 > ma5_prev:
+        slope_labels.append("5MA")
+    if ma20_prev is not None and ma20 > ma20_prev:
+        slope_labels.append("20MA")
+    if ma60_prev is not None and ma60 > ma60_prev:
+        slope_labels.append("60MA")
+    note = (
+        f"5MA {ma5:,.0f} > 20MA {ma20:,.0f} > 60MA {ma60:,.0f} "
+        f"· 상승선 {', '.join(slope_labels) or '없음'}"
+    )
+    if not ma5 > ma20 > ma60:
+        return eval_not_met(f"{note} · 정배열 미충족")
+    if slope_labels:
         return eval_met(note)
-    return eval_not_met(f"{note} · 정배열 또는 5MA 5일 상승 미충족")
+    return eval_not_met(f"{note} · 5/20/60MA 중 상승선 없음")
 
 
 def evaluate_pullback_g2(snapshot: Any) -> EvalResult:
@@ -173,9 +186,9 @@ def evaluate_pullback_g5(context: dict[str, Any]) -> dict[str, Any]:
 
 
 def evaluate_pullback_s1(snapshot: Any) -> EvalResult:
-    rank = int(snapshot.rank or 0)
-    note = f"거래대금 순위 {rank}위 (TOP10 이내 시 S1 충족)"
-    if rank <= 10:
+    rank = int(getattr(snapshot, "rank", 0) or 0)
+    note = f"당일 거래대금 순위 {rank}위 (TOP 30 이내 시 충족)"
+    if 0 < rank <= 30:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -354,9 +367,9 @@ def evaluate_momentum_c3(snapshot: Any) -> EvalResult:
     bid_ask_ratio = float(orderbook.get("bidAskRatio") or 0)
     if bid_ask_ratio <= 0:
         return eval_manual_required("호가잔량 비율 미입력 (토스 호가창 수동 입력)")
-    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≤ 0.8)"
-    if bid_ask_ratio <= 0.8:
-        return eval_met(note)
+    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≥ 1.2)"
+    if bid_ask_ratio >= 1.2:
+        return eval_met(f"{note} · 매수 잔량 우위")
     return eval_not_met(note)
 
 def evaluate_momentum_g3(snapshot: Any) -> EvalResult:
@@ -372,18 +385,16 @@ def evaluate_momentum_g3(snapshot: Any) -> EvalResult:
 
 
 def evaluate_reversal_f1(snapshot: Any) -> EvalResult:
-    if not snapshot.volume_avg_5d:
-        return eval_data_missing("5일 평균 거래량 산출 데이터 부족")
-    ratio = snapshot.volume / snapshot.volume_avg_5d
-    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≥ 200%)"
-    if ratio >= 2.0:
-        return eval_met(f"{note} · 투매 클라이맥스")
+    rank = int(getattr(snapshot, "rank", 0) or 0)
+    note = f"당일 거래대금 순위 {rank}위 (필요 ≤ 100위)"
+    if 0 < rank <= 100:
+        return eval_met(note)
     return eval_not_met(note)
 
 
 def evaluate_reversal_f2(snapshot: Any) -> EvalResult:
-    note = f"시총 {snapshot.market_cap_trillion:.1f}조 (필요 ≥ 30조)"
-    if snapshot.market_cap_trillion >= 30.0:
+    note = f"시총 {snapshot.market_cap_trillion:.1f}조 (필요 ≥ 20조)"
+    if snapshot.market_cap_trillion >= 20.0:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -403,8 +414,8 @@ def evaluate_reversal_f4() -> EvalResult:
 
 
 def evaluate_reversal_g1(snapshot: Any) -> EvalResult:
-    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +12%)"
-    if snapshot.return_21d >= 12.0:
+    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +30%)"
+    if snapshot.return_21d >= 30.0:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -465,9 +476,10 @@ def evaluate_reversal_s1(snapshot: Any) -> EvalResult:
 def evaluate_reversal_p1(snapshot: Any) -> EvalResult:
     if snapshot.ma20 is None:
         return eval_data_missing("20일 이동평균 산출 데이터 부족")
-    note = f"종가 {snapshot.current_price:,.0f} / 20MA {snapshot.ma20:,.0f}"
-    if snapshot.current_price > snapshot.ma20:
-        return eval_met(note)
+    ratio = snapshot.current_price / snapshot.ma20 * 100 if snapshot.ma20 else 0.0
+    note = f"종가 {snapshot.current_price:,.0f} / 20MA {snapshot.ma20:,.0f} ({ratio:.1f}% · 필요 ≥ 98%)"
+    if snapshot.current_price >= snapshot.ma20 * 0.98:
+        return eval_met(f"{note} · 20MA 근접 회복")
     return eval_not_met(note)
 
 
@@ -485,9 +497,9 @@ def evaluate_reversal_c1(snapshot: Any) -> EvalResult:
     if not snapshot.volume_avg_5d:
         return eval_data_missing("5일 평균 거래량 산출 데이터 부족")
     ratio = snapshot.volume / snapshot.volume_avg_5d
-    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≥ 300%)"
-    if ratio >= 3.0:
-        return eval_met(f"{note} · 극단적 투매")
+    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≥ 200%)"
+    if ratio >= 2.0:
+        return eval_met(f"{note} · 투매 클라이맥스")
     return eval_not_met(note)
 
 
@@ -514,9 +526,9 @@ def evaluate_reversal_c2(snapshot: Any) -> EvalResult:
     bid_ask_ratio = float(orderbook.get("bidAskRatio") or 0)
     if bid_ask_ratio <= 0:
         return eval_manual_required("호가잔량 비율 미입력 (토스 호가창 수동 입력)")
-    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≤ 0.8)"
-    if bid_ask_ratio <= 0.8:
-        return eval_met(note)
+    note = f"매수/매도 호가잔량 {bid_ask_ratio:.2f} (필요 ≥ 1.0)"
+    if bid_ask_ratio >= 1.0:
+        return eval_met(f"{note} · 하방 흡수 확인")
     return eval_not_met(note)
 
 
