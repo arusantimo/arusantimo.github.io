@@ -19,7 +19,8 @@ REGIME_BOX_INDEX = "박스권 ⚠️ (지수 우선)"
 
 # pullback G5 — keep in sync with js/market-analyze-bridge.js
 PULLBACK_G5_VKOSPI_STRICT = 30
-PULLBACK_G5_VKOSPI_MACRO_CAP = 80
+PULLBACK_G5_VKOSPI_WARN_CAP = 75
+PULLBACK_G5_VKOSPI_MACRO_CAP = 85
 
 
 def tools_root_from_jongga_module() -> Path:
@@ -317,6 +318,8 @@ def build_pullback_g5_gate(context: dict[str, Any]) -> dict[str, Any]:
     macro_friendly = is_macro_friendly_for_g5(context)
     if vkospi <= PULLBACK_G5_VKOSPI_STRICT:
         return {"code": "G5", "status": "✅", "note": note_base}
+    if vkospi <= PULLBACK_G5_VKOSPI_WARN_CAP:
+        return {"code": "G5", "status": "⚠️", "note": f"{note_base} · 변동성 경계"}
     if macro_friendly and vkospi <= PULLBACK_G5_VKOSPI_MACRO_CAP:
         return {"code": "G5", "status": "⚠️", "note": f"{note_base} · 거시·레짐 완화"}
     return {"code": "G5", "status": "⛔", "note": f"{note_base} · VKOSPI 과열"}

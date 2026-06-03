@@ -101,7 +101,7 @@ const RULE_GUIDE = {
         { code: 'G2', condition: '종가 > 60일선', source: '네이버 증권 일봉 차트' },
         { code: 'G3', condition: '주봉 RSI(14) ≥ 50', source: '네이버 증권 주봉 차트' },
         { code: 'G4', condition: '일봉 MACD 히스토그램이 음전환 후 3일 이내 OR 0선 위 회복 시도 중', source: '네이버 증권 일봉 차트' },
-        { code: 'G5', condition: 'KOSPI 5일선 위 + VKOSPI (≤30 ✅ / 거시·강세·순환 시 30~70 ⚠️ / 70 초과 ⛔)', source: '네이버 증권 시장지표' }
+        { code: 'G5', condition: 'KOSPI 5일선 위 + VKOSPI (≤30 ✅ / 30~75 ⚠️ / 거시·강세·순환 시 75~85 ⚠️ / 85 초과 ⛔)', source: '네이버 증권 시장지표' }
       ],
       scores: [
         { code: 'S1', condition: '당일 거래대금 순위 30위 이내', source: '네이버 증권' },
@@ -133,15 +133,15 @@ const RULE_GUIDE = {
     reversal: {
       filters: [
         { code: 'F1', condition: '거래대금 당일 100위 이내' },
-        { code: 'F2', condition: '시가총액 20조원 이상 (대형·준대형 리더 우선)' },
+        { code: 'F2', condition: '시가총액 8조원 이상 (대형·준대형 리더 우선)' },
         { code: 'F3', condition: '실적발표 D-2, 분할/합병/배당락 D-5 이내 제외' },
         { code: 'F4', condition: '동일 종목 본 전략 진입 후 5거래일 이내 재진입 금지' }
       ],
       gates: [
-        { code: 'G1', condition: '직전 1개월 누적 상승률 ≥ +30% (주도주 자격)', source: '네이버 일봉' },
+        { code: 'G1', condition: '직전 1개월 누적 상승률 ≥ +20% (주도주·강한 순환매 자격)', source: '네이버 일봉' },
         { code: 'G2', condition: '직전 단기 고점(20거래일 최고종가) 대비 -7% ~ -20% 하락 구간', source: '네이버 일봉' },
         { code: 'G3', condition: '종가 > 60MA (장기 추세 베이스 유지)', source: '네이버 일봉' },
-        { code: 'G4', condition: '직전 5거래일 내 일봉 -5% 이상 급락 1회 이상 발생', source: '네이버 일봉' },
+        { code: 'G4', condition: '직전 5거래일 내 일봉 -4% 이상 급락 1회 이상 발생', source: '네이버 일봉' },
         { code: 'G5', condition: '안정화 캔들 패턴 (G5-a 양봉 / G5-b 긴아래꼬리 / G5-c 도지)', source: '네이버 일봉' }
       ],
       scores: [

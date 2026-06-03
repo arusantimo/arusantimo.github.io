@@ -109,12 +109,25 @@ class MacroOverlayTest(unittest.TestCase):
         label = trend_status_label("A", REGIME_STRONG_BULL, "G-A", [gate], rise_justified=True)
         self.assertEqual(label, "매수추천")
 
-    def test_pullback_g5_blocks_above_30_without_macro(self):
+    def test_pullback_g5_warns_above_30_even_without_macro_until_warn_cap(self):
         gate = build_pullback_g5_gate(
             {
                 "kospiClose": 8100.0,
                 "kospiMa5": 7600.0,
                 "vkospiValue": 68.0,
+                "vkospiLabel": "VKOSPI",
+                "riseJustifiedByMacro": False,
+                "regimeLabel": "박스권 ⚠️",
+            }
+        )
+        self.assertEqual(gate["status"], "⚠️")
+
+    def test_pullback_g5_blocks_above_warn_cap_without_macro(self):
+        gate = build_pullback_g5_gate(
+            {
+                "kospiClose": 8100.0,
+                "kospiMa5": 7600.0,
+                "vkospiValue": 78.0,
                 "vkospiLabel": "VKOSPI",
                 "riseJustifiedByMacro": False,
                 "regimeLabel": "박스권 ⚠️",
@@ -127,7 +140,7 @@ class MacroOverlayTest(unittest.TestCase):
             {
                 "kospiClose": 8100.0,
                 "kospiMa5": 7600.0,
-                "vkospiValue": 85.0,
+                "vkospiValue": 88.0,
                 "vkospiLabel": "VKOSPI",
                 "riseJustifiedByMacro": True,
                 "regimeLabel": REGIME_STRONG_BULL,

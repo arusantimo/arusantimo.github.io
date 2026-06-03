@@ -8,7 +8,8 @@ const REGIME_BOX_MACRO = '박스권 ⚠️ (거시 완충)';
 const REGIME_BOX_INDEX = '박스권 ⚠️ (지수 우선)';
 // pullback G5 — keep in sync with jongga/macro_overlay.py
 const PULLBACK_G5_VKOSPI_STRICT = 30;
-const PULLBACK_G5_VKOSPI_MACRO_CAP = 80;
+const PULLBACK_G5_VKOSPI_WARN_CAP = 75;
+const PULLBACK_G5_VKOSPI_MACRO_CAP = 85;
 
 let marketAnalyzeScriptPromise = null;
 let marketAnalyzeCachedSnapshot = null;
@@ -146,6 +147,9 @@ function buildPullbackG5Gate(context = {}) {
   }
   if (vkospi <= PULLBACK_G5_VKOSPI_STRICT) {
     return { code: 'G5', status: '✅', note: noteBase, evalStatus: 'met' };
+  }
+  if (vkospi <= PULLBACK_G5_VKOSPI_WARN_CAP) {
+    return { code: 'G5', status: '⚠️', note: `${noteBase} · 변동성 경계`, evalStatus: 'not_met' };
   }
   if (isMacroFriendlyForG5(context) && vkospi <= PULLBACK_G5_VKOSPI_MACRO_CAP) {
     return { code: 'G5', status: '⚠️', note: `${noteBase} · 거시·레짐 완화`, evalStatus: 'not_met' };

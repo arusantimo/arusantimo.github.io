@@ -42,6 +42,32 @@ test('buildPullbackG5Gate warns for vkospi 68 when macro friendly', () => {
   assert.equal(label, '매수추천');
 });
 
+test('buildPullbackG5Gate warns for vkospi 68 even without macro-friendly context', () => {
+  const ctx = loadBridgeContext();
+  const gate = ctx.buildPullbackG5Gate({
+    kospiClose: 8100,
+    kospiMa5: 7600,
+    vkospiValue: 68,
+    vkospiLabel: 'VKOSPI',
+    riseJustifiedByMacro: false,
+    effectiveRegimeLabel: '박스권 ⚠️'
+  });
+  assert.equal(gate.status, '⚠️');
+});
+
+test('buildPullbackG5Gate blocks above warn cap without macro-friendly context', () => {
+  const ctx = loadBridgeContext();
+  const gate = ctx.buildPullbackG5Gate({
+    kospiClose: 8100,
+    kospiMa5: 7600,
+    vkospiValue: 78,
+    vkospiLabel: 'VKOSPI',
+    riseJustifiedByMacro: false,
+    effectiveRegimeLabel: '박스권 ⚠️'
+  });
+  assert.equal(gate.status, '⛔');
+});
+
 test('isRiseJustifiedByMacro rejects critical bubble', () => {
   const ctx = loadBridgeContext();
   const snapshot = {

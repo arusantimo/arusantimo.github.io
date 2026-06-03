@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from jongga.macro_overlay import build_pullback_g5_gate, is_macro_friendly_for_g5
+from jongga.macro_overlay import build_pullback_g5_gate
 
 EvalStatus = Literal["met", "not_met", "data_missing", "manual_required"]
 
@@ -170,15 +170,8 @@ def evaluate_pullback_g5(context: dict[str, Any]) -> dict[str, Any]:
         return gate
     if gate["status"] == "✅":
         gate["evalStatus"] = "met"
-    elif gate["status"] == "⚠️":
-        gate["evalStatus"] = "not_met"
     else:
-        if kospi_close <= kospi_ma5:
-            gate["evalStatus"] = "not_met"
-        elif vkospi > 70 or (vkospi > 30 and not is_macro_friendly_for_g5(context)):
-            gate["evalStatus"] = "not_met"
-        else:
-            gate["evalStatus"] = "not_met"
+        gate["evalStatus"] = "not_met"
     return gate
 
 
@@ -393,8 +386,8 @@ def evaluate_reversal_f1(snapshot: Any) -> EvalResult:
 
 
 def evaluate_reversal_f2(snapshot: Any) -> EvalResult:
-    note = f"시총 {snapshot.market_cap_trillion:.1f}조 (필요 ≥ 20조)"
-    if snapshot.market_cap_trillion >= 20.0:
+    note = f"시총 {snapshot.market_cap_trillion:.1f}조 (필요 ≥ 8조)"
+    if snapshot.market_cap_trillion >= 8.0:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -414,8 +407,8 @@ def evaluate_reversal_f4() -> EvalResult:
 
 
 def evaluate_reversal_g1(snapshot: Any) -> EvalResult:
-    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +30%)"
-    if snapshot.return_21d >= 30.0:
+    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +20%)"
+    if snapshot.return_21d >= 20.0:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -442,8 +435,8 @@ def evaluate_reversal_g4(snapshot: Any) -> EvalResult:
     if len(daily_returns) < 5:
         return eval_data_missing("최근 5거래일 수익률 산출 데이터 부족")
     worst = min(daily_returns)
-    note = f"최근 5거래일 최저 {signed_pct(worst)} (필요 -5% 이하 급락 1회 이상)"
-    if any(value <= -5.0 for value in daily_returns):
+    note = f"최근 5거래일 최저 {signed_pct(worst)} (필요 -4% 이하 급락 1회 이상)"
+    if any(value <= -4.0 for value in daily_returns):
         return eval_met(note)
     return eval_not_met(note)
 

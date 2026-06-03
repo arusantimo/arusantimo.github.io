@@ -2,12 +2,14 @@ import io
 import unittest
 from contextlib import redirect_stdout
 from datetime import date
+from types import SimpleNamespace
 from unittest import mock
 
 from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
+from jongga.rule_evaluation import evaluate_reversal_f2, evaluate_reversal_g1, evaluate_reversal_g4
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -862,6 +864,24 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIn("0.92", c2_rule["note"])
         self.assertEqual(c3_rule["evalStatus"], "not_met")
         self.assertIn("미달", c3_rule["note"])
+
+    def test_reversal_thresholds_are_relaxed_for_large_secondary_leaders(self):
+        snapshot = SimpleNamespace(
+            market_cap_trillion=8.5,
+            return_21d=22.0,
+            close_history=[100.0, 96.0, 100.0, 101.0, 102.0, 103.0],
+        )
+
+        f2 = evaluate_reversal_f2(snapshot)
+        g1 = evaluate_reversal_g1(snapshot)
+        g4 = evaluate_reversal_g4(snapshot)
+
+        self.assertEqual(f2.eval_status, "met")
+        self.assertEqual(g1.eval_status, "met")
+        self.assertEqual(g4.eval_status, "met")
+        self.assertIn("필요 ≥ 8조", f2.note)
+        self.assertIn("필요 ≥ +20%", g1.note)
+        self.assertIn("필요 -4% 이하", g4.note)
 
     def _sample_payload(self):
         return {
