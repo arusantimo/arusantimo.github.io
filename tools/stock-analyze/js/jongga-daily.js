@@ -173,7 +173,9 @@ function getJonggaCompactDate(dateKey) {
 
 function getJonggaDailyScriptPath(dateKey = getJonggaKstTodayKey(), variant = getJonggaActiveVariant()) {
   const suffix = normalizeJonggaVariant(variant) === 'canary' ? '_canary' : '';
-  return `jongga/output/jongga_data_${getJonggaCompactDate(dateKey)}${suffix}.js`;
+  const compactDate = getJonggaCompactDate(dateKey);
+  const monthFolder = compactDate.substring(0, 6);
+  return `jongga/output/${monthFolder}/jongga_data_${compactDate}${suffix}.js`;
 }
 
 function loadJonggaScriptOnce(src) {

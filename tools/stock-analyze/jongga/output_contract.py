@@ -53,7 +53,8 @@ def bridge_namespace(value: str | None = None) -> str:
 
 
 def build_daily_output_paths(out_dir: str | Path, analysis_date: date, *, variant: str = VARIANT_STABLE) -> tuple[Path, Path]:
-    directory = Path(out_dir)
+    month_folder = analysis_date.strftime("%Y%m")
+    directory = Path(out_dir) / month_folder
     compact = compact_date(analysis_date)
     suffix = variant_suffix(variant)
     return directory / f"latest_{compact}{suffix}.json", directory / f"jongga_data_{compact}{suffix}.js"

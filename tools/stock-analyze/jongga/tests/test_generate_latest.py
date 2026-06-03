@@ -185,13 +185,13 @@ class GenerateLatestTest(unittest.TestCase):
 
     def test_daily_output_paths_use_compact_date(self):
         json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_STABLE)
-        self.assertEqual(json_path.as_posix(), "jongga/output/latest_20260522.json")
-        self.assertEqual(js_path.as_posix(), "jongga/output/jongga_data_20260522.js")
+        self.assertEqual(json_path.as_posix(), "jongga/output/202605/latest_20260522.json")
+        self.assertEqual(js_path.as_posix(), "jongga/output/202605/jongga_data_20260522.js")
 
     def test_canary_output_paths_use_suffix(self):
         json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_CANARY)
-        self.assertEqual(json_path.as_posix(), "jongga/output/latest_20260522_canary.json")
-        self.assertEqual(js_path.as_posix(), "jongga/output/jongga_data_20260522_canary.js")
+        self.assertEqual(json_path.as_posix(), "jongga/output/202605/latest_20260522_canary.json")
+        self.assertEqual(js_path.as_posix(), "jongga/output/202605/jongga_data_20260522_canary.js")
 
     def test_daily_bridge_uses_date_key(self):
         payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
@@ -241,7 +241,7 @@ class GenerateLatestTest(unittest.TestCase):
                 history_js = handle.read()
             self.assertEqual(history_js.count('"date": "2026-05-22"'), 1)
             self.assertEqual(history_js.count('"variant": "stable"'), 1)
-            with open(f"{tmp}/jongga_data_20260522.js", encoding="utf-8") as handle:
+            with open(f"{tmp}/202605/jongga_data_20260522.js", encoding="utf-8") as handle:
                 self.assertIn('window.JONGGA_DAILY_DATA["2026-05-22"]', handle.read())
 
     def test_write_daily_outputs_keeps_stable_and_canary_variants(self):
@@ -255,7 +255,7 @@ class GenerateLatestTest(unittest.TestCase):
                 history_js = handle.read()
             self.assertIn('"variant": "stable"', history_js)
             self.assertIn('"variant": "canary"', history_js)
-            with open(f"{tmp}/jongga_data_20260522_canary.js", encoding="utf-8") as handle:
+            with open(f"{tmp}/202605/jongga_data_20260522_canary.js", encoding="utf-8") as handle:
                 self.assertIn('window.JONGGA_CANARY_DAILY_DATA["2026-05-22"]', handle.read())
 
     def test_emit_cli_failures_prints_explicit_items(self):
