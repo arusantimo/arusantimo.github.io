@@ -1,6 +1,6 @@
 {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-06-03T05:53:15+00:00",
+  "generatedAt": "2026-06-03T06:08:00+00:00",
   "variant": "canary",
   "dataQuality": {
     "status": "partial",
@@ -57,7 +57,7 @@
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1151.2,
+        "durationMs": 1211.9,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -65,7 +65,7 @@
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 495.1,
+        "durationMs": 192.5,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -80,28 +80,28 @@
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 1278.3,
+        "durationMs": 1461.7,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 1.2,
+        "durationMs": 1.3,
         "detail": "강세장 ✅ (펀더·지수 정당)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 40508.7,
+        "durationMs": 36786.1,
         "count": 19
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 6135.9,
+        "durationMs": 5130.0,
         "detail": "성공 19 / 실패 0",
         "count": 19
       },
@@ -109,7 +109,7 @@
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 5117.5,
+        "durationMs": 4792.5,
         "detail": "direct-http · 체결강도 19 / 호가 19 / 틱프록시 19",
         "count": 19
       },
@@ -117,7 +117,7 @@
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 4.6,
+        "durationMs": 5.4,
         "detail": "pullback 3, momentum 3, reversal 3",
         "count": 9
       },
@@ -125,7 +125,7 @@
         "step": "browser_enrichment",
         "label": "카나리 KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 24648.5,
+        "durationMs": 22669.8,
         "detail": "chrome:google-chrome · KIND 0",
         "count": 3
       }
@@ -248,7 +248,7 @@
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "+1.00%",
+            "actualValue": "+0.94%",
             "baseScore": "+1점",
             "weight": "×2.5",
             "formula": "+1 × 2.5 = +2.5점",
@@ -272,7 +272,7 @@
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "+19.68원",
+            "actualValue": "+19.03원",
             "baseScore": "-2점",
             "weight": "×1.5",
             "formula": "-2 × 1.5 = -3.0점",
