@@ -16,6 +16,10 @@
             "matchCommandLine": true
         },
         "git fetch": true,
-        "git pull": true
+        "git pull": true,
+        "/^git commit -m \"Resolve merge conflicts in jongga output artifacts\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }
