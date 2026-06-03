@@ -2,7 +2,7 @@ const JONGGA_SCHEMA_VERSION = 'jongga_result.v1';
 const JONGGA_BUY_STRATEGIES = ['pullback', 'momentum', 'reversal'];
 const JONGGA_REQUIRED_RULES = {
   pullback: ['G1', 'G2', 'G3', 'G4', 'G5'],
-  momentum: ['G1', 'G2', 'G3', 'G4'],  // G1=초과수익률(구G2), G2=52주고가(구G3), G3=거래대금(구G4) / RS는 채점 항목
+  momentum: ['G1', 'G2', 'G3'],  // G1=초과수익률(구G2), G2=52주고가(구G3), G3=거래대금(구G4) / RS는 채점 항목
   reversal: ['F1', 'F2', 'F3', 'F4', 'G1', 'G2', 'G3', 'G4', 'G5']
 };
 
