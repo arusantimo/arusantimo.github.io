@@ -200,7 +200,7 @@ function getBuyPresentation(entry) {
   const normalizedLiveRefresh = (hasStrategyScore && !isHistoryView) ? normalizeBuyLiveRefresh(entry, entry.liveRefresh) : null;
   
   const hasLiveRefresh = Boolean(normalizedLiveRefresh);
-  const primaryScore = normalizedLiveRefresh?.finalScore ?? strategyScore;
+  const primaryScore = normalizedLiveRefresh?.finalScore ?? (Number.isFinite(Number(entry.signalScore)) ? Number(entry.signalScore) : strategyScore);
   const primaryGrade = normalizedLiveRefresh?.finalGrade ?? strategyGrade;
   let primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? strategyStatusLabel;
 
@@ -225,7 +225,9 @@ function getBuyPresentation(entry) {
         ? `최종 ${primaryGrade} · 컨센서스 미제공 · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
         : `최종 ${primaryGrade} · 컨센서스 ${formatBuySignedPoints(normalizedLiveRefresh.adjustment)} · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`
       : strategyScore !== null
-        ? `전략 기준 ${strategyGrade}`
+        ? (Number.isFinite(Number(entry.strictScore))
+          ? `신호 ${getBuyDisplayScore(entry, entry.signalScore ?? strategyScore)} / 진입 ${getBuyDisplayScore(entry, entry.strictScore)} · ${strategyGrade}`
+          : `전략 기준 ${strategyGrade}`)
         : `전략 점수 ${getBuyUnavailableScoreLabel(entry)}`,
     verdictClass: entry.safety?.blocked 
       ? (primaryStatusLabel.includes('주의') ? 'watch' : 'exclude')

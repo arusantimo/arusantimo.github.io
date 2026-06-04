@@ -275,7 +275,11 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(entry["variantLabel"], "현재 버전")
         self.assertEqual(entry["status"], "partial")
         self.assertEqual(entry["buyCount"], 2)
-        self.assertEqual(entry["topRecommendations"][0]["code"], "000020")
+        self.assertEqual(len(entry["topRecommendations"]), 2)
+        self.assertEqual(entry["topRecommendations"][0]["strategy"], "pullback")
+        self.assertEqual(entry["topRecommendations"][0]["scoreScope"], "pullback")
+        codes = {row["code"] for row in entry["topRecommendations"]}
+        self.assertEqual(codes, {"000010", "000020"})
 
     def test_history_update_replaces_same_date(self):
         entries = update_history_index(
@@ -676,6 +680,14 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(c3_rule["evalStatus"], "met")
         self.assertIn("114.0%", s2_rule["note"])
         self.assertIn("1.5", c3_rule["note"])
+        self.assertEqual(entry["scoreMax"], 12.5)
+        self.assertIn("strictScore", entry)
+        self.assertIn("signalScore", entry)
+        self.assertIn("scoreBreakdown", entry)
+        self.assertIn("entryEligible", entry)
+        self.assertEqual(entry["score"], entry["signalScore"])
+        self.assertIsInstance(entry["scoreBreakdown"], list)
+        self.assertTrue(any(row["code"] == "RS" for row in entry["scoreBreakdown"]))
 
     def test_build_momentum_entry_explains_missing_browser_metrics(self):
         snapshot = StockSnapshot(

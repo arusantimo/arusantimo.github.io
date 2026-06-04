@@ -583,16 +583,19 @@ function renderJonggaHistoryItem(entry) {
 }
 
 function renderJonggaHistoryRecommendation(item) {
-  const score = Number.isFinite(Number(item.score)) ? Number(item.score).toFixed(1) : '-';
+  const score = Number.isFinite(Number(item.signalScore ?? item.score)) ? Number(item.signalScore ?? item.score).toFixed(1) : '-';
   const priceText = item.currentPrice ? `${Number(item.currentPrice).toLocaleString()}원` : '-';
   const strategyText = ({ pullback: '눌림목', momentum: '수급', reversal: '반등', swing: '스윙' })[item.strategy] || item.strategy || '-';
+  const entryBadge = item.entryEligible === true
+    ? '<span class="buy-entry-badge entry-ok">진입가능</span>'
+    : (item.entryEligible === false ? '<span class="buy-entry-badge entry-blocked">진입불가</span>' : '');
   
   return `
     <div class="history-rec-card" style="display: flex; flex-direction: column; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background-color: rgba(255, 255, 255, 0.03); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
       <div style="font-weight: bold; font-size: 13px; margin-bottom: 2px;">${escapeHtml(item.name || '종목명 없음')}</div>
       <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">${escapeHtml(item.code || '-')}</div>
       <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-        <span style="font-weight: bold; color: var(--accent-primary, #00d9ff);">${score}점</span>
+        <span style="font-weight: bold; color: var(--accent-primary, #00d9ff);">${score}점 ${entryBadge}</span>
         <span style="font-size: 10px; padding: 2px 4px; background: rgba(255,255,255,0.05); border-radius: 3px; border: 1px solid var(--border-color);">${escapeHtml(strategyText)} · ${escapeHtml(item.grade || '-')}</span>
       </div>
       <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">

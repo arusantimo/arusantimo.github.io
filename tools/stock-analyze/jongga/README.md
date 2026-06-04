@@ -66,7 +66,7 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
 ```
 
 - 공개 소스: 네이버 모바일 API, 네이버 차트, Yahoo chart API, CNBC quote page
-- 추천 universe는 네이버 모바일 전체 종목의 금일 누적 거래대금 기준 TOP40으로 제한합니다. ETF/ETN은 제외하되 41위 이하 종목을 백필하지 않습니다.
+- 추천 universe는 네이버 모바일 전체 종목의 금일 누적 거래대금 기준 TOP100으로 제한합니다. ETF/ETN은 제외하되 41위 이하 종목을 백필하지 않습니다.
 - VKOSPI는 CNBC `.KSVKOSPI` 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 폴백합니다.
 - 토스 전용 지표와 이벤트 필터는 아직 수동 확인이 필요합니다.
 
@@ -84,6 +84,7 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
 - **당일 `latest.js`가 저장소에 있어야** GHA 생성 JSON에도 macro 완화가 반영됩니다. market-analyze를 먼저 갱신·커밋하세요.
 - UI는 기술 레짐 vs 적용 레짐·거시 패널을 표시하고, 배포된 JSON의 `statusLabel`을 브라우저에서 재계산합니다.
 - **눌림목 G5**: 거시 정당·강세/순환 레짐이면 VKOSPI 30~70은 `⚠️`(매수 금지 아님), 30 이하는 `✅`, 70 초과만 `⛔`. 그 외는 VKOSPI 30 초과 시 `⛔`.
+- **듀얼 점수** (`jongga/scoring.py`): `signalScore`(부분 점수·모니터링), `strictScore`(이진·등급), `entryEligible`(진입 가능). `grade`는 strict를 10점 척도로 환산해 산출합니다. 전략 간 점수는 비교하지 않습니다.
 - **매수 등급 하한** ([`grade_policy.py`](grade_policy.py), [`js/config.js`](../js/config.js) `BUY_GRADE_MIN_SCORES`): 추세·눌림목·수급매집 S≥8.5 / A≥7.0 / B≥5.5, 역추세 S≥8.0 / A≥6.5 / B≥5.0 (이전 대비 0.5~1.0점 완화).
 
 ## HTML 연결

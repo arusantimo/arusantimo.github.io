@@ -50,7 +50,7 @@ function loadJonggaContext() {
     rebuildSellStocksFromSnapshots() {}
   };
   vm.createContext(context);
-  for (const file of ['state.js', 'jongga-schema.js']) {
+  for (const file of ['state.js', 'jongga-schema.js', 'entry-policy.js']) {
     vm.runInContext(fs.readFileSync(new URL(`./${file}`, import.meta.url), 'utf8'), context);
   }
   vm.runInContext(`
@@ -115,7 +115,14 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
           name: '삼성전자',
           code: '005930',
           score: 8.1,
+          signalScore: 8.4,
+          strictScore: 8.1,
+          scoreMax: 12.5,
+          gradeScore: 6.5,
           grade: 'A',
+          entryEligible: true,
+          entryBlockers: [],
+          scoreBreakdown: [{ code: 'C3', strictPoints: 0, signalPoints: 0.5, maxPoints: 1, note: '호가' }],
           currentPrice: 71200,
           previousClose: 70000,
           dailyChange: 1200,
@@ -136,4 +143,11 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(snapshot.momentumEntries[0].source, 'jongga-json');
   assert.equal(snapshot.momentumEntries[0].dailyChangePct, 1.71);
   assert.equal(snapshot.momentumEntries[0].dailyChange, 1200);
+  const momentum = snapshot.momentumEntries[0];
+  assert.equal(momentum.signalScore, 8.4);
+  assert.equal(momentum.strictScore, 8.1);
+  assert.equal(momentum.scoreMax, 12.5);
+  assert.equal(momentum.score, 8.4);
+  assert.equal(momentum.entryEligible, true);
+  assert.equal(momentum.scoreBreakdown.length, 1);
 });

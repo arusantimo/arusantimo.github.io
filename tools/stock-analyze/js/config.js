@@ -18,6 +18,11 @@ const BUY_GRADE_MIN_SCORES = {
 };
 
 const RULE_GUIDE = {
+  scoreAxes: {
+    signal: '당일 신호 강도(부분 점수 포함, 전략 내부 정렬용)',
+    strict: '진입 판단용 엄격 점수(이진 충족만 반영, 등급 산출)',
+    entry: 'entryEligible — Gate·등급·statusLabel 종합 진입 가능 여부'
+  },
   regimes: [
     {
       state: '강세장 ✅',

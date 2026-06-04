@@ -288,5 +288,8 @@ function applyMacroOverlayToEntry(entry, strategy, context) {
   } else {
     next.statusLabel = recalculateTrendStatusLabel(grade, regimeLabel, gapCode, next.gates, gateContext);
   }
+  if (typeof attachEntryEligibility === 'function') {
+    return attachEntryEligibility(next);
+  }
   return next;
 }

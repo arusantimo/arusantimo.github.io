@@ -125,7 +125,7 @@ def build_history_entry(
         "generatedAt": payload.get("generatedAt") or "",
         "status": quality.get("status") or "unknown",
         "buyCount": count_buy_entries(payload),
-        "topRecommendations": extract_top_recommendations(payload, limit=top_limit),
+        "topRecommendations": extract_top_recommendations(payload, per_strategy=max(1, min(3, top_limit // 3))),
     }
 
 
@@ -180,20 +180,34 @@ def count_buy_entries(payload: dict[str, Any]) -> int:
     return total
 
 
-def extract_top_recommendations(payload: dict[str, Any], *, limit: int = 10) -> list[dict[str, Any]]:
+def extract_top_recommendations(payload: dict[str, Any], *, per_strategy: int = 2) -> list[dict[str, Any]]:
+    """전략별 상위만 추출합니다. 서로 다른 전략의 점수는 비교하지 않습니다."""
     rows: list[dict[str, Any]] = []
-    for strategy, entry in iter_buy_entries(payload):
-        rows.append({
-            "strategy": strategy,
-            "name": entry.get("name") or "",
-            "code": entry.get("code") or "",
-            "score": entry.get("score"),
-            "grade": entry.get("grade") or "",
-            "statusLabel": entry.get("statusLabel") or entry.get("status") or "",
-            "currentPrice": entry.get("currentPrice"),
-        })
-    rows.sort(key=lambda item: _score_sort_value(item.get("score")), reverse=True)
-    return rows[:limit]
+    for strategy in STRATEGY_ORDER:
+        if strategy == "swing":
+            continue
+        strategy_rows: list[dict[str, Any]] = []
+        for row_strategy, entry in iter_buy_entries(payload):
+            if row_strategy != strategy:
+                continue
+            strategy_rows.append({
+                "strategy": strategy,
+                "scoreScope": strategy,
+                "name": entry.get("name") or "",
+                "code": entry.get("code") or "",
+                "score": entry.get("signalScore", entry.get("score")),
+                "signalScore": entry.get("signalScore", entry.get("score")),
+                "strictScore": entry.get("strictScore", entry.get("score")),
+                "scoreMax": entry.get("scoreMax"),
+                "grade": entry.get("grade") or "",
+                "gradeScore": entry.get("gradeScore"),
+                "statusLabel": entry.get("statusLabel") or entry.get("status") or "",
+                "entryEligible": entry.get("entryEligible"),
+                "currentPrice": entry.get("currentPrice"),
+            })
+        strategy_rows.sort(key=lambda item: _score_sort_value(item.get("signalScore") or item.get("score")), reverse=True)
+        rows.extend(strategy_rows[:per_strategy])
+    return rows
 
 
 def iter_buy_entries(payload: dict[str, Any]):

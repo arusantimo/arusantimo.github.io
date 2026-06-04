@@ -659,7 +659,9 @@ function renderBuyStockCards() {
       const presentation = getBuyPresentation(entry);
       const verdictClass = presentation.verdictClass;
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';
-      const scoreDisplay = getBuyDisplayScore(entry, presentation.primaryScore);
+      const scoreBox = typeof buildBuyScoreDisplayHtml === 'function'
+        ? buildBuyScoreDisplayHtml(entry, presentation)
+        : { signalText: getBuyDisplayScore(entry, presentation.primaryScore), strictLine: '', badgeHtml: '' };
       const liveMetaHtml = presentation.liveRefresh
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
@@ -673,7 +675,8 @@ function renderBuyStockCards() {
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">
-                ${escapeHtml(scoreDisplay)}
+                ${escapeHtml(scoreBox.signalText)}${scoreBox.badgeHtml || ''}
+                ${scoreBox.strictLine || ''}
               </div>
               <div class="buy-grade ${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryGrade)}</div>
               <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
@@ -1132,8 +1135,11 @@ function openModal(codeOrEntryKey, mode = 'sell') {
     const entry = detail;
     const presentation = getBuyPresentation(entry);
     const verdictText = buildBuyModalVerdictText(presentation);
-    const scoreDisplay = getBuyDisplayScore(entry, presentation.primaryScore);
-    const scoreSuffix = Number.isFinite(Number(presentation.primaryScore)) ? ' / 10' : '';
+    const scoreBox = typeof buildBuyScoreDisplayHtml === 'function'
+      ? buildBuyScoreDisplayHtml(entry, presentation)
+      : { signalText: getBuyDisplayScore(entry, presentation.primaryScore), strictLine: '', badgeHtml: '' };
+    const scoreDisplay = scoreBox.signalText;
+    const scoreSuffix = '';
     const modalLiveMetaHtml = buildBuyLivePillsHtml(entry, presentation, {
       includeCurrentPrice: Boolean(presentation.liveRefresh),
       includeTargetPrice: Boolean(presentation.liveRefresh),
@@ -1199,6 +1205,11 @@ function openModal(codeOrEntryKey, mode = 'sell') {
             ` : ''}
             <div class="modal-section-label">Gate 일치 여부</div>
             <div class="modal-ind-list">${renderGateList(entry)}</div>
+          </div>
+
+          <div>
+            <div class="modal-section-label">점수 breakdown (신호 vs 진입)</div>
+            ${typeof renderBuyScoreBreakdownTable === 'function' ? renderBuyScoreBreakdownTable(entry) : ''}
           </div>
 
           <div>

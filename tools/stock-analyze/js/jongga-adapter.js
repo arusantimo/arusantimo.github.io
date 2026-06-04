@@ -138,11 +138,19 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     ? applyJonggaManualOverridesToRawEntry(rawEntry, strategy, context)
     : rawEntry;
   const code = getJonggaCode(effectiveRawEntry);
-  const score = toJonggaNumber(pickJonggaValue(effectiveRawEntry, ['score', 'finalScore']), null);
+  const strictScore = toJonggaNumber(pickJonggaValue(effectiveRawEntry, ['strictScore']), null);
+  const signalScore = toJonggaNumber(pickJonggaValue(effectiveRawEntry, ['signalScore', 'score', 'finalScore']), null);
+  const scoreMax = toJonggaNumber(pickJonggaValue(effectiveRawEntry, ['scoreMax']), null);
+  const gradeScore = toJonggaNumber(pickJonggaValue(effectiveRawEntry, ['gradeScore']), null);
+  const score = signalScore ?? strictScore;
   const gradeFromJson = String(pickJonggaValue(effectiveRawEntry, ['grade', 'finalGrade'], '')).trim();
-  const grade = score === null
-    ? (gradeFromJson || '미산출')
-    : getBuyGradeFromScore(score, strategy);
+  let grade = gradeFromJson;
+  if (!grade) {
+    if (gradeScore !== null) grade = getBuyGradeFromScore(gradeScore, strategy);
+    else if (strictScore !== null && scoreMax) grade = getBuyGradeFromScore(strictScore * 10 / scoreMax, strategy);
+    else if (score !== null) grade = getBuyGradeFromScore(score, strategy);
+    else grade = '미산출';
+  }
   const required = JONGGA_REQUIRED_RULES[strategy] || [];
   const gates = normalizeJonggaRuleList(effectiveRawEntry.gates || effectiveRawEntry.rules, required.filter(code => code.startsWith('G')));
   const filters = normalizeJonggaRuleList(effectiveRawEntry.filters || effectiveRawEntry.rules, required.filter(code => code.startsWith('F')));
@@ -160,6 +168,19 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     name: getJonggaName(effectiveRawEntry),
     code,
     score,
+    strictScore,
+    signalScore,
+    scoreMax,
+    gradeScore,
+    scoreBreakdown: Array.isArray(effectiveRawEntry.scoreBreakdown) ? effectiveRawEntry.scoreBreakdown : [],
+    scoreScope: String(effectiveRawEntry.scoreScope || strategy),
+    ...(typeof effectiveRawEntry.entryEligible === 'boolean'
+      ? {
+          entryEligible: effectiveRawEntry.entryEligible,
+          entryWatch: Boolean(effectiveRawEntry.entryWatch),
+          entryBlockers: Array.isArray(effectiveRawEntry.entryBlockers) ? effectiveRawEntry.entryBlockers : []
+        }
+      : {}),
     grade,
     scoreUnavailable: Boolean(effectiveRawEntry.scoreUnavailable) || score === null,
     scoreLabel: effectiveRawEntry.scoreLabel || (score === null ? '미산출' : ''),
@@ -191,7 +212,7 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
   const withMacro = typeof applyMacroOverlayToEntry === 'function'
     ? applyMacroOverlayToEntry(normalized, strategy, context)
     : normalized;
-  return applyJonggaSafety(withMacro, context);
+  return applyJonggaSafety(typeof attachEntryEligibility === 'function' ? attachEntryEligibility(withMacro) : withMacro, context);
 }
 
 function normalizeJonggaSwingEntry(rawEntry, rank) {

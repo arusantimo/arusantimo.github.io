@@ -3245,3 +3245,9 @@ body.modal-scroll-locked {
   color: var(--text-secondary) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
+
+.buy-entry-badge { display: inline-block; font-size: 11px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; border: 1px solid var(--border-color); }
+.buy-entry-badge.entry-ok { color: #3ddc97; }
+.buy-entry-badge.entry-watch { color: #f5c842; }
+.buy-entry-badge.entry-blocked { color: #ff7b7b; }
+.buy-score-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }

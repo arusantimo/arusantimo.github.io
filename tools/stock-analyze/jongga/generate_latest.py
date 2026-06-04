@@ -15,7 +15,17 @@ from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from jongga.entry_policy import attach_entry_eligibility
 from jongga.grade_policy import grade_from_score
+from jongga.scoring import (
+    MOMENTUM_STRICT_MAX,
+    MOMENTUM_WEIGHTS,
+    REVERSAL_SCORE_WEIGHTS,
+    REVERSAL_STRICT_MAX,
+    TREND_SCORE_WEIGHTS,
+    TREND_STRICT_MAX,
+    apply_buy_scoring,
+)
 from jongga.macro_overlay import (
     apply_regime_fields_to_context,
     build_macro_overlay_block,
@@ -1862,6 +1872,11 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
     }
 
 
+
+
+def finalize_scored_buy_entry(entry: dict[str, Any]) -> dict[str, Any]:
+    return attach_entry_eligibility(entry)
+
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
     score_map = {
@@ -1882,17 +1897,20 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         evaluate_pullback_g5(context),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
-    score_items = {code: result.score for code, result in score_map.items()}
-    raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
-    final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
-    grade = grade_from_score(final_score, "pullback")
     trade_plan = build_trade_plan("pullback", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    scoring = apply_buy_scoring(
+        strategy="pullback",
+        score_map=score_map,
+        weights=TREND_SCORE_WEIGHTS,
+        strict_max=TREND_STRICT_MAX,
+        vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
+    )
+    grade = scoring["grade"]
     entry = {
         "rank": 0,
         "name": snapshot.name,
         "code": snapshot.code,
-        "score": final_score,
-        "grade": grade,
+        **scoring,
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "pullback",
         "gates": gates,
@@ -1909,7 +1927,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
         "source": "jongga-live",
     }
-    return entry
+    return finalize_scored_buy_entry(entry)
 
 
 def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_top10: bool, kospi_return_5d: float, kospi_return_20d: float) -> dict[str, Any]:
@@ -1930,17 +1948,21 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         gate_dict("G3", evaluate_momentum_g3(snapshot)),                                      # 구 G4 -> TOP100
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
-    score_items = {code: result.score for code, result in score_map.items()}
-    raw_score = score_items["RS"] * 1.5 + score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
-    final_score = round(raw_score * trend_vkospi_multiplier(context["vkospiValue"]), 1)
-    grade = grade_from_score(final_score, "momentum")
     trade_plan = build_trade_plan("momentum", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    scoring = apply_buy_scoring(
+        strategy="momentum",
+        score_map=score_map,
+        weights=MOMENTUM_WEIGHTS,
+        strict_max=MOMENTUM_STRICT_MAX,
+        vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
+        snapshot=snapshot,
+    )
+    grade = scoring["grade"]
     entry = {
         "rank": 0,
         "name": snapshot.name,
         "code": snapshot.code,
-        "score": final_score,
-        "grade": grade,
+        **scoring,
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "momentum",
         "gates": gates,
@@ -1960,7 +1982,7 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "momentum")
-    return entry
+    return finalize_scored_buy_entry(entry)
 
 
 def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
@@ -1995,17 +2017,20 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict(g5_code, g5_result),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
-    score_items = {code: result.score for code, result in score_map.items()}
-    raw_score = score_items["S1"] * 2 + score_items["S2"] * 2 + score_items["P1"] * 1.5 + score_items["P2"] * 1.5 + score_items["C1"] + score_items["C2"] + score_items["C3"]
-    final_score = round(raw_score * reversal_vkospi_multiplier(context["vkospiValue"]), 1)
-    grade = grade_from_score(final_score, "reversal")
     trade_plan = build_trade_plan("reversal", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    scoring = apply_buy_scoring(
+        strategy="reversal",
+        score_map=score_map,
+        weights=REVERSAL_SCORE_WEIGHTS,
+        strict_max=REVERSAL_STRICT_MAX,
+        vkospi_multiplier=reversal_vkospi_multiplier(context["vkospiValue"]),
+    )
+    grade = scoring["grade"]
     entry = {
         "rank": 0,
         "name": snapshot.name,
         "code": snapshot.code,
-        "score": final_score,
-        "grade": grade,
+        **scoring,
         "statusLabel": reversal_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], filters, gates, **macro_status_kwargs(context)),
         "strategy": "reversal",
         "filters": filters,
@@ -2028,7 +2053,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "reversal")
-    return entry
+    return finalize_scored_buy_entry(entry)
 
 
 def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
