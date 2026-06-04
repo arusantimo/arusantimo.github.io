@@ -79,6 +79,32 @@ def render_daily_bridge_js(payload: dict[str, Any], *, variant: str | None = Non
     )
 
 
+def read_js_assignment(path: str | Path, marker: str) -> Any:
+    """`window.<marker> = <json>;` 형태의 JS 파일에서 JSON 값을 파싱합니다.
+
+    같은 파일에 여러 할당이 있어도 marker 이후 첫 JSON 리터럴만 정확히 읽습니다.
+    파일/마커 부재 또는 파싱 실패 시 None을 반환합니다.
+    """
+    p = Path(path)
+    if not p.exists():
+        return None
+    text = p.read_text(encoding="utf-8")
+    idx = text.find(marker)
+    if idx < 0:
+        return None
+    eq = text.find("=", idx)
+    if eq < 0:
+        return None
+    pos = eq + 1
+    while pos < len(text) and text[pos] in " \t\r\n":
+        pos += 1
+    try:
+        value, _ = json.JSONDecoder().raw_decode(text, pos)
+        return value
+    except json.JSONDecodeError:
+        return None
+
+
 def render_history_bridge_js(entries: list[dict[str, Any]]) -> str:
     return f"window.JONGGA_HISTORY_INDEX = {json.dumps(entries, ensure_ascii=False, indent=2)};\n"
 

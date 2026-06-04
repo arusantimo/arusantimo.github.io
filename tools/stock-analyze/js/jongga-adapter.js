@@ -46,13 +46,41 @@ function normalizeJonggaRuleCodes(value, matched = false) {
 
 function normalizeJonggaTradePlanRows(value) {
   const rows = Array.isArray(value) ? value : [];
-  return rows.map(row => ({
-    stage: String(pickJonggaValue(row, ['stage', 'step', 'label'])),
-    condition: String(pickJonggaValue(row, ['condition', 'trigger', 'rule'])),
-    quantity: String(pickJonggaValue(row, ['quantity', 'qty', 'size'])),
-    targetYield: String(pickJonggaValue(row, ['targetYield', 'yield', 'rate'])),
-    targetPrice: String(pickJonggaValue(row, ['targetPrice', 'price', 'target']))
-  }));
+  return rows.map(row => {
+    const hitRate = row.historicalHitRate;
+    return {
+      stage: String(pickJonggaValue(row, ['stage', 'step', 'label'])),
+      condition: String(pickJonggaValue(row, ['condition', 'trigger', 'rule'])),
+      quantity: String(pickJonggaValue(row, ['quantity', 'qty', 'size'])),
+      targetYield: String(pickJonggaValue(row, ['targetYield', 'yield', 'rate'])),
+      targetPrice: String(pickJonggaValue(row, ['targetPrice', 'price', 'target'])),
+      recommended: Boolean(row.recommended),
+      historicalHitRate: (hitRate === null || hitRate === undefined) ? null : Number(hitRate)
+    };
+  });
+}
+
+function normalizeJonggaRecommendedBand(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    low: toJonggaNumber(value.low),
+    high: toJonggaNumber(value.high),
+    anchor: toJonggaNumber(value.anchor),
+    label: String(value.label || '')
+  };
+}
+
+function normalizeJonggaRecommendedStage(value) {
+  if (!value || typeof value !== 'object') return null;
+  const hitRate = value.hitRate;
+  return {
+    stageKey: String(value.stageKey || ''),
+    evBasis: String(value.evBasis || ''),
+    reason: String(value.reason || ''),
+    hitRate: (hitRate === null || hitRate === undefined) ? null : Number(hitRate),
+    ev: (value.ev === null || value.ev === undefined) ? null : Number(value.ev),
+    sampleCount: Number(value.sampleCount || 0)
+  };
 }
 
 function normalizeJonggaGapScore(slot = {}, root = {}) {
@@ -204,6 +232,8 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     rr: String(effectiveRawEntry.rr || effectiveRawEntry.riskReward || ''),
     notes: asJonggaArray(effectiveRawEntry.notes).map(note => String(note)),
     tradePlanRows: normalizeJonggaTradePlanRows(effectiveRawEntry.tradePlanRows || effectiveRawEntry.tradePlan),
+    recommendedEntryBand: normalizeJonggaRecommendedBand(effectiveRawEntry.recommendedEntryBand),
+    recommendedStage: normalizeJonggaRecommendedStage(effectiveRawEntry.recommendedStage),
     liveRefresh: buildJonggaLiveRefresh(effectiveRawEntry),
     source: 'jongga-json',
     dataQuality: effectiveRawEntry.dataQuality || null

@@ -104,6 +104,7 @@ from jongga.output_contract import (
     VARIANT_STABLE,
     normalize_variant,
     payload_with_analysis_date,
+    read_js_assignment,
     resolve_analysis_date,
     variant_label,
     write_daily_outputs,
@@ -295,12 +296,24 @@ def warning_status(note: str) -> dict[str, str]:
     return {"status": "⚠️", "note": note}
 
 
-def request_text(url: str, *, timeout: float = 15.0, encoding: str | None = None) -> str:
+def request_text(url: str, *, timeout: float = 15.0, encoding: str | None = None, _retries: int = 1) -> str:
     request = Request(url, headers={"User-Agent": USER_AGENT})
-    with urlopen(request, timeout=timeout) as response:
-        raw = response.read()
-        detected = encoding or response.headers.get_content_charset() or "utf-8"
-        return raw.decode(detected, errors="replace")
+    last_error: Exception | None = None
+    for attempt in range(1 + _retries):
+        try:
+            with urlopen(request, timeout=timeout) as response:
+                raw = response.read()
+                detected = encoding or response.headers.get_content_charset() or "utf-8"
+                return raw.decode(detected, errors="replace")
+        except URLError as exc:
+            last_error = exc
+            # DNS 일시 실패(errno 8=EAI_NONAME, errno -2=NAME_NOT_RESOLVED)만 재시도
+            if attempt < _retries and getattr(exc.reason, "errno", None) in (8, -2, -3):
+                import time as _time
+                _time.sleep(0.4 * (attempt + 1))
+                continue
+            raise
+    raise last_error  # type: ignore[misc]  # unreachable — loop always raises on last attempt
 
 
 def request_json(url: str, *, timeout: float = 15.0) -> Any:
@@ -819,8 +832,27 @@ def fetch_toss_metrics_with_http(code: str) -> dict[str, Any] | None:
     return merged
 
 
+def _fetch_orderbook_naver_fallback(code: str) -> dict[str, Any] | None:
+    """Naver Finance 메인 페이지에서 잔량합계를 파싱하는 HTTP 폴백 (Toss API 실패 시 사용)."""
+    url = NAVER_ORDERBOOK_URL_TEMPLATE.format(code=code)
+    try:
+        html = request_text(url, timeout=15.0, encoding="utf-8", _retries=0)
+    except Exception:
+        return None
+    result = parse_naver_orderbook_ratio_html(html, code)
+    if result is not None:
+        result = {**result, "source": "naver_orderbook_http"}
+    return result
+
+
 def fetch_orderbook_with_http(code: str) -> dict[str, Any] | None:
-    return parse_toss_quotes_payload(request_json(TOSS_QUOTES_API_TEMPLATE.format(code=code), timeout=10.0), code)
+    try:
+        result = parse_toss_quotes_payload(request_json(TOSS_QUOTES_API_TEMPLATE.format(code=code), timeout=10.0), code)
+        if result is not None:
+            return result
+    except Exception:
+        pass
+    return _fetch_orderbook_naver_fallback(code)
 
 
 def fetch_http_candidate_enrichments(candidates: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], list[str]]:
@@ -1745,45 +1777,128 @@ def relative_strength_rank(snapshot: StockSnapshot, universe_returns: list[tuple
     return any(code == snapshot.code for code, _ in ordered[:top_count])
 
 
+# 매매 단계 행 정의: (스테이지 라벨, 조건 문구, targets 인덱스, intraday 여부)
+# targets 튜플 인덱스: 0=프리마켓 1=장초반 2=장중1차 3=장중2차 4=스윙
+TRADE_PLAN_STAGE_DEFS: tuple[tuple[str, str, int, bool], ...] = (
+    ("🌅 프리마켓", "{yield} 도달", 0, False),
+    ("🔔 장초반", "{yield} 도달", 1, False),
+    ("📈 장중 1차", "{yield} 도달", 2, True),
+    ("📈 장중 2차", "추세 유지 시", 3, True),
+    ("📊 스윙 전환", "V 조건 충족 시", 4, True),
+)
+
+# 전략 × 레짐 버킷별 매매 단계 행렬.
+#   targets: (프리마켓, 장초반, 장중1차, 장중2차, 스윙) 목표 수익률 %, None이면 단계 제외
+#   stop:    손절 %
+#   qty:     각 단계 분할 익절 비중 % (합 100), 0이면 행 제외
+#   gapShiftsIntraday: gap_offset을 장중1차/2차/스윙에도 적용할지 여부
+TRADE_PLAN_MATRIX: dict[str, dict[str, dict[str, Any]]] = {
+    "breakout": {
+        "bull": {"targets": (4.0, 7.0, 11.0, 15.0, 20.0), "stop": -5.0, "qty": (15, 15, 20, 25, 25), "gapShiftsIntraday": True},
+        "box": {"targets": (3.0, 5.0, 8.0, 11.0, 14.0), "stop": -4.0, "qty": (20, 20, 25, 20, 15), "gapShiftsIntraday": True},
+        "weak": {"targets": (2.0, 4.0, 6.0, 8.0, None), "stop": -3.5, "qty": (25, 25, 30, 20, 0), "gapShiftsIntraday": True},
+    },
+    "pullback": {
+        "bull": {"targets": (2.5, 4.0, 6.0, 8.0, 10.0), "stop": -3.0, "qty": (30, 30, 25, 10, 5), "gapShiftsIntraday": False},
+        "box": {"targets": (2.0, 3.0, 4.5, 6.0, None), "stop": -2.5, "qty": (35, 30, 25, 10, 0), "gapShiftsIntraday": False},
+        "weak": {"targets": (1.5, 2.5, 3.5, None, None), "stop": -2.0, "qty": (40, 35, 25, 0, 0), "gapShiftsIntraday": False},
+    },
+    "accumulation": {
+        "bull": {"targets": (2.5, 4.0, 7.0, 10.0, 14.0), "stop": -3.5, "qty": (15, 20, 20, 20, 25), "gapShiftsIntraday": False},
+        "box": {"targets": (2.0, 3.5, 5.5, 8.0, 11.0), "stop": -3.0, "qty": (20, 20, 25, 20, 15), "gapShiftsIntraday": False},
+        "weak": {"targets": (1.5, 3.0, 4.5, 6.0, None), "stop": -2.5, "qty": (25, 25, 30, 20, 0), "gapShiftsIntraday": False},
+    },
+    "reversal": {
+        "bull": {"targets": (2.0, 3.5, 5.0, None, None), "stop": -2.0, "qty": (50, 30, 20, 0, 0), "gapShiftsIntraday": True},
+        "box": {"targets": (1.8, 3.0, 4.0, None, None), "stop": -1.8, "qty": (55, 30, 15, 0, 0), "gapShiftsIntraday": True},
+        "weak": {"targets": (1.5, 2.5, 3.0, None, None), "stop": -1.5, "qty": (60, 25, 15, 0, 0), "gapShiftsIntraday": True},
+    },
+}
+
+
+def regime_bucket(regime_label: str) -> str:
+    label = str(regime_label or "")
+    if label.startswith("강세장"):
+        return "bull"
+    if label.startswith("박스권"):
+        return "box"
+    return "weak"
+
+
+def trade_plan_profile(strategy: str, regime_label: str) -> dict[str, Any]:
+    normalized = "breakout" if strategy == "momentum" else strategy
+    table = TRADE_PLAN_MATRIX.get(normalized) or TRADE_PLAN_MATRIX["pullback"]
+    return table[regime_bucket(regime_label)]
+
+
+def blended_target_rate(strategy: str, regime_label: str) -> float:
+    """분할 익절 비중으로 가중 평균한 목표 수익률 (R/R 보상 레그용)."""
+    profile = trade_plan_profile(strategy, regime_label)
+    targets = profile["targets"]
+    qty = profile["qty"]
+    weighted = 0.0
+    total = 0.0
+    for rate, weight in zip(targets, qty):
+        if rate is None or weight <= 0:
+            continue
+        weighted += rate * weight
+        total += weight
+    return weighted / total if total > 0 else 0.0
+
+
 def build_trade_plan(strategy: str, entry_price: float, regime_label: str, gap_code: str) -> list[dict[str, str]]:
     gap_offset = -0.5 if gap_code == "G-C" else -1.0 if gap_code == "G-D" else 0.0
-    if strategy == "pullback":
-        if regime_label.startswith("강세장"):
-            premarket, open_target, intraday, stop = 3.0 + gap_offset, 4.5 + gap_offset, 9.0, -3.0 + min(gap_offset, 0.0)
-        elif regime_label.startswith("박스권"):
-            premarket, open_target, intraday, stop = 2.0 + gap_offset, 3.0 + gap_offset, 6.5, -2.0 + min(gap_offset, 0.0)
-        else:
-            premarket, open_target, intraday, stop = 1.5 + gap_offset, 2.5 + gap_offset, 3.0, -1.5 + min(gap_offset, 0.0)
-    elif strategy in {"breakout", "momentum"}:
-        if regime_label.startswith("강세장"):
-            premarket, open_target, intraday, stop = 4.0 + gap_offset, 7.0 + gap_offset, 15.0, -4.0 + min(gap_offset, 0.0)
-        elif regime_label.startswith("박스권"):
-            premarket, open_target, intraday, stop = 3.0 + gap_offset, 5.0 + gap_offset, 10.0, -3.0 + min(gap_offset, 0.0)
-        else:
-            premarket, open_target, intraday, stop = 2.0 + gap_offset, 4.0 + gap_offset, 5.0, -2.0 + min(gap_offset, 0.0)
-    elif strategy == "accumulation":
-        if regime_label.startswith("강세장"):
-            premarket, open_target, intraday, stop = 3.0 + gap_offset, 4.5 + gap_offset, 9.0, -3.0 + min(gap_offset, 0.0)
-        elif regime_label.startswith("박스권"):
-            premarket, open_target, intraday, stop = 2.0 + gap_offset, 3.0 + gap_offset, 6.5, -2.0 + min(gap_offset, 0.0)
-        else:
-            premarket, open_target, intraday, stop = 1.5 + gap_offset, 2.5 + gap_offset, 3.0, -1.5 + min(gap_offset, 0.0)
-    else:
-        premarket, open_target, intraday, stop = 3.0, 4.5, 8.0, -3.0 + min(gap_offset, 0.0)
+    profile = trade_plan_profile(strategy, regime_label)
+    targets = profile["targets"]
+    qty = profile["qty"]
+    stop = profile["stop"] + min(gap_offset, 0.0)
+    shift_intraday = bool(profile["gapShiftsIntraday"])
 
     def target(rate: float) -> str:
         return f"{round(entry_price * (1 + rate / 100)):,}원"
 
-    rows = [
-        {"stage": "🌅 프리마켓", "condition": f"{signed_number(premarket, 1, '%')} 도달", "quantity": "40% 익절" if strategy != "reversal" else "50% 익절", "targetYield": signed_number(premarket, 1, "%"), "targetPrice": target(premarket)},
-        {"stage": "🔔 장초반", "condition": f"{signed_number(open_target, 1, '%')} 도달", "quantity": "30% 익절", "targetYield": signed_number(open_target, 1, "%"), "targetPrice": target(open_target)},
-        {"stage": "📈 장중 1차", "condition": f"{signed_number(intraday, 1, '%')} 도달", "quantity": "잔량 전량" if strategy == "reversal" else "30% 익절", "targetYield": signed_number(intraday, 1, "%"), "targetPrice": target(intraday)},
-    ]
-    if strategy != "reversal":
-        rows.append({"stage": "📈 장중 2차", "condition": "추세 유지 시", "quantity": "잔량 보유", "targetYield": signed_number(intraday + 3.0, 1, "%"), "targetPrice": target(intraday + 3.0)})
-        rows.append({"stage": "📊 스윙 전환", "condition": "V 조건 충족 시", "quantity": "잔량 보유", "targetYield": signed_number(intraday + 6.0, 1, "%"), "targetPrice": target(intraday + 6.0)})
+    # 비제로 비중을 가진 마지막 익절 단계 인덱스 (reversal "잔량 전량" 표기용)
+    active_idx = [idx for idx in range(len(targets)) if targets[idx] is not None and qty[idx] > 0]
+    last_idx = active_idx[-1] if active_idx else None
+    is_reversal = (strategy == "reversal")
+
+    rows: list[dict[str, str]] = []
+    for stage_label, condition_tpl, idx, is_intraday in TRADE_PLAN_STAGE_DEFS:
+        rate = targets[idx]
+        weight = qty[idx]
+        if rate is None or weight <= 0:
+            continue
+        adjusted = rate + (gap_offset if (not is_intraday or shift_intraday) else 0.0)
+        yield_text = signed_number(adjusted, 1, "%")
+        if idx == last_idx and is_reversal:
+            quantity_text = f"{weight}% 익절 (잔량 전량)"
+        else:
+            quantity_text = f"{weight}% 익절"
+        rows.append({
+            "stage": stage_label,
+            "condition": condition_tpl.format(**{"yield": yield_text}),
+            "quantity": quantity_text,
+            "targetYield": yield_text,
+            "targetPrice": target(adjusted),
+        })
     rows.append({"stage": "🛑 손절", "condition": f"{signed_number(stop, 1, '%')} 이탈", "quantity": "전량", "targetYield": signed_number(stop, 1, "%"), "targetPrice": target(stop)})
     return rows
+
+
+def blended_reward_from_plan(rows: list[dict[str, str]]) -> float:
+    """매매 단계 행에서 분할 비중 가중 평균 목표 수익률 (손절 행 제외)."""
+    weighted = 0.0
+    total = 0.0
+    for row in rows:
+        if "손절" in str(row.get("stage") or ""):
+            continue
+        qty_match = re.match(r"\s*(\d+)", str(row.get("quantity") or ""))
+        weight = float(qty_match.group(1)) if qty_match else 0.0
+        if weight <= 0:
+            continue
+        weighted += parse_float(row.get("targetYield")) * weight
+        total += weight
+    return weighted / total if total > 0 else 0.0
 
 
 def rr_text(entry_price: float, stop_rate: float, target_rate: float) -> str:
@@ -1792,6 +1907,132 @@ def rr_text(entry_price: float, stop_rate: float, target_rate: float) -> str:
     if risk <= 0:
         return "1 : -"
     return f"1 : {reward / risk:.1f}"
+
+
+# --- 추천 마킹 (진입가 밴드 + 최적 익절 단계) ---
+
+OUTCOMES_DEFAULT_PATH = "jongga/output/jongga_outcomes.js"
+MARKING_MIN_SAMPLES = 8  # 신뢰 하한: 셀 표본이 이보다 적으면 상위(coarse) 셀로 폴백
+
+# 스테이지 라벨 키워드 → stageKey (outcome_tracker.STAGE_KEY_BY_KEYWORD와 동일)
+_STAGE_KEY_BY_KEYWORD: tuple[tuple[str, str], ...] = (
+    ("프리마켓", "premarket"),
+    ("장초반", "openPhase"),
+    ("장중 1차", "intraday1"),
+    ("장중 2차", "intraday2"),
+    ("스윙", "swing"),
+)
+
+# 콜드스타트 휴리스틱 단계 (레짐/변동성 기준)
+_COLDSTART_STAGE_BY_BUCKET = {"bull": "intraday1", "box": "openPhase", "weak": "premarket"}
+
+
+def load_outcomes_rollup(path: str = OUTCOMES_DEFAULT_PATH) -> dict[str, Any]:
+    value = read_js_assignment(path, "JONGGA_OUTCOMES_ROLLUP")
+    return value if isinstance(value, dict) else {}
+
+
+def _row_stage_key(stage_label: str) -> str:
+    for keyword, key in _STAGE_KEY_BY_KEYWORD:
+        if keyword in str(stage_label or ""):
+            return key
+    return ""
+
+
+def _lookup_hit_rate(rollup: dict[str, Any], strategy: str, dims: dict[str, str], stage_key: str) -> dict[str, Any] | None:
+    """byCell(5차원) → byStrategyStage(coarse) 순으로 신뢰 표본을 만족하는 셀을 찾는다."""
+    by_cell = rollup.get("byCell") if isinstance(rollup.get("byCell"), dict) else {}
+    by_strat = rollup.get("byStrategyStage") if isinstance(rollup.get("byStrategyStage"), dict) else {}
+    cell_key = f"{strategy}|{dims.get('regimeBucket', '')}|{dims.get('vkospiTier', '')}|{dims.get('gapGrade', '')}|{stage_key}"
+    cell = by_cell.get(cell_key)
+    if isinstance(cell, dict) and int(cell.get("sampleCount") or 0) >= MARKING_MIN_SAMPLES:
+        return {**cell, "basis": "cell"}
+    coarse = by_strat.get(f"{strategy}|{stage_key}")
+    if isinstance(coarse, dict) and int(coarse.get("sampleCount") or 0) >= MARKING_MIN_SAMPLES:
+        return {**coarse, "basis": "strategyStage"}
+    return None
+
+
+def compute_recommended_entry_band(entry_price: float, regime_label: str, gap_code: str) -> dict[str, Any]:
+    bucket = regime_bucket(regime_label)
+    gap_offset = -0.5 if gap_code == "G-C" else -1.0 if gap_code == "G-D" else 0.0
+    skew = {"bull": 0.0, "box": -0.3, "weak": -0.6}[bucket] + gap_offset * 0.5
+    low = round(entry_price * (1 + (skew - 0.7) / 100))
+    high = round(entry_price * (1 + (skew + 0.3) / 100))
+    return {
+        "low": low,
+        "high": high,
+        "anchor": round(entry_price),
+        "label": f"{low:,}~{high:,}원 (종가 ±, 분할매수)",
+    }
+
+
+def attach_marking(entry: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
+    """엔트리에 recommendedEntryBand·recommendedStage를 추가하고, tradePlanRows에
+    recommended/historicalHitRate를 표기한다. 과거 적중 롤업이 있으면 EV(=적중률×목표)로,
+    없으면 현재 시장 휴리스틱으로 최적 익절 단계를 선택한다."""
+    strategy = "breakout" if entry.get("strategy") == "momentum" else str(entry.get("strategy") or "")
+    rows = entry.get("tradePlanRows") or []
+    regime_label = str(context.get("regimeLabel") or "")
+    entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+    gap_code = str((context.get("gapScore") or {}).get("code") or "")
+    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
+    dims = {
+        "regimeBucket": regime_bucket(regime_label),
+        "vkospiTier": str(context.get("kospiBullTier") or "unknown"),
+        "gapGrade": gap_code,
+    }
+
+    take_profit = [(row, _row_stage_key(row.get("stage"))) for row in rows if "손절" not in str(row.get("stage") or "")]
+    take_profit = [(row, key) for row, key in take_profit if key]
+
+    best_key = None
+    best_ev = None
+    used_basis = "heuristic"
+    sample_count = 0
+    best_hit_rate = None
+    for row, stage_key in take_profit:
+        stat = _lookup_hit_rate(rollup, strategy, dims, stage_key)
+        hit_rate = float(stat["hitRate"]) if stat else None
+        row["historicalHitRate"] = round(hit_rate, 4) if hit_rate is not None else None
+        if stat is not None:
+            ev = hit_rate * parse_float(row.get("targetYield"))
+            if best_ev is None or ev > best_ev:
+                best_ev, best_key, used_basis = ev, stage_key, "historical"
+                sample_count = int(stat.get("sampleCount") or 0)
+                best_hit_rate = hit_rate
+
+    if best_key is None:
+        # 콜드스타트: 현재 시장 휴리스틱
+        bucket = dims["regimeBucket"]
+        vk = dims["vkospiTier"]
+        heuristic_key = "premarket" if (bucket == "weak" or vk == "weak") else _COLDSTART_STAGE_BY_BUCKET.get(bucket, "openPhase")
+        available = {key for _, key in take_profit}
+        best_key = heuristic_key if heuristic_key in available else (next(iter(available)) if available else None)
+        recommended_stage = {
+            "stageKey": best_key,
+            "evBasis": "heuristic",
+            "reason": "기본 추천(데이터 축적 중)",
+            "hitRate": None,
+            "ev": None,
+            "sampleCount": 0,
+        }
+    else:
+        recommended_stage = {
+            "stageKey": best_key,
+            "evBasis": used_basis,
+            "reason": f"EV=적중률×목표 (과거 {sample_count}건)",
+            "hitRate": round(best_hit_rate, 4) if best_hit_rate is not None else None,
+            "ev": round(best_ev, 4) if best_ev is not None else None,
+            "sampleCount": sample_count,
+        }
+
+    for row, stage_key in take_profit:
+        row["recommended"] = (stage_key == best_key)
+
+    entry["recommendedEntryBand"] = compute_recommended_entry_band(entry_price, regime_label, gap_code)
+    entry["recommendedStage"] = recommended_stage
+    return entry
 
 
 def build_top_trading_value_gate(rank: int, code: str) -> dict[str, Any]:
@@ -1916,7 +2157,9 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
 
 
 
-def finalize_scored_buy_entry(entry: dict[str, Any]) -> dict[str, Any]:
+def finalize_scored_buy_entry(entry: dict[str, Any], context: dict[str, Any] | None = None) -> dict[str, Any]:
+    if context is not None:
+        attach_marking(entry, context)
     return attach_entry_eligibility(entry)
 
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
@@ -1966,10 +2209,10 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
-        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
+        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
-    return finalize_scored_buy_entry(entry)
+    return finalize_scored_buy_entry(entry, context)
 
 
 def build_breakout_entry(
@@ -2034,11 +2277,11 @@ def build_breakout_entry(
         "orderbook": snapshot.orderbook or {},
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
-        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
+        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "breakout")
-    return finalize_scored_buy_entry(entry)
+    return finalize_scored_buy_entry(entry, context)
 
 
 def build_momentum_entry(
@@ -2102,10 +2345,10 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
-        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
+        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
-    return finalize_scored_buy_entry(entry)
+    return finalize_scored_buy_entry(entry, context)
 
 
 def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
@@ -2172,11 +2415,11 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "toss": snapshot.toss or {},
         "orderbook": snapshot.orderbook or {},
         "tradePlanRows": trade_plan,
-        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
+        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "reversal")
-    return finalize_scored_buy_entry(entry)
+    return finalize_scored_buy_entry(entry, context)
 
 
 def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -2284,6 +2527,7 @@ def collect_live_payload(
     resolved_analysis_date = analysis_date or resolve_analysis_date(None)
     market_snapshot = load_market_analyze_snapshot()
     context = build_market_context(kospi_history, gap_score, live_metrics["vkospi"], analysis_date=resolved_analysis_date)
+    context["outcomesRollup"] = load_outcomes_rollup()
     log_step(
         "market_context",
         "시장 레짐 계산",

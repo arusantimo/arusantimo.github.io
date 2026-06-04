@@ -689,6 +689,13 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(entry["score"], entry["signalScore"])
         self.assertIsInstance(entry["scoreBreakdown"], list)
         self.assertTrue(any(row["code"] == "RS" for row in entry["scoreBreakdown"]))
+        # marking attached through the real builder path (cold-start: empty rollup in test context)
+        self.assertIn("recommendedEntryBand", entry)
+        self.assertIn("recommendedStage", entry)
+        self.assertTrue(entry["recommendedStage"]["stageKey"])
+        take_profit = [row for row in entry["tradePlanRows"] if "손절" not in row["stage"]]
+        self.assertEqual(sum(1 for row in take_profit if row.get("recommended")), 1)
+        self.assertTrue(all("historicalHitRate" in row for row in take_profit))
 
     def test_build_momentum_entry_explains_missing_browser_metrics(self):
         snapshot = StockSnapshot(
@@ -1025,6 +1032,151 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(alias_entry.get("strategy"), "breakout")
         self.assertEqual(breakout_entry.get("strategy"), "breakout")
         self.assertEqual(alias_entry.get("code"), breakout_entry.get("code"))
+
+
+class TradePlanTest(unittest.TestCase):
+    def _take_profit_rows(self, rows):
+        return [row for row in rows if "손절" not in row["stage"]]
+
+    def _qty(self, row):
+        return int(str(row["quantity"]).split("%")[0])
+
+    def test_pullback_accumulation_differ(self):
+        from jongga.generate_latest import build_trade_plan
+
+        for regime in ("강세장 ✅", "박스권 ⚠️", "약세장 ⛔"):
+            pull = build_trade_plan("pullback", 10000, regime, "G-A")
+            accu = build_trade_plan("accumulation", 10000, regime, "G-A")
+            pull_qty = [self._qty(r) for r in self._take_profit_rows(pull)]
+            accu_qty = [self._qty(r) for r in self._take_profit_rows(accu)]
+            self.assertNotEqual(pull_qty, accu_qty, f"pullback/accumulation qty identical for {regime}")
+
+    def test_reversal_regime_aware_and_no_swing(self):
+        from jongga.generate_latest import build_trade_plan, parse_float
+
+        stops = {}
+        for regime in ("강세장 ✅", "박스권 ⚠️", "약세장 ⛔"):
+            rows = build_trade_plan("reversal", 10000, regime, "G-A")
+            self.assertFalse(any("스윙" in r["stage"] for r in rows), "reversal must have no swing row")
+            self.assertFalse(any("장중 2차" in r["stage"] for r in rows), "reversal must have no intraday2 row")
+            self.assertEqual(len(self._take_profit_rows(rows)), 3)
+            stops[regime] = parse_float(rows[-1]["targetYield"])
+        self.assertEqual(len(set(stops.values())), 3, f"reversal stops must differ by regime: {stops}")
+
+    def test_qty_sums_to_100_and_omits_zero_legs(self):
+        from jongga.generate_latest import build_trade_plan
+
+        for strategy in ("pullback", "accumulation", "breakout", "reversal"):
+            for regime in ("강세장 ✅", "박스권 ⚠️", "약세장 ⛔"):
+                rows = build_trade_plan(strategy, 10000, regime, "G-A")
+                tp = self._take_profit_rows(rows)
+                self.assertEqual(sum(self._qty(r) for r in tp), 100, f"{strategy}/{regime} qty != 100")
+                self.assertTrue(all(self._qty(r) > 0 for r in tp), "zero-qty leg should be omitted")
+
+    def test_gap_offset_intraday_gating(self):
+        from jongga.generate_latest import build_trade_plan, parse_float
+
+        def intraday1(rows):
+            return parse_float(next(r["targetYield"] for r in rows if "장중 1차" in r["stage"]))
+
+        # breakout/reversal shift intraday on gap-down; pullback/accumulation do not
+        for strategy, expected_shift in (("breakout", -1.0), ("reversal", -1.0), ("pullback", 0.0), ("accumulation", 0.0)):
+            base = build_trade_plan(strategy, 10000, "강세장 ✅", "G-A")
+            gapped = build_trade_plan(strategy, 10000, "강세장 ✅", "G-D")
+            self.assertAlmostEqual(intraday1(gapped) - intraday1(base), expected_shift, msg=f"{strategy} intraday gating")
+            # premarket always shifts
+            self.assertAlmostEqual(parse_float(gapped[0]["targetYield"]) - parse_float(base[0]["targetYield"]), -1.0)
+
+    def test_rr_uses_blended_reward_not_premarket(self):
+        from jongga.generate_latest import build_trade_plan, blended_reward_from_plan, parse_float
+
+        rows = build_trade_plan("breakout", 10000, "강세장 ✅", "G-A")
+        premarket_rate = parse_float(rows[0]["targetYield"])
+        blended = blended_reward_from_plan(rows)
+        # blended reward must exceed the smallest (premarket) leg → higher, more realistic R/R
+        self.assertGreater(blended, premarket_rate)
+
+    def test_reversal_terminal_leg_marked_full_remainder(self):
+        from jongga.generate_latest import build_trade_plan
+
+        rows = build_trade_plan("reversal", 10000, "강세장 ✅", "G-A")
+        tp = self._take_profit_rows(rows)
+        self.assertIn("잔량 전량", tp[-1]["quantity"])
+
+
+class MarkingTest(unittest.TestCase):
+    def _entry(self, strategy="pullback"):
+        from jongga.generate_latest import build_trade_plan
+
+        return {
+            "strategy": strategy,
+            "entryPrice": 10000,
+            "currentPrice": 10000,
+            "tradePlanRows": build_trade_plan(strategy, 10000, "강세장 ✅", "G-A"),
+        }
+
+    def test_cold_start_uses_heuristic(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("pullback")
+        ctx = {"regimeLabel": "강세장 ✅", "gapScore": {"code": "G-A"}, "kospiBullTier": "strong", "outcomesRollup": {}}
+        attach_marking(entry, ctx)
+        self.assertEqual(entry["recommendedStage"]["evBasis"], "heuristic")
+        self.assertEqual(entry["recommendedStage"]["stageKey"], "intraday1")  # bull → intraday1
+        tp = [r for r in entry["tradePlanRows"] if "손절" not in r["stage"]]
+        self.assertTrue(all(r["historicalHitRate"] is None for r in tp))
+        self.assertEqual(sum(1 for r in tp if r.get("recommended")), 1)
+
+    def test_cold_start_high_vol_picks_premarket(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("breakout")
+        ctx = {"regimeLabel": "약세장 ⛔", "gapScore": {"code": "G-A"}, "kospiBullTier": "weak", "outcomesRollup": {}}
+        attach_marking(entry, ctx)
+        self.assertEqual(entry["recommendedStage"]["stageKey"], "premarket")
+
+    def test_ev_argmax_from_rollup(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("pullback")
+        # openPhase has lower hitRate but at +4.0% → EV may beat premarket(+2.5%); intraday1 highest EV
+        rollup = {
+            "byStrategyStage": {
+                "pullback|premarket": {"hitRate": 0.5, "sampleCount": 50},
+                "pullback|openPhase": {"hitRate": 0.5, "sampleCount": 50},
+                "pullback|intraday1": {"hitRate": 0.5, "sampleCount": 50},
+                "pullback|intraday2": {"hitRate": 0.1, "sampleCount": 50},
+                "pullback|swing": {"hitRate": 0.05, "sampleCount": 50},
+            },
+            "byCell": {},
+        }
+        ctx = {"regimeLabel": "강세장 ✅", "gapScore": {"code": "G-A"}, "kospiBullTier": "strong", "outcomesRollup": rollup}
+        attach_marking(entry, ctx)
+        # equal hitRate 0.5 across pre/open/i1 → highest target (intraday1 +6.0%) wins EV
+        self.assertEqual(entry["recommendedStage"]["stageKey"], "intraday1")
+        self.assertEqual(entry["recommendedStage"]["evBasis"], "historical")
+
+    def test_confidence_floor_falls_back_to_coarse(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("pullback")
+        # cell below MIN_SAMPLES(8) → ignored; coarse has enough samples
+        rollup = {
+            "byCell": {"pullback|bull|strong|G-A|premarket": {"hitRate": 0.99, "sampleCount": 3}},
+            "byStrategyStage": {"pullback|premarket": {"hitRate": 0.6, "sampleCount": 40}},
+        }
+        ctx = {"regimeLabel": "강세장 ✅", "gapScore": {"code": "G-A"}, "kospiBullTier": "strong", "outcomesRollup": rollup}
+        attach_marking(entry, ctx)
+        pre = next(r for r in entry["tradePlanRows"] if "프리마켓" in r["stage"])
+        self.assertEqual(pre["historicalHitRate"], 0.6)  # coarse, not the sparse 0.99 cell
+
+    def test_entry_band_brackets_anchor(self):
+        from jongga.generate_latest import compute_recommended_entry_band
+
+        band = compute_recommended_entry_band(10000, "강세장 ✅", "G-A")
+        self.assertLess(band["low"], band["anchor"])
+        self.assertLessEqual(band["anchor"], band["high"] + 1)
+        self.assertLess(band["low"], band["high"])
 
 
 if __name__ == "__main__":

@@ -34,7 +34,7 @@ def emit(label: str, message: str) -> None:
 
 def run_preflight() -> list[str]:
     warnings: list[str] = []
-    emit("STEP", "0/3 환경 점검")
+    emit("STEP", "0/4 환경 점검")
     emit("OK", f"Python {sys.version.split()[0]} · cwd={ROOT.name}")
     try:
         import playwright  # noqa: F401
@@ -54,7 +54,7 @@ def run_preflight() -> list[str]:
 
 
 def run_unit_tests() -> int:
-    emit("STEP", "1/3 단위 테스트 (jongga/tests)")
+    emit("STEP", "1/4 단위 테스트 (jongga/tests)")
     suite = unittest.defaultTestLoader.discover(
         start_dir=str(JONGGA_TESTS),
         pattern="test_*.py",
@@ -68,8 +68,41 @@ def run_unit_tests() -> int:
     return 1
 
 
+def run_outcome_backfill(*, analysis_date: str | None, variant: str, lookback_days: int = 30) -> int:
+    """과거 추천의 실제 다음날 적중 결과 백필. 비치명적 — 실패해도 파이프라인은 계속한다."""
+    emit("STEP", "2/4 추천 적중 백필 (어제 이전 추천의 다음날 OHLC 집계)")
+    cmd = [
+        sys.executable,
+        "-m",
+        "jongga.outcome_tracker",
+        "--history-js",
+        "jongga/output/jongga_history.js",
+        "--outcomes-js",
+        "jongga/output/jongga_outcomes.js",
+        "--out-dir",
+        "jongga/output",
+        "--lookback-days",
+        str(lookback_days),
+        "--variant",
+        variant,
+    ]
+    if analysis_date:
+        cmd.extend(["--date", analysis_date])
+    emit("RUN", " ".join(cmd[2:]))
+    try:
+        completed = subprocess.run(cmd, cwd=ROOT, check=False)
+    except Exception as exc:  # noqa: BLE001
+        emit("WARN", f"적중 백필 실행 실패(무시하고 계속): {exc}")
+        return 0
+    if completed.returncode != 0:
+        emit("WARN", f"적중 백필 종료 코드 {completed.returncode} — 무시하고 생성 단계로 진행")
+        return 0
+    emit("OK", "적중 백필 완료")
+    return 0
+
+
 def run_generate(*, analysis_date: str | None, variant: str, top_limit: int) -> int:
-    emit("STEP", "2/3 라이브 수집 + 종가베팅 추천 생성 (stable · canary)")
+    emit("STEP", "3/4 라이브 수집 + 종가베팅 추천 생성 (stable · canary)")
     cmd = [
         sys.executable,
         "-m",
@@ -107,7 +140,7 @@ def _compact_date(analysis_date: str | None) -> str:
 
 
 def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, dict[str, object]]:
-    emit("STEP", "3/3 산출물 검증")
+    emit("STEP", "4/4 산출물 검증")
     compact = _compact_date(analysis_date)
     month_folder = compact[:6]
     required: list[Path] = [
@@ -146,6 +179,11 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
         "OK",
         f"stable 품질={status} · 눌림목 {counts['pullback']} · 돌파 {counts['breakout']} · 매집 {counts['accumulation']} · 급락반등 {counts['reversal']}",
     )
+    outcomes_path = JONGGA_OUTPUT / "jongga_outcomes.js"
+    if outcomes_path.exists():
+        emit("FILE", "jongga/output/jongga_outcomes.js (적중 추적)")
+    else:
+        emit("WARN", "jongga_outcomes.js 없음 — 적중 데이터 축적 전(콜드스타트)이거나 백필 생략됨")
     emit("FILE", f"jongga/output/{month_folder}/jongga_data_{compact}.js")
     emit("FILE", "jongga/output/latest.json (레거시 브리지)")
     emit("UI", "tools/stock-analyze/index.html")
@@ -187,6 +225,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="단위 테스트만 실행하고 종료",
     )
+    parser.add_argument(
+        "--skip-outcomes",
+        action="store_true",
+        help="추천 적중 백필 단계 생략 (오프라인/빠른 실행용)",
+    )
     return parser
 
 
@@ -213,6 +256,11 @@ def main() -> int:
         if args.tests_only:
             print_summary(exit_code=0, quality_status="complete")
             return 0
+
+    if not args.skip_outcomes:
+        run_outcome_backfill(analysis_date=args.date, variant=args.variant)
+    else:
+        emit("STEP", "2/4 추천 적중 백필 — 생략(--skip-outcomes)")
 
     gen_code = run_generate(
         analysis_date=args.date,

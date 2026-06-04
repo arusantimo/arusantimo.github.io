@@ -1099,16 +1099,43 @@ function renderFilterList(entry) {
   return (entry.filters || []).map(filter => renderStrategyRuleCard(filter, entry, 'filter', filter.status === '✅')).join('');
 }
 
+function renderTradePlanRecommendation(entry) {
+  const band = entry.recommendedEntryBand;
+  const stage = entry.recommendedStage;
+  if (!band && !stage) return '';
+  const bandText = band && band.label ? `💰 추천 진입가 ${escapeHtml(band.label)}` : '';
+  let stageText = '';
+  if (stage && stage.stageKey) {
+    const meta = (typeof getSellStrategyStageMeta === 'function')
+      ? getSellStrategyStageMeta(stage.stageKey)
+      : { icon: '🎯', title: stage.stageKey };
+    const reason = stage.reason ? ` · ${escapeHtml(stage.reason)}` : '';
+    stageText = `🎯 최적 익절 단계: <strong>${escapeHtml(meta.icon + ' ' + meta.title)}</strong>${reason}`;
+  }
+  const lines = [bandText, stageText].filter(Boolean).map(line => `<div>${line}</div>`).join('');
+  if (!lines) return '';
+  return `<div class="modal-ind-card clear" style="margin-bottom:8px;">${lines}</div>`;
+}
+
 function renderTradePlanTable(entry) {
   if (!entry.tradePlanRows.length) {
     return '<div class="empty-state compact">매매 단계 정보가 없습니다.</div>';
   }
 
+  const recRowStyle = 'background:rgba(16,185,129,0.10)';
   return `
+    ${renderTradePlanRecommendation(entry)}
     <table class="guide-table compact-table">
       <thead><tr><th>단계</th><th>조건</th><th>수량</th><th>목표 수익률</th><th>목표가</th></tr></thead>
       <tbody>
-        ${entry.tradePlanRows.map(row => `<tr><td>${escapeHtml(row.stage)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.quantity)}</td><td>${escapeHtml(row.targetYield)}</td><td>${escapeHtml(row.targetPrice)}</td></tr>`).join('')}
+        ${entry.tradePlanRows.map(row => {
+          const isRec = Boolean(row.recommended);
+          const hitRate = (row.historicalHitRate === null || row.historicalHitRate === undefined)
+            ? ''
+            : ` <span style="color:var(--text-muted)">· 적중 ${Math.round(row.historicalHitRate * 100)}%</span>`;
+          const star = isRec ? '⭐ ' : '';
+          return `<tr${isRec ? ` style="${recRowStyle}"` : ''}><td>${star}${escapeHtml(row.stage)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.quantity)}</td><td>${escapeHtml(row.targetYield)}${hitRate}</td><td>${escapeHtml(row.targetPrice)}</td></tr>`;
+        }).join('')}
       </tbody>
     </table>
   `;

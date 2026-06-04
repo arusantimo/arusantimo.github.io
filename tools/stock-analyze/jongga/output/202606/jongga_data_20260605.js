@@ -1,4 +1,5 @@
-{
+window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
+window.JONGGA_DAILY_DATA["2026-06-05"] = {
   "schemaVersion": "jongga_result.v1",
   "generatedAt": "2026-06-04T15:11:36+00:00",
   "variant": "stable",
@@ -3507,4 +3508,4 @@
     }
   ],
   "analysisDate": "2026-06-05"
-}
+};
