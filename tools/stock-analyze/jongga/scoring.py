@@ -7,7 +7,7 @@ from typing import Any, Callable
 from jongga.grade_policy import grade_from_score
 from jongga.rule_evaluation import EvalResult
 
-MOMENTUM_WEIGHTS: dict[str, float] = {
+BREAKOUT_WEIGHTS: dict[str, float] = {
     "RS": 1.5,
     "S1": 2.0,
     "S2": 2.0,
@@ -17,7 +17,11 @@ MOMENTUM_WEIGHTS: dict[str, float] = {
     "C2": 1.0,
     "C3": 1.0,
 }
-MOMENTUM_STRICT_MAX = 12.5  # sum(weights); float 합산은 11.5로 깨질 수 있음
+BREAKOUT_STRICT_MAX = 11.5
+
+# Legacy names
+MOMENTUM_WEIGHTS = BREAKOUT_WEIGHTS
+MOMENTUM_STRICT_MAX = BREAKOUT_STRICT_MAX
 
 TREND_SCORE_WEIGHTS: dict[str, float] = {
     "S1": 2.0,
@@ -30,13 +34,16 @@ TREND_SCORE_WEIGHTS: dict[str, float] = {
 }
 TREND_STRICT_MAX = 10.0
 
+ACCUMULATION_SCORE_WEIGHTS = TREND_SCORE_WEIGHTS
+ACCUMULATION_STRICT_MAX = TREND_STRICT_MAX
+
 REVERSAL_SCORE_WEIGHTS = TREND_SCORE_WEIGHTS
 REVERSAL_STRICT_MAX = TREND_STRICT_MAX
 
 SignalFactorFn = Callable[[str, EvalResult, Any | None], float]
 
 
-def _momentum_s2_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
+def _breakout_s2_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
     if result.score >= 1.0:
         return 1.0
     if snapshot is None:
@@ -49,7 +56,7 @@ def _momentum_s2_signal_factor(_code: str, result: EvalResult, snapshot: Any | N
     return 0.0
 
 
-def _momentum_c3_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
+def _breakout_c3_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
     if result.score >= 1.0:
         return 1.0
     if snapshot is None:
@@ -63,12 +70,21 @@ def _momentum_c3_signal_factor(_code: str, result: EvalResult, snapshot: Any | N
     return 0.0
 
 
-def _momentum_p1_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
+def _breakout_p1_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
     if result.score >= 1.0:
         return 1.0
     if snapshot is None or not snapshot.high_20d:
         return 0.0
-    ratio = snapshot.current_price / snapshot.high_20d * 100
+    price = snapshot.current_price
+    high_20d = snapshot.high_20d
+    if price > high_20d:
+        extension = (price / high_20d - 1) * 100
+        if extension <= 5.0:
+            return 1.0
+        if extension <= 7.0:
+            return 0.5
+        return 0.0
+    ratio = price / high_20d * 100
     if ratio >= 95.0:
         return 1.0
     if ratio >= 92.0:
@@ -76,11 +92,13 @@ def _momentum_p1_signal_factor(_code: str, result: EvalResult, snapshot: Any | N
     return 0.0
 
 
-MOMENTUM_SIGNAL_FACTORS: dict[str, SignalFactorFn] = {
-    "S2": _momentum_s2_signal_factor,
-    "C3": _momentum_c3_signal_factor,
-    "P1": _momentum_p1_signal_factor,
+BREAKOUT_SIGNAL_FACTORS: dict[str, SignalFactorFn] = {
+    "S2": _breakout_s2_signal_factor,
+    "C3": _breakout_c3_signal_factor,
+    "P1": _breakout_p1_signal_factor,
 }
+
+MOMENTUM_SIGNAL_FACTORS = BREAKOUT_SIGNAL_FACTORS
 
 
 def weight_factor(
@@ -153,7 +171,8 @@ def apply_buy_scoring(
     vkospi_multiplier: float,
     snapshot: Any | None = None,
 ) -> dict[str, Any]:
-    signal_factors = MOMENTUM_SIGNAL_FACTORS if strategy == "momentum" else None
+    normalized = "breakout" if strategy == "momentum" else strategy
+    signal_factors = BREAKOUT_SIGNAL_FACTORS if normalized == "breakout" else None
     strict_raw = aggregate_raw_score(score_map, weights, snapshot=None, signal_factors=None)
     signal_raw = aggregate_raw_score(score_map, weights, snapshot=snapshot, signal_factors=signal_factors)
     strict_score = round(strict_raw * vkospi_multiplier, 1)
@@ -173,5 +192,17 @@ def apply_buy_scoring(
             snapshot=snapshot,
             signal_factors=signal_factors,
         ),
-        "scoreScope": strategy,
+        "scoreScope": normalized,
     }
+
+
+def rank_buy_entries(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """strictScore 우선, 동점 시 entryEligible·signalScore 순."""
+
+    def sort_key(entry: dict[str, Any]) -> tuple:
+        eligible = 1 if entry.get("entryEligible") else 0
+        strict = float(entry.get("strictScore") or 0)
+        signal = float(entry.get("signalScore") or entry.get("score") or 0)
+        return (eligible, strict, signal)
+
+    return sorted(entries, key=sort_key, reverse=True)

@@ -13,7 +13,9 @@ const LEGACY_SAVED_NOTION_URL_KEY = 'savedNotionUrl';
 // Keep in sync with jongga/grade_policy.py
 const BUY_GRADE_MIN_SCORES = {
   pullback: { S: 8.5, A: 7.0, B: 5.5 },
+  breakout: { S: 8.5, A: 7.0, B: 5.5 },
   momentum: { S: 8.5, A: 7.0, B: 5.5 },
+  accumulation: { S: 8.5, A: 7.0, B: 5.5 },
   reversal: { S: 8.0, A: 6.5, B: 5.0 }
 };
 
@@ -28,25 +30,29 @@ const RULE_GUIDE = {
       state: '강세장 ✅',
       condition: '60MA 우상향 AND 20MA 우상향 AND VKOSPI < 20',
       pullback: '서브 (3종목)',
-      momentum: '메인 (3종목)'
+      breakout: '메인 (3종목)',
+      accumulation: '보조 (3종목)'
     },
     {
       state: '순환매장 🔄',
       condition: '60MA 횡보 AND 신고가 ≥ 30 AND 업종 리더십 변경 AND 거래대금 유지',
       pullback: '서브 (2종목)',
-      momentum: '메인 (2종목)'
+      breakout: '메인 (2종목)',
+      accumulation: '보조 (3종목)'
     },
     {
       state: '박스권 ⚠️',
       condition: '그 외 (지수 정체 + 내부 침체)',
-      pullback: '메인 (3종목)',
-      momentum: '서브 (1종목)'
+      pullback: '서브 (3종목)',
+      breakout: '서브 (1종목)',
+      accumulation: '메인 (3종목)'
     },
     {
       state: '약세장 ⛔',
       condition: 'KOSPI 60MA 하락 OR VKOSPI > 30',
       pullback: '관망',
-      momentum: '관망'
+      breakout: '관망',
+      accumulation: '관망'
     }
   ],
   trendGrades: [
@@ -118,22 +124,51 @@ const RULE_GUIDE = {
         { code: 'C3', condition: '해당 섹터 지수가 코스피 대비 당일 outperform', source: '네이버 증권' }
       ]
     },
-    momentum: {
+    breakout: {
       gates: [
         { code: 'G1', condition: '5일 또는 20일 KOSPI 대비 초과수익률 > 0', source: '네이버 증권' },
-        { code: 'G2', condition: '52주 고점의 92% 이상 위치 OR 52주 신고가 갱신', source: '네이버 증권' },
-        { code: 'G3', condition: '당일 거래대금 100위 이내', source: '네이버 증권' }
+        { code: 'G2', condition: '52주 고점의 92% 이상', source: '네이버 증권' },
+        { code: 'G3', condition: '당일 거래대금 TOP100', source: '네이버 증권' },
+        { code: 'G4', condition: '당일 거래량 ≥ 20일 평균 150%', source: '네이버 증권' },
+        { code: 'G5', condition: '몸통 ≥ 70% + 윗꼬리 ≤ 몸통 30%', source: '네이버 증권' },
+        { code: 'G6', condition: '당일 등락률 ≤ +12%', source: '네이버 증권' },
+        { code: 'G7', condition: '종가 > 5MA AND 5MA 우상향', source: '네이버 증권' }
       ],
       scores: [
-        { code: 'S1', condition: '외국인 OR 기관 순매수', source: '네이버 증권' },
-        { code: 'S2', condition: '분당 체결강도 평균 ≥ 100%가 장중 70% 이상 유지 + 당일 체결강도 평균 ≥ 110%', source: '토스 증권' },
-        { code: 'P1', condition: '박스권 상단 OR 전고점 돌파 후 +5% 이내 자리', source: '네이버 증권' },
-        { code: 'P2', condition: '돌파 당일 거래량이 20일 평균의 150% 이상', source: '네이버 증권' },
-        { code: 'C1', condition: '종가 ≥ 당일 고가의 95%', source: '네이버 증권' },
-        { code: 'C2', condition: '몸통이 전체 캔들의 70% 이상 + 윗꼬리 ≤ 몸통의 30%', source: '네이버 증권' },
-        { code: 'C3', condition: '매수호가 잔량 우위 (Bid/Ask 잔량 비율 ≥ 1.2, 돌파 추종 수요 확인)', source: '토스 증권' },
-        { code: 'RS', condition: '3개월 상대강도(RS) 상위 25% 이내 시 가점', source: '네이버 증권' }
+        { code: 'S1', condition: '외국인 AND 기관 당일 양매수', source: '네이버 증권' },
+        { code: 'S2', condition: '체결강도 평균 ≥110% · 100% 유지 ≥70%', source: '토스 증권' },
+        { code: 'P1', condition: '20일 고점 돌파 후 +5% 이내 OR 미돌파 시 95% 이상', source: '네이버 증권' },
+        { code: 'P2', condition: '돌파 당일 거래량 ≥ 20일 평균 150%', source: '네이버 증권' },
+        { code: 'C1', condition: '종가 ≥ 당일 고가 95%', source: '네이버 증권' },
+        { code: 'C2', condition: '양봉 몸통·윗꼬리 품질 (G5와 동일)', source: '네이버 증권' },
+        { code: 'C3', condition: '호가 매수 잔량 ≥ 1.2', source: '토스 증권' },
+        { code: 'RS', condition: '3개월 RS 상위 25% 가점', source: '네이버 증권' }
       ]
+    },
+    accumulation: {
+      gates: [
+        { code: 'G0', condition: '최근 20일 거래량 급증 이력 ≥200%', source: '네이버 증권' },
+        { code: 'G1', condition: '종가 > 60MA', source: '네이버 증권' },
+        { code: 'G2', condition: '52주 고가 대비 < 92% (돌파 구간 제외)', source: '네이버 증권' },
+        { code: 'G3', condition: '거래대금 TOP100', source: '네이버 증권' },
+        { code: 'G4', condition: '당일 거래량 < 20일 평균 120%', source: '네이버 증권' },
+        { code: 'G5', condition: 'KOSPI 5일선 + VKOSPI (눌림목 G5와 동일)', source: '네이버 증권' }
+      ],
+      scores: [
+        { code: 'S1', condition: '외국인 AND 기관 당일 양매수', source: '네이버 증권' },
+        { code: 'S2', condition: '2일 수급 개선 (연속 순매수 또는 당일 양매수+전일 유지)', source: '네이버 증권' },
+        { code: 'P1', condition: '종가가 20MA 98~102% (횡보·눌림)', source: '네이버 증권' },
+        { code: 'P2', condition: '5MA > 20MA', source: '네이버 증권' },
+        { code: 'C1', condition: '당일 거래량 ≤ 5일 평균 90%', source: '네이버 증권' },
+        { code: 'C2', condition: '당일 등락 -3% ~ +5%', source: '네이버 증권' },
+        { code: 'C3', condition: '섹터 outperform', source: '네이버 증권' }
+      ]
+    },
+    momentum: {
+      gates: [
+        { code: 'G1', condition: '(레거시) breakout G1-G7로 이전', source: '네이버 증권' }
+      ],
+      scores: []
     },
     reversal: {
       filters: [
@@ -168,10 +203,20 @@ const STRATEGY_META = {
     shortLabel: '눌림목',
     noun: '눌림목 베팅'
   },
-  momentum: {
-    label: '🔥 수급 매집형 종가베팅 TOP',
+  breakout: {
+    label: '🚀 주도주 돌파형 종가베팅',
+    shortLabel: '주도주 돌파형',
+    noun: '주도주 돌파형'
+  },
+  accumulation: {
+    label: '🔥 수급 매집형 종가베팅',
     shortLabel: '수급 매집형',
     noun: '수급 매집형'
+  },
+  momentum: {
+    label: '🚀 주도주 돌파형 종가베팅',
+    shortLabel: '주도주 돌파형',
+    noun: '주도주 돌파형'
   },
   reversal: {
     label: '🔻 주도주 급락 반등',

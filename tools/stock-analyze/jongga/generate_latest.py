@@ -18,14 +18,18 @@ from urllib.request import Request, urlopen
 from jongga.entry_policy import attach_entry_eligibility
 from jongga.grade_policy import grade_from_score
 from jongga.scoring import (
-    MOMENTUM_STRICT_MAX,
-    MOMENTUM_WEIGHTS,
+    ACCUMULATION_SCORE_WEIGHTS,
+    ACCUMULATION_STRICT_MAX,
+    BREAKOUT_STRICT_MAX,
+    BREAKOUT_WEIGHTS,
     REVERSAL_SCORE_WEIGHTS,
     REVERSAL_STRICT_MAX,
     TREND_SCORE_WEIGHTS,
     TREND_STRICT_MAX,
     apply_buy_scoring,
+    rank_buy_entries,
 )
+from jongga.strategy_regime import slot_limits_for_regime, strategy_display_name
 from jongga.macro_overlay import (
     apply_regime_fields_to_context,
     build_macro_overlay_block,
@@ -34,17 +38,34 @@ from jongga.macro_overlay import (
     trend_status_label,
 )
 from jongga.rule_evaluation import (
-    evaluate_momentum_c1,
-    evaluate_momentum_c2,
-    evaluate_momentum_c3,
-    evaluate_momentum_g3,
-    evaluate_momentum_rs,
-    evaluate_momentum_g1,
-    evaluate_momentum_g2,
-    evaluate_momentum_p1,
-    evaluate_momentum_p2,
-    evaluate_momentum_s1,
-    evaluate_momentum_s2,
+    evaluate_accumulation_c1,
+    evaluate_accumulation_c2,
+    evaluate_accumulation_c3,
+    evaluate_accumulation_g0,
+    evaluate_accumulation_g1,
+    evaluate_accumulation_g2,
+    evaluate_accumulation_g3,
+    evaluate_accumulation_g4_volume,
+    evaluate_accumulation_g5,
+    evaluate_accumulation_p1,
+    evaluate_accumulation_p2,
+    evaluate_accumulation_s1,
+    evaluate_accumulation_s2,
+    evaluate_breakout_c1,
+    evaluate_breakout_c2,
+    evaluate_breakout_c3,
+    evaluate_breakout_g1,
+    evaluate_breakout_g2,
+    evaluate_breakout_g3,
+    evaluate_breakout_g4_volume,
+    evaluate_breakout_g5_candle,
+    evaluate_breakout_g6_daily_change,
+    evaluate_breakout_g7_ma5,
+    evaluate_breakout_p1,
+    evaluate_breakout_p2,
+    evaluate_breakout_rs,
+    evaluate_breakout_s1,
+    evaluate_breakout_s2,
     evaluate_pullback_c1,
     evaluate_pullback_c2,
     evaluate_pullback_c3,
@@ -191,7 +212,7 @@ def summarize_top_recommendations(payload: dict[str, Any], *, limit: int = 3) ->
     slot = (payload.get("slots") or [{}])[0]
     entries = slot.get("entries") if isinstance(slot, dict) else {}
     rows: list[dict[str, Any]] = []
-    for strategy in ("pullback", "momentum", "reversal"):
+    for strategy in ("pullback", "accumulation", "breakout", "reversal"):
         for entry in entries.get(strategy) or []:
             if isinstance(entry, dict):
                 rows.append({
@@ -213,7 +234,13 @@ def print_variant_summary(run: dict[str, Any], analysis_date: date) -> None:
     quality = payload.get("dataQuality") if isinstance(payload.get("dataQuality"), dict) else {}
     status = str(quality.get("status") or "unknown")
     status_tone = step_tone(status.lower())
-    buy_count = len(payload["slots"][0]["entries"]["pullback"]) + len(payload["slots"][0]["entries"]["momentum"]) + len(payload["slots"][0]["entries"]["reversal"])
+    entries = payload["slots"][0]["entries"]
+    buy_count = (
+        len(entries.get("pullback") or [])
+        + len(entries.get("breakout") or entries.get("momentum") or [])
+        + len(entries.get("accumulation") or [])
+        + len(entries.get("reversal") or [])
+    )
     emit_cli_log(
         "DONE",
         (
@@ -954,7 +981,7 @@ def rebuild_entry_notes(entry: dict[str, Any], strategy: str) -> None:
     toss = entry.get("toss") or {}
     orderbook = entry.get("orderbook") or {}
     event_filter = entry.get("eventFilter") or {}
-    if strategy == "momentum":
+    if strategy in {"breakout", "momentum"}:
         if not is_entry_field_satisfied(entry, "toss.avgStrength"):
             notes.append("토스 체결강도 미반영")
         if not is_entry_field_satisfied(entry, "toss.intradayAbove100Ratio"):
@@ -1560,7 +1587,7 @@ def reversal_vkospi_multiplier(vkospi_proxy: float) -> float:
     return 0.9
 
 
-def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> tuple[str, str, str, str, str]:
+def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> tuple[str, str, str, str, str, str]:
     closes = [parse_float(row.get("closePrice")) for row in kospi_history]
     current_close = closes[0] if closes else 0.0
     ma20 = moving_average(closes, 20)
@@ -1571,16 +1598,16 @@ def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> t
     ma60_up = bool(ma60 and ma60_prev and ma60 > ma60_prev)
     ma60_flat = bool(ma60 and ma60_prev and abs(ma60 - ma60_prev) / ma60 < 0.003)
     if ma60 and current_close < ma60 and vkospi_proxy > 28:
-        return "약세장 ⛔", "none", "none", "금지", "비활성"
+        return "약세장 ⛔", "none", "none", "none", "금지", "비활성"
     if not ma60_up and vkospi_proxy > 32:
-        return "약세장 ⛔", "none", "none", "금지", "비활성"
+        return "약세장 ⛔", "none", "none", "none", "금지", "비활성"
     if vkospi_proxy > 30 and ma60 and current_close >= ma60:
-        return "박스권 ⚠️", "pullback", "momentum", "조건부", "활성"
+        return "박스권 ⚠️", "accumulation", "pullback", "breakout", "조건부", "활성"
     if ma60_up and ma20_up and vkospi_proxy < 20:
-        return "강세장 ✅", "momentum", "pullback", "적극", "활성"
+        return "강세장 ✅", "breakout", "pullback", "accumulation", "적극", "활성"
     if ma60_flat and vkospi_proxy <= 25:
-        return "순환매장 🔄", "momentum", "pullback", "제한", "제한 활성"
-    return "박스권 ⚠️", "pullback", "momentum", "조건부", "활성"
+        return "순환매장 🔄", "breakout", "pullback", "accumulation", "제한", "제한 활성"
+    return "박스권 ⚠️", "accumulation", "pullback", "breakout", "조건부", "활성"
 
 
 def build_market_context(
@@ -1611,12 +1638,16 @@ def build_market_context(
     ma20_up = bool(ma20 and moving_average(closes, 20, 1) and ma20 > moving_average(closes, 20, 1))
     ma60_prev = moving_average(closes, 60, 1)
     ma60_up = bool(ma60 and ma60_prev and ma60 > ma60_prev)
-    regime_label, primary_strategy, secondary_strategy, swing_mode, reversal_track = decide_regime(kospi_history, resolved_vkospi["current"])
+    regime_label, primary_strategy, secondary_strategy, tertiary_strategy, swing_mode, reversal_track = decide_regime(
+        kospi_history, resolved_vkospi["current"]
+    )
     context: dict[str, Any] = {
         "technicalRegimeLabel": regime_label,
         "regimeLabel": regime_label,
         "primaryStrategy": primary_strategy,
         "secondaryStrategy": secondary_strategy,
+        "tertiaryStrategy": tertiary_strategy,
+        "strategySlotLimits": slot_limits_for_regime(regime_label),
         "swingMode": swing_mode,
         "reversalTrack": reversal_track,
         "openingBet": "활성" if regime_label in {"강세장 ✅", "순환매장 🔄"} else "비활성",
@@ -1641,8 +1672,11 @@ def build_market_context(
 
 
 def build_regime_block(context: dict[str, Any], market_snapshot: dict[str, Any] | None = None) -> dict[str, Any]:
-    primary = {"momentum": "수급매집형", "pullback": "눌림목", "none": "없음"}[context["primaryStrategy"]]
-    secondary = {"momentum": "수급매집형", "pullback": "눌림목", "none": "없음"}[context["secondaryStrategy"]]
+    primary = strategy_display_name(context["primaryStrategy"])
+    secondary = strategy_display_name(context["secondaryStrategy"])
+    tertiary = strategy_display_name(context.get("tertiaryStrategy") or "none")
+    limits = context.get("strategySlotLimits") or slot_limits_for_regime(context.get("regimeLabel") or "")
+    slot_note = f"돌파 {limits.get('breakout', 0)} · 매집 {limits.get('accumulation', 0)} · 눌림 {limits.get('pullback', 0)}"
     technical = str(context.get("technicalRegimeLabel") or context["regimeLabel"])
     effective = str(context.get("effectiveRegimeLabel") or context["regimeLabel"])
     table = [
@@ -1650,7 +1684,8 @@ def build_regime_block(context: dict[str, Any], market_snapshot: dict[str, Any] 
         {"item": "기술 레짐", "value": technical},
         {"item": "KOSPI", "value": f"{context['kospiClose']:.2f} ({signed_number(context['kospiChangePct'], 2, '%')})"},
         {"item": "VKOSPI", "value": f"{context['vkospiLabel']} {context['vkospiValue']:.2f}"},
-        {"item": "진입 전략", "value": f"메인={primary} / 서브={secondary}"},
+        {"item": "진입 전략", "value": f"메인={primary} / 서브={secondary} / 보조={tertiary}"},
+        {"item": "추천 슬롯", "value": slot_note},
         {"item": "스윙 전환 활성도", "value": context["swingMode"]},
         {"item": "시가베팅", "value": context["openingBet"]},
         {"item": "역추세 트랙", "value": context["reversalTrack"]},
@@ -1719,13 +1754,20 @@ def build_trade_plan(strategy: str, entry_price: float, regime_label: str, gap_c
             premarket, open_target, intraday, stop = 2.0 + gap_offset, 3.0 + gap_offset, 6.5, -2.0 + min(gap_offset, 0.0)
         else:
             premarket, open_target, intraday, stop = 1.5 + gap_offset, 2.5 + gap_offset, 3.0, -1.5 + min(gap_offset, 0.0)
-    elif strategy == "momentum":
+    elif strategy in {"breakout", "momentum"}:
         if regime_label.startswith("강세장"):
             premarket, open_target, intraday, stop = 4.0 + gap_offset, 7.0 + gap_offset, 15.0, -4.0 + min(gap_offset, 0.0)
         elif regime_label.startswith("박스권"):
             premarket, open_target, intraday, stop = 3.0 + gap_offset, 5.0 + gap_offset, 10.0, -3.0 + min(gap_offset, 0.0)
         else:
             premarket, open_target, intraday, stop = 2.0 + gap_offset, 4.0 + gap_offset, 5.0, -2.0 + min(gap_offset, 0.0)
+    elif strategy == "accumulation":
+        if regime_label.startswith("강세장"):
+            premarket, open_target, intraday, stop = 3.0 + gap_offset, 4.5 + gap_offset, 9.0, -3.0 + min(gap_offset, 0.0)
+        elif regime_label.startswith("박스권"):
+            premarket, open_target, intraday, stop = 2.0 + gap_offset, 3.0 + gap_offset, 6.5, -2.0 + min(gap_offset, 0.0)
+        else:
+            premarket, open_target, intraday, stop = 1.5 + gap_offset, 2.5 + gap_offset, 3.0, -1.5 + min(gap_offset, 0.0)
     else:
         premarket, open_target, intraday, stop = 3.0, 4.5, 8.0, -3.0 + min(gap_offset, 0.0)
 
@@ -1761,7 +1803,7 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
     toss_chart_url = f"https://www.tossinvest.com/stocks/A{snapshot.code}/chart"
     kind_disclosure_url = "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain"
     auto_event_filter_ready = is_snapshot_field_satisfied(snapshot, "eventFilter")
-    if strategy == "momentum":
+    if strategy in {"breakout", "momentum"}:
         fields: list[dict[str, Any]] = []
         if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
             fields.append({
@@ -1930,30 +1972,41 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     return finalize_scored_buy_entry(entry)
 
 
-def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_top10: bool, kospi_return_5d: float, kospi_return_20d: float) -> dict[str, Any]:
-    manual_input = build_manual_input_meta("momentum", snapshot)
+def build_breakout_entry(
+    snapshot: StockSnapshot,
+    context: dict[str, Any],
+    rs_top10: bool,
+    kospi_return_5d: float,
+    kospi_return_20d: float,
+) -> dict[str, Any]:
+    daily_change_pct = stock_daily_change(snapshot)
+    manual_input = build_manual_input_meta("breakout", snapshot)
     score_map = {
-        "RS": evaluate_momentum_rs(rs_top10),   # 3개월 상대강도 쭄점 항목
-        "S1": evaluate_momentum_s1(snapshot),
-        "S2": evaluate_momentum_s2(snapshot),
-        "P1": evaluate_momentum_p1(snapshot),
-        "P2": evaluate_momentum_p2(snapshot),
-        "C1": evaluate_momentum_c1(snapshot),
-        "C2": evaluate_momentum_c2(snapshot, candle_range, upper_wick_ratio),
-        "C3": evaluate_momentum_c3(snapshot),
+        "RS": evaluate_breakout_rs(rs_top10),
+        "S1": evaluate_breakout_s1(snapshot),
+        "S2": evaluate_breakout_s2(snapshot),
+        "P1": evaluate_breakout_p1(snapshot),
+        "P2": evaluate_breakout_p2(snapshot),
+        "C1": evaluate_breakout_c1(snapshot),
+        "C2": evaluate_breakout_c2(snapshot, candle_range, upper_wick_ratio),
+        "C3": evaluate_breakout_c3(snapshot),
     }
     gates = [
-        gate_dict("G1", evaluate_momentum_g1(snapshot, kospi_return_5d, kospi_return_20d)),  # 구 G2
-        gate_dict("G2", evaluate_momentum_g2(snapshot)),                                     # 구 G3
-        gate_dict("G3", evaluate_momentum_g3(snapshot)),                                      # 구 G4 -> TOP100
+        gate_dict("G1", evaluate_breakout_g1(snapshot, kospi_return_5d, kospi_return_20d)),
+        gate_dict("G2", evaluate_breakout_g2(snapshot)),
+        gate_dict("G3", evaluate_breakout_g3(snapshot)),
+        gate_dict("G4", evaluate_breakout_g4_volume(snapshot)),
+        gate_dict("G5", evaluate_breakout_g5_candle(snapshot, candle_range, upper_wick_ratio)),
+        gate_dict("G6", evaluate_breakout_g6_daily_change(snapshot, daily_change_pct)),
+        gate_dict("G7", evaluate_breakout_g7_ma5(snapshot)),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
-    trade_plan = build_trade_plan("momentum", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    trade_plan = build_trade_plan("breakout", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
     scoring = apply_buy_scoring(
-        strategy="momentum",
+        strategy="breakout",
         score_map=score_map,
-        weights=MOMENTUM_WEIGHTS,
-        strict_max=MOMENTUM_STRICT_MAX,
+        weights=BREAKOUT_WEIGHTS,
+        strict_max=BREAKOUT_STRICT_MAX,
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
         snapshot=snapshot,
     )
@@ -1964,7 +2017,7 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "code": snapshot.code,
         **scoring,
         "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
-        "strategy": "momentum",
+        "strategy": "breakout",
         "gates": gates,
         "matchedRules": matched_rules,
         "unmatchedRules": unmatched_rules,
@@ -1972,7 +2025,10 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "keyPoint": f"상대강도 상위 여부와 돌파 지속성을 공개 데이터로 계산했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
+        "keyPoint": (
+            f"주도주 돌파형 — RS·거래량·강마감·5MA 추세를 점검했습니다. "
+            f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주."
+        ),
         "notes": [],
         "toss": snapshot.toss or {},
         "orderbook": snapshot.orderbook or {},
@@ -1981,7 +2037,74 @@ def build_momentum_entry(snapshot: StockSnapshot, context: dict[str, Any], rs_to
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
         "source": "jongga-live",
     }
-    rebuild_entry_notes(entry, "momentum")
+    rebuild_entry_notes(entry, "breakout")
+    return finalize_scored_buy_entry(entry)
+
+
+def build_momentum_entry(
+    snapshot: StockSnapshot,
+    context: dict[str, Any],
+    rs_top10: bool,
+    kospi_return_5d: float,
+    kospi_return_20d: float,
+) -> dict[str, Any]:
+    return build_breakout_entry(snapshot, context, rs_top10, kospi_return_5d, kospi_return_20d)
+
+
+def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
+    daily_change_pct = stock_daily_change(snapshot)
+    manual_input = build_manual_input_meta("accumulation", snapshot)
+    score_map = {
+        "S1": evaluate_accumulation_s1(snapshot),
+        "S2": evaluate_accumulation_s2(snapshot),
+        "P1": evaluate_accumulation_p1(snapshot),
+        "P2": evaluate_accumulation_p2(snapshot),
+        "C1": evaluate_accumulation_c1(snapshot),
+        "C2": evaluate_accumulation_c2(snapshot, daily_change_pct),
+        "C3": evaluate_accumulation_c3(snapshot, context),
+    }
+    gates = [
+        gate_dict("G0", evaluate_accumulation_g0(snapshot)),
+        gate_dict("G1", evaluate_accumulation_g1(snapshot)),
+        gate_dict("G2", evaluate_accumulation_g2(snapshot)),
+        gate_dict("G3", evaluate_accumulation_g3(snapshot)),
+        gate_dict("G4", evaluate_accumulation_g4_volume(snapshot)),
+        evaluate_accumulation_g5(context),
+    ]
+    matched_rules, unmatched_rules = split_rule_lists(score_map)
+    trade_plan = build_trade_plan("accumulation", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    scoring = apply_buy_scoring(
+        strategy="accumulation",
+        score_map=score_map,
+        weights=ACCUMULATION_SCORE_WEIGHTS,
+        strict_max=ACCUMULATION_STRICT_MAX,
+        vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
+    )
+    grade = scoring["grade"]
+    entry = {
+        "rank": 0,
+        "name": snapshot.name,
+        "code": snapshot.code,
+        **scoring,
+        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
+        "strategy": "accumulation",
+        "gates": gates,
+        "matchedRules": matched_rules,
+        "unmatchedRules": unmatched_rules,
+        **build_price_change_meta(snapshot),
+        "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
+        "entryPrice": round(snapshot.current_price),
+        "entryMeta": "당일 종가 기준",
+        "keyPoint": (
+            f"수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름을 점검했습니다. "
+            f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주."
+        ),
+        "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
+        "manualInput": manual_input,
+        "tradePlanRows": trade_plan,
+        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), parse_float(trade_plan[0]["targetYield"])),
+        "source": "jongga-live",
+    }
     return finalize_scored_buy_entry(entry)
 
 
@@ -2238,16 +2361,36 @@ def collect_live_payload(
             emit_cli_failures("토스 API 보강 실패", http_errors)
 
     scoring_started_at = perf_counter()
-    pullback_entries = sorted((build_pullback_entry(snapshot, context) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
-    momentum_entries = sorted((build_momentum_entry(snapshot, context, relative_strength_rank(snapshot, universe_returns), kospi_return_5d, kospi_return_20d) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
-    reversal_entries = sorted((build_reversal_entry(snapshot, context) for snapshot in snapshots), key=lambda entry: entry["score"], reverse=True)[:3]
+    slot_limits = context.get("strategySlotLimits") or slot_limits_for_regime(context.get("regimeLabel") or "")
+    pullback_entries = rank_buy_entries([build_pullback_entry(snapshot, context) for snapshot in snapshots])[
+        : slot_limits.get("pullback", 3)
+    ]
+    breakout_entries = rank_buy_entries(
+        [
+            build_breakout_entry(
+                snapshot,
+                context,
+                relative_strength_rank(snapshot, universe_returns),
+                kospi_return_5d,
+                kospi_return_20d,
+            )
+            for snapshot in snapshots
+        ]
+    )[: slot_limits.get("breakout", 3)]
+    accumulation_entries = rank_buy_entries([build_accumulation_entry(snapshot, context) for snapshot in snapshots])[
+        : slot_limits.get("accumulation", 3)
+    ]
+    reversal_entries = rank_buy_entries([build_reversal_entry(snapshot, context) for snapshot in snapshots])[:3]
 
     log_step(
         "entry_scoring",
         "전략별 후보 계산",
         scoring_started_at,
-        detail=f"pullback {len(pullback_entries)}, momentum {len(momentum_entries)}, reversal {len(reversal_entries)}",
-        count=len(pullback_entries) + len(momentum_entries) + len(reversal_entries),
+        detail=(
+            f"pullback {len(pullback_entries)}, breakout {len(breakout_entries)}, "
+            f"accumulation {len(accumulation_entries)}, reversal {len(reversal_entries)}"
+        ),
+        count=len(pullback_entries) + len(breakout_entries) + len(accumulation_entries) + len(reversal_entries),
     )
 
     kind_candidates = [
@@ -2278,7 +2421,7 @@ def collect_live_payload(
         if browser_errors:
             emit_cli_failures("카나리 KIND 브라우저 실패" if resolved_mode == VARIANT_CANARY else "KIND 브라우저 실패", browser_errors)
 
-    all_entries = pullback_entries + momentum_entries + reversal_entries
+    all_entries = pullback_entries + breakout_entries + accumulation_entries + reversal_entries
     missing_public_metrics = sum(1 for entry in all_entries if entry.get("notes"))
     fallback_keys = ["vkospi"] if live_metrics["vkospi"]["isFallback"] else []
     manual_keys: list[str] = []
@@ -2357,7 +2500,8 @@ def collect_live_payload(
                 "gapScore": gap_score,
                 "entries": {
                     "pullback": assign_ranks(pullback_entries),
-                    "momentum": assign_ranks(momentum_entries),
+                    "breakout": assign_ranks(breakout_entries),
+                    "accumulation": assign_ranks(accumulation_entries),
                     "reversal": assign_ranks(reversal_entries),
                     "swing": [],
                 },

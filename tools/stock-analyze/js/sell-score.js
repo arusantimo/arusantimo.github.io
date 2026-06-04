@@ -153,7 +153,9 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
   const stopPrice = resolveNonSwingFollowUpStopPrice(ruleSet, payload);
   const stopRatio = getStopProximityRatio(data.currentPrice, stopPrice);
   const stageRatio = getSellStageScoreRatio(stage);
-  const weakStrength = Number.isFinite(data.strength) ? data.strength < (stock.type === 'momentum' ? 100 : 80) : false;
+  const weakStrength = Number.isFinite(data.strength)
+    ? data.strength < ((stock.type === 'breakout' || stock.type === 'momentum') ? 100 : 80)
+    : false;
   const gapTriggered = hasTriggeredSellRule(ruleSet, 'P1') || hasTriggeredSellRule(ruleSet, 'W1');
   const ma5Triggered = hasTriggeredSellRule(ruleSet, 'W2');
   const wyckoffInfo = typeof getSellWyckoffScoreInfo === 'function'
@@ -186,7 +188,7 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
     }),
     buildSellScoreItem({
       code: 'S-S4',
-      label: stock.type === 'momentum' ? '갭/프리마켓 보수운용' : '갭 경고',
+      label: (stock.type === 'breakout' || stock.type === 'momentum') ? '갭/프리마켓 보수운용' : '갭 경고',
       points: gapTriggered ? weights.gap : 0,
       maxPoints: weights.gap,
       triggered: gapTriggered,

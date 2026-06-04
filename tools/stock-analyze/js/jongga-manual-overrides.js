@@ -206,7 +206,7 @@ function updateManualOverrideNotes(notes, strategy, override, appliedLabels) {
   if (!appliedLabels.length) return filteredNotes;
 
   const missing = [];
-  if (strategy === 'momentum') {
+  if (strategy === 'breakout' || strategy === 'momentum') {
     if (!isManualOverrideFinite(override?.toss?.avgStrength) || !isManualOverrideFinite(override?.toss?.intradayAbove100Ratio)) missing.push('토스 체결강도');
     if (!isManualOverrideFinite(override?.orderbook?.bidAskRatio)) missing.push('호가잔량');
   }
@@ -260,7 +260,7 @@ function applyJonggaManualOverridesToRawEntry(rawEntry, strategy, context = {}) 
   if (Number.isFinite(override.orderbook.bidAskRatio)) next.orderbook.bidAskRatio = override.orderbook.bidAskRatio;
   if (normalizeManualOverrideText(override.orderbook.note)) next.orderbook.note = override.orderbook.note;
 
-  if (strategy === 'momentum') {
+  if (strategy === 'breakout' || strategy === 'momentum') {
     const tossPass = Number.isFinite(override.toss.avgStrength) && Number.isFinite(override.toss.intradayAbove100Ratio)
       ? override.toss.avgStrength >= 110 && override.toss.intradayAbove100Ratio >= 70
       : null;
@@ -353,7 +353,7 @@ function applyJonggaManualOverridesToPayload(payload) {
   const processSlot = slot => {
     const entries = slot?.entries;
     if (!entries || typeof entries !== 'object') return;
-    ['pullback', 'momentum', 'reversal'].forEach(strategy => {
+    ['pullback', 'breakout', 'momentum', 'accumulation', 'reversal'].forEach(strategy => {
       if (!Array.isArray(entries[strategy])) return;
       entries[strategy] = entries[strategy].map(entry => applyJonggaManualOverridesToRawEntry(entry, strategy, { slot, root: next, regime: slot.regime || next.regime }));
     });

@@ -223,7 +223,8 @@ renderSellStockCards = function renderSellStockCardsOverride() {
 
   renderGroup(groups.swing, 'list-swing', 'swing');
   renderGroup(groups.pullback, 'list-pullback', 'pullback');
-  renderGroup(groups.momentum, 'list-momentum', 'momentum');
+  renderGroup(groups.breakout, 'list-breakout', 'breakout');
+  renderGroup(groups.accumulation, 'list-accumulation', 'accumulation');
   renderGroup(groups.reversal, 'list-reversal', 'reversal');
   renderVisibleSellDetails();
 };
@@ -286,7 +287,8 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
 
   const snapshot = getActiveBuySnapshot();
   renderGroup(snapshot.pullbackEntries, 'buy-list-pullback');
-  renderGroup(snapshot.momentumEntries, 'buy-list-momentum');
+  renderGroup(snapshot.breakoutEntries || snapshot.momentumEntries, 'buy-list-breakout');
+  renderGroup(snapshot.accumulationEntries || [], 'buy-list-accumulation');
   renderGroup(snapshot.reversalEntries, 'buy-list-reversal');
 };
 
@@ -791,9 +793,11 @@ openModal = function openModalOverride(codeOrEntryKey, mode = 'sell') {
     ? '🔄 스윙 보유'
     : detail.stock.type === 'pullback'
       ? '📊 눌림목 종가베팅'
-      : detail.stock.type === 'momentum'
+      : detail.stock.type === 'accumulation'
         ? '🔥 수급 매집형 종가베팅'
-        : '🔻 주도주 급락 반등';
+        : (detail.stock.type === 'breakout' || detail.stock.type === 'momentum')
+          ? '🚀 주도주 돌파형 종가베팅'
+          : '🔻 주도주 급락 반등';
   document.getElementById('modal-body').innerHTML = buildSellModalBody(detail);
   document.getElementById('modal-overlay').classList.add('open');
   syncBodyScrollLock();

@@ -12,7 +12,7 @@ try:
     KST = ZoneInfo("Asia/Seoul")
 except ZoneInfoNotFoundError:
     KST = timezone(timedelta(hours=9), name="KST")
-STRATEGY_ORDER = ("pullback", "momentum", "reversal", "swing")
+STRATEGY_ORDER = ("pullback", "accumulation", "breakout", "reversal", "swing")
 VARIANT_STABLE = "stable"
 VARIANT_CANARY = "canary"
 VARIANT_LABELS = {
@@ -216,7 +216,10 @@ def iter_buy_entries(payload: dict[str, Any]):
         if not isinstance(entries, dict):
             continue
         for strategy in STRATEGY_ORDER:
-            for entry in entries.get(strategy) or []:
+            bucket = entries.get(strategy) or []
+            if strategy == "breakout" and not bucket:
+                bucket = entries.get("momentum") or []
+            for entry in bucket:
                 if isinstance(entry, dict):
                     yield strategy, entry
 

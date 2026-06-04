@@ -72,6 +72,8 @@ function createEmptySnapshot() {
     regimeAdjustmentReason: '',
     gapScore: createEmptyGapScore(),
     pullbackEntries: [],
+    breakoutEntries: [],
+    accumulationEntries: [],
     momentumEntries: [],
     reversalEntries: [],
     swingEntries: [],

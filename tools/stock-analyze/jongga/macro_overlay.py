@@ -6,6 +6,8 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from jongga.strategy_regime import slot_limits_for_regime
+
 MARKET_ANALYZE_RELATIVE = Path("market-analyze") / "store" / "results" / "latest.js"
 MARKET_RESULT_GLOBAL = "__MARKET_ANALYZE_RESULT__"
 
@@ -135,14 +137,14 @@ def _is_technical_soft_regime(regime_label: str) -> bool:
     return label.startswith("약세장") or label.startswith("박스권") or label.startswith("순환매장")
 
 
-def _regime_tuple(label: str) -> tuple[str, str, str, str, str]:
+def _regime_tuple(label: str) -> tuple[str, str, str, str, str, str]:
     if label.startswith("강세장"):
-        return "강세장 ✅", "momentum", "pullback", "적극", "활성"
+        return "강세장 ✅", "breakout", "pullback", "accumulation", "적극", "활성"
     if label.startswith("순환매장"):
-        return "순환매장 🔄", "momentum", "pullback", "제한", "제한 활성"
+        return "순환매장 🔄", "breakout", "pullback", "accumulation", "제한", "제한 활성"
     if label.startswith("박스권"):
-        return "박스권 ⚠️", "pullback", "momentum", "조건부", "활성"
-    return "약세장 ⛔", "none", "none", "금지", "비활성"
+        return "박스권 ⚠️", "accumulation", "pullback", "breakout", "조건부", "활성"
+    return "약세장 ⛔", "none", "none", "none", "금지", "비활성"
 
 
 def compute_effective_regime_label(
@@ -198,7 +200,7 @@ def apply_regime_fields_to_context(
     rise_justified = is_rise_justified_by_macro(snapshot, analysis_date)
     kospi_tier = classify_kospi_bull_tier(context)
     effective, adjustment_note = compute_effective_regime_label(technical, rise_justified, kospi_tier)
-    _, primary, secondary, swing_mode, reversal_track = _regime_tuple(effective)
+    _, primary, secondary, tertiary, swing_mode, reversal_track = _regime_tuple(effective)
     meta = market_analyze_meta(snapshot)
     reason = build_regime_adjustment_reason(snapshot, rise_justified, kospi_tier, adjustment_note)
     context.update(
@@ -211,6 +213,8 @@ def apply_regime_fields_to_context(
             "kospiBullTier": kospi_tier,
             "primaryStrategy": primary,
             "secondaryStrategy": secondary,
+            "tertiaryStrategy": tertiary,
+            "strategySlotLimits": slot_limits_for_regime(effective),
             "swingMode": swing_mode,
             "reversalTrack": reversal_track,
             "openingBet": "활성" if effective.startswith("강세장") or effective.startswith("순환매장") else "비활성",

@@ -7,7 +7,9 @@
       "Skill(agent-browser:*)",
       "Bash(npx -y http-server -p 8899 --cors -c-1)",
       "Bash(agent-browser open *)",
-      "Bash(agent-browser snapshot *)"
+      "Bash(agent-browser snapshot *)",
+      "Bash(python3 -m pytest jongga/tests/ -v)",
+      "Bash(python3.14 -m unittest discover -s jongga/tests -p \"test_*.py\" -v)"
     ]
   }
 }

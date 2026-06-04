@@ -172,7 +172,8 @@ function isSellStockVisible(stock, universeMode = getSellUniverseMode(stock?.slo
 
 function getSellStocksByType(type, slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
   const normalizedSlotId = normalizeSlotId(slotId);
-  return (stocks[type] || [])
+  const stockType = type === 'momentum' ? 'breakout' : type;
+  return (stocks[stockType] || [])
     .filter(stock => stock.slotId === normalizedSlotId)
     .map(stock => ensureStockIdentity(stock, normalizedSlotId))
     .filter(stock => isSellStockVisible(stock, universeMode));
@@ -182,25 +183,38 @@ function getVisibleSellStockCollections(slotId = activeSellSlot, universeMode = 
   return {
     swing: getSellStocksByType('swing', slotId, universeMode),
     pullback: getSellStocksByType('pullback', slotId, universeMode),
-    momentum: getSellStocksByType('momentum', slotId, universeMode),
+    breakout: getSellStocksByType('breakout', slotId, universeMode),
+    accumulation: getSellStocksByType('accumulation', slotId, universeMode),
     reversal: getSellStocksByType('reversal', slotId, universeMode)
   };
 }
 
 function getVisibleSellStocksList(slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
   const collections = getVisibleSellStockCollections(slotId, universeMode);
-  return [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
+  return [
+    ...collections.swing,
+    ...collections.pullback,
+    ...collections.breakout,
+    ...collections.accumulation,
+    ...collections.reversal
+  ];
 }
 
 function getAllSellStocks() {
-  return ['swing', 'pullback', 'momentum', 'reversal']
+  return ['swing', 'pullback', 'breakout', 'accumulation', 'reversal']
     .flatMap(type => stocks[type] || [])
     .map(stock => ensureStockIdentity(stock, stock.slotId));
 }
 
 function getSellStocksForAnalysis(isBefore0908, slotId = activeSellSlot, universeMode = getSellUniverseMode(slotId)) {
   const collections = getVisibleSellStockCollections(slotId, universeMode);
-  return [...collections.swing, ...collections.pullback, ...collections.momentum, ...collections.reversal];
+  return [
+    ...collections.swing,
+    ...collections.pullback,
+    ...collections.breakout,
+    ...collections.accumulation,
+    ...collections.reversal
+  ];
 }
 
 function getSellStocksForCurrentSellView(isBefore0908 = false, slotId = activeSellSlot) {
@@ -242,9 +256,11 @@ function rebuildSellStocksFromSnapshots() {
   NOTION_SLOT_IDS.forEach(slotId => {
     const snapshot = getSlotSnapshot(slotId);
     const manualPullback = (stocks.pullback || []).filter(stock => stock.manual && stock.slotId === slotId);
-    const manualMomentum = (stocks.momentum || []).filter(stock => stock.manual && stock.slotId === slotId);
+    const manualBreakout = (stocks.breakout || stocks.momentum || []).filter(stock => stock.manual && stock.slotId === slotId);
+    const manualAccumulation = (stocks.accumulation || []).filter(stock => stock.manual && stock.slotId === slotId);
     const manualReversal = (stocks.reversal || []).filter(stock => stock.manual && stock.slotId === slotId);
     const manualSwing = (stocks.swing || []).filter(stock => stock.manual && stock.slotId === slotId);
+    const breakoutEntries = snapshot.breakoutEntries || snapshot.momentumEntries || [];
 
     replaceStocksForSlot(slotId, {
       pullback: [
@@ -257,16 +273,27 @@ function rebuildSellStocksFromSnapshots() {
         }, slotId)),
         ...manualPullback.filter(stock => !snapshot.pullbackEntries.some(entry => entry.code === stock.code))
       ],
-      momentum: [
-        ...snapshot.momentumEntries.map(entry => ensureStockIdentity({
+      breakout: [
+        ...breakoutEntries.map(entry => ensureStockIdentity({
           name: entry.name,
           code: entry.code,
-          type: 'momentum',
-          strategy: 'momentum',
+          type: 'breakout',
+          strategy: 'breakout',
           source: entry.source || 'strategy-data'
         }, slotId)),
-        ...manualMomentum.filter(stock => !snapshot.momentumEntries.some(entry => entry.code === stock.code))
+        ...manualBreakout.filter(stock => !breakoutEntries.some(entry => entry.code === stock.code))
       ],
+      accumulation: [
+        ...(snapshot.accumulationEntries || []).map(entry => ensureStockIdentity({
+          name: entry.name,
+          code: entry.code,
+          type: 'accumulation',
+          strategy: 'accumulation',
+          source: entry.source || 'strategy-data'
+        }, slotId)),
+        ...manualAccumulation.filter(stock => !(snapshot.accumulationEntries || []).some(entry => entry.code === stock.code))
+      ],
+      momentum: [],
       reversal: [
         ...snapshot.reversalEntries.map(entry => ensureStockIdentity({
           name: entry.name,

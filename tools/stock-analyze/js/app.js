@@ -65,7 +65,8 @@ function handleManualAdd(type, nameInputId, codeInputId) {
 }
 
 document.getElementById('btn-add-pullback').addEventListener('click', () => handleManualAdd('pullback', 'pullback-name', 'pullback-code'));
-document.getElementById('btn-add-momentum').addEventListener('click', () => handleManualAdd('momentum', 'momentum-name', 'momentum-code'));
+document.getElementById('btn-add-breakout')?.addEventListener('click', () => handleManualAdd('breakout', 'breakout-name', 'breakout-code'));
+document.getElementById('btn-add-accumulation')?.addEventListener('click', () => handleManualAdd('accumulation', 'accumulation-name', 'accumulation-code'));
 document.getElementById('btn-add-reversal').addEventListener('click', () => handleManualAdd('reversal', 'reversal-name', 'reversal-code'));
 document.getElementById('btn-add-swing').addEventListener('click', () => {
   const name = document.getElementById('swing-name').value.trim();
@@ -178,8 +179,9 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
       return;
     }
 
-    const sellCount = collections.swing.length + collections.pullback.length + collections.momentum.length + collections.reversal.length;
-    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${stocksToAnalyze.length}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 수급 ${collections.momentum.length}, 급락반등 ${collections.reversal.length})`);
+    const sellCount = collections.swing.length + collections.pullback.length
+      + collections.breakout.length + collections.accumulation.length + collections.reversal.length;
+    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${stocksToAnalyze.length}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 돌파 ${collections.breakout.length}, 매집 ${collections.accumulation.length}, 급락반등 ${collections.reversal.length})`);
 
     for (const stock of stocksToAnalyze) {
       // 실매수 종목 모드에서는 추적 종목인지 한번 더 확인

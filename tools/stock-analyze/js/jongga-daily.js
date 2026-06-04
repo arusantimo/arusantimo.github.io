@@ -533,14 +533,16 @@ function renderJonggaHistoryItem(entry) {
 
   const STRATEGY_LABELS = {
     pullback: '⚡ 눌림목',
-    momentum: '🔥 수급매집',
+    breakout: '🚀 주도주 돌파',
+    accumulation: '🔥 수급 매집',
+    momentum: '🚀 주도주 돌파',
     reversal: '🔻 급락반등',
     swing: '🔄 스윙'
   };
   
   let recHtml = '';
   if (recommendations.length) {
-    const order = ['pullback', 'momentum', 'reversal', 'swing'];
+    const order = ['pullback', 'accumulation', 'breakout', 'momentum', 'reversal', 'swing'];
     const presentStrategies = order.filter(s => strategyGroups[s] && strategyGroups[s].length);
     Object.keys(strategyGroups).forEach(s => {
       if (!order.includes(s)) presentStrategies.push(s);
@@ -585,7 +587,14 @@ function renderJonggaHistoryItem(entry) {
 function renderJonggaHistoryRecommendation(item) {
   const score = Number.isFinite(Number(item.signalScore ?? item.score)) ? Number(item.signalScore ?? item.score).toFixed(1) : '-';
   const priceText = item.currentPrice ? `${Number(item.currentPrice).toLocaleString()}원` : '-';
-  const strategyText = ({ pullback: '눌림목', momentum: '수급', reversal: '반등', swing: '스윙' })[item.strategy] || item.strategy || '-';
+  const strategyText = ({
+    pullback: '눌림목',
+    breakout: '돌파',
+    accumulation: '매집',
+    momentum: '돌파',
+    reversal: '반등',
+    swing: '스윙'
+  })[item.strategy] || item.strategy || '-';
   const entryBadge = item.entryEligible === true
     ? '<span class="buy-entry-badge entry-ok">진입가능</span>'
     : (item.entryEligible === false ? '<span class="buy-entry-badge entry-blocked">진입불가</span>' : '');

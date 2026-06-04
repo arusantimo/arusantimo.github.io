@@ -85,7 +85,26 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
 - UI는 기술 레짐 vs 적용 레짐·거시 패널을 표시하고, 배포된 JSON의 `statusLabel`을 브라우저에서 재계산합니다.
 - **눌림목 G5**: 거시 정당·강세/순환 레짐이면 VKOSPI 30~70은 `⚠️`(매수 금지 아님), 30 이하는 `✅`, 70 초과만 `⛔`. 그 외는 VKOSPI 30 초과 시 `⛔`.
 - **듀얼 점수** (`jongga/scoring.py`): `signalScore`(부분 점수·모니터링), `strictScore`(이진·등급), `entryEligible`(진입 가능). `grade`는 strict를 10점 척도로 환산해 산출합니다. 전략 간 점수는 비교하지 않습니다.
-- **매수 등급 하한** ([`grade_policy.py`](grade_policy.py), [`js/config.js`](../js/config.js) `BUY_GRADE_MIN_SCORES`): 추세·눌림목·수급매집 S≥8.5 / A≥7.0 / B≥5.5, 역추세 S≥8.0 / A≥6.5 / B≥5.0 (이전 대비 0.5~1.0점 완화).
+- **매수 등급 하한** ([`grade_policy.py`](grade_policy.py), [`js/config.js`](../js/config.js) `BUY_GRADE_MIN_SCORES`): 추세·눌림목·돌파·매집 S≥8.5 / A≥7.0 / B≥5.5, 역추세 S≥8.0 / A≥6.5 / B≥5.0 (이전 대비 0.5~1.0점 완화).
+
+## 종가 추천 4트랙 (2026-06)
+
+| JSON 키 | 표시명 | 요약 |
+|---------|--------|------|
+| `pullback` | 눌림목 | 장기 추세 눌림 + 반등 |
+| `breakout` | 주도주 돌파형 | 52주 고가 ≥92%, 거래량 150%+, 강마감·양매수 (구 `momentum` → 읽기 alias) |
+| `accumulation` | 수급 매집형 | 52주 고가 &lt;92%, 거래량 축소·횡보 박스, 양매수 |
+| `reversal` | 급락 반등 | 역추세 단기 |
+
+**상호 배타**: 돌파 G2(52주 ≥92%) vs 매집 G2(&lt;92%) — 동일 종목이 양쪽 TOP에 동시 노출되지 않습니다.
+
+**레짐별 일일 슬롯 (TOP3 확정)**: 강세 3/3/3, 순환 2/3/2, 박스 1/3/3 (돌파/매집/눌림). `decide_regime`·[`strategy_regime.py`](strategy_regime.py) 참고.
+
+**돌파형 Gate (미충족 ⛔)**: G1 RS·G2 52주·G3 TOP100·G4 거래량 150%·G5 캔들·G6 당일 +12% 상한·G7 5MA 상승.
+
+**매집형 Gate**: G0 과거 거래량 급증·G1 60MA·G2 52주 &lt;92%·G3 TOP100·G4 당일 거래량 &lt;120%·G5 VKOSPI(눌림목 G5 재사용).
+
+산출 JSON은 `entries.breakout`·`entries.accumulation`을 씁니다. 과거 파일의 `entries.momentum`은 프론트 [`jongga-schema.js`](../js/jongga-schema.js)에서 `breakout`으로 정규화합니다.
 
 ## HTML 연결
 
@@ -110,21 +129,10 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
       "regime": { "table": [{ "item": "레짐", "value": "강세장" }] },
       "gapScore": { "grade": "G-B", "totalScore": "3.5" },
       "entries": {
-        "momentum": [
-          {
-            "rank": 1,
-            "name": "삼성전자",
-            "code": "005930",
-            "score": 8.1,
-            "grade": "A",
-            "gates": {
-              "G1": { "status": "passed" },
-              "G2": { "status": "passed" },
-              "G3": { "status": "passed" },
-              "G4": { "status": "passed" }
-            }
-          }
-        ]
+        "breakout": [],
+        "accumulation": [],
+        "pullback": [],
+        "reversal": []
       }
     }
   ]

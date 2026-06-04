@@ -255,18 +255,17 @@ def evaluate_pullback_c3(snapshot: Any, context: dict[str, Any]) -> EvalResult:
     return eval_not_met(f"{comparison_note} underperform")
 
 
-# --- Momentum ---
+# --- Breakout (주도주 돌파형) ---
 
 
-def evaluate_momentum_rs(rs_top10: bool) -> EvalResult:
+def evaluate_breakout_rs(rs_top10: bool) -> EvalResult:
     """3개월 상대강도 — 채점 항목 (상위 25% 충족 시 +1.5점)"""
     if rs_top10:
         return eval_met("3개월 상대강도 상위 25%")
     return eval_not_met("3개월 상대강도 상위 25% 밖")
 
 
-def evaluate_momentum_g1(snapshot: Any, kospi_return_5d: float, kospi_return_20d: float) -> EvalResult:
-    """구 G2 → 새 G1: 5일·20일 KOSPI 대비 초과 수익률 (둘 중 하나 이상)"""
+def evaluate_breakout_g1(snapshot: Any, kospi_return_5d: float, kospi_return_20d: float) -> EvalResult:
     excess_5 = snapshot.return_5d - kospi_return_5d
     excess_20 = snapshot.return_20d - kospi_return_20d
     note = f"5일 초과 {signed_pct(excess_5)} / 20일 초과 {signed_pct(excess_20)}"
@@ -275,8 +274,7 @@ def evaluate_momentum_g1(snapshot: Any, kospi_return_5d: float, kospi_return_20d
     return eval_not_met(note)
 
 
-def evaluate_momentum_g2(snapshot: Any) -> EvalResult:
-    """구 G3 → 새 G2: 52주 고가 대비 92% 이상"""
+def evaluate_breakout_g2(snapshot: Any) -> EvalResult:
     if not snapshot.high_52w:
         return eval_data_missing("52주 고가 데이터 부족")
     ratio = snapshot.current_price / snapshot.high_52w * 100
@@ -286,26 +284,69 @@ def evaluate_momentum_g2(snapshot: Any) -> EvalResult:
     return eval_not_met(note)
 
 
-def evaluate_momentum_s1(snapshot: Any) -> EvalResult:
-    note = f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주"
-    if snapshot.foreign_net > 0 or snapshot.institution_net > 0:
-        return eval_met(f"{note} · 외인/기관 중 순매수")
-    return eval_not_met(f"{note} · 양매도 (단독 매수 없음)")
-
-
-def evaluate_momentum_p1(snapshot: Any) -> EvalResult:
-    if not has_history(snapshot, 20):
-        return eval_data_missing("20일 고점 산출 데이터 부족")
-    if not snapshot.high_20d:
-        return eval_data_missing("20일 고점 데이터 부족")
-    ratio = snapshot.current_price / snapshot.high_20d * 100
-    note = f"20일 고점 대비 {ratio:.1f}% (필요 ≥ 95%)"
-    if snapshot.current_price >= snapshot.high_20d * 0.95:
+def evaluate_breakout_g3(snapshot: Any) -> EvalResult:
+    rank = int(getattr(snapshot, "rank", 0) or 0)
+    note = f"거래대금 TOP100 순위 {rank}"
+    if 0 < rank <= TOP_TRADING_VALUE_LIMIT:
         return eval_met(note)
     return eval_not_met(note)
 
 
-def evaluate_momentum_p2(snapshot: Any) -> EvalResult:
+def evaluate_breakout_g4_volume(snapshot: Any) -> EvalResult:
+    return evaluate_breakout_p2(snapshot)
+
+
+def evaluate_breakout_g5_candle(snapshot: Any, candle_range, upper_wick_ratio) -> EvalResult:
+    return evaluate_breakout_c2(snapshot, candle_range, upper_wick_ratio)
+
+
+def evaluate_breakout_g6_daily_change(snapshot: Any, daily_change_pct: float) -> EvalResult:
+    note = f"당일 등락 {signed_pct(daily_change_pct, 2)} (필요 ≤ +12%)"
+    if daily_change_pct <= 12.0:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_breakout_g7_ma5(snapshot: Any) -> EvalResult:
+    if snapshot.ma5 is None or snapshot.ma5_prev is None:
+        return eval_data_missing("5일 이동평균 산출 데이터 부족")
+    note = (
+        f"종가 {snapshot.current_price:,.0f} / 5MA {snapshot.ma5:,.0f} "
+        f"(전일 5MA {snapshot.ma5_prev:,.0f})"
+    )
+    if snapshot.current_price > snapshot.ma5 and snapshot.ma5 > snapshot.ma5_prev:
+        return eval_met(f"{note} · 5MA 위·우상향")
+    return eval_not_met(f"{note} · 5MA 조건 미충족")
+
+
+def evaluate_breakout_s1(snapshot: Any) -> EvalResult:
+    note = f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주"
+    if snapshot.foreign_net > 0 and snapshot.institution_net > 0:
+        return eval_met(f"{note} · 외인·기관 양매수")
+    return eval_not_met(f"{note} · 양매수 아님")
+
+
+def evaluate_breakout_p1(snapshot: Any) -> EvalResult:
+    if not has_history(snapshot, 20):
+        return eval_data_missing("20일 고점 산출 데이터 부족")
+    if not snapshot.high_20d:
+        return eval_data_missing("20일 고점 데이터 부족")
+    price = snapshot.current_price
+    high_20d = snapshot.high_20d
+    ratio = price / high_20d * 100
+    if price > high_20d:
+        extension = (price / high_20d - 1) * 100
+        note = f"20일 고점 돌파 · 이격 {extension:.1f}% (필요 ≤ +5%)"
+        if price <= high_20d * 1.05:
+            return eval_met(note)
+        return eval_not_met(note)
+    note = f"20일 고점 대비 {ratio:.1f}% (미돌파 시 필요 ≥ 95%)"
+    if ratio >= 95.0:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_breakout_p2(snapshot: Any) -> EvalResult:
     if not snapshot.volume_avg_20d:
         return eval_data_missing("20일 평균 거래량 산출 데이터 부족")
     ratio = snapshot.volume / snapshot.volume_avg_20d
@@ -315,7 +356,7 @@ def evaluate_momentum_p2(snapshot: Any) -> EvalResult:
     return eval_not_met(note)
 
 
-def evaluate_momentum_c1(snapshot: Any) -> EvalResult:
+def evaluate_breakout_c1(snapshot: Any) -> EvalResult:
     if not snapshot.high_price:
         return eval_data_missing("당일 고가 데이터 부족")
     ratio = snapshot.current_price / snapshot.high_price * 100
@@ -325,7 +366,7 @@ def evaluate_momentum_c1(snapshot: Any) -> EvalResult:
     return eval_not_met(note)
 
 
-def evaluate_momentum_c2(snapshot: Any, candle_range, upper_wick_ratio) -> EvalResult:
+def evaluate_breakout_c2(snapshot: Any, candle_range, upper_wick_ratio) -> EvalResult:
     span = candle_range(snapshot)
     if span <= 0:
         return eval_data_missing("당일 캔들 범위 데이터 부족")
@@ -337,7 +378,7 @@ def evaluate_momentum_c2(snapshot: Any, candle_range, upper_wick_ratio) -> EvalR
     return eval_not_met(note)
 
 
-def evaluate_momentum_s2(snapshot: Any) -> EvalResult:
+def evaluate_breakout_s2(snapshot: Any) -> EvalResult:
     toss = snapshot.toss or {}
     avg_strength = float(toss.get("avgStrength") or 0)
     intraday_ratio = float(toss.get("intradayAbove100Ratio") or 0)
@@ -355,7 +396,7 @@ def evaluate_momentum_s2(snapshot: Any) -> EvalResult:
     return eval_not_met(note)
 
 
-def evaluate_momentum_c3(snapshot: Any) -> EvalResult:
+def evaluate_breakout_c3(snapshot: Any) -> EvalResult:
     orderbook = snapshot.orderbook or {}
     bid_ask_ratio = float(orderbook.get("bidAskRatio") or 0)
     if bid_ask_ratio <= 0:
@@ -365,13 +406,128 @@ def evaluate_momentum_c3(snapshot: Any) -> EvalResult:
         return eval_met(f"{note} · 매수 잔량 우위")
     return eval_not_met(note)
 
-def evaluate_momentum_g3(snapshot: Any) -> EvalResult:
-    """새 G3 (구 G4): 거래대금 TOP100"""
-    rank = int(getattr(snapshot, "rank", 0) or 0)
-    note = f"거래대금 TOP100 순위 {rank}"
-    if 0 < rank <= 100:
+
+# Legacy momentum aliases
+evaluate_momentum_rs = evaluate_breakout_rs
+evaluate_momentum_g1 = evaluate_breakout_g1
+evaluate_momentum_g2 = evaluate_breakout_g2
+evaluate_momentum_g3 = evaluate_breakout_g3
+evaluate_momentum_s1 = evaluate_breakout_s1
+evaluate_momentum_p1 = evaluate_breakout_p1
+evaluate_momentum_p2 = evaluate_breakout_p2
+evaluate_momentum_c1 = evaluate_breakout_c1
+evaluate_momentum_c2 = evaluate_breakout_c2
+evaluate_momentum_s2 = evaluate_breakout_s2
+evaluate_momentum_c3 = evaluate_breakout_c3
+
+
+# --- Accumulation (수급 매집형) ---
+
+
+def evaluate_accumulation_g0(snapshot: Any) -> EvalResult:
+    today_any = snapshot.foreign_net > 0 or snapshot.institution_net > 0
+    prev_any = snapshot.foreign_previous > 0 or snapshot.institution_previous > 0
+    note = (
+        f"외인 전일 {snapshot.foreign_previous:+,.0f}/당일 {snapshot.foreign_net:+,.0f} · "
+        f"기관 전일 {snapshot.institution_previous:+,.0f}/당일 {snapshot.institution_net:+,.0f}"
+    )
+    if today_any and prev_any:
+        return eval_met(f"{note} · 2일 연속 수급 유입")
+    return eval_not_met(f"{note} · 2일 연속 수급 유입 미충족")
+
+
+def evaluate_accumulation_g1(snapshot: Any) -> EvalResult:
+    return evaluate_pullback_g2(snapshot)
+
+
+def evaluate_accumulation_g2(snapshot: Any) -> EvalResult:
+    if not snapshot.high_52w:
+        return eval_data_missing("52주 고가 데이터 부족")
+    ratio = snapshot.current_price / snapshot.high_52w * 100
+    note = f"52주 고가 대비 {ratio:.1f}% (필요 < 92%)"
+    if snapshot.current_price < snapshot.high_52w * 0.92:
         return eval_met(note)
     return eval_not_met(note)
+
+
+def evaluate_accumulation_g3(snapshot: Any) -> EvalResult:
+    return evaluate_breakout_g3(snapshot)
+
+
+def evaluate_accumulation_g4_volume(snapshot: Any) -> EvalResult:
+    if not snapshot.volume_avg_20d:
+        return eval_data_missing("20일 평균 거래량 산출 데이터 부족")
+    ratio = snapshot.volume / snapshot.volume_avg_20d
+    note = f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% (필요 < 120%)"
+    if ratio < 1.2:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_accumulation_g5(context: dict[str, Any]) -> dict[str, Any]:
+    return evaluate_pullback_g5(context)
+
+
+def evaluate_accumulation_s1(snapshot: Any) -> EvalResult:
+    note = f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주"
+    if snapshot.foreign_net > 0 and snapshot.institution_net > 0:
+        return eval_met(f"{note} · 외인·기관 양매수")
+    return eval_not_met(f"{note} · 양매수 아님")
+
+
+def evaluate_accumulation_s2(snapshot: Any) -> EvalResult:
+    note = (
+        f"외인 당일 {snapshot.foreign_net:,.0f} / 전일 {snapshot.foreign_previous:,.0f} · "
+        f"기관 당일 {snapshot.institution_net:,.0f} / 전일 {snapshot.institution_previous:,.0f}"
+    )
+    both_today = snapshot.foreign_net > 0 and snapshot.institution_net > 0
+    both_prev_positive = snapshot.foreign_previous >= 0 and snapshot.institution_previous >= 0
+    prev_either_buy = snapshot.foreign_previous > 0 or snapshot.institution_previous > 0
+    if both_prev_positive:
+        return eval_met(f"{note} · 2일 연속 순매수 흐름")
+    if both_today and prev_either_buy:
+        return eval_met(f"{note} · 당일 양매수 + 전일 수급 유지")
+    return eval_not_met(f"{note} · 수급 개선 미확인")
+
+
+def evaluate_accumulation_p1(snapshot: Any) -> EvalResult:
+    if snapshot.ma20 is None:
+        return eval_data_missing("20일 이동평균 산출 데이터 부족")
+    ratio = snapshot.current_price / snapshot.ma20 * 100
+    note = f"종가 / 20MA {ratio:.1f}% (필요 98~102%)"
+    if snapshot.ma20 * 0.98 <= snapshot.current_price <= snapshot.ma20 * 1.02:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_accumulation_p2(snapshot: Any) -> EvalResult:
+    if snapshot.ma5 is None or snapshot.ma20 is None:
+        return eval_data_missing("5/20일 이동평균 산출 데이터 부족")
+    note = f"5MA {snapshot.ma5:,.0f} / 20MA {snapshot.ma20:,.0f}"
+    if snapshot.ma5 > snapshot.ma20:
+        return eval_met(f"{note} · 5MA > 20MA")
+    return eval_not_met(f"{note} · 정배열 미충족")
+
+
+def evaluate_accumulation_c1(snapshot: Any) -> EvalResult:
+    if not snapshot.volume_avg_5d:
+        return eval_data_missing("5일 평균 거래량 산출 데이터 부족")
+    ratio = snapshot.volume / snapshot.volume_avg_5d
+    note = f"당일 거래량 / 5일 평균 {ratio * 100:.0f}% (필요 ≤ 90%)"
+    if ratio <= 0.9:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_accumulation_c2(snapshot: Any, daily_change_pct: float) -> EvalResult:
+    note = f"당일 등락 {signed_pct(daily_change_pct, 2)} (필요 -3% ~ +5%)"
+    if -3.0 <= daily_change_pct <= 5.0:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_accumulation_c3(snapshot: Any, context: dict[str, Any]) -> EvalResult:
+    return evaluate_pullback_c3(snapshot, context)
 
 
 # --- Reversal filters & gates ---

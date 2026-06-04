@@ -138,10 +138,14 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
     entries = slot.get("entries") if isinstance(slot, dict) else {}
     counts = {
         "pullback": len(entries.get("pullback") or []),
-        "momentum": len(entries.get("momentum") or []),
+        "breakout": len(entries.get("breakout") or entries.get("momentum") or []),
+        "accumulation": len(entries.get("accumulation") or []),
         "reversal": len(entries.get("reversal") or []),
     }
-    emit("OK", f"stable 품질={status} · 눌림목 {counts['pullback']} · 수급 {counts['momentum']} · 급락반등 {counts['reversal']}")
+    emit(
+        "OK",
+        f"stable 품질={status} · 눌림목 {counts['pullback']} · 돌파 {counts['breakout']} · 매집 {counts['accumulation']} · 급락반등 {counts['reversal']}",
+    )
     emit("FILE", f"jongga/output/{month_folder}/jongga_data_{compact}.js")
     emit("FILE", "jongga/output/latest.json (레거시 브리지)")
     emit("UI", "tools/stock-analyze/index.html")

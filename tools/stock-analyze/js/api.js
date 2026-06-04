@@ -461,7 +461,10 @@ async function loadNotionSlot(slotId, urlInput) {
   const sourceText = buildSourceTextFromNotion(data);
   const snapshot = parseNotionSnapshotFromText(sourceText);
   const decoratedSnapshot = decorateSnapshotEntries(normalizedSlotId, snapshot);
-  const totalBuy = decoratedSnapshot.pullbackEntries.length + decoratedSnapshot.momentumEntries.length + decoratedSnapshot.reversalEntries.length;
+  const totalBuy = decoratedSnapshot.pullbackEntries.length
+    + (decoratedSnapshot.breakoutEntries || decoratedSnapshot.momentumEntries).length
+    + (decoratedSnapshot.accumulationEntries || []).length
+    + decoratedSnapshot.reversalEntries.length;
   const totalSell = totalBuy + decoratedSnapshot.swingEntries.length;
 
   setNotionPageState(normalizedSlotId, {

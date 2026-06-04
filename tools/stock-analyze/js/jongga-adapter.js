@@ -271,7 +271,9 @@ function buildSnapshotFromJonggaSlot(slot, root = {}) {
   snapshot.regimeAdjustmentReason = regime.regimeAdjustmentReason || macroContext.regimeAdjustmentReason || '';
   snapshot.gapScore = gapScore;
   snapshot.pullbackEntries = collections.pullback.map((entry, index) => normalizeJonggaEntry(entry, 'pullback', index + 1, context));
-  snapshot.momentumEntries = collections.momentum.map((entry, index) => normalizeJonggaEntry(entry, 'momentum', index + 1, context));
+  snapshot.breakoutEntries = collections.breakout.map((entry, index) => normalizeJonggaEntry(entry, 'breakout', index + 1, context));
+  snapshot.accumulationEntries = collections.accumulation.map((entry, index) => normalizeJonggaEntry(entry, 'accumulation', index + 1, context));
+  snapshot.momentumEntries = snapshot.breakoutEntries;
   snapshot.reversalEntries = collections.reversal.map((entry, index) => normalizeJonggaEntry(entry, 'reversal', index + 1, context));
   snapshot.swingEntries = collections.swing.map((entry, index) => normalizeJonggaSwingEntry(entry, index + 1));
   snapshot.sourceText = JSON.stringify({ schemaVersion: root.schemaVersion, slotId: slot.slotId || 'slotA' });

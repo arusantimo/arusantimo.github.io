@@ -5,7 +5,8 @@ from datetime import date
 from types import SimpleNamespace
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_auto_event_filter, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
@@ -680,7 +681,7 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(c3_rule["evalStatus"], "met")
         self.assertIn("114.0%", s2_rule["note"])
         self.assertIn("1.5", c3_rule["note"])
-        self.assertEqual(entry["scoreMax"], 12.5)
+        self.assertEqual(entry["scoreMax"], 11.5)
         self.assertIn("strictScore", entry)
         self.assertIn("signalScore", entry)
         self.assertIn("scoreBreakdown", entry)
@@ -904,12 +905,126 @@ class GenerateLatestTest(unittest.TestCase):
                 "slotId": "slotA",
                 "entries": {
                     "pullback": [{"name": "낮은점수", "code": "000010", "score": 6.1, "grade": "B", "statusLabel": "관심후보"}],
-                    "momentum": [{"name": "높은점수", "code": "000020", "score": 8.7, "grade": "A", "statusLabel": "매수추천"}],
+                    "breakout": [{"name": "높은점수", "code": "000020", "score": 8.7, "grade": "A", "statusLabel": "매수추천"}],
                     "reversal": [],
                     "swing": [],
                 },
             }],
         }
+
+
+    def test_breakout_and_accumulation_g2_are_mutually_exclusive(self):
+        def make_snapshot(*, price: float, high_52w: float) -> StockSnapshot:
+            return StockSnapshot(
+                rank=10,
+                code="005930",
+                name="테스트",
+                current_price=price,
+                prev_close=price * 0.99,
+                open_price=price * 0.98,
+                high_price=price * 1.01,
+                low_price=price * 0.97,
+                volume=1000.0,
+                trading_value_text="1,000억",
+                market_cap_trillion=10.0,
+                foreign_net=1000.0,
+                institution_net=500.0,
+                foreign_previous=0.0,
+                institution_previous=0.0,
+                close_history=[price] * 21,
+                high_history=[price * 1.02] * 21,
+                low_history=[price * 0.97] * 21,
+                volume_history=[800.0] * 21,
+                ma5=price * 0.99,
+                ma10=price * 0.98,
+                ma20=price * 0.97,
+                ma60=price * 0.95,
+                ma5_prev=price * 0.98,
+                ma20_prev=price * 0.96,
+                ma60_prev=price * 0.94,
+                weekly_rsi=55.0,
+                macd_hist=[0.1],
+                high_20d=price * 1.05,
+                low_5d=price * 0.95,
+                high_52w=high_52w,
+                return_5d=5.0,
+                return_20d=10.0,
+                return_21d=11.0,
+                volume_avg_5d=700.0,
+                volume_avg_20d=800.0,
+                industry_code="307",
+                industry_compare_change_pct=1.0,
+                industry_compare_count=5,
+                intraday_30m={"available": False},
+                event_filter=None,
+                toss={},
+                orderbook={},
+            )
+
+        near_high = make_snapshot(price=92000.0, high_52w=100000.0)
+        self.assertTrue(evaluate_breakout_g2(near_high).passed)
+        self.assertFalse(evaluate_accumulation_g2(near_high).passed)
+
+        quiet = make_snapshot(price=80000.0, high_52w=100000.0)
+        self.assertFalse(evaluate_breakout_g2(quiet).passed)
+        self.assertTrue(evaluate_accumulation_g2(quiet).passed)
+
+    def test_build_momentum_entry_is_breakout_alias(self):
+        snapshot = StockSnapshot(
+            rank=5,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9700.0,
+            high_price=10100.0,
+            low_price=9650.0,
+            volume=300.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=10.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[10000.0] * 21,
+            high_history=[10100.0] * 21,
+            low_history=[9600.0] * 21,
+            volume_history=[300.0, 120.0] + [100.0] * 19,
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3],
+            high_20d=10100.0,
+            low_5d=9600.0,
+            high_52w=10500.0,
+            return_5d=7.0,
+            return_20d=25.0,
+            return_21d=26.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={"avgStrength": 114.0, "intradayAbove100Ratio": 82.0},
+            orderbook={"bidAskRatio": 1.5},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+        }
+        alias_entry = build_momentum_entry(snapshot, context, True, 1.0, 5.0)
+        breakout_entry = build_breakout_entry(snapshot, context, True, 1.0, 5.0)
+        self.assertEqual(alias_entry.get("strategy"), "breakout")
+        self.assertEqual(breakout_entry.get("strategy"), "breakout")
+        self.assertEqual(alias_entry.get("code"), breakout_entry.get("code"))
 
 
 if __name__ == "__main__":

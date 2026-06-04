@@ -1,8 +1,10 @@
 const JONGGA_SCHEMA_VERSION = 'jongga_result.v1';
-const JONGGA_BUY_STRATEGIES = ['pullback', 'momentum', 'reversal'];
+const JONGGA_BUY_STRATEGIES = ['pullback', 'accumulation', 'breakout', 'reversal'];
 const JONGGA_REQUIRED_RULES = {
   pullback: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5'],
-  momentum: ['G1', 'G2', 'G3'],  // G1=초과수익률(구G2), G2=52주고가(구G3), G3=거래대금(구G4) / RS는 채점 항목
+  breakout: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'],
+  momentum: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'],
+  accumulation: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5'],
   reversal: ['F1', 'F2', 'F3', 'F4', 'G1', 'G2', 'G3', 'G4', 'G5']
 };
 
@@ -13,7 +15,10 @@ function asJonggaArray(value) {
 function normalizeJonggaStrategy(value) {
   const text = String(value || '').trim().toLowerCase();
   if (['pullback', 'trend_pullback', 'strategy1', 'strategy_1'].includes(text)) return 'pullback';
-  if (['momentum', 'supply_momentum', 'strategy2', 'strategy_2'].includes(text)) return 'momentum';
+  if (['breakout', 'leader_breakout', 'momentum', 'supply_momentum', 'strategy2', 'strategy_2'].includes(text)) {
+    return 'breakout';
+  }
+  if (['accumulation', 'supply_accumulation'].includes(text)) return 'accumulation';
   if (['reversal', 'leader_reversal', 'strategy3', 'strategy_3'].includes(text)) return 'reversal';
   if (['swing', 'holding'].includes(text)) return 'swing';
   return text;
@@ -21,9 +26,12 @@ function normalizeJonggaStrategy(value) {
 
 function getJonggaEntryCollections(slot = {}) {
   const entries = slot.entries || slot.candidates || slot.recommendations || slot;
+  const legacyBreakout = entries.breakout || entries.momentum || entries.momentumEntries;
   return {
     pullback: asJonggaArray(entries.pullback || entries.pullbackEntries),
-    momentum: asJonggaArray(entries.momentum || entries.momentumEntries),
+    breakout: asJonggaArray(legacyBreakout),
+    momentum: asJonggaArray(legacyBreakout),
+    accumulation: asJonggaArray(entries.accumulation || entries.accumulationEntries),
     reversal: asJonggaArray(entries.reversal || entries.reversalEntries),
     swing: asJonggaArray(entries.swing || entries.swingEntries)
   };

@@ -105,7 +105,7 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
     }));
   }
 
-  if (stock.type === 'momentum' && data.currentPrice > 0 && data.openPrice > 0) {
+  if ((stock.type === 'breakout' || stock.type === 'momentum') && data.currentPrice > 0 && data.openPrice > 0) {
     const openRecovery = data.currentPrice >= data.openPrice;
     rules.push(createSellRule({
       code: 'P2',
@@ -435,7 +435,7 @@ function buildIndicators(stock, data, isBefore0908) {
   }
 
   const stageLabel = '통합 매도 분석';
-  const stageDesc = stock.type === 'momentum'
+  const stageDesc = (stock.type === 'breakout' || stock.type === 'momentum')
     ? '매도 단계 판정 + 하드 손절/보조 경고 검증 + 시가 회복 여부 점검'
     : '매도 단계 판정 + 하드 손절/보조 경고 검증';
   indicators.push({
@@ -506,7 +506,7 @@ function buildIndicators(stock, data, isBefore0908) {
   }
 
   if (data.strength !== null && data.strength !== undefined) {
-    const threshold = stock.type === 'momentum' ? 100 : 80;
+    const threshold = (stock.type === 'breakout' || stock.type === 'momentum') ? 100 : 80;
     const weakStr = data.strength < threshold;
     indicators.push({
       title: '체결강도 점검',

@@ -18,6 +18,8 @@ function createEmptySnapshot() {
       note: ''
     },
     pullbackEntries: [],
+    breakoutEntries: [],
+    accumulationEntries: [],
     momentumEntries: [],
     reversalEntries: [],
     swingEntries: [],
@@ -35,7 +37,9 @@ function loadJonggaContext() {
     getBuyGradeFromScore(score, strategy = 'pullback') {
       const maps = {
         pullback: { S: 8.5, A: 7.0, B: 5.5 },
+        breakout: { S: 8.5, A: 7.0, B: 5.5 },
         momentum: { S: 8.5, A: 7.0, B: 5.5 },
+        accumulation: { S: 8.5, A: 7.0, B: 5.5 },
         reversal: { S: 8.0, A: 6.5, B: 5.0 }
       };
       const thresholds = maps[strategy] || maps.pullback;
@@ -57,7 +61,12 @@ function loadJonggaContext() {
     function getAllBuyEntries() {
       return NOTION_SLOT_IDS.flatMap(slotId => {
         const snapshot = getSlotSnapshot(slotId);
-        return [...snapshot.pullbackEntries, ...snapshot.momentumEntries, ...snapshot.reversalEntries];
+        return [
+          ...snapshot.pullbackEntries,
+          ...(snapshot.breakoutEntries || snapshot.momentumEntries),
+          ...(snapshot.accumulationEntries || []),
+          ...snapshot.reversalEntries
+        ];
       });
     }
   `, context);
@@ -139,15 +148,16 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(count, 1);
   assert.equal(snapshot.regimeTable[0].value, '강세장');
   assert.equal(snapshot.gapScore.grade, 'G-B');
-  assert.equal(snapshot.momentumEntries[0].entryKey, 'slotA:momentum:005930');
-  assert.equal(snapshot.momentumEntries[0].source, 'jongga-json');
-  assert.equal(snapshot.momentumEntries[0].dailyChangePct, 1.71);
-  assert.equal(snapshot.momentumEntries[0].dailyChange, 1200);
-  const momentum = snapshot.momentumEntries[0];
-  assert.equal(momentum.signalScore, 8.4);
-  assert.equal(momentum.strictScore, 8.1);
-  assert.equal(momentum.scoreMax, 12.5);
-  assert.equal(momentum.score, 8.4);
-  assert.equal(momentum.entryEligible, true);
-  assert.equal(momentum.scoreBreakdown.length, 1);
+  const breakout = snapshot.breakoutEntries[0];
+  assert.equal(breakout.entryKey, 'slotA:breakout:005930');
+  assert.equal(breakout.source, 'jongga-json');
+  assert.equal(breakout.dailyChangePct, 1.71);
+  assert.equal(breakout.dailyChange, 1200);
+  assert.equal(breakout.signalScore, 8.4);
+  assert.equal(breakout.strictScore, 8.1);
+  assert.equal(breakout.scoreMax, 12.5);
+  assert.equal(breakout.score, 8.4);
+  assert.equal(breakout.entryEligible, true);
+  assert.equal(breakout.scoreBreakdown.length, 1);
+  assert.deepEqual(snapshot.momentumEntries, snapshot.breakoutEntries);
 });

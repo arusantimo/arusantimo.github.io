@@ -260,15 +260,15 @@ function renderRegimeSummary() {
 function renderGuideTables() {
   document.getElementById('guide-regime-table').innerHTML = `
     <table class="guide-table">
-      <thead><tr><th>상태</th><th>조건</th><th>눌림목</th><th>수급매집형</th></tr></thead>
+      <thead><tr><th>상태</th><th>조건</th><th>눌림목</th><th>돌파형</th><th>매집형</th></tr></thead>
       <tbody>
-        ${RULE_GUIDE.regimes.map(row => `<tr><td>${escapeHtml(row.state)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.pullback)}</td><td>${escapeHtml(row.momentum)}</td></tr>`).join('')}
+        ${RULE_GUIDE.regimes.map(row => `<tr><td>${escapeHtml(row.state)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.pullback)}</td><td>${escapeHtml(row.breakout)}</td><td>${escapeHtml(row.accumulation)}</td></tr>`).join('')}
       </tbody>
     </table>
   `;
 
   document.getElementById('guide-grade-table').innerHTML = `
-    <div class="guide-subtitle">추세 추종 전략 (눌림목·수급매집형)</div>
+    <div class="guide-subtitle">추세 추종 전략 (눌림목·돌파형·매집형)</div>
     <table class="guide-table">
       <thead><tr><th>등급</th><th>점수</th><th>의미</th></tr></thead>
       <tbody>
@@ -598,7 +598,8 @@ function renderSellStockCards() {
   };
 
   renderGroup(stocks.pullback, 'list-pullback');
-  renderGroup(stocks.momentum, 'list-momentum');
+  renderGroup(stocks.breakout, 'list-breakout');
+  renderGroup(stocks.accumulation, 'list-accumulation');
   renderGroup(stocks.reversal, 'list-reversal');
   renderSwingCards();
 }
@@ -705,7 +706,8 @@ function renderBuyStockCards() {
   };
 
   renderGroup(notionSnapshot.pullbackEntries, 'buy-list-pullback');
-  renderGroup(notionSnapshot.momentumEntries, 'buy-list-momentum');
+  renderGroup(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries, 'buy-list-breakout');
+  renderGroup(notionSnapshot.accumulationEntries || [], 'buy-list-accumulation');
   renderGroup(notionSnapshot.reversalEntries, 'buy-list-reversal');
 }
 
@@ -724,8 +726,12 @@ function renderAll() {
 
 function updateAnalyzeButtonState() {
   const analyzeBtn = document.getElementById('btn-analyze');
-  const hasBuyEntries = notionSnapshot.pullbackEntries.length > 0 || notionSnapshot.momentumEntries.length > 0 || notionSnapshot.reversalEntries.length > 0;
-  const hasSellStocks = stocks.pullback.length > 0 || stocks.momentum.length > 0 || stocks.reversal.length > 0 || stocks.swing.length > 0;
+  const hasBuyEntries = notionSnapshot.pullbackEntries.length > 0
+    || (notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries).length > 0
+    || (notionSnapshot.accumulationEntries || []).length > 0
+    || notionSnapshot.reversalEntries.length > 0;
+  const hasSellStocks = stocks.pullback.length > 0 || stocks.breakout.length > 0
+    || stocks.accumulation.length > 0 || stocks.reversal.length > 0 || stocks.swing.length > 0;
   analyzeBtn.disabled = isAnalysisRunning || (activeTab === 'buy' ? !hasBuyEntries : !hasSellStocks);
 }
 
@@ -746,7 +752,7 @@ function updateCurrentTime() {
   const ss = now.getSeconds().toString().padStart(2, '0');
   const totalMins = now.getHours() * 60 + now.getMinutes();
   const isBefore = totalMins < (9 * 60 + 8);
-  const label = isBefore ? '[1차 분석] 9:08 이전 (수급 매집형 손절 점검)' : '[2차 분석] 9:08 이후 (전체 매도/손절 분석)';
+  const label = isBefore ? '[1차 분석] 9:08 이전 (돌파형 시초가 점검)' : '[2차 분석] 9:08 이후 (전체 매도/손절 분석)';
   const scheduleHint = getAnalyzerTabScheduleHint(now);
   const el = document.getElementById('current-time-display');
   if (el) {
@@ -769,7 +775,8 @@ function updateCurrentTime() {
     return;
   }
 
-  const hasSellResult = [...stocks.pullback, ...stocks.momentum, ...stocks.swing].some(stock => stockDetailMap[stock.code]?.mode === 'sell');
+  const hasSellResult = [...stocks.pullback, ...stocks.breakout, ...stocks.accumulation, ...stocks.swing]
+    .some(stock => stockDetailMap[stock.code]?.mode === 'sell');
   analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차' : '2차'} ${hasSellResult ? '다시 분석' : '분석 시작'}${archiveSuffix}`;
 }
 function setActiveTab(tab) {
@@ -1008,9 +1015,9 @@ function openRegimeReport() {
 
       <div class="modal-section-label" style="margin-top:18px">전략 우선순위</div>
       <table class="guide-table">
-        <thead><tr><th>레짐</th><th>눌림목</th><th>수급매집형</th></tr></thead>
+        <thead><tr><th>레짐</th><th>눌림목</th><th>돌파형</th><th>매집형</th></tr></thead>
         <tbody>
-          ${regimeChecks.map(r => `<tr style="${r.isMatch ? 'background:rgba(16,185,129,0.08)' : ''}"><td>${escapeHtml(r.state)}</td><td>${escapeHtml(r.pullback)}</td><td>${escapeHtml(r.momentum)}</td></tr>`).join('')}
+          ${regimeChecks.map(r => `<tr style="${r.isMatch ? 'background:rgba(16,185,129,0.08)' : ''}"><td>${escapeHtml(r.state)}</td><td>${escapeHtml(r.pullback)}</td><td>${escapeHtml(r.breakout)}</td><td>${escapeHtml(r.accumulation)}</td></tr>`).join('')}
         </tbody>
       </table>
 
@@ -1224,7 +1231,14 @@ function openModal(codeOrEntryKey, mode = 'sell') {
     const { stock, data, indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, isBefore0908, gapProfile } = detail;
     document.getElementById('modal-name').textContent = stock.name;
     document.getElementById('modal-code').textContent = stock.code;
-    document.getElementById('modal-type').textContent = stock.type === 'swing' ? '🔄 스윙 보유' : stock.type === 'pullback' ? '📊 눌림목 종가베팅' : '🔥 수급 매집형 종가베팅';
+    const typeLabel = stock.type === 'swing'
+      ? '🔄 스윙 보유'
+      : stock.type === 'pullback'
+        ? '📊 눌림목 종가베팅'
+        : stock.type === 'accumulation'
+          ? '🔥 수급 매집형 종가베팅'
+          : '🚀 주도주 돌파형 종가베팅';
+    document.getElementById('modal-type').textContent = typeLabel;
 
     const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
     const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
@@ -1408,22 +1422,35 @@ const STRATEGY_INFO_CONTENT = {
       </ul>
     `
   },
-  momentum: {
-    title: '타입 2: 수급 매집형 종가베팅 (전략 ②)',
-    subtitle: '"시장의 대세 상승 주도주에 올라탄다"',
+  breakout: {
+    title: '주도주 돌파형 종가베팅',
+    subtitle: '"주도주의 전고점·신고가 돌파 직후, 수급이 따라붙을 때"',
     body: `
-      <p><strong>개념:</strong> 시장에서 가장 강한 상승 모멘텀을 보여주는 주도주가 전고점을 돌파하거나 신고가를 경신하기 직전/직후에 매수하는 돌파 매매 전략입니다.</p>
-      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
+      <p><strong>개념:</strong> 시장 대비 강한 주도주가 52주·20일 고점권을 돌파하고 거래량·강마감·양매수가 확인될 때 종가에 진입하는 전략입니다. 돌파 후 +5% 이내·당일 +12% 이하로 상따 구간을 배제합니다.</p>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">핵심 Gate:</div>
       <ul style="padding-left: 20px; margin-top: 8px;">
-        <li><strong>초강세:</strong> 3개월 기준 시장 대비 초과수익률(RS)이 상위 10% 이내여야 합니다.</li>
-        <li><strong>신고가 영역:</strong> 52주 신고가를 경신했거나, 52주 고점의 92% 이상 고가권에 위치해야 합니다.</li>
-        <li><strong>단기 상승세:</strong> 종가가 5일선 위에 있고 5일선이 위를 향하고 있어야 합니다.</li>
+        <li>RS·초과수익·52주 92% 이상·거래대금 TOP100</li>
+        <li>거래량 150% 이상, 윗꼬리 억제, 5MA 위·우상향</li>
+        <li>외인·기관 양매수 (S1)</li>
       </ul>
-      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">채점 및 최종 선정:</div>
+      <p style="margin-top:12px">TOP3는 strictScore 우선으로 정렬됩니다.</p>
+    `
+  },
+  momentum: {
+    title: '주도주 돌파형 종가베팅 (레거시 키)',
+    subtitle: '"breakout과 동일"',
+    body: `<p>이 전략은 <strong>주도주 돌파형(breakout)</strong>으로 이전되었습니다. 설명은 돌파형 안내를 참고하세요.</p>`
+  },
+  accumulation: {
+    title: '수급 매집형 종가베팅',
+    subtitle: '"조용히 쌓이는 구간에서 수급이 먼저 들어올 때"',
+    body: `
+      <p><strong>개념:</strong> 장기 추세는 유지되지만 52주 고점권(92% 이상)에 있지 않고, 거래량이 줄어든 횡보·눌림 구간에서 외인·기관이 연속 매수하는 종목을 종가에 매수합니다. 돌파형과 Gate G2로 상호 배타됩니다.</p>
+      <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">핵심 Gate:</div>
       <ul style="padding-left: 20px; margin-top: 8px;">
-        <li><strong>기관과 외국인이 동시에 강하게 매수(양매수)</strong>하고 있는지 봅니다.</li>
-        <li>토스 증권의 실시간 호가창 데이터를 통해 분당 체결강도 평균이 100% 이상으로 유지(매수세가 계속 유입)되는지 확인합니다.</li>
-        <li>돌파 당일 거래량이 평소(20일 평균)보다 150% 이상 폭발했는지 점수를 매겨 등급을 산출합니다.</li>
+        <li>52주 고가 &lt; 92%, 거래량 &lt; 20일 평균 120%</li>
+        <li>60MA 위, 과거 거래량 급증 이력, VKOSPI(눌림목 G5)</li>
+        <li>20MA 98~102% 박스, 5MA&gt;20MA, 당일 등락 -3%~+5%</li>
       </ul>
     `
   },

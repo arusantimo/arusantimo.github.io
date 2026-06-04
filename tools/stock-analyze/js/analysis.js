@@ -13,11 +13,25 @@ function rebuildSellStocksFromSnapshot() {
       strategy: 'pullback',
       source: entry.source || 'strategy-data'
     }, activeSellSlot)),
-    momentum: visibleSnapshot.momentumEntries.map(entry => ensureStockIdentity({
+    breakout: (visibleSnapshot.breakoutEntries || visibleSnapshot.momentumEntries).map(entry => ensureStockIdentity({
       name: entry.name,
       code: entry.code,
-      type: 'momentum',
-      strategy: 'momentum',
+      type: 'breakout',
+      strategy: 'breakout',
+      source: entry.source || 'strategy-data'
+    }, activeSellSlot)),
+    accumulation: (visibleSnapshot.accumulationEntries || []).map(entry => ensureStockIdentity({
+      name: entry.name,
+      code: entry.code,
+      type: 'accumulation',
+      strategy: 'accumulation',
+      source: entry.source || 'strategy-data'
+    }, activeSellSlot)),
+    momentum: (visibleSnapshot.breakoutEntries || visibleSnapshot.momentumEntries).map(entry => ensureStockIdentity({
+      name: entry.name,
+      code: entry.code,
+      type: 'breakout',
+      strategy: 'breakout',
       source: entry.source || 'strategy-data'
     }, activeSellSlot)),
     reversal: visibleSnapshot.reversalEntries.map(entry => ensureStockIdentity({
@@ -44,7 +58,8 @@ function getVisibleBuyEntries(slotId = activeBuySlot) {
   const snapshot = getSlotSnapshot(slotId);
   return [
     ...snapshot.pullbackEntries,
-    ...snapshot.momentumEntries,
+    ...(snapshot.breakoutEntries || snapshot.momentumEntries),
+    ...(snapshot.accumulationEntries || []),
     ...snapshot.reversalEntries
   ].map(entry => ensureEntryIdentity(entry, slotId));
 }
@@ -308,12 +323,12 @@ function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile
     });
   }
 
-  if (stock.type === 'momentum' && isBefore0908 && data.currentPrice > 0 && data.openPrice > 0) {
+  if ((stock.type === 'breakout' || stock.type === 'momentum') && isBefore0908 && data.currentPrice > 0 && data.openPrice > 0) {
     const openRecovery = data.currentPrice >= data.openPrice;
     rejections.push({
       code: 'R3',
-      title: '수급매집형 시초가 미회복 (9:08 이전)',
-      criterion: '수급 매집형은 9:08 이전 시초가 하락 전환 시 50% 정리를 권장합니다.\n기준: 현재가 < 시가',
+      title: '돌파형 시초가 미회복 (9:08 이전)',
+      criterion: '주도주 돌파형은 9:08 이전 시초가 하락 전환 시 50% 정리를 권장합니다.\n기준: 현재가 < 시가',
       triggered: !openRecovery,
       result: !openRecovery
         ? `시초가 미회복 (현재가 ${data.currentPrice.toLocaleString()} < 시가 ${data.openPrice.toLocaleString()}) → 50% 추가 정리`
@@ -795,19 +810,20 @@ function buildIndicators(stock, data, isBefore0908) {
     return { indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile };
   }
 
-  if (stock.type === 'pullback' && isBefore0908) {
+  if ((stock.type === 'pullback' || stock.type === 'accumulation') && isBefore0908) {
+    const waitLabel = stock.type === 'accumulation' ? '수급 매집형' : '눌림목';
     indicators.push({
       title: '분석 단계',
-      criterion: '눌림목 베팅은 9시 8분 이후에 매도/손절 분석이 시작됩니다.\n현재는 대기 상태입니다.',
+      criterion: `${waitLabel} 베팅은 9시 8분 이후에 매도/손절 분석이 시작됩니다.\n현재는 대기 상태입니다.`,
       status: 'unknown',
-      result: '1차: 눌림목 베팅 분석 대기 중 (9:08 이후 시작)'
+      result: `1차: ${waitLabel} 베팅 분석 대기 중 (9:08 이후 시작)`
     });
     return { indicators, decision: 'hold', actionStage: 'wait', triggeredRule: null, targets, gainRate, gapProfile };
   }
 
   const stageLabel = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
-  const stageDesc = stock.type === 'momentum' && isBefore0908
-    ? '수급 매집형: 시초가 하락 전환 시 50% 추가 정리 + 손절 점검'
+  const stageDesc = (stock.type === 'breakout' || stock.type === 'momentum') && isBefore0908
+    ? '주도주 돌파형: 시초가 하락 전환 시 50% 추가 정리 + 손절 점검'
     : '매도 단계 판정 + 손절 조건(R1~R4) 검증';
   indicators.push({
     title: '분석 단계',
@@ -889,7 +905,7 @@ function buildIndicators(stock, data, isBefore0908) {
   }
 
   if (data.strength !== null && data.strength !== undefined) {
-    const threshold = stock.type === 'momentum' ? 100 : 80;
+    const threshold = (stock.type === 'breakout' || stock.type === 'momentum') ? 100 : 80;
     const weakStr = data.strength < threshold;
     indicators.push({
       title: '체결강도 점검',

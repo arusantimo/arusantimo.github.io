@@ -24,12 +24,15 @@ function normalizeCodeKey(value) {
   return String(value ?? '').trim();
 }
 
-const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'momentum', 'reversal', 'swing']);
+const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'breakout', 'accumulation', 'momentum', 'reversal', 'swing']);
 
 function normalizeEntryStrategyKey(strategy) {
   const text = String(strategy || '').trim().toLowerCase();
   if (['pullback', 'trend_pullback', 'strategy1', 'strategy_1'].includes(text)) return 'pullback';
-  if (['momentum', 'supply_momentum', 'strategy2', 'strategy_2'].includes(text)) return 'momentum';
+  if (['breakout', 'leader_breakout', 'momentum', 'supply_momentum', 'strategy2', 'strategy_2'].includes(text)) {
+    return 'breakout';
+  }
+  if (['accumulation', 'supply_accumulation'].includes(text)) return 'accumulation';
   if (['reversal', 'leader_reversal', 'strategy3', 'strategy_3'].includes(text)) return 'reversal';
   if (['swing', 'holding'].includes(text)) return 'swing';
   return '';
@@ -177,7 +180,7 @@ function decorateSnapshotEntries(slotId, snapshot = createEmptySnapshot()) {
   const nextSnapshot = snapshot;
   nextSnapshot.slotId = normalizedSlotId;
 
-  ['pullbackEntries', 'momentumEntries', 'reversalEntries', 'swingEntries'].forEach(key => {
+  ['pullbackEntries', 'breakoutEntries', 'accumulationEntries', 'momentumEntries', 'reversalEntries', 'swingEntries'].forEach(key => {
     if (!Array.isArray(nextSnapshot[key])) nextSnapshot[key] = [];
     nextSnapshot[key] = nextSnapshot[key].map(entry => {
       const normalized = { ...entry };
@@ -214,6 +217,8 @@ function createDefaultNotionPages() {
 function createStockCollections() {
   return {
     pullback: [],
+    breakout: [],
+    accumulation: [],
     momentum: [],
     reversal: [],
     swing: []

@@ -1,6 +1,8 @@
 const STRATEGY_LABELS = {
   pullback: '눌림목',
-  momentum: '수급매집형',
+  breakout: '주도주 돌파형',
+  accumulation: '수급 매집형',
+  momentum: '주도주 돌파형',
   reversal: '급락 반등',
   manual: '직접 입력'
 };
@@ -296,7 +298,7 @@ function collectRecommendedManualEntries() {
   const merged = {};
   payload.slots.forEach(slot => {
     const entries = slot?.entries || {};
-    ['pullback', 'momentum', 'reversal'].forEach(strategy => {
+    ['pullback', 'breakout', 'accumulation', 'momentum', 'reversal'].forEach(strategy => {
       (Array.isArray(entries[strategy]) ? entries[strategy] : []).forEach(rawEntry => {
         if (!rawEntry?.manualInput?.required) return;
         merged[rawEntry.code] = mergeRecommendedEntry(merged[rawEntry.code], rawEntry, strategy);
