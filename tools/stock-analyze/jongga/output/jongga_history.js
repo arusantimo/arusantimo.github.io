@@ -5,7 +5,7 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/202606/jongga_data_20260604.js",
     "jsonFile": "jongga/output/202606/latest_20260604.json",
-    "generatedAt": "2026-06-04T05:52:06+00:00",
+    "generatedAt": "2026-06-04T06:07:08+00:00",
     "status": "partial",
     "buyCount": 9,
     "topRecommendations": [
@@ -16,7 +16,16 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 8.4,
         "grade": "A",
         "statusLabel": "매수추천",
-        "currentPrice": 247500
+        "currentPrice": 247000
+      },
+      {
+        "strategy": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 247000
       },
       {
         "strategy": "reversal",
@@ -28,13 +37,13 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 535000
       },
       {
-        "strategy": "pullback",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 8.0,
-        "grade": "A",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 1362000
+        "strategy": "reversal",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 163900
       },
       {
         "strategy": "pullback",
@@ -43,7 +52,82 @@ window.JONGGA_HISTORY_INDEX = [
         "score": 8.0,
         "grade": "A",
         "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 759000
+        "currentPrice": 753000
+      },
+      {
+        "strategy": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 2291000
+      },
+      {
+        "strategy": "pullback",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매수추천",
+        "currentPrice": 1725000
+      },
+      {
+        "strategy": "momentum",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 1725000
+      },
+      {
+        "strategy": "momentum",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "제외",
+        "currentPrice": 163900
+      }
+    ]
+  },
+  {
+    "date": "2026-06-04",
+    "variant": "canary",
+    "variantLabel": "카나리",
+    "jsFile": "jongga/output/202606/jongga_data_20260604_canary.js",
+    "jsonFile": "jongga/output/202606/latest_20260604_canary.json",
+    "generatedAt": "2026-06-04T06:08:40+00:00",
+    "status": "partial",
+    "buyCount": 9,
+    "topRecommendations": [
+      {
+        "strategy": "momentum",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 8.4,
+        "grade": "A",
+        "statusLabel": "매수추천",
+        "currentPrice": 248000
+      },
+      {
+        "strategy": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 8.1,
+        "grade": "S",
+        "statusLabel": "매매금지",
+        "currentPrice": 248000
+      },
+      {
+        "strategy": "pullback",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 8.0,
+        "grade": "A",
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "currentPrice": 751000
       },
       {
         "strategy": "pullback",
@@ -55,133 +139,49 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 2289000
       },
       {
-        "strategy": "momentum",
-        "name": "KB금융",
-        "code": "105560",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매수추천",
-        "currentPrice": 164400
-      },
-      {
-        "strategy": "reversal",
-        "name": "주성엔지니어링",
-        "code": "036930",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 247500
-      },
-      {
-        "strategy": "reversal",
-        "name": "성호전자",
-        "code": "043260",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 51300
-      },
-      {
-        "strategy": "momentum",
+        "strategy": "pullback",
         "name": "삼성전기",
         "code": "009150",
-        "score": 4.8,
-        "grade": "C",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 1729000
-      }
-    ]
-  },
-  {
-    "date": "2026-06-04",
-    "variant": "canary",
-    "variantLabel": "카나리",
-    "jsFile": "jongga/output/202606/jongga_data_20260604_canary.js",
-    "jsonFile": "jongga/output/202606/latest_20260604_canary.json",
-    "generatedAt": "2026-06-04T05:53:28+00:00",
-    "status": "partial",
-    "buyCount": 9,
-    "topRecommendations": [
-      {
-        "strategy": "momentum",
-        "name": "주성엔지니어링",
-        "code": "036930",
-        "score": 8.4,
+        "score": 7.2,
         "grade": "A",
         "statusLabel": "매수추천",
-        "currentPrice": 247000
-      },
-      {
-        "strategy": "pullback",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 8.0,
-        "grade": "A",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 1363000
-      },
-      {
-        "strategy": "pullback",
-        "name": "현대모비스",
-        "code": "012330",
-        "score": 8.0,
-        "grade": "A",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 758000
-      },
-      {
-        "strategy": "pullback",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 2288000
-      },
-      {
-        "strategy": "reversal",
-        "name": "주성엔지니어링",
-        "code": "036930",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 247000
-      },
-      {
-        "strategy": "reversal",
-        "name": "성호전자",
-        "code": "043260",
-        "score": 7.2,
-        "grade": "A",
-        "statusLabel": "매매금지",
-        "currentPrice": 51400
+        "currentPrice": 1723000
       },
       {
         "strategy": "reversal",
         "name": "삼성물산",
         "code": "028260",
-        "score": 6.3,
-        "grade": "B",
+        "score": 7.2,
+        "grade": "A",
         "statusLabel": "매매금지",
-        "currentPrice": 533000
+        "currentPrice": 536000
+      },
+      {
+        "strategy": "reversal",
+        "name": "SK네트웍스",
+        "code": "001740",
+        "score": 7.2,
+        "grade": "A",
+        "statusLabel": "매매금지",
+        "currentPrice": 13030
       },
       {
         "strategy": "momentum",
         "name": "KB금융",
         "code": "105560",
-        "score": 5.6,
-        "grade": "B",
-        "statusLabel": "관심후보",
-        "currentPrice": 164500
+        "score": 4.8,
+        "grade": "C",
+        "statusLabel": "제외",
+        "currentPrice": 163800
       },
       {
         "strategy": "momentum",
-        "name": "한미반도체",
-        "code": "042700",
-        "score": 5.2,
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 4.4,
         "grade": "C",
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "currentPrice": 303000
+        "statusLabel": "제외",
+        "currentPrice": 354000
       }
     ]
   },
