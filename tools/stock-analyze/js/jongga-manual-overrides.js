@@ -353,7 +353,7 @@ function applyJonggaManualOverridesToPayload(payload) {
   const processSlot = slot => {
     const entries = slot?.entries;
     if (!entries || typeof entries !== 'object') return;
-    ['pullback', 'breakout', 'momentum', 'accumulation', 'reversal'].forEach(strategy => {
+    ['pullback', 'accumulation', 'breakout', 'momentum', 'reversal'].forEach(strategy => {
       if (!Array.isArray(entries[strategy])) return;
       entries[strategy] = entries[strategy].map(entry => applyJonggaManualOverridesToRawEntry(entry, strategy, { slot, root: next, regime: slot.regime || next.regime }));
     });

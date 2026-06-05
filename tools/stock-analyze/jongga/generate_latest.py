@@ -117,7 +117,7 @@ TOSS_ORDER_URL_TEMPLATE = "https://www.tossinvest.com/stocks/A{code}/order"
 TOSS_STOCK_DETAIL_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v3/stock-prices/details?productCodes=A{code}"
 TOSS_QUOTES_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v3/stock-prices/A{code}/quotes?viewType=krx_all&investMode=krx"
 TOSS_TICKS_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v2/stock-prices/A{code}/ticks?viewType=krx_all&count=120&investMode=krx"
-NAVER_ORDERBOOK_URL_TEMPLATE = "https://finance.naver.com/item/main.naver?code={code}"
+NAVER_ORDERBOOK_URL_TEMPLATE = "https://finance.naver.com/item/main.nhn?code={code}"
 KIND_DISCLOSURE_SEARCH_URL = "https://kind.krx.co.kr/disclosureSimpleSearch.do?method=disclosureSimpleSearchMain"
 ETF_NAME_PATTERN = re.compile(
     r"KODEX|TIGER|KOSEF|KBSTAR|ARIRANG|HANARO|ACE|SOL|TIMEFOLIO|PLUS|ETF|ETN|스팩|우B?$",
@@ -846,13 +846,14 @@ def _fetch_orderbook_naver_fallback(code: str) -> dict[str, Any] | None:
 
 
 def fetch_orderbook_with_http(code: str) -> dict[str, Any] | None:
+    # Naver Finance HTTP를 우선 시도 (안정적). 실패 시 Toss API로 대체.
+    naver = _fetch_orderbook_naver_fallback(code)
+    if naver is not None:
+        return naver
     try:
-        result = parse_toss_quotes_payload(request_json(TOSS_QUOTES_API_TEMPLATE.format(code=code), timeout=10.0), code)
-        if result is not None:
-            return result
+        return parse_toss_quotes_payload(request_json(TOSS_QUOTES_API_TEMPLATE.format(code=code), timeout=10.0), code)
     except Exception:
-        pass
-    return _fetch_orderbook_naver_fallback(code)
+        return None
 
 
 def fetch_http_candidate_enrichments(candidates: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], list[str]]:
@@ -1708,7 +1709,7 @@ def build_regime_block(context: dict[str, Any], market_snapshot: dict[str, Any] 
     secondary = strategy_display_name(context["secondaryStrategy"])
     tertiary = strategy_display_name(context.get("tertiaryStrategy") or "none")
     limits = context.get("strategySlotLimits") or slot_limits_for_regime(context.get("regimeLabel") or "")
-    slot_note = f"돌파 {limits.get('breakout', 0)} · 매집 {limits.get('accumulation', 0)} · 눌림 {limits.get('pullback', 0)}"
+    slot_note = f"매집 {limits.get('accumulation', 0)} · 돌파 {limits.get('breakout', 0)} · 눌림 {limits.get('pullback', 0)}"
     technical = str(context.get("technicalRegimeLabel") or context["regimeLabel"])
     effective = str(context.get("effectiveRegimeLabel") or context["regimeLabel"])
     table = [

@@ -180,8 +180,8 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
     }
 
     const sellCount = collections.swing.length + collections.pullback.length
-      + collections.breakout.length + collections.accumulation.length + collections.reversal.length;
-    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${stocksToAnalyze.length}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 돌파 ${collections.breakout.length}, 매집 ${collections.accumulation.length}, 급락반등 ${collections.reversal.length})`);
+      + collections.accumulation.length + collections.breakout.length + collections.reversal.length;
+    log(`ℹ️ [${getSlotLabel(activeSellSlot)} · ${universeLabel}] 분석 대상 ${stocksToAnalyze.length}개 (스윙 ${collections.swing.length}, 눌림목 ${collections.pullback.length}, 매집 ${collections.accumulation.length}, 돌파 ${collections.breakout.length}, 급락반등 ${collections.reversal.length})`);
 
     for (const stock of stocksToAnalyze) {
       // 실매수 종목 모드에서는 추적 종목인지 한번 더 확인

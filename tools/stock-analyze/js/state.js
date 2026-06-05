@@ -180,7 +180,7 @@ function decorateSnapshotEntries(slotId, snapshot = createEmptySnapshot()) {
   const nextSnapshot = snapshot;
   nextSnapshot.slotId = normalizedSlotId;
 
-  ['pullbackEntries', 'breakoutEntries', 'accumulationEntries', 'momentumEntries', 'reversalEntries', 'swingEntries'].forEach(key => {
+  ['pullbackEntries', 'accumulationEntries', 'breakoutEntries', 'momentumEntries', 'reversalEntries', 'swingEntries'].forEach(key => {
     if (!Array.isArray(nextSnapshot[key])) nextSnapshot[key] = [];
     nextSnapshot[key] = nextSnapshot[key].map(entry => {
       const normalized = { ...entry };

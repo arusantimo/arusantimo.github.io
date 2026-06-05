@@ -1,7 +1,7 @@
 window.JONGGA_CANARY_DAILY_DATA = window.JONGGA_CANARY_DAILY_DATA || {};
 window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-06-04T15:11:45+00:00",
+  "generatedAt": "2026-06-04T15:34:16+00:00",
   "variant": "canary",
   "dataQuality": {
     "status": "partial",
@@ -58,7 +58,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1293.8,
+        "durationMs": 373.3,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -66,7 +66,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 1185.0,
+        "durationMs": 1289.5,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -81,28 +81,28 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 76.1,
+        "durationMs": 82.3,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 2.7,
+        "durationMs": 2.1,
         "detail": "강세장 ✅ (펀더·지수 정당)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 3876.5,
+        "durationMs": 6092.4,
         "count": 22
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 1601.5,
+        "durationMs": 1765.9,
         "detail": "성공 22 / 실패 0",
         "count": 22
       },
@@ -110,7 +110,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 593.1,
+        "durationMs": 631.9,
         "detail": "direct-http · 체결강도 22 / 호가 22 / 틱프록시 22",
         "count": 22
       },
@@ -118,7 +118,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 12.9,
+        "durationMs": 12.7,
         "detail": "pullback 3, breakout 3, accumulation 3, reversal 3",
         "count": 12
       },
@@ -167,7 +167,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
           },
           {
             "item": "추천 슬롯",
-            "value": "돌파 3 · 매집 3 · 눌림 3"
+            "value": "매집 3 · 돌파 3 · 눌림 3"
           },
           {
             "item": "스윙 전환 활성도",
@@ -183,7 +183,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
           },
           {
             "item": "갭 스코어",
-            "value": "G-C 🟡 (-1.5점)"
+            "value": "G-C 🟡 (+1.0점)"
           },
           {
             "item": "갭 조정",
@@ -255,15 +255,15 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "-0.64%",
-            "baseScore": "-1점",
+            "actualValue": "-0.41%",
+            "baseScore": "+0점",
             "weight": "×2.5",
-            "formula": "-1 × 2.5 = -2.5점",
-            "weightedScore": "-2.5점"
+            "formula": "+0 × 2.5 = +0.0점",
+            "weightedScore": "+0.0점"
           },
           {
             "indicator": "VIX 수준",
-            "actualValue": "+15.74",
+            "actualValue": "+15.70",
             "baseScore": "+1점",
             "weight": "×2.0",
             "formula": "+1 × 2.0 = +2.0점",
@@ -271,7 +271,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
           },
           {
             "indicator": "미국 10년 금리 전일비",
-            "actualValue": "+1.2bp",
+            "actualValue": "+0.8bp",
             "baseScore": "+0점",
             "weight": "×1.5",
             "formula": "+0 × 1.5 = +0.0점",
@@ -279,7 +279,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "+36.43원",
+            "actualValue": "+36.38원",
             "baseScore": "-2점",
             "weight": "×1.5",
             "formula": "-2 × 1.5 = -3.0점",
@@ -287,14 +287,14 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-05"] = {
           },
           {
             "indicator": "SOX 전일 변화율",
-            "actualValue": "+5.41%",
+            "actualValue": "+5.38%",
             "baseScore": "+2점",
             "weight": "×1.0",
             "formula": "+2 × 1.0 = +2.0점",
             "weightedScore": "+2.0점"
           }
         ],
-        "totalScore": "-1.5점",
+        "totalScore": "+1.0점",
         "grade": "G-C 🟡",
         "code": "G-C",
         "entryAdjustment": "✅ 70% 진입 / ⚠️ 50% 진입",

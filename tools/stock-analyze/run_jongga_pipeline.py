@@ -177,7 +177,7 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
     }
     emit(
         "OK",
-        f"stable 품질={status} · 눌림목 {counts['pullback']} · 돌파 {counts['breakout']} · 매집 {counts['accumulation']} · 급락반등 {counts['reversal']}",
+        f"stable 품질={status} · 눌림목 {counts['pullback']} · 매집 {counts['accumulation']} · 돌파 {counts['breakout']} · 급락반등 {counts['reversal']}",
     )
     outcomes_path = JONGGA_OUTPUT / "jongga_outcomes.js"
     if outcomes_path.exists():

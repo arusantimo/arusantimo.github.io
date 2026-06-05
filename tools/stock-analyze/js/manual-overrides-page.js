@@ -298,7 +298,7 @@ function collectRecommendedManualEntries() {
   const merged = {};
   payload.slots.forEach(slot => {
     const entries = slot?.entries || {};
-    ['pullback', 'breakout', 'accumulation', 'momentum', 'reversal'].forEach(strategy => {
+    ['pullback', 'accumulation', 'breakout', 'momentum', 'reversal'].forEach(strategy => {
       (Array.isArray(entries[strategy]) ? entries[strategy] : []).forEach(rawEntry => {
         if (!rawEntry?.manualInput?.required) return;
         merged[rawEntry.code] = mergeRecommendedEntry(merged[rawEntry.code], rawEntry, strategy);

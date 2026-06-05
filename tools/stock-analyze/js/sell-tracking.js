@@ -194,14 +194,14 @@ function getVisibleSellStocksList(slotId = activeSellSlot, universeMode = getSel
   return [
     ...collections.swing,
     ...collections.pullback,
-    ...collections.breakout,
     ...collections.accumulation,
+    ...collections.breakout,
     ...collections.reversal
   ];
 }
 
 function getAllSellStocks() {
-  return ['swing', 'pullback', 'breakout', 'accumulation', 'reversal']
+  return ['swing', 'pullback', 'accumulation', 'breakout', 'reversal']
     .flatMap(type => stocks[type] || [])
     .map(stock => ensureStockIdentity(stock, stock.slotId));
 }
@@ -211,8 +211,8 @@ function getSellStocksForAnalysis(isBefore0908, slotId = activeSellSlot, univers
   return [
     ...collections.swing,
     ...collections.pullback,
-    ...collections.breakout,
     ...collections.accumulation,
+    ...collections.breakout,
     ...collections.reversal
   ];
 }

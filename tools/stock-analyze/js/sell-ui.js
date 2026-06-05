@@ -223,8 +223,8 @@ renderSellStockCards = function renderSellStockCardsOverride() {
 
   renderGroup(groups.swing, 'list-swing', 'swing');
   renderGroup(groups.pullback, 'list-pullback', 'pullback');
-  renderGroup(groups.breakout, 'list-breakout', 'breakout');
   renderGroup(groups.accumulation, 'list-accumulation', 'accumulation');
+  renderGroup(groups.breakout, 'list-breakout', 'breakout');
   renderGroup(groups.reversal, 'list-reversal', 'reversal');
   renderVisibleSellDetails();
 };
@@ -287,8 +287,8 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
 
   const snapshot = getActiveBuySnapshot();
   renderGroup(snapshot.pullbackEntries, 'buy-list-pullback');
-  renderGroup(snapshot.breakoutEntries || snapshot.momentumEntries, 'buy-list-breakout');
   renderGroup(snapshot.accumulationEntries || [], 'buy-list-accumulation');
+  renderGroup(snapshot.breakoutEntries || snapshot.momentumEntries, 'buy-list-breakout');
   renderGroup(snapshot.reversalEntries, 'buy-list-reversal');
 };
 

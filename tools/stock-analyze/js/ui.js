@@ -260,15 +260,15 @@ function renderRegimeSummary() {
 function renderGuideTables() {
   document.getElementById('guide-regime-table').innerHTML = `
     <table class="guide-table">
-      <thead><tr><th>상태</th><th>조건</th><th>눌림목</th><th>돌파형</th><th>매집형</th></tr></thead>
+      <thead><tr><th>상태</th><th>조건</th><th>눌림목</th><th>매집형</th><th>돌파형</th></tr></thead>
       <tbody>
-        ${RULE_GUIDE.regimes.map(row => `<tr><td>${escapeHtml(row.state)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.pullback)}</td><td>${escapeHtml(row.breakout)}</td><td>${escapeHtml(row.accumulation)}</td></tr>`).join('')}
+        ${RULE_GUIDE.regimes.map(row => `<tr><td>${escapeHtml(row.state)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.pullback)}</td><td>${escapeHtml(row.accumulation)}</td><td>${escapeHtml(row.breakout)}</td></tr>`).join('')}
       </tbody>
     </table>
   `;
 
   document.getElementById('guide-grade-table').innerHTML = `
-    <div class="guide-subtitle">추세 추종 전략 (눌림목·돌파형·매집형)</div>
+    <div class="guide-subtitle">추세 추종 전략 (눌림목·매집형·돌파형)</div>
     <table class="guide-table">
       <thead><tr><th>등급</th><th>점수</th><th>의미</th></tr></thead>
       <tbody>
@@ -598,8 +598,8 @@ function renderSellStockCards() {
   };
 
   renderGroup(stocks.pullback, 'list-pullback');
-  renderGroup(stocks.breakout, 'list-breakout');
   renderGroup(stocks.accumulation, 'list-accumulation');
+  renderGroup(stocks.breakout, 'list-breakout');
   renderGroup(stocks.reversal, 'list-reversal');
   renderSwingCards();
 }
@@ -706,8 +706,8 @@ function renderBuyStockCards() {
   };
 
   renderGroup(notionSnapshot.pullbackEntries, 'buy-list-pullback');
-  renderGroup(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries, 'buy-list-breakout');
   renderGroup(notionSnapshot.accumulationEntries || [], 'buy-list-accumulation');
+  renderGroup(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries, 'buy-list-breakout');
   renderGroup(notionSnapshot.reversalEntries, 'buy-list-reversal');
 }
 
@@ -775,7 +775,7 @@ function updateCurrentTime() {
     return;
   }
 
-  const hasSellResult = [...stocks.pullback, ...stocks.breakout, ...stocks.accumulation, ...stocks.swing]
+  const hasSellResult = [...stocks.pullback, ...stocks.accumulation, ...stocks.breakout, ...stocks.swing]
     .some(stock => stockDetailMap[stock.code]?.mode === 'sell');
   analyzeBtn.innerHTML = `<span>⚡</span> ${isBefore ? '1차' : '2차'} ${hasSellResult ? '다시 분석' : '분석 시작'}${archiveSuffix}`;
 }
@@ -1015,9 +1015,9 @@ function openRegimeReport() {
 
       <div class="modal-section-label" style="margin-top:18px">전략 우선순위</div>
       <table class="guide-table">
-        <thead><tr><th>레짐</th><th>눌림목</th><th>돌파형</th><th>매집형</th></tr></thead>
+        <thead><tr><th>레짐</th><th>눌림목</th><th>매집형</th><th>돌파형</th></tr></thead>
         <tbody>
-          ${regimeChecks.map(r => `<tr style="${r.isMatch ? 'background:rgba(16,185,129,0.08)' : ''}"><td>${escapeHtml(r.state)}</td><td>${escapeHtml(r.pullback)}</td><td>${escapeHtml(r.breakout)}</td><td>${escapeHtml(r.accumulation)}</td></tr>`).join('')}
+          ${regimeChecks.map(r => `<tr style="${r.isMatch ? 'background:rgba(16,185,129,0.08)' : ''}"><td>${escapeHtml(r.state)}</td><td>${escapeHtml(r.pullback)}</td><td>${escapeHtml(r.accumulation)}</td><td>${escapeHtml(r.breakout)}</td></tr>`).join('')}
         </tbody>
       </table>
 

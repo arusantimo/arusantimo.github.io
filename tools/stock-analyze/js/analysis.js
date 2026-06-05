@@ -58,8 +58,8 @@ function getVisibleBuyEntries(slotId = activeBuySlot) {
   const snapshot = getSlotSnapshot(slotId);
   return [
     ...snapshot.pullbackEntries,
-    ...(snapshot.breakoutEntries || snapshot.momentumEntries),
     ...(snapshot.accumulationEntries || []),
+    ...(snapshot.breakoutEntries || snapshot.momentumEntries),
     ...snapshot.reversalEntries
   ].map(entry => ensureEntryIdentity(entry, slotId));
 }

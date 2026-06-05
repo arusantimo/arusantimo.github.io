@@ -92,17 +92,17 @@
       </div>
       <div id="buy-list-pullback" class="buy-grid"></div>
 
-      <div class="section-title">🚀 주도주 돌파형 종가베팅
-        <span class="section-help">strictScore 우선 정렬 · 신호 점수는 전략 내부 모니터링용입니다.</span>
-        <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
-      </div>
-      <div id="buy-list-breakout" class="buy-grid"></div>
-
       <div class="section-title">🔥 수급 매집형 종가베팅
         <span class="section-help">조용한 거래량·20MA 횡보·양매수 흐름 중심 (돌파 구간과 분리)</span>
         <button class="icon-btn strategy-info-btn" data-strategy="accumulation" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
       </div>
       <div id="buy-list-accumulation" class="buy-grid"></div>
+
+      <div class="section-title">🚀 주도주 돌파형 종가베팅
+        <span class="section-help">strictScore 우선 정렬 · 신호 점수는 전략 내부 모니터링용입니다.</span>
+        <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+      </div>
+      <div id="buy-list-breakout" class="buy-grid"></div>
 
       <div class="section-title">🔻 주도주 급락 반등 후보 (전략 ③)
         <span class="section-help">역추세 전용 채점표입니다. 수급 매집형 점수와 크기를 비교하지 마세요.</span>
@@ -154,20 +154,6 @@
       </div>
 
       <div class="section-title split-title">
-        <div>🚀 주도주 돌파형 <span class="section-help">9:08 이전 시초가 점검 · 이후 매도/손절 분석</span>
-          <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
-        </div>
-        <div class="inline-inputs">
-          <input type="text" id="breakout-name" placeholder="종목명">
-          <input type="text" id="breakout-code" placeholder="코드(6자리)" maxlength="6">
-          <button id="btn-add-breakout" class="btn btn-secondary small">➕ 추가</button>
-        </div>
-      </div>
-      <div id="list-breakout" class="stock-grid">
-        <div class="empty-state">종목 데이터가 없습니다.</div>
-      </div>
-
-      <div class="section-title split-title">
         <div>🔥 수급 매집형 <span class="section-help">9:08 이후 매도/손절 분석 (눌림목과 동일)</span>
           <button class="icon-btn strategy-info-btn" data-strategy="accumulation" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
         </div>
@@ -178,6 +164,20 @@
         </div>
       </div>
       <div id="list-accumulation" class="stock-grid">
+        <div class="empty-state">종목 데이터가 없습니다.</div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>🚀 주도주 돌파형 <span class="section-help">9:08 이전 시초가 점검 · 이후 매도/손절 분석</span>
+          <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+        </div>
+        <div class="inline-inputs">
+          <input type="text" id="breakout-name" placeholder="종목명">
+          <input type="text" id="breakout-code" placeholder="코드(6자리)" maxlength="6">
+          <button id="btn-add-breakout" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-breakout" class="stock-grid">
         <div class="empty-state">종목 데이터가 없습니다.</div>
       </div>
 

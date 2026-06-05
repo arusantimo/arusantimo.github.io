@@ -203,15 +203,15 @@ const STRATEGY_META = {
     shortLabel: '눌림목',
     noun: '눌림목 베팅'
   },
-  breakout: {
-    label: '🚀 주도주 돌파형 종가베팅',
-    shortLabel: '주도주 돌파형',
-    noun: '주도주 돌파형'
-  },
   accumulation: {
     label: '🔥 수급 매집형 종가베팅',
     shortLabel: '수급 매집형',
     noun: '수급 매집형'
+  },
+  breakout: {
+    label: '🚀 주도주 돌파형 종가베팅',
+    shortLabel: '주도주 돌파형',
+    noun: '주도주 돌파형'
   },
   momentum: {
     label: '🚀 주도주 돌파형 종가베팅',
