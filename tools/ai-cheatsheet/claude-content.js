@@ -10,26 +10,47 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.159</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-31</span>
+        <span class="meta-version">v2.1.165</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-05</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.159)</span>
+        <span>📋 최근 변경사항 (v2.1.165)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="내부 인프라 개선 (v2.1.159)"
-            data-tt-desc="사용자 대면 변경사항이 없는 내부 인프라 개선이 진행되었습니다."
-            data-tt-example="">내부 인프라 개선 (v2.1.159) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="버전 요구사항 설정 및 플러그인 리스트 (v2.1.163)"
+            data-tt-desc="requiredMinimumVersion / requiredMaximumVersion 설정이 추가되었으며, /plugin list 명령어(--enabled/--disabled)가 지원됩니다."
+            data-tt-example="/plugin list --enabled">버전 요구사항 설정 및 <code>/plugin list</code> (v2.1.163) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/btw 명령어 c로 복사 및 stdio MCP 개선 (v2.1.163)"
+            data-tt-desc="/btw 답변을 c 키로 마크다운 형식 복사할 수 있으며, stdio MCP에 CLAUDE_CODE_SESSION_ID가 전달됩니다."
+            data-tt-example=""><code>/btw</code> 마크다운 복사(c) 및 stdio MCP 세션 ID 지원 (v2.1.163) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude agents --json 및 WebFetch 권한 우선순위 (v2.1.162)"
+            data-tt-desc="claude agents --json에 대기 상태(waitingFor)가 표시되고, 명시적 WebFetch 규칙이 기본 허용 도메인보다 우선 적용됩니다."
+            data-tt-example="claude agents --json"><code>claude agents --json</code> 대기 상태 표시 및 WebFetch 우선순위 (v2.1.162) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="병렬 도구 호출 독립 실행 및 OTEL 라벨 (v2.1.161)"
+            data-tt-desc="병렬 도구 호출 중 하나가 실패해도 다른 호출이 취소되지 않고 독립적으로 결과를 반환하며, OTEL 측정에 라벨이 추가되었습니다."
+            data-tt-example="">병렬 도구 호출 독립 실행 보장 및 OTEL 라벨 (v2.1.161) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="시작 파일 작성 승인 확인 및 ultracode 트리거 (v2.1.160)"
+            data-tt-desc="셸 시작 파일(.zshenv 등)이나 빌드 도구 설정 작성 시 사용자 승인을 받습니다. 동적 워크플로 트리거 키워드가 workflow에서 ultracode로 변경되었습니다."
+            data-tt-example="">시작 파일 작성 승인 및 <code>ultracode</code> 트리거 키워드 변경 (v2.1.160) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.159</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="내부 인프라 개선 (v2.1.159)"
+                data-tt-desc="사용자 대면 변경사항이 없는 내부 인프라 개선이 진행되었습니다."
+                data-tt-example="">내부 인프라 개선 (v2.1.159)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.158</summary>
@@ -296,7 +317,7 @@ const claudeContent = `
         <div class="group">
           <div class="group-label">내장 스킬</div>
           <div class="row cl-tip">
-            <div class="row-key"><code>/code-review</code> <span class="badge-new">NEW</span></div>
+            <div class="row-key"><code>/code-review</code> </div>
             <div class="row-desc">코드 리뷰 (지정 effort 및 PR 코멘트 지원)</div>
           </div>
           <div class="row">

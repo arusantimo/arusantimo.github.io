@@ -162,6 +162,30 @@ def grade_score_from_strict(strict_score: float, strict_max: float) -> float:
     return round(strict_score * 10.0 / strict_max, 1)
 
 
+def available_strict_max(
+    score_map: dict[str, EvalResult],
+    weights: dict[str, float],
+) -> float:
+    """data_missing / manual_required 항목을 분모에서 제외한 실효 최대점수.
+
+    돌파 전략의 S2(체결강도)·C3(호가잔량)은 토스 데이터 없으면 자동으로 0점이지만
+    분모는 고정 11.5라 만점이 불가능했다. 가용 항목 기준으로 분모를 조정하면
+    자동 파이프라인에서도 셋업이 좋을 때 S 등급 진입이 가능하다.
+
+    단, data_missing 항목은 평가 불가라 제외하는 게 정확하다.
+    manual_required도 동일 — 수동 입력 없이 0점이므로 제외.
+    """
+    available = 0.0
+    for code, weight in weights.items():
+        result = score_map.get(code)
+        if result is None:
+            continue
+        if result.eval_status in ("data_missing", "manual_required"):
+            continue
+        available += weight
+    return available if available > 0 else sum(weights.values())
+
+
 def apply_buy_scoring(
     *,
     strategy: str,
@@ -177,13 +201,17 @@ def apply_buy_scoring(
     signal_raw = aggregate_raw_score(score_map, weights, snapshot=snapshot, signal_factors=signal_factors)
     strict_score = round(strict_raw * vkospi_multiplier, 1)
     signal_score = round(signal_raw * vkospi_multiplier, 1)
-    grade_score = grade_score_from_strict(strict_score, strict_max)
+    # 가용성 인지 정규화: data_missing/manual_required 항목을 분모에서 제외한다.
+    # 이를 통해 토스 데이터 미수집 시에도 셋업이 완벽하면 S 등급에 도달 가능.
+    eff_max = available_strict_max(score_map, weights)
+    grade_score = grade_score_from_strict(strict_score, eff_max)
     grade = grade_from_score(grade_score, strategy)
     return {
         "strictScore": strict_score,
         "signalScore": signal_score,
         "score": signal_score,
-        "scoreMax": strict_max,
+        "scoreMax": strict_max,        # 원래 최대점수는 정보용으로 보존
+        "effectiveScoreMax": round(eff_max, 2),  # 실효 분모 (등급 산출에 사용)
         "gradeScore": grade_score,
         "grade": grade,
         "scoreBreakdown": build_score_breakdown(

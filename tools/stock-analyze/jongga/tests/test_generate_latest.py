@@ -1252,7 +1252,7 @@ class MarkingTest(unittest.TestCase):
         attach_marking(entry, ctx)
         # equal hitRate 0.5 across pre/open/i1 → highest target (intraday1 +6.0%) wins EV
         self.assertEqual(entry["recommendedStage"]["stageKey"], "intraday1")
-        self.assertEqual(entry["recommendedStage"]["evBasis"], "historical")
+        self.assertTrue(entry["recommendedStage"]["evBasis"].startswith("historical"))
 
     def test_confidence_floor_falls_back_to_coarse(self):
         from jongga.generate_latest import attach_marking

@@ -8696,379 +8696,454 @@ window.JONGGA_OUTCOMES_ROLLUP = {
     "reversal|bull|strong|G-C|premarket": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-C|openPhase": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-C|intraday1": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-C|premarket": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-C|openPhase": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-C|intraday1": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-C|intraday2": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-C|swing": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.035
+      "avgRealizedReturn": -0.035,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-C|premarket": {
       "hitRate": 0.6667,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.0001
+      "avgRealizedReturn": 0.0001,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-C|openPhase": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.0001
+      "avgRealizedReturn": 0.0001,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-C|intraday1": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.0001
+      "avgRealizedReturn": 0.0001,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-C|intraday2": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.0001
+      "avgRealizedReturn": 0.0001,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-C|swing": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.0001
+      "avgRealizedReturn": 0.0001,
+      "avgStageReturn": null
     },
     "accumulation|bull|strong|G-C|premarket": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|bull|strong|G-C|openPhase": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|bull|strong|G-C|intraday1": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|bull|strong|G-C|intraday2": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|bull|strong|G-C|swing": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-B|premarket": {
       "hitRate": 0.6667,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.00216
+      "avgRealizedReturn": 0.00216,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-B|openPhase": {
       "hitRate": 0.6667,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.00216
+      "avgRealizedReturn": 0.00216,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-B|intraday1": {
       "hitRate": 0.1667,
       "sampleCount": 6,
-      "avgRealizedReturn": 0.00216
+      "avgRealizedReturn": 0.00216,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-B|premarket": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03
+      "avgRealizedReturn": -0.03,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-B|openPhase": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03
+      "avgRealizedReturn": -0.03,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-B|intraday1": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03
+      "avgRealizedReturn": -0.03,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-B|intraday2": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03
+      "avgRealizedReturn": -0.03,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-B|swing": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03
+      "avgRealizedReturn": -0.03,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-B|premarket": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03078
+      "avgRealizedReturn": -0.03078,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-B|openPhase": {
       "hitRate": 0.1667,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03078
+      "avgRealizedReturn": -0.03078,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-B|intraday1": {
       "hitRate": 0.1667,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03078
+      "avgRealizedReturn": -0.03078,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-B|intraday2": {
       "hitRate": 0.1667,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03078
+      "avgRealizedReturn": -0.03078,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-B|swing": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.03078
+      "avgRealizedReturn": -0.03078,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-A|premarket": {
       "hitRate": 0.8,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02663
+      "avgRealizedReturn": 0.02663,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-A|openPhase": {
       "hitRate": 0.7333,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02663
+      "avgRealizedReturn": 0.02663,
+      "avgStageReturn": null
     },
     "reversal|bull|strong|G-A|intraday1": {
       "hitRate": 0.4667,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02663
+      "avgRealizedReturn": 0.02663,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-A|premarket": {
       "hitRate": 0.6333,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.009
+      "avgRealizedReturn": 0.009,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-A|openPhase": {
       "hitRate": 0.4,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.009
+      "avgRealizedReturn": 0.009,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-A|intraday1": {
       "hitRate": 0.2667,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.009
+      "avgRealizedReturn": 0.009,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-A|intraday2": {
       "hitRate": 0.2,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.009
+      "avgRealizedReturn": 0.009,
+      "avgStageReturn": null
     },
     "pullback|bull|strong|G-A|swing": {
       "hitRate": 0.1333,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.009
+      "avgRealizedReturn": 0.009,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-A|premarket": {
       "hitRate": 0.6333,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02113
+      "avgRealizedReturn": 0.02113,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-A|openPhase": {
       "hitRate": 0.3667,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02113
+      "avgRealizedReturn": 0.02113,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-A|intraday1": {
       "hitRate": 0.2,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02113
+      "avgRealizedReturn": 0.02113,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-A|intraday2": {
       "hitRate": 0.2,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02113
+      "avgRealizedReturn": 0.02113,
+      "avgStageReturn": null
     },
     "breakout|bull|strong|G-A|swing": {
       "hitRate": 0.1333,
       "sampleCount": 30,
-      "avgRealizedReturn": 0.02113
+      "avgRealizedReturn": 0.02113,
+      "avgStageReturn": null
     },
     "reversal|weak|unknown|G-B|premarket": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.05696
+      "avgRealizedReturn": 0.05696,
+      "avgStageReturn": null
     },
     "reversal|weak|unknown|G-B|openPhase": {
       "hitRate": 0.6667,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.05696
+      "avgRealizedReturn": 0.05696,
+      "avgStageReturn": null
     },
     "reversal|weak|unknown|G-B|intraday1": {
       "hitRate": 0.6667,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.05696
+      "avgRealizedReturn": 0.05696,
+      "avgStageReturn": null
     },
     "pullback|weak|unknown|G-B|premarket": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.0225
+      "avgRealizedReturn": 0.0225,
+      "avgStageReturn": null
     },
     "pullback|weak|unknown|G-B|openPhase": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.0225
+      "avgRealizedReturn": 0.0225,
+      "avgStageReturn": null
     },
     "pullback|weak|unknown|G-B|intraday1": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.0225
+      "avgRealizedReturn": 0.0225,
+      "avgStageReturn": null
     },
     "pullback|weak|unknown|G-B|intraday2": {
       "hitRate": 0.6667,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.0225
+      "avgRealizedReturn": 0.0225,
+      "avgStageReturn": null
     },
     "pullback|weak|unknown|G-B|swing": {
       "hitRate": 0.3333,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.0225
+      "avgRealizedReturn": 0.0225,
+      "avgStageReturn": null
     },
     "breakout|weak|unknown|G-B|premarket": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.035
+      "avgRealizedReturn": 0.035,
+      "avgStageReturn": null
     },
     "breakout|weak|unknown|G-B|openPhase": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.035
+      "avgRealizedReturn": 0.035,
+      "avgStageReturn": null
     },
     "breakout|weak|unknown|G-B|intraday1": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.035
+      "avgRealizedReturn": 0.035,
+      "avgStageReturn": null
     },
     "breakout|weak|unknown|G-B|intraday2": {
       "hitRate": 1.0,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.035
+      "avgRealizedReturn": 0.035,
+      "avgStageReturn": null
     },
     "breakout|weak|unknown|G-B|swing": {
       "hitRate": 0.6667,
       "sampleCount": 3,
-      "avgRealizedReturn": 0.035
+      "avgRealizedReturn": 0.035,
+      "avgStageReturn": null
     }
   },
   "byStrategyStage": {
     "reversal|premarket": {
       "hitRate": 0.7333,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01819
+      "avgRealizedReturn": 0.01819,
+      "avgStageReturn": null
     },
     "reversal|openPhase": {
       "hitRate": 0.6667,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01819
+      "avgRealizedReturn": 0.01819,
+      "avgStageReturn": null
     },
     "reversal|intraday1": {
       "hitRate": 0.3778,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01819
+      "avgRealizedReturn": 0.01819,
+      "avgStageReturn": null
     },
     "pullback|premarket": {
       "hitRate": 0.5333,
       "sampleCount": 45,
-      "avgRealizedReturn": -0.00201
+      "avgRealizedReturn": -0.00201,
+      "avgStageReturn": null
     },
     "pullback|openPhase": {
       "hitRate": 0.3778,
       "sampleCount": 45,
-      "avgRealizedReturn": -0.00201
+      "avgRealizedReturn": -0.00201,
+      "avgStageReturn": null
     },
     "pullback|intraday1": {
       "hitRate": 0.2444,
       "sampleCount": 45,
-      "avgRealizedReturn": -0.00201
+      "avgRealizedReturn": -0.00201,
+      "avgStageReturn": null
     },
     "pullback|intraday2": {
       "hitRate": 0.1778,
       "sampleCount": 45,
-      "avgRealizedReturn": -0.00201
+      "avgRealizedReturn": -0.00201,
+      "avgStageReturn": null
     },
     "pullback|swing": {
       "hitRate": 0.1111,
       "sampleCount": 45,
-      "avgRealizedReturn": -0.00201
+      "avgRealizedReturn": -0.00201,
+      "avgStageReturn": null
     },
     "breakout|premarket": {
       "hitRate": 0.6222,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01359
+      "avgRealizedReturn": 0.01359,
+      "avgStageReturn": null
     },
     "breakout|openPhase": {
       "hitRate": 0.3778,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01359
+      "avgRealizedReturn": 0.01359,
+      "avgStageReturn": null
     },
     "breakout|intraday1": {
       "hitRate": 0.2222,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01359
+      "avgRealizedReturn": 0.01359,
+      "avgStageReturn": null
     },
     "breakout|intraday2": {
       "hitRate": 0.2222,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01359
+      "avgRealizedReturn": 0.01359,
+      "avgStageReturn": null
     },
     "breakout|swing": {
       "hitRate": 0.1333,
       "sampleCount": 45,
-      "avgRealizedReturn": 0.01359
+      "avgRealizedReturn": 0.01359,
+      "avgStageReturn": null
     },
     "accumulation|premarket": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|openPhase": {
       "hitRate": 0.3333,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|intraday1": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|intraday2": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     },
     "accumulation|swing": {
       "hitRate": 0.0,
       "sampleCount": 6,
-      "avgRealizedReturn": -0.0121
+      "avgRealizedReturn": -0.0121,
+      "avgStageReturn": null
     }
   }
 };

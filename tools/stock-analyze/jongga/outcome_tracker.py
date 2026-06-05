@@ -193,6 +193,34 @@ def compute_outcome(
         realized = (sum(s["targetRate"] * s["qty"] for s in hit_stages) + close_rate * remainder) / 100.0 / 100.0
         status = "stop_first_ambiguous" if (stop_hit and hit_stages) else "resolved"
 
+    # 단계별 실현수익 계산 (#1/#2 개선 - net EV 추천에 사용)
+    # "이 단계까지만 익절한다면 실현수익이 얼마였나?" — 단계별 독립 수익 추정.
+    # 도달 단계: targetRate * qty + 나머지(=미도달량) × 종가청산.
+    # 미도달(손절): stopRate(손절 발생 시) 또는 종가.
+    # stop_first_ambiguous 여부와 무관하게 단계별로 계산한다(하방 포함이 목적).
+    for s in stages:
+        if not s["hit"]:
+            # 이 단계에 도달하지 못함 → 이전 도달 단계의 익절 + 잔량 종가(또는 손절)
+            prev_hit = [h for h in hit_stages if STAGE_LADDER.index(h["stageKey"]) < STAGE_LADDER.index(s["stageKey"])]
+            prev_filled = sum(h["qty"] for h in prev_hit)
+            remainder_qty = max(0, 100 - prev_filled)
+            exit_rate = stop_rate if (stop_hit and best_stage_hit is None) else close_rate
+            stage_ret = (
+                sum(h["targetRate"] * h["qty"] for h in prev_hit)
+                + exit_rate * remainder_qty
+            ) / 100.0 / 100.0
+            s["stageRealizedReturn"] = round(stage_ret, 5)
+        else:
+            # 이 단계까지 익절 → 이 단계 이하 모든 도달 단계 익절 + 나머지 종가
+            up_to = [h for h in hit_stages if STAGE_LADDER.index(h["stageKey"]) <= STAGE_LADDER.index(s["stageKey"])]
+            filled_here = sum(h["qty"] for h in up_to)
+            remainder_qty = max(0, 100 - filled_here)
+            stage_ret = (
+                sum(h["targetRate"] * h["qty"] for h in up_to)
+                + close_rate * remainder_qty
+            ) / 100.0 / 100.0
+            s["stageRealizedReturn"] = round(stage_ret, 5)
+
     return {
         **identity,
         "entryPrice": entry_price,
@@ -243,17 +271,35 @@ def load_daily_payload(out_dir: str | Path, date_str: str, variant: str) -> dict
 
 
 def build_rollup(index: list[dict[str, Any]]) -> dict[str, Any]:
+    """단계별 hitRate + avgStageReturn(단계 독립 실현수익) 집계.
+
+    avgStageReturn: "이 단계까지 익절한다면 과거 평균 실현수익이 얼마였나?"
+    compute_outcome에서 stages[n]["stageRealizedReturn"]으로 단계별 독립 수익을
+    기록하므로, 이를 집계해 EV 추천의 하방 포함 신호로 활용한다.
+    (기존 avgRealizedReturn은 레코드 전체 실현수익으로 단계 구분 없음 → 유지하되
+    단계별 신호는 avgStageReturn을 사용한다.)
+    """
     by_cell: dict[str, dict[str, float]] = {}
     by_strategy_stage: dict[str, dict[str, float]] = {}
 
-    def accumulate(bucket: dict[str, dict[str, float]], key: str, hit: bool, realized: float | None) -> None:
-        cell = bucket.setdefault(key, {"hit": 0, "samples": 0, "retSum": 0.0, "retCount": 0})
+    def accumulate(
+        bucket: dict[str, dict[str, float]],
+        key: str,
+        hit: bool,
+        realized: float | None,
+        stage_ret: float | None,
+    ) -> None:
+        cell = bucket.setdefault(key, {"hit": 0, "samples": 0, "retSum": 0.0, "retCount": 0,
+                                       "stageRetSum": 0.0, "stageRetCount": 0})
         cell["samples"] += 1
         if hit:
             cell["hit"] += 1
         if realized is not None:
             cell["retSum"] += realized
             cell["retCount"] += 1
+        if stage_ret is not None:
+            cell["stageRetSum"] += stage_ret
+            cell["stageRetCount"] += 1
 
     for record in index:
         status = str(record.get("outcomeStatus") or "")
@@ -270,8 +316,11 @@ def build_rollup(index: list[dict[str, Any]]) -> dict[str, Any]:
             if not stage_key:
                 continue
             hit = bool(stage.get("hit"))
-            accumulate(by_cell, f"{strategy}|{regime}|{vk}|{gap}|{stage_key}", hit, realized)
-            accumulate(by_strategy_stage, f"{strategy}|{stage_key}", hit, realized)
+            # 단계별 실현수익 — 신규 필드 없으면 None(하위 호환)
+            sr = stage.get("stageRealizedReturn")
+            stage_ret = float(sr) if sr is not None else None
+            accumulate(by_cell, f"{strategy}|{regime}|{vk}|{gap}|{stage_key}", hit, realized, stage_ret)
+            accumulate(by_strategy_stage, f"{strategy}|{stage_key}", hit, realized, stage_ret)
 
     def finalize(bucket: dict[str, dict[str, float]]) -> dict[str, Any]:
         out: dict[str, Any] = {}
@@ -281,6 +330,7 @@ def build_rollup(index: list[dict[str, Any]]) -> dict[str, Any]:
                 "hitRate": round(cell["hit"] / samples, 4) if samples else 0.0,
                 "sampleCount": samples,
                 "avgRealizedReturn": round(cell["retSum"] / cell["retCount"], 5) if cell["retCount"] else None,
+                "avgStageReturn": round(cell["stageRetSum"] / cell["stageRetCount"], 5) if cell["stageRetCount"] else None,
             }
         return out
 

@@ -392,13 +392,20 @@ def evaluate_breakout_p1(snapshot: Any) -> EvalResult:
 
 
 def evaluate_breakout_p2(snapshot: Any) -> EvalResult:
+    """거래량 급증 — 게이트(G4)와 점수(P2)가 동일 이진 임계를 사용하면 적격 종목 사이에서
+    변별력이 없다. 점수 항목(P2)은 거래량 배율 구간별 부분 점수를 반환한다.
+    게이트(G4)는 binary 그대로 — 이 함수를 공유하므로 게이트는 score >= 0.5 기준으로 차단.
+    """
     if not snapshot.volume_avg_20d:
         return eval_data_missing("20일 평균 거래량 산출 데이터 부족")
     ratio = snapshot.volume / snapshot.volume_avg_20d
-    note = f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% (필요 ≥ 150%)"
+    if ratio >= 3.0:
+        return eval_met(f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% · 폭발적 급증 (≥300%)", score=1.0)
+    if ratio >= 2.0:
+        return eval_met(f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% · 강한 급증 (≥200%)", score=0.75)
     if ratio >= 1.5:
-        return eval_met(note)
-    return eval_not_met(note)
+        return eval_met(f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% · 기준 충족 (≥150%)", score=0.5)
+    return eval_not_met(f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% (필요 ≥ 150%)")
 
 
 def evaluate_breakout_c1(snapshot: Any) -> EvalResult:
@@ -412,15 +419,23 @@ def evaluate_breakout_c1(snapshot: Any) -> EvalResult:
 
 
 def evaluate_breakout_c2(snapshot: Any, candle_range, upper_wick_ratio) -> EvalResult:
+    """강마감 캔들 — 게이트(G5)와 점수(C2)를 분리해 캔들 강도별 부분 점수를 적용한다.
+    게이트는 score >= 0.5 여부로 차단, 점수는 구간별 차등 반환.
+    """
     span = candle_range(snapshot)
     if span <= 0:
         return eval_data_missing("당일 캔들 범위 데이터 부족")
     body = abs(snapshot.current_price - snapshot.open_price)
     upper = upper_wick_ratio(snapshot)
-    note = f"몸통 {body / span * 100:.0f}% / 윗꼬리·몸통 {upper:.2f}"
+    body_pct = body / span * 100
+    note = f"몸통 {body_pct:.0f}% / 윗꼬리·몸통 {upper:.2f}"
+    if body >= span * 0.85 and upper <= 0.15:
+        return eval_met(f"{note} · 완벽한 강마감", score=1.0)
     if body >= span * 0.7 and upper <= 0.3:
-        return eval_met(note)
-    return eval_not_met(note)
+        return eval_met(f"{note} · 강마감 기준 충족", score=0.75)
+    if body >= span * 0.55 and upper <= 0.5:
+        return eval_met(f"{note} · 강마감 약충족", score=0.5)
+    return eval_not_met(f"{note} (필요: 몸통 ≥70%, 윗꼬리·몸통 ≤0.3)")
 
 
 def evaluate_breakout_s2(snapshot: Any) -> EvalResult:
@@ -521,18 +536,23 @@ def evaluate_accumulation_s1(snapshot: Any) -> EvalResult:
 
 
 def evaluate_accumulation_s2(snapshot: Any) -> EvalResult:
+    """수급 2일 연속 유입 확인.
+
+    버그 수정: 기존 `>= 0` 조건은 외인·기관 수급이 둘 다 정확히 0(거래 없음)이어도
+    "순매수"로 오판하고 당일 수급을 아예 확인하지 않았다. → `> 0`으로 통일.
+    """
     note = (
-        f"외인 당일 {snapshot.foreign_net:,.0f} / 전일 {snapshot.foreign_previous:,.0f} · "
-        f"기관 당일 {snapshot.institution_net:,.0f} / 전일 {snapshot.institution_previous:,.0f}"
+        f"외인 당일 {snapshot.foreign_net:+,.0f} / 전일 {snapshot.foreign_previous:+,.0f} · "
+        f"기관 당일 {snapshot.institution_net:+,.0f} / 전일 {snapshot.institution_previous:+,.0f}"
     )
     both_today = snapshot.foreign_net > 0 and snapshot.institution_net > 0
-    both_prev_positive = snapshot.foreign_previous >= 0 and snapshot.institution_previous >= 0
     prev_either_buy = snapshot.foreign_previous > 0 or snapshot.institution_previous > 0
-    if both_prev_positive:
-        return eval_met(f"{note} · 2일 연속 순매수 흐름")
+    both_prev_buy = snapshot.foreign_previous > 0 and snapshot.institution_previous > 0
+    if both_prev_buy and both_today:
+        return eval_met(f"{note} · 2일 연속 외인·기관 양매수")
     if both_today and prev_either_buy:
-        return eval_met(f"{note} · 당일 양매수 + 전일 수급 유지")
-    return eval_not_met(f"{note} · 수급 개선 미확인")
+        return eval_met(f"{note} · 당일 양매수 + 전일 수급 유입")
+    return eval_not_met(f"{note} · 2일 연속 수급 유입 미확인")
 
 
 def evaluate_accumulation_p1(snapshot: Any) -> EvalResult:
@@ -603,8 +623,51 @@ def evaluate_reversal_f3(snapshot: Any) -> EvalResult:
     return eval_not_met(note)
 
 
-def evaluate_reversal_f4() -> EvalResult:
-    return eval_manual_required("최근 5거래일 재진입 이력 수동 확인 필요")
+def evaluate_reversal_f4(
+    code: str | None = None,
+    analysis_date: str | None = None,
+    outcomes_index: list[dict[str, Any]] | None = None,
+) -> EvalResult:
+    """최근 5거래일 이내 동일 종목 재진입 차단.
+
+    outcomes_index(JONGGA_OUTCOMES_INDEX)가 주입되면 자동 조회한다.
+    - 최근 5거래일 이내 손절(stopHit=True, bestStageHit=None) → ⛔
+    - 최근 5거래일 이내 resolved 추천 존재(손절 포함) → ⚠️ 경고
+    - 이력 없음 또는 데이터 없으면 이전처럼 수동 확인 권고.
+    """
+    if not code or outcomes_index is None:
+        return eval_manual_required("최근 5거래일 재진입 이력 수동 확인 필요")
+
+    # 분석 날짜 기준 최근 5거래일 레코드 조회
+    from datetime import date as _date, timedelta
+    try:
+        base = _date.fromisoformat(str(analysis_date)) if analysis_date else _date.today()
+    except ValueError:
+        return eval_manual_required("날짜 파싱 오류 — 수동 확인 필요")
+
+    cutoff = (base - timedelta(days=10)).isoformat()  # 넉넉하게 10일(공휴일 포함 5거래일)
+    recent = [
+        r for r in outcomes_index
+        if str(r.get("code") or "") == str(code)
+        and str(r.get("strategy") or "") == "reversal"
+        and str(r.get("date") or "") >= cutoff
+        and str(r.get("date") or "") < str(base.isoformat())
+        and str(r.get("outcomeStatus") or "") in ("resolved", "stop_first_ambiguous")
+    ]
+
+    if not recent:
+        return eval_met(f"최근 5거래일({cutoff}~) 동일 종목 반등 진입 이력 없음 · 자동 확인")
+
+    stop_records = [r for r in recent if r.get("stopHit") and not r.get("bestStageHit")]
+    if stop_records:
+        last_date = stop_records[-1].get("date", "?")
+        return eval_not_met(f"최근 손절 이력 {len(stop_records)}건 (최근: {last_date}) · 재진입 차단")
+
+    last_date = max(r.get("date", "") for r in recent)
+    return eval_met(
+        f"최근 진입 이력 {len(recent)}건 · 손절 없음 (최근: {last_date}) · 자동 확인",
+        score=0.5,  # 이력 있으면 낮은 신뢰 부분 점수 (완전 클린 상태는 score=1.0)
+    )
 
 
 def evaluate_reversal_g1(snapshot: Any) -> EvalResult:

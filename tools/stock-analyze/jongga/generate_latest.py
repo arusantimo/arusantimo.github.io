@@ -1608,19 +1608,40 @@ def build_gap_score(live_metrics: dict[str, dict[str, float]]) -> dict[str, Any]
 
 
 def trend_vkospi_multiplier(vkospi_proxy: float) -> float:
-    if vkospi_proxy < 20:
+    """트렌드 전략(눌림목·매집·돌파) VKOSPI 페널티 승수.
+
+    기존 3단계 계단(≤20→1.0, ≤30→0.9, >30→0.8)은 임계 근방에서 불연속 점프가 발생해
+    VKOSPI 29.9와 30.1이 전혀 다른 등급을 받는 비일관성이 있었다.
+    → 선형 보간으로 부드럽게 연결. 범위: VKOSPI 15(×1.0) ~ 45(×0.75).
+    VKOSPI 45 이상에서 G5가 이미 ⛔ 차단하므로 하한 0.75 이하로는 내려가지 않는다.
+    """
+    v = float(vkospi_proxy or 0)
+    if v <= 15:
         return 1.0
-    if vkospi_proxy <= 30:
-        return 0.9
-    return 0.8
+    if v >= 45:
+        return 0.75
+    # 15→45 구간 선형 보간: 1.0 → 0.75
+    return round(1.0 - (v - 15) / (45 - 15) * 0.25, 4)
 
 
 def reversal_vkospi_multiplier(vkospi_proxy: float) -> float:
-    if vkospi_proxy < 20:
+    """급락반등 전략 VKOSPI 승수 — 역전략이라 중간 변동성(20~35)에서 유리.
+
+    기존 3단계 계단(≤20→0.8, ≤30→1.0, >30→0.9)의 불연속을 제거.
+    → VKOSPI 20~35 구간을 피크(×1.0)로 양쪽을 선형 테이퍼.
+    """
+    v = float(vkospi_proxy or 0)
+    if v <= 15:
         return 0.8
-    if vkospi_proxy <= 30:
+    if v <= 20:
+        # 15→20: 0.8→1.0
+        return round(0.8 + (v - 15) / 5 * 0.2, 4)
+    if v <= 35:
         return 1.0
-    return 0.9
+    if v <= 50:
+        # 35→50: 1.0→0.85
+        return round(1.0 - (v - 35) / 15 * 0.15, 4)
+    return 0.85
 
 
 def decide_regime(kospi_history: list[dict[str, Any]], vkospi_proxy: float) -> tuple[str, str, str, str, str, str]:
@@ -1936,6 +1957,11 @@ def load_outcomes_rollup(path: str = OUTCOMES_DEFAULT_PATH) -> dict[str, Any]:
     return value if isinstance(value, dict) else {}
 
 
+def load_outcomes_index(path: str = OUTCOMES_DEFAULT_PATH) -> list[dict[str, Any]]:
+    value = read_js_assignment(path, "JONGGA_OUTCOMES_INDEX")
+    return value if isinstance(value, list) else []
+
+
 def _row_stage_key(stage_label: str) -> str:
     for keyword, key in _STAGE_KEY_BY_KEYWORD:
         if keyword in str(stage_label or ""):
@@ -1995,14 +2021,28 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any]) -> dict[str, 
     used_basis = "heuristic"
     sample_count = 0
     best_hit_rate = None
+
+    # EV 계산 우선순위:
+    # 1. avgStageReturn(단계별 하방 포함 실현수익 평균) — 가장 정직한 신호
+    # 2. avgStageReturn 없으면 hitRate×targetYield(낙관적 상한) 폴백
+    # 두 경우 모두 MIN_SAMPLES 미달이면 None(콜드스타트로 이동)
     for row, stage_key in take_profit:
         stat = _lookup_hit_rate(rollup, strategy, dims, stage_key)
         hit_rate = float(stat["hitRate"]) if stat else None
         row["historicalHitRate"] = round(hit_rate, 4) if hit_rate is not None else None
         if stat is not None:
-            ev = hit_rate * parse_float(row.get("targetYield"))
+            avg_stage_ret = stat.get("avgStageReturn")
+            if avg_stage_ret is not None:
+                # 단계별 실현수익이 있으면 그것으로 비교 (하방 포함, 단위 소수)
+                ev = float(avg_stage_ret) * 100  # % 스케일로 통일
+                ev_basis_local = "netStageReturn"
+            else:
+                # 폴백: hitRate × 목표수익률(%) — 모호건 포함 낙관 상한
+                ev = hit_rate * parse_float(row.get("targetYield"))
+                ev_basis_local = "hitRateXTarget"
             if best_ev is None or ev > best_ev:
-                best_ev, best_key, used_basis = ev, stage_key, "historical"
+                best_ev, best_key = ev, stage_key
+                used_basis = f"historical:{ev_basis_local}"
                 sample_count = int(stat.get("sampleCount") or 0)
                 best_hit_rate = hit_rate
 
@@ -2022,10 +2062,11 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any]) -> dict[str, 
             "sampleCount": 0,
         }
     else:
+        ev_label = "순수익" if "netStageReturn" in used_basis else "적중률×목표"
         recommended_stage = {
             "stageKey": best_key,
             "evBasis": used_basis,
-            "reason": f"EV=적중률×목표 (과거 {sample_count}건)",
+            "reason": f"EV={ev_label} argmax (과거 {sample_count}건)",
             "hitRate": round(best_hit_rate, 4) if best_hit_rate is not None else None,
             "ev": round(best_ev, 4) if best_ev is not None else None,
             "sampleCount": sample_count,
@@ -2381,7 +2422,11 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict("F1", evaluate_reversal_f1(snapshot)),
         gate_dict("F2", evaluate_reversal_f2(snapshot)),
         gate_dict("F3", evaluate_reversal_f3(snapshot)),
-        gate_dict("F4", evaluate_reversal_f4()),
+        gate_dict("F4", evaluate_reversal_f4(
+            code=snapshot.code,
+            analysis_date=str(context.get("analysisDate") or ""),
+            outcomes_index=context.get("outcomesIndex"),
+        )),
     ]
     gates = [
         gate_dict("G1", evaluate_reversal_g1(snapshot)),
@@ -2536,6 +2581,8 @@ def collect_live_payload(
     market_snapshot = load_market_analyze_snapshot()
     context = build_market_context(kospi_history, gap_score, live_metrics["vkospi"], analysis_date=resolved_analysis_date)
     context["outcomesRollup"] = load_outcomes_rollup()
+    context["outcomesIndex"] = load_outcomes_index()
+    context["analysisDate"] = resolved_analysis_date.isoformat()
     log_step(
         "market_context",
         "시장 레짐 계산",

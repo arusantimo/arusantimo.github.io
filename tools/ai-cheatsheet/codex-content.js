@@ -10,26 +10,50 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.135.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-28</span>
+        <span class="meta-version">v0.137.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-04</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.135.0)</span>
+        <span>📋 최근 변경사항 (v0.137.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="안정성 및 호환성 개선 (v0.135.0)"
-            data-tt-desc="내부 최적화 및 최신 릴리스 호환성을 위한 안정성 개선 업데이트가 반영되었습니다."
-            data-tt-example="">성능 및 안정성 향상 (v0.135.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/archive 슬래시 커맨드 및 모델 도구 모드 (v0.137.0)"
+            data-tt-desc="/archive 슬래시 커맨드, 모델 도구 모드 선택기 추가 및 TUI f24 키 매핑과 취소된 프롬프트 복원 기능이 지원됩니다."
+            data-tt-example="/archive"><code>/archive</code> 슬래시 커맨드 및 모델 도구 모드 선택 (v0.137.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="클라우드 관리 설정 레이어 및 스킬 확장 스캐폴드 (v0.137.0)"
+            data-tt-desc="클라우드 관리 설정 레이어(cloud-managed config)가 지원되며, 스킬 확장을 위한 스캐폴드가 추가되었습니다. 병렬 독립 웹 검색도 가능합니다."
+            data-tt-example="">클라우드 관리 설정 레이어 및 스킬 확장 스캐폴드 (v0.137.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Remote-control 페어링 시작 및 플러그인 로직 개선 (v0.137.0)"
+            data-tt-desc="remote-control 페어링 기능이 추가되었고, 플러그인 검색 로직이 core-plugins로 이동했습니다."
+            data-tt-example="">Remote-control 페어링 시작 및 플러그인 탐색 개선 (v0.137.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Python SDK 베타 독립 릴리스 및 CodexConfig (v0.136.0)"
+            data-tt-desc="Python SDK 베타 버전이 런타임과 독립적으로 릴리스되며, AppServerConfig가 CodexConfig로 명칭이 변경되었습니다."
+            data-tt-example="">Python SDK 베타 독립 릴리스 및 <code>CodexConfig</code> 명칭 변경 (v0.136.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Amazon Bedrock GPT-5.5 지원 및 MCP 1.7.0 (v0.136.0)"
+            data-tt-desc="Bedrock 카탈로그 메타데이터가 갱신되어 GPT-5.5를 지원하며, MCP 의존성이 rmcp 1.7.0으로 업데이트되었습니다."
+            data-tt-example="">Bedrock GPT-5.5 카탈로그 지원 및 MCP 업데이트 (v0.136.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 exec-server 등록 및 도구 스키마 개선 (v0.136.0)"
+            data-tt-desc="원격 exec-server 등록 시 API-key 인증을 허용하고, 내장 도구(MCP, shell, image 등)의 스키마 설명과 기본값이 명확해졌습니다."
+            data-tt-example="">원격 exec-server 등록 및 내장 도구 스키마 설명 개선 (v0.136.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.135.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="안정성 및 호환성 개선 (v0.135.0)"
+                data-tt-desc="내부 최적화 및 최신 릴리스 호환성을 위한 안정성 개선 업데이트가 반영되었습니다."
+                data-tt-example="">성능 및 안정성 향상 (v0.135.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.133.0</summary>
@@ -481,7 +505,7 @@ const codexContent = `
                 <div class="row-desc">Codex 자체를 MCP 서버로 실행</div>
               </div>
               <div class="row cl-tip">
-                <div class="row-key"><code>codex remote-control</code> <span class="badge-new">NEW</span></div>
+                <div class="row-key"><code>codex remote-control</code> </div>
                 <div class="row-desc">포그라운드 대기 및 데몬식 start/stop 지원</div>
               </div>
               <div class="row">
