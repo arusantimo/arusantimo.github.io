@@ -1,4 +1,9 @@
 window.ANTIGRAVITY_TIPS = {
+  "/mcp discover": {
+    "title": "/mcp discover — 자동 탐지",
+    "desc": "로컬 시스템에서 사용 가능한 MCP 서버를 자동으로 탐지하고 제안합니다.",
+    "example": "/mcp discover"
+  },
   "/goal": {
     "title": "자율 턴 자동화 동작 (/goal)",
     "desc": "사용자의 매번 승인하는 수동 대기 과정 없이, 에이전트가 완료 조건이 충족될 때까지 연속으로 자율 탐색 및 실행을 지속합니다.",

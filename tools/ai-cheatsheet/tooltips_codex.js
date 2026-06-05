@@ -1,4 +1,9 @@
 window.CODEX_TIPS = {
+  "/archive": {
+    "title": "/archive — 세션 보관",
+    "desc": "현재 진행 중인 세션을 아카이브 처리하고 컨텍스트를 정리합니다.",
+    "example": "/archive"
+  },
   "codex": {
     "title": "codex — 대화형 TUI 시작",
     "desc": "현재 디렉터리를 컨텍스트로 대화형 Codex CLI 세션을 시작합니다. AGENTS.md, .mcp.json, .codex/config.toml을 자동으로 로드합니다.",

@@ -244,7 +244,11 @@ const codexContent = `
         <div class="group">
           <div class="group-label">세션 제어</div>
           <div class="row">
-            <div class="row-key"><code>/clear</code></div>
+            <div class="row-key"><code>/archive</code></div>
+                <div class="row-desc">현재 세션을 보관 <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>/clear</code></div>
             <div class="row-desc">화면과 대화 초기화</div>
           </div>
           <div class="row">

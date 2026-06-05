@@ -1,4 +1,15 @@
 window.CLAUDE_TIPS = {
+  "claude plugin list": {
+    "title": "claude plugin list — 플러그인 목록",
+    "desc": "설치된 플러그인 목록을 출력합니다. --enabled 또는 --disabled로 필터링할 수 있습니다.",
+    "example": "claude plugin list
+claude plugin list --enabled"
+  },
+  "requiredMinimumVersion": {
+    "title": "requiredMinimumVersion — 요구 버전",
+    "desc": "클라이언트 실행을 위한 최소/최대 버전을 설정합니다.",
+    "example": ""requiredMinimumVersion": "2.1.163""
+  },
   "/code-review": {
     "title": "/code-review — 코드 리뷰 스킬",
     "desc": "코드를 분석해 지정한 effort 레벨(e.g., /code-review high)에 맞춰 검토 결과를 보고하며, --comment 플래그로 GitHub PR에 인라인 코멘트로 결과를 달 수 있습니다. 기존의 /simplify가 변경되었습니다.",

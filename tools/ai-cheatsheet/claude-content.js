@@ -808,6 +808,10 @@ const claudeContent = `
           <div>
             <div class="group">
               <div class="group-label">핵심 명령</div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>claude plugin list</code></div>
+                <div class="row-desc">설치된 플러그인 확인 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>claude</code></div>
                 <div class="row-desc">대화형 시작</div>
@@ -1442,6 +1446,10 @@ const claudeContent = `
             </div>
             <div class="group">
               <div class="group-label">핵심 설정 항목</div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>requiredMinimumVersion</code></div>
+                <div class="row-desc">최소 허용 버전 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>modelOverrides</code></div>
                 <div class="row-desc">모델 피커 → 커스텀 ID 매핑</div>

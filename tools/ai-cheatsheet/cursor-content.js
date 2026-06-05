@@ -10,26 +10,41 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.6</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-05-29</span>
+        <span class="meta-version">v3.7</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-05</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.6)</span>
+        <span>📋 최근 변경사항 (v3.7)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Auto-review Run Mode (v3.6)"
-            data-tt-desc="Auto-review는 더 적은 승인 프롬프트와 더 안전한 실행으로 Cursor가 더 오래 작동할 수 있는 새 실행 모드입니다. Shell, MCP, Fetch 툰 콜에 적용되며, 허용된 콜은 즉시 실행하고 샌드박스에서 실행 가능한 콜은 샌드박스에서 실행됩니다. Settings > Cursor Settings > Agents > Run Mode에서 구성."
-            data-tt-example="Settings > Cursor Settings > Agents > Run Mode">Auto-review Run Mode 추가 — 승인 프롬프트 최소화 + 안전 실행 (v3.6) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Canvas Improvements (v3.7)"
+            data-tt-desc="캔버스에 Design Mode가 도입되어 UI 요소를 직접 선택해 주석을 달 수 있으며, Context Usage Report로 토큰 사용량을 시각적으로 분석할 수 있습니다."
+            data-tt-example="Canvas > Design Mode">Canvas 기능 강화 — Design Mode 및 Context Usage Report (v3.7) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor Enterprise Organizations (v3.7)"
+            data-tt-desc="엔터프라이즈 고객을 위한 다중 팀 관리, 보안, 예산 및 거버넌스 제어를 통합한 중앙 집중식 조직 허브가 제공됩니다."
+            data-tt-example="Settings > Organization">Cursor Enterprise 조직 허브 도입 — 보안 및 다중 팀 관리 (v3.7) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Teams Pricing & Controls (v3.7)"
+            data-tt-desc="에이전트를 많이 사용하는 유저를 위한 신규 Premium seat가 도입되었으며, 사용 비용 예측 및 가시성이 향상되었습니다."
+            data-tt-example="">Teams 플랜 개선 — 신규 Premium Seat 및 비용 가시성 향상 (v3.7) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.6</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Auto-review Run Mode (v3.6)"
+                data-tt-desc="Auto-review는 더 적은 승인 프롬프트와 더 안전한 실행으로 Cursor가 더 오래 작동할 수 있는 새 실행 모드입니다. Shell, MCP, Fetch 툰 콜에 적용되며, 허용된 콜은 즉시 실행하고 샌드박스에서 실행 가능한 콜은 샌드박스에서 실행됩니다. Settings > Cursor Settings > Agents > Run Mode에서 구성."
+                data-tt-example="Settings > Cursor Settings > Agents > Run Mode">Auto-review Run Mode 추가 — 승인 프롬프트 최소화 + 안전 실행 (v3.6)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.5</summary>
@@ -134,6 +149,10 @@ const cursorContent = `
           <div>
             <div class="group">
               <div class="group-label">Composer 주요 제어</div>
+              <div class="row">
+                <div class="row-key">Canvas Design Mode</div>
+                <div class="row-desc">UI 선택 및 컨텍스트 리포트 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key">다중 파일 편집</div>
                 <div class="row-desc">Composer 창에서 여러 개의 파일을 한꺼번에 수정/생성</div>
