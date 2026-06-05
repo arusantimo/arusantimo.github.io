@@ -1,5 +1,6 @@
 import io
 import unittest
+from dataclasses import replace
 from contextlib import redirect_stdout
 from datetime import date
 from types import SimpleNamespace
@@ -244,6 +245,103 @@ class GenerateLatestTest(unittest.TestCase):
         g1_gate = next(rule for rule in entry["gates"] if rule["code"] == "G1")
         self.assertEqual(g1_gate["status"], "✅")
         self.assertIn("20MA", g1_gate["note"])
+
+    def _overextended_pullback_snapshot(self) -> StockSnapshot:
+        """주성엔지니어링 2026-06-05 재현: +27% 폭등·주봉 RSI 95.7·이평 과이격."""
+        return StockSnapshot(
+            rank=7,
+            code="036930",
+            name="주성엔지니어링",
+            current_price=250500.0,
+            prev_close=196900.0,
+            open_price=197100.0,
+            high_price=250500.0,
+            low_price=190300.0,
+            volume=100.0,
+            trading_value_text="1조",
+            market_cap_trillion=10.0,
+            foreign_net=252062.0,
+            institution_net=11672.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[250500.0] * 70,
+            high_history=[250500.0] * 70,
+            low_history=[190300.0] * 70,
+            volume_history=[100.0] * 70,
+            ma5=208180.0,
+            ma10=200000.0,
+            ma20=182440.0,
+            ma60=113990.0,
+            ma5_prev=200000.0,
+            ma20_prev=175000.0,
+            ma60_prev=110000.0,
+            weekly_rsi=95.7,
+            macd_hist=[0.5, 0.4, 0.3],
+            high_20d=250500.0,
+            low_5d=190300.0,
+            high_52w=250500.0,
+            return_5d=20.0,
+            return_20d=40.0,
+            return_21d=42.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=7.70,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+        )
+
+    def test_pullback_overextension_gates_block_parabolic_stock(self):
+        snapshot = self._overextended_pullback_snapshot()
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+        gates = {rule["code"]: rule for rule in entry["gates"]}
+
+        # 세 과열 가드레일이 모두 ⛔ 차단
+        self.assertEqual(gates["G6"]["status"], "⛔")  # 당일 +27% 급등
+        self.assertEqual(gates["G7"]["status"], "⛔")  # 주봉 RSI 95.7
+        self.assertEqual(gates["G8"]["status"], "⛔")  # 20/60MA 과이격
+        # 결과적으로 매매금지·진입 불가
+        self.assertIn("매매금지", entry["statusLabel"])
+        self.assertFalse(entry["entryEligible"])
+
+    def test_pullback_overextension_gates_pass_healthy_dip(self):
+        snapshot = self._overextended_pullback_snapshot()
+        # 건강한 눌림목으로 보정: 소폭 등락·정상 RSI·지지선 근접
+        snapshot = replace(
+            snapshot,
+            current_price=185000.0,
+            prev_close=183000.0,
+            high_price=186000.0,
+            weekly_rsi=58.0,
+            ma60=160000.0,
+            ma60_prev=158000.0,
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+        gates = {rule["code"]: rule for rule in entry["gates"]}
+
+        # 새 과열 가드레일은 건강한 눌림목을 차단하지 않는다(정상 신호 보존).
+        self.assertEqual(gates["G6"]["status"], "✅")  # 당일 +1.1%
+        self.assertEqual(gates["G7"]["status"], "✅")  # RSI 58
+        self.assertEqual(gates["G8"]["status"], "✅")  # 20MA +1.4%, 60MA 이격 정상 범위
 
     def test_daily_output_paths_use_compact_date(self):
         json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_STABLE)

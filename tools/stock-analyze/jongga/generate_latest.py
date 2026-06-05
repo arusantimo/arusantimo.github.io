@@ -75,6 +75,9 @@ from jongga.rule_evaluation import (
     evaluate_pullback_g3,
     evaluate_pullback_g4,
     evaluate_pullback_g5,
+    evaluate_pullback_g6_daily_change,
+    evaluate_pullback_g7_rsi_ceiling,
+    evaluate_pullback_g8_extension,
     evaluate_pullback_p1,
     evaluate_pullback_p2,
     evaluate_pullback_s1,
@@ -2165,6 +2168,7 @@ def finalize_scored_buy_entry(entry: dict[str, Any], context: dict[str, Any] | N
 
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
+    daily_change_pct = stock_daily_change(snapshot)
     score_map = {
         "S1": evaluate_pullback_s1(snapshot),
         "S2": evaluate_pullback_s2(snapshot),
@@ -2181,6 +2185,9 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict("G3", evaluate_pullback_g3(snapshot)),
         gate_dict("G4", evaluate_pullback_g4(snapshot, recent_negative_cross)),
         evaluate_pullback_g5(context),
+        gate_dict("G6", evaluate_pullback_g6_daily_change(snapshot, daily_change_pct)),
+        gate_dict("G7", evaluate_pullback_g7_rsi_ceiling(snapshot)),
+        gate_dict("G8", evaluate_pullback_g8_extension(snapshot)),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("pullback", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])

@@ -175,6 +175,51 @@ def evaluate_pullback_g5(context: dict[str, Any]) -> dict[str, Any]:
     return gate
 
 
+# --- Pullback overextension gates (눌림목 과열 차단 가드레일) ---
+# 눌림목은 "상승추세 종목이 지지선까지 눌렸을 때" 매수하는 전략이다.
+# 아래 세 게이트는 '눌림'이 아니라 '과열·추격'인 종목을 ⛔로 차단한다.
+# 절대 지수 스케일과 무관한 비율 기준만 사용한다.
+PULLBACK_MAX_DAILY_CHANGE_PCT = 12.0
+PULLBACK_MAX_WEEKLY_RSI = 80.0
+PULLBACK_MAX_EXT_MA20_PCT = 25.0
+PULLBACK_MAX_EXT_MA60_PCT = 60.0
+
+
+def evaluate_pullback_g6_daily_change(snapshot: Any, daily_change_pct: float) -> EvalResult:
+    """당일 급등일은 눌림목이 아니라 추격 매수 → 차단."""
+    note = f"당일 등락 {signed_pct(daily_change_pct, 2)} (필요 ≤ +{PULLBACK_MAX_DAILY_CHANGE_PCT:.0f}%)"
+    if daily_change_pct <= PULLBACK_MAX_DAILY_CHANGE_PCT:
+        return eval_met(note)
+    return eval_not_met(f"{note} · 급등일은 눌림목 부적합")
+
+
+def evaluate_pullback_g7_rsi_ceiling(snapshot: Any) -> EvalResult:
+    """주봉 RSI 과매수 상한 — G3(≥50 하한)의 반대편 가드. 과열 구간 매수 차단."""
+    if snapshot.weekly_rsi is None:
+        return eval_data_missing("주봉 RSI(14) 산출 데이터 부족")
+    note = f"주봉 RSI {snapshot.weekly_rsi:.1f} (필요 ≤ {PULLBACK_MAX_WEEKLY_RSI:.0f})"
+    if snapshot.weekly_rsi <= PULLBACK_MAX_WEEKLY_RSI:
+        return eval_met(note)
+    return eval_not_met(f"{note} · 과매수 과열")
+
+
+def evaluate_pullback_g8_extension(snapshot: Any) -> EvalResult:
+    """이평 이격 상한 — 지지선까지 '눌린' 상태여야 함. 과이격이면 눌림 아님."""
+    ma20, ma60 = snapshot.ma20, snapshot.ma60
+    price = snapshot.current_price
+    if ma20 is None or ma60 is None:
+        return eval_data_missing("20/60일 이동평균 산출 데이터 부족")
+    ext20 = (price / ma20 - 1) * 100 if ma20 else 0.0
+    ext60 = (price / ma60 - 1) * 100 if ma60 else 0.0
+    note = (
+        f"이격 20MA {signed_pct(ext20, 1)} (필요 ≤ +{PULLBACK_MAX_EXT_MA20_PCT:.0f}%) · "
+        f"60MA {signed_pct(ext60, 1)} (필요 ≤ +{PULLBACK_MAX_EXT_MA60_PCT:.0f}%)"
+    )
+    if ext20 <= PULLBACK_MAX_EXT_MA20_PCT and ext60 <= PULLBACK_MAX_EXT_MA60_PCT:
+        return eval_met(note)
+    return eval_not_met(f"{note} · 과이격(지지선 눌림 아님)")
+
+
 # --- Pullback scores ---
 
 
