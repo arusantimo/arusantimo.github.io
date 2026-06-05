@@ -11,6 +11,9 @@ BUY_STATUS_MARKERS = (
     "진입 가능",
 )
 
+# 거시 시장 차단 게이트 코드 (종목 셋업과 무관, 시장 상태가 바뀌면 해제됨)
+MACRO_GATE_CODES = frozenset({"G5"})
+
 
 def _gate_blockers(rows: list[dict[str, Any]]) -> list[str]:
     blockers: list[str] = []
@@ -19,6 +22,38 @@ def _gate_blockers(rows: list[dict[str, Any]]) -> list[str]:
             code = str(row.get("code") or "").strip() or "?"
             blockers.append(f"핵심 Gate 미충족: {code}")
     return blockers
+
+
+def _classify_setup_quality(
+    grade: str,
+    gates: list[dict[str, Any]],
+    filters: list[dict[str, Any]],
+    entry_eligible: bool,
+) -> str:
+    """차단 엔트리를 '시장 보류'와 '셋업 미흡'으로 구분.
+
+    - "eligible": 진입 가능 (차단 없음)
+    - "market_hold": 셋업(등급·캔들·기술 게이트)은 양호하나 오직 거시 G5만 차단
+    - "setup_weak": 셋업 자체에 문제 (등급 B↓ 또는 비거시 게이트 ⛔)
+    """
+    if entry_eligible:
+        return "eligible"
+
+    grade_code = str(grade or "").strip().upper()[:1]
+    grade_ok = grade_code in {"S", "A"}
+
+    all_rows = list(gates or []) + list(filters or [])
+    blocked_codes = {
+        str(row.get("code") or "").strip()
+        for row in all_rows
+        if row.get("status") == "⛔"
+    }
+
+    # 차단 게이트가 모두 거시(G5)이고 등급도 양호한 경우만 market_hold
+    if grade_ok and blocked_codes and blocked_codes.issubset(MACRO_GATE_CODES):
+        return "market_hold"
+
+    return "setup_weak"
 
 
 def _is_buy_status_label(status_label: str) -> bool:
@@ -63,11 +98,13 @@ def compute_entry_eligibility(
 
     entry_eligible = not blockers and grade_ok and buy_status
     entry_watch = not entry_eligible and not blockers and grade_code == "B" and watch_status
+    setup_quality = _classify_setup_quality(grade, gate_rows, filter_rows, entry_eligible)
 
     return {
         "entryEligible": entry_eligible,
         "entryWatch": entry_watch,
         "entryBlockers": blockers,
+        "setupQuality": setup_quality,
     }
 
 

@@ -645,6 +645,63 @@ function renderSwingCards() {
   });
 }
 
+/** 시장 거시 보류 배너 렌더링.
+ *  전 전략 후보가 오직 시장(G5) 때문에 막힌 경우 상단에 이유 요약 배너를 표시.
+ *  셋업이 약한 경우(setup_weak)나 일부만 막힌 경우에는 표시 안 함. */
+function renderBuyMarketHoldBanner() {
+  const banner = document.getElementById('buy-market-hold-banner');
+  if (!banner) return;
+
+  const allEntries = [
+    ...(notionSnapshot.pullbackEntries || []),
+    ...(notionSnapshot.accumulationEntries || []),
+    ...(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || []),
+    ...(notionSnapshot.reversalEntries || []),
+  ];
+
+  const totalWithQuality = allEntries.filter(e => e.setupQuality);
+  if (!totalWithQuality.length) { banner.innerHTML = ''; return; }
+
+  const eligibleCount = allEntries.filter(e => e.entryEligible).length;
+  const marketHoldCount = allEntries.filter(e => e.setupQuality === 'market_hold').length;
+  const setupWeakCount = allEntries.filter(e => e.setupQuality === 'setup_weak').length;
+
+  // 배너 표시 조건: 매수 가능 종목이 없고 market_hold가 1개 이상
+  if (eligibleCount > 0 || marketHoldCount === 0) { banner.innerHTML = ''; return; }
+
+  // 거시 컨텍스트 추출
+  const kospiClose = notionSnapshot.kospiClose || notionSnapshot.marketContext?.find?.(r => r.item === 'KOSPI')?.value || '';
+  const kospiMa5 = notionSnapshot.kospiMa5;
+  const vkospi = notionSnapshot.vkospiValue || notionSnapshot.marketContext?.find?.(r => r.item?.includes('VKOSPI'))?.value || '';
+  const regimeLabel = notionSnapshot.regimeLabel || '';
+
+  let kospiDesc = '';
+  if (kospiClose && kospiMa5 && Number(kospiClose) && Number(kospiMa5)) {
+    const pct = ((Number(kospiClose) / Number(kospiMa5)) - 1) * 100;
+    const sign = pct >= 0 ? '+' : '';
+    kospiDesc = `KOSPI ${Number(kospiClose).toLocaleString('ko-KR', {maximumFractionDigits:0})} / 5일선 ${Number(kospiMa5).toLocaleString('ko-KR', {maximumFractionDigits:0})} (${sign}${pct.toFixed(1)}%)`;
+  }
+  const vkospiDesc = vkospi ? `VKOSPI ${Number(vkospi).toFixed(1)}` : '';
+
+  const marketDesc = [kospiDesc, vkospiDesc].filter(Boolean).join(' · ');
+
+  banner.innerHTML = `
+    <div class="market-hold-banner">
+      <div class="market-hold-banner-icon">⚠️</div>
+      <div class="market-hold-banner-body">
+        <div class="market-hold-banner-title">오늘은 전 종목 종가 베팅 보류 권고</div>
+        <div class="market-hold-banner-desc">
+          ${marketDesc ? `${escapeHtml(marketDesc)} — KOSPI 단기 추세 이탈로 거시 G5 차단.` : '거시 시장 조건 미충족으로 진입 보류.'}
+          ${setupWeakCount > 0 ? ` (셋업 미흡 ${setupWeakCount}건 포함)` : ''}
+        </div>
+        <div class="market-hold-banner-sub">
+          셋업 양호·시장 보류 <strong>${marketHoldCount}</strong>건 — 시장이 회복되면 재검토 후보로 우선 활용하세요.
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderBuyStockCards() {
   const renderGroup = (entries, containerId) => {
     const container = document.getElementById(containerId);
@@ -666,6 +723,15 @@ function renderBuyStockCards() {
       const liveMetaHtml = presentation.liveRefresh
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
+
+      // setupQuality 배지: market_hold는 노란색 "시장 보류", setup_weak는 회색 "셋업 미흡"
+      const sq = entry.setupQuality;
+      const setupBadgeHtml = !entry.entryEligible && sq === 'market_hold'
+        ? '<span class="buy-setup-badge market-hold">📌 셋업 양호 · 시장 보류</span>'
+        : !entry.entryEligible && sq === 'setup_weak'
+          ? '<span class="buy-setup-badge setup-weak">셋업 미흡</span>'
+          : '';
+
       container.innerHTML += `
         <div class="buy-card ${verdictClass}" data-code="${entry.code}">
           <div class="buy-card-head">
@@ -684,6 +750,7 @@ function renderBuyStockCards() {
             </div>
           </div>
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
+          ${setupBadgeHtml}
           <div class="buy-card-tags">
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
@@ -719,6 +786,7 @@ function renderAll() {
   updateRegimeHeader();
   renderGuideTables();
   renderBuyStockCards();
+  renderBuyMarketHoldBanner();
   renderSellStockCards();
   updateAnalyzeButtonState();
   updateTabUI();

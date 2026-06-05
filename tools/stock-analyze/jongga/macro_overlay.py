@@ -314,10 +314,24 @@ def build_pullback_g5_gate(context: dict[str, Any]) -> dict[str, Any]:
     kospi_ma5 = float(context.get("kospiMa5") or 0)
     vkospi = float(context.get("vkospiValue") or 0)
     vkospi_label = str(context.get("vkospiLabel") or "VKOSPI")
-    note_base = f"KOSPI>{kospi_ma5:.2f}, {vkospi_label} {vkospi:.2f}" if kospi_ma5 > 0 else f"{vkospi_label} {vkospi:.2f}"
 
-    if kospi_ma5 <= 0 or kospi_close <= kospi_ma5:
-        return {"code": "G5", "status": "⛔", "note": note_base}
+    # KOSPI 종가 vs 5MA 비교를 명확히 표기 — 기존 노트는 "KOSPI>8582" 형태로
+    # KOSPI가 5MA 위인 것처럼 보여 차단 이유를 역방향으로 오해시켰음.
+    if kospi_ma5 > 0 and kospi_close > 0:
+        pct = (kospi_close / kospi_ma5 - 1) * 100
+        sign = "+" if pct >= 0 else ""
+        kospi_note = f"KOSPI {kospi_close:,.0f} / 5MA {kospi_ma5:,.0f} ({sign}{pct:.1f}%)"
+    elif kospi_ma5 > 0:
+        kospi_note = f"KOSPI 데이터 없음 / 5MA {kospi_ma5:,.0f}"
+    else:
+        kospi_note = "KOSPI 5MA 데이터 없음"
+    vkospi_note = f"{vkospi_label} {vkospi:.1f}"
+    note_base = f"{kospi_note} · {vkospi_note}"
+
+    if kospi_ma5 <= 0:
+        return {"code": "G5", "status": "⛔", "note": f"{note_base} · KOSPI 5MA 데이터 부족"}
+    if kospi_close <= kospi_ma5:
+        return {"code": "G5", "status": "⛔", "note": f"{note_base} · KOSPI 단기 추세 이탈"}
 
     macro_friendly = is_macro_friendly_for_g5(context)
     if vkospi <= PULLBACK_G5_VKOSPI_STRICT:

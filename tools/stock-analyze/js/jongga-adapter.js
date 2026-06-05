@@ -206,7 +206,8 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
       ? {
           entryEligible: effectiveRawEntry.entryEligible,
           entryWatch: Boolean(effectiveRawEntry.entryWatch),
-          entryBlockers: Array.isArray(effectiveRawEntry.entryBlockers) ? effectiveRawEntry.entryBlockers : []
+          entryBlockers: Array.isArray(effectiveRawEntry.entryBlockers) ? effectiveRawEntry.entryBlockers : [],
+          setupQuality: String(effectiveRawEntry.setupQuality || 'setup_weak')
         }
       : {}),
     grade,
