@@ -92,17 +92,17 @@ python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\
 | JSON 키 | 표시명 | 요약 |
 |---------|--------|------|
 | `pullback` | 눌림목 | 장기 추세 눌림 + 반등 |
-| `breakout` | 주도주 돌파형 | 52주 고가 ≥92%, 거래량 150%+, 강마감·양매수 (구 `momentum` → 읽기 alias) |
-| `accumulation` | 수급 매집형 | 52주 고가 &lt;92%, 거래량 축소·횡보 박스, 양매수 |
+| `breakout` | 주도주 돌파형 | 52주 고가 90%권+, 거래량 150%+, 강마감·5MA는 경고 허용 (구 `momentum` → 읽기 alias) |
+| `accumulation` | 수급 매집형 | 52주 고가 &lt;92%가 이상적이지만 근접 고점·수급 첫 유입은 경고 허용, 거래량 150% 미만 |
 | `reversal` | 급락 반등 | 역추세 단기 |
 
-**상호 배타**: 돌파 G2(52주 ≥92%) vs 매집 G2(&lt;92%) — 동일 종목이 양쪽 TOP에 동시 노출되지 않습니다.
+**전략 구분 원칙**: 돌파는 52주 고가 90%권 이상, 매집은 52주 고가 &lt;92%를 이상형으로 봅니다. 다만 매집 G2는 초입 종목을 놓치지 않도록 `⚠️` 경고 허용이라 일부 종목은 양쪽 후보로 함께 관찰될 수 있습니다.
 
 **레짐별 일일 슬롯 (TOP3 확정)**: 강세 3/3/3, 순환 2/3/2, 박스 1/3/3 (돌파/매집/눌림). `decide_regime`·[`strategy_regime.py`](strategy_regime.py) 참고.
 
-**돌파형 Gate (미충족 ⛔)**: G1 RS·G2 52주·G3 TOP100·G4 거래량 150%·G5 캔들·G6 당일 +12% 상한·G7 5MA 상승.
+**돌파형 Gate**: G1 RS·G2 52주 90%권·G3 TOP100·G4 거래량 150%·G5 캔들·G6 당일 +12% 상한·G7 5MA 상승. 단, G5·G7은 추세가 살아 있으면 `⚠️` 경고로만 남길 수 있습니다.
 
-**매집형 Gate**: G0 과거 거래량 급증·G1 60MA·G2 52주 &lt;92%·G3 TOP100·G4 당일 거래량 &lt;120%·G5 VKOSPI(눌림목 G5 재사용).
+**매집형 Gate**: G0 2일 수급 유입·G1 60MA·G2 52주 &lt;92%·G3 TOP100·G4 당일 거래량 &lt;150%·G5 VKOSPI(눌림목 G5 재사용). G0·G2는 초입 종목을 놓치지 않도록 `⚠️` 경고 허용입니다.
 
 산출 JSON은 `entries.breakout`·`entries.accumulation`을 씁니다. 과거 파일의 `entries.momentum`은 프론트 [`jongga-schema.js`](../js/jongga-schema.js)에서 `breakout`으로 정규화합니다.
 

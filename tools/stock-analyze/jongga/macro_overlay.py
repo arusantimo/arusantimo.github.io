@@ -236,6 +236,7 @@ def apply_regime_fields_to_context(
 
 
 def trend_status_label(
+    strategy: str,
     grade: str,
     regime_label: str,
     gap_code: str,
@@ -261,11 +262,15 @@ def trend_status_label(
             return "강력매수(소액)"
         if grade == "A":
             return "관심후보(약세·소액)"
+        if strategy == "pullback" and grade == "B":
+            return "관심후보(B·조건부)"
         return "매매금지(약세장)"
     if grade == "S":
         return "강력매수"
     if grade == "A":
         return "매수추천"
+    if strategy == "pullback" and grade == "B":
+        return "진입 가능(B·조건부)"
     if grade == "B":
         return "관심후보"
     return "제외"
@@ -329,9 +334,9 @@ def build_pullback_g5_gate(context: dict[str, Any]) -> dict[str, Any]:
     note_base = f"{kospi_note} · {vkospi_note}"
 
     if kospi_ma5 <= 0:
-        return {"code": "G5", "status": "⛔", "note": f"{note_base} · KOSPI 5MA 데이터 부족"}
+        return {"code": "G5", "status": "⚠️", "note": f"{note_base} · KOSPI 5MA 데이터 부족"}
     if kospi_close <= kospi_ma5:
-        return {"code": "G5", "status": "⛔", "note": f"{note_base} · KOSPI 단기 추세 이탈"}
+        return {"code": "G5", "status": "⚠️", "note": f"{note_base} · KOSPI 단기 추세 이탈"}
 
     macro_friendly = is_macro_friendly_for_g5(context)
     if vkospi <= PULLBACK_G5_VKOSPI_STRICT:

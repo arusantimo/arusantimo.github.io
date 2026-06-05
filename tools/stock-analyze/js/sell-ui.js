@@ -230,16 +230,35 @@ renderSellStockCards = function renderSellStockCardsOverride() {
 };
 
 renderBuyStockCards = function renderBuyStockCardsOverride() {
+  const replayViewMode = typeof getJonggaReplayViewMode === 'function'
+    ? getJonggaReplayViewMode()
+    : 'recommendation';
+  const filterEntries = entries => (
+    typeof filterJonggaReplayViewEntries === 'function'
+      ? filterJonggaReplayViewEntries(entries, replayViewMode)
+      : (Array.isArray(entries) ? entries : [])
+  );
+  const emptyMessage = replayViewMode === 'replay'
+    ? '6.0 & B 조건을 만족하는 종목이 없습니다.'
+    : replayViewMode === 'all'
+      ? '전체 후보가 없습니다.'
+    : '매수추천 조건을 만족하는 종목이 없습니다.';
+
+  if (typeof updateJonggaReplayViewControls === 'function') {
+    updateJonggaReplayViewControls(getActiveBuySnapshot());
+  }
+
   const renderGroup = (entries, containerId) => {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
-    if (!entries.length) {
-      container.innerHTML = '<div class="empty-state">전략 JSON에서 불러온 매수 후보가 없습니다.</div>';
+    const visibleEntries = filterEntries(entries);
+    if (!visibleEntries.length) {
+      container.innerHTML = `<div class="empty-state">${escapeHtml(emptyMessage)}</div>`;
       return;
     }
 
-    container.innerHTML = entries.map(entry => {
+    container.innerHTML = visibleEntries.map(entry => {
       const gateSummary = summarizeGateStatus(entry);
       const presentation = getBuyPresentation(entry);
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';

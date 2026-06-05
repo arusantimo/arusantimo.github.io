@@ -9,6 +9,7 @@ function computeEntryEligibility(strategy, grade, statusLabel, gates = [], filte
 
   const label = String(statusLabel || '').trim();
   const gradeCode = String(grade || '').trim().charAt(0).toUpperCase();
+  const normalizedStrategy = String(strategy || '').trim().toLowerCase();
 
   if (label.includes('매매금지')) {
     if (!blockers.some(item => item.includes('매매금지'))) blockers.push(label);
@@ -16,17 +17,20 @@ function computeEntryEligibility(strategy, grade, statusLabel, gates = [], filte
     blockers.push('제외');
   }
 
-  const minGrades = new Set(['S', 'A']);
+  const minGrades = normalizedStrategy === 'pullback'
+    ? new Set(['S', 'A', 'B'])
+    : new Set(['S', 'A']);
   const gradeOk = minGrades.has(gradeCode);
   if (!gradeOk && gradeCode) {
-    blockers.push(`등급 ${gradeCode} — 진입 최소 A, S`);
+    blockers.push(`등급 ${gradeCode} — 진입 최소 ${Array.from(minGrades).sort().join(', ')}`);
   }
 
   const buyStatus = label && !label.includes('매매금지') && label !== '제외'
     && ['강력매수', '매수추천', '최우선 진입', '진입 가능'].some(marker => label.includes(marker));
   const watchStatus = label.includes('관심후보') && !label.includes('매매금지');
 
-  const entryEligible = !blockers.length && gradeOk && buyStatus;
+  const conditionalPullbackB = normalizedStrategy === 'pullback' && gradeCode === 'B' && watchStatus;
+  const entryEligible = !blockers.length && gradeOk && (buyStatus || conditionalPullbackB);
   const entryWatch = !entryEligible && !blockers.length && gradeCode === 'B' && watchStatus;
 
   return { entryEligible, entryWatch, entryBlockers: blockers };

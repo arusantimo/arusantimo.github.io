@@ -20,6 +20,10 @@ export FORCE_COLOR=1
 
 pushd "$script_dir" >/dev/null || exit 1
 
+echo
+echo "  [COMMAND] 추천 생성 + 자동 replay 검증 + 화면 브리지 갱신"
+echo
+
 if command -v python3 >/dev/null 2>&1; then
   python_cmd=python3
 elif command -v python >/dev/null 2>&1; then

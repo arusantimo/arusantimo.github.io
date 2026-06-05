@@ -132,9 +132,15 @@ function buildPullbackG5Gate(context = {}) {
   const kospiMa5 = Number(context.kospiMa5);
   const vkospi = Number(context.vkospiValue);
   const vkospiLabel = String(context.vkospiLabel || 'VKOSPI');
-  const noteBase = Number.isFinite(kospiMa5) && kospiMa5 > 0
-    ? `KOSPI>${kospiMa5.toFixed(2)}, ${vkospiLabel} ${vkospi.toFixed(2)}`
-    : `${vkospiLabel} ${vkospi.toFixed(2)}`;
+  let kospiNote = 'KOSPI 5MA 데이터 없음';
+  if (Number.isFinite(kospiMa5) && kospiMa5 > 0 && Number.isFinite(kospiClose) && kospiClose > 0) {
+    const pct = ((kospiClose / kospiMa5) - 1) * 100;
+    const sign = pct >= 0 ? '+' : '';
+    kospiNote = `KOSPI ${kospiClose.toLocaleString('ko-KR', { maximumFractionDigits: 0 })} / 5MA ${kospiMa5.toLocaleString('ko-KR', { maximumFractionDigits: 0 })} (${sign}${pct.toFixed(1)}%)`;
+  } else if (Number.isFinite(kospiMa5) && kospiMa5 > 0) {
+    kospiNote = `KOSPI 데이터 없음 / 5MA ${kospiMa5.toLocaleString('ko-KR', { maximumFractionDigits: 0 })}`;
+  }
+  const noteBase = `${kospiNote} · ${vkospiLabel} ${Number.isFinite(vkospi) ? vkospi.toFixed(1) : '0.0'}`;
 
   if ((!Number.isFinite(kospiMa5) || kospiMa5 <= 0) && (!Number.isFinite(vkospi) || vkospi <= 0)) {
     return { code: 'G5', status: '⚠️', note: `${noteBase} · KOSPI·VKOSPI 시장지표 부족`, evalStatus: 'data_missing' };
@@ -143,7 +149,7 @@ function buildPullbackG5Gate(context = {}) {
     return { code: 'G5', status: '⚠️', note: `${noteBase} · KOSPI 5일선 데이터 부족`, evalStatus: 'data_missing' };
   }
   if (!Number.isFinite(kospiClose) || kospiClose <= kospiMa5) {
-    return { code: 'G5', status: '⛔', note: noteBase, evalStatus: 'not_met' };
+    return { code: 'G5', status: '⚠️', note: `${noteBase} · KOSPI 단기 추세 이탈`, evalStatus: 'not_met' };
   }
   if (vkospi <= PULLBACK_G5_VKOSPI_STRICT) {
     return { code: 'G5', status: '✅', note: noteBase, evalStatus: 'met' };
@@ -219,7 +225,7 @@ function resolveMacroOverlayContext(slot = {}, root = {}, analysisDate = '') {
   };
 }
 
-function recalculateTrendStatusLabel(grade, regimeLabel, gapCode, gates, overlay = {}) {
+function recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, gates, overlay = {}) {
   const blocked = (gates || []).some(gate => gate.status === '⛔');
   if (blocked) return '매매금지(핵심 Gate 미충족)';
   if (gapCode === 'G-E') return '매매금지(갭다운 경고)';
@@ -232,10 +238,12 @@ function recalculateTrendStatusLabel(grade, regimeLabel, gapCode, gates, overlay
     }
     if (grade === 'S') return '강력매수(소액)';
     if (grade === 'A') return '관심후보(약세·소액)';
+    if (strategy === 'pullback' && grade === 'B') return '관심후보(B·조건부)';
     return '매매금지(약세장)';
   }
   if (grade === 'S') return '강력매수';
   if (grade === 'A') return '매수추천';
+  if (strategy === 'pullback' && grade === 'B') return '진입 가능(B·조건부)';
   if (grade === 'B') return '관심후보';
   return '제외';
 }
@@ -275,18 +283,13 @@ function applyMacroOverlayToEntry(entry, strategy, context) {
   };
   const next = { ...entry };
   if (strategy === 'pullback') {
-    const g5Note = (next.gates || []).find(gate => gate.code === 'G5')?.note || '';
-    const ma5FromNote = g5Note.match(/KOSPI>([\d,.]+)/);
-    if (!Number.isFinite(gateContext.kospiMa5) && ma5FromNote) {
-      gateContext.kospiMa5 = Number(ma5FromNote[1].replace(/,/g, ''));
-    }
     const g5 = buildPullbackG5Gate(gateContext);
     next.gates = (next.gates || []).map(gate => (gate.code === 'G5' ? g5 : gate));
   }
   if (strategy === 'reversal') {
     next.statusLabel = recalculateReversalStatusLabel(grade, regimeLabel, gapCode, next.filters, next.gates, gateContext);
   } else {
-    next.statusLabel = recalculateTrendStatusLabel(grade, regimeLabel, gapCode, next.gates, gateContext);
+    next.statusLabel = recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, next.gates, gateContext);
   }
   if (typeof attachEntryEligibility === 'function') {
     return attachEntryEligibility(next);

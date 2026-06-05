@@ -11,7 +11,7 @@ from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
-from jongga.rule_evaluation import evaluate_reversal_f2, evaluate_reversal_g1, evaluate_reversal_g4
+from jongga.rule_evaluation import evaluate_reversal_f2, evaluate_reversal_g1, evaluate_reversal_g2, evaluate_reversal_g4
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -983,23 +983,28 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(c3_rule["evalStatus"], "not_met")
         self.assertIn("미달", c3_rule["note"])
 
-    def test_reversal_thresholds_are_relaxed_for_large_secondary_leaders(self):
+    def test_reversal_thresholds_are_relaxed_for_practical_candidates(self):
         snapshot = SimpleNamespace(
-            market_cap_trillion=8.5,
-            return_21d=22.0,
-            close_history=[100.0, 96.0, 100.0, 101.0, 102.0, 103.0],
+            market_cap_trillion=5.2,
+            return_21d=15.0,
+            close_history=[100.0, 97.0, 100.0, 101.0, 102.0, 103.0],
+            high_20d=108.0,
+            current_price=102.0,
         )
 
         f2 = evaluate_reversal_f2(snapshot)
         g1 = evaluate_reversal_g1(snapshot)
+        g2 = evaluate_reversal_g2(snapshot)
         g4 = evaluate_reversal_g4(snapshot)
 
         self.assertEqual(f2.eval_status, "met")
         self.assertEqual(g1.eval_status, "met")
+        self.assertEqual(g2.eval_status, "met")
         self.assertEqual(g4.eval_status, "met")
-        self.assertIn("필요 ≥ 8조", f2.note)
-        self.assertIn("필요 ≥ +20%", g1.note)
-        self.assertIn("필요 -4% 이하", g4.note)
+        self.assertIn("필요 ≥ 5조", f2.note)
+        self.assertIn("필요 ≥ +15%", g1.note)
+        self.assertIn("필요 -5%~-25%", g2.note)
+        self.assertIn("필요 -3% 이하", g4.note)
 
     def _sample_payload(self):
         return {
@@ -1073,6 +1078,128 @@ class GenerateLatestTest(unittest.TestCase):
         quiet = make_snapshot(price=80000.0, high_52w=100000.0)
         self.assertFalse(evaluate_breakout_g2(quiet).passed)
         self.assertTrue(evaluate_accumulation_g2(quiet).passed)
+
+    def test_accumulation_confirmation_gates_are_warning_not_hard_block(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=130.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=1500.0,
+            institution_net=500.0,
+            foreign_previous=-200.0,
+            institution_previous=-100.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[130.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=93800.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=93700.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=100000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=110.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={},
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+        g0_gate = next(rule for rule in entry["gates"] if rule["code"] == "G0")
+        g2_gate = next(rule for rule in entry["gates"] if rule["code"] == "G2")
+        g4_gate = next(rule for rule in entry["gates"] if rule["code"] == "G4")
+
+        self.assertEqual(g0_gate["status"], "⚠️")
+        self.assertEqual(g2_gate["status"], "⚠️")
+        self.assertEqual(g4_gate["status"], "✅")
+
+    def test_breakout_candle_and_ma5_gates_are_warning_not_hard_block(self):
+        snapshot = StockSnapshot(
+            rank=8,
+            code="000660",
+            name="하이닉스",
+            current_price=90000.0,
+            prev_close=88500.0,
+            open_price=88000.0,
+            high_price=93000.0,
+            low_price=87500.0,
+            volume=220.0,
+            trading_value_text="1,500억",
+            market_cap_trillion=60.0,
+            foreign_net=1200.0,
+            institution_net=700.0,
+            foreign_previous=500.0,
+            institution_previous=300.0,
+            close_history=[90000.0] * 21,
+            high_history=[93000.0] * 21,
+            low_history=[87000.0] * 21,
+            volume_history=[220.0] + [100.0] * 20,
+            ma5=90500.0,
+            ma10=89000.0,
+            ma20=88000.0,
+            ma60=84000.0,
+            ma5_prev=91000.0,
+            ma20_prev=87500.0,
+            ma60_prev=83500.0,
+            weekly_rsi=62.0,
+            macd_hist=[0.4, 0.3, 0.2],
+            high_20d=90500.0,
+            low_5d=86000.0,
+            high_52w=100000.0,
+            return_5d=6.0,
+            return_20d=18.0,
+            return_21d=18.0,
+            volume_avg_5d=130.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.4,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={"avgStrength": 112.0, "intradayAbove100Ratio": 75.0},
+            orderbook={"bidAskRatio": 1.2},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+        }
+
+        entry = build_breakout_entry(snapshot, context, True, 1.0, 5.0)
+        g5_gate = next(rule for rule in entry["gates"] if rule["code"] == "G5")
+        g7_gate = next(rule for rule in entry["gates"] if rule["code"] == "G7")
+
+        self.assertEqual(g5_gate["status"], "⚠️")
+        self.assertEqual(g7_gate["status"], "⚠️")
 
     def test_build_momentum_entry_is_breakout_alias(self):
         snapshot = StockSnapshot(

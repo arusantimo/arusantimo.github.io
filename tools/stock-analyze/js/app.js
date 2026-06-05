@@ -127,6 +127,14 @@ document.getElementById('sell-universe-switch')?.addEventListener('click', event
   }
 });
 
+document.getElementById('jongga-replay-view-switch')?.addEventListener('click', event => {
+  const button = event.target.closest('[data-jongga-replay-view]');
+  if (!button) return;
+  if (typeof setJonggaReplayViewMode === 'function') {
+    setJonggaReplayViewMode(button.dataset.jonggaReplayView);
+  }
+});
+
 document.getElementById('btn-analyze').addEventListener('click', async () => {
   const btn = document.getElementById('btn-analyze');
   if (isAnalysisRunning) return;
@@ -211,6 +219,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (document.getElementById('jongga-quality-panel')) {
     if (typeof bindJonggaLoaderControls === 'function') bindJonggaLoaderControls();
+    if (typeof bindJonggaReplayControls === 'function') bindJonggaReplayControls();
     renderAll();
     restoreAnalysisArchiveState();
     if (typeof loadInitialJonggaData === 'function') loadInitialJonggaData();

@@ -703,16 +703,35 @@ function renderBuyMarketHoldBanner() {
 }
 
 function renderBuyStockCards() {
+  const replayViewMode = typeof getJonggaReplayViewMode === 'function'
+    ? getJonggaReplayViewMode()
+    : 'recommendation';
+  const filterEntries = entries => (
+    typeof filterJonggaReplayViewEntries === 'function'
+      ? filterJonggaReplayViewEntries(entries, replayViewMode)
+      : (Array.isArray(entries) ? entries : [])
+  );
+  const emptyMessage = replayViewMode === 'replay'
+    ? '6.0 & B 조건을 만족하는 종목이 없습니다.'
+    : replayViewMode === 'all'
+      ? '전체 후보가 없습니다.'
+    : '매수추천 조건을 만족하는 종목이 없습니다.';
+
+  if (typeof updateJonggaReplayViewControls === 'function') {
+    updateJonggaReplayViewControls(getActiveBuySnapshot());
+  }
+
   const renderGroup = (entries, containerId) => {
     const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
-    if (!entries.length) {
-      container.innerHTML = '<div class="empty-state">전략 JSON에서 불러온 매수 후보가 없습니다.</div>';
+    const visibleEntries = filterEntries(entries);
+    if (!visibleEntries.length) {
+      container.innerHTML = `<div class="empty-state">${escapeHtml(emptyMessage)}</div>`;
       return;
     }
 
-    entries.forEach(entry => {
+    visibleEntries.forEach(entry => {
       const gateSummary = summarizeGateStatus(entry);
       const presentation = getBuyPresentation(entry);
       const verdictClass = presentation.verdictClass;
@@ -733,7 +752,7 @@ function renderBuyStockCards() {
           : '';
 
       container.innerHTML += `
-        <div class="buy-card ${verdictClass}" data-code="${entry.code}">
+        <div class="buy-card ${verdictClass}" data-entry-key="${escapeHtml(entry.entryKey)}">
           <div class="buy-card-head">
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}</div>
@@ -768,7 +787,7 @@ function renderBuyStockCards() {
     });
 
     container.querySelectorAll('.buy-card').forEach(card => {
-      card.addEventListener('click', () => openModal(card.dataset.code, 'buy'));
+      card.addEventListener('click', () => openModal(card.dataset.entryKey, 'buy'));
     });
   };
 

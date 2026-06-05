@@ -2245,7 +2245,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "name": snapshot.name,
         "code": snapshot.code,
         **scoring,
-        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
+        "statusLabel": trend_status_label("pullback", grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "pullback",
         "gates": gates,
         "matchedRules": matched_rules,
@@ -2288,9 +2288,9 @@ def build_breakout_entry(
         gate_dict("G2", evaluate_breakout_g2(snapshot)),
         gate_dict("G3", evaluate_breakout_g3(snapshot)),
         gate_dict("G4", evaluate_breakout_g4_volume(snapshot)),
-        gate_dict("G5", evaluate_breakout_g5_candle(snapshot, candle_range, upper_wick_ratio)),
+        gate_dict("G5", evaluate_breakout_g5_candle(snapshot, candle_range, upper_wick_ratio), warn_if_not_met=True),
         gate_dict("G6", evaluate_breakout_g6_daily_change(snapshot, daily_change_pct)),
-        gate_dict("G7", evaluate_breakout_g7_ma5(snapshot)),
+        gate_dict("G7", evaluate_breakout_g7_ma5(snapshot), warn_if_not_met=True),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("breakout", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
@@ -2308,7 +2308,7 @@ def build_breakout_entry(
         "name": snapshot.name,
         "code": snapshot.code,
         **scoring,
-        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
+        "statusLabel": trend_status_label("breakout", grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "breakout",
         "gates": gates,
         "matchedRules": matched_rules,
@@ -2356,9 +2356,9 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "C3": evaluate_accumulation_c3(snapshot, context),
     }
     gates = [
-        gate_dict("G0", evaluate_accumulation_g0(snapshot)),
+        gate_dict("G0", evaluate_accumulation_g0(snapshot), warn_if_not_met=True),
         gate_dict("G1", evaluate_accumulation_g1(snapshot)),
-        gate_dict("G2", evaluate_accumulation_g2(snapshot)),
+        gate_dict("G2", evaluate_accumulation_g2(snapshot), warn_if_not_met=True),
         gate_dict("G3", evaluate_accumulation_g3(snapshot)),
         gate_dict("G4", evaluate_accumulation_g4_volume(snapshot)),
         evaluate_accumulation_g5(context),
@@ -2378,7 +2378,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "name": snapshot.name,
         "code": snapshot.code,
         **scoring,
-        "statusLabel": trend_status_label(grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
+        "statusLabel": trend_status_label("accumulation", grade, context["regimeLabel"], context["gapScore"]["code"], gates, **macro_status_kwargs(context)),
         "strategy": "accumulation",
         "gates": gates,
         "matchedRules": matched_rules,

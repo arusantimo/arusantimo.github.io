@@ -1,0 +1,4 @@
+[mcp_servers.agentmemory]
+command = "npx"
+args = ["-y", "@agentmemory/mcp"]
+enabled = true

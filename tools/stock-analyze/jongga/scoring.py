@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
 from jongga.grade_policy import grade_from_score
 from jongga.rule_evaluation import EvalResult
@@ -40,7 +40,7 @@ ACCUMULATION_STRICT_MAX = TREND_STRICT_MAX
 REVERSAL_SCORE_WEIGHTS = TREND_SCORE_WEIGHTS
 REVERSAL_STRICT_MAX = TREND_STRICT_MAX
 
-SignalFactorFn = Callable[[str, EvalResult, Any | None], float]
+SignalFactorFn = Callable[[str, EvalResult, Optional[Any]], float]
 
 
 def _breakout_s2_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:

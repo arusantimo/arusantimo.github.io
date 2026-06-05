@@ -87,11 +87,11 @@ class MacroOverlayTest(unittest.TestCase):
         )
 
     def test_trend_status_label_uses_effective_regime(self):
-        label = trend_status_label("A", REGIME_STRONG_BULL, "G-A", [], rise_justified=True, technical_regime="약세장 ⛔")
+        label = trend_status_label("pullback", "A", REGIME_STRONG_BULL, "G-A", [], rise_justified=True, technical_regime="약세장 ⛔")
         self.assertEqual(label, "매수추천")
 
     def test_trend_status_label_softens_pure_bear(self):
-        label = trend_status_label("A", "약세장 ⛔", "G-A", [], rise_justified=False, technical_regime="약세장 ⛔")
+        label = trend_status_label("pullback", "A", "약세장 ⛔", "G-A", [], rise_justified=False, technical_regime="약세장 ⛔")
         self.assertEqual(label, "관심후보(약세·소액)")
 
     def test_pullback_g5_warns_when_macro_friendly_and_vkospi_elevated(self):
@@ -106,8 +106,26 @@ class MacroOverlayTest(unittest.TestCase):
             }
         )
         self.assertEqual(gate["status"], "⚠️")
-        label = trend_status_label("A", REGIME_STRONG_BULL, "G-A", [gate], rise_justified=True)
+        label = trend_status_label("pullback", "A", REGIME_STRONG_BULL, "G-A", [gate], rise_justified=True)
         self.assertEqual(label, "매수추천")
+
+    def test_pullback_g5_warns_when_kospi_below_ma5(self):
+        gate = build_pullback_g5_gate(
+            {
+                "kospiClose": 8100.0,
+                "kospiMa5": 8500.0,
+                "vkospiValue": 73.0,
+                "vkospiLabel": "VKOSPI",
+                "riseJustifiedByMacro": False,
+                "regimeLabel": "박스권 ⚠️",
+            }
+        )
+        self.assertEqual(gate["status"], "⚠️")
+        self.assertIn("KOSPI 단기 추세 이탈", gate["note"])
+
+    def test_trend_status_label_allows_pullback_b_conditionally(self):
+        label = trend_status_label("pullback", "B", REGIME_STRONG_BULL, "G-A", [], rise_justified=True)
+        self.assertEqual(label, "진입 가능(B·조건부)")
 
     def test_pullback_g5_warns_above_30_even_without_macro_until_warn_cap(self):
         gate = build_pullback_g5_gate(

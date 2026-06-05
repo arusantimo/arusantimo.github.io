@@ -15,6 +15,13 @@ BUY_STATUS_MARKERS = (
 MACRO_GATE_CODES = frozenset({"G5"})
 
 
+def _entry_min_grades(strategy: str) -> set[str]:
+    normalized = str(strategy or "").strip().lower()
+    if normalized == "pullback":
+        return {"S", "A", "B"}
+    return {"S", "A"}
+
+
 def _gate_blockers(rows: list[dict[str, Any]]) -> list[str]:
     blockers: list[str] = []
     for row in rows or []:
@@ -25,6 +32,7 @@ def _gate_blockers(rows: list[dict[str, Any]]) -> list[str]:
 
 
 def _classify_setup_quality(
+    strategy: str,
     grade: str,
     gates: list[dict[str, Any]],
     filters: list[dict[str, Any]],
@@ -40,7 +48,7 @@ def _classify_setup_quality(
         return "eligible"
 
     grade_code = str(grade or "").strip().upper()[:1]
-    grade_ok = grade_code in {"S", "A"}
+    grade_ok = grade_code in _entry_min_grades(strategy)
 
     all_rows = list(gates or []) + list(filters or [])
     blocked_codes = {
@@ -88,7 +96,7 @@ def compute_entry_eligibility(
     elif label == "제외":
         blockers.append("제외")
 
-    min_grades = {"S", "A"}
+    min_grades = _entry_min_grades(strategy)
     grade_ok = grade_code in min_grades
     if not grade_ok and grade_code:
         blockers.append(f"등급 {grade_code} — 진입 최소 {', '.join(sorted(min_grades))}")
@@ -96,9 +104,10 @@ def compute_entry_eligibility(
     buy_status = _is_buy_status_label(label)
     watch_status = _is_watch_status_label(label)
 
-    entry_eligible = not blockers and grade_ok and buy_status
+    conditional_pullback_b = strategy == "pullback" and grade_code == "B" and watch_status
+    entry_eligible = not blockers and grade_ok and (buy_status or conditional_pullback_b)
     entry_watch = not entry_eligible and not blockers and grade_code == "B" and watch_status
-    setup_quality = _classify_setup_quality(grade, gate_rows, filter_rows, entry_eligible)
+    setup_quality = _classify_setup_quality(strategy, grade, gate_rows, filter_rows, entry_eligible)
 
     return {
         "entryEligible": entry_eligible,

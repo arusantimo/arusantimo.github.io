@@ -23,6 +23,16 @@ class EntryPolicyTests(unittest.TestCase):
         )
         self.assertTrue(result["entryEligible"])
 
+    def test_pullback_b_watch_status_enables_conditional_entry(self):
+        result = compute_entry_eligibility(
+            "pullback",
+            "B",
+            "진입 가능(B·조건부)",
+            gates=[{"code": "G1", "status": "✅", "note": "ok"}],
+        )
+        self.assertTrue(result["entryEligible"])
+        self.assertEqual(result["setupQuality"], "eligible")
+
 
 if __name__ == "__main__":
     unittest.main()

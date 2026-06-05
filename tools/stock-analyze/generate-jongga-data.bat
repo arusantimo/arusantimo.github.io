@@ -32,7 +32,8 @@ echo  ============================================================
 echo.
 echo  [1] 환경 점검
 echo  [2] jongga.generate_latest (stable + canary + 레거시 브리지)
-echo  [3] 산출물 검증
+echo  [3] jongga.replay_backtest (stable/current 최근 거래일 자동 검증)
+echo  [4] 산출물 검증 + 화면 브리지 갱신
 echo  (단위 테스트: --with-tests)
 echo.
 

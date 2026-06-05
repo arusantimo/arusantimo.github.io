@@ -18,7 +18,7 @@ test('computeEffectiveRegimeLabel upgrades box to strong bull when macro and kos
 
 test('recalculateTrendStatusLabel respects effective bull regime', () => {
   const ctx = loadBridgeContext();
-  const label = ctx.recalculateTrendStatusLabel('A', '강세장 ✅ (펀더·지수 정당)', 'G-A', [], {
+  const label = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅ (펀더·지수 정당)', 'G-A', [], {
     riseJustifiedByMacro: true,
     technicalRegimeLabel: '약세장 ⛔'
   });
@@ -36,10 +36,32 @@ test('buildPullbackG5Gate warns for vkospi 68 when macro friendly', () => {
     effectiveRegimeLabel: '강세장 ✅ (펀더·지수 정당)'
   });
   assert.equal(gate.status, '⚠️');
-  const label = ctx.recalculateTrendStatusLabel('A', '강세장 ✅ (펀더·지수 정당)', 'G-A', [gate], {
+  const label = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅ (펀더·지수 정당)', 'G-A', [gate], {
     riseJustifiedByMacro: true
   });
   assert.equal(label, '매수추천');
+});
+
+test('buildPullbackG5Gate warns when kospi is below ma5', () => {
+  const ctx = loadBridgeContext();
+  const gate = ctx.buildPullbackG5Gate({
+    kospiClose: 8100,
+    kospiMa5: 8500,
+    vkospiValue: 73,
+    vkospiLabel: 'VKOSPI',
+    riseJustifiedByMacro: false,
+    effectiveRegimeLabel: '박스권 ⚠️'
+  });
+  assert.equal(gate.status, '⚠️');
+  assert.match(gate.note, /KOSPI 단기 추세 이탈/);
+});
+
+test('recalculateTrendStatusLabel allows pullback B conditionally', () => {
+  const ctx = loadBridgeContext();
+  const label = ctx.recalculateTrendStatusLabel('pullback', 'B', '강세장 ✅ (펀더·지수 정당)', 'G-A', [], {
+    riseJustifiedByMacro: true
+  });
+  assert.equal(label, '진입 가능(B·조건부)');
 });
 
 test('buildPullbackG5Gate warns for vkospi 68 even without macro-friendly context', () => {

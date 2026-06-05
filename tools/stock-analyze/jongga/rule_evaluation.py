@@ -10,6 +10,13 @@ from jongga.macro_overlay import build_pullback_g5_gate
 EvalStatus = Literal["met", "not_met", "data_missing", "manual_required"]
 
 TOP_TRADING_VALUE_LIMIT = 100
+BREAKOUT_NEAR_HIGH_MIN_RATIO = 0.90
+ACCUMULATION_VOLUME_SOFT_CAP = 1.5
+REVERSAL_MIN_MARKET_CAP_TRILLION = 5.0
+REVERSAL_MIN_RETURN_21D = 15.0
+REVERSAL_DRAWDOWN_MIN = -25.0
+REVERSAL_DRAWDOWN_MAX = -5.0
+REVERSAL_WORST_DAY_MIN_DROP = -3.0
 
 
 @dataclass(frozen=True)
@@ -323,8 +330,8 @@ def evaluate_breakout_g2(snapshot: Any) -> EvalResult:
     if not snapshot.high_52w:
         return eval_data_missing("52주 고가 데이터 부족")
     ratio = snapshot.current_price / snapshot.high_52w * 100
-    note = f"52주 고가 대비 {ratio:.1f}% (필요 ≥ 92%)"
-    if snapshot.current_price >= snapshot.high_52w * 0.92:
+    note = f"52주 고가 대비 {ratio:.1f}% (필요 ≥ 90%)"
+    if snapshot.current_price >= snapshot.high_52w * BREAKOUT_NEAR_HIGH_MIN_RATIO:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -518,8 +525,8 @@ def evaluate_accumulation_g4_volume(snapshot: Any) -> EvalResult:
     if not snapshot.volume_avg_20d:
         return eval_data_missing("20일 평균 거래량 산출 데이터 부족")
     ratio = snapshot.volume / snapshot.volume_avg_20d
-    note = f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% (필요 < 120%)"
-    if ratio < 1.2:
+    note = f"당일 거래량 / 20일 평균 {ratio * 100:.0f}% (필요 < 150%)"
+    if ratio < ACCUMULATION_VOLUME_SOFT_CAP:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -607,8 +614,8 @@ def evaluate_reversal_f1(snapshot: Any) -> EvalResult:
 
 
 def evaluate_reversal_f2(snapshot: Any) -> EvalResult:
-    note = f"시총 {snapshot.market_cap_trillion:.1f}조 (필요 ≥ 8조)"
-    if snapshot.market_cap_trillion >= 8.0:
+    note = f"시총 {snapshot.market_cap_trillion:.1f}조 (필요 ≥ 5조)"
+    if snapshot.market_cap_trillion >= REVERSAL_MIN_MARKET_CAP_TRILLION:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -671,8 +678,8 @@ def evaluate_reversal_f4(
 
 
 def evaluate_reversal_g1(snapshot: Any) -> EvalResult:
-    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +20%)"
-    if snapshot.return_21d >= 20.0:
+    note = f"1개월 수익률 {signed_pct(snapshot.return_21d)} (필요 ≥ +15%)"
+    if snapshot.return_21d >= REVERSAL_MIN_RETURN_21D:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -681,8 +688,8 @@ def evaluate_reversal_g2(snapshot: Any) -> EvalResult:
     drawdown = drawdown_from_high_20d(snapshot)
     if drawdown is None:
         return eval_data_missing("20일 고점·종가 데이터 부족")
-    note = f"20일 고점 대비 {signed_pct(drawdown)} (필요 -7%~-20%)"
-    if -20.0 <= drawdown <= -7.0:
+    note = f"20일 고점 대비 {signed_pct(drawdown)} (필요 -5%~-25%)"
+    if REVERSAL_DRAWDOWN_MIN <= drawdown <= REVERSAL_DRAWDOWN_MAX:
         return eval_met(note)
     return eval_not_met(note)
 
@@ -699,8 +706,8 @@ def evaluate_reversal_g4(snapshot: Any) -> EvalResult:
     if len(daily_returns) < 5:
         return eval_data_missing("최근 5거래일 수익률 산출 데이터 부족")
     worst = min(daily_returns)
-    note = f"최근 5거래일 최저 {signed_pct(worst)} (필요 -4% 이하 급락 1회 이상)"
-    if any(value <= -4.0 for value in daily_returns):
+    note = f"최근 5거래일 최저 {signed_pct(worst)} (필요 -3% 이하 급락 1회 이상)"
+    if any(value <= REVERSAL_WORST_DAY_MIN_DROP for value in daily_returns):
         return eval_met(note)
     return eval_not_met(note)
 

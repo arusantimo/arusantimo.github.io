@@ -35,8 +35,14 @@ echo "    종가베팅 추천 데이터 파이프라인 (stock-analyze)"
 echo "    $(date '+%Y-%m-%d %H:%M:%S')"
 echo "  ============================================================"
 echo ""
+echo "  [SH] 추천 생성 + 자동 replay 검증 + 화면 브리지 갱신"
+echo ""
 
-"$PYTHON" "$SCRIPT_DIR/run_jongga_pipeline.py" "${ARGS[@]}"
+if [[ ${#ARGS[@]} -gt 0 ]]; then
+  "$PYTHON" "$SCRIPT_DIR/run_jongga_pipeline.py" "${ARGS[@]}"
+else
+  "$PYTHON" "$SCRIPT_DIR/run_jongga_pipeline.py"
+fi
 EXITCODE=$?
 
 echo ""

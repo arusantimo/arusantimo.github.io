@@ -1,0 +1,459 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+
+function createElementStub() {
+  return {
+    textContent: '',
+    className: '',
+    title: '',
+    innerHTML: '',
+    disabled: false,
+    dataset: {},
+    classList: {
+      values: new Set(),
+      add(value) { this.values.add(value); },
+      remove(value) { this.values.delete(value); },
+      toggle(value, force) {
+        if (force === undefined) {
+          if (this.values.has(value)) this.values.delete(value);
+          else this.values.add(value);
+          return;
+        }
+        if (force) this.values.add(value);
+        else this.values.delete(value);
+      },
+      contains(value) { return this.values.has(value); }
+    },
+    addEventListener() {}
+  };
+}
+
+function loadReplayContext() {
+  const elements = new Map();
+  let activeMode = 'recommendation';
+  const context = {
+    console,
+    JSON,
+    window: null,
+    document: {
+      getElementById(id) { return elements.get(id) || null; }
+    },
+    escapeHtml(value) {
+      return String(value ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    },
+    getJonggaVariantLabel(value) {
+      return value === 'canary' ? '카나리' : '현재 버전';
+    },
+    getJonggaReplayViewMode() {
+      return activeMode;
+    },
+    getJonggaReplayViewMeta(mode = activeMode) {
+      return mode === 'replay'
+        ? { label: '6.0 & B', description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.' }
+        : { label: '매수추천', description: 'entryEligible 기준으로 표시합니다.' };
+    },
+    normalizeJonggaReplayViewMode(value) {
+      return String(value || '').trim() === 'replay' ? 'replay' : 'recommendation';
+    },
+    setReplayMode(mode) {
+      activeMode = mode;
+    },
+    formatCompactDate(value) {
+      const text = String(value ?? '');
+      return `${text.slice(0, 4)}.${text.slice(4, 6)}.${text.slice(6, 8)}`;
+    },
+    syncBodyScrollLock() {},
+    elements
+  };
+  context.window = context;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync(new URL('./jongga-replay.js', import.meta.url), 'utf8'), context);
+  return context;
+}
+
+function sampleReplayBridge() {
+  return {
+    generatedAt: '2026-06-05T19:30:00',
+    latestAttempt: {
+      status: 'complete',
+      message: '',
+      generatedAt: '2026-06-05T19:30:00'
+    },
+    latestRun: {
+      runId: 'run-1',
+      generatedAt: '2026-06-05T19:30:00',
+      from: '2026-05-08',
+      to: '2026-06-04',
+      variant: 'stable',
+      thresholdProfile: 'current',
+      replayPolicy: {
+        mode: 'relaxed',
+        label: '완화 모드',
+        summary: 'D+1만 있어도 replay 포함',
+        detail: 'D+2가 있으면 3일차까지 연장',
+        minFollowupDays: 1,
+        maxFollowupDays: 2
+      },
+      days: [
+        {
+          date: '2026-06-03',
+          summaryFile: 'replay_summary_20260603.json',
+          ordersFile: 'sim_orders_20260603.json',
+          fillsFile: 'sim_fills_20260603.json',
+          candidateCount: 3,
+          eligibleCount: 1,
+          includedCount: 2,
+          tradeCount: 1,
+          degradedCount: 1,
+          ambiguousCount: 0,
+          byStrategy: {
+            pullback: {
+              candidateCount: 3,
+              eligibleCount: 1,
+              includedCount: 2,
+              tradeCount: 1,
+              winRate: 1,
+              avgNetReturnPct: 1.2,
+              cumNetReturnPct: 1.2,
+              maxDrawdownPct: 0.4,
+              degradedCount: 1,
+              ambiguousCount: 0,
+              unfilledRate: 0
+            }
+          },
+          trades: [
+            {
+              strategy: 'pullback',
+              code: '000001',
+              name: 'Alpha',
+              entryFilledAt: '2026-06-03T15:30:00+09:00',
+              entryFillPrice: 10050.2,
+              exitFilledAt: '2026-06-04T09:00:00+09:00',
+              exitAvgFillPrice: 10200.6,
+              exitLastFillPrice: 10200.6,
+              tradeStatus: 'closed',
+              netReturnPct: 1.2
+            }
+          ]
+        }
+      ],
+      summary: {
+        candidateCount: 12,
+        eligibleCount: 3,
+        includedCount: 7,
+        tradeCount: 3,
+        winRate: 0.6667,
+        avgNetReturnPct: 1.25,
+        cumNetReturnPct: 3.52,
+        maxDrawdownPct: 2.1,
+        degradedCount: 3,
+        ambiguousCount: 0,
+        overall: {
+          candidateCount: 12,
+          eligibleCount: 3,
+          includedCount: 7,
+          tradeCount: 3,
+          winRate: 0.6667,
+          avgNetReturnPct: 1.25,
+          cumNetReturnPct: 3.52,
+          maxDrawdownPct: 2.1,
+          degradedCount: 3,
+          ambiguousCount: 0
+        },
+        byStrategy: {
+          pullback: {
+            candidateCount: 5,
+            eligibleCount: 2,
+            includedCount: 3,
+            tradeCount: 2,
+            winRate: 0.5,
+            avgNetReturnPct: 0.85,
+            cumNetReturnPct: 1.71,
+            maxDrawdownPct: 1.2,
+            degradedCount: 2,
+            ambiguousCount: 0,
+            unfilledRate: 0
+          }
+        },
+        byStock: [
+          {
+            strategy: 'pullback',
+            code: '000001',
+            name: 'Alpha',
+            tradeCount: 2,
+            winRate: 0.5,
+            avgNetReturnPct: 0.85,
+            cumNetReturnPct: 1.71,
+            lastReplayDate: '2026-06-03',
+            lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
+            lastEntryFillPrice: 10050.2,
+            lastExitFilledAt: '2026-06-04T09:00:00+09:00',
+            lastExitAvgFillPrice: 10200.6,
+            lastExitFillPrice: 10200.6
+          }
+        ]
+      },
+      strategyViews: {
+        pullback: {
+          summary: {
+            candidateCount: 5,
+            eligibleCount: 2,
+            includedCount: 3,
+            tradeCount: 2,
+            winRate: 0.5,
+            avgNetReturnPct: 0.85,
+            cumNetReturnPct: 1.71,
+            maxDrawdownPct: 1.2,
+            degradedCount: 2,
+            ambiguousCount: 0,
+            unfilledRate: 0
+          },
+          stocks: [
+            {
+              strategy: 'pullback',
+              code: '000001',
+              name: 'Alpha',
+              tradeCount: 2,
+              winRate: 0.5,
+              avgNetReturnPct: 0.85,
+              cumNetReturnPct: 1.71,
+              lastReplayDate: '2026-06-03',
+              lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
+              lastEntryFillPrice: 10050.2,
+              lastExitFilledAt: '2026-06-04T09:00:00+09:00',
+              lastExitAvgFillPrice: 10200.6,
+              lastExitFillPrice: 10200.6
+            }
+          ],
+          days: [
+            {
+              date: '2026-06-03',
+              summaryFile: 'replay_summary_20260603.json',
+              ordersFile: 'sim_orders_20260603.json',
+              fillsFile: 'sim_fills_20260603.json',
+              includedCount: 2,
+              tradeCount: 1,
+              winRate: 1,
+              avgNetReturnPct: 1.2,
+              cumNetReturnPct: 1.2,
+              maxDrawdownPct: 0.4,
+              degradedCount: 1,
+              ambiguousCount: 0,
+              trades: [
+                {
+                  strategy: 'pullback',
+                  code: '000001',
+                  name: 'Alpha',
+                  entryFilledAt: '2026-06-03T15:30:00+09:00',
+                  entryFillPrice: 10050.2,
+                  exitFilledAt: '2026-06-04T09:00:00+09:00',
+                  exitAvgFillPrice: 10200.6,
+                  exitLastFillPrice: 10200.6,
+                  tradeStatus: 'closed',
+                  netReturnPct: 1.2
+                }
+              ]
+            }
+          ],
+          caseViews: {
+            recommendation: {
+              summary: {
+                candidateCount: 2,
+                eligibleCount: 2,
+                includedCount: 2,
+                tradeCount: 1,
+                winRate: 1,
+                avgNetReturnPct: 1.2,
+                cumNetReturnPct: 1.2,
+                maxDrawdownPct: 0.4,
+                degradedCount: 1,
+                ambiguousCount: 0,
+                unfilledRate: 0
+              },
+              stocks: [
+                {
+                  strategy: 'pullback',
+                  code: '000001',
+                  name: 'Alpha',
+                  tradeCount: 1,
+                  winRate: 1,
+                  avgNetReturnPct: 1.2,
+                  cumNetReturnPct: 1.2,
+                  lastReplayDate: '2026-06-03',
+                  lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
+                  lastEntryFillPrice: 10050.2,
+                  lastExitFilledAt: '2026-06-04T09:00:00+09:00',
+                  lastExitAvgFillPrice: 10200.6,
+                  lastExitFillPrice: 10200.6
+                }
+              ],
+              days: [
+                {
+                  date: '2026-06-03',
+                  summaryFile: 'replay_summary_20260603.json',
+                  ordersFile: 'sim_orders_20260603.json',
+                  fillsFile: 'sim_fills_20260603.json',
+                  includedCount: 2,
+                  tradeCount: 1,
+                  winRate: 1,
+                  avgNetReturnPct: 1.2,
+                  cumNetReturnPct: 1.2,
+                  maxDrawdownPct: 0.4,
+                  degradedCount: 1,
+                  ambiguousCount: 0,
+                  trades: [
+                    {
+                      strategy: 'pullback',
+                      code: '000001',
+                      name: 'Alpha',
+                      entryFilledAt: '2026-06-03T15:30:00+09:00',
+                      entryFillPrice: 10050.2,
+                      exitFilledAt: '2026-06-04T09:00:00+09:00',
+                      exitAvgFillPrice: 10200.6,
+                      exitLastFillPrice: 10200.6,
+                      tradeStatus: 'closed',
+                      netReturnPct: 1.2
+                    }
+                  ]
+                }
+              ]
+            },
+            replay: {
+              summary: {
+                candidateCount: 3,
+                eligibleCount: 0,
+                includedCount: 1,
+                tradeCount: 1,
+                winRate: 0,
+                avgNetReturnPct: -0.6,
+                cumNetReturnPct: -0.6,
+                maxDrawdownPct: 0.8,
+                degradedCount: 0,
+                ambiguousCount: 0,
+                unfilledRate: 0
+              },
+              stocks: [
+                {
+                  strategy: 'pullback',
+                  code: '000002',
+                  name: 'Beta',
+                  tradeCount: 1,
+                  winRate: 0,
+                  avgNetReturnPct: -0.6,
+                  cumNetReturnPct: -0.6,
+                  lastReplayDate: '2026-06-03',
+                  lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
+                  lastEntryFillPrice: 20000.0,
+                  lastExitFilledAt: '2026-06-04T09:00:00+09:00',
+                  lastExitAvgFillPrice: 19880.0,
+                  lastExitFillPrice: 19880.0
+                }
+              ],
+              days: [
+                {
+                  date: '2026-06-03',
+                  summaryFile: 'replay_summary_20260603.json',
+                  ordersFile: 'sim_orders_20260603.json',
+                  fillsFile: 'sim_fills_20260603.json',
+                  includedCount: 1,
+                  tradeCount: 1,
+                  winRate: 0,
+                  avgNetReturnPct: -0.6,
+                  cumNetReturnPct: -0.6,
+                  maxDrawdownPct: 0.8,
+                  degradedCount: 0,
+                  ambiguousCount: 0,
+                  trades: [
+                    {
+                      strategy: 'pullback',
+                      code: '000002',
+                      name: 'Beta',
+                      entryFilledAt: '2026-06-03T15:30:00+09:00',
+                      entryFillPrice: 20000.0,
+                      exitFilledAt: '2026-06-04T09:00:00+09:00',
+                      exitAvgFillPrice: 19880.0,
+                      exitLastFillPrice: 19880.0,
+                      tradeStatus: 'closed',
+                      netReturnPct: -0.6
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    latestSummary: {
+      date: '2026-06-03',
+      tradeCount: 1
+    },
+    runs: []
+  };
+}
+
+test('strategy section renders selected case summary and button state', () => {
+  const context = loadReplayContext();
+  context.setReplayMode('replay');
+  const badge = createElementStub();
+  const summary = createElementStub();
+  const button = createElementStub();
+  context.elements.set('jongga-replay-badge-pullback', badge);
+  context.elements.set('jongga-replay-summary-pullback', summary);
+  context.elements.set('btn-open-jongga-replay-pullback', button);
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+
+  context.renderReplayStrategySections();
+
+  assert.equal(badge.textContent, 'complete');
+  assert.match(summary.innerHTML, /-0\.60%/);
+  assert.match(summary.innerHTML, /체결/);
+  assert.equal(button.disabled, false);
+  assert.match(button.title, /6\.0 & B/);
+});
+
+test('strategy modal renders selected case summary, stock table, and day files', () => {
+  const context = loadReplayContext();
+  context.setReplayMode('recommendation');
+  const body = createElementStub();
+  const title = createElementStub();
+  const subtitle = createElementStub();
+  context.elements.set('jongga-replay-body', body);
+  context.elements.set('jongga-replay-modal-title', title);
+  context.elements.set('jongga-replay-modal-subtitle', subtitle);
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+
+  context.renderJonggaReplayModal('pullback');
+
+  assert.match(title.textContent, /눌림목/);
+  assert.match(title.textContent, /매수추천/);
+  assert.match(body.innerHTML, /타입 수익/);
+  assert.match(body.innerHTML, /종목별 수익/);
+  assert.match(body.innerHTML, /Alpha/);
+  assert.match(body.innerHTML, /매수가/);
+  assert.match(body.innerHTML, /매도가/);
+  assert.match(body.innerHTML, /완화 모드/);
+  assert.match(body.innerHTML, /D\+2가 있으면 3일차까지 연장/);
+  assert.match(body.innerHTML, /10,050원/);
+  assert.match(body.innerHTML, /10,201원/);
+  assert.match(body.innerHTML, /매수\/매도 종목/);
+  assert.match(body.innerHTML, /sim_orders_20260603\.json/);
+});
+
+test('missing replay data disables strategy button and renders empty state', () => {
+  const context = loadReplayContext();
+  const badge = createElementStub();
+  const summary = createElementStub();
+  const button = createElementStub();
+  context.elements.set('jongga-replay-badge-pullback', badge);
+  context.elements.set('jongga-replay-summary-pullback', summary);
+  context.elements.set('btn-open-jongga-replay-pullback', button);
+
+  context.renderReplayStrategySections();
+
+  assert.equal(badge.textContent, '없음');
+  assert.equal(button.disabled, true);
+  assert.match(summary.innerHTML, /검증 데이터 없음|자동 검증 실패/);
+});

@@ -25,6 +25,21 @@ function normalizeCodeKey(value) {
 }
 
 const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'breakout', 'accumulation', 'momentum', 'reversal', 'swing']);
+const JONGGA_REPLAY_VIEW_STORAGE_KEY = 'stockAnalyzeJonggaReplayViewModeV1';
+const JONGGA_REPLAY_VIEW_MODES = {
+  recommendation: {
+    label: '매수추천',
+    description: 'entryEligible 기준으로 표시합니다.'
+  },
+  replay: {
+    label: '6.0 & B',
+    description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.'
+  },
+  all: {
+    label: '전체',
+    description: '매수추천과 6.0 & B를 모두 포함해 표시합니다.'
+  }
+};
 
 function normalizeEntryStrategyKey(strategy) {
   const text = String(strategy || '').trim().toLowerCase();
@@ -229,6 +244,7 @@ let activeTab = typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzer
 let lastScheduledAnalyzerPeriod = typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzerTab() : null;
 let activeBuySlot = 'slotA';
 let activeSellSlot = 'slotA';
+let activeJonggaReplayViewMode = readStoredJonggaReplayViewMode();
 let stocks = createStockCollections();
 let notionPages = createDefaultNotionPages();
 let notionSnapshot = getNotionPageState(activeBuySlot).snapshot;
@@ -291,6 +307,136 @@ function getActiveBuySnapshot() {
 
 function getActiveSellSnapshot() {
   return getSlotSnapshot(activeSellSlot);
+}
+
+function normalizeJonggaReplayViewMode(value) {
+  const normalized = String(value || '').trim();
+  if (normalized === 'replay') return 'replay';
+  if (normalized === 'all') return 'all';
+  return 'recommendation';
+}
+
+function getJonggaReplayViewMeta(mode = getJonggaReplayViewMode()) {
+  const normalizedMode = normalizeJonggaReplayViewMode(mode);
+  return JONGGA_REPLAY_VIEW_MODES[normalizedMode] || JONGGA_REPLAY_VIEW_MODES.recommendation;
+}
+
+function readStoredJonggaReplayViewMode() {
+  try {
+    return normalizeJonggaReplayViewMode(localStorage.getItem(JONGGA_REPLAY_VIEW_STORAGE_KEY) || 'recommendation');
+  } catch {
+    return 'recommendation';
+  }
+}
+
+function getJonggaReplayViewMode() {
+  activeJonggaReplayViewMode = normalizeJonggaReplayViewMode(activeJonggaReplayViewMode);
+  return activeJonggaReplayViewMode;
+}
+
+function persistJonggaReplayViewMode(mode) {
+  activeJonggaReplayViewMode = normalizeJonggaReplayViewMode(mode);
+  try {
+    localStorage.setItem(JONGGA_REPLAY_VIEW_STORAGE_KEY, activeJonggaReplayViewMode);
+  } catch {}
+  return activeJonggaReplayViewMode;
+}
+
+function getJonggaReplayViewGroups(snapshot = getActiveBuySnapshot()) {
+  return {
+    pullback: Array.isArray(snapshot?.pullbackEntries) ? snapshot.pullbackEntries : [],
+    accumulation: Array.isArray(snapshot?.accumulationEntries) ? snapshot.accumulationEntries : [],
+    breakout: Array.isArray(snapshot?.breakoutEntries) ? snapshot.breakoutEntries : (Array.isArray(snapshot?.momentumEntries) ? snapshot.momentumEntries : []),
+    reversal: Array.isArray(snapshot?.reversalEntries) ? snapshot.reversalEntries : []
+  };
+}
+
+function getJonggaReplayEntryGradeScore(entry = {}) {
+  const gradeScore = Number(entry.gradeScore);
+  if (Number.isFinite(gradeScore)) return gradeScore;
+  const fallbackScore = Number(entry.score);
+  return Number.isFinite(fallbackScore) ? fallbackScore : null;
+}
+
+function matchesJonggaReplayViewMode(entry = {}, mode = getJonggaReplayViewMode()) {
+  const normalizedMode = normalizeJonggaReplayViewMode(mode);
+  if (normalizedMode === 'all') return true;
+  if (normalizedMode === 'replay') {
+    const gradeScore = getJonggaReplayEntryGradeScore(entry);
+    const gradeCode = String(entry.grade || '').trim().charAt(0).toUpperCase();
+    return !Boolean(entry?.entryEligible) && Number.isFinite(gradeScore) && gradeScore >= 6.0 && ['S', 'A', 'B'].includes(gradeCode);
+  }
+
+  if (typeof inferEntryEligibilityFromEntry === 'function') {
+    return Boolean(inferEntryEligibilityFromEntry(entry).entryEligible);
+  }
+
+  return Boolean(entry?.entryEligible);
+}
+
+function filterJonggaReplayViewEntries(entries = [], mode = getJonggaReplayViewMode()) {
+  const list = Array.isArray(entries) ? entries : [];
+  return list.filter(entry => matchesJonggaReplayViewMode(entry, mode));
+}
+
+function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
+  const groups = getJonggaReplayViewGroups(snapshot);
+  const allEntries = [
+    ...groups.pullback,
+    ...groups.accumulation,
+    ...groups.breakout,
+    ...groups.reversal
+  ];
+  const recommendationCount = filterJonggaReplayViewEntries(allEntries, 'recommendation').length;
+  const replayCount = filterJonggaReplayViewEntries(allEntries, 'replay').length;
+  const allCount = allEntries.length;
+  const activeMode = getJonggaReplayViewMode();
+  const activeCount = filterJonggaReplayViewEntries(allEntries, activeMode).length;
+  const activeMeta = getJonggaReplayViewMeta(activeMode);
+  return {
+    recommendationCount,
+    replayCount,
+    allCount,
+    activeCount,
+    activeMode,
+    activeLabel: activeMeta.label
+  };
+}
+
+function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
+  const activeMode = getJonggaReplayViewMode();
+  const activeMeta = getJonggaReplayViewMeta(activeMode);
+  document.querySelectorAll('[data-jongga-replay-view]').forEach(button => {
+    const viewMode = normalizeJonggaReplayViewMode(button.dataset.jonggaReplayView);
+    button.classList.toggle('active', viewMode === activeMode);
+    button.setAttribute('aria-pressed', String(viewMode === activeMode));
+    button.title = getJonggaReplayViewMeta(viewMode).description;
+  });
+
+  const summary = document.getElementById('jongga-replay-view-summary');
+  if (summary) {
+    const counts = getJonggaReplayViewCounts(snapshot);
+    summary.innerHTML = `
+      <span>매수추천 ${counts.recommendationCount}건</span>
+      <span>6.0 & B ${counts.replayCount}건</span>
+      <span>전체 ${counts.allCount}건</span>
+      <span class="jongga-replay-view-current">${activeMeta.label} ${counts.activeCount}건</span>
+    `;
+  }
+}
+
+function setJonggaReplayViewMode(mode, { persist = true, rerender = true } = {}) {
+  const nextMode = normalizeJonggaReplayViewMode(mode);
+  if (persist) persistJonggaReplayViewMode(nextMode);
+  else activeJonggaReplayViewMode = nextMode;
+  updateJonggaReplayViewControls();
+  if (rerender && typeof renderBuyStockCards === 'function') {
+    renderBuyStockCards();
+  }
+  if (typeof renderJonggaReplayModal === 'function') {
+    renderJonggaReplayModal();
+  }
+  return nextMode;
 }
 
 function setActiveBuySlot(slotId) {

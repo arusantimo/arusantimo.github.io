@@ -9,7 +9,14 @@
       "Bash(agent-browser open *)",
       "Bash(agent-browser snapshot *)",
       "Bash(python3 -m pytest jongga/tests/ -v)",
-      "Bash(python3.14 -m unittest discover -s jongga/tests -p \"test_*.py\" -v)"
+      "Bash(python3.14 -m unittest discover -s jongga/tests -p \"test_*.py\" -v)",
+      "WebSearch",
+      "WebFetch(domain:m.samsungsem.com)",
+      "Bash(python3 -c \"import openpyxl; print\\('openpyxl', openpyxl.__version__\\)\")",
+      "Bash(python3 -m pip --version)",
+      "Bash(/opt/homebrew/bin/python3 -m pip install openpyxl --quiet --break-system-packages)",
+      "Bash(/opt/homebrew/bin/python3 -c \"import openpyxl; print\\('openpyxl', openpyxl.__version__\\)\")",
+      "Bash(/opt/homebrew/bin/python3 build_model.py)"
     ]
   }
 }

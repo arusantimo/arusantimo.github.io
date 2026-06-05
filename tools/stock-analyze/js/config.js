@@ -58,7 +58,7 @@ const RULE_GUIDE = {
   trendGrades: [
     { grade: 'S', score: '8.5 ~ 10점', meaning: '레짐 무관 진입 가능' },
     { grade: 'A', score: '7.0 ~ 8.4점', meaning: '강세장·순환매장·박스권 진입 가능' },
-    { grade: 'B', score: '5.5 ~ 6.9점', meaning: '매매 단계 노출, 진입 보류, 익일 재평가' },
+    { grade: 'B', score: '5.5 ~ 6.9점', meaning: '기본은 진입 보류, 눌림목은 조건부 진입 가능' },
     { grade: 'C', score: '5.5점 미만', meaning: '출력 목록에서 제외' }
   ],
   reversalGrades: [
@@ -68,9 +68,9 @@ const RULE_GUIDE = {
     { grade: 'C', score: '5.0점 미만', meaning: '출력 제외' }
   ],
   permissions: [
-    { regime: '강세장', s: '✅ 100% 진입', a: '✅ 100% 진입', b: '👀 모니터링' },
-    { regime: '순환매장', s: '✅ 80% 진입', a: '✅ 70% 진입', b: '👀 모니터링' },
-    { regime: '박스권', s: '✅ 70% 진입', a: '✅ 70% 진입', b: '👀 모니터링' },
+    { regime: '강세장', s: '✅ 100% 진입', a: '✅ 100% 진입', b: '눌림목 조건부 / 그 외 모니터링' },
+    { regime: '순환매장', s: '✅ 80% 진입', a: '✅ 70% 진입', b: '눌림목 조건부 / 그 외 모니터링' },
+    { regime: '박스권', s: '✅ 70% 진입', a: '✅ 70% 진입', b: '눌림목 조건부 / 그 외 모니터링' },
     { regime: '약세장', s: '✅ 50% 진입', a: '❌ 매매금지', b: '👀 모니터링' }
   ],
   trendVkospiAdjustments: [
@@ -112,7 +112,7 @@ const RULE_GUIDE = {
         { code: 'G2', condition: '종가 > 60일선', source: '네이버 증권 일봉 차트' },
         { code: 'G3', condition: '주봉 RSI(14) ≥ 50', source: '네이버 증권 주봉 차트' },
         { code: 'G4', condition: '일봉 MACD 히스토그램이 음전환 후 3일 이내 OR 0선 위 회복 시도 중', source: '네이버 증권 일봉 차트' },
-        { code: 'G5', condition: 'KOSPI 5일선 위 + VKOSPI (≤30 ✅ / 30~75 ⚠️ / 거시·강세·순환 시 75~85 ⚠️ / 85 초과 ⛔)', source: '네이버 증권 시장지표' }
+        { code: 'G5', condition: 'KOSPI 5일선 이탈은 경고로만 반영, VKOSPI (≤30 ✅ / 30~75 ⚠️ / 거시·강세·순환 시 75~85 ⚠️ / 85 초과 ⛔)', source: '네이버 증권 시장지표' }
       ],
       scores: [
         { code: 'S1', condition: '당일 거래대금 순위 30위 이내', source: '네이버 증권' },
