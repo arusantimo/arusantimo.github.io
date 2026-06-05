@@ -1110,7 +1110,7 @@ function renderTradePlanRecommendation(entry) {
       ? getSellStrategyStageMeta(stage.stageKey)
       : { icon: '🎯', title: stage.stageKey };
     const reason = stage.reason ? ` · ${escapeHtml(stage.reason)}` : '';
-    stageText = `🎯 최적 익절 단계: <strong>${escapeHtml(meta.icon + ' ' + meta.title)}</strong>${reason}`;
+    stageText = `🎯 현재 추천 단계: <strong>${escapeHtml(meta.icon + ' ' + meta.title)}</strong>${reason}`;
   }
   const lines = [bandText, stageText].filter(Boolean).map(line => `<div>${line}</div>`).join('');
   if (!lines) return '';
@@ -1122,7 +1122,10 @@ function renderTradePlanTable(entry) {
     return '<div class="empty-state compact">매매 단계 정보가 없습니다.</div>';
   }
 
-  const recRowStyle = 'background:rgba(16,185,129,0.10)';
+  const recRowStyle = 'background:rgba(16,185,129,0.16);box-shadow:inset 3px 0 0 var(--text-success)';
+  const recCellStyle = 'font-weight:700';
+  const recYieldStyle = 'color:var(--text-success);font-weight:700';
+  const recBadge = '<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천</span>';
   return `
     ${renderTradePlanRecommendation(entry)}
     <table class="guide-table compact-table">
@@ -1133,8 +1136,16 @@ function renderTradePlanTable(entry) {
           const hitRate = (row.historicalHitRate === null || row.historicalHitRate === undefined)
             ? ''
             : ` <span style="color:var(--text-muted)">· 적중 ${Math.round(row.historicalHitRate * 100)}%</span>`;
-          const star = isRec ? '⭐ ' : '';
-          return `<tr${isRec ? ` style="${recRowStyle}"` : ''}><td>${star}${escapeHtml(row.stage)}</td><td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.quantity)}</td><td>${escapeHtml(row.targetYield)}${hitRate}</td><td>${escapeHtml(row.targetPrice)}</td></tr>`;
+          const stageCell = isRec
+            ? `<td style="${recCellStyle}">${escapeHtml(row.stage)}${recBadge}</td>`
+            : `<td>${escapeHtml(row.stage)}</td>`;
+          const yieldCell = isRec
+            ? `<td style="${recYieldStyle}">${escapeHtml(row.targetYield)}${hitRate}</td>`
+            : `<td>${escapeHtml(row.targetYield)}${hitRate}</td>`;
+          const priceCell = isRec
+            ? `<td style="${recYieldStyle}">${escapeHtml(row.targetPrice)}</td>`
+            : `<td>${escapeHtml(row.targetPrice)}</td>`;
+          return `<tr${isRec ? ` style="${recRowStyle}"` : ''}>${stageCell}<td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.quantity)}</td>${yieldCell}${priceCell}</tr>`;
         }).join('')}
       </tbody>
     </table>
