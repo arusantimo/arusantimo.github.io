@@ -5,10 +5,40 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "현재 버전",
     "jsFile": "jongga/output/202606/jongga_data_20260605.js",
     "jsonFile": "jongga/output/202606/latest_20260605.json",
-    "generatedAt": "2026-06-05T05:52:32+00:00",
+    "generatedAt": "2026-06-05T06:07:06+00:00",
     "status": "partial",
     "buyCount": 12,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "entryEligible": false,
+        "currentPrice": 1177000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "entryEligible": false,
+        "currentPrice": 1247000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -22,37 +52,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.2,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 255500
+        "currentPrice": 257000
       },
       {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "현대모비스",
-        "code": "012330",
-        "score": 7.2,
-        "signalScore": 7.2,
-        "strictScore": 7.2,
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.0,
+        "signalScore": 6.0,
+        "strictScore": 6.0,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.2,
+        "grade": "B",
+        "gradeScore": 6.0,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 699000
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "주성엔지니어링",
-        "code": "036930",
-        "score": 7.2,
-        "signalScore": 7.2,
-        "strictScore": 7.2,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "entryEligible": false,
-        "currentPrice": 214000
+        "currentPrice": 1247000
       },
       {
         "strategy": "accumulation",
@@ -67,7 +82,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.0,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 214000
+        "currentPrice": 213000
       },
       {
         "strategy": "accumulation",
@@ -82,22 +97,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.0,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 170600
+        "currentPrice": 170900
       },
       {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
-        "scoreMax": 10.0,
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 5.6,
+        "signalScore": 5.6,
+        "strictScore": 4.8,
+        "scoreMax": 11.5,
         "grade": "C",
-        "gradeScore": 5.2,
+        "gradeScore": 4.2,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 1234000
+        "currentPrice": 1177000
       },
       {
         "strategy": "breakout",
@@ -112,7 +127,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.2,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 170600
+        "currentPrice": 170900
       },
       {
         "strategy": "breakout",
@@ -121,28 +136,28 @@ window.JONGGA_HISTORY_INDEX = [
         "code": "090360",
         "score": 4.8,
         "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 11.5,
-        "grade": "C",
-        "gradeScore": 4.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "entryEligible": false,
-        "currentPrice": 151600
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 4.0,
-        "signalScore": 4.0,
         "strictScore": 4.0,
         "scoreMax": 11.5,
         "grade": "C",
         "gradeScore": 3.5,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 1171000
+        "currentPrice": 145900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1177000
       },
       {
         "strategy": "reversal",
@@ -157,13 +172,13 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 133200
+        "currentPrice": 131900
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "HPSP",
-        "code": "403870",
+        "name": "로보스타",
+        "code": "090360",
         "score": 6.8,
         "signalScore": 6.8,
         "strictScore": 6.8,
@@ -172,22 +187,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 50500
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "삼성전기",
-        "code": "009150",
-        "score": 6.3,
-        "signalScore": 6.3,
-        "strictScore": 6.3,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.3,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 1770000
+        "currentPrice": 145900
       }
     ]
   },
@@ -197,10 +197,40 @@ window.JONGGA_HISTORY_INDEX = [
     "variantLabel": "카나리",
     "jsFile": "jongga/output/202606/jongga_data_20260605_canary.js",
     "jsonFile": "jongga/output/202606/latest_20260605_canary.json",
-    "generatedAt": "2026-06-05T05:54:14+00:00",
+    "generatedAt": "2026-06-05T06:08:33+00:00",
     "status": "partial",
     "buyCount": 12,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "entryEligible": false,
+        "currentPrice": 1181000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "entryEligible": false,
+        "currentPrice": 1249000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -214,37 +244,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.2,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 254500
+        "currentPrice": 257500
       },
       {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "현대모비스",
-        "code": "012330",
-        "score": 7.2,
-        "signalScore": 7.2,
-        "strictScore": 7.2,
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.0,
+        "signalScore": 6.0,
+        "strictScore": 6.0,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.2,
+        "grade": "B",
+        "gradeScore": 6.0,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 702000
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "주성엔지니어링",
-        "code": "036930",
-        "score": 7.2,
-        "signalScore": 7.2,
-        "strictScore": 7.2,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "entryEligible": false,
-        "currentPrice": 214000
+        "currentPrice": 1249000
       },
       {
         "strategy": "accumulation",
@@ -259,7 +274,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.0,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 214000
+        "currentPrice": 213000
       },
       {
         "strategy": "accumulation",
@@ -274,22 +289,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.0,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 170200
+        "currentPrice": 171000
       },
       {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
-        "scoreMax": 10.0,
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 5.6,
+        "signalScore": 5.6,
+        "strictScore": 5.6,
+        "scoreMax": 11.5,
         "grade": "C",
-        "gradeScore": 5.2,
+        "gradeScore": 4.9,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 1233000
+        "currentPrice": 1181000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 4.8,
+        "scoreMax": 11.5,
+        "grade": "C",
+        "gradeScore": 4.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족)",
+        "entryEligible": false,
+        "currentPrice": 171000
       },
       {
         "strategy": "breakout",
@@ -298,43 +328,28 @@ window.JONGGA_HISTORY_INDEX = [
         "code": "090360",
         "score": 4.8,
         "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 11.5,
-        "grade": "C",
-        "gradeScore": 4.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "entryEligible": false,
-        "currentPrice": 149300
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "KB금융",
-        "code": "105560",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 11.5,
-        "grade": "C",
-        "gradeScore": 4.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족)",
-        "entryEligible": false,
-        "currentPrice": 170200
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 4.8,
-        "signalScore": 4.8,
         "strictScore": 4.0,
         "scoreMax": 11.5,
         "grade": "C",
         "gradeScore": 3.5,
         "statusLabel": "매매금지(핵심 Gate 미충족)",
         "entryEligible": false,
-        "currentPrice": 1172000
+        "currentPrice": 147300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "로보스타",
+        "code": "090360",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 147300
       },
       {
         "strategy": "reversal",
@@ -349,7 +364,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 132800
+        "currentPrice": 132300
       },
       {
         "strategy": "reversal",
@@ -364,22 +379,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1774000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 6.3,
-        "signalScore": 6.3,
-        "strictScore": 6.3,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.3,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 1172000
+        "currentPrice": 1783000
       }
     ]
   },
