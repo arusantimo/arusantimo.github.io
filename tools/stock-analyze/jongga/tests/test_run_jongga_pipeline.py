@@ -35,6 +35,77 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
 
             self.assertEqual(replay_dates, [date(2026, 6, 2), date(2026, 6, 3)])
 
+    def test_select_replay_dates_from_history_skips_weekends(self):
+        with TemporaryDirectory() as tmp:
+            history_path = Path(tmp) / "jongga_history.js"
+            history_path.write_text(
+                _render_history([
+                    {"date": "2026-06-07", "variant": "stable"},
+                    {"date": "2026-06-06", "variant": "stable"},
+                    {"date": "2026-06-05", "variant": "stable"},
+                    {"date": "2026-06-04", "variant": "stable"},
+                    {"date": "2026-06-03", "variant": "stable"},
+                    {"date": "2026-06-02", "variant": "stable"},
+                    {"date": "2026-06-01", "variant": "stable"},
+                ]),
+                encoding="utf-8",
+            )
+
+            replay_dates = pipeline.select_replay_dates_from_history(
+                history_js=history_path,
+                cutoff_date=date(2026, 6, 8),
+                variant="stable",
+            )
+
+            self.assertEqual(replay_dates, [date(2026, 6, 1), date(2026, 6, 2), date(2026, 6, 3), date(2026, 6, 4)])
+
+    def test_build_replay_recommendation_keys_uses_entry_eligible_rows(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            daily_json = out_dir / "202606" / "latest_20260603.json"
+            daily_json.parent.mkdir(parents=True, exist_ok=True)
+            daily_json.write_text(json.dumps({
+                "slots": [
+                    {
+                        "entries": {
+                            "pullback": [
+                                {"code": "000001", "strategy": "pullback", "entryEligible": True},
+                                {"code": "000002", "strategy": "pullback", "entryEligible": False},
+                            ],
+                            "accumulation": [
+                                {"code": "000003", "strategy": "accumulation", "entryEligible": True},
+                            ],
+                        }
+                    }
+                ]
+            }, ensure_ascii=False), encoding="utf-8")
+
+            history_path = Path(tmp) / "jongga_history.js"
+            history_path.write_text(
+                _render_history([
+                    {
+                        "date": "2026-06-03",
+                        "variant": "stable",
+                        "jsonFile": str(daily_json),
+                    }
+                ]),
+                encoding="utf-8",
+            )
+
+            keys = pipeline.build_replay_recommendation_keys_from_history(
+                history_js=history_path,
+                variant="stable",
+                analysis_dates=[date(2026, 6, 3)],
+            )
+
+            self.assertEqual(
+                keys,
+                {
+                    "2026-06-03|stable|pullback|000001",
+                    "2026-06-03|stable|accumulation|000003",
+                },
+            )
+
     def test_run_replay_backtest_uses_current_stable_recent_days_defaults(self):
         with TemporaryDirectory() as tmp:
             history_path = Path(tmp) / "jongga_history.js"

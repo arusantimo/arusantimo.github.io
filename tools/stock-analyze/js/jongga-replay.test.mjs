@@ -60,12 +60,19 @@ function loadReplayContext() {
       return activeMode;
     },
     getJonggaReplayViewMeta(mode = activeMode) {
-      return mode === 'replay'
-        ? { label: '6.0 & B', description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.' }
-        : { label: '매수추천', description: 'entryEligible 기준으로 표시합니다.' };
+      if (mode === 'replay') {
+        return { label: '6.0 & B', description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.' };
+      }
+      if (mode === 'a7plus') {
+        return { label: 'A 7+', description: 'gradeScore 7.0 이상, A 등급만 표시합니다.' };
+      }
+      return { label: '매수추천', description: 'entryEligible 기준으로 표시합니다.' };
     },
     normalizeJonggaReplayViewMode(value) {
-      return String(value || '').trim() === 'replay' ? 'replay' : 'recommendation';
+      const normalized = String(value || '').trim();
+      if (normalized === 'replay') return 'replay';
+      if (normalized === 'a7plus') return 'a7plus';
+      return 'recommendation';
     },
     setReplayMode(mode) {
       activeMode = mode;
@@ -311,6 +318,69 @@ function sampleReplayBridge() {
                   ordersFile: 'sim_orders_20260603.json',
                   fillsFile: 'sim_fills_20260603.json',
                   includedCount: 2,
+                  tradeCount: 1,
+                  winRate: 1,
+                  avgNetReturnPct: 1.2,
+                  cumNetReturnPct: 1.2,
+                  maxDrawdownPct: 0.4,
+                  degradedCount: 1,
+                  ambiguousCount: 0,
+                  trades: [
+                    {
+                      strategy: 'pullback',
+                      code: '000001',
+                      name: 'Alpha',
+                      entryFilledAt: '2026-06-03T15:30:00+09:00',
+                      entryFillPrice: 10050.2,
+                      exitFilledAt: '2026-06-04T09:00:00+09:00',
+                      exitAvgFillPrice: 10200.6,
+                      exitLastFillPrice: 10200.6,
+                      tradeStatus: 'closed',
+                      closedReason: 'primary_target_touch',
+                      netReturnPct: 1.2
+                    }
+                  ]
+                }
+              ]
+            },
+            a7plus: {
+              summary: {
+                candidateCount: 1,
+                eligibleCount: 1,
+                includedCount: 1,
+                tradeCount: 1,
+                winRate: 1,
+                avgNetReturnPct: 1.2,
+                cumNetReturnPct: 1.2,
+                maxDrawdownPct: 0.4,
+                degradedCount: 1,
+                ambiguousCount: 0,
+                unfilledRate: 0
+              },
+              stocks: [
+                {
+                  strategy: 'pullback',
+                  code: '000001',
+                  name: 'Alpha',
+                  tradeCount: 1,
+                  winRate: 1,
+                  avgNetReturnPct: 1.2,
+                  cumNetReturnPct: 1.2,
+                  lastReplayDate: '2026-06-03',
+                  lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
+                  lastEntryFillPrice: 10050.2,
+                  lastExitFilledAt: '2026-06-04T09:00:00+09:00',
+                  lastExitAvgFillPrice: 10200.6,
+                  lastExitFillPrice: 10200.6
+                }
+              ],
+              days: [
+                {
+                  date: '2026-06-03',
+                  summaryFile: 'replay_summary_20260603.json',
+                  ordersFile: 'sim_orders_20260603.json',
+                  fillsFile: 'sim_fills_20260603.json',
+                  includedCount: 1,
                   tradeCount: 1,
                   winRate: 1,
                   avgNetReturnPct: 1.2,

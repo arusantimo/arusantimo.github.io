@@ -3,9 +3,10 @@ import unittest
 from datetime import date
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest import mock
 
 from jongga.output_contract import VARIANT_STABLE, build_daily_output_paths, read_js_assignment
-from jongga.replay_backtest import REPLAY_RUNS_MARKER, grade_from_threshold_profile, replay_entry_view, run_replay
+from jongga.replay_backtest import REPLAY_RUNS_MARKER, grade_from_threshold_profile, iter_dates, normalize_analysis_dates, replay_entry_view, run_replay
 from jongga.replay_market_data import build_replay_market_data
 
 
@@ -99,6 +100,7 @@ class ReplayBacktestTests(unittest.TestCase):
         )
         self.assertFalse(candidate["entryEligible"])
         self.assertTrue(candidate["replayIncluded"])
+        self.assertTrue(candidate["replayA7Plus"])
 
         min_cut = replay_entry_view(
             {
@@ -180,6 +182,18 @@ class ReplayBacktestTests(unittest.TestCase):
         self.assertEqual(len(market_data["replayBars"]), 5)
         self.assertEqual(market_data["replayBars"][-1]["timestamp"], "2026-06-05T15:00:00+09:00")
 
+    def test_iter_dates_skips_weekends(self):
+        self.assertEqual(
+            list(iter_dates(date(2026, 5, 29), date(2026, 6, 2))),
+            [date(2026, 5, 29), date(2026, 6, 1), date(2026, 6, 2)],
+        )
+
+    def test_normalize_analysis_dates_skips_weekends(self):
+        self.assertEqual(
+            normalize_analysis_dates([date(2026, 6, 1), date(2026, 6, 6), date(2026, 6, 7), date(2026, 6, 2)]),
+            [date(2026, 6, 1), date(2026, 6, 2)],
+        )
+
     def test_run_replay_writes_expected_artifacts(self):
         with TemporaryDirectory() as tmp:
             out_dir = Path(tmp) / "jongga" / "output"
@@ -250,8 +264,13 @@ class ReplayBacktestTests(unittest.TestCase):
                 ["A"],
             )
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["summary"]["candidateCount"], 1)
-            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["replay"]["summary"]["candidateCount"], 0)
-            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["replay"]["days"], [])
+            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["summary"]["candidateCount"], 1)
+            self.assertEqual(
+                [item["name"] for item in run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["days"][0]["trades"]],
+                ["A"],
+            )
+            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["replay"]["summary"]["candidateCount"], 1)
+            self.assertEqual([day["date"] for day in run_record["strategyViews"]["pullback"]["caseViews"]["replay"]["days"]], ["2026-06-03"])
             self.assertEqual(
                 [item["name"] for item in run_record["strategyViews"]["accumulation"]["caseViews"]["replay"]["days"][0]["trades"]],
                 ["B"],
@@ -274,6 +293,73 @@ class ReplayBacktestTests(unittest.TestCase):
             self.assertEqual(bridge["latestRun"]["runId"], run_record["runId"])
             self.assertEqual(bridge["latestAttempt"]["status"], "complete")
             self.assertEqual(bridge["latestSummary"]["tradeCount"], 2)
+
+    def test_run_replay_omits_weekend_dates_from_analysis_window(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            self._write_payload(out_dir, self._payload())
+            rows_by_code = {
+                "000001": [
+                    {"localTradedAt": "20260603", "openPrice": "9950", "highPrice": "10050", "lowPrice": "9800", "closePrice": "10000", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260602", "openPrice": "9950", "highPrice": "10050", "lowPrice": "9800", "closePrice": "10000", "accumulatedTradingVolume": "1000"},
+                ],
+                "000002": [
+                    {"localTradedAt": "20260603", "openPrice": "19900", "highPrice": "20100", "lowPrice": "19800", "closePrice": "20000", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260602", "openPrice": "19900", "highPrice": "20100", "lowPrice": "19800", "closePrice": "20000", "accumulatedTradingVolume": "1000"},
+                ],
+            }
+
+            with mock.patch("jongga.generate_latest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]), \
+                 mock.patch("jongga.replay_market_data.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]), \
+                 mock.patch("jongga.replay_backtest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code], create=True):
+                run_record = run_replay(
+                    date_from=date(2026, 5, 30),
+                    date_to=date(2026, 6, 2),
+                    variant="stable",
+                    bar="1m",
+                    threshold_profile="relaxed",
+                    out_dir=out_dir,
+                )
+
+            self.assertEqual(run_record["analysisDates"], ["2026-06-01", "2026-06-02"])
+            self.assertEqual([day["date"] for day in run_record["days"]], ["2026-06-01", "2026-06-02"])
+
+    def test_run_replay_uses_history_recommendation_keys(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            self._write_payload(out_dir, self._payload())
+            rows_by_code = {
+                "000001": [
+                    {"localTradedAt": "20260605", "openPrice": "10320", "highPrice": "10400", "lowPrice": "10020", "closePrice": "10250", "accumulatedTradingVolume": "900"},
+                    {"localTradedAt": "20260604", "openPrice": "10050", "highPrice": "10450", "lowPrice": "9900", "closePrice": "10350", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260603", "openPrice": "9950", "highPrice": "10050", "lowPrice": "9800", "closePrice": "10000", "accumulatedTradingVolume": "1000"},
+                ],
+                "000002": [
+                    {"localTradedAt": "20260605", "openPrice": "20050", "highPrice": "20100", "lowPrice": "19850", "closePrice": "20050", "accumulatedTradingVolume": "900"},
+                    {"localTradedAt": "20260604", "openPrice": "20000", "highPrice": "20100", "lowPrice": "19800", "closePrice": "19950", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260603", "openPrice": "19900", "highPrice": "20100", "lowPrice": "19800", "closePrice": "20000", "accumulatedTradingVolume": "1000"},
+                ],
+            }
+
+            recommendation_keys = {"2026-06-03|stable|pullback|000001"}
+
+            with mock.patch("jongga.generate_latest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]), \
+                 mock.patch("jongga.replay_market_data.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]), \
+                 mock.patch("jongga.replay_backtest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code], create=True):
+                run_record = run_replay(
+                    date_from=date(2026, 6, 3),
+                    date_to=date(2026, 6, 3),
+                    variant="stable",
+                    bar="1m",
+                    threshold_profile="relaxed",
+                    out_dir=out_dir,
+                    recommendation_keys=recommendation_keys,
+                )
+
+            recommendation_view = run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]
+            self.assertEqual(recommendation_view["summary"]["candidateCount"], 1)
+            self.assertEqual([day["date"] for day in recommendation_view["days"]], ["2026-06-03"])
+            self.assertTrue(recommendation_view["days"][0]["candidates"][0]["historyRecommendation"])
 
 
 if __name__ == "__main__":

@@ -21,6 +21,7 @@ REPLAY_INCLUDE_GRADE_MIN = "B"
 REPLAY_RULE_VERSION = "2026-06-06-cumulative-v1"
 REPLAY_CASE_RECOMMENDATION = "recommendation"
 REPLAY_CASE_REPLAY = "replay"
+REPLAY_CASE_A7PLUS = "a7plus"
 REPLAY_VALIDATION_POLICY = {
     "mode": "relaxed",
     "label": "완화 모드",
@@ -66,14 +67,15 @@ def grade_from_threshold_profile(grade_score: float, strategy: str, profile: str
 def iter_dates(date_from: date, date_to: date):
     current = date_from
     while current <= date_to:
-        yield current
+        if current.weekday() < 5:
+            yield current
         current += timedelta(days=1)
 
 
 def normalize_analysis_dates(analysis_dates: list[date] | None) -> list[date]:
     if not analysis_dates:
         return []
-    return sorted({day for day in analysis_dates})
+    return sorted({day for day in analysis_dates if day.weekday() < 5})
 
 
 def build_replay_rule_spec(*, variant: str, threshold_profile: str, bar: str) -> dict[str, Any]:
@@ -113,6 +115,7 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
     grade_score = float(entry.get("gradeScore") or 0.0)
     replay_grade = grade_from_threshold_profile(float(entry.get("gradeScore") or 0.0), strategy, threshold_profile)
     replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A", "B"}
+    replay_a7plus = grade_score >= 7.0 and replay_grade == "A"
     eligibility = compute_entry_eligibility(
         strategy,
         replay_grade,
@@ -131,22 +134,34 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "signalScore": float(entry.get("signalScore") or entry.get("score") or 0.0),
         "entryPrice": float(entry.get("entryPrice") or entry.get("currentPrice") or 0.0),
         "entryEligibleOriginal": bool(entry.get("entryEligible")),
+        "historyRecommendation": bool(entry.get("historyRecommendation")),
         "replayIncluded": replay_included,
         "replayIncludeRule": f"gradeScore>={REPLAY_INCLUDE_GRADE_SCORE_MIN:.1f} AND replayGrade>={REPLAY_INCLUDE_GRADE_MIN}",
+        "replayA7Plus": replay_a7plus,
+        "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade==A",
         **eligibility,
     }
 
 
-def replay_case_key(item: dict[str, Any]) -> str:
-    if bool(item.get("entryEligibleOriginal")):
-        return REPLAY_CASE_RECOMMENDATION
-    if bool(item.get("replayIncluded")):
-        return REPLAY_CASE_REPLAY
-    return ""
+def matches_replay_case(item: dict[str, Any], case_key: str) -> bool:
+    normalized = str(case_key or "").strip()
+    if normalized == "all":
+        return True
+    if normalized == REPLAY_CASE_RECOMMENDATION:
+        return bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal"))
+    if normalized == REPLAY_CASE_REPLAY:
+        return bool(item.get("replayIncluded"))
+    if normalized == REPLAY_CASE_A7PLUS:
+        if bool(item.get("replayA7Plus")):
+            return True
+        grade_score = float(item.get("gradeScore") or 0.0)
+        replay_grade = str(item.get("replayGrade") or item.get("grade") or "").strip().upper()
+        return grade_score >= 7.0 and replay_grade.startswith("A")
+    return False
 
 
 def filter_replay_case_items(items: list[dict[str, Any]], case_key: str) -> list[dict[str, Any]]:
-    return [item for item in items if replay_case_key(item) == case_key]
+    return [item for item in items if matches_replay_case(item, case_key)]
 
 
 def max_drawdown_pct(returns_pct: list[float]) -> float:
@@ -398,7 +413,7 @@ def build_strategy_views(
             })
 
         case_views: dict[str, Any] = {}
-        for case_key in (REPLAY_CASE_RECOMMENDATION, REPLAY_CASE_REPLAY):
+        for case_key in (REPLAY_CASE_RECOMMENDATION, REPLAY_CASE_REPLAY, REPLAY_CASE_A7PLUS):
             case_candidates = filter_replay_case_items(strategy_candidates, case_key)
             case_results = filter_replay_case_items(strategy_results, case_key)
             case_entry_keys = {
@@ -643,6 +658,7 @@ def run_replay(
     threshold_profile: str,
     out_dir: str | Path = "jongga/output",
     analysis_dates: list[date] | None = None,
+    recommendation_keys: set[str] | None = None,
     replace_existing_runs: bool = False,
 ) -> dict[str, Any]:
     generated_at = datetime.now().isoformat(timespec="seconds")
@@ -656,6 +672,7 @@ def run_replay(
     all_orders: list[dict[str, Any]] = []
     all_results: list[dict[str, Any]] = []
     all_candidates: list[dict[str, Any]] = []
+    recommendation_key_set = set(recommendation_keys or set())
     target_days = normalize_analysis_dates(analysis_dates) or list(iter_dates(date_from, date_to))
 
     for day in target_days:
@@ -672,11 +689,12 @@ def run_replay(
             for strategy, entry in iter_buy_entries(payload):
                 candidate = replay_entry_view(entry, strategy, threshold_profile)
                 daily_candidates.append(candidate)
-                if not candidate["replayIncluded"]:
-                    continue
                 code = candidate["code"]
                 if not code:
                     continue
+                candidate_key = f"{date_str}|{variant}|{strategy}|{code}"
+                if candidate_key in recommendation_key_set:
+                    candidate["historyRecommendation"] = True
                 if code not in history_cache:
                     history_cache[code] = entry.get("_historyRows") or []
                     if not history_cache[code]:
@@ -732,6 +750,7 @@ def run_replay(
                     "gradeScore": candidate["gradeScore"],
                     "replayIncluded": candidate["replayIncluded"],
                     "replayIncludeRule": candidate["replayIncludeRule"],
+                    "historyRecommendation": candidate["historyRecommendation"],
                     "entryEligible": candidate["entryEligible"],
                     "entryEligibleOriginal": candidate["entryEligibleOriginal"],
                     "setupQuality": candidate["setupQuality"],

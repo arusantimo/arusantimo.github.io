@@ -108,6 +108,7 @@ from jongga.rule_evaluation import (
 from jongga.output_contract import (
     VARIANT_CANARY,
     VARIANT_STABLE,
+    compact_date,
     normalize_variant,
     payload_with_analysis_date,
     read_js_assignment,
@@ -1385,7 +1386,25 @@ class StockSnapshot:
     orderbook: dict[str, Any] | None = None
 
 
-def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
+def _analysis_history_rows(
+    history_rows: list[dict[str, str]],
+    analysis_date: date | str | None,
+) -> tuple[list[dict[str, str]], dict[str, str] | None]:
+    if not history_rows:
+        return [], None
+    if analysis_date is None:
+        return history_rows, history_rows[0]
+
+    target_key = compact_date(analysis_date) if isinstance(analysis_date, date) else str(analysis_date).replace("-", "")[:8]
+    row_key = lambda row: str(row.get("localTradedAt") or "").replace("-", "")[:8]
+    filtered_rows = [row for row in history_rows if row_key(row) <= target_key]
+    if not filtered_rows:
+        return history_rows, history_rows[0]
+    analysis_row = next((row for row in filtered_rows if row_key(row) == target_key), filtered_rows[0])
+    return filtered_rows, analysis_row
+
+
+def build_stock_snapshot(item: tuple[int, str, str], analysis_date: date | str | None = None) -> StockSnapshot:
     rank, code, name = item
     basic = request_json(f"https://m.stock.naver.com/api/stock/{code}/basic", timeout=20.0)
     integration = request_json(f"https://m.stock.naver.com/api/stock/{code}/integration", timeout=20.0)
@@ -1393,10 +1412,11 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
     if not history_rows:
         raise RuntimeError(f"price history unavailable for {code}")
 
-    close_history = [float(parse_int(row["closePrice"])) for row in history_rows]
-    high_history = [float(parse_int(row["highPrice"])) for row in history_rows]
-    low_history = [float(parse_int(row["lowPrice"])) for row in history_rows]
-    volume_history = [float(parse_int(row["accumulatedTradingVolume"])) for row in history_rows]
+    analysis_rows, analysis_row = _analysis_history_rows(history_rows, analysis_date)
+    close_history = [float(parse_int(row["closePrice"])) for row in analysis_rows]
+    high_history = [float(parse_int(row["highPrice"])) for row in analysis_rows]
+    low_history = [float(parse_int(row["lowPrice"])) for row in analysis_rows]
+    volume_history = [float(parse_int(row["accumulatedTradingVolume"])) for row in analysis_rows]
     total_infos = integration.get("totalInfos", []) or []
     deals = integration.get("dealTrendInfos", []) or []
     industry_compare_rows = integration.get("industryCompareInfo", []) or []
@@ -1411,11 +1431,16 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
 
     history_high_window = high_history[:120] or [parse_float(basic.get("highPrice") or basic.get("closePrice") or basic.get("stockPrice")) or 0.0]
     high_52w = parse_float(find_total_info(total_infos, "highPriceOf52Weeks")) or max(history_high_window)
-    current_price = parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
-    prev_close = parse_float(find_total_info(total_infos, "lastClosePrice")) or (close_history[1] if len(close_history) > 1 else current_price)
-    open_price = parse_float(find_total_info(total_infos, "openPrice")) or parse_float(history_rows[0]["openPrice"])
-    high_price = parse_float(find_total_info(total_infos, "highPrice")) or parse_float(history_rows[0]["highPrice"])
-    low_price = parse_float(find_total_info(total_infos, "lowPrice")) or parse_float(history_rows[0]["lowPrice"])
+    historical_current = parse_float(analysis_row["closePrice"]) if analysis_row else 0.0
+    current_price = historical_current or parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
+    prev_close = parse_float(analysis_rows[1]["closePrice"]) if len(analysis_rows) > 1 else 0.0
+    prev_close = prev_close or parse_float(find_total_info(total_infos, "lastClosePrice")) or (close_history[1] if len(close_history) > 1 else current_price)
+    open_price = parse_float(analysis_row["openPrice"]) if analysis_row else 0.0
+    open_price = open_price or parse_float(find_total_info(total_infos, "openPrice")) or parse_float(analysis_rows[0]["openPrice"])
+    high_price = parse_float(analysis_row["highPrice"]) if analysis_row else 0.0
+    high_price = high_price or parse_float(find_total_info(total_infos, "highPrice")) or parse_float(analysis_rows[0]["highPrice"])
+    low_price = parse_float(analysis_row["lowPrice"]) if analysis_row else 0.0
+    low_price = low_price or parse_float(find_total_info(total_infos, "lowPrice")) or parse_float(analysis_rows[0]["lowPrice"])
 
     ma5 = moving_average(close_history, 5)
     ma10 = moving_average(close_history, 10)
@@ -1440,7 +1465,9 @@ def build_stock_snapshot(item: tuple[int, str, str]) -> StockSnapshot:
         open_price=open_price,
         high_price=high_price,
         low_price=low_price,
-        volume=parse_float(find_total_info(total_infos, "accumulatedTradingVolume")) or volume_history[0],
+        volume=(
+            parse_float(analysis_row["accumulatedTradingVolume"]) if analysis_row else 0.0
+        ) or parse_float(find_total_info(total_infos, "accumulatedTradingVolume")) or volume_history[0],
         trading_value_text=find_total_info(total_infos, "accumulatedTradingValue"),
         market_cap_trillion=parse_market_cap_trillion(find_total_info(total_infos, "marketValue")),
         foreign_net=parse_float(today_deal.get("foreignerPureBuyQuant")),
@@ -2738,7 +2765,7 @@ def collect_live_payload(
     errors: list[str] = []
     started_at = perf_counter()
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-        future_map = {executor.submit(build_stock_snapshot, item): item for item in top_trading}
+        future_map = {executor.submit(build_stock_snapshot, item, resolved_analysis_date): item for item in top_trading}
         for future in concurrent.futures.as_completed(future_map):
             item = future_map[future]
             try:

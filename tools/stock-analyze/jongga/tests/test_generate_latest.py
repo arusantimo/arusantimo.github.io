@@ -531,6 +531,62 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(snapshot.industry_code, "")
         self.assertIsNone(snapshot.industry_compare_change_pct)
 
+    @mock.patch("jongga.generate_latest.build_auto_event_filter", return_value=None)
+    @mock.patch("jongga.generate_latest.fetch_reversal_intraday_signal", return_value={"available": False, "signal": False, "candles": []})
+    @mock.patch("jongga.generate_latest.fetch_naver_price_history")
+    @mock.patch("jongga.generate_latest.request_json")
+    def test_build_stock_snapshot_uses_analysis_date_history_row(self, request_json_mock, price_history_mock, _intraday_mock, _event_filter_mock):
+        request_json_mock.side_effect = [
+            {"closePrice": "3000", "stockPrice": "3000", "sosok": "KOSDAQ"},
+            {
+                "totalInfos": [
+                    {"code": "lastClosePrice", "value": "2900"},
+                    {"code": "openPrice", "value": "2950"},
+                    {"code": "highPrice", "value": "3050"},
+                    {"code": "lowPrice", "value": "2850"},
+                    {"code": "accumulatedTradingVolume", "value": "555555"},
+                    {"code": "accumulatedTradingValue", "value": "12,345,678,900"},
+                    {"code": "marketValue", "value": "1조 2,000억"},
+                ],
+                "dealTrendInfos": [],
+            },
+        ]
+        price_history_mock.return_value = [
+            {
+                "localTradedAt": "2026-06-07",
+                "closePrice": "3000",
+                "highPrice": "3100",
+                "lowPrice": "2950",
+                "openPrice": "2970",
+                "accumulatedTradingVolume": "120000",
+            },
+            {
+                "localTradedAt": "2026-06-06",
+                "closePrice": "2500",
+                "highPrice": "2600",
+                "lowPrice": "2450",
+                "openPrice": "2480",
+                "accumulatedTradingVolume": "90000",
+            },
+            {
+                "localTradedAt": "2026-06-05",
+                "closePrice": "2000",
+                "highPrice": "2100",
+                "lowPrice": "1950",
+                "openPrice": "1980",
+                "accumulatedTradingVolume": "80000",
+            },
+        ]
+
+        snapshot = build_stock_snapshot((1, "477850", "마키나락스"), date(2026, 6, 6))
+
+        self.assertEqual(snapshot.current_price, 2500.0)
+        self.assertEqual(snapshot.prev_close, 2000.0)
+        self.assertEqual(snapshot.open_price, 2480.0)
+        self.assertEqual(snapshot.high_price, 2600.0)
+        self.assertEqual(snapshot.low_price, 2450.0)
+        self.assertEqual(snapshot.volume, 90000.0)
+
     def test_fetch_browser_candidate_enrichments_treats_missing_playwright_as_note(self):
         import builtins
 

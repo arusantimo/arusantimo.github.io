@@ -36,11 +36,13 @@ function loadStateContext() {
   const buttons = [
     createElementStub(),
     createElementStub(),
+    createElementStub(),
     createElementStub()
   ];
   buttons[0].dataset.jonggaReplayView = 'recommendation';
-  buttons[1].dataset.jonggaReplayView = 'replay';
-  buttons[2].dataset.jonggaReplayView = 'all';
+  buttons[1].dataset.jonggaReplayView = 'a7plus';
+  buttons[2].dataset.jonggaReplayView = 'replay';
+  buttons[3].dataset.jonggaReplayView = 'all';
 
   const context = {
     console,
@@ -133,7 +135,7 @@ function sampleReplayBridge() {
   };
 }
 
-test('replay view mode filters buy entries by recommendation or 6.0&B', () => {
+test('replay view mode filters buy entries by recommendation, 6.0&B, or A 7+', () => {
   const { context } = loadStateContext();
   const snapshot = sampleSnapshot();
 
@@ -147,6 +149,11 @@ test('replay view mode filters buy entries by recommendation or 6.0&B', () => {
     ...snapshot.accumulationEntries,
     ...snapshot.reversalEntries
   ], 'replay');
+  const a7plus = context.filterJonggaReplayViewEntries([
+    ...snapshot.pullbackEntries,
+    ...snapshot.accumulationEntries,
+    ...snapshot.reversalEntries
+  ], 'a7plus');
   const all = context.filterJonggaReplayViewEntries([
     ...snapshot.pullbackEntries,
     ...snapshot.accumulationEntries,
@@ -155,6 +162,7 @@ test('replay view mode filters buy entries by recommendation or 6.0&B', () => {
 
   assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Reco C']);
   assert.deepEqual(replay.map(item => item.name), ['Replay B', 'Replay D']);
+  assert.deepEqual(a7plus.map(item => item.name), ['Reco A']);
   assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'Too Low', 'Reco C', 'Replay D']);
 });
 
@@ -169,9 +177,10 @@ test('replay view controls show counts and active mode', () => {
   context.updateJonggaReplayViewControls(snapshot);
 
   assert.equal(buttons[0].classList.contains('active'), false);
-  assert.equal(buttons[1].classList.contains('active'), true);
-  assert.equal(buttons[2].classList.contains('active'), false);
+  assert.equal(buttons[1].classList.contains('active'), false);
+  assert.equal(buttons[2].classList.contains('active'), true);
   assert.match(summary.innerHTML, /매수추천 2건/);
+  assert.match(summary.innerHTML, /A 7\+ 1건/);
   assert.match(summary.innerHTML, /6\.0 & B 2건/);
   assert.match(summary.innerHTML, /전체 5건/);
   assert.match(summary.innerHTML, /누적 수익률 -0\.60%/);

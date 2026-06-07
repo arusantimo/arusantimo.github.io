@@ -143,16 +143,25 @@ function filterReplayDaysByPeriod(days = [], period = typeof getJonggaReplayPeri
   return (Array.isArray(days) ? days : []).filter(day => isReplayDateInPeriod(day?.date, period));
 }
 
-function replayCaseKey(item = {}) {
-  if (Boolean(item.entryEligibleOriginal)) return 'recommendation';
-  if (Boolean(item.replayIncluded)) return 'replay';
-  return '';
+function matchesReplayCaseItem(item = {}, caseKey = 'all') {
+  const normalizedCase = String(caseKey || '').trim();
+  if (normalizedCase === 'all') return true;
+  if (normalizedCase === 'recommendation') {
+    return Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal);
+  }
+  if (normalizedCase === 'replay') return Boolean(item.replayIncluded);
+  if (normalizedCase === 'a7plus') {
+    if (Boolean(item.replayA7Plus)) return true;
+    const gradeScore = Number(item.gradeScore);
+    const gradeCode = String(item.replayGrade || item.grade || '').trim().charAt(0).toUpperCase();
+    return Number.isFinite(gradeScore) && gradeScore >= 7.0 && gradeCode === 'A';
+  }
+  return false;
 }
 
 function filterReplayCaseItems(items = [], caseKey = 'all') {
   const list = Array.isArray(items) ? items : [];
-  if (caseKey === 'all') return list;
-  return list.filter(item => replayCaseKey(item) === caseKey);
+  return list.filter(item => matchesReplayCaseItem(item, caseKey));
 }
 
 function sortReplayResultsForReturns(items = []) {

@@ -30,15 +30,19 @@ const JONGGA_REPLAY_PERIOD_STORAGE_KEY = 'stockAnalyzeJonggaReplayPeriodV1';
 const JONGGA_REPLAY_VIEW_MODES = {
   recommendation: {
     label: '매수추천',
-    description: 'entryEligible 기준으로 표시합니다.'
+    description: '과거 daily 추천 목록 기준으로 표시합니다.'
   },
   replay: {
     label: '6.0 & B',
-    description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.'
+    description: 'gradeScore 6.0 이상, B 이상 항목의 거래를 표시합니다.'
+  },
+  a7plus: {
+    label: 'A 7+',
+    description: 'gradeScore 7.0 이상, A 등급 항목의 거래를 표시합니다.'
   },
   all: {
     label: '전체',
-    description: '매수추천과 6.0 & B를 모두 포함해 표시합니다.'
+    description: '매수추천, 6.0 & B, A 7+ 거래를 모두 포함해 표시합니다.'
   }
 };
 
@@ -314,6 +318,7 @@ function getActiveSellSnapshot() {
 function normalizeJonggaReplayViewMode(value) {
   const normalized = String(value || '').trim();
   if (normalized === 'replay') return 'replay';
+  if (normalized === 'a7plus' || normalized === 'a7' || normalized === 'gradea7plus') return 'a7plus';
   if (normalized === 'all') return 'all';
   return 'recommendation';
 }
@@ -471,6 +476,11 @@ function matchesJonggaReplayViewMode(entry = {}, mode = getJonggaReplayViewMode(
     const gradeCode = String(entry.grade || '').trim().charAt(0).toUpperCase();
     return !Boolean(entry?.entryEligible) && Number.isFinite(gradeScore) && gradeScore >= 6.0 && ['S', 'A', 'B'].includes(gradeCode);
   }
+  if (normalizedMode === 'a7plus') {
+    const gradeScore = getJonggaReplayEntryGradeScore(entry);
+    const gradeCode = String(entry.grade || '').trim().charAt(0).toUpperCase();
+    return Number.isFinite(gradeScore) && gradeScore >= 7.0 && gradeCode === 'A';
+  }
 
   if (typeof inferEntryEligibilityFromEntry === 'function') {
     return Boolean(inferEntryEligibilityFromEntry(entry).entryEligible);
@@ -494,6 +504,7 @@ function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
   ];
   const recommendationCount = filterJonggaReplayViewEntries(allEntries, 'recommendation').length;
   const replayCount = filterJonggaReplayViewEntries(allEntries, 'replay').length;
+  const a7plusCount = filterJonggaReplayViewEntries(allEntries, 'a7plus').length;
   const allCount = allEntries.length;
   const activeMode = getJonggaReplayViewMode();
   const activeCount = filterJonggaReplayViewEntries(allEntries, activeMode).length;
@@ -501,6 +512,7 @@ function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
   return {
     recommendationCount,
     replayCount,
+    a7plusCount,
     allCount,
     activeCount,
     activeMode,
@@ -583,6 +595,7 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
     summary.innerHTML = `
       <span>기간 ${periodLabel}</span>
       <span>매수추천 ${counts.recommendationCount}건</span>
+      <span>A 7+ ${counts.a7plusCount}건</span>
       <span>6.0 & B ${counts.replayCount}건</span>
       <span>전체 ${counts.allCount}건</span>
       <span>누적 수익률 ${formatJonggaReplaySummaryPercent(cumulativeReturnPct)}</span>

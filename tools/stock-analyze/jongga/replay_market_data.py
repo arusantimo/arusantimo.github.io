@@ -41,7 +41,7 @@ def _parse_float(value: Any) -> float:
 
 def _normalize_daily_row(row: dict[str, Any]) -> dict[str, Any]:
     return {
-        "date": str(row.get("localTradedAt") or "")[:8],
+        "date": str(row.get("localTradedAt") or "").replace("-", "")[:8],
         "open": _parse_float(row.get("openPrice")),
         "high": _parse_float(row.get("highPrice")),
         "low": _parse_float(row.get("lowPrice")),

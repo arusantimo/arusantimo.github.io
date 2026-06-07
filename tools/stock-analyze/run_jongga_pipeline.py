@@ -191,6 +191,10 @@ def _latest_processed_replay_date(replay_runs_path: Path) -> date | None:
     return max(processed) if processed else None
 
 
+def _is_weekend_day(day: date) -> bool:
+    return day.weekday() >= 5
+
+
 def select_replay_dates_from_history(
     *,
     history_js: str | Path,
@@ -217,6 +221,7 @@ def select_replay_dates_from_history(
         stable_dates.append(entry_date)
 
     stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date < cutoff_date})
+    stable_dates = [entry_date for entry_date in stable_dates if not _is_weekend_day(entry_date)]
     if since_date:
         stable_dates = [entry_date for entry_date in stable_dates if entry_date > since_date]
     if not stable_dates:
@@ -224,6 +229,42 @@ def select_replay_dates_from_history(
     if len(stable_dates) <= required_followup_days:
         return []
     return stable_dates[:-required_followup_days]
+
+
+def build_replay_recommendation_keys_from_history(*, history_js: str | Path, variant: str, analysis_dates: list[date]) -> set[str]:
+    from jongga.output_contract import normalize_variant, read_history_index
+
+    resolved_variant = normalize_variant(variant)
+    allowed_dates = {day.isoformat() for day in analysis_dates}
+    keys: set[str] = set()
+    for entry in read_history_index(history_js):
+        if normalize_variant(str(entry.get("variant") or "")) != resolved_variant:
+            continue
+        date_str = str(entry.get("date") or "")
+        if date_str not in allowed_dates:
+            continue
+        json_file = Path(str(entry.get("jsonFile") or ""))
+        if not json_file.is_absolute():
+            json_file = Path.cwd() / json_file
+        if not json_file.exists():
+            continue
+        try:
+            payload = json.loads(json_file.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            continue
+        for slot in payload.get("slots") or []:
+            entries = slot.get("entries") if isinstance(slot, dict) else {}
+            if not isinstance(entries, dict):
+                continue
+            for strategy in ("pullback", "accumulation", "breakout", "reversal"):
+                for rec in entries.get(strategy) or []:
+                    if not isinstance(rec, dict) or not rec.get("entryEligible"):
+                        continue
+                    code = str(rec.get("code") or "").strip()
+                    if not code:
+                        continue
+                    keys.add(f"{date_str}|{resolved_variant}|{strategy}|{code}")
+    return keys
 
 
 def run_replay_backtest(
@@ -252,6 +293,11 @@ def run_replay_backtest(
         cutoff_date=cutoff_date,
         variant=variant,
         since_date=None if needs_full_rebuild else _latest_processed_replay_date(runs_path),
+    )
+    recommendation_keys = build_replay_recommendation_keys_from_history(
+        history_js=history_js,
+        variant=variant,
+        analysis_dates=replay_dates,
     )
     generated_at = datetime.now().isoformat(timespec="seconds")
     if not replay_dates:
@@ -284,6 +330,7 @@ def run_replay_backtest(
             threshold_profile=threshold_profile,
             out_dir=out_dir,
             analysis_dates=replay_dates,
+            recommendation_keys=recommendation_keys,
             replace_existing_runs=needs_full_rebuild,
         )
     except Exception as exc:  # noqa: BLE001
