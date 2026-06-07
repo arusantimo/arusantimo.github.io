@@ -135,7 +135,7 @@ function sampleReplayBridge() {
   };
 }
 
-test('replay view mode filters buy entries by recommendation, 6.0&B, or A 7+', () => {
+test('replay view mode filters buy entries by recommendation, 6.0&B, or 7&A', () => {
   const { context } = loadStateContext();
   const snapshot = sampleSnapshot();
 

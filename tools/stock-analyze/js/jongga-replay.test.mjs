@@ -64,7 +64,7 @@ function loadReplayContext() {
         return { label: '6.0 & B', description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.' };
       }
       if (mode === 'a7plus') {
-        return { label: 'A 7+', description: 'gradeScore 7.0 이상, A 등급만 표시합니다.' };
+        return { label: '7 & A', description: 'gradeScore 7.0 이상, A 등급만 표시합니다.' };
       }
       return { label: '매수추천', description: 'entryEligible 기준으로 표시합니다.' };
     },

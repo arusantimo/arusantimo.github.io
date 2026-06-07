@@ -37,12 +37,12 @@ const JONGGA_REPLAY_VIEW_MODES = {
     description: 'gradeScore 6.0 이상, B 이상 항목의 거래를 표시합니다.'
   },
   a7plus: {
-    label: 'A 7+',
+    label: '7 & A',
     description: 'gradeScore 7.0 이상, A 등급 항목의 거래를 표시합니다.'
   },
   all: {
     label: '전체',
-    description: '매수추천, 6.0 & B, A 7+ 거래를 모두 포함해 표시합니다.'
+    description: '매수추천, 6.0 & B, 7 & A 거래를 모두 포함해 표시합니다.'
   }
 };
 
@@ -595,7 +595,7 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
     summary.innerHTML = `
       <span>기간 ${periodLabel}</span>
       <span>매수추천 ${counts.recommendationCount}건</span>
-      <span>A 7+ ${counts.a7plusCount}건</span>
+      <span>7 & A ${counts.a7plusCount}건</span>
       <span>6.0 & B ${counts.replayCount}건</span>
       <span>전체 ${counts.allCount}건</span>
       <span>누적 수익률 ${formatJonggaReplaySummaryPercent(cumulativeReturnPct)}</span>
