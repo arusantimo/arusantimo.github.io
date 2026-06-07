@@ -34,13 +34,28 @@ TREND_SCORE_WEIGHTS: dict[str, float] = {
 }
 TREND_STRICT_MAX = 10.0
 
-ACCUMULATION_SCORE_WEIGHTS = TREND_SCORE_WEIGHTS
-ACCUMULATION_STRICT_MAX = TREND_STRICT_MAX
+ACCUMULATION_SCORE_WEIGHTS = {
+    "S1": 2.0,
+    "S2": 2.0,
+    "S3": 1.0,
+    "S4": 0.5,
+    "P1": 1.5,
+    "P2": 1.5,
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 1.0,
+    "C4": 0.5,
+}
+ACCUMULATION_STRICT_MAX = 12.0
 
 REVERSAL_SCORE_WEIGHTS = TREND_SCORE_WEIGHTS
 REVERSAL_STRICT_MAX = TREND_STRICT_MAX
 
 SignalFactorFn = Callable[[str, EvalResult, Optional[Any]], float]
+
+
+def _clamp_score(value: float, minimum: float, maximum: float) -> float:
+    return max(minimum, min(maximum, value))
 
 
 def _breakout_s2_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
@@ -156,6 +171,30 @@ def build_score_breakdown(
     return rows
 
 
+def append_volatility_breakdown_row(
+    rows: list[dict[str, Any]],
+    volatility_context: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    if not volatility_context:
+        return rows
+    score_delta = float(volatility_context.get("scoreDelta") or 0.0)
+    summary = str(volatility_context.get("summary") or "").strip()
+    if abs(score_delta) < 1e-9 and not summary:
+        return rows
+    next_rows = list(rows)
+    next_rows.append(
+        {
+            "code": "V1",
+            "strictPoints": round(score_delta, 2),
+            "signalPoints": round(score_delta, 2),
+            "maxPoints": 1.0,
+            "evalStatus": "met",
+            "note": summary or "변동성 적합도 보정",
+        }
+    )
+    return next_rows
+
+
 def grade_score_from_strict(strict_score: float, strict_max: float) -> float:
     if strict_max <= 0:
         return 0.0
@@ -194,17 +233,19 @@ def apply_buy_scoring(
     strict_max: float,
     vkospi_multiplier: float,
     snapshot: Any | None = None,
+    volatility_context: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     normalized = "breakout" if strategy == "momentum" else strategy
     signal_factors = BREAKOUT_SIGNAL_FACTORS if normalized == "breakout" else None
     strict_raw = aggregate_raw_score(score_map, weights, snapshot=None, signal_factors=None)
     signal_raw = aggregate_raw_score(score_map, weights, snapshot=snapshot, signal_factors=signal_factors)
-    strict_score = round(strict_raw * vkospi_multiplier, 1)
-    signal_score = round(signal_raw * vkospi_multiplier, 1)
+    score_delta = float((volatility_context or {}).get("scoreDelta") or 0.0)
+    strict_score = round(_clamp_score(strict_raw * vkospi_multiplier + score_delta, 0.0, strict_max), 1)
+    signal_score = round(_clamp_score(signal_raw * vkospi_multiplier + score_delta, 0.0, strict_max), 1)
     # 가용성 인지 정규화: data_missing/manual_required 항목을 분모에서 제외한다.
     # 이를 통해 토스 데이터 미수집 시에도 셋업이 완벽하면 S 등급에 도달 가능.
     eff_max = available_strict_max(score_map, weights)
-    grade_score = grade_score_from_strict(strict_score, eff_max)
+    grade_score = round(_clamp_score(grade_score_from_strict(strict_score, eff_max), 0.0, 10.0), 1)
     grade = grade_from_score(grade_score, strategy)
     return {
         "strictScore": strict_score,
@@ -214,11 +255,14 @@ def apply_buy_scoring(
         "effectiveScoreMax": round(eff_max, 2),  # 실효 분모 (등급 산출에 사용)
         "gradeScore": grade_score,
         "grade": grade,
-        "scoreBreakdown": build_score_breakdown(
-            score_map,
-            weights,
-            snapshot=snapshot,
-            signal_factors=signal_factors,
+        "scoreBreakdown": append_volatility_breakdown_row(
+            build_score_breakdown(
+                score_map,
+                weights,
+                snapshot=snapshot,
+                signal_factors=signal_factors,
+            ),
+            volatility_context,
         ),
         "scoreScope": normalized,
     }

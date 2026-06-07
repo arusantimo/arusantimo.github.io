@@ -16,7 +16,9 @@
       "Bash(python3 -m pip --version)",
       "Bash(/opt/homebrew/bin/python3 -m pip install openpyxl --quiet --break-system-packages)",
       "Bash(/opt/homebrew/bin/python3 -c \"import openpyxl; print\\('openpyxl', openpyxl.__version__\\)\")",
-      "Bash(/opt/homebrew/bin/python3 build_model.py)"
+      "Bash(/opt/homebrew/bin/python3 build_model.py)",
+      "WebFetch(domain:stockanalysis.com)",
+      "Bash(/opt/homebrew/bin/python3 add_valuation_tabs.py)"
     ]
   }
 }

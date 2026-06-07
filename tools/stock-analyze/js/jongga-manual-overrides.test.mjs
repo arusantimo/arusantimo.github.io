@@ -18,6 +18,7 @@ function createEmptySnapshot() {
       note: ''
     },
     pullbackEntries: [],
+    accumulationEntries: [],
     momentumEntries: [],
     reversalEntries: [],
     swingEntries: [],
@@ -73,7 +74,7 @@ function loadContext() {
     function getAllBuyEntries() {
       return NOTION_SLOT_IDS.flatMap(slotId => {
         const snapshot = getSlotSnapshot(slotId);
-        return [...snapshot.pullbackEntries, ...snapshot.momentumEntries, ...snapshot.reversalEntries];
+        return [...snapshot.pullbackEntries, ...(snapshot.accumulationEntries || []), ...snapshot.momentumEntries, ...snapshot.reversalEntries];
       });
     }
   `, context);
@@ -178,4 +179,45 @@ test('reversal event filter manual block enforces safety block', () => {
   assert.equal(rawEntry.eventFilter.blocked, true);
   assert.equal(rawEntry.eventFilter.note, '실적 D-1');
   assert.ok(entry.filters.find(rule => rule.code === 'F3')?.note.includes('이벤트 필터 차단'));
+});
+
+test('accumulation manual overrides apply late-strength confirmations', () => {
+  const context = loadContext();
+  context.saveJonggaManualOverridePayload({
+    entries: {
+      '035420': {
+        code: '035420',
+        name: 'NAVER',
+        toss: { avgStrength: 96.0, lastHourAvgStrength: 118.0 }
+      }
+    }
+  });
+
+  const payload = {
+    schemaVersion: 'jongga_result.v1',
+    slots: [{
+      slotId: 'slotA',
+      regime: { table: [{ item: 'VKOSPI', value: 'VKOSPI 18.00' }] },
+      entries: {
+        accumulation: [{
+          rank: 1,
+          name: 'NAVER',
+          code: '035420',
+          score: 6.0,
+          grade: 'B',
+          statusLabel: '관심후보',
+          toss: { avgStrength: 91.0, note: '자동 수집값' },
+          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5']),
+          notes: ['당일 평균 체결강도 미반영', '마지막 1시간 체결강도 미반영']
+        }]
+      }
+    }]
+  };
+
+  const effective = context.applyJonggaManualOverridesToPayload(payload);
+  const rawEntry = effective.slots[0].entries.accumulation[0];
+  assert.equal(rawEntry.toss.avgStrength, 96.0);
+  assert.equal(rawEntry.toss.lastHourAvgStrength, 118.0);
+  assert.deepEqual(Array.from(rawEntry.matchedRules || [], rule => rule.code).sort(), ['S3', 'S4']);
+  assert.ok((rawEntry.notes || []).some(note => note.includes('수동 입력 반영')));
 });

@@ -224,3 +224,42 @@ test('history modal filters by active variant and renders variant badge', () => 
   assert.match(body.innerHTML, /history-variant-badge canary/);
   assert.equal(context.applied, undefined);
 });
+
+test('history modal groups entries by week and shows one week per page with top navigation', () => {
+  const context = loadDailyContext();
+  const body = createElementStub();
+  context.elements.set('jongga-history-body', body);
+  context.setActiveJonggaVariant('stable', { reload: false });
+  context.window.JONGGA_HISTORY_INDEX = [
+    '2026-06-05',
+    '2026-05-29',
+    '2026-05-22',
+    '2026-05-15',
+    '2026-05-08',
+    '2026-05-01'
+  ].map((date, index) => ({
+    date,
+    variant: 'stable',
+    generatedAt: `2026-06-${String(5 - index).padStart(2, '0')}T01:00:00Z`,
+    status: 'complete',
+    buyCount: index + 1,
+    topRecommendations: [{ strategy: 'momentum', name: `종목${index + 1}`, code: `00${index + 1}`.padStart(6, '0'), score: 7.8, grade: 'A', statusLabel: '매수추천' }]
+  }));
+
+  context.renderJonggaHistoryModal();
+  assert.match(body.innerHTML, /주간 보기 · 최신 6주 중 1페이지/);
+  assert.match(body.innerHTML, /이전주/);
+  assert.match(body.innerHTML, /다음주/);
+  assert.match(body.innerHTML, /data-history-page="2"[^>]*>이전주/);
+  assert.match(body.innerHTML, /data-history-page="1"[^>]*>다음주/);
+  assert.match(body.innerHTML, /2026\.06\.01 ~ 2026\.06\.07/);
+  assert.doesNotMatch(body.innerHTML, /2026\.05\.25 ~ 2026\.05\.31/);
+  assert.doesNotMatch(body.innerHTML, /2026\.04\.27 ~ 2026\.05\.03/);
+  assert.match(body.innerHTML, /history-pagination-top/);
+
+  context.setJonggaHistoryPage(2, { rerender: false });
+  context.renderJonggaHistoryModal();
+  assert.match(body.innerHTML, /주간 보기 · 최신 6주 중 2페이지/);
+  assert.match(body.innerHTML, /2026\.05\.25 ~ 2026\.05\.31/);
+  assert.doesNotMatch(body.innerHTML, /2026\.06\.02/);
+});

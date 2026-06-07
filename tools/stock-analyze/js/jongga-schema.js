@@ -1,7 +1,7 @@
 const JONGGA_SCHEMA_VERSION = 'jongga_result.v1';
 const JONGGA_BUY_STRATEGIES = ['pullback', 'accumulation', 'breakout', 'reversal'];
 const JONGGA_REQUIRED_RULES = {
-  pullback: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5'],
+  pullback: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9'],
   breakout: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'],
   momentum: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'],
   accumulation: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5'],
@@ -192,7 +192,7 @@ function getJonggaSafetyIssues(entry = {}, context = {}) {
   });
 
   if (getJonggaGapCode(context.gapScore) === 'G-E') {
-    issues.push({ code: 'G-E', severity: 'block', message: '갭다운 경고 등급에서는 신규 진입 금지' });
+    issues.push({ code: 'G-E', severity: 'block', message: '갭다운 경고 · 신규 진입 금지' });
   }
   if (context.dataQuality?.status === 'failed') {
     issues.push({ code: 'DQ', severity: 'block', message: '데이터 품질 실패 상태' });

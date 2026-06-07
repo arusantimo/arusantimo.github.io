@@ -203,11 +203,17 @@ function getBuyPresentation(entry) {
   const primaryScore = normalizedLiveRefresh?.finalScore ?? (Number.isFinite(Number(entry.signalScore)) ? Number(entry.signalScore) : strategyScore);
   const primaryGrade = normalizedLiveRefresh?.finalGrade ?? strategyGrade;
   let primaryStatusLabel = normalizedLiveRefresh?.finalStatusLabel ?? strategyStatusLabel;
+  const strategyStatusReason = String(entry?.statusReason || '').trim();
+  const strategyStatusReasonShort = String(entry?.statusReasonShort || '').trim();
+  const primaryStatusReason = hasLiveRefresh && primaryStatusLabel !== strategyStatusLabel ? '' : strategyStatusReason;
+  const primaryStatusReasonShort = hasLiveRefresh && primaryStatusLabel !== strategyStatusLabel ? '' : (strategyStatusReasonShort || strategyStatusReason);
 
   return {
     strategyScore,
     strategyGrade,
     strategyStatusLabel,
+    strategyStatusReason,
+    strategyStatusReasonShort,
     consensusScore: normalizedLiveRefresh?.consensusScore ?? null,
     consensusGrade: normalizedLiveRefresh?.consensusGrade ?? '',
     adjustment: normalizedLiveRefresh?.adjustment ?? 0,
@@ -220,6 +226,8 @@ function getBuyPresentation(entry) {
     primaryScore,
     primaryGrade,
     primaryStatusLabel,
+    primaryStatusReason,
+    primaryStatusReasonShort,
     primarySummary: normalizedLiveRefresh
       ? normalizedLiveRefresh.consensusUnavailable
         ? `최종 ${primaryGrade} · 컨센서스 미제공 · 와이코프 ${formatBuySignedPoints(normalizedLiveRefresh.wyckoffAdjustment)}`

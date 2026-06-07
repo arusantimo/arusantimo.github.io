@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>종가 베팅 JSON 매수/매도 분석기 <span style="color:#ff4d4d;">Beta</span></title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260606-status-reason">
   <script src="../analysis-access-gate.js" data-redirect="../../index.html"></script>
 </head>
 
@@ -85,6 +85,7 @@
           <button id="btn-regime-toggle" type="button" class="section-toggle" aria-expanded="false" aria-controls="buy-regime-summary" title="시장 레짐 펼치기">+</button>
           <span>🧭 시장 레짐 체크</span>
           <span id="regime-current-badge" class="regime-current-badge unknown">미확인</span>
+          <span id="regime-volatility-badge" class="regime-volatility-badge unknown">변동성 미확인</span>
         </div>
         <div class="section-title-actions">
           <button id="btn-buy-guide" class="btn btn-secondary small">
@@ -382,7 +383,7 @@
   <script src="jongga/output/replay/replay_runs.js"></script>
   <script src="js/config.js?v=20260604-rule-relax"></script>
   <script src="js/utils.js"></script>
-  <script src="js/entry-policy.js?v=20260604-dual-score"></script>
+  <script src="js/entry-policy.js?v=20260606-status-reason"></script>
   <script src="js/gap.js"></script>
   <script src="js/state.js"></script>
   <script src="js/archive.js"></script>
@@ -390,20 +391,21 @@
   <script src="../market-analyze/wyckoff.js"></script>
   <script src="js/wyckoff-bias.js"></script>
   <script src="js/analysis.js"></script>
-  <script src="js/buy-live.js?v=20260604-safety-status"></script>
+  <script src="js/buy-live.js?v=20260606-status-reason"></script>
   <script src="js/jongga-schema.js"></script>
   <script src="js/jongga-manual-overrides.js"></script>
-  <script src="js/market-analyze-bridge.js?v=20260604-rule-relax"></script>
-  <script src="js/jongga-adapter.js?v=20260605-setup-quality"></script>
+  <script src="js/market-analyze-bridge.js?v=20260606-status-reason"></script>
+  <script src="js/support-levels.js?v=20260606-pullback-support"></script>
+  <script src="js/jongga-adapter.js?v=20260606-status-reason"></script>
   <script src="js/jongga-loader.js?v=20260604-safety-status"></script>
   <script src="js/jongga-daily.js"></script>
   <script src="js/jongga-replay.js"></script>
-  <script src="js/ui.js?v=20260605-market-hold-banner"></script>
+  <script src="js/ui.js?v=20260606-status-reason"></script>
   <script src="js/sell-tracking.js"></script>
   <script src="js/sell-score.js"></script>
   <script src="js/sell-rules.js"></script>
   <script src="js/sell-score-ui.js"></script>
-  <script src="js/sell-ui.js?v=20260604-safety-status"></script>
+  <script src="js/sell-ui.js?v=20260606-status-reason"></script>
   <script src="js/app.js"></script>
 </body>
 

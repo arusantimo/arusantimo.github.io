@@ -51,6 +51,9 @@ from jongga.rule_evaluation import (
     evaluate_accumulation_p2,
     evaluate_accumulation_s1,
     evaluate_accumulation_s2,
+    evaluate_accumulation_s3,
+    evaluate_accumulation_s4,
+    evaluate_accumulation_c4,
     evaluate_breakout_c1,
     evaluate_breakout_c2,
     evaluate_breakout_c3,
@@ -112,6 +115,8 @@ from jongga.output_contract import (
     variant_label,
     write_daily_outputs,
 )
+from jongga.support_levels import build_pullback_support_gate, build_pullback_support_payload_from_snapshot
+from jongga.volatility_context import build_volatility_context, build_volatility_keypoint_suffix
 
 
 USER_AGENT = "Mozilla/5.0 jongga-live-generator/1.0"
@@ -576,7 +581,11 @@ def parse_toss_ticks_strength_payload(payload: Any) -> dict[str, Any] | None:
     strengths.sort(key=lambda item: item[0])
     observed_minutes = max(latest_minute - earliest_minute + 1, 1)
     last_hour_start = latest_minute - 59
+    last_30_start = latest_minute - 29
     last_hour_strengths = [strength for minute, strength in strengths if minute >= last_hour_start]
+    last_30_strengths = [strength for minute, strength in strengths if minute >= last_30_start]
+    last_30_buy_volume = sum(volumes["buy"] for minute, volumes in minute_buckets.items() if minute >= last_30_start)
+    last_30_sell_volume = sum(volumes["sell"] for minute, volumes in minute_buckets.items() if minute >= last_30_start)
     intraday_above_100_ratio = sum(1 for _, strength in strengths if strength >= 100.0) / len(strengths) * 100.0
     payload = {
         "intradayAbove100Ratio": round(intraday_above_100_ratio, 1),
@@ -588,6 +597,14 @@ def parse_toss_ticks_strength_payload(payload: Any) -> dict[str, Any] | None:
     if last_hour_strengths:
         payload["lastHourAvgStrength"] = round(sum(last_hour_strengths) / len(last_hour_strengths), 1)
         payload["lastHourObservedMinutes"] = min(observed_minutes, 60)
+    if last_30_strengths:
+        payload["last30AvgStrength"] = round(sum(last_30_strengths) / len(last_30_strengths), 1)
+        payload["last30ObservedMinutes"] = min(observed_minutes, 30)
+    if last_30_buy_volume > 0 or last_30_sell_volume > 0:
+        ratio = (last_30_buy_volume / last_30_sell_volume) if last_30_sell_volume > 0 else last_30_buy_volume
+        payload["last30BuySellRatio"] = round(ratio, 4)
+        payload["last30BuyVolume"] = round(last_30_buy_volume, 1)
+        payload["last30SellVolume"] = round(last_30_sell_volume, 1)
     return payload
 
 
@@ -979,6 +996,8 @@ def is_entry_field_satisfied(entry: dict[str, Any], field_key: str) -> bool:
         return "intradayAbove100Ratio" in toss and math.isfinite(parse_float(toss.get("intradayAbove100Ratio"))) and parse_float(toss.get("intradayAbove100Ratio")) >= 0
     if field_key == "toss.lastHourAvgStrength":
         return "lastHourAvgStrength" in toss and math.isfinite(parse_float(toss.get("lastHourAvgStrength"))) and parse_float(toss.get("lastHourAvgStrength")) >= 0
+    if field_key == "toss.last30BuySellRatio":
+        return "last30BuySellRatio" in toss and math.isfinite(parse_float(toss.get("last30BuySellRatio"))) and parse_float(toss.get("last30BuySellRatio")) >= 0
     if field_key == "orderbook.bidAskRatio":
         return "bidAskRatio" in orderbook and math.isfinite(parse_float(orderbook.get("bidAskRatio"))) and parse_float(orderbook.get("bidAskRatio")) >= 0
     if field_key == "eventFilter":
@@ -1014,8 +1033,6 @@ def sync_entry_manual_input(entry: dict[str, Any]) -> None:
 
 def rebuild_entry_notes(entry: dict[str, Any], strategy: str) -> None:
     notes: list[str] = []
-    toss = entry.get("toss") or {}
-    orderbook = entry.get("orderbook") or {}
     event_filter = entry.get("eventFilter") or {}
     if strategy in {"breakout", "momentum"}:
         if not is_entry_field_satisfied(entry, "toss.avgStrength"):
@@ -1024,6 +1041,13 @@ def rebuild_entry_notes(entry: dict[str, Any], strategy: str) -> None:
             notes.append("체결강도 100% 유지 비율 미반영")
         if not is_entry_field_satisfied(entry, "orderbook.bidAskRatio"):
             notes.append("호가잔량 미반영")
+    if strategy == "accumulation":
+        if not is_entry_field_satisfied(entry, "toss.avgStrength"):
+            notes.append("당일 평균 체결강도 미반영")
+        if not is_entry_field_satisfied(entry, "toss.lastHourAvgStrength"):
+            notes.append("마지막 1시간 체결강도 미반영")
+        if not is_entry_field_satisfied(entry, "toss.last30BuySellRatio"):
+            notes.append("마지막 30분 틱 프록시 미반영")
     if strategy == "reversal":
         intraday_30m = entry.get("intraday30m") or {}
         if not is_entry_field_satisfied(entry, "toss.avgStrength"):
@@ -1470,6 +1494,45 @@ def build_price_change_meta(snapshot: StockSnapshot) -> dict[str, Any]:
     }
 
 
+def _days_ago_label(days_ago: int) -> str:
+    return "전일" if days_ago == 1 else f"{days_ago}일 전"
+
+
+def build_pullback_support_context(snapshot: StockSnapshot) -> dict[str, Any]:
+    return build_pullback_support_payload_from_snapshot(snapshot)
+
+
+def build_pullback_volume_burst_context(snapshot: StockSnapshot) -> dict[str, Any]:
+    history = list(snapshot.volume_history or [])[1:21]
+    avg_20 = float(snapshot.volume_avg_20d or 0)
+    if not history or avg_20 <= 0:
+        return {"summary": "", "burstCount": 0, "maxRatioPct": 0, "latestBurstDaysAgo": None}
+
+    ratios = [volume / avg_20 for volume in history]
+    max_index, max_ratio = max(enumerate(ratios), key=lambda item: item[1])
+    burst_days = [index + 1 for index, ratio in enumerate(ratios) if ratio >= 2.0]
+    latest_burst_days_ago = burst_days[0] if burst_days else None
+    burst_count = len(burst_days)
+    summary = (
+        f"최근 20일 최대 거래량 {max_ratio * 100:.0f}% ({_days_ago_label(max_index + 1)})"
+        + (f" · 200%+ 급증 {burst_count}회" if burst_count else "")
+    )
+    return {
+        "summary": summary,
+        "burstCount": burst_count,
+        "maxRatioPct": round(max_ratio * 100, 1),
+        "latestBurstDaysAgo": latest_burst_days_ago,
+    }
+
+
+def build_entry_volatility_context(snapshot: StockSnapshot, context: dict[str, Any], strategy: str) -> dict[str, Any]:
+    return build_volatility_context(snapshot, context, strategy)
+
+
+def join_keypoint_parts(*parts: str) -> str:
+    return " ".join(part.strip() for part in parts if str(part or "").strip()).strip()
+
+
 def lower_wick_ratio(snapshot: StockSnapshot) -> float:
     body_low = min(snapshot.current_price, snapshot.open_price)
     body = abs(snapshot.current_price - snapshot.open_price)
@@ -1585,13 +1648,13 @@ def build_gap_score(live_metrics: dict[str, dict[str, float]]) -> dict[str, Any]
     elif total_score >= -7.9:
         grade_code = "G-D"
         grade = "G-D 🟠"
-        entry_adjustment = "⚠️ S등급 50% 진입만 허용 / ❌ 진입 보류"
+        entry_adjustment = "⚠️ S등급만 50% 허용 / ❌ 신규 진입 보류"
         sell_adjustment = "프리마켓 첫 가격 즉시 50% 정리 | 손절폭 -1%p 축소"
         swing_adjustment = "금지"
     else:
         grade_code = "G-E"
         grade = "G-E 🔴"
-        entry_adjustment = "❌ 전 등급 진입 금지 / ❌ 진입 금지"
+        entry_adjustment = "❌ 전 등급 신규 진입 금지 / ❌ 신규 진입 금지"
         sell_adjustment = "진입 없음 | 해당 없음"
         swing_adjustment = "금지"
 
@@ -2131,6 +2194,35 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
                 ],
             })
         return fields
+    if strategy == "accumulation":
+        fields = []
+        if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
+            fields.append({
+                "fieldKey": "toss.avgStrength",
+                "label": "당일 평균 체결강도 (%)",
+                "sourceName": "토스증권 주문 화면",
+                "sourceUrl": toss_order_url,
+                "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                "instructions": [
+                    f"토스증권에서 {snapshot.name} ({snapshot.code}) 주문 화면을 엽니다.",
+                    "체결강도 영역의 당일 평균 값을 확인합니다.",
+                    "예: 97.5 처럼 숫자만 붙여넣습니다.",
+                ],
+            })
+        if not is_snapshot_field_satisfied(snapshot, "toss.lastHourAvgStrength"):
+            fields.append({
+                "fieldKey": "toss.lastHourAvgStrength",
+                "label": "마지막 1시간 평균 체결강도 (%)",
+                "sourceName": "토스증권 체결강도 분봉 화면",
+                "sourceUrl": toss_chart_url,
+                "copyHint": "마감 전 최근 1시간 평균 체결강도만 붙여넣습니다.",
+                "instructions": [
+                    f"토스증권에서 {snapshot.name} ({snapshot.code}) 차트 화면을 엽니다.",
+                    "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
+                    "예: 104.2 처럼 숫자만 붙여넣습니다.",
+                ],
+            })
+        return fields
     if strategy == "reversal":
         fields = []
         if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
@@ -2205,11 +2297,14 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
 def finalize_scored_buy_entry(entry: dict[str, Any], context: dict[str, Any] | None = None) -> dict[str, Any]:
     if context is not None:
         attach_marking(entry, context)
-    return attach_entry_eligibility(entry)
+    return attach_entry_eligibility(entry, context)
 
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
     daily_change_pct = stock_daily_change(snapshot)
+    support_context = build_pullback_support_context(snapshot)
+    volume_burst_context = build_pullback_volume_burst_context(snapshot)
+    volatility_context = build_entry_volatility_context(snapshot, context, "pullback")
     score_map = {
         "S1": evaluate_pullback_s1(snapshot),
         "S2": evaluate_pullback_s2(snapshot),
@@ -2229,6 +2324,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict("G6", evaluate_pullback_g6_daily_change(snapshot, daily_change_pct)),
         gate_dict("G7", evaluate_pullback_g7_rsi_ceiling(snapshot)),
         gate_dict("G8", evaluate_pullback_g8_extension(snapshot)),
+        build_pullback_support_gate(support_context),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("pullback", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
@@ -2238,6 +2334,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         weights=TREND_SCORE_WEIGHTS,
         strict_max=TREND_STRICT_MAX,
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
+        volatility_context=volatility_context,
     )
     grade = scoring["grade"]
     entry = {
@@ -2254,8 +2351,18 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "keyPoint": f"5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
+        "marketCapTrillion": snapshot.market_cap_trillion,
+        "keyPoint": join_keypoint_parts(
+            f"5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
+            build_volatility_keypoint_suffix(volatility_context),
+        ),
         "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
+        "pullbackContext": {
+            "support": support_context["support"],
+            "families": support_context["families"],
+            "volumeBurst": volume_burst_context,
+        },
+        "volatilityContext": volatility_context,
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
@@ -2273,6 +2380,7 @@ def build_breakout_entry(
 ) -> dict[str, Any]:
     daily_change_pct = stock_daily_change(snapshot)
     manual_input = build_manual_input_meta("breakout", snapshot)
+    volatility_context = build_entry_volatility_context(snapshot, context, "breakout")
     score_map = {
         "RS": evaluate_breakout_rs(rs_top10),
         "S1": evaluate_breakout_s1(snapshot),
@@ -2301,6 +2409,7 @@ def build_breakout_entry(
         strict_max=BREAKOUT_STRICT_MAX,
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
         snapshot=snapshot,
+        volatility_context=volatility_context,
     )
     grade = scoring["grade"]
     entry = {
@@ -2317,13 +2426,15 @@ def build_breakout_entry(
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "keyPoint": (
-            f"주도주 돌파형 — RS·거래량·강마감·5MA 추세를 점검했습니다. "
-            f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주."
+        "marketCapTrillion": snapshot.market_cap_trillion,
+        "keyPoint": join_keypoint_parts(
+            f"주도주 돌파형 — RS·거래량·강마감·5MA 추세를 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
+            build_volatility_keypoint_suffix(volatility_context),
         ),
         "notes": [],
         "toss": snapshot.toss or {},
         "orderbook": snapshot.orderbook or {},
+        "volatilityContext": volatility_context,
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
@@ -2346,14 +2457,22 @@ def build_momentum_entry(
 def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     daily_change_pct = stock_daily_change(snapshot)
     manual_input = build_manual_input_meta("accumulation", snapshot)
+    toss = snapshot.toss or {}
+    volatility_context = build_entry_volatility_context(snapshot, context, "accumulation")
+    late_strength = parse_float(toss.get("lastHourAvgStrength"))
+    avg_strength = parse_float(toss.get("avgStrength"))
+    last30_ratio = parse_float(toss.get("last30BuySellRatio"))
     score_map = {
         "S1": evaluate_accumulation_s1(snapshot),
         "S2": evaluate_accumulation_s2(snapshot),
+        "S3": evaluate_accumulation_s3(snapshot),
+        "S4": evaluate_accumulation_s4(snapshot),
         "P1": evaluate_accumulation_p1(snapshot),
         "P2": evaluate_accumulation_p2(snapshot),
         "C1": evaluate_accumulation_c1(snapshot),
         "C2": evaluate_accumulation_c2(snapshot, daily_change_pct),
         "C3": evaluate_accumulation_c3(snapshot, context),
+        "C4": evaluate_accumulation_c4(snapshot),
     }
     gates = [
         gate_dict("G0", evaluate_accumulation_g0(snapshot), warn_if_not_met=True),
@@ -2371,8 +2490,18 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         weights=ACCUMULATION_SCORE_WEIGHTS,
         strict_max=ACCUMULATION_STRICT_MAX,
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
+        snapshot=snapshot,
+        volatility_context=volatility_context,
     )
     grade = scoring["grade"]
+    flow_bits: list[str] = []
+    if late_strength > 0:
+        flow_bits.append(f"마지막 1시간 {late_strength:.1f}%")
+    if late_strength > 0 and avg_strength > 0 and late_strength > avg_strength:
+        flow_bits.append("장후반 매수세 강화")
+    if last30_ratio > 0:
+        flow_bits.append(f"마지막 30분 틱 {last30_ratio:.2f}:1")
+    flow_summary = f" / {' · '.join(flow_bits)}" if flow_bits else ""
     entry = {
         "rank": 0,
         "name": snapshot.name,
@@ -2387,16 +2516,20 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "keyPoint": (
-            f"수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름을 점검했습니다. "
-            f"외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주."
+        "marketCapTrillion": snapshot.market_cap_trillion,
+        "keyPoint": join_keypoint_parts(
+            f"수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주{flow_summary}.",
+            build_volatility_keypoint_suffix(volatility_context),
         ),
         "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
+        "toss": snapshot.toss or {},
+        "volatilityContext": volatility_context,
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
+    rebuild_entry_notes(entry, "accumulation")
     return finalize_scored_buy_entry(entry, context)
 
 
@@ -2404,6 +2537,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     manual_input = build_manual_input_meta("reversal", snapshot)
     auto_event_filter = snapshot.event_filter
     intraday_signal = snapshot.intraday_30m
+    volatility_context = build_entry_volatility_context(snapshot, context, "reversal")
     drawdown_20d = drawdown_from_high_20d(snapshot) or 0.0
     bullish = snapshot.current_price > snapshot.open_price
     doji = candle_range(snapshot) > 0 and abs(snapshot.current_price - snapshot.open_price) <= candle_range(snapshot) * 0.3
@@ -2443,6 +2577,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         weights=REVERSAL_SCORE_WEIGHTS,
         strict_max=REVERSAL_STRICT_MAX,
         vkospi_multiplier=reversal_vkospi_multiplier(context["vkospiValue"]),
+        volatility_context=volatility_context,
     )
     grade = scoring["grade"]
     entry = {
@@ -2460,13 +2595,18 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "keyPoint": f"20일 고점 대비 {drawdown_20d:.1f}% 조정 후 안정화 패턴 여부를 점검했습니다.",
+        "marketCapTrillion": snapshot.market_cap_trillion,
+        "keyPoint": join_keypoint_parts(
+            f"20일 고점 대비 {drawdown_20d:.1f}% 조정 후 안정화 패턴 여부를 점검했습니다.",
+            build_volatility_keypoint_suffix(volatility_context),
+        ),
         "notes": [],
         "manualInput": manual_input,
         "eventFilter": auto_event_filter,
         "intraday30m": intraday_signal,
         "toss": snapshot.toss or {},
         "orderbook": snapshot.orderbook or {},
+        "volatilityContext": volatility_context,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",

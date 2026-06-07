@@ -1,7 +1,7 @@
 [
   {
     "orderId": "20260604|stable|pullback|009150-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -21,7 +21,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|009150-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -37,11 +37,11 @@
     "stageKey": "takeProfitPrimary",
     "activeFrom": "2026-06-05T09:00:00+09:00",
     "activeUntil": "2026-06-05T10:00:00+09:00",
-    "finalStatus": "cancelled"
+    "finalStatus": "filled"
   },
   {
     "orderId": "20260604|stable|pullback|009150-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -61,7 +61,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|009150-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -77,11 +77,11 @@
     "stageKey": "stop",
     "activeFrom": "",
     "activeUntil": "",
-    "finalStatus": "filled"
+    "finalStatus": "open"
   },
   {
     "orderId": "20260604|stable|pullback|009150-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -92,7 +92,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 1757000.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|pullback|009150",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",
@@ -101,7 +101,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|036930-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -121,7 +121,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|036930-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -141,7 +141,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|036930-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -161,7 +161,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|036930-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -181,7 +181,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|036930-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -192,7 +192,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 210000.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|pullback|036930",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",
@@ -201,7 +201,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|035420-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -221,7 +221,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|035420-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -241,7 +241,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|035420-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -261,7 +261,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|035420-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -281,7 +281,7 @@
   },
   {
     "orderId": "20260604|stable|pullback|035420-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "pullback",
@@ -292,7 +292,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 255500.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|pullback|035420",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",
@@ -301,7 +301,7 @@
   },
   {
     "orderId": "20260604|stable|accumulation|402340-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "accumulation",
@@ -321,7 +321,7 @@
   },
   {
     "orderId": "20260604|stable|accumulation|402340-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "accumulation",
@@ -341,7 +341,7 @@
   },
   {
     "orderId": "20260604|stable|accumulation|402340-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "accumulation",
@@ -361,7 +361,7 @@
   },
   {
     "orderId": "20260604|stable|accumulation|402340-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "accumulation",
@@ -381,7 +381,7 @@
   },
   {
     "orderId": "20260604|stable|accumulation|402340-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "accumulation",
@@ -392,7 +392,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 1258000.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|accumulation|402340",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",
@@ -401,7 +401,7 @@
   },
   {
     "orderId": "20260604|stable|breakout|036930-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "breakout",
@@ -421,7 +421,7 @@
   },
   {
     "orderId": "20260604|stable|breakout|036930-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "breakout",
@@ -441,7 +441,7 @@
   },
   {
     "orderId": "20260604|stable|breakout|036930-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "breakout",
@@ -461,7 +461,7 @@
   },
   {
     "orderId": "20260604|stable|breakout|036930-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "breakout",
@@ -481,7 +481,7 @@
   },
   {
     "orderId": "20260604|stable|breakout|036930-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "breakout",
@@ -492,7 +492,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 210000.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|breakout|036930",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",
@@ -501,7 +501,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|402340-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -521,7 +521,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|402340-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -541,7 +541,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|402340-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -561,7 +561,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|402340-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -581,7 +581,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|402340-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -592,7 +592,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 1258000.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|reversal|402340",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",
@@ -601,7 +601,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|011070-entry",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -621,7 +621,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|011070-takeProfitPrimary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -637,11 +637,11 @@
     "stageKey": "takeProfitPrimary",
     "activeFrom": "2026-06-05T09:00:00+09:00",
     "activeUntil": "2026-06-05T10:00:00+09:00",
-    "finalStatus": "cancelled"
+    "finalStatus": "filled"
   },
   {
     "orderId": "20260604|stable|reversal|011070-takeProfitSecondary",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -661,7 +661,7 @@
   },
   {
     "orderId": "20260604|stable|reversal|011070-stop",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -677,11 +677,11 @@
     "stageKey": "stop",
     "activeFrom": "",
     "activeUntil": "",
-    "finalStatus": "filled"
+    "finalStatus": "open"
   },
   {
     "orderId": "20260604|stable|reversal|011070-finalCutoff",
-    "runId": "replay-20260606-002659-26ce2654",
+    "runId": "replay-20260607-023158-7ed2263a",
     "date": "2026-06-04",
     "variant": "stable",
     "strategy": "reversal",
@@ -692,7 +692,7 @@
     "requestedAt": "2026-06-05T15:00:00+09:00",
     "requestedPrice": 1160000.0,
     "quantityPct": 100.0,
-    "reason": "3일차 10시 컷오프 청산",
+    "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260604|stable|reversal|011070",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-05T15:00:00+09:00",

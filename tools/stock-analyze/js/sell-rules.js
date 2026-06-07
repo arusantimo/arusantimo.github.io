@@ -26,6 +26,59 @@ function buildSellIndicatorFromRule(rule) {
   };
 }
 
+function getLatestConfirmedClosePrice(data) {
+  const series = Array.isArray(data?.ohlcvSeries) ? data.ohlcvSeries : [];
+  for (let index = series.length - 1; index >= 0; index -= 1) {
+    const closePrice = Number(series[index]?.close);
+    if (Number.isFinite(closePrice) && closePrice > 0) return closePrice;
+  }
+  return 0;
+}
+
+function resolvePullbackSupportContextForSell(stock, data) {
+  if (stock?.type !== 'pullback') return null;
+  const entry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
+  const existing = entry?.pullbackContext;
+  const hasExistingSupport = existing?.support?.primaryLine || existing?.support?.strengthScore || existing?.families;
+  if (hasExistingSupport) return existing;
+  if (typeof analyzePullbackSupportLevels !== 'function' || !Array.isArray(data?.ohlcvSeries) || !data.ohlcvSeries.length) {
+    return existing || null;
+  }
+  const recalculated = analyzePullbackSupportLevels(data.ohlcvSeries, { currentPrice: data.currentPrice });
+  return {
+    support: recalculated?.support || null,
+    families: recalculated?.families || {},
+    volumeBurst: existing?.volumeBurst || { summary: '', burstCount: 0, maxRatioPct: null, latestBurstDaysAgo: null }
+  };
+}
+
+function buildPullbackSupportIndicator(supportContext) {
+  if (!supportContext?.support) return null;
+  const support = supportContext.support;
+  const primaryLine = support.primaryLine || null;
+  const strengthScore = Number(support.strengthScore || 0);
+  const tone = support.warningLevel === 'clear'
+    ? 'clear'
+    : support.warningLevel === 'danger'
+      ? 'warning'
+      : 'warning';
+  const familyLabels = Array.isArray(primaryLine?.familyLabels) && primaryLine.familyLabels.length
+    ? primaryLine.familyLabels.join(' · ')
+    : '근거 부족';
+  const distanceText = typeof primaryLine?.distancePct === 'number'
+    ? `${primaryLine.distancePct.toFixed(2)}% 아래`
+    : '거리 미산출';
+  return {
+    title: '복합 지지선 구조',
+    criterion: '최근 60일 기준 수평 지지, 스윙로우 군집, volume shelf, 급증봉 저점 앵커를 함께 계산해 하단 방어력을 보조 경고로 점검합니다.',
+    status: tone,
+    result: primaryLine
+      ? `강도 ${strengthScore}점 / ${support.strengthLabel || 'weak'} · 주지지 ${Number(primaryLine.price || 0).toLocaleString()}원 (${distanceText})`
+      : `강도 ${strengthScore}점 · 현재가 아래 유효 주지지 부족`,
+    value: support.warningReason || familyLabels
+  };
+}
+
 function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile) {
   const entryPrice = targets?.entryPrice || data.prevClose;
   const rules = [];
@@ -37,6 +90,8 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
   const fallbackStopPrice = entryPrice > 0
     ? Math.round(entryPrice * (1 + (adjustedStopLossRate / 100)))
     : 0;
+  const latestClosePrice = getLatestConfirmedClosePrice(data);
+  const hasLatestClose = latestClosePrice > 0;
   let effectiveStopPrice = 0;
 
   if (gapProfile?.immediatePartialExit && data.currentPrice > 0) {
@@ -69,37 +124,37 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
     }));
   }
 
-  if (targets?.stopLoss?.price && data.currentPrice > 0) {
+  if (targets?.stopLoss?.price && hasLatestClose) {
     effectiveStopPrice = Math.max(targets.stopLoss.price, tightenedDefaultStopPrice || 0);
-    const belowStopLoss = data.currentPrice <= effectiveStopPrice;
+    const belowStopLoss = latestClosePrice <= effectiveStopPrice;
     rules.push(createSellRule({
       code: 'H1',
-      title: '유효 손절가 이탈',
+      title: '유효 손절가 종가 이탈',
       criterion: gapProfile?.tightenStopLossRate
-        ? `전략 손절가와 갭 조정 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
-        : `전략 데이터의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
+        ? `장중 저가 이탈은 손절로 보지 않고 확정 종가 기준으로만 판단합니다.\n기준: 최근 확정 종가 ≤ MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
+        : `장중 변동은 무시하고 최근 확정 종가가 전략 손절가(${targets.stopLoss.price.toLocaleString()}원) 아래로 마감했을 때만 전량 매도합니다.`,
       triggered: belowStopLoss,
       result: belowStopLoss
-        ? `현재가 ${data.currentPrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 즉시 전량 매도`
-        : `현재가 ${data.currentPrice.toLocaleString()} > 유효 손절가 ${effectiveStopPrice.toLocaleString()} — 안전`,
-      value: `현재가 ${data.currentPrice.toLocaleString()} / 유효 손절가 ${effectiveStopPrice.toLocaleString()}${gapProfile?.tightenStopLossRate ? ` (갭 ${gapProfile.code}로 ${gapProfile.tightenStopLossRate}%p 축소)` : ''}`,
+        ? `확정 종가 ${latestClosePrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 종가 기준 전량 매도`
+        : `확정 종가 ${latestClosePrice.toLocaleString()} > 유효 손절가 ${effectiveStopPrice.toLocaleString()} — 종가 손절 미발생`,
+      value: `확정 종가 ${latestClosePrice.toLocaleString()} / 유효 손절가 ${effectiveStopPrice.toLocaleString()}${gapProfile?.tightenStopLossRate ? ` (갭 ${gapProfile.code}로 ${gapProfile.tightenStopLossRate}%p 축소)` : ''}`,
       severity: 'hard',
       bucket: 'sell'
     }));
-  } else if (entryPrice > 0 && data.currentPrice > 0) {
-    const lossRate = ((data.currentPrice - entryPrice) / entryPrice) * 100;
+  } else if (entryPrice > 0 && hasLatestClose) {
+    const lossRate = ((latestClosePrice - entryPrice) / entryPrice) * 100;
     const belowDefault = lossRate <= adjustedStopLossRate;
     rules.push(createSellRule({
       code: 'H2',
-      title: `기본 손절선 (${adjustedStopLossRate.toFixed(1)}%) 이탈`,
+      title: `기본 손절선 (${adjustedStopLossRate.toFixed(1)}%) 종가 이탈`,
       criterion: gapProfile?.tightenStopLossRate
-        ? `전략 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${adjustedStopLossRate.toFixed(1)}%`
-        : `전략 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
+        ? `전략 손절가 미설정 시에도 장중 손절은 하지 않고 확정 종가 기준으로만 판단합니다.\n기준: (최근 확정 종가 - 진입가) / 진입가 ≤ ${adjustedStopLossRate.toFixed(1)}%`
+        : `전략 손절가 미설정 시에도 장중 손절은 하지 않고 확정 종가가 진입가 대비 ${baseLossRate}% 이하로 마감했을 때만 전량 매도합니다.\n기준: (최근 확정 종가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
       triggered: belowDefault,
       result: belowDefault
-        ? `진입가 대비 ${lossRate.toFixed(2)}% → 즉시 전량 매도`
-        : `진입가 대비 ${lossRate.toFixed(2)}% — 손절선 이내`,
-      value: `(${data.currentPrice.toLocaleString()} - ${entryPrice.toLocaleString()}) / ${entryPrice.toLocaleString()} = ${lossRate.toFixed(2)}%${gapProfile?.tightenStopLossRate ? ` / 갭 ${gapProfile.code} 기준 ${adjustedStopLossRate.toFixed(1)}%` : ''}`,
+        ? `확정 종가 기준 ${lossRate.toFixed(2)}% → 종가 기준 전량 매도`
+        : `확정 종가 기준 ${lossRate.toFixed(2)}% — 손절선 이내`,
+      value: `(${latestClosePrice.toLocaleString()} - ${entryPrice.toLocaleString()}) / ${entryPrice.toLocaleString()} = ${lossRate.toFixed(2)}%${gapProfile?.tightenStopLossRate ? ` / 갭 ${gapProfile.code} 기준 ${adjustedStopLossRate.toFixed(1)}%` : ''}`,
       severity: 'hard',
       bucket: 'sell'
     }));
@@ -171,10 +226,12 @@ function resolveSellSignalMeta(decision, actionStage, triggeredRule = null) {
 
 function attachEntryContext(payload, stock, meta = {}) {
   const entry = stock.type === 'swing' ? null : getEntryByCode(stock.entryKey || stock.code, stock.slotId);
+  const pullbackSupport = payload.pullbackSupport || resolvePullbackSupportContextForSell(stock, meta.data || {});
+  const executionPayload = pullbackSupport ? { ...payload, pullbackSupport } : payload;
   const signalMeta = resolveSellSignalMeta(payload.decision, payload.actionStage, payload.triggeredRule);
   const executionMeta = buildSellExecutionContext({
     stock,
-    payload,
+    payload: executionPayload,
     data: meta.data || {},
     isBefore0908: Boolean(meta.isBefore0908),
     ruleSet: meta.ruleSet || null,
@@ -182,6 +239,7 @@ function attachEntryContext(payload, stock, meta = {}) {
   });
   return {
     ...payload,
+    pullbackSupport,
     entryGrade: entry?.grade || '',
     entryStatusLabel: entry?.statusLabel || '',
     signalSeverity: signalMeta.severity,
@@ -205,6 +263,7 @@ function buildIndicators(stock, data, isBefore0908) {
   const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
   const gainRate = entryPrice > 0 ? ((data.currentPrice - entryPrice) / entryPrice) * 100 : 0;
   const gapProfile = getGapSellAdjustmentProfile();
+  const pullbackSupport = resolvePullbackSupportContextForSell(stock, data);
 
   if (gapProfile.code) {
     indicators.push({
@@ -302,7 +361,7 @@ function buildIndicators(stock, data, isBefore0908) {
       actionStage = 'reject';
       triggeredRule = triggeredRejections[0];
       const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfile);
-      return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile }, stock, { data, isBefore0908 });
+      return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile, pullbackSupport }, stock, { data, isBefore0908 });
     }
 
     const below60ma = data.ma60 > 0 && data.currentPrice < data.ma60;
@@ -317,7 +376,7 @@ function buildIndicators(stock, data, isBefore0908) {
       actionStage = 'reject';
       triggeredRule = { code: '60MA', title: '60MA 이탈 강제 청산', triggered: true, severity: 'hard', bucket: 'sell' };
       const lossManagement = buildSwingLossManagement(data, entryPrice, gainRate, volRatio, gapProfile);
-      return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile }, stock, { data, isBefore0908 });
+      return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile, pullbackSupport }, stock, { data, isBefore0908 });
     }
     if (data.ma60 > 0) {
       indicators.push({
@@ -431,7 +490,7 @@ function buildIndicators(stock, data, isBefore0908) {
       actionStage = 'partial_exit';
     }
 
-    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile }, stock, { data, isBefore0908 });
+    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, lossManagement, gapProfile, pullbackSupport }, stock, { data, isBefore0908 });
   }
 
   const stageLabel = '통합 매도 분석';
@@ -454,14 +513,14 @@ function buildIndicators(stock, data, isBefore0908) {
     decision = 'sell';
     actionStage = 'reject';
     triggeredRule = ruleSet.hardSignals[0];
-    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile }, stock, { data, isBefore0908, ruleSet });
+    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile, pullbackSupport }, stock, { data, isBefore0908, ruleSet });
   }
 
   if (ruleSet.partialSignals.length > 0) {
     decision = 'caution';
     actionStage = 'partial_exit';
     triggeredRule = ruleSet.partialSignals[0];
-    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile }, stock, { data, isBefore0908, ruleSet });
+    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile, pullbackSupport }, stock, { data, isBefore0908, ruleSet });
   }
 
   const stageResult = evaluateTradeStage(data, targets, data.prevClose, gapProfile);
@@ -481,6 +540,15 @@ function buildIndicators(stock, data, isBefore0908) {
     decision = 'hold';
   } else if (stageResult.stage === 'underwater') {
     decision = 'caution';
+  }
+
+  const supportIndicator = buildPullbackSupportIndicator(pullbackSupport);
+  if (supportIndicator) {
+    indicators.push(supportIndicator);
+    if (supportIndicator.status === 'warning' && decision === 'hold') {
+      decision = 'caution';
+      if (actionStage === 'swing') actionStage = 'warning';
+    }
   }
 
   if (stageResult.stage === 'swing' && gapProfile.swingMode === 'ban') {
@@ -540,7 +608,7 @@ function buildIndicators(stock, data, isBefore0908) {
     actionStage = 'warning';
   }
 
-  return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile }, stock, { data, isBefore0908, ruleSet, stageResult });
+  return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile, pullbackSupport }, stock, { data, isBefore0908, ruleSet, stageResult });
 }
 
 function applyRules(stock, data, isBefore0908) {
@@ -574,7 +642,8 @@ function applyRules(stock, data, isBefore0908) {
     sellScore: detail.sellScore,
     scoreDirection: detail.scoreDirection,
     scoreBreakdown: detail.scoreBreakdown,
-    actionPlan: detail.actionPlan
+    actionPlan: detail.actionPlan,
+    pullbackSupport: detail.pullbackSupport
   };
 
   if (!card || !priceRow || !meta || !indBox || !badge) {

@@ -83,6 +83,94 @@ function normalizeJonggaRecommendedStage(value) {
   };
 }
 
+function normalizeJonggaPullbackContext(value) {
+  if (!value || typeof value !== 'object') return null;
+  const support = value.support && typeof value.support === 'object' ? value.support : {};
+  const families = value.families && typeof value.families === 'object' ? value.families : {};
+  const volumeBurst = value.volumeBurst && typeof value.volumeBurst === 'object' ? value.volumeBurst : {};
+  const normalizeSupportFamilyLine = line => ({
+    family: String(line.family || ''),
+    familyLabel: String(line.familyLabel || ''),
+    label: String(line.label || ''),
+    price: toJonggaNumber(line.price),
+    distancePct: toJonggaNumber(line.distancePct, null),
+    count: Number(line.count || 0),
+    lastSeenDaysAgo: toJonggaNumber(line.lastSeenDaysAgo, null),
+    valid: Boolean(line.valid),
+    weight: Number(line.weight || 0),
+    bandLow: toJonggaNumber(line.bandLow, null),
+    bandHigh: toJonggaNumber(line.bandHigh, null),
+    pivotCount: Number(line.pivotCount || 0),
+    volume: toJonggaNumber(line.volume, null),
+    binLow: toJonggaNumber(line.binLow, null),
+    binHigh: toJonggaNumber(line.binHigh, null),
+    burstRatioPct: toJonggaNumber(line.burstRatioPct, null),
+    anchorCount: Number(line.anchorCount || 0),
+    role: String(line.role || ''),
+    sources: Array.isArray(line.sources) ? line.sources.map(item => String(item || '')) : [],
+    families: Array.isArray(line.families) ? line.families.map(item => String(item || '')) : [],
+    familyLabels: Array.isArray(line.familyLabels) ? line.familyLabels.map(item => String(item || '')) : [],
+    familyCount: Number(line.familyCount || 0),
+    strengthPoints: Number(line.strengthPoints || 0),
+    consensusBonus: Number(line.consensusBonus || 0)
+  });
+  const normalizedLines = asJonggaArray(support.lines).map(normalizeSupportFamilyLine).filter(line => line.price !== null);
+  const normalizedPrimaryLine = support.primaryLine && typeof support.primaryLine === 'object'
+    ? normalizeSupportFamilyLine(support.primaryLine)
+    : normalizedLines[0] || null;
+  const normalizedStrengthScore = Number(support.strengthScore || normalizedPrimaryLine?.strengthPoints || 0);
+  const normalizedStrengthLabel = String(support.strengthLabel || (typeof getPullbackSupportStrengthLabel === 'function'
+    ? getPullbackSupportStrengthLabel(normalizedStrengthScore)
+    : normalizedStrengthScore >= 70 ? 'strong' : normalizedStrengthScore >= 45 ? 'watch' : 'weak'));
+  const normalizeFamilyList = items => asJonggaArray(items).map(normalizeSupportFamilyLine).filter(line => line.price !== null);
+  return {
+    support: {
+      summary: String(support.summary || ''),
+      lines: normalizedLines,
+      primaryLine: normalizedPrimaryLine,
+      strengthScore: normalizedStrengthScore,
+      strengthLabel: normalizedStrengthLabel,
+      warningLevel: String(support.warningLevel || ''),
+      warningReason: String(support.warningReason || ''),
+      activeFamilyCount: Number(support.activeFamilyCount || normalizedPrimaryLine?.familyCount || 0),
+      barCount: Number(support.barCount || 0)
+    },
+    families: {
+      horizontal: normalizeFamilyList(families.horizontal),
+      swingCluster: normalizeFamilyList(families.swingCluster),
+      volumeShelf: normalizeFamilyList(families.volumeShelf),
+      eventAnchors: normalizeFamilyList(families.eventAnchors)
+    },
+    volumeBurst: {
+      summary: String(volumeBurst.summary || ''),
+      burstCount: Number(volumeBurst.burstCount || 0),
+      maxRatioPct: toJonggaNumber(volumeBurst.maxRatioPct, null),
+      latestBurstDaysAgo: toJonggaNumber(volumeBurst.latestBurstDaysAgo, null)
+    }
+  };
+}
+
+function normalizeJonggaVolatilityContext(value) {
+  if (!value || typeof value !== 'object') return null;
+  const metrics = value.metrics && typeof value.metrics === 'object' ? value.metrics : {};
+  return {
+    marketState: String(value.marketState || ''),
+    stockState: String(value.stockState || ''),
+    blendedState: String(value.blendedState || ''),
+    strategyFit: String(value.strategyFit || ''),
+    scoreDelta: toJonggaNumber(value.scoreDelta, 0),
+    summary: String(value.summary || ''),
+    reason: String(value.reason || ''),
+    strategyLabel: String(value.strategyLabel || ''),
+    metrics: {
+      atrPct10: toJonggaNumber(metrics.atrPct10, null),
+      returnStd20: toJonggaNumber(metrics.returnStd20, null),
+      todayRangePct: toJonggaNumber(metrics.todayRangePct, null),
+      vkospi: toJonggaNumber(metrics.vkospi, null)
+    }
+  };
+}
+
 function normalizeJonggaGapScore(slot = {}, root = {}) {
   const source = slot.gapScore || root.gapScore || {};
   return {
@@ -223,6 +311,13 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     entryPriceText: String(entryPrice || ''),
     entryPriceValue: toJonggaNumber(entryPrice),
     entryMeta: String(effectiveRawEntry.entryMeta || ''),
+    marketCapTrillion: toJonggaNumber(
+      effectiveRawEntry.marketCapTrillion
+      ?? effectiveRawEntry.market_cap_trillion
+      ?? effectiveRawEntry.marketCap
+      ?? effectiveRawEntry.market_cap,
+      null
+    ),
     currentPrice: toJonggaNumber(effectiveRawEntry.currentPrice || effectiveRawEntry.price, null),
     previousClose: toJonggaNumber(effectiveRawEntry.previousClose || effectiveRawEntry.prevClose, null),
     dailyChange: toJonggaNumber(effectiveRawEntry.dailyChange || effectiveRawEntry.change, null),
@@ -231,10 +326,14 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     rationale: String(effectiveRawEntry.rationale || effectiveRawEntry.reason || effectiveRawEntry.summary || ''),
     keyPoint: String(effectiveRawEntry.keyPoint || effectiveRawEntry.key || ''),
     rr: String(effectiveRawEntry.rr || effectiveRawEntry.riskReward || ''),
+    statusReason: String(effectiveRawEntry.statusReason || ''),
+    statusReasonShort: String(effectiveRawEntry.statusReasonShort || ''),
     notes: asJonggaArray(effectiveRawEntry.notes).map(note => String(note)),
     tradePlanRows: normalizeJonggaTradePlanRows(effectiveRawEntry.tradePlanRows || effectiveRawEntry.tradePlan),
     recommendedEntryBand: normalizeJonggaRecommendedBand(effectiveRawEntry.recommendedEntryBand),
     recommendedStage: normalizeJonggaRecommendedStage(effectiveRawEntry.recommendedStage),
+    pullbackContext: normalizeJonggaPullbackContext(effectiveRawEntry.pullbackContext),
+    volatilityContext: normalizeJonggaVolatilityContext(effectiveRawEntry.volatilityContext),
     liveRefresh: buildJonggaLiveRefresh(effectiveRawEntry),
     source: 'jongga-json',
     dataQuality: effectiveRawEntry.dataQuality || null
@@ -243,7 +342,7 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
   const withMacro = typeof applyMacroOverlayToEntry === 'function'
     ? applyMacroOverlayToEntry(normalized, strategy, context)
     : normalized;
-  return applyJonggaSafety(typeof attachEntryEligibility === 'function' ? attachEntryEligibility(withMacro) : withMacro, context);
+  return applyJonggaSafety(typeof attachEntryEligibility === 'function' ? attachEntryEligibility(withMacro, context) : withMacro, context);
 }
 
 function normalizeJonggaSwingEntry(rawEntry, rank) {

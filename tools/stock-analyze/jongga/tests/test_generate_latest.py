@@ -9,7 +9,7 @@ from unittest import mock
 from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
 from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
-from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot
+from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
 from jongga.rule_evaluation import evaluate_reversal_f2, evaluate_reversal_g1, evaluate_reversal_g2, evaluate_reversal_g4
 from pathlib import Path
@@ -17,6 +17,20 @@ from tempfile import TemporaryDirectory
 
 
 class GenerateLatestTest(unittest.TestCase):
+    def test_status_labels_separate_gapdown_ban_and_market_gate_hold(self):
+        self.assertEqual(
+            trend_status_label("pullback", "A", "강세장 ✅", "G-A", [{"code": "G5", "status": "⛔"}]),
+            "시장 Gate 차단 · 신규 진입 보류",
+        )
+        self.assertEqual(
+            trend_status_label("pullback", "A", "강세장 ✅", "G-E", []),
+            "매매금지(갭다운 경고 · 신규 진입 금지)",
+        )
+        self.assertEqual(
+            reversal_status_label("A", "강세장 ✅", "G-D", [], []),
+            "매매금지(갭다운 주의 · 신규 진입 보류)",
+        )
+
     def test_parse_cnbc_quote_html(self):
         quote = parse_cnbc_quote_html('{"symbol":".KSVKOSPI","last":"71.37","open":"71.44","high":"72.95","low":"71.37","change":"-1.14","change_pct":"-1.57%","previous_day_closing":"72.51"}')
         self.assertEqual(quote["current"], 71.37)
@@ -138,6 +152,8 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(parsed["observedMinutes"], 3)
         self.assertAlmostEqual(parsed["intradayAbove100Ratio"], 66.7, places=1)
         self.assertAlmostEqual(parsed["lastHourAvgStrength"], 181.0, places=1)
+        self.assertAlmostEqual(parsed["last30AvgStrength"], 181.0, places=1)
+        self.assertAlmostEqual(parsed["last30BuySellRatio"], 1.5, places=4)
 
     def test_parse_naver_orderbook_ratio_html_reads_total_row(self):
         parsed = parse_naver_orderbook_ratio_html(
@@ -243,8 +259,20 @@ class GenerateLatestTest(unittest.TestCase):
         entry = build_pullback_entry(snapshot, context)
 
         g1_gate = next(rule for rule in entry["gates"] if rule["code"] == "G1")
+        g9_gate = next(rule for rule in entry["gates"] if rule["code"] == "G9")
         self.assertEqual(g1_gate["status"], "✅")
         self.assertIn("20MA", g1_gate["note"])
+        self.assertIn(g9_gate["status"], {"✅", "⚠️"})
+        self.assertIn("pullbackContext", entry)
+        self.assertIn("강도", entry["pullbackContext"]["support"]["summary"])
+        self.assertIn("primaryLine", entry["pullbackContext"]["support"])
+        self.assertIn("strengthScore", entry["pullbackContext"]["support"])
+        self.assertIn("horizontal", entry["pullbackContext"]["families"])
+        self.assertIn("최근 20일 최대 거래량 100%", entry["pullbackContext"]["volumeBurst"]["summary"])
+        self.assertEqual(entry["pullbackContext"]["volumeBurst"]["burstCount"], 0)
+        self.assertEqual(entry["volatilityContext"]["marketState"], "calm")
+        self.assertIn("변동성", entry["keyPoint"])
+        self.assertTrue(any(row["code"] == "V1" for row in entry["scoreBreakdown"]))
 
     def _overextended_pullback_snapshot(self) -> StockSnapshot:
         """주성엔지니어링 2026-06-05 재현: +27% 폭등·주봉 RSI 95.7·이평 과이격."""
@@ -917,6 +945,9 @@ class GenerateLatestTest(unittest.TestCase):
         c3_rule = next(rule for rule in entry["matchedRules"] if rule["code"] == "C3")
         self.assertIn("1.1", c2_rule["note"])
         self.assertIn("30분봉", c3_rule["note"])
+        self.assertEqual(entry["volatilityContext"]["blendedState"], "volatile")
+        self.assertEqual(entry["volatilityContext"]["strategyFit"], "favorable")
+        self.assertTrue(any(row["code"] == "V1" and row["strictPoints"] == 1.0 for row in entry["scoreBreakdown"]))
 
     def test_build_reversal_entry_explains_missing_last_hour_strength(self):
         snapshot = StockSnapshot(
@@ -1142,6 +1173,78 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(g2_gate["status"], "⚠️")
         self.assertEqual(g4_gate["status"], "✅")
 
+    def test_accumulation_uses_late_buy_strength_confirmation(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=85.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=1500.0,
+            institution_net=500.0,
+            foreign_previous=200.0,
+            institution_previous=100.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[85.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=94600.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=94500.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=110000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={
+                "avgStrength": 96.0,
+                "lastHourAvgStrength": 118.0,
+                "last30AvgStrength": 122.0,
+                "last30BuySellRatio": 1.42,
+            },
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+        matched_codes = {rule["code"] for rule in entry["matchedRules"]}
+        self.assertTrue({"S3", "S4", "C4"}.issubset(matched_codes))
+        self.assertIn("장후반 매수세 강화", entry["keyPoint"])
+        self.assertIn("마지막 30분 틱 1.42:1", entry["keyPoint"])
+        self.assertEqual(entry["manualInput"]["required"], False)
+        self.assertEqual(entry["toss"]["avgStrength"], 96.0)
+        self.assertEqual(entry["toss"]["lastHourAvgStrength"], 118.0)
+        self.assertEqual(entry["toss"]["last30BuySellRatio"], 1.42)
+        self.assertFalse(any("미반영" in note for note in entry["notes"]))
+        self.assertEqual(entry["volatilityContext"]["strategyFit"], "unfavorable")
+        self.assertTrue(any(row["code"] == "V1" for row in entry["scoreBreakdown"]))
+
     def test_breakout_candle_and_ma5_gates_are_warning_not_hard_block(self):
         snapshot = StockSnapshot(
             rank=8,
@@ -1200,6 +1303,9 @@ class GenerateLatestTest(unittest.TestCase):
 
         self.assertEqual(g5_gate["status"], "⚠️")
         self.assertEqual(g7_gate["status"], "⚠️")
+        self.assertIn(entry["volatilityContext"]["strategyFit"], {"favorable", "slight_favorable", "neutral", "unfavorable"})
+        self.assertIn("변동성", entry["keyPoint"])
+        self.assertTrue(any(row["code"] == "V1" for row in entry["scoreBreakdown"]))
 
     def test_build_momentum_entry_is_breakout_alias(self):
         snapshot = StockSnapshot(

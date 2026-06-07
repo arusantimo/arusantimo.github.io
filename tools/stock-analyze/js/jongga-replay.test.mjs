@@ -37,8 +37,18 @@ function loadReplayContext() {
     console,
     JSON,
     window: null,
+    localStorage: {
+      store: new Map(),
+      getItem(key) {
+        return this.store.has(key) ? this.store.get(key) : null;
+      },
+      setItem(key, value) {
+        this.store.set(key, String(value));
+      }
+    },
     document: {
-      getElementById(id) { return elements.get(id) || null; }
+      getElementById(id) { return elements.get(id) || null; },
+      querySelectorAll() { return []; }
     },
     escapeHtml(value) {
       return String(value ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -69,6 +79,10 @@ function loadReplayContext() {
   };
   context.window = context;
   vm.createContext(context);
+  vm.runInContext(fs.readFileSync(new URL('./gap.js', import.meta.url), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(new URL('./utils.js', import.meta.url), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(new URL('./entry-policy.js', import.meta.url), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(new URL('./state.js', import.meta.url), 'utf8'), context);
   vm.runInContext(fs.readFileSync(new URL('./jongga-replay.js', import.meta.url), 'utf8'), context);
   return context;
 }
@@ -134,6 +148,7 @@ function sampleReplayBridge() {
               exitAvgFillPrice: 10200.6,
               exitLastFillPrice: 10200.6,
               tradeStatus: 'closed',
+              closedReason: 'primary_target_touch',
               netReturnPct: 1.2
             }
           ]
@@ -314,6 +329,7 @@ function sampleReplayBridge() {
                       exitAvgFillPrice: 10200.6,
                       exitLastFillPrice: 10200.6,
                       tradeStatus: 'closed',
+                      closedReason: 'primary_target_touch',
                       netReturnPct: 1.2
                     }
                   ]
@@ -376,6 +392,7 @@ function sampleReplayBridge() {
                       exitAvgFillPrice: 19880.0,
                       exitLastFillPrice: 19880.0,
                       tradeStatus: 'closed',
+                      closedReason: 'stop_touch',
                       netReturnPct: -0.6
                     }
                   ]
@@ -394,9 +411,143 @@ function sampleReplayBridge() {
   };
 }
 
+function sampleReplayBridgeWithSecondDay() {
+  const bridge = sampleReplayBridge();
+  bridge.latestRun.days.push({
+    date: '2026-06-04',
+    summaryFile: 'replay_summary_20260604.json',
+    ordersFile: 'sim_orders_20260604.json',
+    fillsFile: 'sim_fills_20260604.json',
+    candidateCount: 2,
+    eligibleCount: 1,
+    includedCount: 1,
+    tradeCount: 1,
+    degradedCount: 0,
+    ambiguousCount: 0,
+    byStrategy: {
+      pullback: {
+        candidateCount: 2,
+        eligibleCount: 1,
+        includedCount: 1,
+        tradeCount: 1,
+        winRate: 0,
+        avgNetReturnPct: -0.4,
+        cumNetReturnPct: -0.4,
+        maxDrawdownPct: 0.4,
+        degradedCount: 0,
+        ambiguousCount: 0,
+        unfilledRate: 0
+      }
+    },
+    trades: [
+      {
+        strategy: 'pullback',
+        code: '000006',
+        name: 'Gamma',
+        entryFilledAt: '2026-06-04T15:30:00+09:00',
+        entryFillPrice: 30000.0,
+        exitFilledAt: '2026-06-05T10:00:00+09:00',
+        exitAvgFillPrice: 29880.0,
+        exitLastFillPrice: 29880.0,
+        tradeStatus: 'closed',
+        closedReason: 'stop_close',
+        netReturnPct: -0.4
+      }
+    ],
+    candidates: [
+      {
+        strategy: 'pullback',
+        name: 'Gamma',
+        code: '000006',
+        replayIncluded: true,
+        entryEligible: false
+      }
+    ],
+    results: [
+      {
+        strategy: 'pullback',
+        code: '000006',
+        name: 'Gamma',
+        date: '2026-06-04',
+        sourceEntryKey: 'entry-2',
+        entryEligibleOriginal: false,
+        replayIncluded: true,
+        entryFilledAt: '2026-06-04T15:30:00+09:00',
+        entryFillPrice: 30000.0,
+        exitFilledAt: '2026-06-05T10:00:00+09:00',
+        exitAvgFillPrice: 29880.0,
+        exitLastFillPrice: 29880.0,
+        tradeStatus: 'closed',
+        closedReason: 'stop_close',
+        netReturnPct: -0.4,
+        dataQualityStatus: 'degraded',
+        ambiguousCount: 0
+      }
+    ],
+    orders: [
+      {
+        strategy: 'pullback',
+        side: 'SELL',
+        sourceEntryKey: 'entry-2',
+        finalStatus: 'filled'
+      }
+    ]
+  });
+  bridge.latestRun.summary.candidateCount += 2;
+  bridge.latestRun.summary.eligibleCount += 1;
+  bridge.latestRun.summary.includedCount += 1;
+  bridge.latestRun.summary.tradeCount += 1;
+  bridge.latestRun.summary.degradedCount += 0;
+  bridge.latestRun.summary.overall.candidateCount += 2;
+  bridge.latestRun.summary.overall.eligibleCount += 1;
+  bridge.latestRun.summary.overall.includedCount += 1;
+  bridge.latestRun.summary.overall.tradeCount += 1;
+  bridge.latestRun.summary.overall.degradedCount += 0;
+  bridge.latestRun.strategyViews.pullback.summary.candidateCount += 2;
+  bridge.latestRun.strategyViews.pullback.summary.eligibleCount += 1;
+  bridge.latestRun.strategyViews.pullback.summary.includedCount += 1;
+  bridge.latestRun.strategyViews.pullback.summary.tradeCount += 1;
+  bridge.latestRun.strategyViews.pullback.summary.degradedCount += 0;
+  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.candidateCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.eligibleCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.includedCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.tradeCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.degradedCount += 0;
+  bridge.latestRun.strategyViews.pullback.caseViews.replay.days.push({
+    date: '2026-06-04',
+    summaryFile: 'replay_summary_20260604.json',
+    ordersFile: 'sim_orders_20260604.json',
+    fillsFile: 'sim_fills_20260604.json',
+    includedCount: 1,
+    tradeCount: 1,
+    winRate: 0,
+    avgNetReturnPct: -0.4,
+    cumNetReturnPct: -0.4,
+    maxDrawdownPct: 0.4,
+    degradedCount: 0,
+    ambiguousCount: 0,
+    trades: [
+      {
+        strategy: 'pullback',
+        code: '000006',
+        name: 'Gamma',
+        entryFilledAt: '2026-06-04T15:30:00+09:00',
+        entryFillPrice: 30000.0,
+        exitFilledAt: '2026-06-05T10:00:00+09:00',
+        exitAvgFillPrice: 29880.0,
+        exitLastFillPrice: 29880.0,
+        tradeStatus: 'closed',
+        closedReason: 'stop_close',
+        netReturnPct: -0.4
+      }
+    ]
+  });
+  return bridge;
+}
+
 test('strategy section renders selected case summary and button state', () => {
   const context = loadReplayContext();
-  context.setReplayMode('replay');
+  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
   const badge = createElementStub();
   const summary = createElementStub();
   const button = createElementStub();
@@ -416,7 +567,7 @@ test('strategy section renders selected case summary and button state', () => {
 
 test('strategy modal renders selected case summary, stock table, and day files', () => {
   const context = loadReplayContext();
-  context.setReplayMode('recommendation');
+  context.setJonggaReplayViewMode('recommendation', { persist: false, rerender: false });
   const body = createElementStub();
   const title = createElementStub();
   const subtitle = createElementStub();
@@ -439,7 +590,29 @@ test('strategy modal renders selected case summary, stock table, and day files',
   assert.match(body.innerHTML, /10,050원/);
   assert.match(body.innerHTML, /10,201원/);
   assert.match(body.innerHTML, /매수\/매도 종목/);
+  assert.match(body.innerHTML, /🔔 장초반/);
+  assert.match(body.innerHTML, /익일 10시 2\.0% 익절/);
   assert.match(body.innerHTML, /sim_orders_20260603\.json/);
+});
+
+test('replay period filter narrows modal content to the selected dates', () => {
+  const context = loadReplayContext();
+  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
+  const body = createElementStub();
+  const title = createElementStub();
+  const subtitle = createElementStub();
+  context.elements.set('jongga-replay-body', body);
+  context.elements.set('jongga-replay-modal-title', title);
+  context.elements.set('jongga-replay-modal-subtitle', subtitle);
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridgeWithSecondDay();
+
+  context.setJonggaReplayPeriod({ from: '2026-06-04', to: '2026-06-04' }, { persist: false, rerender: false });
+  context.renderJonggaReplayModal('pullback');
+
+  assert.match(body.innerHTML, /현재 필터 2026-06-04 ~ 2026-06-04/);
+  assert.match(body.innerHTML, /Gamma/);
+  assert.match(body.innerHTML, /2026\.06\.04/);
+  assert.doesNotMatch(body.innerHTML, /2026\.06\.03/);
 });
 
 test('missing replay data disables strategy button and renders empty state', () => {

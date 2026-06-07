@@ -15,6 +15,9 @@
 | **`generate-jongga-data.bat`** | Windows 일상 실행 (더블클릭·터미널) |
 | **`generate-jongga-data.command`** | macOS Finder 더블클릭 |
 | `generate-jongga-data.sh` | macOS / Linux 터미널 |
+| **`replay-jongga-data.bat`** | Windows replay-only 재검증 |
+| **`replay-jongga-data.command`** | macOS Finder replay-only |
+| `replay-jongga-data.sh` | macOS / Linux replay-only |
 | `run_jongga_pipeline.py` | 공통 Python 오케스트레이터 |
 
 ```bat
@@ -22,12 +25,18 @@ cd tools\stock-analyze
 generate-jongga-data.bat
 generate-jongga-data.bat --with-tests
 generate-jongga-data.bat --no-pause --date 2026-05-26
+
+replay-jongga-data.bat
+replay-jongga-data.bat --no-pause
 ```
 
 ```bash
 cd tools/stock-analyze
 chmod +x generate-jongga-data.sh
 ./generate-jongga-data.sh --with-tests
+
+chmod +x replay-jongga-data.sh
+./replay-jongga-data.sh
 ```
 
 파이프라인이 생성하는 산출물:

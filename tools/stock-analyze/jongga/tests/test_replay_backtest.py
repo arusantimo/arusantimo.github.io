@@ -178,7 +178,7 @@ class ReplayBacktestTests(unittest.TestCase):
         market_data = build_replay_market_data(code="000001", entry_date="2026-06-03", entry_price=10000.0, history_rows=rows)
         self.assertEqual(market_data["futureTradingDates"], ["20260604", "20260605"])
         self.assertEqual(len(market_data["replayBars"]), 5)
-        self.assertEqual(market_data["replayBars"][-1]["timestamp"], "2026-06-05T10:00:00+09:00")
+        self.assertEqual(market_data["replayBars"][-1]["timestamp"], "2026-06-05T15:00:00+09:00")
 
     def test_run_replay_writes_expected_artifacts(self):
         with TemporaryDirectory() as tmp:

@@ -188,7 +188,7 @@ renderSellStockCards = function renderSellStockCardsOverride() {
           <div class="scard-head">
             <div>
               <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
-              <div class="scard-code">${escapeHtml(stock.code)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
+              <div class="scard-code">${escapeHtml(stock.code)}${slotLabel ? ` · ${slotLabel}` : ''}${renderMarketCapInlineHtml(stock)}</div>
             </div>
             <div class="scard-badges">
               ${slotLabel ? `<span class="badge badge-page">${slotLabel}</span>` : ''}
@@ -267,13 +267,16 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
       const liveMetaHtml = presentation.liveRefresh
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
+      const statusReasonHtml = presentation.primaryStatusReasonShort
+        ? `<div class="buy-card-status-reason">${escapeHtml(presentation.primaryStatusReasonShort)}</div>`
+        : '';
       return `
         <div class="buy-card ${presentation.verdictClass}" data-entry-key="${escapeHtml(entry.entryKey)}">
           <div class="buy-card-head">
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
               <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
-              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}</div>
+              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry)}</div>
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">
@@ -285,6 +288,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
             </div>
           </div>
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
+          ${statusReasonHtml}
           <div class="buy-card-tags">
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
@@ -648,7 +652,7 @@ function buildSellTriggeredRuleHtml(triggeredRule) {
 }
 
 function buildSellModalBody(detail) {
-  const { stock, data, indicators, targets, gainRate, lossManagement, isBefore0908, gapProfile } = detail;
+  const { stock, data, indicators, targets, gainRate, lossManagement, isBefore0908, gapProfile, pullbackSupport } = detail;
   const badgeInfo = getSellActionPlanBadge(detail);
   const shiftBadgeInfo = getGapComparisonBadge(gapProfile?.comparison);
   const verdictCls = badgeInfo.tone;
@@ -658,6 +662,9 @@ function buildSellModalBody(detail) {
   const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 전략 데이터에 없습니다.</div>';
   const strategyPlanHtml = renderSellStrategyPlan(detail, false);
   const scoreBreakdownHtml = renderSellScoreBreakdown(detail);
+  const pullbackSupportHtml = stock.type === 'pullback' && typeof renderPullbackSupportModalSection === 'function'
+    ? renderPullbackSupportModalSection(pullbackSupport || {})
+    : '';
   const entryPrice = stock.entryPrice || targets?.entryPrice || data.prevClose;
   const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
   const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
@@ -754,6 +761,7 @@ function buildSellModalBody(detail) {
     ${comparisonShiftHtml}
 
     ${scoreBreakdownHtml}
+    ${pullbackSupportHtml}
     ${strategyPlanHtml}
     ${gapAdjustmentHtml}
     ${buildSellTriggeredRuleHtml(detail.triggeredRule)}

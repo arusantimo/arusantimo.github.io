@@ -120,6 +120,24 @@ function formatWon(value) {
   return `${Number(value).toLocaleString()}원`;
 }
 
+function formatMarketCapTrillion(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return '';
+  const trillions = num.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const billions = (num * 10000).toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  return `시총 ${billions}억 (${trillions}조)`;
+}
+
+function renderMarketCapLineHtml(entryOrStock) {
+  const text = formatMarketCapTrillion(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
+  return text ? `<div class="stock-code-cap">${escapeHtml(text)}</div>` : '';
+}
+
+function renderMarketCapInlineHtml(entryOrStock) {
+  const text = formatMarketCapTrillion(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
+  return text ? `<span class="stock-code-cap stock-code-cap-inline">${escapeHtml(text)}</span>` : '';
+}
+
 function getDailyChangeTone(value) {
   const num = Number(value);
   if (!Number.isFinite(num) || num === 0) return 'nt';

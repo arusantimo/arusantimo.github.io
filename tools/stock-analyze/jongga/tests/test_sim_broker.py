@@ -14,6 +14,7 @@ class SimBrokerTests(unittest.TestCase):
         day2_open=10080.0,
         day2_high=10300.0,
         day2_low=9800.0,
+        day2_close=10080.0,
     ):
         return {
             "entryBar": {
@@ -67,11 +68,11 @@ class SimBrokerTests(unittest.TestCase):
                     "phase": "day2_open",
                 },
                 {
-                    "timestamp": "2026-06-05T10:00:00+09:00",
+                    "timestamp": "2026-06-05T15:00:00+09:00",
                     "open": day2_open,
                     "high": day2_high,
                     "low": day2_low,
-                    "close": day2_open,
+                    "close": day2_close,
                     "volume": 0.0,
                     "source": "daily_ohlc_fallback",
                     "phase": "day2_final_cutoff",
@@ -81,7 +82,7 @@ class SimBrokerTests(unittest.TestCase):
                 "primaryTargetUntil": "2026-06-04T10:00:00+09:00",
                 "secondaryTargetFrom": "2026-06-04T10:00:00+09:00",
                 "secondaryTargetUntil": "2026-06-04T15:00:00+09:00",
-                "finalExitAt": "2026-06-05T10:00:00+09:00",
+                "finalExitAt": "2026-06-05T15:00:00+09:00",
             },
         }
 
@@ -107,12 +108,13 @@ class SimBrokerTests(unittest.TestCase):
             auto_flatten=auto_flatten,
         )
 
-    def test_ambiguous_bar_prefers_stop_first(self):
-        result = self._simulate(self._market_data(day1_high=10300.0, day1_low=9600.0, day1_close=9800.0))
-        self.assertEqual(result["result"]["tradeStatus"], "ambiguous")
-        self.assertEqual(result["result"]["closedReason"], "ambiguous_stop_first")
+    def test_target_hit_wins_even_if_same_day_close_finishes_below_stop(self):
+        result = self._simulate(self._market_data(day1_high=10300.0, day1_low=9600.0, day1_close=9600.0))
+        self.assertEqual(result["result"]["tradeStatus"], "closed")
+        self.assertEqual(result["result"]["closedReason"], "primary_target_touch")
+        self.assertEqual(result["result"]["ambiguousCount"], 0)
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
-        self.assertTrue(any(fill["fillRule"] == "ambiguous_stop_first" for fill in result["fills"]))
+        self.assertTrue(any(fill["fillRule"] == "primary_target_touch" for fill in result["fills"]))
 
     def test_primary_target_hits_by_first_day_morning_cutoff(self):
         result = self._simulate(self._market_data(day1_high=10450.0, day1_low=9900.0, day1_close=10350.0))
@@ -128,19 +130,65 @@ class SimBrokerTests(unittest.TestCase):
         self.assertEqual(result["result"]["exitFilledAt"], "2026-06-04T15:00:00+09:00")
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
 
-    def test_stop_only_closes_position_when_touched_on_third_day(self):
-        result = self._simulate(self._market_data(day1_high=10100.0, day1_low=9800.0, day1_close=10050.0, day2_high=10100.0, day2_low=9600.0))
+    def test_intraday_stop_breach_without_close_break_does_not_stop(self):
+        result = self._simulate(
+            self._market_data(
+                day1_high=10100.0,
+                day1_low=9600.0,
+                day1_close=10050.0,
+                day2_open=10080.0,
+                day2_high=10100.0,
+                day2_low=9600.0,
+                day2_close=10020.0,
+            )
+        )
         self.assertEqual(result["result"]["tradeStatus"], "closed")
-        self.assertEqual(result["result"]["closedReason"], "stop_touch")
-        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-05T10:00:00+09:00")
+        self.assertEqual(result["result"]["closedReason"], "third_day_cutoff_market")
+        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-05T15:00:00+09:00")
+        self.assertEqual(result["result"]["exitLastFillPrice"], 10020.0)
+
+    def test_close_below_stop_uses_close_price_for_stop_exit(self):
+        result = self._simulate(self._market_data(day1_high=10100.0, day1_low=9600.0, day1_close=9600.0, day2_high=10100.0, day2_low=9500.0))
+        self.assertEqual(result["result"]["tradeStatus"], "closed")
+        self.assertEqual(result["result"]["closedReason"], "stop_close")
+        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-04T15:00:00+09:00")
+        self.assertEqual(result["result"]["exitLastFillPrice"], 9600.0)
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
 
     def test_final_cutoff_sells_remaining_position_on_third_day(self):
-        result = self._simulate(self._market_data(day1_high=10100.0, day1_low=9800.0, day1_close=10050.0, day2_open=10080.0, day2_high=10100.0, day2_low=9800.0))
+        result = self._simulate(
+            self._market_data(
+                day1_high=10100.0,
+                day1_low=9800.0,
+                day1_close=10050.0,
+                day2_open=10080.0,
+                day2_high=10100.0,
+                day2_low=9800.0,
+                day2_close=10030.0,
+            )
+        )
         self.assertEqual(result["result"]["tradeStatus"], "closed")
         self.assertEqual(result["result"]["closedReason"], "third_day_cutoff_market")
-        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-05T10:00:00+09:00")
-        self.assertEqual(result["result"]["exitLastFillPrice"], 10080.0)
+        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-05T15:00:00+09:00")
+        self.assertEqual(result["result"]["exitLastFillPrice"], 10030.0)
+
+    def test_second_followup_day_close_below_stop_also_triggers_stop_close(self):
+        result = self._simulate(
+            self._market_data(
+                day1_high=10100.0,
+                day1_low=9800.0,
+                day1_close=10050.0,
+                day2_open=10080.0,
+                day2_high=10100.0,
+                day2_low=9500.0,
+                day2_close=9600.0,
+            )
+        )
+        self.assertEqual(result["result"]["tradeStatus"], "closed")
+        self.assertEqual(result["result"]["closedReason"], "stop_close")
+        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-05T15:00:00+09:00")
+        self.assertEqual(result["result"]["exitLastFillPrice"], 9600.0)
+        self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
 
     def test_single_followup_day_uses_day1_cutoff_for_flattening(self):
         market_data = self._market_data(day1_high=10100.0, day1_low=9800.0, day1_close=10050.0, day2_open=10080.0, day2_high=10100.0, day2_low=9800.0)

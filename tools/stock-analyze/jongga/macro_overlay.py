@@ -245,11 +245,18 @@ def trend_status_label(
     rise_justified: bool = False,
     technical_regime: str = "",
 ) -> str:
-    blocked = any(gate.get("status") == "⛔" for gate in gates)
-    if blocked:
-        return "매매금지(핵심 Gate 미충족)"
+    blocked_codes = [
+        str(gate.get("code") or "").strip().upper()
+        for gate in gates
+        if gate.get("status") == "⛔"
+    ]
+    if blocked_codes:
+        if all(code == "G5" for code in blocked_codes):
+            return "시장 Gate 차단 · 신규 진입 보류"
+        joined = ", ".join(code for code in blocked_codes if code)
+        return f"매매금지(핵심 Gate 미충족{': ' + joined if joined else ''})"
     if gap_code == "G-E":
-        return "매매금지(갭다운 경고)"
+        return "매매금지(갭다운 경고 · 신규 진입 금지)"
     effective = str(regime_label or "")
     technical = str(technical_regime or effective)
     if effective.startswith("약세장"):
@@ -290,8 +297,10 @@ def reversal_status_label(
         return "매매금지"
     effective = str(regime_label or "")
     technical = str(technical_regime or effective)
-    if gap_code in {"G-D", "G-E"}:
-        return "매매금지"
+    if gap_code == "G-E":
+        return "매매금지(갭다운 경고 · 신규 진입 금지)"
+    if gap_code == "G-D":
+        return "매매금지(갭다운 주의 · 신규 진입 보류)"
     if effective.startswith("약세장"):
         if rise_justified and grade in {"S", "A"} and gap_code in {"G-A", "G-B", "G-C"}:
             return "진입 가능(거시완충)"

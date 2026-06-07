@@ -14,18 +14,18 @@
     "fillRule": "close_slippage"
   },
   {
-    "orderId": "20260604|stable|pullback|009150-stop",
+    "orderId": "20260604|stable|pullback|009150-takeProfitPrimary",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T09:00:00+09:00",
-    "fillPrice": 1655940.0,
+    "filledAt": "2026-06-05T10:00:00+09:00",
+    "fillPrice": 1752070.32,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T09:00:00+09:00",
+    "barTimestamp": "2026-06-05T10:00:00+09:00",
     "barOpen": 1621000.0,
-    "barHigh": 1621000.0,
-    "barLow": 1621000.0,
+    "barHigh": 1845000.0,
+    "barLow": 1615000.0,
     "barClose": 1621000.0,
-    "fillRule": "stop_touch"
+    "fillRule": "primary_target_touch"
   },
   {
     "orderId": "20260604|stable|pullback|036930-entry",
@@ -44,16 +44,16 @@
   {
     "orderId": "20260604|stable|pullback|036930-stop",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T09:00:00+09:00",
-    "fillPrice": 241732.0,
+    "filledAt": "2026-06-05T15:00:00+09:00",
+    "fillPrice": 210000.0,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T09:00:00+09:00",
+    "barTimestamp": "2026-06-05T15:00:00+09:00",
     "barOpen": 228500.0,
-    "barHigh": 228500.0,
-    "barLow": 228500.0,
-    "barClose": 228500.0,
-    "fillRule": "stop_touch"
+    "barHigh": 232500.0,
+    "barLow": 209500.0,
+    "barClose": 210000.0,
+    "fillRule": "stop_close"
   },
   {
     "orderId": "20260604|stable|pullback|035420-entry",
@@ -72,16 +72,16 @@
   {
     "orderId": "20260604|stable|pullback|035420-stop",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T09:00:00+09:00",
-    "fillPrice": 258138.0,
+    "filledAt": "2026-06-05T15:00:00+09:00",
+    "fillPrice": 255500.0,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T09:00:00+09:00",
+    "barTimestamp": "2026-06-05T15:00:00+09:00",
     "barOpen": 254500.0,
-    "barHigh": 254500.0,
-    "barLow": 254500.0,
-    "barClose": 254500.0,
-    "fillRule": "stop_touch"
+    "barHigh": 266500.0,
+    "barLow": 245000.0,
+    "barClose": 255500.0,
+    "fillRule": "stop_close"
   },
   {
     "orderId": "20260604|stable|accumulation|402340-entry",
@@ -100,16 +100,16 @@
   {
     "orderId": "20260604|stable|accumulation|402340-stop",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T10:00:00+09:00",
-    "fillPrice": 1313365.0,
+    "filledAt": "2026-06-05T15:00:00+09:00",
+    "fillPrice": 1258000.0,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T10:00:00+09:00",
+    "barTimestamp": "2026-06-05T15:00:00+09:00",
     "barOpen": 1332000.0,
     "barHigh": 1334000.0,
     "barLow": 1225000.0,
-    "barClose": 1332000.0,
-    "fillRule": "stop_touch"
+    "barClose": 1258000.0,
+    "fillRule": "stop_close"
   },
   {
     "orderId": "20260604|stable|breakout|036930-entry",
@@ -128,16 +128,16 @@
   {
     "orderId": "20260604|stable|breakout|036930-stop",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T09:00:00+09:00",
-    "fillPrice": 239228.0,
+    "filledAt": "2026-06-05T15:00:00+09:00",
+    "fillPrice": 210000.0,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T09:00:00+09:00",
+    "barTimestamp": "2026-06-05T15:00:00+09:00",
     "barOpen": 228500.0,
-    "barHigh": 228500.0,
-    "barLow": 228500.0,
-    "barClose": 228500.0,
-    "fillRule": "stop_touch"
+    "barHigh": 232500.0,
+    "barLow": 209500.0,
+    "barClose": 210000.0,
+    "fillRule": "stop_close"
   },
   {
     "orderId": "20260604|stable|reversal|402340-entry",
@@ -156,16 +156,16 @@
   {
     "orderId": "20260604|stable|reversal|402340-stop",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T10:00:00+09:00",
-    "fillPrice": 1313365.0,
+    "filledAt": "2026-06-05T15:00:00+09:00",
+    "fillPrice": 1258000.0,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T10:00:00+09:00",
+    "barTimestamp": "2026-06-05T15:00:00+09:00",
     "barOpen": 1332000.0,
     "barHigh": 1334000.0,
     "barLow": 1225000.0,
-    "barClose": 1332000.0,
-    "fillRule": "stop_touch"
+    "barClose": 1258000.0,
+    "fillRule": "stop_close"
   },
   {
     "orderId": "20260604|stable|reversal|011070-entry",
@@ -182,17 +182,17 @@
     "fillRule": "close_slippage"
   },
   {
-    "orderId": "20260604|stable|reversal|011070-stop",
+    "orderId": "20260604|stable|reversal|011070-takeProfitPrimary",
     "fillStatus": "filled",
-    "filledAt": "2026-06-05T09:00:00+09:00",
-    "fillPrice": 1131945.0,
+    "filledAt": "2026-06-05T10:00:00+09:00",
+    "fillPrice": 1197656.46,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-05T09:00:00+09:00",
+    "barTimestamp": "2026-06-05T10:00:00+09:00",
     "barOpen": 1091000.0,
-    "barHigh": 1091000.0,
-    "barLow": 1091000.0,
+    "barHigh": 1242000.0,
+    "barLow": 1074000.0,
     "barClose": 1091000.0,
-    "fillRule": "stop_touch"
+    "fillRule": "primary_target_touch"
   }
 ]

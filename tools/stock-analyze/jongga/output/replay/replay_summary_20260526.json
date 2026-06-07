@@ -1,5 +1,5 @@
 {
-  "runId": "replay-20260606-002659-26ce2654",
+  "runId": "replay-20260607-023158-7ed2263a",
   "date": "2026-05-26",
   "variant": "stable",
   "thresholdProfile": "current",
@@ -129,7 +129,7 @@
       "entryEligible": false,
       "entryWatch": false,
       "entryBlockers": [
-        "핵심 Gate 미충족: G5",
+        "시장 Gate 차단: G5 — 신규 진입 보류",
         "매매금지(핵심 Gate 미충족)",
         "등급 C — 진입 최소 A, B, S"
       ],
@@ -151,7 +151,7 @@
       "entryEligible": false,
       "entryWatch": false,
       "entryBlockers": [
-        "핵심 Gate 미충족: G5",
+        "시장 Gate 차단: G5 — 신규 진입 보류",
         "매매금지(핵심 Gate 미충족)",
         "등급 C — 진입 최소 A, B, S"
       ],
@@ -173,7 +173,7 @@
       "entryEligible": false,
       "entryWatch": false,
       "entryBlockers": [
-        "핵심 Gate 미충족: G5",
+        "시장 Gate 차단: G5 — 신규 진입 보류",
         "매매금지(핵심 Gate 미충족)",
         "등급 C — 진입 최소 A, B, S"
       ],

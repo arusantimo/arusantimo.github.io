@@ -258,6 +258,10 @@ function parseTradePlanTargets(entry) {
 function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile) {
   const rejections = [];
   const entryPrice = targets?.entryPrice || data.prevClose;
+  const latestClosePrice = Array.isArray(data?.ohlcvSeries)
+    ? [...data.ohlcvSeries].reverse().find(row => Number(row?.close) > 0)?.close || 0
+    : 0;
+  const hasLatestClose = Number(latestClosePrice) > 0;
 
   if (gapProfile?.immediatePartialExit && isBefore0908 && data.currentPrice > 0) {
     rejections.push({
@@ -290,36 +294,36 @@ function checkRejectionConditions(stock, data, isBefore0908, targets, gapProfile
     ? Math.round(entryPrice * (1 - ((Math.abs(baseLossRate) - (gapProfile?.tightenStopLossRate || 0)) / 100)))
     : 0;
 
-  if (targets?.stopLoss?.price && data.currentPrice > 0) {
+  if (targets?.stopLoss?.price && hasLatestClose) {
     const effectiveStopPrice = Math.max(targets.stopLoss.price, tightenedDefaultStopPrice || 0);
-    const belowStopLoss = data.currentPrice <= effectiveStopPrice;
+    const belowStopLoss = latestClosePrice <= effectiveStopPrice;
     rejections.push({
       code: 'R2',
-      title: '손절가 이탈',
+      title: '손절가 종가 이탈',
       criterion: gapProfile?.tightenStopLossRate
-        ? `전략 손절가와 갭 보수 손절가 중 더 보수적인 기준을 사용합니다.\n기준: MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
-        : `전략 데이터의 손절가(${targets.stopLoss.price.toLocaleString()}원)를 하향 이탈하면 전량 매도합니다.`,
+        ? `장중 저가 이탈은 손절로 보지 않고 확정 종가 기준으로만 판단합니다.\n기준: 최근 확정 종가 ≤ MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
+        : `장중 변동은 무시하고 최근 확정 종가가 전략 손절가(${targets.stopLoss.price.toLocaleString()}원) 아래로 마감했을 때만 전량 매도합니다.`,
       triggered: belowStopLoss,
       result: belowStopLoss
-        ? `현재가 ${data.currentPrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 즉시 전량 매도`
-        : `현재가 ${data.currentPrice.toLocaleString()} > 유효 손절가 ${effectiveStopPrice.toLocaleString()} — 안전`,
-      value: `현재가 ${data.currentPrice.toLocaleString()} / 유효 손절가 ${effectiveStopPrice.toLocaleString()}${gapProfile?.tightenStopLossRate ? ` (갭 ${gapProfile.code}로 ${gapProfile.tightenStopLossRate}%p 축소)` : ''}`
+        ? `확정 종가 ${latestClosePrice.toLocaleString()} ≤ 유효 손절가 ${effectiveStopPrice.toLocaleString()} → 종가 기준 전량 매도`
+        : `확정 종가 ${latestClosePrice.toLocaleString()} > 유효 손절가 ${effectiveStopPrice.toLocaleString()} — 종가 손절 미발생`,
+      value: `확정 종가 ${latestClosePrice.toLocaleString()} / 유효 손절가 ${effectiveStopPrice.toLocaleString()}${gapProfile?.tightenStopLossRate ? ` (갭 ${gapProfile.code}로 ${gapProfile.tightenStopLossRate}%p 축소)` : ''}`
     });
-  } else if (entryPrice > 0 && data.currentPrice > 0) {
-    const lossRate = ((data.currentPrice - entryPrice) / entryPrice) * 100;
+  } else if (entryPrice > 0 && hasLatestClose) {
+    const lossRate = ((latestClosePrice - entryPrice) / entryPrice) * 100;
     const defaultStopLossRate = baseLossRate + (gapProfile?.tightenStopLossRate || 0);
     const belowDefault = lossRate <= defaultStopLossRate;
     rejections.push({
       code: 'R2',
-      title: `기본 손절선 (${defaultStopLossRate.toFixed(1)}%) 이탈`,
+      title: `기본 손절선 (${defaultStopLossRate.toFixed(1)}%) 종가 이탈`,
       criterion: gapProfile?.tightenStopLossRate
-        ? `전략 손절가 미설정 시 갭 등급에 맞춰 손절폭을 축소합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${defaultStopLossRate.toFixed(1)}%`
-        : `전략 손절가 미설정 시, 진입가 대비 ${baseLossRate}% 이탈하면 전량 매도합니다.\n기준: (현재가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
+        ? `전략 손절가 미설정 시에도 장중 손절은 하지 않고 확정 종가 기준으로만 판단합니다.\n기준: (최근 확정 종가 - 진입가) / 진입가 ≤ ${defaultStopLossRate.toFixed(1)}%`
+        : `전략 손절가 미설정 시에도 장중 손절은 하지 않고 확정 종가가 진입가 대비 ${baseLossRate}% 이하로 마감했을 때만 전량 매도합니다.\n기준: (최근 확정 종가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
       triggered: belowDefault,
       result: belowDefault
-        ? `진입가 대비 ${lossRate.toFixed(2)}% → 즉시 전량 매도`
-        : `진입가 대비 ${lossRate.toFixed(2)}% — 손절선 이내`,
-      value: `(${data.currentPrice.toLocaleString()} - ${entryPrice.toLocaleString()}) / ${entryPrice.toLocaleString()} = ${lossRate.toFixed(2)}%${gapProfile?.tightenStopLossRate ? ` / 갭 ${gapProfile.code} 기준 ${defaultStopLossRate.toFixed(1)}%` : ''}`
+        ? `확정 종가 기준 ${lossRate.toFixed(2)}% → 종가 기준 전량 매도`
+        : `확정 종가 기준 ${lossRate.toFixed(2)}% — 손절선 이내`,
+      value: `(${latestClosePrice.toLocaleString()} - ${entryPrice.toLocaleString()}) / ${entryPrice.toLocaleString()} = ${lossRate.toFixed(2)}%${gapProfile?.tightenStopLossRate ? ` / 갭 ${gapProfile.code} 기준 ${defaultStopLossRate.toFixed(1)}%` : ''}`
     });
   }
 

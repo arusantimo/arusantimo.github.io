@@ -201,7 +201,7 @@ function isManualOverrideFinite(value) {
 
 function updateManualOverrideNotes(notes, strategy, override, appliedLabels) {
   const nextNotes = Array.isArray(notes) ? notes.map(note => String(note)) : [];
-  const filteredNotes = nextNotes.filter(note => !/토스 .*미반영|기업 이벤트 필터는 미반영/.test(note));
+  const filteredNotes = nextNotes.filter(note => !/토스 .*미반영|당일 평균 체결강도 미반영|마지막 1시간 체결강도 미반영|마지막 30분 틱 프록시 미반영|기업 이벤트 필터는 미반영/.test(note));
 
   if (!appliedLabels.length) return filteredNotes;
 
@@ -209,6 +209,10 @@ function updateManualOverrideNotes(notes, strategy, override, appliedLabels) {
   if (strategy === 'breakout' || strategy === 'momentum') {
     if (!isManualOverrideFinite(override?.toss?.avgStrength) || !isManualOverrideFinite(override?.toss?.intradayAbove100Ratio)) missing.push('토스 체결강도');
     if (!isManualOverrideFinite(override?.orderbook?.bidAskRatio)) missing.push('호가잔량');
+  }
+  if (strategy === 'accumulation') {
+    if (!isManualOverrideFinite(override?.toss?.avgStrength) || !isManualOverrideFinite(override?.toss?.lastHourAvgStrength)) missing.push('장후반 체결강도');
+    missing.push('마지막 30분 틱 프록시');
   }
   if (strategy === 'reversal') {
     if (!isManualOverrideFinite(override?.toss?.avgStrength) || !isManualOverrideFinite(override?.toss?.lastHourAvgStrength)) missing.push('토스 체결강도');
@@ -281,6 +285,30 @@ function applyJonggaManualOverridesToRawEntry(rawEntry, strategy, context = {}) 
       next.unmatchedRules = orderbookPass ? removeRawOverrideRuleCode(next.unmatchedRules, 'C3') : upsertRawOverrideRuleCode(next.unmatchedRules, 'C3', orderbookNote);
       if (orderbookPass) scoreDelta += 1 * scoreMultiplier;
       appliedLabels.push('호가잔량');
+    }
+  }
+
+  if (strategy === 'accumulation') {
+    const lastHourPass = Number.isFinite(override.toss.lastHourAvgStrength)
+      ? override.toss.lastHourAvgStrength >= 100
+      : null;
+    if (lastHourPass !== null) {
+      const lastHourNote = `수동 입력 · 마지막 1시간 평균 체결강도 ${override.toss.lastHourAvgStrength.toFixed(1)}%`;
+      next.matchedRules = lastHourPass ? upsertRawOverrideRuleCode(next.matchedRules, 'S3', lastHourNote) : removeRawOverrideRuleCode(next.matchedRules, 'S3');
+      next.unmatchedRules = lastHourPass ? removeRawOverrideRuleCode(next.unmatchedRules, 'S3') : upsertRawOverrideRuleCode(next.unmatchedRules, 'S3', lastHourNote);
+      if (lastHourPass) scoreDelta += 1 * scoreMultiplier;
+      appliedLabels.push('장후반 체결강도');
+    }
+
+    const strengtheningPass = Number.isFinite(override.toss.avgStrength) && Number.isFinite(override.toss.lastHourAvgStrength)
+      ? override.toss.lastHourAvgStrength > override.toss.avgStrength
+      : null;
+    if (strengtheningPass !== null) {
+      const strengtheningNote = `수동 입력 · 당일 평균 ${override.toss.avgStrength.toFixed(1)}%, 마지막 1시간 ${override.toss.lastHourAvgStrength.toFixed(1)}%`;
+      next.matchedRules = strengtheningPass ? upsertRawOverrideRuleCode(next.matchedRules, 'S4', strengtheningNote) : removeRawOverrideRuleCode(next.matchedRules, 'S4');
+      next.unmatchedRules = strengtheningPass ? removeRawOverrideRuleCode(next.unmatchedRules, 'S4') : upsertRawOverrideRuleCode(next.unmatchedRules, 'S4', strengtheningNote);
+      if (strengtheningPass) scoreDelta += 0.5 * scoreMultiplier;
+      appliedLabels.push('장후반 수급 강화');
     }
   }
 

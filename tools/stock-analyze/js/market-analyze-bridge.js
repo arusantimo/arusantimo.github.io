@@ -226,9 +226,12 @@ function resolveMacroOverlayContext(slot = {}, root = {}, analysisDate = '') {
 }
 
 function recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, gates, overlay = {}) {
-  const blocked = (gates || []).some(gate => gate.status === '⛔');
-  if (blocked) return '매매금지(핵심 Gate 미충족)';
-  if (gapCode === 'G-E') return '매매금지(갭다운 경고)';
+  const blockedCodes = (gates || []).filter(gate => gate.status === '⛔').map(gate => String(gate.code || '').trim().toUpperCase()).filter(Boolean);
+  const hasBlocked = blockedCodes.length > 0;
+  const onlyG5Blocked = hasBlocked && blockedCodes.every(code => code === 'G5');
+  if (onlyG5Blocked) return '시장 Gate 차단 · 신규 진입 보류';
+  if (hasBlocked) return `매매금지(핵심 Gate 미충족${blockedCodes.length ? `: ${blockedCodes.join(', ')}` : ''})`;
+  if (gapCode === 'G-E') return '매매금지(갭다운 경고 · 신규 진입 금지)';
   const effective = String(regimeLabel || '');
   const riseJustified = Boolean(overlay.riseJustifiedByMacro);
   if (effective.startsWith('약세장')) {
@@ -250,7 +253,8 @@ function recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, gate
 
 function recalculateReversalStatusLabel(grade, regimeLabel, gapCode, filters, gates, overlay = {}) {
   if ((filters || []).concat(gates || []).some(row => row.status === '⛔')) return '매매금지';
-  if (gapCode === 'G-D' || gapCode === 'G-E') return '매매금지';
+  if (gapCode === 'G-E') return '매매금지(갭다운 경고 · 신규 진입 금지)';
+  if (gapCode === 'G-D') return '매매금지(갭다운 주의 · 신규 진입 보류)';
   const effective = String(regimeLabel || '');
   const riseJustified = Boolean(overlay.riseJustifiedByMacro);
   const technical = String(overlay.technicalRegimeLabel || effective);
@@ -292,7 +296,7 @@ function applyMacroOverlayToEntry(entry, strategy, context) {
     next.statusLabel = recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, next.gates, gateContext);
   }
   if (typeof attachEntryEligibility === 'function') {
-    return attachEntryEligibility(next);
+    return attachEntryEligibility(next, context);
   }
   return next;
 }

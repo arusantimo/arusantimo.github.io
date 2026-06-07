@@ -87,15 +87,15 @@ const RULE_GUIDE = {
     { grade: 'G-A', label: '갭업 우호', score: '+7.0 이상', outlook: '익일 갭업 +1.5% 이상 기대', color: '🟢' },
     { grade: 'G-B', label: '갭업 중립', score: '+2.0 ~ +6.9', outlook: '갭업 +0.5~+1.5% 또는 보합', color: '🔵' },
     { grade: 'G-C', label: '갭 불안정', score: '-2.9 ~ +1.9', outlook: '보합 또는 소폭 갭다운 가능', color: '🟡' },
-    { grade: 'G-D', label: '갭다운 주의', score: '-7.9 ~ -3.0', outlook: '갭다운 -0.5~-2.0% 경계', color: '🟠' },
-    { grade: 'G-E', label: '갭다운 경고', score: '-8.0 미만', outlook: '갭다운 -2.0% 이상 위험', color: '🔴' }
+    { grade: 'G-D', label: '갭다운 주의', score: '-7.9 ~ -3.0', outlook: '익일 갭다운 -0.5~-2.0% 경계', color: '🟠' },
+    { grade: 'G-E', label: '갭다운 경고', score: '-8.0 미만', outlook: '익일 갭다운 -2.0% 이상 위험 · 신규 진입 금지', color: '🔴' }
   ],
   gapEntryAdjustments: [
     { grade: 'G-A', trend: '✅ 100% 진입', reversal: '✅ 100% 진입', note: '익일 프리마켓 갭업 익절 최적 환경' },
     { grade: 'G-B', trend: '✅ 100% 진입', reversal: '✅ 80% 진입', note: '기본 운용' },
     { grade: 'G-C', trend: '✅ 70% 진입', reversal: '⚠️ 50% 진입', note: '포지션 축소. 손절폭 동일 유지' },
-    { grade: 'G-D', trend: '⚠️ S등급 50% 진입만 허용', reversal: '❌ 진입 보류', note: 'A·B등급 당일 진입 금지' },
-    { grade: 'G-E', trend: '❌ 전 등급 진입 금지', reversal: '❌ 진입 금지', note: '당일 종가베팅 전면 보류' }
+    { grade: 'G-D', trend: '⚠️ S등급만 50% 허용', reversal: '❌ 신규 진입 보류', note: 'A·B등급 당일 신규 진입 금지' },
+    { grade: 'G-E', trend: '❌ 전 등급 신규 진입 금지', reversal: '❌ 신규 진입 금지', note: '당일 종가베팅 전면 보류' }
   ],
   gapSellAdjustments: [
     { grade: 'G-A', premarket: '기본 조건 유지', stopLoss: '기본 손절폭 유지', swing: '적극 허용' },
@@ -112,7 +112,11 @@ const RULE_GUIDE = {
         { code: 'G2', condition: '종가 > 60일선', source: '네이버 증권 일봉 차트' },
         { code: 'G3', condition: '주봉 RSI(14) ≥ 50', source: '네이버 증권 주봉 차트' },
         { code: 'G4', condition: '일봉 MACD 히스토그램이 음전환 후 3일 이내 OR 0선 위 회복 시도 중', source: '네이버 증권 일봉 차트' },
-        { code: 'G5', condition: 'KOSPI 5일선 이탈은 경고로만 반영, VKOSPI (≤30 ✅ / 30~75 ⚠️ / 거시·강세·순환 시 75~85 ⚠️ / 85 초과 ⛔)', source: '네이버 증권 시장지표' }
+        { code: 'G5', condition: 'KOSPI 5일선 이탈은 경고로만 반영, VKOSPI (≤30 ✅ / 30~75 ⚠️ / 거시·강세·순환 시 75~85 ⚠️ / 85 초과 ⛔)', source: '네이버 증권 시장지표' },
+        { code: 'G6', condition: '당일 등락률 ≤ +12% (과열 추격 차단)', source: '네이버 증권 일봉 차트' },
+        { code: 'G7', condition: '주봉 RSI(14) ≤ 80 (과매수 상한)', source: '네이버 증권 주봉 차트' },
+        { code: 'G8', condition: '종가와 20MA/60MA 이격률 상한 유지 (20MA ≤ +25%, 60MA ≤ +60%)', source: '네이버 증권 일봉 차트' },
+        { code: 'G9', condition: '복합 지지선 강도 70점 이상 + 현재가 아래 유효 지지 family 2개 이상이면 ✅, 45~69점 또는 family 1개면 ⚠️, 핵심 지지 부재 시만 ⛔', source: '최근 60일 일봉 기반 복합 지지선 엔진' }
       ],
       scores: [
         { code: 'S1', condition: '당일 거래대금 순위 30위 이내', source: '네이버 증권' },
@@ -121,7 +125,8 @@ const RULE_GUIDE = {
         { code: 'P2', condition: '당일 종가가 5일/10일/20일선 중 최소 1개 위', source: '네이버 증권' },
         { code: 'C1', condition: '양봉 OR 아래꼬리:몸통 비율 ≥ 1:1', source: '네이버 증권' },
         { code: 'C2', condition: '당일 거래량이 5일 평균의 80% 이하 (거래량 감소)', source: '네이버 증권' },
-        { code: 'C3', condition: '해당 섹터 지수가 코스피 대비 당일 outperform', source: '네이버 증권' }
+        { code: 'C3', condition: '해당 섹터 지수가 코스피 대비 당일 outperform', source: '네이버 증권' },
+        { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 눌림목 적합도를 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
       ]
     },
     breakout: {
@@ -142,7 +147,8 @@ const RULE_GUIDE = {
         { code: 'C1', condition: '종가 ≥ 당일 고가 95%', source: '네이버 증권' },
         { code: 'C2', condition: '양봉 몸통·윗꼬리 품질 (G5와 동일)', source: '네이버 증권' },
         { code: 'C3', condition: '호가 매수 잔량 ≥ 1.2', source: '토스 증권' },
-        { code: 'RS', condition: '3개월 RS 상위 25% 가점', source: '네이버 증권' }
+        { code: 'RS', condition: '3개월 RS 상위 25% 가점', source: '네이버 증권' },
+        { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 저변동성 유리, 고변동성 불리 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
       ]
     },
     accumulation: {
@@ -157,11 +163,15 @@ const RULE_GUIDE = {
       scores: [
         { code: 'S1', condition: '외국인 AND 기관 당일 양매수', source: '네이버 증권' },
         { code: 'S2', condition: '2일 수급 개선 (연속 순매수 또는 당일 양매수+전일 유지)', source: '네이버 증권' },
+        { code: 'S3', condition: '마지막 1시간 평균 체결강도 ≥ 100%', source: '토스 체결강도 틱 프록시' },
+        { code: 'S4', condition: '마지막 1시간 평균 체결강도 > 당일 평균 체결강도', source: '토스 체결강도 틱 프록시' },
         { code: 'P1', condition: '종가가 20MA 98~102% (횡보·눌림)', source: '네이버 증권' },
         { code: 'P2', condition: '5MA > 20MA', source: '네이버 증권' },
         { code: 'C1', condition: '당일 거래량 ≤ 5일 평균 90%', source: '네이버 증권' },
         { code: 'C2', condition: '당일 등락 -3% ~ +5%', source: '네이버 증권' },
-        { code: 'C3', condition: '섹터 outperform', source: '네이버 증권' }
+        { code: 'C3', condition: '섹터 outperform', source: '네이버 증권' },
+        { code: 'C4', condition: '마지막 30분 틱 프록시 매수/매도 비율 ≥ 1.1:1', source: '토스 체결 틱 프록시' },
+        { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 고변동성 유리, 저변동성 불리 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
       ]
     },
     momentum: {
@@ -191,7 +201,8 @@ const RULE_GUIDE = {
         { code: 'P2', condition: '종가 위치가 당일 고가-저가 레인지 상단 50% 이상', source: '네이버 증권' },
         { code: 'C1', condition: '당일 거래량 5일 평균의 200% 이상 (투매 클라이맥스 확인)', source: '네이버 증권' },
         { code: 'C2', condition: '토스 호가창 매수/매도 잔량 비율 ≥ 1.0 (하방 흡수 확인)', source: '토스 증권' },
-        { code: 'C3', condition: '장 마감 직전 30분봉이 양봉 또는 종가 ≥ 30분봉 시가', source: '네이버·토스' }
+        { code: 'C3', condition: '장 마감 직전 30분봉이 양봉 또는 종가 ≥ 30분봉 시가', source: '네이버·토스' },
+        { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 고변동성 유리, 저변동성 불리 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
       ]
     }
   }

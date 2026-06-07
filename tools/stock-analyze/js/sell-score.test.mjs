@@ -342,3 +342,82 @@ test('건강한 스윙 수익 구간은 홀딩 또는 낮은 점수 구간을 �
   assert.ok(result.sellScore < 40);
   assert.equal(result.actionPlan.bucket, 'hold');
 });
+
+test('pullback 복합 지지선 watch 경고는 보조 점수 5점을 더한다', () => {
+  const { buildSellExecutionContext } = loadSellScoreContext();
+  const baseline = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9500 } },
+      gapProfile: {}
+    },
+    data: {
+      currentPrice: 10000,
+      openPrice: 10050,
+      strength: 90,
+      wyckoff: { phase: 'NEUTRAL', confidence: 0, reason: '중립' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9500, fallbackStopPrice: 9500, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+  const watched = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: null,
+      targets: { stopLoss: { price: 9500 } },
+      gapProfile: {},
+      pullbackSupport: {
+        support: {
+          strengthScore: 58,
+          strengthLabel: 'watch',
+          warningLevel: 'warning',
+          warningReason: '복합 지지 합의 강도 중간',
+          primaryLine: { price: 9900 }
+        }
+      }
+    },
+    data: {
+      currentPrice: 10000,
+      openPrice: 10050,
+      strength: 90,
+      wyckoff: { phase: 'NEUTRAL', confidence: 0, reason: '중립' }
+    },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9500, fallbackStopPrice: 9500, partialSignals: [], hardSignals: [], rules: [] },
+    stageResult: { stage: 'hold', detail: '홀딩 구간' }
+  });
+
+  assert.equal(watched.sellScore - baseline.sellScore, 5);
+  assert.ok(watched.scoreBreakdown.some(item => item.code === 'S-S7' && item.points === 5));
+});
+
+test('pullback 복합 지지선 보조 점수는 하드 손절 우선순위를 덮지 못한다', () => {
+  const { buildSellExecutionContext } = loadSellScoreContext();
+  const result = buildSellExecutionContext({
+    stock: { type: 'pullback' },
+    payload: {
+      actionStage: 'hold',
+      triggeredRule: { severity: 'hard', code: 'H1', title: '유효 손절가 이탈', result: '즉시 전량 매도' },
+      targets: { stopLoss: { price: 9500 } },
+      pullbackSupport: {
+        support: {
+          strengthScore: 20,
+          strengthLabel: 'weak',
+          warningLevel: 'danger',
+          warningReason: '현재가 아래 지지 부재',
+          primaryLine: null
+        }
+      }
+    },
+    data: { currentPrice: 9400, openPrice: 9600, strength: 120 },
+    isBefore0908: false,
+    ruleSet: { effectiveStopPrice: 9500, fallbackStopPrice: 9500, rules: [] }
+  });
+
+  assert.equal(result.sellScore, 100);
+  assert.equal(result.actionPlan.bucket, 'full_exit');
+});

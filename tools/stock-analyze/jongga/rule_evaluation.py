@@ -12,6 +12,9 @@ EvalStatus = Literal["met", "not_met", "data_missing", "manual_required"]
 TOP_TRADING_VALUE_LIMIT = 100
 BREAKOUT_NEAR_HIGH_MIN_RATIO = 0.90
 ACCUMULATION_VOLUME_SOFT_CAP = 1.5
+ACCUMULATION_LAST_HOUR_STRENGTH_MIN = 100.0
+ACCUMULATION_LATE_STRENGTH_DELTA_MIN = 0.0
+ACCUMULATION_LAST_30M_BUY_SELL_RATIO_MIN = 1.1
 REVERSAL_MIN_MARKET_CAP_TRILLION = 5.0
 REVERSAL_MIN_RETURN_21D = 15.0
 REVERSAL_DRAWDOWN_MIN = -25.0
@@ -562,6 +565,37 @@ def evaluate_accumulation_s2(snapshot: Any) -> EvalResult:
     return eval_not_met(f"{note} · 2일 연속 수급 유입 미확인")
 
 
+def evaluate_accumulation_s3(snapshot: Any) -> EvalResult:
+    toss = snapshot.toss or {}
+    last_hour = float(toss.get("lastHourAvgStrength") or 0)
+    if last_hour <= 0:
+        return eval_manual_required("마지막 1시간 평균 체결강도 미입력")
+    note = f"마지막 1시간 평균 체결강도 {last_hour:.1f}% (필요 ≥ {ACCUMULATION_LAST_HOUR_STRENGTH_MIN:.0f}%)"
+    if last_hour >= ACCUMULATION_LAST_HOUR_STRENGTH_MIN:
+        return eval_met(note)
+    return eval_not_met(note)
+
+
+def evaluate_accumulation_s4(snapshot: Any) -> EvalResult:
+    toss = snapshot.toss or {}
+    avg_strength = float(toss.get("avgStrength") or 0)
+    last_hour = float(toss.get("lastHourAvgStrength") or 0)
+    if avg_strength <= 0 and last_hour <= 0:
+        return eval_manual_required("당일 평균·마지막 1시간 체결강도 미입력")
+    if avg_strength <= 0:
+        return eval_manual_required(f"마지막 1시간 평균 {last_hour:.1f}% · 당일 평균 체결강도 미입력")
+    if last_hour <= 0:
+        return eval_manual_required(f"당일 평균 체결강도 {avg_strength:.1f}% · 마지막 1시간 평균 미입력")
+    delta = last_hour - avg_strength
+    note = (
+        f"당일 평균 {avg_strength:.1f}% / 마지막 1시간 {last_hour:.1f}% "
+        f"(필요 마지막 1시간 > 당일 평균)"
+    )
+    if delta > ACCUMULATION_LATE_STRENGTH_DELTA_MIN:
+        return eval_met(f"{note} · 장후반 매수세 강화")
+    return eval_not_met(f"{note} · 장후반 강화 미확인")
+
+
 def evaluate_accumulation_p1(snapshot: Any) -> EvalResult:
     if snapshot.ma20 is None:
         return eval_data_missing("20일 이동평균 산출 데이터 부족")
@@ -600,6 +634,23 @@ def evaluate_accumulation_c2(snapshot: Any, daily_change_pct: float) -> EvalResu
 
 def evaluate_accumulation_c3(snapshot: Any, context: dict[str, Any]) -> EvalResult:
     return evaluate_pullback_c3(snapshot, context)
+
+
+def evaluate_accumulation_c4(snapshot: Any) -> EvalResult:
+    toss = snapshot.toss or {}
+    last_30_ratio = float(toss.get("last30BuySellRatio") or 0)
+    last_30_strength = float(toss.get("last30AvgStrength") or 0)
+    if last_30_ratio <= 0 and last_30_strength <= 0:
+        return eval_data_missing("마지막 30분 틱 프록시 데이터 부족")
+    ratio_text = f"{last_30_ratio:.2f}:1" if last_30_ratio > 0 else "미산출"
+    strength_text = f"{last_30_strength:.1f}%" if last_30_strength > 0 else "미산출"
+    note = (
+        f"마지막 30분 틱프록시 매수/매도 {ratio_text} · 평균 체결강도 {strength_text} "
+        f"(필요 ≥ {ACCUMULATION_LAST_30M_BUY_SELL_RATIO_MIN:.1f}:1)"
+    )
+    if last_30_ratio >= ACCUMULATION_LAST_30M_BUY_SELL_RATIO_MIN:
+        return eval_met(f"{note} · 장마감 매수 우위")
+    return eval_not_met(note)
 
 
 # --- Reversal filters & gates ---

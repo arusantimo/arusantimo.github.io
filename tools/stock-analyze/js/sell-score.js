@@ -147,6 +147,32 @@ function buildSellActionPlan({ stock, payload, data, isBefore0908, ruleSet, stag
   };
 }
 
+function getPullbackSupportScoreInfo(payload) {
+  const support = payload?.pullbackSupport?.support && typeof payload.pullbackSupport.support === 'object'
+    ? payload.pullbackSupport.support
+    : null;
+  if (!support) {
+    return { points: 0, triggered: false, detail: '복합 지지선 데이터 없음', warningLevel: '', label: '' };
+  }
+  const warningLevel = String(support.warningLevel || '');
+  const strengthLabel = String(support.strengthLabel || '');
+  const primaryPrice = Number(support.primaryLine?.price || 0);
+  const detailParts = [];
+  if (strengthLabel) detailParts.push(`강도 ${Number(support.strengthScore || 0)}점 / ${strengthLabel}`);
+  if (primaryPrice > 0) detailParts.push(`주지지 ${formatWon(primaryPrice)}`);
+  if (support.warningReason) detailParts.push(support.warningReason);
+  if (warningLevel === 'clear') {
+    return { points: 0, triggered: false, detail: detailParts.join(' · ') || '복합 지지 strong', warningLevel, label: strengthLabel };
+  }
+  if (warningLevel === 'warning') {
+    return { points: 5, triggered: true, detail: detailParts.join(' · ') || '복합 지지 watch', warningLevel, label: strengthLabel };
+  }
+  if (warningLevel === 'danger') {
+    return { points: 10, triggered: true, detail: detailParts.join(' · ') || '복합 지지 weak', warningLevel, label: strengthLabel };
+  }
+  return { points: 0, triggered: false, detail: detailParts.join(' · ') || '복합 지지 데이터 대기', warningLevel, label: strengthLabel };
+}
+
 function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, ruleSet, stageResult }) {
   const weights = getNonSwingSellScoreWeights(stock.type);
   const stage = resolveSellScoreStage(payload, stageResult);
@@ -161,6 +187,9 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
   const wyckoffInfo = typeof getSellWyckoffScoreInfo === 'function'
     ? getSellWyckoffScoreInfo(data.wyckoff)
     : { points: 0, applied: false, detail: '와이코프 중립' };
+  const supportInfo = stock.type === 'pullback'
+    ? getPullbackSupportScoreInfo(payload)
+    : { points: 0, triggered: false, detail: '', warningLevel: '', label: '' };
   const breakdown = [
     buildSellScoreItem({
       code: 'S-S1',
@@ -211,7 +240,17 @@ function buildNonSwingSellScoreContext({ stock, payload, data, isBefore0908, rul
       maxPoints: 15,
       triggered: wyckoffInfo.applied,
       detail: wyckoffInfo.detail
-    })
+    }),
+    ...(stock.type === 'pullback'
+      ? [buildSellScoreItem({
+          code: 'S-S7',
+          label: '복합 지지선 경고',
+          points: supportInfo.points,
+          maxPoints: 10,
+          triggered: supportInfo.triggered,
+          detail: supportInfo.detail || '복합 지지선 중립'
+        })]
+      : [])
   ];
 
   let sellScore = breakdown.reduce((sum, item) => sum + item.points, 0);

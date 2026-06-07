@@ -10,7 +10,7 @@ DAILY_FALLBACK_SOURCE = "daily_ohlc_fallback"
 TICK_PROXY_SOURCE = "toss_ticks_proxy"
 REPLAY_PRIMARY_TARGET_CUTOFF_TIME = "10:00:00+09:00"
 REPLAY_SECONDARY_TARGET_CUTOFF_TIME = "15:00:00+09:00"
-REPLAY_FINAL_STOP_CUTOFF_TIME = "10:00:00+09:00"
+REPLAY_FINAL_STOP_CUTOFF_TIME = "15:00:00+09:00"
 REPLAY_REQUIRED_FOLLOWUP_TRADING_DAYS = 1
 
 
@@ -131,6 +131,7 @@ def build_synthetic_minute_bars(
         second_open = float(second_day.get("open") or 0.0)
         second_high = float(second_day.get("high") or second_open)
         second_low = float(second_day.get("low") or second_open)
+        second_close = float(second_day.get("close") or second_open)
         bars.extend(
             [
                 ReplayBar(
@@ -146,9 +147,9 @@ def build_synthetic_minute_bars(
                 ReplayBar(
                     timestamp=f"{second_date[:4]}-{second_date[4:6]}-{second_date[6:8]}T{REPLAY_FINAL_STOP_CUTOFF_TIME}",
                     open=second_open,
-                    high=max(second_high, second_open),
-                    low=min(second_low, second_open),
-                    close=second_open,
+                    high=max(second_high, second_open, second_close),
+                    low=min(second_low, second_open, second_close),
+                    close=second_close,
                     volume=0.0,
                     source=source,
                     phase="day2_final_cutoff",

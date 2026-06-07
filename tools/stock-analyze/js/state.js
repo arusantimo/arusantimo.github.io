@@ -26,6 +26,7 @@ function normalizeCodeKey(value) {
 
 const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'breakout', 'accumulation', 'momentum', 'reversal', 'swing']);
 const JONGGA_REPLAY_VIEW_STORAGE_KEY = 'stockAnalyzeJonggaReplayViewModeV1';
+const JONGGA_REPLAY_PERIOD_STORAGE_KEY = 'stockAnalyzeJonggaReplayPeriodV1';
 const JONGGA_REPLAY_VIEW_MODES = {
   recommendation: {
     label: '매수추천',
@@ -245,6 +246,7 @@ let lastScheduledAnalyzerPeriod = typeof getDefaultAnalyzerTab === 'function' ? 
 let activeBuySlot = 'slotA';
 let activeSellSlot = 'slotA';
 let activeJonggaReplayViewMode = readStoredJonggaReplayViewMode();
+let activeJonggaReplayPeriod = readStoredJonggaReplayPeriod();
 let stocks = createStockCollections();
 let notionPages = createDefaultNotionPages();
 let notionSnapshot = getNotionPageState(activeBuySlot).snapshot;
@@ -342,6 +344,109 @@ function persistJonggaReplayViewMode(mode) {
   return activeJonggaReplayViewMode;
 }
 
+function normalizeJonggaReplayDate(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const dateOnly = raw.slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateOnly) ? dateOnly : '';
+}
+
+function normalizeJonggaReplayPeriod(value = {}) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return { from: '', to: '' };
+  }
+  let from = normalizeJonggaReplayDate(value.from ?? value.start ?? value.startDate);
+  let to = normalizeJonggaReplayDate(value.to ?? value.end ?? value.endDate);
+  if (from && to && from > to) {
+    const swap = from;
+    from = to;
+    to = swap;
+  }
+  return { from, to };
+}
+
+function readStoredJonggaReplayPeriod() {
+  try {
+    const raw = localStorage.getItem(JONGGA_REPLAY_PERIOD_STORAGE_KEY);
+    if (!raw) return { from: '', to: '' };
+    return normalizeJonggaReplayPeriod(JSON.parse(raw));
+  } catch {
+    return { from: '', to: '' };
+  }
+}
+
+function persistJonggaReplayPeriod(period) {
+  activeJonggaReplayPeriod = normalizeJonggaReplayPeriod(period);
+  try {
+    localStorage.setItem(JONGGA_REPLAY_PERIOD_STORAGE_KEY, JSON.stringify(activeJonggaReplayPeriod));
+  } catch {}
+  return activeJonggaReplayPeriod;
+}
+
+function getJonggaReplayPeriod() {
+  activeJonggaReplayPeriod = normalizeJonggaReplayPeriod(activeJonggaReplayPeriod);
+  return activeJonggaReplayPeriod;
+}
+
+function hasJonggaReplayPeriodFilter(period = getJonggaReplayPeriod()) {
+  return Boolean(normalizeJonggaReplayPeriod(period).from || normalizeJonggaReplayPeriod(period).to);
+}
+
+function getJonggaReplayAvailablePeriod(bridge = getJonggaReplayBridgePayload()) {
+  const latestRun = bridge?.latestRun;
+  if (!latestRun || typeof latestRun !== 'object') {
+    return { from: '', to: '' };
+  }
+  const dates = Array.isArray(latestRun.analysisDates) && latestRun.analysisDates.length
+    ? latestRun.analysisDates
+    : Array.isArray(latestRun.days)
+      ? latestRun.days.map(day => day?.date).filter(Boolean)
+      : [];
+  const normalized = dates
+    .map(normalizeJonggaReplayDate)
+    .filter(Boolean)
+    .sort();
+  if (!normalized.length) return { from: '', to: '' };
+  return { from: normalized[0], to: normalized[normalized.length - 1] };
+}
+
+function isJonggaReplayDateInPeriod(dateValue, period = getJonggaReplayPeriod()) {
+  const normalizedDate = normalizeJonggaReplayDate(dateValue);
+  if (!normalizedDate) return false;
+  const normalizedPeriod = normalizeJonggaReplayPeriod(period);
+  if (!normalizedPeriod.from && !normalizedPeriod.to) return true;
+  if (normalizedPeriod.from && normalizedDate < normalizedPeriod.from) return false;
+  if (normalizedPeriod.to && normalizedDate > normalizedPeriod.to) return false;
+  return true;
+}
+
+function filterJonggaReplayDaysByPeriod(days = [], period = getJonggaReplayPeriod()) {
+  return (Array.isArray(days) ? days : []).filter(day => isJonggaReplayDateInPeriod(day?.date, period));
+}
+
+function getJonggaReplayPeriodLabel(period = getJonggaReplayPeriod(), bridge = getJonggaReplayBridgePayload()) {
+  const normalizedPeriod = normalizeJonggaReplayPeriod(period);
+  if (!normalizedPeriod.from && !normalizedPeriod.to) return '전체';
+  const available = getJonggaReplayAvailablePeriod(bridge);
+  const from = normalizedPeriod.from || available.from || '시작일';
+  const to = normalizedPeriod.to || available.to || '종료일';
+  return `${from} ~ ${to}`;
+}
+
+function setJonggaReplayPeriod(period, { persist = true, rerender = true } = {}) {
+  const nextPeriod = normalizeJonggaReplayPeriod(period);
+  if (persist) persistJonggaReplayPeriod(nextPeriod);
+  else activeJonggaReplayPeriod = nextPeriod;
+  updateJonggaReplayViewControls();
+  if (typeof renderReplayStrategySections === 'function') {
+    renderReplayStrategySections();
+  }
+  if (rerender && typeof renderJonggaReplayModal === 'function') {
+    renderJonggaReplayModal();
+  }
+  return nextPeriod;
+}
+
 function getJonggaReplayViewGroups(snapshot = getActiveBuySnapshot()) {
   return {
     pullback: Array.isArray(snapshot?.pullbackEntries) ? snapshot.pullbackEntries : [],
@@ -403,6 +508,63 @@ function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
   };
 }
 
+function formatJonggaReplaySummaryPercent(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '—';
+  return `${num > 0 ? '+' : ''}${num.toFixed(2)}%`;
+}
+
+function getJonggaReplayBridgePayload() {
+  if (typeof window === 'undefined') return null;
+  const payload = window.JONGGA_REPLAY_RUNS;
+  return payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : null;
+}
+
+function getJonggaReplayCumulativeReturnPct(mode = getJonggaReplayViewMode()) {
+  const bridge = getJonggaReplayBridgePayload();
+  const latestRun = bridge?.latestRun;
+  if (!latestRun || typeof latestRun !== 'object') return null;
+
+  const normalizedMode = normalizeJonggaReplayViewMode(mode);
+  const period = getJonggaReplayPeriod();
+  if (typeof buildJonggaReplayPeriodSummary === 'function' && hasJonggaReplayPeriodFilter(period)) {
+    try {
+      const summaryView = buildJonggaReplayPeriodSummary(bridge, null, normalizedMode, period);
+      const cumulativeReturn = Number(summaryView?.summary?.cumNetReturnPct);
+      if (Number.isFinite(cumulativeReturn)) return cumulativeReturn;
+    } catch {}
+  }
+  if (normalizedMode === 'all') {
+    const overall = latestRun.summary?.overall || latestRun.summary || {};
+    const overallReturn = Number(overall?.cumNetReturnPct);
+    return Number.isFinite(overallReturn) ? overallReturn : null;
+  }
+
+  const strategyViews = latestRun.strategyViews;
+  if (!strategyViews || typeof strategyViews !== 'object') return null;
+
+  const returns = [];
+  Object.values(strategyViews).forEach(view => {
+    const days = Array.isArray(view?.caseViews?.[normalizedMode]?.days)
+      ? view.caseViews[normalizedMode].days
+      : [];
+    days.forEach(day => {
+      const trades = Array.isArray(day?.trades) ? day.trades : [];
+      trades.forEach(item => {
+        const value = Number(item?.netReturnPct);
+        if (Number.isFinite(value)) returns.push(value);
+      });
+    });
+  });
+
+  if (!returns.length) return null;
+  let equity = 1;
+  returns.forEach(value => {
+    equity *= 1 + (value / 100);
+  });
+  return (equity - 1) * 100;
+}
+
 function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
   const activeMode = getJonggaReplayViewMode();
   const activeMeta = getJonggaReplayViewMeta(activeMode);
@@ -416,10 +578,14 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
   const summary = document.getElementById('jongga-replay-view-summary');
   if (summary) {
     const counts = getJonggaReplayViewCounts(snapshot);
+    const cumulativeReturnPct = getJonggaReplayCumulativeReturnPct(activeMode);
+    const periodLabel = getJonggaReplayPeriodLabel();
     summary.innerHTML = `
+      <span>기간 ${periodLabel}</span>
       <span>매수추천 ${counts.recommendationCount}건</span>
       <span>6.0 & B ${counts.replayCount}건</span>
       <span>전체 ${counts.allCount}건</span>
+      <span>누적 수익률 ${formatJonggaReplaySummaryPercent(cumulativeReturnPct)}</span>
       <span class="jongga-replay-view-current">${activeMeta.label} ${counts.activeCount}건</span>
     `;
   }
@@ -430,6 +596,9 @@ function setJonggaReplayViewMode(mode, { persist = true, rerender = true } = {})
   if (persist) persistJonggaReplayViewMode(nextMode);
   else activeJonggaReplayViewMode = nextMode;
   updateJonggaReplayViewControls();
+  if (typeof renderReplayStrategySections === 'function') {
+    renderReplayStrategySections();
+  }
   if (rerender && typeof renderBuyStockCards === 'function') {
     renderBuyStockCards();
   }

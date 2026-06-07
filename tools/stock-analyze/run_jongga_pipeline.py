@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-import calendar
 import json
 import os
 import subprocess
@@ -16,7 +15,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 JONGGA_OUTPUT = ROOT / "jongga" / "output"
 JONGGA_TESTS = ROOT / "jongga" / "tests"
-DEFAULT_REPLAY_WINDOW_MONTHS = 1
 DEFAULT_REPLAY_VARIANT = "stable"
 DEFAULT_REPLAY_THRESHOLD_PROFILE = "current"
 DEFAULT_REPLAY_REQUIRED_FOLLOWUP_DAYS = 1
@@ -150,12 +148,55 @@ def resolve_pipeline_analysis_date(analysis_date: str | None) -> date:
     return resolve_analysis_date(analysis_date)
 
 
+def _load_replay_run_records(replay_runs_path: Path) -> list[dict[str, object]]:
+    if not replay_runs_path.exists():
+        return []
+    try:
+        value = json.loads(replay_runs_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    if isinstance(value, list):
+        return [item for item in value if isinstance(item, dict)]
+    if isinstance(value, dict):
+        history = value.get("runHistory")
+        if isinstance(history, list):
+            return [item for item in history if isinstance(item, dict)]
+    return []
+
+
+def _processed_replay_dates(replay_runs_path: Path) -> set[date]:
+    processed: set[date] = set()
+    for run in _load_replay_run_records(replay_runs_path):
+        for value in run.get("analysisDates") or []:
+            try:
+                processed.add(date.fromisoformat(str(value)))
+            except ValueError:
+                continue
+    return processed
+
+
+def _replay_rule_signature(*, variant: str, threshold_profile: str, bar: str) -> str:
+    from jongga.replay_backtest import build_replay_rule_spec, replay_rule_signature
+
+    spec = build_replay_rule_spec(variant=variant, threshold_profile=threshold_profile, bar=bar)
+    return replay_rule_signature(spec)
+
+
+def _current_replay_rule_signature(*, variant: str, threshold_profile: str, bar: str) -> str:
+    return _replay_rule_signature(variant=variant, threshold_profile=threshold_profile, bar=bar)
+
+
+def _latest_processed_replay_date(replay_runs_path: Path) -> date | None:
+    processed = _processed_replay_dates(replay_runs_path)
+    return max(processed) if processed else None
+
+
 def select_replay_dates_from_history(
     *,
     history_js: str | Path,
     cutoff_date: date,
     variant: str = DEFAULT_REPLAY_VARIANT,
-    window_months: int = DEFAULT_REPLAY_WINDOW_MONTHS,
+    since_date: date | None = None,
     required_followup_days: int = DEFAULT_REPLAY_REQUIRED_FOLLOWUP_DAYS,
 ) -> list[date]:
     from jongga.output_contract import normalize_variant, read_history_index
@@ -176,29 +217,13 @@ def select_replay_dates_from_history(
         stable_dates.append(entry_date)
 
     stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date < cutoff_date})
+    if since_date:
+        stable_dates = [entry_date for entry_date in stable_dates if entry_date > since_date]
     if not stable_dates:
         return []
-
-    def subtract_months(value: date, months: int) -> date:
-        months = max(1, months)
-        year = value.year
-        month = value.month - months
-        while month <= 0:
-            year -= 1
-            month += 12
-        day = min(value.day, calendar.monthrange(year, month)[1])
-        return date(year, month, day)
-
-    window_start = subtract_months(cutoff_date, window_months)
-    selected = [entry_date for entry_date in stable_dates if window_start <= entry_date < cutoff_date]
-    if selected:
-        if len(selected) > required_followup_days:
-            return selected[:-required_followup_days]
-        return selected
-
-    if len(stable_dates) > required_followup_days:
-        return stable_dates[:-required_followup_days]
-    return stable_dates
+    if len(stable_dates) <= required_followup_days:
+        return []
+    return stable_dates[:-required_followup_days]
 
 
 def run_replay_backtest(
@@ -208,25 +233,33 @@ def run_replay_backtest(
     out_dir: str | Path,
     variant: str = DEFAULT_REPLAY_VARIANT,
     threshold_profile: str = DEFAULT_REPLAY_THRESHOLD_PROFILE,
-    window_months: int = DEFAULT_REPLAY_WINDOW_MONTHS,
+    step_label: str = "4/5",
 ) -> tuple[int, dict[str, object]]:
     from jongga.replay_backtest import run_replay, write_replay_bridge
+    from jongga.replay_backtest import replay_runs_paths, read_replay_runs
+    from jongga.replay_backtest import build_replay_rule_spec, replay_rule_signature
 
-    emit("STEP", "4/5 리플레이 검증 (자동 stable/current 최근 1개월)")
+    emit("STEP", f"{step_label} 리플레이 검증 (자동 stable/current 누적)")
     cutoff_date = resolve_pipeline_analysis_date(analysis_date)
+    runs_path, _ = replay_runs_paths(out_dir)
+    existing_runs = read_replay_runs(runs_path)
+    current_rule_spec = build_replay_rule_spec(variant=variant, threshold_profile=threshold_profile, bar="1m")
+    current_rule_signature = replay_rule_signature(current_rule_spec)
+    latest_run = existing_runs[-1] if existing_runs else None
+    needs_full_rebuild = not latest_run or str(latest_run.get("replayRuleSignature") or "") != current_rule_signature
     replay_dates = select_replay_dates_from_history(
         history_js=history_js,
         cutoff_date=cutoff_date,
         variant=variant,
-        window_months=window_months,
+        since_date=None if needs_full_rebuild else _latest_processed_replay_date(runs_path),
     )
     generated_at = datetime.now().isoformat(timespec="seconds")
     if not replay_dates:
-        message = f"{variant} replay 대상 날짜가 없어 자동 검증을 생략합니다."
+        message = "새 replay 대상 날짜가 없어 기존 누적 상태를 유지합니다."
         write_replay_bridge(
             out_dir,
             latest_attempt={
-                "status": "missing",
+                "status": "complete",
                 "message": message,
                 "generatedAt": generated_at,
                 "variant": variant,
@@ -234,13 +267,13 @@ def run_replay_backtest(
             },
             generated_at=generated_at,
         )
-        emit("WARN", message)
-        return 0, {"status": "missing", "message": message}
+        emit("OK", message)
+        return 0, {"status": "complete", "message": message, "skipped": True}
 
     emit(
         "RUN",
         f"jongga.replay_backtest auto {variant}/{threshold_profile} "
-        f"{replay_dates[0].isoformat()}~{replay_dates[-1].isoformat()} ({len(replay_dates)}일, 최근 1개월)",
+        f"{replay_dates[0].isoformat()}~{replay_dates[-1].isoformat()} ({len(replay_dates)}일, {'full' if needs_full_rebuild else 'append'})",
     )
     try:
         run_record = run_replay(
@@ -251,6 +284,7 @@ def run_replay_backtest(
             threshold_profile=threshold_profile,
             out_dir=out_dir,
             analysis_dates=replay_dates,
+            replace_existing_runs=needs_full_rebuild,
         )
     except Exception as exc:  # noqa: BLE001
         message = f"자동 replay 실패(무시하고 계속): {exc}"
@@ -280,13 +314,13 @@ def run_replay_backtest(
         "runId": str(run_record.get("runId") or ""),
         "from": replay_dates[0].isoformat(),
         "to": replay_dates[-1].isoformat(),
-        "windowMonths": window_months,
         "windowDays": len(replay_dates),
+        "mode": "full" if needs_full_rebuild else "append",
     }
 
 
-def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, dict[str, object]]:
-    emit("STEP", "5/5 산출물 검증")
+def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str = "5/5") -> tuple[int, dict[str, object]]:
+    emit("STEP", f"{step_label} 산출물 검증")
     compact = _compact_date(analysis_date)
     month_folder = compact[:6]
     required: list[Path] = [
@@ -342,12 +376,12 @@ def validate_outputs(*, analysis_date: str | None, variant: str) -> tuple[int, d
     return 0, {"status": status, "counts": counts}
 
 
-def print_summary(*, exit_code: int, quality_status: str) -> None:
+def print_summary(*, exit_code: int, quality_status: str, summary_label: str = "종가베팅 추천 데이터 생성 완료") -> None:
     border = "=" * 60
     print()
     print(f"  {border}")
     if exit_code == 0 and quality_status == "complete":
-        print("    SUCCESS — 종가베팅 추천 데이터 생성 완료")
+        print(f"    SUCCESS — {summary_label}")
     elif exit_code == 0:
         print("    SUCCESS (partial) — 산출물 생성됨, 일부 수집 미완료")
     else:
@@ -386,10 +420,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="자동 replay 검증 단계 생략",
     )
     parser.add_argument(
-        "--replay-window-months",
-        type=int,
-        default=DEFAULT_REPLAY_WINDOW_MONTHS,
-        help="자동 replay 기본 기간(개월)",
+        "--replay-only",
+        action="store_true",
+        help="라이브 수집/추천 생성 없이 replay 검증과 산출물 검증만 실행",
     )
     parser.add_argument(
         "--replay-variant",
@@ -430,6 +463,24 @@ def main() -> int:
             print_summary(exit_code=0, quality_status="complete")
             return 0
 
+    if args.replay_only:
+        replay_code, replay_meta = run_replay_backtest(
+            analysis_date=args.date,
+            history_js=JONGGA_OUTPUT / "jongga_history.js",
+            out_dir=JONGGA_OUTPUT,
+            variant=args.replay_variant,
+            threshold_profile=args.replay_threshold_profile,
+            step_label="1/2",
+        )
+        if replay_code != 0:
+            print_summary(exit_code=replay_code, quality_status="", summary_label="리플레이 재검증 완료")
+            return replay_code
+
+        validate_code, meta = validate_outputs(analysis_date=args.date, variant=args.variant, step_label="2/2")
+        quality_status = str(meta.get("status") or "")
+        print_summary(exit_code=validate_code, quality_status=quality_status, summary_label="리플레이 재검증 완료")
+        return validate_code
+
     if not args.skip_outcomes:
         run_outcome_backfill(analysis_date=args.date, variant=args.variant)
     else:
@@ -451,7 +502,6 @@ def main() -> int:
             out_dir=JONGGA_OUTPUT,
             variant=args.replay_variant,
             threshold_profile=args.replay_threshold_profile,
-            window_months=args.replay_window_months,
         )
     else:
         emit("STEP", "4/5 리플레이 검증 — 생략(--skip-replay)")

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import hashlib
 import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -17,6 +18,7 @@ from jongga.sim_broker import simulate_trade
 REPLAY_RUNS_MARKER = "JONGGA_REPLAY_RUNS"
 REPLAY_INCLUDE_GRADE_SCORE_MIN = 6.0
 REPLAY_INCLUDE_GRADE_MIN = "B"
+REPLAY_RULE_VERSION = "2026-06-06-cumulative-v1"
 REPLAY_CASE_RECOMMENDATION = "recommendation"
 REPLAY_CASE_REPLAY = "replay"
 REPLAY_VALIDATION_POLICY = {
@@ -72,6 +74,31 @@ def normalize_analysis_dates(analysis_dates: list[date] | None) -> list[date]:
     if not analysis_dates:
         return []
     return sorted({day for day in analysis_dates})
+
+
+def build_replay_rule_spec(*, variant: str, threshold_profile: str, bar: str) -> dict[str, Any]:
+    return {
+        "ruleVersion": REPLAY_RULE_VERSION,
+        "variant": normalize_variant(variant),
+        "thresholdProfile": str(threshold_profile or ""),
+        "bar": str(bar or ""),
+        "includeGradeScoreMin": REPLAY_INCLUDE_GRADE_SCORE_MIN,
+        "includeGradeMin": REPLAY_INCLUDE_GRADE_MIN,
+        "validationPolicy": REPLAY_VALIDATION_POLICY,
+    }
+
+
+def replay_rule_signature(rule_spec: dict[str, Any]) -> str:
+    serialized = json.dumps(rule_spec, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha1(serialized.encode("utf-8")).hexdigest()
+
+
+def replay_rule_state(*, variant: str, threshold_profile: str, bar: str) -> dict[str, Any]:
+    spec = build_replay_rule_spec(variant=variant, threshold_profile=threshold_profile, bar=bar)
+    return {
+        "spec": spec,
+        "signature": replay_rule_signature(spec),
+    }
 
 
 def _tick_proxy_source(entry: dict[str, Any]) -> str | None:
@@ -425,6 +452,67 @@ def build_strategy_views(
     return views
 
 
+def _sorted_run_history(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    def _sort_key(item: dict[str, Any]) -> tuple[str, str]:
+        generated_at = str(item.get("generatedAt") or "")
+        run_id = str(item.get("runId") or "")
+        return generated_at, run_id
+
+    return sorted([item for item in runs if isinstance(item, dict)], key=_sort_key)
+
+
+def _merged_run_days(run_history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_date: dict[str, dict[str, Any]] = {}
+    for run in run_history:
+        for day in run.get("days") or []:
+            if not isinstance(day, dict):
+                continue
+            date_str = str(day.get("date") or "")
+            if not date_str:
+                continue
+            by_date[date_str] = day
+    return [
+        by_date[date_str]
+        for date_str in sorted(by_date)
+    ]
+
+
+def build_cumulative_run_record(runs: list[dict[str, Any]]) -> dict[str, Any] | None:
+    if not runs:
+        return None
+    ordered_runs = _sorted_run_history(runs)
+    cumulative_days = _merged_run_days(ordered_runs)
+    candidates = [item for day in cumulative_days for item in (day.get("candidates") or [])]
+    results = [item for day in cumulative_days for item in (day.get("results") or [])]
+    orders = [item for day in cumulative_days for item in (day.get("orders") or [])]
+    summary = build_summary_payload(candidates=candidates, results=results, orders=orders)
+    latest_run = ordered_runs[-1]
+    analysis_dates = sorted({str(day.get("date") or "") for day in cumulative_days if str(day.get("date") or "")})
+    from_date = analysis_dates[0] if analysis_dates else str(latest_run.get("from") or "")
+    to_date = analysis_dates[-1] if analysis_dates else str(latest_run.get("to") or "")
+    return {
+        "runId": str(latest_run.get("runId") or ""),
+        "generatedAt": str(latest_run.get("generatedAt") or ""),
+        "from": from_date,
+        "to": to_date,
+        "variant": str(latest_run.get("variant") or VARIANT_STABLE),
+        "bar": str(latest_run.get("bar") or "1m"),
+        "thresholdProfile": str(latest_run.get("thresholdProfile") or "current"),
+        "entryMode": str(latest_run.get("entryMode") or "close"),
+        "replayPolicy": latest_run.get("replayPolicy") or REPLAY_VALIDATION_POLICY,
+        "replayRule": latest_run.get("replayRule") or {},
+        "replayRuleSignature": str(latest_run.get("replayRuleSignature") or ""),
+        "analysisDates": analysis_dates,
+        "days": cumulative_days,
+        "summary": summary,
+        "strategyViews": build_strategy_views(run_days=cumulative_days, summary=summary),
+        "runCount": len(ordered_runs),
+        "runHistory": ordered_runs,
+        "latestRunId": str(latest_run.get("runId") or ""),
+        "latestBuiltDate": to_date,
+    }
+
+
 def _read_json_list(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
@@ -433,6 +521,15 @@ def _read_json_list(path: Path) -> list[dict[str, Any]]:
     except json.JSONDecodeError:
         return []
     return value if isinstance(value, list) else []
+
+
+def _read_json_value(path: Path) -> Any:
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -446,11 +543,18 @@ def replay_runs_paths(out_dir: str | Path) -> tuple[Path, Path]:
 
 
 def read_replay_runs(path: str | Path) -> list[dict[str, Any]]:
-    value = read_js_assignment(path, REPLAY_RUNS_MARKER) if str(path).endswith(".js") else None
+    path_obj = Path(path)
+    if str(path_obj).endswith(".js"):
+        value = read_js_assignment(path_obj, REPLAY_RUNS_MARKER)
+    else:
+        value = _read_json_value(path_obj)
     if isinstance(value, dict):
+        runs = value.get("runHistory")
+        if isinstance(runs, list):
+            return runs
         runs = value.get("runs")
         return runs if isinstance(runs, list) else []
-    return _read_json_list(Path(path))
+    return value if isinstance(value, list) else []
 
 
 def _latest_daily_summary(replay_dir: Path, latest_run: dict[str, Any] | None) -> dict[str, Any] | None:
@@ -483,8 +587,10 @@ def build_replay_bridge_payload(
     max_runs: int = 12,
 ) -> dict[str, Any]:
     replay_dir_path = Path(replay_dir)
-    latest_run = runs[0] if runs else None
-    latest_summary = _latest_daily_summary(replay_dir_path, latest_run)
+    ordered_runs = _sorted_run_history(runs)
+    cumulative_run = build_cumulative_run_record(runs)
+    latest_run = cumulative_run
+    latest_summary = cumulative_run.get("summary") if isinstance(cumulative_run, dict) else None
     attempt = {
         "status": "missing" if not runs else "complete",
         "message": "",
@@ -497,8 +603,8 @@ def build_replay_bridge_payload(
         "latestAttempt": attempt,
         "latestRun": latest_run,
         "latestSummary": latest_summary,
-        "runCount": len(runs),
-        "runs": runs[:max_runs],
+        "runCount": len(ordered_runs),
+        "runs": ordered_runs[-max_runs:],
     }
 
 
@@ -513,7 +619,10 @@ def write_replay_bridge(
     generated_at: str | None = None,
 ) -> dict[str, Any]:
     runs_path, bridge_path = replay_runs_paths(out_dir)
-    runs = _read_json_list(runs_path)
+    raw_runs = _read_json_value(runs_path)
+    runs = raw_runs if isinstance(raw_runs, list) else (raw_runs.get("runHistory") if isinstance(raw_runs, dict) else [])
+    if not isinstance(runs, list):
+        runs = []
     payload = build_replay_bridge_payload(
         runs,
         replay_dir=Path(out_dir) / "replay",
@@ -534,12 +643,14 @@ def run_replay(
     threshold_profile: str,
     out_dir: str | Path = "jongga/output",
     analysis_dates: list[date] | None = None,
+    replace_existing_runs: bool = False,
 ) -> dict[str, Any]:
     generated_at = datetime.now().isoformat(timespec="seconds")
     run_id = datetime.now().strftime("replay-%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex[:8]
     out_root = Path(out_dir)
     replay_dir = out_root / "replay"
     variant = normalize_variant(variant)
+    rule_state = replay_rule_state(variant=variant, threshold_profile=threshold_profile, bar=bar)
     history_cache: dict[str, list[dict[str, Any]]] = {}
     run_days: list[dict[str, Any]] = []
     all_orders: list[dict[str, Any]] = []
@@ -664,7 +775,10 @@ def run_replay(
         })
 
     runs_path = replay_dir / "replay_runs.json"
-    existing_runs = _read_json_list(runs_path)
+    existing_raw = [] if replace_existing_runs else _read_json_value(runs_path)
+    existing_runs = existing_raw if isinstance(existing_raw, list) else (existing_raw.get("runHistory") if isinstance(existing_raw, dict) else [])
+    if not isinstance(existing_runs, list):
+        existing_runs = []
     summary = build_summary_payload(candidates=all_candidates, results=all_results, orders=all_orders)
     run_record = {
         "runId": run_id,
@@ -676,7 +790,10 @@ def run_replay(
         "thresholdProfile": threshold_profile,
         "entryMode": "close",
         "replayPolicy": REPLAY_VALIDATION_POLICY,
+        "replayRule": rule_state["spec"],
+        "replayRuleSignature": rule_state["signature"],
         "analysisDates": [day.isoformat() for day in target_days],
+        "latestBuiltDate": target_days[-1].isoformat() if target_days else "",
         "days": run_days,
         "summary": summary,
         "strategyViews": build_strategy_views(run_days=run_days, summary=summary),

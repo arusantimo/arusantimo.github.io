@@ -97,6 +97,42 @@ function sampleSnapshot() {
   };
 }
 
+function sampleReplayBridge() {
+  return {
+    latestRun: {
+      summary: {
+        overall: {
+          cumNetReturnPct: 0.59
+        }
+      },
+      strategyViews: {
+        pullback: {
+          caseViews: {
+            recommendation: {
+              days: [
+                {
+                  trades: [
+                    { netReturnPct: 1.2 }
+                  ]
+                }
+              ]
+            },
+            replay: {
+              days: [
+                {
+                  trades: [
+                    { netReturnPct: -0.6 }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  };
+}
+
 test('replay view mode filters buy entries by recommendation or 6.0&B', () => {
   const { context } = loadStateContext();
   const snapshot = sampleSnapshot();
@@ -127,6 +163,7 @@ test('replay view controls show counts and active mode', () => {
   const summary = createElementStub();
   elements.set('jongga-replay-view-summary', summary);
   const snapshot = sampleSnapshot();
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
 
   context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
   context.updateJonggaReplayViewControls(snapshot);
@@ -137,5 +174,23 @@ test('replay view controls show counts and active mode', () => {
   assert.match(summary.innerHTML, /매수추천 2건/);
   assert.match(summary.innerHTML, /6\.0 & B 2건/);
   assert.match(summary.innerHTML, /전체 5건/);
+  assert.match(summary.innerHTML, /누적 수익률 -0\.60%/);
   assert.match(summary.innerHTML, /jongga-replay-view-current">6\.0 & B 2건/);
+});
+
+test('setJonggaReplayViewMode rerenders strategy replay sections on tab switch', () => {
+  const { context } = loadStateContext();
+  let replaySectionRenderCount = 0;
+  let modalRenderCount = 0;
+  context.renderReplayStrategySections = () => {
+    replaySectionRenderCount += 1;
+  };
+  context.renderJonggaReplayModal = () => {
+    modalRenderCount += 1;
+  };
+
+  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
+
+  assert.equal(replaySectionRenderCount, 1);
+  assert.equal(modalRenderCount, 1);
 });

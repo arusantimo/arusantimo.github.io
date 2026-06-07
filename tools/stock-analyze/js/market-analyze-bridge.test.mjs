@@ -56,6 +56,14 @@ test('buildPullbackG5Gate warns when kospi is below ma5', () => {
   assert.match(gate.note, /KOSPI 단기 추세 이탈/);
 });
 
+test('recalculateTrendStatusLabel separates G5-only market gate block from general gate failure', () => {
+  const ctx = loadBridgeContext();
+  const marketHold = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅', 'G-A', [{ code: 'G5', status: '⛔' }], {});
+  const hardBlock = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅', 'G-A', [{ code: 'G2', status: '⛔' }], {});
+  assert.equal(marketHold, '시장 Gate 차단 · 신규 진입 보류');
+  assert.equal(hardBlock, '매매금지(핵심 Gate 미충족: G2)');
+});
+
 test('recalculateTrendStatusLabel allows pullback B conditionally', () => {
   const ctx = loadBridgeContext();
   const label = ctx.recalculateTrendStatusLabel('pullback', 'B', '강세장 ✅ (펀더·지수 정당)', 'G-A', [], {
@@ -88,6 +96,14 @@ test('buildPullbackG5Gate blocks above warn cap without macro-friendly context',
     effectiveRegimeLabel: '박스권 ⚠️'
   });
   assert.equal(gate.status, '⛔');
+});
+
+test('gap code labels distinguish G-D holdback and G-E entry ban', () => {
+  const ctx = loadBridgeContext();
+  const trendLabel = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅', 'G-E', [], {});
+  const reversalLabel = ctx.recalculateReversalStatusLabel('A', '강세장 ✅', 'G-D', [], [], {});
+  assert.equal(trendLabel, '매매금지(갭다운 경고 · 신규 진입 금지)');
+  assert.equal(reversalLabel, '매매금지(갭다운 주의 · 신규 진입 보류)');
 });
 
 test('isRiseJustifiedByMacro rejects critical bubble', () => {

@@ -30,6 +30,9 @@ function createEmptySnapshot() {
 function loadJonggaContext() {
   const context = {
     console,
+    escapeHtml(value) {
+      return String(value ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    },
     createEmptySnapshot,
     createEmptyLiveGapState() {
       return { status: 'idle', score: createEmptySnapshot().gapScore, fetchedAt: '', source: '', error: '' };
@@ -123,6 +126,7 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
           rank: 1,
           name: '삼성전자',
           code: '005930',
+          marketCapTrillion: 400.1,
           score: 8.1,
           signalScore: 8.4,
           strictScore: 8.1,
@@ -159,5 +163,204 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(breakout.score, 8.4);
   assert.equal(breakout.entryEligible, true);
   assert.equal(breakout.scoreBreakdown.length, 1);
+  assert.equal(breakout.marketCapTrillion, 400.1);
   assert.deepEqual(snapshot.momentumEntries, snapshot.breakoutEntries);
+});
+
+test('pullbackContext 확장 필드를 정규화한다', () => {
+  const context = loadJonggaContext();
+  const payload = {
+    schemaVersion: 'jongga_result.v1',
+    slots: [{
+      slotId: 'slotA',
+      entries: {
+        pullback: [{
+          rank: 1,
+          name: '테스트',
+          code: '005930',
+          score: 7.4,
+          grade: 'A',
+          statusLabel: '매수추천',
+          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9']),
+          pullbackContext: {
+            support: {
+              summary: '주지지 99,000원 · 강도 80점',
+              primaryLine: {
+                label: '복합 지지',
+                price: 99000,
+                distancePct: 1.2,
+                families: ['horizontal', 'eventAnchors'],
+                familyLabels: ['수평 지지', '급증봉 저점'],
+                familyCount: 2,
+                count: 4,
+                lastSeenDaysAgo: 3,
+                strengthPoints: 80,
+                role: 'primary'
+              },
+              lines: [{
+                label: '복합 지지',
+                price: 99000,
+                distancePct: 1.2,
+                families: ['horizontal', 'eventAnchors'],
+                familyLabels: ['수평 지지', '급증봉 저점'],
+                familyCount: 2,
+                count: 4,
+                lastSeenDaysAgo: 3,
+                strengthPoints: 80,
+                role: 'primary'
+              }],
+              strengthScore: 80,
+              strengthLabel: 'strong',
+              warningLevel: 'clear',
+              warningReason: '복합 지지 strong',
+              activeFamilyCount: 2
+            },
+            families: {
+              horizontal: [{ family: 'horizontal', familyLabel: '수평 지지', label: '수평 지지', price: 99000, count: 3, lastSeenDaysAgo: 5, valid: true }],
+              swingCluster: [],
+              volumeShelf: [],
+              eventAnchors: [{ family: 'eventAnchors', familyLabel: '급증봉 저점', label: '급증봉 저점', price: 99200, count: 1, lastSeenDaysAgo: 3, valid: true }]
+            },
+            volumeBurst: {
+              summary: '200%+ 급증 1회',
+              burstCount: 1,
+              maxRatioPct: 240,
+              latestBurstDaysAgo: 3
+            }
+          }
+        }]
+      }
+    }]
+  };
+
+  context.applyJonggaResultToState(payload);
+  const entry = context.getSlotSnapshot('slotA').pullbackEntries[0];
+  assert.equal(entry.pullbackContext.support.primaryLine.price, 99000);
+  assert.equal(entry.pullbackContext.support.strengthScore, 80);
+  assert.equal(entry.pullbackContext.support.warningLevel, 'clear');
+  assert.equal(entry.pullbackContext.families.horizontal[0].price, 99000);
+  assert.equal(entry.pullbackContext.volumeBurst.burstCount, 1);
+});
+
+test('volatilityContext 확장 필드를 정규화하고 구버전 payload는 null로 폴백한다', () => {
+  const context = loadJonggaContext();
+  const payload = {
+    schemaVersion: 'jongga_result.v1',
+    slots: [{
+      slotId: 'slotA',
+      entries: {
+        breakout: [{
+          rank: 1,
+          name: '테스트',
+          code: '005930',
+          score: 7.8,
+          strictScore: 7.6,
+          signalScore: 7.8,
+          grade: 'A',
+          statusLabel: '매수추천',
+          gates: validGateMap(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7']),
+          volatilityContext: {
+            marketState: 'volatile',
+            stockState: 'neutral',
+            blendedState: 'volatile',
+            strategyFit: 'unfavorable',
+            scoreDelta: -1.0,
+            summary: '불리 (고변동성 장세라 실패 돌파 위험 확대)',
+            reason: '시장 고변동성 / 종목 중립 변동성',
+            metrics: {
+              atrPct10: 3.8,
+              returnStd20: 2.4,
+              todayRangePct: 4.6,
+              vkospi: 26.4
+            }
+          }
+        }, {
+          rank: 2,
+          name: '구버전',
+          code: '000660',
+          score: 6.4,
+          grade: 'B',
+          statusLabel: '관심후보',
+          gates: validGateMap(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'])
+        }]
+      }
+    }]
+  };
+
+  context.applyJonggaResultToState(payload);
+  const [first, second] = context.getSlotSnapshot('slotA').breakoutEntries;
+  assert.equal(first.volatilityContext.marketState, 'volatile');
+  assert.equal(first.volatilityContext.scoreDelta, -1);
+  assert.equal(first.volatilityContext.metrics.vkospi, 26.4);
+  assert.equal(second.volatilityContext, null);
+});
+
+test('statusReason 필드를 갭다운 경고와 Gate 차단 근거로 정규화한다', () => {
+  const context = loadJonggaContext();
+  const payload = {
+    schemaVersion: 'jongga_result.v1',
+    slots: [{
+      slotId: 'slotA',
+      gapScore: {
+        code: 'G-E',
+        totalScore: '-11.5점',
+        rows: [
+          { indicator: 'NQ 선물 변화율', actualValue: '-5.04%', weightedScore: '-5.0점' },
+          { indicator: '원달러 환율 변화', actualValue: '+52.00원', weightedScore: '-3.0점' },
+          { indicator: 'SOX 전일 변화율', actualValue: '-4.74%', weightedScore: '-2.0점' }
+        ]
+      },
+      entries: {
+        pullback: [
+          {
+            rank: 1,
+            name: '갭다운종목',
+            code: '005930',
+            score: 6.8,
+            grade: 'B',
+            statusLabel: '매매금지(갭다운 경고)',
+            gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9'])
+          },
+          {
+            rank: 2,
+            name: '게이트차단종목',
+            code: '000660',
+            score: 6.8,
+            grade: 'B',
+            statusLabel: '매매금지(핵심 Gate 미충족)',
+            gates: {
+              G0: { status: 'blocked', note: '최근 20일 최대 거래량 급증 166% (필요 ≥ 200%)' },
+              G1: { status: 'passed' },
+              G2: { status: 'passed' },
+              G3: { status: 'passed' },
+              G4: { status: 'passed' },
+              G5: { status: 'warning' },
+              G9: { status: 'passed' }
+            }
+          }
+        ]
+      }
+    }]
+  };
+
+  context.applyJonggaResultToState(payload);
+  const [gapEntry, gateEntry] = context.getSlotSnapshot('slotA').pullbackEntries;
+  assert.match(gapEntry.statusReason, /갭 스코어 G-E/);
+  assert.match(gapEntry.statusReasonShort, /원달러 \+52\.00원/);
+  assert.match(gateEntry.statusReason, /G0 미충족/);
+  assert.match(gateEntry.statusReasonShort, /최근 20일 최대 거래량 급증 166%/);
+});
+
+test('score breakdown table renders volatility synthetic row V1 그대로 노출한다', () => {
+  const context = loadJonggaContext();
+  const html = context.renderBuyScoreBreakdownTable({
+    scoreBreakdown: [
+      { code: 'S1', signalPoints: 2, strictPoints: 2, maxPoints: 2, note: '수급' },
+      { code: 'V1', signalPoints: -1, strictPoints: -1, maxPoints: 1, note: '불리 (고변동성 장세라 실패 돌파 위험 확대)' }
+    ]
+  });
+
+  assert.match(html, /V1/);
+  assert.match(html, /-1/);
+  assert.match(html, /실패 돌파 위험 확대/);
 });

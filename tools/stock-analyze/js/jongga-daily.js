@@ -12,6 +12,8 @@ const JONGGA_DAILY_NAMESPACES = {
 };
 
 let jonggaDailyControlsBound = false;
+let activeJonggaHistoryPage = 1;
+const JONGGA_HISTORY_WEEKS_PER_PAGE = 1;
 let activeJonggaVariant = readStoredJonggaVariant();
 const jonggaDailyScriptPromises = {};
 const jonggaDailyLoadPromises = {};
@@ -484,6 +486,7 @@ function applyJonggaJsonInput() {
 }
 
 function openJonggaHistoryModal() {
+  activeJonggaHistoryPage = 1;
   renderJonggaHistoryModal();
   document.getElementById('jongga-history-overlay')?.classList.add('open');
   syncBodyScrollLock();
@@ -502,6 +505,111 @@ function getJonggaHistoryEntries(variant = getJonggaActiveVariant()) {
     .sort((left, right) => String(right.date || '').localeCompare(String(left.date || '')));
 }
 
+function normalizeJonggaHistoryDate(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const dateOnly = raw.slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(dateOnly) ? dateOnly : '';
+}
+
+function getJonggaHistoryWeekStart(dateKey) {
+  const normalizedDate = normalizeJonggaHistoryDate(dateKey);
+  if (!normalizedDate) return '';
+  const date = new Date(`${normalizedDate}T00:00:00+09:00`);
+  const day = date.getDay();
+  const delta = (day + 6) % 7;
+  date.setDate(date.getDate() - delta);
+  return getJonggaKstTodayKey(date);
+}
+
+function getJonggaHistoryWeekEnd(weekStart) {
+  const normalizedStart = normalizeJonggaHistoryDate(weekStart);
+  if (!normalizedStart) return '';
+  const date = new Date(`${normalizedStart}T00:00:00+09:00`);
+  date.setDate(date.getDate() + 6);
+  return getJonggaKstTodayKey(date);
+}
+
+function getJonggaHistoryWeekLabel(weekStart, weekEnd = getJonggaHistoryWeekEnd(weekStart)) {
+  const startLabel = normalizeJonggaHistoryDate(weekStart).replace(/-/g, '.');
+  const endLabel = normalizeJonggaHistoryDate(weekEnd).replace(/-/g, '.');
+  return `${startLabel} ~ ${endLabel}`;
+}
+
+function groupJonggaHistoryEntriesByWeek(entries = []) {
+  const grouped = new Map();
+  entries.forEach(entry => {
+    const dateKey = normalizeJonggaHistoryDate(entry?.date);
+    if (!dateKey) return;
+    const weekStart = getJonggaHistoryWeekStart(dateKey);
+    if (!weekStart) return;
+    const current = grouped.get(weekStart) || {
+      weekStart,
+      weekEnd: getJonggaHistoryWeekEnd(weekStart),
+      entries: []
+    };
+    current.entries.push(entry);
+    grouped.set(weekStart, current);
+  });
+  return [...grouped.values()]
+    .map(group => ({
+      ...group,
+      entries: [...group.entries].sort((left, right) => String(right.date || '').localeCompare(String(left.date || '')))
+    }))
+    .sort((left, right) => String(right.weekStart || '').localeCompare(String(left.weekStart || '')));
+}
+
+function getJonggaHistoryPaginatedWeeks(entries = [], page = activeJonggaHistoryPage, weeksPerPage = JONGGA_HISTORY_WEEKS_PER_PAGE) {
+  const groups = groupJonggaHistoryEntriesByWeek(entries);
+  const totalPages = Math.max(1, Math.ceil(groups.length / weeksPerPage));
+  const normalizedPage = Math.min(Math.max(Number(page) || 1, 1), totalPages);
+  const startIndex = (normalizedPage - 1) * weeksPerPage;
+  return {
+    groups: groups.slice(startIndex, startIndex + weeksPerPage),
+    totalPages,
+    currentPage: normalizedPage,
+    totalWeeks: groups.length
+  };
+}
+
+function setJonggaHistoryPage(page, { rerender = true } = {}) {
+  activeJonggaHistoryPage = Math.max(1, Number(page) || 1);
+  if (rerender) renderJonggaHistoryModal();
+  return activeJonggaHistoryPage;
+}
+
+function renderJonggaHistoryPagination(currentPage, totalPages, currentGroup = null) {
+  if (totalPages <= 1) return '';
+  return `
+    <div class="history-pagination history-pagination-top">
+      <button type="button" class="history-page-nav" data-history-page="${Math.min(totalPages, currentPage + 1)}" ${currentPage === totalPages ? 'disabled' : ''}>이전주</button>
+      <div class="history-pagination-meta">
+        <strong>${escapeHtml(currentGroup?.weekStart && currentGroup?.weekEnd ? getJonggaHistoryWeekLabel(currentGroup.weekStart, currentGroup.weekEnd) : `주 ${currentPage}`)}</strong>
+        <span>${currentPage} / ${totalPages}주</span>
+      </div>
+      <button type="button" class="history-page-nav" data-history-page="${Math.max(1, currentPage - 1)}" ${currentPage === 1 ? 'disabled' : ''}>다음주</button>
+    </div>
+  `;
+}
+
+function renderJonggaHistoryWeekGroup(group) {
+  const entries = Array.isArray(group?.entries) ? group.entries : [];
+  return `
+    <section class="history-week-group">
+      <div class="history-week-head">
+        <div>
+          <div class="history-week-title">${escapeHtml(getJonggaHistoryWeekLabel(group.weekStart, group.weekEnd))}</div>
+          <div class="history-week-meta">${escapeHtml(group.weekStart)} 기준 · ${entries.length}개</div>
+        </div>
+        <div class="history-week-badge">주간</div>
+      </div>
+      <div class="history-week-entries">
+        ${entries.map(renderJonggaHistoryItem).join('')}
+      </div>
+    </section>
+  `;
+}
+
 function renderJonggaHistoryModal() {
   const body = document.getElementById('jongga-history-body');
   if (!body) return;
@@ -511,7 +619,18 @@ function renderJonggaHistoryModal() {
     body.innerHTML = `<div class="history-empty">${variantInfo.label} 기준 jongga_history.js에 이전 분석 기록이 없습니다.</div>`;
     return;
   }
-  body.innerHTML = `<div class="history-list">${entries.map(renderJonggaHistoryItem).join('')}</div>`;
+  const paginated = getJonggaHistoryPaginatedWeeks(entries, activeJonggaHistoryPage);
+  activeJonggaHistoryPage = paginated.currentPage;
+  body.innerHTML = `
+    <div class="history-modal-summary">
+      <div class="history-modal-summary-line">주간 보기 · 최신 ${paginated.totalWeeks}주 중 ${paginated.currentPage}페이지</div>
+      <div class="history-modal-summary-line muted">한 페이지에 1주만 표시합니다. 상단 버튼으로 이전주·다음주로 이동하세요.</div>
+    </div>
+    ${renderJonggaHistoryPagination(paginated.currentPage, paginated.totalPages, paginated.groups[0] || null)}
+    <div class="history-list">
+      ${paginated.groups.map(renderJonggaHistoryWeekGroup).join('')}
+    </div>
+  `;
 }
 
 function renderJonggaHistoryItem(entry) {
@@ -642,6 +761,14 @@ function bindJonggaDailyControls() {
       if (date && variant) {
         loadJonggaDailyData(date, variant);
         closeJonggaHistoryModal();
+      }
+      return;
+    }
+    const pageBtn = event.target.closest('[data-history-page]');
+    if (pageBtn) {
+      const nextPage = Number(pageBtn.dataset.historyPage);
+      if (Number.isFinite(nextPage)) {
+        setJonggaHistoryPage(nextPage);
       }
       return;
     }

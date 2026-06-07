@@ -355,6 +355,309 @@ function buildSellCardPlanSummary(code) {
   `;
 }
 
+const PULLBACK_SUPPORT_FAMILY_META = {
+  horizontal: { shortLabel: '수평', icon: '📏' },
+  swingCluster: { shortLabel: '스윙', icon: '📉' },
+  volumeShelf: { shortLabel: '매물대', icon: '📦' },
+  eventAnchors: { shortLabel: '급증봉', icon: '⚓' }
+};
+
+function formatPullbackSupportPrice(price) {
+  const numeric = Number(price);
+  return Number.isFinite(numeric) && numeric > 0 ? `${numeric.toLocaleString()}원` : '가격 미산출';
+}
+
+function formatPullbackSupportDaysAgo(daysAgo) {
+  const numeric = Number(daysAgo);
+  if (!Number.isFinite(numeric) || numeric < 0) return '최근성 미상';
+  if (numeric === 0) return '당일';
+  if (numeric === 1) return '1일 전';
+  return `${numeric}일 전`;
+}
+
+function getPullbackSupportStrengthBadgeMeta(support = {}) {
+  const label = String(support.strengthLabel || '');
+  if (label === 'strong') return { cls: 'strong', text: `강도 ${Number(support.strengthScore || 0)} · strong` };
+  if (label === 'watch') return { cls: 'watch', text: `강도 ${Number(support.strengthScore || 0)} · watch` };
+  return { cls: 'weak', text: `강도 ${Number(support.strengthScore || 0)} · weak` };
+}
+
+function getPullbackSupportWarningBadgeMeta(support = {}) {
+  const level = String(support.warningLevel || '');
+  if (level === 'clear') return { cls: 'clear', text: '경고 낮음' };
+  if (level === 'warning') return { cls: 'warning', text: '주의 필요' };
+  return { cls: 'danger', text: '하단 방어 약함' };
+}
+
+function getPullbackRepresentativeFamilyLines(context = {}) {
+  const families = context.families && typeof context.families === 'object' ? context.families : {};
+  return ['horizontal', 'swingCluster', 'volumeShelf', 'eventAnchors']
+    .map(family => {
+      const lines = Array.isArray(families[family]) ? families[family] : [];
+      return lines.find(line => line?.valid) || lines[0] || null;
+    })
+    .filter(Boolean);
+}
+
+function buildPullbackSupportCardTags(context = {}) {
+  const support = context.support || {};
+  const primaryLine = support.primaryLine || null;
+  const chips = [];
+  if (primaryLine?.price) {
+    chips.push(`<span class="buy-card-support-tag primary">주지지 ${formatPullbackSupportPrice(primaryLine.price)}</span>`);
+  }
+  if (Number.isFinite(Number(support.strengthScore))) {
+    const strengthBadge = getPullbackSupportStrengthBadgeMeta(support);
+    chips.push(`<span class="buy-card-support-tag strength ${strengthBadge.cls}">${escapeHtml(strengthBadge.text)}</span>`);
+  }
+  getPullbackRepresentativeFamilyLines(context).slice(0, 3).forEach(line => {
+    const familyMeta = PULLBACK_SUPPORT_FAMILY_META[line.family] || { shortLabel: line.familyLabel || line.label || '지지', icon: '•' };
+    chips.push(`<span class="buy-card-support-tag family">${escapeHtml(familyMeta.shortLabel)} ${formatPullbackSupportPrice(line.price)}</span>`);
+  });
+  return chips.slice(0, 5).join('');
+}
+
+function buildPullbackVolumeHistoryText(context = {}) {
+  const volumeBurst = context.volumeBurst || {};
+  const eventAnchors = Array.isArray(context.families?.eventAnchors) ? context.families.eventAnchors : [];
+  const primaryAnchor = eventAnchors.find(line => line?.valid) || eventAnchors[0] || null;
+  const parts = [];
+  if (Number(volumeBurst.burstCount || 0) > 0) {
+    parts.push(`200%+ 급증 ${Number(volumeBurst.burstCount)}회`);
+  } else if (volumeBurst.summary) {
+    parts.push(String(volumeBurst.summary));
+  }
+  if (primaryAnchor?.price) {
+    parts.push(`유효 앵커 ${formatPullbackSupportPrice(primaryAnchor.price)} (${formatPullbackSupportDaysAgo(primaryAnchor.lastSeenDaysAgo)})`);
+  }
+  return parts.join(' · ');
+}
+
+function buildPullbackSupportEvidenceCards(context = {}) {
+  const support = context.support || {};
+  const families = getPullbackRepresentativeFamilyLines(context);
+  const mergedLines = Array.isArray(support.lines) ? support.lines.slice(0, 2) : [];
+  const cards = [];
+  mergedLines.forEach(line => {
+    const toneClass = line.role === 'primary' ? 'clear' : 'unknown';
+    const distanceText = typeof line.distancePct === 'number' ? `${line.distancePct.toFixed(2)}% 아래` : '거리 미산출';
+    const familiesText = Array.isArray(line.familyLabels) ? line.familyLabels.join(' · ') : '';
+    cards.push(`
+      <div class="modal-ind-card ${toneClass}">
+        <div class="modal-ind-icon">${line.role === 'primary' ? '🧱' : '➖'}</div>
+        <div class="modal-ind-content">
+          <div class="modal-ind-title">${escapeHtml(line.label || '지지선')}</div>
+          <div class="modal-ind-result">→ ${escapeHtml(formatPullbackSupportPrice(line.price))} · ${escapeHtml(distanceText)}</div>
+          <div class="modal-ind-value">📐 family ${Number(line.familyCount || 0)}개 / 반복 ${Number(line.count || 0)}회 / 최근 ${escapeHtml(formatPullbackSupportDaysAgo(line.lastSeenDaysAgo))}${familiesText ? ` / ${escapeHtml(familiesText)}` : ''}</div>
+        </div>
+      </div>
+    `);
+  });
+  families.forEach(line => {
+    const familyMeta = PULLBACK_SUPPORT_FAMILY_META[line.family] || { shortLabel: line.familyLabel || line.label || '지지', icon: '•' };
+    const distanceText = typeof line.distancePct === 'number' ? `${line.distancePct.toFixed(2)}% 아래` : '거리 미산출';
+    cards.push(`
+      <div class="modal-ind-card ${line.valid ? 'clear' : 'unknown'}">
+        <div class="modal-ind-icon">${escapeHtml(familyMeta.icon)}</div>
+        <div class="modal-ind-content">
+          <div class="modal-ind-title">${escapeHtml(familyMeta.shortLabel)} 근거</div>
+          <div class="modal-ind-result">→ ${escapeHtml(formatPullbackSupportPrice(line.price))} · ${escapeHtml(distanceText)}</div>
+          <div class="modal-ind-value">📐 반복 ${Number(line.count || 0)}회 / 최근 ${escapeHtml(formatPullbackSupportDaysAgo(line.lastSeenDaysAgo))}</div>
+        </div>
+      </div>
+    `);
+  });
+  return cards.join('');
+}
+
+function renderPullbackSupportModalSection(context = {}) {
+  if (!context?.support) return '';
+  const support = context.support;
+  const primaryLine = support.primaryLine || null;
+  const strengthBadge = getPullbackSupportStrengthBadgeMeta(support);
+  const warningBadge = getPullbackSupportWarningBadgeMeta(support);
+  const badgeRow = [
+    `<span class="pullback-support-badge ${strengthBadge.cls}">${escapeHtml(strengthBadge.text)}</span>`,
+    `<span class="pullback-support-badge ${warningBadge.cls}">${escapeHtml(warningBadge.text)}</span>`,
+    primaryLine?.price ? `<span class="pullback-support-badge primary">주지지 ${escapeHtml(formatPullbackSupportPrice(primaryLine.price))}</span>` : ''
+  ].filter(Boolean).join('');
+
+  return `
+    <div>
+      <div class="modal-section-label">지지선 구조</div>
+      <div class="pullback-support-badges">${badgeRow}</div>
+      ${support.summary ? `<div class="buy-detail-note"><strong>요약</strong><span>${escapeHtml(support.summary)}</span></div>` : ''}
+      ${support.warningReason ? `<div class="buy-detail-note"><strong>경고</strong><span>${escapeHtml(support.warningReason)}</span></div>` : ''}
+      <div class="modal-ind-list">
+        ${buildPullbackSupportEvidenceCards(context)}
+      </div>
+    </div>
+  `;
+}
+
+window.renderPullbackSupportModalSection = renderPullbackSupportModalSection;
+
+function renderPullbackCardInsights(entry) {
+  if (entry?.strategy !== 'pullback' || !entry?.pullbackContext) return '';
+  const context = entry.pullbackContext;
+  const support = context.support || {};
+  const supportTags = buildPullbackSupportCardTags(context);
+  const volumeHistoryText = buildPullbackVolumeHistoryText(context);
+
+  if (!supportTags && !support.summary && !volumeHistoryText) return '';
+
+  return `
+    <div class="buy-card-insight">
+      ${supportTags ? `<div class="buy-card-support-lines">${supportTags}</div>` : ''}
+      ${support.summary ? `<div class="buy-card-insight-line"><strong>지지선</strong><span>${escapeHtml(support.summary)}</span></div>` : ''}
+      ${volumeHistoryText ? `<div class="buy-card-insight-line"><strong>거래량 이력</strong><span>${escapeHtml(volumeHistoryText)}</span></div>` : ''}
+    </div>
+  `;
+}
+
+function getVolatilityStateLabel(state) {
+  if (state === 'calm') return '저변동성';
+  if (state === 'volatile') return '고변동성';
+  return '중립 변동성';
+}
+
+function getVolatilityFitLabel(fit) {
+  if (fit === 'favorable') return '유리';
+  if (fit === 'slight_favorable') return '다소 유리';
+  if (fit === 'unfavorable') return '불리';
+  return '중립';
+}
+
+function getVolatilityToneClass(fit) {
+  if (fit === 'favorable' || fit === 'slight_favorable') return 'clear';
+  if (fit === 'unfavorable') return 'triggered';
+  return 'unknown';
+}
+
+function getVolatilityDeltaToneClass(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || Math.abs(numeric) < 1e-9) return 'unknown';
+  return numeric > 0 ? 'clear' : 'triggered';
+}
+
+function getVolatilityFitBadgeText(fit) {
+  if (fit === 'favorable' || fit === 'slight_favorable') return '✅ 변동성 유리';
+  if (fit === 'unfavorable') return '⛔ 변동성 불리';
+  return '➖ 변동성 중립';
+}
+
+function getVolatilityDeltaBadgeText(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || Math.abs(numeric) < 1e-9) return '➖ 점수 보정 0.00점';
+  if (numeric > 0) return `📈 가점 ${formatSignedVolatilityDelta(numeric)}`;
+  return `📉 감점 ${formatSignedVolatilityDelta(numeric)}`;
+}
+
+function formatSignedVolatilityDelta(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return '0.00점';
+  return `${numeric >= 0 ? '+' : ''}${numeric.toFixed(2)}점`;
+}
+
+function trimVolatilitySummaryText(summary) {
+  const raw = String(summary || '').trim();
+  const match = raw.match(/^[^(]+\((.*)\)$/);
+  return (match ? match[1] : raw).trim();
+}
+
+function trimVolatilityReasonText(context = {}) {
+  const reason = String(context.reason || '').trim();
+  if (!reason) return '';
+  const metricsMarker = reason.indexOf(' VKOSPI ');
+  return (metricsMarker >= 0 ? reason.slice(0, metricsMarker) : reason).trim().replace(/\s+/g, ' ');
+}
+
+function buildVolatilityStateTriplet(context = {}) {
+  return [
+    `시장 ${getVolatilityStateLabel(context.marketState)}`,
+    `종목 ${getVolatilityStateLabel(context.stockState)}`,
+    `혼합 ${getVolatilityStateLabel(context.blendedState)}`
+  ].join(' / ');
+}
+
+function buildVolatilityBadgeRow(context = {}) {
+  const toneClass = getVolatilityToneClass(context.strategyFit);
+  const deltaToneClass = getVolatilityDeltaToneClass(context.scoreDelta);
+  return [
+    `<span class="buy-card-support-tag volatility-fit ${toneClass}">${escapeHtml(getVolatilityFitBadgeText(context.strategyFit))}</span>`,
+    `<span class="buy-card-support-tag volatility-state ${toneClass}">${escapeHtml(getVolatilityStateLabel(context.blendedState))}</span>`,
+    `<span class="buy-card-support-tag volatility-delta ${deltaToneClass}">${escapeHtml(getVolatilityDeltaBadgeText(context.scoreDelta))}</span>`
+  ].join('');
+}
+
+function renderVolatilityTopBadges(entry) {
+  const context = entry?.volatilityContext;
+  if (!context?.summary) return '';
+  return `<div class="buy-card-top-badges">${buildVolatilityBadgeRow(context)}</div>`;
+}
+
+function renderVolatilityCardInsights(entry) {
+  const context = entry?.volatilityContext;
+  if (!context?.summary) return '';
+  const toneClass = getVolatilityToneClass(context.strategyFit);
+  const stateTriplet = buildVolatilityStateTriplet(context);
+  const summaryText = trimVolatilitySummaryText(context.summary);
+  return `
+    <div class="buy-card-insight volatility ${toneClass}">
+      <div class="buy-card-insight-line"><strong>변동성 적합</strong><span>${escapeHtml(summaryText)}</span></div>
+      <div class="buy-card-insight-line"><strong>장세 판정</strong><span>${escapeHtml(stateTriplet)}</span></div>
+    </div>
+  `;
+}
+
+function renderVolatilityModalSection(context = {}) {
+  if (!context?.summary) return '';
+  const toneClass = getVolatilityToneClass(context.strategyFit);
+  const metrics = context.metrics || {};
+  const reasonSummary = trimVolatilityReasonText(context) || context.summary;
+  const stateTriplet = buildVolatilityStateTriplet(context);
+  const summaryText = trimVolatilitySummaryText(context.summary);
+  const metricRows = [
+    Number.isFinite(Number(metrics.vkospi)) ? `VKOSPI ${Number(metrics.vkospi).toFixed(2)}` : '',
+    Number.isFinite(Number(metrics.atrPct10)) ? `ATR10 ${Number(metrics.atrPct10).toFixed(2)}%` : '',
+    Number.isFinite(Number(metrics.returnStd20)) ? `20일 표준편차 ${Number(metrics.returnStd20).toFixed(2)}%` : '',
+    Number.isFinite(Number(metrics.todayRangePct)) ? `당일 레인지 ${Number(metrics.todayRangePct).toFixed(2)}%` : ''
+  ].filter(Boolean).join(' / ');
+
+  return `
+    <div>
+      <div class="modal-section-label">변동성 적합도</div>
+      <div class="pullback-support-badges">${buildVolatilityBadgeRow(context)}</div>
+      <div class="modal-ind-list">
+        <div class="modal-ind-card ${toneClass}">
+          <div class="modal-ind-icon">${toneClass === 'clear' ? '🌊' : toneClass === 'triggered' ? '⚠️' : '➖'}</div>
+          <div class="modal-ind-content">
+            <div class="modal-ind-title">${escapeHtml(context.strategyLabel || '현재 전략')} 유불리</div>
+            <div class="modal-ind-result">→ ${escapeHtml(summaryText)}</div>
+            <div class="modal-ind-value">📐 ${escapeHtml(stateTriplet)} / 보정 ${escapeHtml(formatSignedVolatilityDelta(context.scoreDelta))}</div>
+          </div>
+        </div>
+        <div class="modal-ind-card unknown">
+          <div class="modal-ind-icon">🧭</div>
+          <div class="modal-ind-content">
+            <div class="modal-ind-title">판정 해석</div>
+            <div class="modal-ind-result">→ ${escapeHtml(reasonSummary)}</div>
+            <div class="modal-ind-value">📐 ${escapeHtml(stateTriplet)}</div>
+          </div>
+        </div>
+        <div class="modal-ind-card unknown">
+          <div class="modal-ind-icon">📊</div>
+          <div class="modal-ind-content">
+            <div class="modal-ind-title">사용 지표</div>
+            <div class="modal-ind-result">→ 최근 일봉 변동성과 VKOSPI를 함께 반영합니다.</div>
+            ${metricRows ? `<div class="modal-ind-value">📐 ${escapeHtml(metricRows)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function getSellStrategyStageMeta(stage) {
   const stageMap = {
     premarket: { icon: '🌅', title: '프리마켓 익절', shortTitle: '프리마켓' },
@@ -577,7 +880,9 @@ function renderSellStockCards() {
           <div class="scard-head">
             <div>
               <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
-              <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}</div>
+              <div class="scard-code-wrap">
+                <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}${renderMarketCapInlineHtml(getEntryByCode(stock.code))}</div>
+              </div>
             </div>
             <div class="scard-badges">
               <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
@@ -618,10 +923,12 @@ function renderSwingCards() {
     container.innerHTML += `
       <div class="scard swing-card" id="card-${stock.code}">
         <div class="scard-head">
-          <div>
-            <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
-            <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}</div>
-          </div>
+            <div>
+              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
+              <div class="scard-code-wrap">
+                <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}${renderMarketCapInlineHtml(getEntryByCode(stock.code))}</div>
+              </div>
+            </div>
           <div class="scard-badges">
             <span class="badge badge-shift" id="gap-shift-${stock.code}" style="display:none"></span>
             <span class="badge badge-swing" id="badge-${stock.code}">스윙 보유</span>
@@ -691,7 +998,7 @@ function renderBuyMarketHoldBanner() {
       <div class="market-hold-banner-body">
         <div class="market-hold-banner-title">오늘은 전 종목 종가 베팅 보류 권고</div>
         <div class="market-hold-banner-desc">
-          ${marketDesc ? `${escapeHtml(marketDesc)} — KOSPI 단기 추세 이탈로 거시 G5 차단.` : '거시 시장 조건 미충족으로 진입 보류.'}
+          ${marketDesc ? `${escapeHtml(marketDesc)} — 시장 Gate 차단으로 신규 진입 보류.` : '시장 Gate 차단으로 신규 진입 보류.'}
           ${setupWeakCount > 0 ? ` (셋업 미흡 ${setupWeakCount}건 포함)` : ''}
         </div>
         <div class="market-hold-banner-sub">
@@ -742,6 +1049,12 @@ function renderBuyStockCards() {
       const liveMetaHtml = presentation.liveRefresh
         ? `<div class="buy-live-meta">${buildBuyLivePillsHtml(entry, presentation, { includeStrategyStatus: false, includeTargetPrice: true, includeAsOf: true })}</div>`
         : '';
+      const volatilityTopBadgesHtml = renderVolatilityTopBadges(entry);
+      const pullbackInsightHtml = renderPullbackCardInsights(entry);
+      const volatilityInsightHtml = renderVolatilityCardInsights(entry);
+      const statusReasonHtml = presentation.primaryStatusReasonShort
+        ? `<div class="buy-card-status-reason">${escapeHtml(presentation.primaryStatusReasonShort)}</div>`
+        : '';
 
       // setupQuality 배지: market_hold는 노란색 "시장 보류", setup_weak는 회색 "셋업 미흡"
       const sq = entry.setupQuality;
@@ -757,7 +1070,7 @@ function renderBuyStockCards() {
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}</div>
               <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
-              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}</div>
+              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry)}</div>
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">
@@ -768,8 +1081,12 @@ function renderBuyStockCards() {
               <div class="buy-score-caption ${presentation.changed.adjustment ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</div>
             </div>
           </div>
+          ${volatilityTopBadgesHtml}
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
+          ${statusReasonHtml}
           ${setupBadgeHtml}
+          ${pullbackInsightHtml}
+          ${volatilityInsightHtml}
           <div class="buy-card-tags">
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
@@ -973,8 +1290,13 @@ function getRegimeReportSummaryRows() {
   return notionSnapshot.regimeTable.filter(row => row.item && row.value && !('verdict' in row));
 }
 
+function sanitizeUiText(value) {
+  if (typeof sanitizeText === 'function') return sanitizeText(value);
+  return String(value || '').trim();
+}
+
 function getVerdictTone(value) {
-  const text = sanitizeText(value);
+  const text = sanitizeUiText(value);
   if (!text) return 'unknown';
   if (/[✅🟢]|확정|우호|허용|활성/.test(text)) return 'clear';
   if (/[❌🔴⛔]|약세|금지|비활성|경고/.test(text)) return 'triggered';
@@ -982,7 +1304,7 @@ function getVerdictTone(value) {
 }
 
 function getRegimeBadgeMeta(regimeValue) {
-  const regime = sanitizeText(regimeValue);
+  const regime = sanitizeUiText(regimeValue);
   if (!regime) return { label: '미확인', tone: 'unknown' };
   if (regime.includes('강세장')) return { label: '강세장', tone: 'bull' };
   if (regime.includes('순환매장')) return { label: '순환매장', tone: 'rotation' };
@@ -991,12 +1313,38 @@ function getRegimeBadgeMeta(regimeValue) {
   return { label: regime, tone: 'unknown' };
 }
 
+function parseRegimeVkospiValue(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const text = String(value);
+  const match = text.match(/([\d.]+)(?!.*[\d.])/);
+  if (!match) return null;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getMarketVolatilityBadgeMeta(info = null) {
+  const regime = sanitizeUiText(info?.regime || '');
+  const vkospi = parseRegimeVkospiValue(info?.vkospi);
+  if (!regime && !Number.isFinite(vkospi)) {
+    return { label: '변동성 미확인', tone: 'unknown' };
+  }
+  if (regime.includes('강세장') && Number.isFinite(vkospi) && vkospi < 18.5) {
+    return { label: '저변동성 장세', tone: 'calm' };
+  }
+  if ((Number.isFinite(vkospi) && vkospi >= 25) || regime.includes('박스권') || regime.includes('약세장')) {
+    return { label: '고변동성 장세', tone: 'volatile' };
+  }
+  return { label: '중립 변동성', tone: 'neutral' };
+}
+
 function updateRegimeHeader() {
   const toggleButton = document.getElementById('btn-regime-toggle');
   const summary = document.getElementById('buy-regime-summary');
   const badge = document.getElementById('regime-current-badge');
+  const volatilityBadge = document.getElementById('regime-volatility-badge');
   const info = detectCurrentRegime();
   const meta = getRegimeBadgeMeta(info?.regime || '');
+  const volatilityMeta = getMarketVolatilityBadgeMeta(info);
 
   if (toggleButton) {
     toggleButton.textContent = isRegimeSummaryCollapsed ? '+' : '-';
@@ -1012,14 +1360,17 @@ function updateRegimeHeader() {
     badge.textContent = meta.label;
     badge.className = `regime-current-badge ${meta.tone}`;
   }
+
+  if (volatilityBadge) {
+    volatilityBadge.textContent = volatilityMeta.label;
+    volatilityBadge.className = `regime-volatility-badge ${volatilityMeta.tone}`;
+  }
 }
 
 function toggleRegimeSummary() {
   isRegimeSummaryCollapsed = !isRegimeSummaryCollapsed;
   updateRegimeHeader();
 }
-
-  syncBodyScrollLock();
 function openRegimeReport() {
   const info = detectCurrentRegime();
   const body = document.getElementById('regime-report-body');
@@ -1277,11 +1628,19 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       includeTargetPrice: Boolean(presentation.liveRefresh),
       includeAsOf: Boolean(presentation.liveRefresh)
     });
+    const modalStatusReasonHtml = presentation.primaryStatusReason
+      ? `<div class="buy-modal-status-reason">${escapeHtml(presentation.primaryStatusReason)}</div>`
+      : '';
     document.getElementById('modal-name').textContent = entry.name;
     document.getElementById('modal-code').textContent = entry.code;
     document.getElementById('modal-type').textContent = `${STRATEGY_META[entry.strategy].label} · ${entry.rank}위`;
 
     const verdictClass = presentation.verdictClass;
+    const strategyCautionHtml = renderStrategyCautionPanel(entry.strategy, {
+      sectionLabel: '⚠️ 이 종목 전략 주의사항',
+      title: `${STRATEGY_META[normalizeStrategyKey(entry.strategy)].shortLabel} 종목을 볼 때 먼저 확인할 점`,
+      cardClass: 'triggered'
+    });
 
     document.getElementById('modal-body').innerHTML = `
       <div class="buy-modal-layout">
@@ -1290,6 +1649,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
             <div>
               <div class="price-big ${presentation.changed.score ? 'buy-changed' : ''}">${escapeHtml(scoreDisplay)}${scoreSuffix}</div>
               <div class="buy-modal-scoreline"><span class="${presentation.changed.grade ? 'buy-changed' : ''}">${escapeHtml(presentation.primarySummary)}</span></div>
+              ${modalStatusReasonHtml}
             </div>
             <div class="modal-stats">
               <div class="modal-stat">
@@ -1324,6 +1684,8 @@ function openModal(codeOrEntryKey, mode = 'sell') {
               ${renderTradePlanTable(entry)}
             </div>
           </div>
+
+          ${strategyCautionHtml}
         </div>
 
         <div class="buy-modal-scroll" id="buy-modal-scroll-area">
@@ -1338,6 +1700,9 @@ function openModal(codeOrEntryKey, mode = 'sell') {
             <div class="modal-section-label">Gate 일치 여부</div>
             <div class="modal-ind-list">${renderGateList(entry)}</div>
           </div>
+
+          ${entry.strategy === 'pullback' ? renderPullbackSupportModalSection(entry.pullbackContext || {}) : ''}
+          ${renderVolatilityModalSection(entry.volatilityContext || {})}
 
           <div>
             <div class="modal-section-label">점수 breakdown (신호 vs 진입)</div>
@@ -1379,6 +1744,11 @@ function openModal(codeOrEntryKey, mode = 'sell') {
     const notionEntry = getEntryByCode(stock.code);
     const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 전략 데이터에 없습니다.</div>';
     const strategyPlanHtml = renderSellStrategyPlan(detail, false);
+    const strategyCautionHtml = renderStrategyCautionPanel(stock.type, {
+      sectionLabel: '⚠️ 이 종목 전략 주의사항',
+      title: stock.type === 'swing' ? '스윙 보유 종목에서 특히 조심할 점' : `${typeLabel.replace(/^[^\s]+\s*/, '')} 종목을 볼 때 먼저 확인할 점`,
+      cardClass: 'triggered'
+    });
 
     const triggeredRuleHtml = triggeredRule ? `
       <div class="modal-triggered-rule">
@@ -1484,6 +1854,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       ${comparisonShiftHtml}
 
       ${strategyPlanHtml}
+      ${strategyCautionHtml}
       ${gapAdjustmentHtml}
       ${triggeredRuleHtml}
       ${lossManagementHtml}
@@ -1527,12 +1898,83 @@ function closeModal() {
   syncBodyScrollLock();
 }
 
+function normalizeStrategyKey(strategy) {
+  if (strategy === 'momentum') return 'breakout';
+  return strategy;
+}
+
+const STRATEGY_CAUTION_NOTES = {
+  pullback: {
+    headline: '추세가 살아 있을 때만 눌림목입니다. 추세가 꺾이면 눌림목이 아니라 하락 전환입니다.',
+    items: [
+      '20일선·60일선 지지가 약해진 상태에서 반등만 보고 들어가면, 기술적 반등 후 재차 밀릴 가능성이 큽니다.',
+      '조정 폭이 과도하거나 거래량이 다시 늘며 음봉이 커지면 세력이 받는 구간이 아니라 매도가 쏟아지는 구간일 수 있습니다.',
+      '시장 전체가 약한 날에는 좋은 종목도 눌림 뒤 바로 회복하지 못하므로 분할 대응보다 손절 기준을 먼저 지켜야 합니다.'
+    ]
+  },
+  accumulation: {
+    headline: '매집형은 조용해서 좋아 보이지만, 조용하다는 것은 아직 시장이 확신하지 않았다는 뜻이기도 합니다.',
+    items: [
+      '거래량이 너무 마른 박스권은 수급이 들어와도 돌파까지 시간이 오래 걸려 자금이 묶일 수 있습니다.',
+      '외인·기관 순매수가 찍혀도 실제 주도 수급으로 이어지지 않으면 박스 하단 재시험이 반복될 수 있습니다.',
+      '재료 확인 없이 횡보만 보고 매집으로 해석하면, 상승 준비가 아니라 관심 소멸 구간을 잘못 잡을 위험이 큽니다.'
+    ]
+  },
+  breakout: {
+    headline: '돌파매매는 가장 강해 보일 때 사지만, 실패하면 가장 빠르게 손익비가 무너지는 전략입니다.',
+    items: [
+      '변동성 장세에서는 장중 돌파가 윗꼬리·되밀림으로 끝나기 쉬워 종가 기준 실패 돌파가 자주 나옵니다.',
+      '고점 근처 추격 진입이 되면 손절 폭은 커지고 기대수익은 줄어, 다음 날 갭하락이나 시초가 이탈 때 회복이 어렵습니다.',
+      '거래량만 터지고 종가 힘이 약하면 세력 매집이 아니라 분배일 수 있으므로, 강마감이 무너지면 더 보수적으로 봐야 합니다.'
+    ]
+  },
+  reversal: {
+    headline: '급락 반등은 수익이 빨리 날 수 있지만, 바닥 확인 전에 잡으면 낙하하는 칼을 받는 매매가 됩니다.',
+    items: [
+      '악재가 끝나지 않은 종목은 첫 반등 뒤 재차 저점을 깨는 경우가 많아, 평균단가를 낮추는 대응이 특히 위험합니다.',
+      '역추세 매매는 본전 심리가 붙기 쉬워 손절이 늦어지므로, 보유 기간과 최대 손실을 더 짧고 명확하게 관리해야 합니다.',
+      '대형주라도 패닉 구간에서는 체결강도와 수급이 하루 만에 뒤집힐 수 있어, 반등 확인 전 선진입은 피하는 편이 낫습니다.'
+    ]
+  },
+  swing: {
+    headline: '스윙 전환 종목은 하루 버텼다고 안전한 것이 아니라, 갭과 추세 훼손 리스크를 밤새 떠안는 상태입니다.',
+    items: [
+      '종가 기준으로 괜찮아 보여도 다음 날 시가가 크게 이탈하면 장중 대응보다 불리한 가격에서 시작할 수 있습니다.',
+      '스윙은 손실 만회를 기다리는 구간이 아니라, 반등 조건과 철수 조건이 모두 살아 있을 때만 유지해야 합니다.',
+      '기존 종가베팅 논리가 훼손된 상태에서 시간만 늘리면 전략 전환이 아니라 손실 이연이 될 수 있습니다.'
+    ]
+  }
+};
+
+function renderStrategyCautionPanel(strategy, options = {}) {
+  const normalizedStrategy = normalizeStrategyKey(strategy);
+  const caution = STRATEGY_CAUTION_NOTES[normalizedStrategy];
+  if (!caution) return '';
+  const sectionLabel = options.sectionLabel || '⚠️ 전략 주의사항';
+  const title = options.title || '주의를 강하게 봐야 하는 이유';
+  const cardClass = options.cardClass || 'triggered';
+  return `
+    <div class="modal-triggered-rule">
+      <div class="modal-section-label">${sectionLabel}</div>
+      <div class="modal-ind-card ${cardClass}">
+        <div class="modal-ind-icon">⚠️</div>
+        <div class="modal-ind-content">
+          <div class="modal-ind-title">${escapeHtml(title)}</div>
+          <div class="modal-ind-result">→ ${escapeHtml(caution.headline)}</div>
+          <div class="modal-ind-criterion">${caution.items.map(item => `<span>• ${escapeHtml(item)}</span>`).join('<br>')}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 const STRATEGY_INFO_CONTENT = {
   pullback: {
     title: '타입 1: 눌림목 종가베팅 (전략 ①)',
-    subtitle: '"잘 나가는 주식이 일시적으로 조정을 받고 반등할 때를 노린다"',
+    subtitle: '정배열 우량주의 조정 구간을 공략하는 추세 추종 전략',
     body: `
       <p><strong>개념:</strong> 중장기적으로 우상향(정배열)하는 우량 주식이 단기적으로 조정을 받아 가격이 싸졌을 때, 반등 직전의 타이밍을 잡아서 종가에 매수하는 추세 추종형 전략입니다.</p>
+      ${renderStrategyCautionPanel('pullback', { sectionLabel: '⚠️ 꼭 주의할 점', title: '추세가 꺾인 눌림은 매수 기회가 아니라 손절 구간일 수 있습니다.' })}
       <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
       <ul style="padding-left: 20px; margin-top: 8px;">
         <li><strong>정배열:</strong> 5일 이동평균선(MA)이 20일 이동평균선보다 위에 있고, 둘 다 우상향 중이어야 합니다.</li>
@@ -1552,6 +1994,7 @@ const STRATEGY_INFO_CONTENT = {
     subtitle: '"주도주의 전고점·신고가 돌파 직후, 수급이 따라붙을 때"',
     body: `
       <p><strong>개념:</strong> 시장 대비 강한 주도주가 52주·20일 고점권을 돌파하고 거래량·강마감·양매수가 확인될 때 종가에 진입하는 전략입니다. 돌파 후 +5% 이내·당일 +12% 이하로 상따 구간을 배제합니다.</p>
+      ${renderStrategyCautionPanel('breakout', { sectionLabel: '⚠️ 꼭 주의할 점', title: '변동성 장세에서는 가장 먼저 의심해야 할 전략입니다.' })}
       <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">핵심 Gate:</div>
       <ul style="padding-left: 20px; margin-top: 8px;">
         <li>RS·초과수익·52주 92% 이상·거래대금 TOP100</li>
@@ -1571,6 +2014,7 @@ const STRATEGY_INFO_CONTENT = {
     subtitle: '"조용히 쌓이는 구간에서 수급이 먼저 들어올 때"',
     body: `
       <p><strong>개념:</strong> 장기 추세는 유지되지만 52주 고점권(92% 이상)에 있지 않고, 거래량이 줄어든 횡보·눌림 구간에서 외인·기관이 연속 매수하는 종목을 종가에 매수합니다. 돌파형과 Gate G2로 상호 배타됩니다.</p>
+      ${renderStrategyCautionPanel('accumulation', { sectionLabel: '⚠️ 꼭 주의할 점', title: '조용하다는 이유만으로 안전한 구간이라고 보면 안 됩니다.' })}
       <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">핵심 Gate:</div>
       <ul style="padding-left: 20px; margin-top: 8px;">
         <li>52주 고가 &lt; 92%, 거래량 &lt; 20일 평균 120%</li>
@@ -1584,6 +2028,7 @@ const STRATEGY_INFO_CONTENT = {
     subtitle: '"초대형 우량주가 갑자기 폭락했을 때, 첫 반등의 꼬리를 잡는다"',
     body: `
       <p><strong>개념:</strong> 시장을 주도하던 대형·준대형 리더주(시총 8조 원 이상)가 단기 악재 등으로 패닉 셀링(급락)을 겪은 후, 매도가 멈추고 강한 매수세가 처음 유입되는 순간 진입하는 역추세(낙주) 매매입니다. (안정성을 위해 별도 트랙으로 격리 운용하며, 최대 3일만 보유하고 무조건 청산합니다.)</p>
+      ${renderStrategyCautionPanel('reversal', { sectionLabel: '⚠️ 꼭 주의할 점', title: '반등이 보여도 바닥이 확인된 것은 아닙니다.' })}
       <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
       <ul style="padding-left: 20px; margin-top: 8px;">
         <li><strong>시총 8조 원 이상:</strong> 소형주는 배제하되, 대형·준대형 리더주까지 포함해 반등 후보 풀을 넓힙니다.</li>

@@ -180,6 +180,14 @@ def _fill_from_bar(
     }
 
 
+def _is_session_close_bar(bar: dict[str, Any]) -> bool:
+    phase = str(bar.get("phase") or "").strip().lower()
+    if "session_cutoff" in phase or phase.endswith("_close"):
+        return True
+    timestamp = str(bar.get("timestamp") or "")
+    return "T15:00" in timestamp or "T15:30" in timestamp
+
+
 def simulate_exit_plan(
     *,
     orders: list[dict[str, Any]],
@@ -210,7 +218,7 @@ def simulate_exit_plan(
             break
         timestamp = str(bar.get("timestamp") or "")
         high_price = float(bar.get("high") or 0.0)
-        low_price = float(bar.get("low") or 0.0)
+        close_price = float(bar.get("close") or 0.0)
         hit_targets: list[dict[str, Any]] = []
         if (
             primary_target
@@ -229,39 +237,6 @@ def simulate_exit_plan(
             and high_price >= float(secondary_target.get("requestedPrice") or 0.0)
         ):
             hit_targets.append(secondary_target)
-        stop_hit = bool(
-            stop_order
-            and stop_order.get("finalStatus") == "open"
-            and low_price > 0
-            and low_price <= float(stop_order.get("requestedPrice") or 0.0)
-        )
-
-        if stop_hit and hit_targets and ambiguous_policy == "stop_first":
-            ambiguous += 1
-            qty = remaining
-            stop_order["finalStatus"] = "filled"
-            fills.append(_fill_from_bar(stop_order, bar, qty=qty, fill_rule="ambiguous_stop_first", fill_status="ambiguous"))
-            for order in pending_targets.values():
-                if order.get("finalStatus") == "open":
-                    order["finalStatus"] = "cancelled"
-            if final_order and final_order.get("finalStatus") == "open":
-                final_order["finalStatus"] = "cancelled"
-            remaining = 0.0
-            closed_reason = "ambiguous_stop_first"
-            break
-
-        if stop_hit:
-            qty = remaining
-            stop_order["finalStatus"] = "filled"
-            fills.append(_fill_from_bar(stop_order, bar, qty=qty, fill_rule="stop_touch"))
-            for order in pending_targets.values():
-                if order.get("finalStatus") == "open":
-                    order["finalStatus"] = "cancelled"
-            if final_order and final_order.get("finalStatus") == "open":
-                final_order["finalStatus"] = "cancelled"
-            remaining = 0.0
-            closed_reason = "stop_touch"
-            break
 
         for order in hit_targets:
             if remaining <= 0:
@@ -283,6 +258,37 @@ def simulate_exit_plan(
                 final_order["finalStatus"] = "cancelled"
             closed_reason = fill_rule
             remaining = 0.0
+
+        if remaining <= 0:
+            break
+
+        stop_hit = bool(
+            stop_order
+            and stop_order.get("finalStatus") == "open"
+            and _is_session_close_bar(bar)
+            and close_price > 0
+            and close_price <= float(stop_order.get("requestedPrice") or 0.0)
+        )
+
+        if stop_hit:
+            qty = remaining
+            stop_order["finalStatus"] = "filled"
+            fills.append(
+                _fill_from_bar(
+                    stop_order,
+                    bar,
+                    qty=qty,
+                    fill_rule="stop_close",
+                    fill_price=close_price,
+                )
+            )
+            for order in pending_targets.values():
+                if order.get("finalStatus") == "open":
+                    order["finalStatus"] = "cancelled"
+            if final_order and final_order.get("finalStatus") == "open":
+                final_order["finalStatus"] = "cancelled"
+            remaining = 0.0
+            closed_reason = "stop_close"
             break
 
     if remaining > 0 and auto_flatten and final_exit_at:
@@ -304,7 +310,7 @@ def simulate_exit_plan(
                     requested_at=str(final_bar.get("timestamp") or ""),
                     requested_price=float(final_bar.get("close") or 0.0),
                     quantity_pct=remaining,
-                    reason="3일차 10시 컷오프 청산",
+                    reason="3일차 종가 컷오프 청산",
                     source_entry_key=str(orders[0].get("sourceEntryKey") or ""),
                     stage_key="finalCutoff",
                 )
@@ -474,7 +480,7 @@ def simulate_trade(
             requested_at=final_exit_at,
             requested_price=float(replay_bars[-1].get("close") or 0.0) if replay_bars else 0.0,
             quantity_pct=100.0,
-            reason="3일차 10시 컷오프 청산",
+            reason="3일차 종가 컷오프 청산",
             source_entry_key=source_entry_key,
             stage_key="finalCutoff",
             active_from=final_exit_at,
