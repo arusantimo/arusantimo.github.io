@@ -864,6 +864,14 @@ function renderSellStrategyPlan(detail, compact = false) {
 }
 
 function renderSellStockCards() {
+  const allVisibleStocks = [
+    ...(stocks.pullback || []),
+    ...(stocks.accumulation || []),
+    ...(stocks.breakout || []),
+    ...(stocks.reversal || []),
+    ...(stocks.swing || [])
+  ];
+  const marketCapRankMap = buildMarketCapRankMap(allVisibleStocks);
   const renderGroup = (arr, containerId) => {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -875,13 +883,14 @@ function renderSellStockCards() {
 
     arr.forEach(stock => {
       const planHtml = buildSellCardPlanSummary(stock.code);
+      const entry = getEntryByCode(stock.code);
       container.innerHTML += `
         <div class="scard" id="card-${stock.code}">
           <div class="scard-head">
             <div>
               <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
               <div class="scard-code-wrap">
-                <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}${renderMarketCapInlineHtml(getEntryByCode(stock.code))}</div>
+                <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry || stock, marketCapRankMap)}</div>
               </div>
             </div>
             <div class="scard-badges">
@@ -926,7 +935,7 @@ function renderSwingCards() {
             <div>
               <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
               <div class="scard-code-wrap">
-                <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}${renderMarketCapInlineHtml(getEntryByCode(stock.code))}</div>
+                <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}${renderMarketCapInlineHtml(getEntryByCode(stock.code), marketCapRankMap)}</div>
               </div>
             </div>
           <div class="scard-badges">
@@ -1027,6 +1036,12 @@ function renderBuyStockCards() {
   if (typeof updateJonggaReplayViewControls === 'function') {
     updateJonggaReplayViewControls(getActiveBuySnapshot());
   }
+  const marketCapRankMap = buildMarketCapRankMap([
+    ...(filterEntries(notionSnapshot.pullbackEntries || [])),
+    ...(filterEntries(notionSnapshot.accumulationEntries || [])),
+    ...(filterEntries(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || [])),
+    ...(filterEntries(notionSnapshot.reversalEntries || []))
+  ]);
 
   const renderGroup = (entries, containerId) => {
     const container = document.getElementById(containerId);
@@ -1070,7 +1085,7 @@ function renderBuyStockCards() {
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}</div>
               <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
-              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry)}</div>
+              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry, marketCapRankMap)}</div>
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">

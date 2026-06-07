@@ -118,8 +118,20 @@ test('market regime header volatility badge follows regime and VKOSPI thresholds
   assert.equal(neutral.tone, 'neutral');
 });
 
-test('market cap helper renders one-line market cap text', () => {
+test('market cap helper keeps full formatter and compact line output', () => {
   const context = loadUiContext();
   assert.equal(context.formatMarketCapTrillion(40), '시총 400,000.0억 (40.0조)');
-  assert.match(context.renderMarketCapLineHtml({ marketCapTrillion: 40 }), /시총 400,000\.0억 \(40\.0조\)/);
+  assert.equal(context.renderMarketCapLineHtml({ marketCapTrillion: 40 }), '<div class="stock-code-cap market-cap-amount">40.0조</div>');
+});
+
+test('market cap inline helper can insert a rank badge before the amount', () => {
+  const context = loadUiContext();
+  const rankMap = context.buildMarketCapRankMap([
+    { entryKey: 'A', marketCapTrillion: 40 },
+    { entryKey: 'B', marketCapTrillion: 20 },
+    { entryKey: 'C', marketCapTrillion: 5 }
+  ]);
+
+  const html = context.renderMarketCapInlineHtml({ entryKey: 'A', marketCapTrillion: 40 }, rankMap);
+  assert.match(html, /^<span class="market-cap-rank-badge market-cap-rank-top10">시총 1위<\/span><span class="stock-code-cap stock-code-cap-inline market-cap-amount" style="color: rgb\(59, 130, 246\);">40\.0조<\/span>$/);
 });

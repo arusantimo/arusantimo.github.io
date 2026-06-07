@@ -168,6 +168,13 @@ renderSellStockCards = function renderSellStockCardsOverride() {
   renderSellUniverseControls();
   const mode = getSellUniverseMode(activeSellSlot);
   const groups = getVisibleSellStockCollections(activeSellSlot);
+  const marketCapRankMap = buildMarketCapRankMap([
+    ...(groups.swing || []),
+    ...(groups.pullback || []),
+    ...(groups.accumulation || []),
+    ...(groups.breakout || []),
+    ...(groups.reversal || [])
+  ]);
 
   const renderGroup = (arr, containerId, type) => {
     const container = document.getElementById(containerId);
@@ -188,7 +195,7 @@ renderSellStockCards = function renderSellStockCardsOverride() {
           <div class="scard-head">
             <div>
               <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
-              <div class="scard-code">${escapeHtml(stock.code)}${slotLabel ? ` · ${slotLabel}` : ''}${renderMarketCapInlineHtml(stock)}</div>
+              <div class="scard-code">${escapeHtml(stock.code)}${slotLabel ? ` · ${slotLabel}` : ''}${renderMarketCapInlineHtml(stock, marketCapRankMap)}</div>
             </div>
             <div class="scard-badges">
               ${slotLabel ? `<span class="badge badge-page">${slotLabel}</span>` : ''}
@@ -247,6 +254,12 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
   if (typeof updateJonggaReplayViewControls === 'function') {
     updateJonggaReplayViewControls(getActiveBuySnapshot());
   }
+  const marketCapRankMap = buildMarketCapRankMap([
+    ...(filterEntries(notionSnapshot.pullbackEntries || [])),
+    ...(filterEntries(notionSnapshot.accumulationEntries || [])),
+    ...(filterEntries(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || [])),
+    ...(filterEntries(notionSnapshot.reversalEntries || []))
+  ]);
 
   const renderGroup = (entries, containerId) => {
     const container = document.getElementById(containerId);
@@ -276,7 +289,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}${slotLabel ? ` · ${slotLabel}` : ''}</div>
               <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
-              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry)}</div>
+              <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry, marketCapRankMap)}</div>
             </div>
             <div class="buy-card-scorebox">
               <div class="buy-score ${presentation.changed.score ? 'buy-changed' : ''}">

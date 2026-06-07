@@ -128,14 +128,112 @@ function formatMarketCapTrillion(value) {
   return `시총 ${billions}억 (${trillions}조)`;
 }
 
-function renderMarketCapLineHtml(entryOrStock) {
-  const text = formatMarketCapTrillion(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
-  return text ? `<div class="stock-code-cap">${escapeHtml(text)}</div>` : '';
+function formatMarketCapCompactTrillion(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return '';
+  return `${num.toLocaleString('ko-KR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}조`;
 }
 
-function renderMarketCapInlineHtml(entryOrStock) {
-  const text = formatMarketCapTrillion(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
-  return text ? `<span class="stock-code-cap stock-code-cap-inline">${escapeHtml(text)}</span>` : '';
+function getMarketCapTrillionValue(entryOrStock) {
+  const num = Number(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
+  return Number.isFinite(num) && num > 0 ? num : null;
+}
+
+function getMarketCapRankKey(entryOrStock) {
+  const code = String(entryOrStock?.code || '').trim();
+  const slotId = String(entryOrStock?.slotId || '').trim();
+  const entryKey = String(entryOrStock?.entryKey || '').trim();
+  return entryKey || (code ? `${code}:${slotId}` : '');
+}
+
+function buildMarketCapRankMap(entries) {
+  if (!Array.isArray(entries) || !entries.length) return new Map();
+  const rankedEntries = entries
+    .map(entry => ({
+      entry,
+      key: getMarketCapRankKey(entry),
+      marketCapTrillion: getMarketCapTrillionValue(entry)
+    }))
+    .filter(item => item.key && item.marketCapTrillion !== null)
+    .sort((left, right) => {
+      const diff = right.marketCapTrillion - left.marketCapTrillion;
+      if (diff !== 0) return diff;
+      return left.key.localeCompare(right.key);
+    });
+
+  return new Map(rankedEntries.map((item, index) => [item.key, index + 1]));
+}
+
+function getMarketCapRank(entryOrStock, rankMap) {
+  if (!(rankMap instanceof Map)) return null;
+  const rank = rankMap.get(getMarketCapRankKey(entryOrStock));
+  return Number.isFinite(rank) ? rank : null;
+}
+
+function renderMarketCapRankBadgeHtml(entryOrStock, rankMap) {
+  const rank = getMarketCapRank(entryOrStock, rankMap);
+  if (!rank) return '';
+  const cls = rank <= 10 ? 'market-cap-rank-top10' : rank <= 30 ? 'market-cap-rank-top30' : 'market-cap-rank-other';
+  return `<span class="market-cap-rank-badge ${cls}">시총 ${rank}위</span>`;
+}
+
+function interpolateMarketCapColor(t) {
+  const stops = [
+    { stop: 0, color: '#3b82f6' },
+    { stop: 0.33, color: '#22c55e' },
+    { stop: 0.66, color: '#facc15' },
+    { stop: 1, color: '#ffffff' }
+  ];
+  const clamped = clamp(Number(t) || 0, 0, 1);
+
+  for (let index = 0; index < stops.length - 1; index += 1) {
+    const left = stops[index];
+    const right = stops[index + 1];
+    if (clamped > right.stop) continue;
+    const range = right.stop - left.stop || 1;
+    const localT = (clamped - left.stop) / range;
+    const leftRgb = hexToRgb(left.color);
+    const rightRgb = hexToRgb(right.color);
+    if (!leftRgb || !rightRgb) return right.color;
+    const rgb = [
+      Math.round(leftRgb[0] + (rightRgb[0] - leftRgb[0]) * localT),
+      Math.round(leftRgb[1] + (rightRgb[1] - leftRgb[1]) * localT),
+      Math.round(leftRgb[2] + (rightRgb[2] - leftRgb[2]) * localT)
+    ];
+    return `rgb(${rgb.join(', ')})`;
+  }
+
+  return stops[stops.length - 1].color;
+}
+
+function hexToRgb(hex) {
+  const value = String(hex || '').replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(value)) return null;
+  return [
+    Number.parseInt(value.slice(0, 2), 16),
+    Number.parseInt(value.slice(2, 4), 16),
+    Number.parseInt(value.slice(4, 6), 16)
+  ];
+}
+
+function getMarketCapInlineStyle(entryOrStock, rankMap) {
+  const rank = getMarketCapRank(entryOrStock, rankMap);
+  const total = rankMap instanceof Map ? rankMap.size : 0;
+  if (!rank || !total) return '';
+  const t = total <= 1 ? 0 : (rank - 1) / (total - 1);
+  return ` style="color: ${interpolateMarketCapColor(t)};"`;
+}
+
+function renderMarketCapLineHtml(entryOrStock, rankMap = null) {
+  const text = formatMarketCapCompactTrillion(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
+  return text ? `<div class="stock-code-cap market-cap-amount"${getMarketCapInlineStyle(entryOrStock, rankMap)}>${escapeHtml(text)}</div>` : '';
+}
+
+function renderMarketCapInlineHtml(entryOrStock, rankMap = null) {
+  const text = formatMarketCapCompactTrillion(entryOrStock?.marketCapTrillion ?? entryOrStock?.marketCap);
+  if (!text) return '';
+  const rankBadgeHtml = renderMarketCapRankBadgeHtml(entryOrStock, rankMap);
+  return `${rankBadgeHtml}<span class="stock-code-cap stock-code-cap-inline market-cap-amount"${getMarketCapInlineStyle(entryOrStock, rankMap)}>${escapeHtml(text)}</span>`;
 }
 
 function getDailyChangeTone(value) {
