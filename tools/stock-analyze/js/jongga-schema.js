@@ -171,6 +171,21 @@ function isJonggaAutoBuyCandidate(entry = {}) {
   return /^[SA]/.test(grade) || /강력매수|매수추천|진입\s*가능|자동\s*매수/.test(status);
 }
 
+function hasMacroFreshnessIssue(dataQuality = {}) {
+  const staleKeys = Array.isArray(dataQuality?.staleKeys) ? dataQuality.staleKeys : [];
+  return staleKeys.some(key => /^macro_/.test(String(key || '')) || String(key || '') === 'macro_quotes');
+}
+
+function isRelaxedGapEStatus(statusLabel = '') {
+  const label = String(statusLabel || '').trim();
+  return [
+    '강력매수(거시경고·축소)',
+    '진입 가능(거시경고·축소)',
+    '최우선 진입(거시경고·축소)',
+    '관심후보(B·거시경고)'
+  ].includes(label);
+}
+
 function getJonggaSafetyIssues(entry = {}, context = {}) {
   const strategy = normalizeJonggaStrategy(entry.strategy || entry.type);
   const required = JONGGA_REQUIRED_RULES[strategy] || [];
@@ -191,7 +206,12 @@ function getJonggaSafetyIssues(entry = {}, context = {}) {
     }
   });
 
-  if (getJonggaGapCode(context.gapScore) === 'G-E') {
+  if (hasMacroFreshnessIssue(context.dataQuality)) {
+    issues.push({ code: 'DQ-MACRO', severity: 'block', message: '거시 시세 freshness 미확인' });
+  } else if (
+    getJonggaGapCode(context.gapScore) === 'G-E'
+    && (strategy === 'breakout' || !isRelaxedGapEStatus(entry.statusLabel))
+  ) {
     issues.push({ code: 'G-E', severity: 'block', message: '갭다운 경고 · 신규 진입 금지' });
   }
   if (context.dataQuality?.status === 'failed') {
@@ -221,7 +241,7 @@ function validateJonggaResult(payload) {
     const collections = getJonggaEntryCollections(slot);
     const seenCodes = new Set();
     const gapScore = slot.gapScore || payload.gapScore || {};
-    const dataQuality = slot.dataQuality || payload.dataQuality || {};
+    const dataQuality = { ...(payload.dataQuality || {}), ...(slot.dataQuality || {}) };
 
     JONGGA_BUY_STRATEGIES.forEach(strategy => {
       collections[strategy].forEach((entry, entryIndex) => {

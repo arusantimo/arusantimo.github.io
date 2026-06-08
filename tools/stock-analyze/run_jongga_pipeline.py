@@ -73,6 +73,9 @@ def run_unit_tests() -> int:
 
 def run_outcome_backfill(*, analysis_date: str | None, variant: str, lookback_days: int = 30) -> int:
     """과거 추천의 실제 다음날 적중 결과 백필. 비치명적 — 실패해도 파이프라인은 계속한다."""
+    from jongga.output_contract import resolve_outcome_variant_filter
+
+    resolved_variant = resolve_outcome_variant_filter(variant)
     emit("STEP", "2/5 추천 적중 백필 (어제 이전 추천의 다음날 OHLC 집계)")
     cmd = [
         sys.executable,
@@ -87,7 +90,7 @@ def run_outcome_backfill(*, analysis_date: str | None, variant: str, lookback_da
         "--lookback-days",
         str(lookback_days),
         "--variant",
-        variant,
+        resolved_variant,
     ]
     if analysis_date:
         cmd.extend(["--date", analysis_date])
@@ -105,7 +108,10 @@ def run_outcome_backfill(*, analysis_date: str | None, variant: str, lookback_da
 
 
 def run_generate(*, analysis_date: str | None, variant: str, top_limit: int) -> int:
-    emit("STEP", "3/5 라이브 수집 + 종가베팅 추천 생성 (stable · canary)")
+    from jongga.output_contract import is_canary_channel_enabled
+
+    channel_label = "stable · canary" if is_canary_channel_enabled() else "stable"
+    emit("STEP", f"3/5 라이브 수집 + 종가베팅 추천 생성 ({channel_label})")
     cmd = [
         sys.executable,
         "-m",
@@ -202,6 +208,7 @@ def select_replay_dates_from_history(
     variant: str = DEFAULT_REPLAY_VARIANT,
     since_date: date | None = None,
     required_followup_days: int = DEFAULT_REPLAY_REQUIRED_FOLLOWUP_DAYS,
+    include_cutoff_date: bool = False,
 ) -> list[date]:
     from jongga.output_contract import normalize_variant, read_history_index
 
@@ -220,7 +227,10 @@ def select_replay_dates_from_history(
         seen.add(entry_date)
         stable_dates.append(entry_date)
 
-    stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date < cutoff_date})
+    if include_cutoff_date:
+        stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date <= cutoff_date})
+    else:
+        stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date < cutoff_date})
     stable_dates = [entry_date for entry_date in stable_dates if not _is_weekend_day(entry_date)]
     if since_date:
         stable_dates = [entry_date for entry_date in stable_dates if entry_date > since_date]
@@ -242,6 +252,8 @@ def build_replay_recommendation_keys_from_history(*, history_js: str | Path, var
             continue
         date_str = str(entry.get("date") or "")
         if date_str not in allowed_dates:
+            continue
+        if str(entry.get("payloadSourceMode") or "").strip().lower() == "best_effort_legacy":
             continue
         json_file = Path(str(entry.get("jsonFile") or ""))
         if not json_file.is_absolute():
@@ -293,6 +305,7 @@ def run_replay_backtest(
         cutoff_date=cutoff_date,
         variant=variant,
         since_date=None if needs_full_rebuild else _latest_processed_replay_date(runs_path),
+        include_cutoff_date=True,
     )
     recommendation_keys = build_replay_recommendation_keys_from_history(
         history_js=history_js,
@@ -378,7 +391,9 @@ def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str
         JONGGA_OUTPUT / "jongga_data.js",
         JONGGA_OUTPUT / "replay" / "replay_runs.js",
     ]
-    if variant in {"all", "canary"}:
+    from jongga.output_contract import is_canary_channel_enabled
+
+    if is_canary_channel_enabled() and variant in {"all", "canary"}:
         required.extend(
             [
                 JONGGA_OUTPUT / month_folder / f"latest_{compact}_canary.json",
@@ -447,7 +462,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--variant",
         choices=["all", "stable", "canary"],
         default="all",
-        help="출력 채널 (기본: stable + canary)",
+        help="출력 채널 (기본: all — 카나리 비활성 시 stable만 생성)",
     )
     parser.add_argument("--top-limit", type=int, default=40, help="거래대금 TOP universe (최대 40)")
     parser.add_argument("--with-tests", action="store_true", help="생성 전 jongga 단위 테스트 실행")
@@ -492,12 +507,34 @@ def main() -> int:
     if os.getenv("OPEN_BET_FORCE_COLOR") or os.getenv("FORCE_COLOR"):
         os.environ.setdefault("FORCE_COLOR", "1")
 
+    from jongga.output_contract import VARIANT_CANARY, is_canary_channel_enabled, resolve_generation_variants
+
     args = build_parser().parse_args()
     print()
     print("  " + "=" * 58)
     print("    종가베팅 추천 데이터 파이프라인 (stock-analyze/jongga)")
     print("  " + "=" * 58)
     print()
+
+    if args.variant == VARIANT_CANARY and not is_canary_channel_enabled():
+        emit("FAIL", "카나리 채널이 비활성화되어 있습니다. --variant stable 또는 all(=stable만)을 사용하세요.")
+        print_summary(exit_code=2, quality_status="")
+        return 2
+    if args.replay_variant == VARIANT_CANARY and not is_canary_channel_enabled():
+        emit("FAIL", "카나리 replay가 비활성화되어 있습니다. --replay-variant stable 을 사용하세요.")
+        print_summary(exit_code=2, quality_status="")
+        return 2
+    if not resolve_generation_variants(args.variant):
+        emit("FAIL", "요청한 variant에 대해 생성할 채널이 없습니다.")
+        print_summary(exit_code=2, quality_status="")
+        return 2
+    try:
+        resolved_analysis_date = resolve_pipeline_analysis_date(args.date)
+    except ValueError as exc:
+        emit("FAIL", str(exc))
+        print_summary(exit_code=2, quality_status="")
+        return 2
+    analysis_date_arg = resolved_analysis_date.isoformat()
 
     run_preflight()
 
@@ -512,7 +549,7 @@ def main() -> int:
 
     if args.replay_only:
         replay_code, replay_meta = run_replay_backtest(
-            analysis_date=args.date,
+            analysis_date=analysis_date_arg,
             history_js=JONGGA_OUTPUT / "jongga_history.js",
             out_dir=JONGGA_OUTPUT,
             variant=args.replay_variant,
@@ -523,18 +560,18 @@ def main() -> int:
             print_summary(exit_code=replay_code, quality_status="", summary_label="리플레이 재검증 완료")
             return replay_code
 
-        validate_code, meta = validate_outputs(analysis_date=args.date, variant=args.variant, step_label="2/2")
+        validate_code, meta = validate_outputs(analysis_date=analysis_date_arg, variant=args.variant, step_label="2/2")
         quality_status = str(meta.get("status") or "")
         print_summary(exit_code=validate_code, quality_status=quality_status, summary_label="리플레이 재검증 완료")
         return validate_code
 
     if not args.skip_outcomes:
-        run_outcome_backfill(analysis_date=args.date, variant=args.variant)
+        run_outcome_backfill(analysis_date=analysis_date_arg, variant=args.variant)
     else:
         emit("STEP", "2/5 추천 적중 백필 — 생략(--skip-outcomes)")
 
     gen_code = run_generate(
-        analysis_date=args.date,
+        analysis_date=analysis_date_arg,
         variant=args.variant,
         top_limit=args.top_limit,
     )
@@ -544,7 +581,7 @@ def main() -> int:
 
     if not args.skip_replay:
         run_replay_backtest(
-            analysis_date=args.date,
+            analysis_date=analysis_date_arg,
             history_js=JONGGA_OUTPUT / "jongga_history.js",
             out_dir=JONGGA_OUTPUT,
             variant=args.replay_variant,
@@ -565,7 +602,7 @@ def main() -> int:
             },
         )
 
-    validate_code, meta = validate_outputs(analysis_date=args.date, variant=args.variant)
+    validate_code, meta = validate_outputs(analysis_date=analysis_date_arg, variant=args.variant)
     quality_status = str(meta.get("status") or "")
     print_summary(exit_code=validate_code, quality_status=quality_status)
     return validate_code

@@ -348,6 +348,13 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
         wyckoffFailureReason
       });
 
+      if (typeof attachStockIndicatorsToEntry === 'function') {
+        if (Number.isFinite(currentPrice) && currentPrice > 0) {
+          entry.currentPrice = currentPrice;
+        }
+        attachStockIndicatorsToEntry(entry, integrationJson, basicJson, priceHistory);
+      }
+
       renderBuyStockCards();
       if (currentModalState.mode === 'buy' && currentModalState.key === entry.entryKey && document.getElementById('modal-overlay').classList.contains('open')) {
         openModal(entry.entryKey, 'buy');
@@ -379,6 +386,7 @@ async function refreshBuyEntry(codeOrEntryKey, options = {}) {
 
   return false;
 }
+
 async function runBuyBatchRefresh() {
   const allEntries = getAllBuyEntries();
   if (!allEntries.length) return;

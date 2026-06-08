@@ -244,6 +244,7 @@ def trend_status_label(
     *,
     rise_justified: bool = False,
     technical_regime: str = "",
+    gap_is_fresh: bool = False,
 ) -> str:
     blocked_codes = [
         str(gate.get("code") or "").strip().upper()
@@ -255,10 +256,22 @@ def trend_status_label(
             return "시장 Gate 차단 · 신규 진입 보류"
         joined = ", ".join(code for code in blocked_codes if code)
         return f"매매금지(핵심 Gate 미충족{': ' + joined if joined else ''})"
-    if gap_code == "G-E":
-        return "매매금지(갭다운 경고 · 신규 진입 금지)"
     effective = str(regime_label or "")
     technical = str(technical_regime or effective)
+    if gap_code == "G-E":
+        if gap_is_fresh and (effective.startswith("강세장") or effective.startswith("순환매장")):
+            if strategy == "breakout":
+                return "매매금지(갭다운 경고 · 신규 진입 금지)"
+            if grade == "S":
+                return "강력매수(거시경고·축소)"
+            if grade == "A":
+                return "진입 가능(거시경고·축소)"
+            if strategy == "pullback" and grade == "B":
+                return "관심후보(B·거시경고)"
+            if grade == "B":
+                return "관심후보"
+            return "제외"
+        return "매매금지(갭다운 경고 · 신규 진입 금지)"
     if effective.startswith("약세장"):
         if rise_justified or (technical.startswith("약세장") and rise_justified):
             if grade == "S":
@@ -292,12 +305,21 @@ def reversal_status_label(
     *,
     rise_justified: bool = False,
     technical_regime: str = "",
+    gap_is_fresh: bool = False,
 ) -> str:
     if any(row.get("status") == "⛔" for row in filters + gates):
         return "매매금지"
     effective = str(regime_label or "")
     technical = str(technical_regime or effective)
     if gap_code == "G-E":
+        if gap_is_fresh and (effective.startswith("강세장") or effective.startswith("순환매장")):
+            if grade == "S":
+                return "최우선 진입(거시경고·축소)"
+            if grade == "A":
+                return "진입 가능(거시경고·축소)"
+            if grade == "B":
+                return "매매금지"
+            return "제외"
         return "매매금지(갭다운 경고 · 신규 진입 금지)"
     if gap_code == "G-D":
         return "매매금지(갭다운 주의 · 신규 진입 보류)"

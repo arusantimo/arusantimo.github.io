@@ -519,6 +519,97 @@ test('statusReason 필드를 갭다운 경고와 Gate 차단 근거로 정규화
   assert.match(gateEntry.statusReasonShort, /최근 20일 최대 거래량 급증 166%/);
 });
 
+test('fresh G-E 완화 상태 라벨은 safety block 없이 유지된다', () => {
+  const context = loadJonggaContext();
+  const payload = {
+    schemaVersion: 'jongga_result.v1',
+    dataQuality: { status: 'complete', staleKeys: [] },
+    slots: [{
+      slotId: 'slotA',
+      gapScore: { code: 'G-E', isFresh: true },
+      entries: {
+        pullback: [{
+          rank: 1,
+          name: '완화종목',
+          code: '005930',
+          score: 8.4,
+          grade: 'A',
+          statusLabel: '진입 가능(거시경고·축소)',
+          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9'])
+        }]
+      }
+    }]
+  };
+
+  const validation = context.validateJonggaResult(payload);
+  assert.equal(validation.ok, true);
+  assert.equal(validation.safetyBlocks.length, 0);
+
+  const entry = context.attachEntryEligibility({
+    strategy: 'pullback',
+    grade: 'A',
+    statusLabel: '진입 가능(거시경고·축소)',
+    gates: [{ code: 'G1', status: '✅' }]
+  });
+  assert.equal(entry.entryEligible, true);
+});
+
+test('G-E breakout과 stale macro는 계속 safety block으로 남는다', () => {
+  const context = loadJonggaContext();
+  const breakoutPayload = {
+    schemaVersion: 'jongga_result.v1',
+    dataQuality: { status: 'complete', staleKeys: [] },
+    slots: [{
+      slotId: 'slotA',
+      gapScore: { code: 'G-E', isFresh: true },
+      entries: {
+        breakout: [{
+          rank: 1,
+          name: '돌파종목',
+          code: '000660',
+          score: 8.5,
+          grade: 'A',
+          statusLabel: '매수추천',
+          gates: validGateMap(['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'])
+        }]
+      }
+    }]
+  };
+  const stalePayload = {
+    schemaVersion: 'jongga_result.v1',
+    dataQuality: { status: 'partial', staleKeys: ['macro_nq'] },
+    slots: [{
+      slotId: 'slotA',
+      gapScore: { code: 'G-E', isFresh: false },
+      entries: {
+        reversal: [{
+          rank: 1,
+          name: '급락반등',
+          code: '035420',
+          score: 8.8,
+          grade: 'S',
+          statusLabel: '최우선 진입(거시경고·축소)',
+          filters: {
+            F1: { status: 'passed' },
+            F2: { status: 'passed' },
+            F3: { status: 'passed' },
+            F4: { status: 'passed' }
+          },
+          gates: validGateMap(['G1', 'G2', 'G3', 'G4', 'G5'])
+        }]
+      }
+    }]
+  };
+
+  const breakoutValidation = context.validateJonggaResult(breakoutPayload);
+  const staleValidation = context.validateJonggaResult(stalePayload);
+
+  assert.equal(breakoutValidation.ok, true);
+  assert.ok(breakoutValidation.safetyBlocks.some(item => item.includes('갭다운 경고')));
+  assert.equal(staleValidation.ok, true);
+  assert.ok(staleValidation.safetyBlocks.some(item => item.includes('freshness 미확인')));
+});
+
 test('score breakdown table renders volatility synthetic row V1 그대로 노출한다', () => {
   const context = loadJonggaContext();
   const html = context.renderBuyScoreBreakdownTable({

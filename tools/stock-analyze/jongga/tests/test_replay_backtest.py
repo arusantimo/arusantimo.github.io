@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from jongga.output_contract import VARIANT_STABLE, build_daily_output_paths, read_js_assignment
+from jongga.output_contract import INPUT_ARCHIVE_VERSION, PAYLOAD_SOURCE_LIVE, VARIANT_STABLE, build_daily_output_paths, read_js_assignment
 from jongga.replay_backtest import REPLAY_RUNS_MARKER, grade_from_threshold_profile, iter_dates, normalize_analysis_dates, replay_entry_view, run_replay
 from jongga.replay_market_data import build_replay_market_data
 
@@ -15,6 +15,9 @@ class ReplayBacktestTests(unittest.TestCase):
         return {
             "analysisDate": "2026-06-03",
             "variant": "stable",
+            "payloadSourceMode": PAYLOAD_SOURCE_LIVE,
+            "inputArchiveVersion": INPUT_ARCHIVE_VERSION,
+            "rebuildable": True,
             "slots": [
                 {
                     "regime": {
@@ -289,12 +292,17 @@ class ReplayBacktestTests(unittest.TestCase):
             self.assertTrue(run_record["strategyViews"]["pullback"]["days"][0]["fills"])
             self.assertIn("gradeScore", run_record["strategyViews"]["pullback"]["days"][0]["trades"][0])
             self.assertIn("replayGrade", run_record["strategyViews"]["pullback"]["days"][0]["trades"][0])
+            self.assertEqual(run_record["strategyViews"]["pullback"]["days"][0]["candidates"][0]["payloadSourceMode"], PAYLOAD_SOURCE_LIVE)
             self.assertEqual(
                 [item["name"] for item in run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["days"][0]["trades"]],
                 ["A"],
             )
             self.assertTrue(run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["days"][0]["fills"])
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["summary"]["candidateCount"], 1)
+            self.assertEqual(
+                run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["days"][0]["candidates"][0]["historyRecommendationSourceMode"],
+                PAYLOAD_SOURCE_LIVE,
+            )
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a8plus"]["summary"]["candidateCount"], 0)
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["summary"]["candidateCount"], 1)
             self.assertEqual(

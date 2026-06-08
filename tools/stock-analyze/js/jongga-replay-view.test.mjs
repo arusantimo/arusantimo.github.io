@@ -105,6 +105,8 @@ function sampleSnapshot() {
 function sampleReplayBridge() {
   return {
     latestRun: {
+      analysisDates: ['2026-06-02', '2026-06-03'],
+      days: [{ date: '2026-06-02' }, { date: '2026-06-03' }],
       summary: {
         overall: {
           cumNetReturnPct: 0.59
@@ -189,13 +191,14 @@ test('replay view controls show counts and active mode', () => {
   assert.equal(buttons[1].classList.contains('active'), false);
   assert.equal(buttons[2].classList.contains('active'), false);
   assert.equal(buttons[3].classList.contains('active'), true);
-  assert.match(summary.innerHTML, /매수추천 2건/);
-  assert.match(summary.innerHTML, /8 & A\+ 2건/);
-  assert.match(summary.innerHTML, /7 & A 2건/);
-  assert.match(summary.innerHTML, /6\.0 & B 3건/);
-  assert.match(summary.innerHTML, /전체 6건/);
+  assert.match(summary.innerHTML, /기간 전체/);
+  assert.match(summary.innerHTML, /리플레이 총 2일/);
   assert.match(summary.innerHTML, /누적 수익률 -0\.60%/);
-  assert.match(summary.innerHTML, /jongga-replay-view-current">6\.0 & B 3건/);
+  assert.doesNotMatch(summary.innerHTML, /매수추천 .*건/);
+  assert.doesNotMatch(summary.innerHTML, /8 & A\+ .*건/);
+  assert.doesNotMatch(summary.innerHTML, /7 & A .*건/);
+  assert.doesNotMatch(summary.innerHTML, /6\.0 & B .*건/);
+  assert.doesNotMatch(summary.innerHTML, /전체 .*건/);
 });
 
 test('setJonggaReplayViewMode rerenders strategy replay sections on tab switch', () => {

@@ -101,7 +101,11 @@ test('volatility modal section renders states and score delta', () => {
     }
   });
 
+  assert.match(html, /modal-collapsible-section/);
+  assert.match(html, /buy-section-volatility/);
   assert.match(html, /변동성 적합도/);
+  assert.match(html, /modal-section-toggle[^>]*aria-expanded="false"/);
+  assert.match(html, /modal-collapsible-body is-collapsed/);
   assert.match(html, /✅ 변동성 유리/);
   assert.match(html, /눌림목 유불리/);
   assert.match(html, /시장 저변동성 \/ 종목 중립 변동성 \/ 혼합 중립 변동성/);
@@ -109,6 +113,41 @@ test('volatility modal section renders states and score delta', () => {
   assert.match(html, /판정 해석/);
   assert.match(html, /사용 지표/);
   assert.match(html, /20일 표준편차 1.90%/);
+});
+
+test('modal collapsible section toggles body visibility', () => {
+  const context = loadUiContext();
+  const html = context.renderModalCollapsibleSection(
+    'buy-section-gate',
+    'Gate 일치 여부',
+    '<div class="modal-ind-list">gate body</div>',
+    { expanded: true }
+  );
+
+  assert.match(html, /buy-section-gate/);
+  assert.match(html, /Gate 일치 여부/);
+  assert.doesNotMatch(html, /modal-collapsible-body is-collapsed/);
+
+  const section = {
+    querySelector(selector) {
+      if (selector === '.modal-collapsible-body') {
+        return { classList: { toggle() { this.collapsed = !this.collapsed; return this.collapsed; } }, collapsed: false };
+      }
+      if (selector === '.modal-collapsible-title') {
+        return { textContent: 'Gate 일치 여부' };
+      }
+      return null;
+    }
+  };
+  const toggleButton = {
+    closest() { return section; },
+    textContent: '-',
+    setAttribute() {},
+    getAttribute() { return null; }
+  };
+
+  context.toggleModalCollapsibleSection(toggleButton);
+  assert.equal(toggleButton.textContent, '+');
 });
 
 test('volatility badges emphasize unfavorable state with penalty badge', () => {
@@ -315,4 +354,21 @@ test('buy cards render staged exit tags including swing stage', () => {
   assert.match(html, /📈1 25% 익절 270,830원/);
   assert.match(html, /📊 5% 익절 281,050원/);
   assert.match(html, /🛑 전량 247,835원/);
+});
+
+test('G-E 가이드 문구가 전략별 축소 운용 정책과 일치한다', () => {
+  const context = loadUiContext();
+  const ruleGuide = vm.runInContext('RULE_GUIDE', context);
+  const gapGrade = ruleGuide.gapGrades.find(item => item.grade === 'G-E');
+  const gapEntry = ruleGuide.gapEntryAdjustments.find(item => item.grade === 'G-E');
+  const gapSell = ruleGuide.gapSellAdjustments.find(item => item.grade === 'G-E');
+
+  assert.match(gapGrade.outlook, /돌파 금지/);
+  assert.match(gapGrade.outlook, /강세장·순환매장 한정 축소 운용/);
+  assert.match(gapEntry.trend, /눌림목·매집 A\/S만 50% 허용/);
+  assert.match(gapEntry.reversal, /A\/S만 50% 허용/);
+  assert.match(gapEntry.note, /개별 Gate\/Filter 충족 전제/);
+  assert.match(gapSell.premarket, /프리마켓 첫 가격 즉시 50% 정리/);
+  assert.match(gapSell.stopLoss, /손절폭 -1%p 축소/);
+  assert.equal(gapSell.swing, '금지');
 });

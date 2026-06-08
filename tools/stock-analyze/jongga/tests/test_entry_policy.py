@@ -33,6 +33,32 @@ class EntryPolicyTests(unittest.TestCase):
         self.assertTrue(result["entryEligible"])
         self.assertEqual(result["setupQuality"], "eligible")
 
+    def test_macro_warning_relaxed_buy_labels_remain_entry_eligible(self):
+        accumulation = compute_entry_eligibility(
+            "accumulation",
+            "A",
+            "진입 가능(거시경고·축소)",
+            gates=[{"code": "G1", "status": "✅", "note": "ok"}],
+        )
+        reversal = compute_entry_eligibility(
+            "reversal",
+            "S",
+            "최우선 진입(거시경고·축소)",
+            gates=[{"code": "G1", "status": "✅", "note": "ok"}],
+        )
+        self.assertTrue(accumulation["entryEligible"])
+        self.assertTrue(reversal["entryEligible"])
+
+    def test_pullback_b_macro_warning_watch_label_stays_conditionally_eligible(self):
+        result = compute_entry_eligibility(
+            "pullback",
+            "B",
+            "관심후보(B·거시경고)",
+            gates=[{"code": "G1", "status": "✅", "note": "ok"}],
+        )
+        self.assertTrue(result["entryEligible"])
+        self.assertFalse(result["entryWatch"])
+
     def test_attach_entry_eligibility_adds_gapdown_status_reason(self):
         entry = attach_entry_eligibility(
             {

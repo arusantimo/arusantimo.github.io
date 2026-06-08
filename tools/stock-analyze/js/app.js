@@ -239,6 +239,12 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(updateCurrentTime, 1000);
 
   document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('detail-modal')?.addEventListener('click', event => {
+    const toggleButton = event.target.closest('.modal-section-toggle');
+    if (!toggleButton) return;
+    event.preventDefault();
+    toggleModalCollapsibleSection(toggleButton);
+  });
   document.getElementById('modal-overlay').addEventListener('click', event => {
     if (event.target === document.getElementById('modal-overlay')) closeModal();
   });

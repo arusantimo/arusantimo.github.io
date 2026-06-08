@@ -88,21 +88,21 @@ const RULE_GUIDE = {
     { grade: 'G-B', label: '갭업 중립', score: '+2.0 ~ +6.9', outlook: '갭업 +0.5~+1.5% 또는 보합', color: '🔵' },
     { grade: 'G-C', label: '갭 불안정', score: '-2.9 ~ +1.9', outlook: '보합 또는 소폭 갭다운 가능', color: '🟡' },
     { grade: 'G-D', label: '갭다운 주의', score: '-7.9 ~ -3.0', outlook: '익일 갭다운 -0.5~-2.0% 경계', color: '🟠' },
-    { grade: 'G-E', label: '갭다운 경고', score: '-8.0 미만', outlook: '익일 갭다운 -2.0% 이상 위험 · 신규 진입 금지', color: '🔴' }
+    { grade: 'G-E', label: '갭다운 경고', score: '-8.0 미만', outlook: '익일 갭다운 고위험 · 돌파 금지, 눌림/매집/급락반등은 강세장·순환매장 한정 축소 운용', color: '🔴' }
   ],
   gapEntryAdjustments: [
     { grade: 'G-A', trend: '✅ 100% 진입', reversal: '✅ 100% 진입', note: '익일 프리마켓 갭업 익절 최적 환경' },
     { grade: 'G-B', trend: '✅ 100% 진입', reversal: '✅ 80% 진입', note: '기본 운용' },
     { grade: 'G-C', trend: '✅ 70% 진입', reversal: '⚠️ 50% 진입', note: '포지션 축소. 손절폭 동일 유지' },
     { grade: 'G-D', trend: '⚠️ S등급만 50% 허용', reversal: '❌ 신규 진입 보류', note: 'A·B등급 당일 신규 진입 금지' },
-    { grade: 'G-E', trend: '❌ 전 등급 신규 진입 금지', reversal: '❌ 신규 진입 금지', note: '당일 종가베팅 전면 보류' }
+    { grade: 'G-E', trend: '⚠️ 눌림목·매집 A/S만 50% 허용 · 돌파 금지', reversal: '⚠️ A/S만 50% 허용', note: '강세장·순환매장 한정, 개별 Gate/Filter 충족 전제' }
   ],
   gapSellAdjustments: [
     { grade: 'G-A', premarket: '기본 조건 유지', stopLoss: '기본 손절폭 유지', swing: '적극 허용' },
     { grade: 'G-B', premarket: '기본 조건 유지', stopLoss: '기본 유지', swing: '허용' },
     { grade: 'G-C', premarket: '프리마켓 갭업 기준 -0.5%p 하향', stopLoss: '손절폭 -0.5%p 축소', swing: '조건부 허용' },
     { grade: 'G-D', premarket: '프리마켓 첫 가격 즉시 50% 정리', stopLoss: '손절폭 -1%p 축소', swing: '금지' },
-    { grade: 'G-E', premarket: '진입 없음 — 해당 없음', stopLoss: '해당 없음', swing: '금지' }
+    { grade: 'G-E', premarket: '프리마켓 첫 가격 즉시 50% 정리', stopLoss: '손절폭 -1%p 축소', swing: '금지' }
   ],
   strategies: {
     pullback: {
@@ -205,6 +205,56 @@ const RULE_GUIDE = {
         { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 고변동성 유리, 저변동성 불리 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
       ]
     }
+  }
+};
+
+// 전략별 종목 지표 건전도 — stable(초록) / warn(주황) / abnormal(빨강)
+// 사용자 맞춤 조정 가능. rank 계열은 숫자가 낮을수록 좋음(lowBetter).
+const STRATEGY_STOCK_INDICATOR_PROFILES = {
+  pullback: {
+    label: '눌림목',
+    indicators: [
+      { key: 'vs52wHighPct', label: '52주 고가 대비', unit: '%', mode: 'band', ranges: { stable: [72, 94], warn: [60, 72], abnormal: [0, 60] }, stableHint: '눌림 구간', warnHint: '경계 구간', abnormalHint: '고점 이탈 과다' },
+      { key: 'ma20GapPct', label: '20일선 이격', unit: '%', mode: 'band', ranges: { stable: [-4, 4], warn: [-8, -4], abnormal: [-100, -8] }, stableHint: '이격 안정', warnHint: '이격 확대', abnormalHint: '추세 이탈' },
+      { key: 'rsi14', label: 'RSI(14)', unit: '', mode: 'band', ranges: { stable: [42, 62], warn: [35, 42], abnormal: [0, 35] }, stableHint: '눌림 적정', warnHint: '약세 경계', abnormalHint: '과매도·추세 약화' },
+      { key: 'volumeRatio20d', label: '거래량/20일 평균', unit: '%', mode: 'band', ranges: { stable: [70, 160], warn: [160, 260], abnormal: [260, 9999] }, stableHint: '수축·완화', warnHint: '거래량 증가', abnormalHint: '거래량 과열' },
+      { key: 'supportDistancePct', label: '지지선 이격', unit: '%', mode: 'band', ranges: { stable: [0, 3], warn: [3, 6], abnormal: [6, 100] }, stableHint: '지지 근접', warnHint: '지지 이탈 경계', abnormalHint: '지지 이탈' },
+      { key: 'per', label: 'PER', unit: '배', mode: 'band', ranges: { stable: [6, 28], warn: [28, 45], abnormal: [45, 9999] }, stableHint: '밸류 안정', warnHint: '밸류 부담', abnormalHint: '고평가' },
+      { key: 'pbr', label: 'PBR', unit: '배', mode: 'band', ranges: { stable: [0.6, 3.2], warn: [3.2, 5], abnormal: [5, 9999] }, stableHint: '자산가치 안정', warnHint: '자산가치 부담', abnormalHint: '고PBR' }
+    ]
+  },
+  accumulation: {
+    label: '수급 매집형',
+    indicators: [
+      { key: 'supplyTrendScore', label: '외인·기관 순매수', unit: '점', mode: 'highBetter', ranges: { stable: [1, 10], warn: [0, 1], abnormal: [-10, 0] }, stableHint: '수급 유입', warnHint: '수급 중립', abnormalHint: '수급 이탈' },
+      { key: 'foreignRate', label: '외국인 보유비율', unit: '%', mode: 'band', ranges: { stable: [8, 45], warn: [45, 60], abnormal: [0, 8] }, stableHint: '보유 안정', warnHint: '보유 과열', abnormalHint: '보유 낮음' },
+      { key: 'volumeRatio20d', label: '거래량/20일 평균', unit: '%', mode: 'band', ranges: { stable: [45, 115], warn: [115, 140], abnormal: [140, 9999] }, stableHint: '매집형 수축', warnHint: '거래량 증가', abnormalHint: '돌파 전 과열' },
+      { key: 'vs52wHighPct', label: '52주 고가 대비', unit: '%', mode: 'band', ranges: { stable: [68, 91], warn: [91, 95], abnormal: [95, 100] }, stableHint: '돌파 전 구간', warnHint: '고점 근접', abnormalHint: '이미 돌파권' },
+      { key: 'ma20GapPct', label: '20MA 대비', unit: '%', mode: 'band', ranges: { stable: [-2, 2], warn: [2, 5], abnormal: [5, 100] }, stableHint: '횡보 안정', warnHint: '상단 이탈', abnormalHint: '추격 구간' },
+      { key: 'marketCapRank', label: '시가총액 순위', unit: '위', mode: 'lowBetter', ranges: { stable: [1, 80], warn: [80, 150], abnormal: [150, 9999] }, stableHint: '유동성 양호', warnHint: '중소형', abnormalHint: '소형·비유동' }
+    ]
+  },
+  breakout: {
+    label: '주도주 돌파형',
+    indicators: [
+      { key: 'vs52wHighPct', label: '52주 고가 대비', unit: '%', mode: 'band', ranges: { stable: [90, 100], warn: [82, 90], abnormal: [0, 82] }, stableHint: '돌파권', warnHint: '돌파 직전', abnormalHint: '고점 이탈' },
+      { key: 'tradingValueRank', label: '거래대금 순위', unit: '위', mode: 'lowBetter', ranges: { stable: [1, 100], warn: [100, 150], abnormal: [150, 9999] }, stableHint: '주도 수급', warnHint: '수급 약화', abnormalHint: '비주도' },
+      { key: 'volumeRatio20d', label: '거래량/20일 평균', unit: '%', mode: 'highBetter', ranges: { stable: [140, 9999], warn: [110, 140], abnormal: [0, 110] }, stableHint: '거래량 동반', warnHint: '거래량 부족', abnormalHint: '돌파 신뢰 낮음' },
+      { key: 'rs20Pct', label: '20일 상대강도', unit: '%', mode: 'highBetter', ranges: { stable: [3, 9999], warn: [0, 3], abnormal: [-9999, 0] }, stableHint: '상대강도 우위', warnHint: '상대강도 보합', abnormalHint: '상대강도 열위' },
+      { key: 'marketCapRank', label: '시가총액 순위', unit: '위', mode: 'lowBetter', ranges: { stable: [1, 60], warn: [60, 120], abnormal: [120, 9999] }, stableHint: '대형·주도', warnHint: '중형', abnormalHint: '소형' },
+      { key: 'cnsPer', label: '추정 PER', unit: '배', mode: 'band', ranges: { stable: [8, 45], warn: [45, 70], abnormal: [70, 9999] }, stableHint: '성장 프리미엄 허용', warnHint: '프리미엄 부담', abnormalHint: '과열 밸류' }
+    ]
+  },
+  reversal: {
+    label: '급락 반등',
+    indicators: [
+      { key: 'dropFrom52wHighPct', label: '52주 고점 대비 하락', unit: '%', mode: 'band', ranges: { stable: [12, 38], warn: [38, 52], abnormal: [52, 100] }, stableHint: '반등 구간', warnHint: '깊은 조정', abnormalHint: '추가 하락 위험' },
+      { key: 'vs52wLowPct', label: '52주 저가 대비', unit: '%', mode: 'band', ranges: { stable: [8, 45], warn: [45, 70], abnormal: [70, 200] }, stableHint: '저점 이탈 회복', warnHint: '반등 진행', abnormalHint: '고점 회복 과다' },
+      { key: 'pbr', label: 'PBR', unit: '배', mode: 'band', ranges: { stable: [0.4, 2.5], warn: [2.5, 4], abnormal: [4, 9999] }, stableHint: '자산가치 안정', warnHint: '자산가치 부담', abnormalHint: '고PBR' },
+      { key: 'foreignRate', label: '외국인 보유비율', unit: '%', mode: 'band', ranges: { stable: [10, 55], warn: [55, 70], abnormal: [0, 10] }, stableHint: '보유 안정', warnHint: '보유 과열', abnormalHint: '보유 낮음' },
+      { key: 'volumeRatio20d', label: '거래량/20일 평균', unit: '%', mode: 'band', ranges: { stable: [130, 420], warn: [80, 130], abnormal: [0, 80] }, stableHint: '투매 후 수급', warnHint: '거래량 부족', abnormalHint: '관심 소멸' },
+      { key: 'per', label: 'PER', unit: '배', mode: 'band', ranges: { stable: [4, 35], warn: [35, 60], abnormal: [60, 9999] }, stableHint: '밸류 부담 낮음', warnHint: '밸류 부담', abnormalHint: '고평가·적자' }
+    ]
   }
 };
 

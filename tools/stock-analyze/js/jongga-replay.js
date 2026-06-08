@@ -5,8 +5,11 @@ const JONGGA_REPLAY_STRATEGIES = [
   { key: 'reversal', label: '급락 반등' }
 ];
 const JONGGA_REPLAY_STRATEGY_ORDER = ['pullback', 'accumulation', 'breakout', 'reversal'];
+const REPLAY_DAY_PAGE_SIZE = 5;
 
 let currentReplayStrategy = null;
+let replayStockSectionCollapsed = false;
+let replayDayPageIndex = 0;
 
 function getJonggaReplayBridge() {
   const payload = window.JONGGA_REPLAY_RUNS;
@@ -216,6 +219,91 @@ function normalizeReplayDate(value) {
   if (!raw) return '';
   const dateOnly = raw.slice(0, 10);
   return /^\d{4}-\d{2}-\d{2}$/.test(dateOnly) ? dateOnly : '';
+}
+
+function sortReplayDaysNewestFirst(days = []) {
+  return [...(Array.isArray(days) ? days : [])].sort((a, b) => {
+    const aDate = normalizeReplayDate(a?.date) || String(a?.date || '');
+    const bDate = normalizeReplayDate(b?.date) || String(b?.date || '');
+    if (aDate !== bDate) return bDate.localeCompare(aDate);
+    const aSummary = String(a?.summaryFile || '');
+    const bSummary = String(b?.summaryFile || '');
+    return bSummary.localeCompare(aSummary);
+  });
+}
+
+function clampReplayDayPageIndex(totalCount = 0, pageSize = REPLAY_DAY_PAGE_SIZE) {
+  const totalPages = Math.max(1, Math.ceil(Math.max(0, Number(totalCount) || 0) / pageSize));
+  replayDayPageIndex = Math.min(Math.max(0, replayDayPageIndex), totalPages - 1);
+  return replayDayPageIndex;
+}
+
+function setReplayDayPageIndex(value, { rerender = true } = {}) {
+  replayDayPageIndex = Math.max(0, Number.parseInt(value, 10) || 0);
+  if (rerender) renderJonggaReplayModal(currentReplayStrategy);
+  return replayDayPageIndex;
+}
+
+function moveReplayDayPage(direction) {
+  const delta = direction === 'older' ? 1 : direction === 'newer' ? -1 : 0;
+  if (!delta) return replayDayPageIndex;
+  return setReplayDayPageIndex(replayDayPageIndex + delta);
+}
+
+function toggleReplayStockSection() {
+  replayStockSectionCollapsed = !replayStockSectionCollapsed;
+  renderJonggaReplayModal(currentReplayStrategy);
+  return replayStockSectionCollapsed;
+}
+
+function resetReplayModalViewState() {
+  replayStockSectionCollapsed = false;
+  replayDayPageIndex = 0;
+}
+
+function buildReplayDayPageState(days = [], pageSize = REPLAY_DAY_PAGE_SIZE) {
+  const sortedDays = sortReplayDaysNewestFirst(days);
+  const totalCount = sortedDays.length;
+  const totalPages = Math.max(1, Math.ceil(Math.max(0, totalCount) / pageSize));
+  const pageIndex = Math.min(Math.max(0, replayDayPageIndex), totalPages - 1);
+  replayDayPageIndex = pageIndex;
+  const start = pageIndex * pageSize;
+  const visibleDays = sortedDays.slice(start, start + pageSize);
+  return {
+    totalCount,
+    totalPages,
+    pageIndex,
+    pageSize,
+    visibleDays,
+    start: totalCount ? start + 1 : 0,
+    end: totalCount ? start + visibleDays.length : 0,
+  };
+}
+
+function renderReplaySectionHead(title, actions = '', { marginTop = 16 } = {}) {
+  return `
+    <div class="replay-section-head" style="margin-top:${marginTop}px;">
+      <div class="section-title" style="margin-top:0;">${escapeHtml(title)}</div>
+      ${actions ? `<div class="replay-section-actions">${actions}</div>` : ''}
+    </div>
+  `;
+}
+
+function renderReplayDayPager(pageState) {
+  if (!pageState || pageState.totalCount <= 0) return '';
+  const pageNumber = pageState.pageIndex + 1;
+  const olderDisabled = pageState.pageIndex >= pageState.totalPages - 1;
+  const newerDisabled = pageState.pageIndex <= 0;
+  return `
+    <div class="replay-day-pager">
+      <span class="replay-day-pager-meta">총 ${escapeHtml(formatReplayNumber(pageState.totalCount))}일 중 ${escapeHtml(formatReplayNumber(pageState.start))}-${escapeHtml(formatReplayNumber(pageState.end))}일 표시</span>
+      <div class="replay-day-pager-buttons">
+        <button id="btn-jongga-replay-days-prev" type="button" class="btn btn-secondary small" ${olderDisabled ? 'disabled' : ''}>이전주</button>
+        <span class="replay-day-pager-page">${escapeHtml(formatReplayNumber(pageNumber))} / ${escapeHtml(formatReplayNumber(pageState.totalPages))}</span>
+        <button id="btn-jongga-replay-days-next" type="button" class="btn btn-secondary small" ${newerDisabled ? 'disabled' : ''}>다음주</button>
+      </div>
+    </div>
+  `;
 }
 
 function normalizeReplayPeriod(period = {}) {
@@ -871,12 +959,13 @@ function renderReplayTradeTable(rows = []) {
 }
 
 function renderReplayDayList(days = [], variant = 'stable') {
-  if (!Array.isArray(days) || !days.length) {
+  const pageState = buildReplayDayPageState(days);
+  if (!pageState.totalCount) {
     return '<div class="replay-empty">일자별 replay 요약이 없습니다.</div>';
   }
   return `
     <div class="replay-day-list">
-      ${days.map(day => `
+      ${pageState.visibleDays.map(day => `
         <div class="replay-day-item">
           <div class="replay-day-head">
             <strong>${escapeHtml(formatReplayDate(day.date))}</strong>
@@ -938,6 +1027,7 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
       (Array.isArray(strategyView.days) && strategyView.days.length > 0)
     )
   );
+  const dayPageState = hasStrategyData ? buildReplayDayPageState(strategyView?.days || []) : null;
 
   updateReplayModalHeader(strategy);
 
@@ -975,14 +1065,22 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
       ? renderReplayMetricPills(strategySummary, { includedCount: '타입 포함', tradeCount: '타입 체결', cumNetReturnPct: '타입 누적' })
       : '<div class="replay-empty">해당 전략 요약이 없습니다.</div>'}
     <div class="replay-metric-note">MDD는 최대 낙폭, degraded는 분봉/틱 데이터가 부족해 보강 데이터로 검증한 건수, ambiguous는 같은 봉에서 익절과 손절이 동시에 닿아 보수적으로 손절 처리한 건수입니다.</div>
-    <div class="section-title" style="margin-top:16px;">종목별 수익</div>
-    ${hasStrategyData ? renderReplayStockTable(strategyView?.stocks || []) : '<div class="replay-empty">종목별 수익 데이터가 없습니다.</div>'}
-    <div class="section-title" style="margin-top:16px;">일자별 요약</div>
+    ${renderReplaySectionHead(
+      '종목별 수익',
+      `<button id="btn-jongga-replay-stock-toggle" type="button" class="btn btn-secondary small" aria-expanded="${replayStockSectionCollapsed ? 'false' : 'true'}">${replayStockSectionCollapsed ? '펼치기' : '접기'}</button>`
+    )}
+    ${hasStrategyData
+      ? (replayStockSectionCollapsed
+        ? '<div class="replay-section-collapsed-note">종목별 수익 표를 접어둔 상태입니다.</div>'
+        : renderReplayStockTable(strategyView?.stocks || []))
+      : '<div class="replay-empty">종목별 수익 데이터가 없습니다.</div>'}
+    ${renderReplaySectionHead('일자별 요약', hasStrategyData ? renderReplayDayPager(dayPageState) : '')}
     ${hasStrategyData ? renderReplayDayList(strategyView?.days || [], latestRun.variant) : '<div class="replay-empty">일자별 replay 요약이 없습니다.</div>'}
   `;
 }
 
 function openJonggaReplayModal(strategy) {
+  resetReplayModalViewState();
   currentReplayStrategy = strategy || null;
   renderJonggaReplayModal(currentReplayStrategy);
   document.getElementById('jongga-replay-overlay')?.classList.add('open');
@@ -1007,6 +1105,7 @@ function bindJonggaReplayControls() {
     if (!target || typeof target !== 'object') return;
     if (target.id !== 'jongga-replay-period-from' && target.id !== 'jongga-replay-period-to') return;
     if (typeof setJonggaReplayPeriod === 'function') {
+      setReplayDayPageIndex(0, { rerender: false });
       const current = typeof getJonggaReplayPeriod === 'function' ? getJonggaReplayPeriod() : { from: '', to: '' };
       setJonggaReplayPeriod({
         from: target.id === 'jongga-replay-period-from' ? target.value : current.from,
@@ -1016,8 +1115,22 @@ function bindJonggaReplayControls() {
   });
   document.getElementById('jongga-replay-body')?.addEventListener('click', event => {
     const target = event.target;
-    if (!target || typeof target !== 'object' || target.id !== 'btn-jongga-replay-period-reset') return;
+    if (!target || typeof target !== 'object') return;
+    if (target.id === 'btn-jongga-replay-stock-toggle') {
+      toggleReplayStockSection();
+      return;
+    }
+    if (target.id === 'btn-jongga-replay-days-prev') {
+      moveReplayDayPage('older');
+      return;
+    }
+    if (target.id === 'btn-jongga-replay-days-next') {
+      moveReplayDayPage('newer');
+      return;
+    }
+    if (target.id !== 'btn-jongga-replay-period-reset') return;
     if (typeof setJonggaReplayPeriod === 'function') {
+      setReplayDayPageIndex(0, { rerender: false });
       setJonggaReplayPeriod({ from: '', to: '' });
     }
   });

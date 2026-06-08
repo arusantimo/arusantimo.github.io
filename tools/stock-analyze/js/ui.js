@@ -275,7 +275,7 @@ function renderGuideTables() {
         ${RULE_GUIDE.trendGrades.map(row => `<tr><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.score)}</td><td>${escapeHtml(row.meaning)}</td></tr>`).join('')}
       </tbody>
     </table>
-    <div class="guide-subtitle">역추세 전략 (전략 ③)</div>
+    <div class="guide-subtitle">역추세 전략</div>
     <table class="guide-table">
       <thead><tr><th>등급</th><th>점수</th><th>의미</th></tr></thead>
       <tbody>
@@ -301,7 +301,7 @@ function renderGuideTables() {
         ${RULE_GUIDE.trendVkospiAdjustments.map(row => `<tr><td>${escapeHtml(row.range)}</td><td>${escapeHtml(row.rule)}</td></tr>`).join('')}
       </tbody>
     </table>
-    <div class="guide-subtitle">역추세 전략 (전략 ③)</div>
+    <div class="guide-subtitle">역추세 전략</div>
     <table class="guide-table">
       <thead><tr><th>VKOSPI</th><th>최종 점수 보정</th></tr></thead>
       <tbody>
@@ -492,17 +492,16 @@ function renderPullbackSupportModalSection(context = {}) {
     primaryLine?.price ? `<span class="pullback-support-badge primary">주지지 ${escapeHtml(formatPullbackSupportPrice(primaryLine.price))}</span>` : ''
   ].filter(Boolean).join('');
 
-  return `
-    <div>
-      <div class="modal-section-label">지지선 구조</div>
-      <div class="pullback-support-badges">${badgeRow}</div>
-      ${support.summary ? `<div class="buy-detail-note"><strong>요약</strong><span>${escapeHtml(support.summary)}</span></div>` : ''}
-      ${support.warningReason ? `<div class="buy-detail-note"><strong>경고</strong><span>${escapeHtml(support.warningReason)}</span></div>` : ''}
-      <div class="modal-ind-list">
-        ${buildPullbackSupportEvidenceCards(context)}
-      </div>
+  const contentHtml = `
+    <div class="pullback-support-badges">${badgeRow}</div>
+    ${support.summary ? `<div class="buy-detail-note"><strong>요약</strong><span>${escapeHtml(support.summary)}</span></div>` : ''}
+    ${support.warningReason ? `<div class="buy-detail-note"><strong>경고</strong><span>${escapeHtml(support.warningReason)}</span></div>` : ''}
+    <div class="modal-ind-list">
+      ${buildPullbackSupportEvidenceCards(context)}
     </div>
   `;
+
+  return renderModalCollapsibleSection('buy-section-pullback-support', '지지선 구조', contentHtml);
 }
 
 window.renderPullbackSupportModalSection = renderPullbackSupportModalSection;
@@ -620,6 +619,37 @@ function renderVolatilityCardInsights(entry) {
   `;
 }
 
+function renderModalCollapsibleSection(sectionId, title, contentHtml, { expanded = false } = {}) {
+  if (!contentHtml) return '';
+  const collapsedClass = expanded ? '' : ' is-collapsed';
+  const toggleLabel = expanded ? '-' : '+';
+  const toggleTitle = expanded ? `${title} 접기` : `${title} 펼치기`;
+  return `
+    <div class="modal-collapsible-section">
+      <div class="modal-collapsible-header">
+        <button type="button" class="modal-section-toggle section-toggle" aria-expanded="${expanded}" aria-controls="${sectionId}" title="${escapeHtml(toggleTitle)}">${toggleLabel}</button>
+        <div class="modal-section-label modal-collapsible-title">${escapeHtml(title)}</div>
+      </div>
+      <div id="${sectionId}" class="modal-collapsible-body${collapsedClass}">
+        ${contentHtml}
+      </div>
+    </div>
+  `;
+}
+
+function toggleModalCollapsibleSection(toggleButton) {
+  const section = toggleButton.closest('.modal-collapsible-section');
+  if (!section) return;
+  const body = section.querySelector('.modal-collapsible-body');
+  if (!body) return;
+  const titleEl = section.querySelector('.modal-collapsible-title');
+  const title = titleEl?.textContent?.trim() || '섹션';
+  const collapsed = body.classList.toggle('is-collapsed');
+  toggleButton.textContent = collapsed ? '+' : '-';
+  toggleButton.setAttribute('aria-expanded', String(!collapsed));
+  toggleButton.setAttribute('title', collapsed ? `${title} 펼치기` : `${title} 접기`);
+}
+
 function renderVolatilityModalSection(context = {}) {
   if (!context?.summary) return '';
   const toneClass = getVolatilityToneClass(context.strategyFit);
@@ -634,38 +664,37 @@ function renderVolatilityModalSection(context = {}) {
     Number.isFinite(Number(metrics.todayRangePct)) ? `당일 레인지 ${Number(metrics.todayRangePct).toFixed(2)}%` : ''
   ].filter(Boolean).join(' / ');
 
-  return `
-    <div>
-      <div class="modal-section-label">변동성 적합도</div>
-      <div class="pullback-support-badges">${buildVolatilityBadgeRow(context)}</div>
-      <div class="modal-ind-list">
-        <div class="modal-ind-card ${toneClass}">
-          <div class="modal-ind-icon">${toneClass === 'clear' ? '🌊' : toneClass === 'triggered' ? '⚠️' : '➖'}</div>
-          <div class="modal-ind-content">
-            <div class="modal-ind-title">${escapeHtml(context.strategyLabel || '현재 전략')} 유불리</div>
-            <div class="modal-ind-result">→ ${escapeHtml(summaryText)}</div>
-            <div class="modal-ind-value">📐 ${escapeHtml(stateTriplet)} / 보정 ${escapeHtml(formatSignedVolatilityDelta(context.scoreDelta))}</div>
-          </div>
+  const contentHtml = `
+    <div class="pullback-support-badges">${buildVolatilityBadgeRow(context)}</div>
+    <div class="modal-ind-list">
+      <div class="modal-ind-card ${toneClass}">
+        <div class="modal-ind-icon">${toneClass === 'clear' ? '🌊' : toneClass === 'triggered' ? '⚠️' : '➖'}</div>
+        <div class="modal-ind-content">
+          <div class="modal-ind-title">${escapeHtml(context.strategyLabel || '현재 전략')} 유불리</div>
+          <div class="modal-ind-result">→ ${escapeHtml(summaryText)}</div>
+          <div class="modal-ind-value">📐 ${escapeHtml(stateTriplet)} / 보정 ${escapeHtml(formatSignedVolatilityDelta(context.scoreDelta))}</div>
         </div>
-        <div class="modal-ind-card unknown">
-          <div class="modal-ind-icon">🧭</div>
-          <div class="modal-ind-content">
-            <div class="modal-ind-title">판정 해석</div>
-            <div class="modal-ind-result">→ ${escapeHtml(reasonSummary)}</div>
-            <div class="modal-ind-value">📐 ${escapeHtml(stateTriplet)}</div>
-          </div>
+      </div>
+      <div class="modal-ind-card unknown">
+        <div class="modal-ind-icon">🧭</div>
+        <div class="modal-ind-content">
+          <div class="modal-ind-title">판정 해석</div>
+          <div class="modal-ind-result">→ ${escapeHtml(reasonSummary)}</div>
+          <div class="modal-ind-value">📐 ${escapeHtml(stateTriplet)}</div>
         </div>
-        <div class="modal-ind-card unknown">
-          <div class="modal-ind-icon">📊</div>
-          <div class="modal-ind-content">
-            <div class="modal-ind-title">사용 지표</div>
-            <div class="modal-ind-result">→ 최근 일봉 변동성과 VKOSPI를 함께 반영합니다.</div>
-            ${metricRows ? `<div class="modal-ind-value">📐 ${escapeHtml(metricRows)}</div>` : ''}
-          </div>
+      </div>
+      <div class="modal-ind-card unknown">
+        <div class="modal-ind-icon">📊</div>
+        <div class="modal-ind-content">
+          <div class="modal-ind-title">사용 지표</div>
+          <div class="modal-ind-result">→ 최근 일봉 변동성과 VKOSPI를 함께 반영합니다.</div>
+          ${metricRows ? `<div class="modal-ind-value">📐 ${escapeHtml(metricRows)}</div>` : ''}
         </div>
       </div>
     </div>
   `;
+
+  return renderModalCollapsibleSection('buy-section-volatility', '변동성 적합도', contentHtml);
 }
 
 function getSellStrategyStageMeta(stage) {
@@ -1966,6 +1995,30 @@ function renderTradePlanTable(entry) {
   `;
 }
 
+function renderBuyDetailSummaryPanel(entry) {
+  const rows = [];
+  if (entry?.rationale) rows.push({ label: '근거', content: entry.rationale });
+  if (entry?.keyPoint) rows.push({ label: '핵심', content: entry.keyPoint });
+  if (entry?.strategy === 'accumulation' && entry.accumulationStopPolicy?.reasonSummary) {
+    rows.push({ label: '손절', content: entry.accumulationStopPolicy.reasonSummary });
+  }
+  (Array.isArray(entry?.notes) ? entry.notes : []).forEach(note => {
+    if (note) rows.push({ label: '메모', content: note });
+  });
+  if (!rows.length) return '';
+
+  return `
+    <div class="buy-detail-summary-panel">
+      ${rows.map(row => `
+        <div class="buy-detail-summary-row">
+          <span class="buy-detail-summary-label">${escapeHtml(row.label)}</span>
+          <span class="buy-detail-summary-value">${escapeHtml(row.content)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
 window.handleModalRefreshBuy = async function(entryKey) {
   const btn = document.getElementById('btn-modal-refresh-buy');
   if (btn) {
@@ -2017,9 +2070,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       title: `${STRATEGY_META[normalizeStrategyKey(entry.strategy)].shortLabel} 종목을 볼 때 먼저 확인할 점`,
       cardClass: 'triggered'
     });
-    const accumulationStopReasonHtml = entry.strategy === 'accumulation' && entry.accumulationStopPolicy?.reasonSummary
-      ? `<div class="buy-detail-note"><strong>손절</strong><span>${escapeHtml(entry.accumulationStopPolicy.reasonSummary)}</span></div>`
-      : '';
+    const buyDetailSummaryHtml = renderBuyDetailSummaryPanel(entry);
 
     document.getElementById('modal-body').innerHTML = `
       <div class="buy-modal-layout">
@@ -2053,10 +2104,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
           <div class="buy-modal-fixed-grid">
             <div class="buy-detail-block buy-detail-block-fixed">
               <div class="modal-section-label">요약</div>
-              ${entry.rationale ? `<div class="buy-detail-note"><strong>근거</strong><span>${escapeHtml(entry.rationale)}</span></div>` : ''}
-              ${entry.keyPoint ? `<div class="buy-detail-note"><strong>핵심</strong><span>${escapeHtml(entry.keyPoint)}</span></div>` : ''}
-              ${accumulationStopReasonHtml}
-              ${entry.notes.map(note => `<div class="buy-detail-note"><strong>메모</strong><span>${escapeHtml(note)}</span></div>`).join('')}
+              ${buyDetailSummaryHtml}
             </div>
 
             <div class="buy-trade-plan-block">
@@ -2069,30 +2117,37 @@ function openModal(codeOrEntryKey, mode = 'sell') {
         </div>
 
         <div class="buy-modal-scroll" id="buy-modal-scroll-area">
+          ${typeof renderStrategyStockIndicatorsSection === 'function' ? renderStrategyStockIndicatorsSection(entry) : ''}
           ${buildBuyVerificationHtml(entry)}
 
           <div>
             <div class="modal-stage-badge stage2">🧭 전략 데이터 기준 매수 판단</div>
-            ${entry.filters?.length ? `
-              <div class="modal-section-label">필터 (F) 일치 여부</div>
-              <div class="modal-ind-list">${renderFilterList(entry)}</div>
-            ` : ''}
-            <div class="modal-section-label">Gate 일치 여부</div>
-            <div class="modal-ind-list">${renderGateList(entry)}</div>
+            ${entry.filters?.length ? renderModalCollapsibleSection(
+              'buy-section-filter',
+              '필터 (F) 일치 여부',
+              `<div class="modal-ind-list">${renderFilterList(entry)}</div>`
+            ) : ''}
+            ${renderModalCollapsibleSection(
+              'buy-section-gate',
+              'Gate 일치 여부',
+              `<div class="modal-ind-list">${renderGateList(entry)}</div>`
+            )}
           </div>
 
           ${entry.strategy === 'pullback' ? renderPullbackSupportModalSection(entry.pullbackContext || {}) : ''}
           ${renderVolatilityModalSection(entry.volatilityContext || {})}
 
-          <div>
-            <div class="modal-section-label">점수 breakdown (신호 vs 진입)</div>
-            ${typeof renderBuyScoreBreakdownTable === 'function' ? renderBuyScoreBreakdownTable(entry) : ''}
-          </div>
+          ${renderModalCollapsibleSection(
+            'buy-section-score-breakdown',
+            '점수 breakdown (신호 vs 진입)',
+            typeof renderBuyScoreBreakdownTable === 'function' ? renderBuyScoreBreakdownTable(entry) : ''
+          )}
 
-          <div>
-            <div class="modal-section-label">채점 조건 (S·P·C) 일치 / 불일치</div>
-            <div class="modal-ind-list">${renderRuleMatchList(entry)}</div>
-          </div>
+          ${renderModalCollapsibleSection(
+            'buy-section-scoring-rules',
+            '채점 조건 (S·P·C) 일치 / 불일치',
+            `<div class="modal-ind-list">${renderRuleMatchList(entry)}</div>`
+          )}
         </div>
       </div>
     `;

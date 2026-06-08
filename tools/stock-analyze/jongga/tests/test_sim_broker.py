@@ -226,6 +226,94 @@ class SimBrokerTests(unittest.TestCase):
         self.assertEqual(result["result"]["exitLastFillPrice"], 10030.0)
         self.assertTrue(any(fill["fillRule"] == "openPhase_touch" for fill in result["fills"]))
 
+    def test_final_cutoff_counts_followup_trading_days_not_weekends(self):
+        market_data = {
+            "entryBar": {
+                "timestamp": "2026-06-05T15:30:00+09:00",
+                "open": 10000.0,
+                "high": 10000.0,
+                "low": 10000.0,
+                "close": 10000.0,
+                "volume": 0.0,
+                "source": "daily_ohlc_fallback",
+            },
+            "replayBars": [
+                {
+                    "timestamp": "2026-06-08T09:00:00+09:00",
+                    "open": 10020.0,
+                    "high": 10020.0,
+                    "low": 10020.0,
+                    "close": 10020.0,
+                    "volume": 0.0,
+                    "source": "daily_ohlc_fallback",
+                    "phase": "day1_open",
+                },
+                {
+                    "timestamp": "2026-06-08T10:00:00+09:00",
+                    "open": 10020.0,
+                    "high": 10100.0,
+                    "low": 9980.0,
+                    "close": 10020.0,
+                    "volume": 0.0,
+                    "source": "daily_ohlc_fallback",
+                    "phase": "day1_morning_cutoff",
+                },
+                {
+                    "timestamp": "2026-06-08T15:00:00+09:00",
+                    "open": 10020.0,
+                    "high": 10100.0,
+                    "low": 9980.0,
+                    "close": 10040.0,
+                    "volume": 0.0,
+                    "source": "daily_ohlc_fallback",
+                    "phase": "day1_session_cutoff",
+                },
+                {
+                    "timestamp": "2026-06-09T09:00:00+09:00",
+                    "open": 10030.0,
+                    "high": 10030.0,
+                    "low": 10030.0,
+                    "close": 10030.0,
+                    "volume": 0.0,
+                    "source": "daily_ohlc_fallback",
+                    "phase": "day2_open",
+                },
+                {
+                    "timestamp": "2026-06-09T15:00:00+09:00",
+                    "open": 10030.0,
+                    "high": 10120.0,
+                    "low": 9990.0,
+                    "close": 10060.0,
+                    "volume": 0.0,
+                    "source": "daily_ohlc_fallback",
+                    "phase": "day2_final_cutoff",
+                },
+            ],
+            "replaySchedule": {
+                "primaryTargetUntil": "2026-06-08T10:00:00+09:00",
+                "secondaryTargetFrom": "2026-06-08T10:00:00+09:00",
+                "secondaryTargetUntil": "2026-06-08T15:00:00+09:00",
+                "finalExitAt": "2026-06-08T15:00:00+09:00",
+            },
+        }
+        result = simulate_trade(
+            run_id="run-weekend",
+            date="2026-06-05",
+            variant="stable",
+            strategy="pullback",
+            code="000001",
+            name="테스트",
+            source_entry_key="20260605|stable|pullback|000001",
+            trade_plan_rows=self._plan(),
+            market_data=market_data,
+            auto_flatten=True,
+        )
+        final_order = next(order for order in result["orders"] if order["stageKey"] == "finalCutoff")
+        self.assertEqual(result["result"]["closedReason"], "third_day_cutoff_market")
+        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-09T15:00:00+09:00")
+        self.assertEqual(result["result"]["exitLastFillPrice"], 10060.0)
+        self.assertEqual(final_order["requestedAt"], "2026-06-09T15:00:00+09:00")
+
     def test_second_followup_day_close_below_stop_also_triggers_stop_close(self):
         result = self._simulate(
             self._market_data(

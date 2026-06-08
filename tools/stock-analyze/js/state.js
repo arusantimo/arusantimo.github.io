@@ -443,6 +443,20 @@ function getJonggaReplayPeriodLabel(period = getJonggaReplayPeriod(), bridge = g
   return `${from} ~ ${to}`;
 }
 
+function getJonggaReplayPeriodDayCount(bridge = getJonggaReplayBridgePayload(), period = getJonggaReplayPeriod()) {
+  const latestRun = bridge?.latestRun;
+  if (!latestRun || typeof latestRun !== 'object') return 0;
+  const dates = Array.isArray(latestRun.analysisDates) && latestRun.analysisDates.length
+    ? latestRun.analysisDates
+    : Array.isArray(latestRun.days)
+      ? latestRun.days.map(day => day?.date)
+      : [];
+  const filtered = dates
+    .map(normalizeJonggaReplayDate)
+    .filter(dateValue => dateValue && isJonggaReplayDateInPeriod(dateValue, period));
+  return new Set(filtered).size;
+}
+
 function setJonggaReplayPeriod(period, { persist = true, rerender = true } = {}) {
   const nextPeriod = normalizeJonggaReplayPeriod(period);
   if (persist) persistJonggaReplayPeriod(nextPeriod);
@@ -591,7 +605,6 @@ function getJonggaReplayCumulativeReturnPct(mode = getJonggaReplayViewMode()) {
 
 function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
   const activeMode = getJonggaReplayViewMode();
-  const activeMeta = getJonggaReplayViewMeta(activeMode);
   document.querySelectorAll('[data-jongga-replay-view]').forEach(button => {
     const viewMode = normalizeJonggaReplayViewMode(button.dataset.jonggaReplayView);
     button.classList.toggle('active', viewMode === activeMode);
@@ -601,18 +614,13 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
 
   const summary = document.getElementById('jongga-replay-view-summary');
   if (summary) {
-    const counts = getJonggaReplayViewCounts(snapshot);
     const cumulativeReturnPct = getJonggaReplayCumulativeReturnPct(activeMode);
     const periodLabel = getJonggaReplayPeriodLabel();
+    const replayDayCount = getJonggaReplayPeriodDayCount();
     summary.innerHTML = `
       <span>기간 ${periodLabel}</span>
-      <span>매수추천 ${counts.recommendationCount}건</span>
-      <span>8 & A+ ${counts.a8plusCount}건</span>
-      <span>7 & A ${counts.a7plusCount}건</span>
-      <span>6.0 & B ${counts.replayCount}건</span>
-      <span>전체 ${counts.allCount}건</span>
+      <span>리플레이 총 ${replayDayCount}일</span>
       <span>누적 수익률 ${formatJonggaReplaySummaryPercent(cumulativeReturnPct)}</span>
-      <span class="jongga-replay-view-current">${activeMeta.label} ${counts.activeCount}건</span>
     `;
   }
 }

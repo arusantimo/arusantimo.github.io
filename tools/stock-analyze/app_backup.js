@@ -1762,7 +1762,7 @@ function renderGuideTables() {
         ${RULE_GUIDE.trendGrades.map(row => `<tr><td>${escapeHtml(row.grade)}</td><td>${escapeHtml(row.score)}</td><td>${escapeHtml(row.meaning)}</td></tr>`).join('')}
       </tbody>
     </table>
-    <div class="guide-subtitle">역추세 전략 (전략 ③)</div>
+    <div class="guide-subtitle">역추세 전략</div>
     <table class="guide-table">
       <thead><tr><th>등급</th><th>점수</th><th>의미</th></tr></thead>
       <tbody>
@@ -1788,7 +1788,7 @@ function renderGuideTables() {
         ${RULE_GUIDE.trendVkospiAdjustments.map(row => `<tr><td>${escapeHtml(row.range)}</td><td>${escapeHtml(row.rule)}</td></tr>`).join('')}
       </tbody>
     </table>
-    <div class="guide-subtitle">역추세 전략 (전략 ③)</div>
+    <div class="guide-subtitle">역추세 전략</div>
     <table class="guide-table">
       <thead><tr><th>VKOSPI</th><th>최종 점수 보정</th></tr></thead>
       <tbody>
