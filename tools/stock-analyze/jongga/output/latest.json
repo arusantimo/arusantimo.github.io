@@ -27,7 +27,7 @@
         "ok": 19
       },
       "naver_integration_schedule": {
-        "ok": 0
+        "ok": 1
       },
       "yahoo_chart": {
         "ok": 5
@@ -45,7 +45,7 @@
         "ok": 19
       },
       "kind_playwright_disclosure": {
-        "ok": 0
+        "ok": 1
       },
       "cnbc_quote": {
         "ok": 1
@@ -144,7 +144,7 @@
         "table": [
           {
             "item": "적용 레짐",
-            "value": "박스권 ⚠️"
+            "value": "순환매장 🔄 (거시·지수 완충)"
           },
           {
             "item": "기술 레짐",
@@ -160,23 +160,23 @@
           },
           {
             "item": "진입 전략",
-            "value": "메인=수급매집형 / 서브=눌림목 / 보조=주도주돌파형"
+            "value": "메인=주도주돌파형 / 서브=눌림목 / 보조=수급매집형"
           },
           {
             "item": "추천 슬롯",
-            "value": "매집 3 · 돌파 1 · 눌림 3"
+            "value": "매집 3 · 돌파 2 · 눌림 2"
           },
           {
             "item": "스윙 전환 활성도",
-            "value": "조건부"
+            "value": "제한"
           },
           {
             "item": "시가베팅",
-            "value": "비활성"
+            "value": "활성"
           },
           {
             "item": "역추세 트랙",
-            "value": "활성"
+            "value": "제한 활성"
           },
           {
             "item": "갭 스코어",
@@ -216,14 +216,14 @@
           {
             "item": "거시 맥락",
             "value": "Stage 3.2: 펀더멘털 완충형 과열 (Anchor Buffered Overheat) / RI 66",
-            "verdict": "⚠️"
+            "verdict": "✅"
           }
         ],
-        "alert": "CNBC VKOSPI 실측을 사용했습니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다.",
+        "alert": "CNBC VKOSPI 실측을 사용했습니다. 토스 데이터와 이벤트 필터는 수동 확인이 필요합니다. 적용 레짐은 market-analyze·KOSPI 보조 신호로 조정되었습니다.",
         "macroOverlay": {
           "loaded": true,
-          "dateAligned": false,
-          "marketAnalyzeDate": "20260605",
+          "dateAligned": true,
+          "marketAnalyzeDate": "20260608",
           "technicalRegimeLabel": "박스권 ⚠️",
           "effectiveRegimeLabel": "박스권 ⚠️",
           "regimeAdjustmentReason": "KOSPI 60MA 상향",
@@ -233,7 +233,7 @@
           "marketRegimeKey": "anchor-buffered-overheat",
           "fundamentalAnchorScore": 89.0,
           "fundamentalAnchorState": "validated",
-          "bubbleIndex": 45.38,
+          "bubbleIndex": 44.18,
           "bubbleCriticalTrigger": false,
           "bubbleRegimeLabel": "펀더멘털 완충형 과열 경계",
           "riskIndex": 66,
@@ -242,7 +242,7 @@
           "kospiMa5": 8433.36,
           "vkospiValue": 75.28,
           "vkospiLabel": "VKOSPI",
-          "riseJustifiedByMacro": false
+          "riseJustifiedByMacro": true
         },
         "technicalRegimeLabel": "박스권 ⚠️",
         "effectiveRegimeLabel": "박스권 ⚠️",
@@ -2745,12 +2745,12 @@
                     "price": 207528,
                     "distancePct": 26.86,
                     "families": [
-                      "horizontal",
-                      "swingCluster"
+                      "eventAnchors",
+                      "horizontal"
                     ],
                     "familyLabels": [
-                      "수평 지지",
-                      "스윙로우 군집"
+                      "급증봉 저점",
+                      "수평 지지"
                     ],
                     "familyCount": 2,
                     "count": 15,
@@ -2921,6 +2921,207 @@
                     "price": 244500,
                     "distancePct": 13.83,
                     "count": 3,
+                    "lastSeenDaysAgo": 25,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 788000,
+                    "bandHigh": 802000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 812667,
+                    "distancePct": 51.42,
+                    "count": 3,
+                    "lastSeenDaysAgo": 23,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 808000,
+                    "bandHigh": 818000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 832667,
+                    "distancePct": 50.23,
+                    "count": 3,
+                    "lastSeenDaysAgo": 23,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close"
+                    ],
+                    "bandLow": 827000,
+                    "bandHigh": 839000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 856500,
+                    "distancePct": 48.8,
+                    "count": 2,
+                    "lastSeenDaysAgo": 18,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "low"
+                    ],
+                    "bandLow": 855000,
+                    "bandHigh": 858000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 894100,
+                    "distancePct": 46.56,
+                    "count": 5,
+                    "lastSeenDaysAgo": 17,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 880000,
+                    "bandHigh": 900000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 918857,
+                    "distancePct": 45.08,
+                    "count": 7,
+                    "lastSeenDaysAgo": 11,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 912000,
+                    "bandHigh": 926000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 957500,
+                    "distancePct": 42.77,
+                    "count": 2,
+                    "lastSeenDaysAgo": 12,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 957000,
+                    "bandHigh": 958000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 983500,
+                    "distancePct": 41.21,
+                    "count": 2,
+                    "lastSeenDaysAgo": 12,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 980000,
+                    "bandHigh": 987000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1005000,
+                    "distancePct": 39.93,
+                    "count": 2,
+                    "lastSeenDaysAgo": 14,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1000000,
+                    "bandHigh": 1010000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1028000,
+                    "distancePct": 38.55,
+                    "count": 3,
+                    "lastSeenDaysAgo": 13,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close"
+                    ],
+                    "bandLow": 1024000,
+                    "bandHigh": 1031000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1204000,
+                    "distancePct": 28.03,
+                    "count": 2,
+                    "lastSeenDaysAgo": 9,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1204000,
+                    "bandHigh": 1204000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1564500,
+                    "distancePct": 6.49,
+                    "count": 4,
+                    "lastSeenDaysAgo": 0,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1552000,
+                    "bandHigh": 1580000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1622500,
+                    "distancePct": 3.02,
+                    "count": 2,
                     "lastSeenDaysAgo": 1,
                     "valid": true,
                     "weight": 30,
@@ -3024,6 +3225,7 @@
                     "bandHigh": 216000
                   }
                 ],
+                "swingCluster": [],
                 "volumeShelf": [
                   {
                     "family": "volumeShelf",
@@ -3231,7 +3433,7 @@
                 "targetPrice": "276,656원"
               }
             ],
-            "rr": "1 : 1.3",
+            "rr": "1 : 1.2",
             "source": "jongga-live",
             "recommendedEntryBand": {
               "low": 280912,
@@ -3650,6 +3852,11 @@
                 "code": "C2",
                 "note": "몸통 79% / 윗꼬리·몸통 0.26 · 강마감 기준 충족",
                 "evalStatus": "met"
+              },
+              {
+                "code": "C3",
+                "note": "호가잔량 비율 미입력 (토스 호가창 수동 입력)",
+                "evalStatus": "manual_required"
               }
             ],
             "currentPrice": 2027000,
@@ -3691,6 +3898,7 @@
               "source": "naver_orderbook_http",
               "sourceUrl": "https://finance.naver.com/item/main.nhn?code=000660"
             },
+            "orderbook": {},
             "volatilityContext": {
               "marketState": "volatile",
               "stockState": "volatile",
@@ -3708,11 +3916,26 @@
               "strategyLabel": "주도주돌파형"
             },
             "manualInput": {
-              "required": false,
-              "fields": [],
-              "missingFieldCodes": [],
-              "summary": "현재 수동 입력 필드가 없습니다.",
-              "source": "public_data_only"
+              "required": true,
+              "fields": [
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A001740/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 SK네트웍스 (001740) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.25"
+                  ]
+                }
+              ],
+              "missingFieldCodes": [
+                "orderbook.bidAskRatio"
+              ],
+              "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
+              "source": "browser_manual_override"
             },
             "breakoutStopPolicy": {
               "version": "breakout-stop-v1-live",
@@ -4104,7 +4327,7 @@
                 "signalPoints": 0.0,
                 "maxPoints": 2.0,
                 "evalStatus": "not_met",
-                "note": "외인 -606,860주 / 기관 -411,774주 · 양매수 아님"
+                "note": "외인 1,619,826주 / 기관 -1,526,675주 · 양매수 아님"
               },
               {
                 "code": "S2",
@@ -4112,7 +4335,7 @@
                 "signalPoints": 0.0,
                 "maxPoints": 2.0,
                 "evalStatus": "not_met",
-                "note": "외인 당일 -606,860 / 전일 -316,443 · 기관 당일 -411,774 / 전일 +114,049 · 2일 연속 수급 유입 미확인"
+                "note": "외인 당일 +1,619,826 / 전일 -90,931 · 기관 당일 -1,526,675 / 전일 -18,623 · 2일 연속 수급 유입 미확인"
               },
               {
                 "code": "S3",
@@ -4193,9 +4416,9 @@
             "gates": [
               {
                 "code": "G0",
-                "status": "⚠️",
-                "note": "외인 전일 -316,443/당일 -606,860 · 기관 전일 +114,049/당일 -411,774 · 2일 연속 수급 유입 미충족",
-                "evalStatus": "not_met"
+                "status": "✅",
+                "note": "외인 전일 -776,807/당일 -157,611 · 기관 전일 +57,188/당일 +37,521 · 2일 연속 수급 유입",
+                "evalStatus": "met"
               },
               {
                 "code": "G1",
@@ -4212,7 +4435,7 @@
               {
                 "code": "G3",
                 "status": "✅",
-                "note": "거래대금 TOP100 순위 1",
+                "note": "거래대금 TOP100 순위 30",
                 "evalStatus": "met"
               },
               {
@@ -4268,12 +4491,12 @@
             "unmatchedRules": [
               {
                 "code": "S1",
-                "note": "외인 -606,860주 / 기관 -411,774주 · 양매수 아님",
+                "note": "외인 -157,611주 / 기관 37,521주 · 양매수 아님",
                 "evalStatus": "not_met"
               },
               {
                 "code": "S2",
-                "note": "외인 당일 -606,860 / 전일 -316,443 · 기관 당일 -411,774 / 전일 +114,049 · 2일 연속 수급 유입 미확인",
+                "note": "외인 당일 -157,611 / 전일 -776,807 · 기관 당일 +37,521 / 전일 +57,188 · 2일 연속 수급 유입 미확인",
                 "evalStatus": "not_met"
               },
               {
@@ -5346,8 +5569,8 @@
               },
               {
                 "code": "C2",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
                 "note": "당일 등락 +4.04% (필요 -3% ~ +5%)"
@@ -7060,9 +7283,14 @@
             ],
             "unmatchedRules": [
               {
-                "code": "S1",
-                "note": "외인 -1,037,762→-1,042,446 / 기관 -271,969→-18,198 · 순매수 전환 없음",
-                "evalStatus": "not_met"
+                "code": "S2",
+                "note": "당일 평균 82.7% · 마지막 1시간 평균 미입력",
+                "evalStatus": "manual_required"
+              },
+              {
+                "code": "C2",
+                "note": "호가잔량 비율 미입력 (토스 호가창 수동 입력)",
+                "evalStatus": "manual_required"
               },
               {
                 "code": "C1",
@@ -7088,11 +7316,24 @@
             "marketCapUniverseCount": 2561,
             "keyPoint": "20일 고점 대비 -36.5% 조정 후 안정화 패턴 여부를 점검했습니다. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
             "notes": [
+              "호가잔량 미반영",
               "기업 이벤트 필터는 미반영"
             ],
             "manualInput": {
               "required": true,
               "fields": [
+                {
+                  "fieldKey": "orderbook.bidAskRatio",
+                  "label": "매수/매도 호가잔량 비율",
+                  "sourceName": "토스증권 호가창",
+                  "sourceUrl": "https://www.tossinvest.com/stocks/A001740/order",
+                  "copyHint": "매수 잔량 ÷ 매도 잔량 결과만 붙여넣습니다.",
+                  "instructions": [
+                    "토스증권에서 SK네트웍스 (001740) 호가창을 엽니다.",
+                    "총 매수잔량과 총 매도잔량을 확인합니다.",
+                    "매수잔량을 매도잔량으로 나눈 비율만 입력합니다. 예: 1.08"
+                  ]
+                },
                 {
                   "fieldKey": "eventFilter",
                   "label": "실적/기업행사 필터",
@@ -7100,13 +7341,14 @@
                   "sourceUrl": "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain",
                   "copyHint": "실적 발표와 분할/합병/배당락까지 남은 일수만 입력하거나 차단을 체크합니다.",
                   "instructions": [
-                    "KIND 공시에서 LG전자 (066570) 종목 공시를 조회합니다.",
+                    "KIND 공시에서 SK네트웍스 (001740) 종목 공시를 조회합니다.",
                     "실적 발표 예정일, 분할/합병/배당락 일정을 확인합니다.",
                     "남은 일수를 입력하거나 위험 이벤트가 임박했으면 차단을 체크합니다."
                   ]
                 }
               ],
               "missingFieldCodes": [
+                "orderbook.bidAskRatio",
                 "eventFilter"
               ],
               "summary": "수동 입력이 필요한 필드만 남겨둔 항목입니다.",
@@ -7149,6 +7391,7 @@
               "source": "naver_orderbook_http",
               "sourceUrl": "https://finance.naver.com/item/main.nhn?code=066570"
             },
+            "orderbook": {},
             "volatilityContext": {
               "marketState": "volatile",
               "stockState": "volatile",
@@ -7406,7 +7649,7 @@
               "핵심 Gate 미충족: F4",
               "핵심 Gate 미충족: G2",
               "매매금지",
-              "등급 B — 진입 최소 A, S"
+              "등급 C — 진입 최소 A, S"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "F4 미충족: 최근 손절 이력 2건 (최근: 2026-06-02) · 재진입 차단 · 외 1건",
