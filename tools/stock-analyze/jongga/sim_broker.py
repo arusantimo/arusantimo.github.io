@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any
 
 from jongga.outcome_tracker import stage_key_from_row
@@ -36,6 +37,52 @@ def _parse_qty(value: Any) -> float:
         return float("".join(digits)) if digits else 0.0
     except ValueError:
         return 0.0
+
+
+def _normalize_trade_date_text(value: Any) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    if len(raw) >= 10 and raw[4] == "-" and raw[7] == "-":
+        return raw[:10]
+    compact = raw[:8]
+    if len(compact) == 8 and compact.isdigit():
+        return f"{compact[:4]}-{compact[4:6]}-{compact[6:8]}"
+    return ""
+
+
+def _is_weekday_trade_date(date_text: str) -> bool:
+    normalized = _normalize_trade_date_text(date_text)
+    if not normalized:
+        return False
+    try:
+        return datetime.strptime(normalized, "%Y-%m-%d").weekday() < 5
+    except ValueError:
+        return False
+
+
+def _resolve_final_exit_bar(entry_date: str, bars: list[dict[str, Any]], scheduled_at: str = "") -> dict[str, Any] | None:
+    if not bars:
+        return None
+    entry_day = _normalize_trade_date_text(entry_date)
+    followup_day_last_bar: dict[str, dict[str, Any]] = {}
+    for bar in bars:
+        timestamp = str(bar.get("timestamp") or "")
+        trade_day = _normalize_trade_date_text(timestamp)
+        if not trade_day or trade_day == entry_day or not _is_weekday_trade_date(trade_day):
+            continue
+        current = followup_day_last_bar.get(trade_day)
+        if current is None or timestamp > str(current.get("timestamp") or ""):
+            followup_day_last_bar[trade_day] = bar
+    ordered_followup_days = sorted(followup_day_last_bar)
+    if ordered_followup_days:
+        target_day = ordered_followup_days[1] if len(ordered_followup_days) > 1 else ordered_followup_days[0]
+        return followup_day_last_bar[target_day]
+    if scheduled_at:
+        scheduled_bar = next((bar for bar in bars if str(bar.get("timestamp") or "") == str(scheduled_at)), None)
+        if scheduled_bar is not None:
+            return scheduled_bar
+    return bars[-1]
 
 
 def parse_trade_plan_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -504,10 +551,13 @@ def simulate_trade(
     entry_fill = fill_entry_order(entry_order, entry_ref_bar, slippage_pct=slippage_pct, fill_rule=fill_rule)
     fills.append(entry_fill)
 
+    final_exit_bar = _resolve_final_exit_bar(date, replay_bars, str(replay_schedule.get("finalExitAt") or ""))
+    final_exit_at = str(final_exit_bar.get("timestamp") or requested_at) if final_exit_bar else requested_at
+    effective_replay_schedule = dict(replay_schedule)
+    effective_replay_schedule["finalExitAt"] = final_exit_at
     primary_active_until = str(replay_schedule.get("primaryTargetUntil") or (replay_bars[1].get("timestamp") if len(replay_bars) > 1 else requested_at))
     secondary_active_from = str(replay_schedule.get("secondaryTargetFrom") or primary_active_until)
     secondary_active_until = str(replay_schedule.get("secondaryTargetUntil") or (replay_bars[2].get("timestamp") if len(replay_bars) > 2 else primary_active_until))
-    final_exit_at = str(replay_schedule.get("finalExitAt") or (replay_bars[-1].get("timestamp") if replay_bars else requested_at))
     target_window_map = {
         "premarket": (
             str(replay_bars[0].get("timestamp") if replay_bars else requested_at),
@@ -586,7 +636,7 @@ def simulate_trade(
             side="SELL",
             order_type="MKT",
             requested_at=final_exit_at,
-            requested_price=float(replay_bars[-1].get("close") or 0.0) if replay_bars else 0.0,
+            requested_price=float(final_exit_bar.get("close") or 0.0) if final_exit_bar else 0.0,
             quantity_pct=100.0,
             reason="3일차 종가 컷오프 청산",
             source_entry_key=source_entry_key,
@@ -599,7 +649,7 @@ def simulate_trade(
     exit_fills, exit_meta = simulate_exit_plan(
         orders=orders,
         bars=replay_bars,
-        replay_schedule=replay_schedule,
+        replay_schedule=effective_replay_schedule,
         strategy=strategy,
         entry_fill_price=float(entry_fill.get("fillPrice") or 0.0),
         reversal_live_exit_policy=reversal_live_exit_policy,

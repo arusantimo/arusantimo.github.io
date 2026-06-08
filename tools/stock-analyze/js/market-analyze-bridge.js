@@ -231,9 +231,20 @@ function recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, gate
   const onlyG5Blocked = hasBlocked && blockedCodes.every(code => code === 'G5');
   if (onlyG5Blocked) return '시장 Gate 차단 · 신규 진입 보류';
   if (hasBlocked) return `매매금지(핵심 Gate 미충족${blockedCodes.length ? `: ${blockedCodes.join(', ')}` : ''})`;
-  if (gapCode === 'G-E') return '매매금지(갭다운 경고 · 신규 진입 금지)';
   const effective = String(regimeLabel || '');
   const riseJustified = Boolean(overlay.riseJustifiedByMacro);
+  const gapIsFresh = Boolean(overlay.gapIsFresh);
+  if (gapCode === 'G-E') {
+    if (gapIsFresh && (effective.startsWith('강세장') || effective.startsWith('순환매장'))) {
+      if (strategy === 'breakout') return '매매금지(갭다운 경고 · 신규 진입 금지)';
+      if (grade === 'S') return '강력매수(거시경고·축소)';
+      if (grade === 'A') return '진입 가능(거시경고·축소)';
+      if (strategy === 'pullback' && grade === 'B') return '관심후보(B·거시경고)';
+      if (grade === 'B') return '관심후보';
+      return '제외';
+    }
+    return '매매금지(갭다운 경고 · 신규 진입 금지)';
+  }
   if (effective.startsWith('약세장')) {
     if (riseJustified) {
       if (grade === 'S') return '강력매수(소액·거시완충)';
@@ -253,11 +264,20 @@ function recalculateTrendStatusLabel(strategy, grade, regimeLabel, gapCode, gate
 
 function recalculateReversalStatusLabel(grade, regimeLabel, gapCode, filters, gates, overlay = {}) {
   if ((filters || []).concat(gates || []).some(row => row.status === '⛔')) return '매매금지';
-  if (gapCode === 'G-E') return '매매금지(갭다운 경고 · 신규 진입 금지)';
-  if (gapCode === 'G-D') return '매매금지(갭다운 주의 · 신규 진입 보류)';
   const effective = String(regimeLabel || '');
   const riseJustified = Boolean(overlay.riseJustifiedByMacro);
   const technical = String(overlay.technicalRegimeLabel || effective);
+  const gapIsFresh = Boolean(overlay.gapIsFresh);
+  if (gapCode === 'G-E') {
+    if (gapIsFresh && (effective.startsWith('강세장') || effective.startsWith('순환매장'))) {
+      if (grade === 'S') return '최우선 진입(거시경고·축소)';
+      if (grade === 'A') return '진입 가능(거시경고·축소)';
+      if (grade === 'B') return '매매금지';
+      return '제외';
+    }
+    return '매매금지(갭다운 경고 · 신규 진입 금지)';
+  }
+  if (gapCode === 'G-D') return '매매금지(갭다운 주의 · 신규 진입 보류)';
   if (effective.startsWith('약세장')) {
     if (riseJustified && ['S', 'A'].includes(grade) && ['G-A', 'G-B', 'G-C'].includes(gapCode)) {
       return '진입 가능(거시완충)';
@@ -279,11 +299,14 @@ function applyMacroOverlayToEntry(entry, strategy, context) {
   if (!regimeLabel) return entry;
   const gapCode = String(context.gapScore?.code || context.gapScore?.grade || '').trim().slice(0, 3);
   const grade = String(entry.grade || '').charAt(0);
+  const gapIsFresh = context.gapScore?.isFresh === true
+    || String(context.gapScore?.freshnessStatus || '').trim() === 'fresh';
   const gateContext = {
     ...context,
     ...overlay,
     effectiveRegimeLabel: regimeLabel,
-    riseJustifiedByMacro: Boolean(overlay.riseJustified ?? overlay.riseJustifiedByMacro ?? context.riseJustifiedByMacro)
+    riseJustifiedByMacro: Boolean(overlay.riseJustified ?? overlay.riseJustifiedByMacro ?? context.riseJustifiedByMacro),
+    gapIsFresh
   };
   const next = { ...entry };
   if (strategy === 'pullback') {

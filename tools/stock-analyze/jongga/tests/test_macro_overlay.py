@@ -13,6 +13,7 @@ from jongga.macro_overlay import (
     compute_effective_regime_label,
     is_rise_justified_by_macro,
     load_market_analyze_snapshot,
+    reversal_status_label,
     trend_status_label,
 )
 
@@ -126,6 +127,32 @@ class MacroOverlayTest(unittest.TestCase):
     def test_trend_status_label_allows_pullback_b_conditionally(self):
         label = trend_status_label("pullback", "B", REGIME_STRONG_BULL, "G-A", [], rise_justified=True)
         self.assertEqual(label, "진입 가능(B·조건부)")
+
+    def test_trend_status_label_relaxes_fresh_gap_e_for_pullback_and_accumulation(self):
+        pullback = trend_status_label("pullback", "A", REGIME_STRONG_BULL, "G-E", [], rise_justified=True, gap_is_fresh=True)
+        accumulation = trend_status_label("accumulation", "A", REGIME_ROTATION_BUFFERED, "G-E", [], rise_justified=True, gap_is_fresh=True)
+        pullback_b = trend_status_label("pullback", "B", REGIME_STRONG_BULL, "G-E", [], rise_justified=True, gap_is_fresh=True)
+        self.assertEqual(pullback, "진입 가능(거시경고·축소)")
+        self.assertEqual(accumulation, "진입 가능(거시경고·축소)")
+        self.assertEqual(pullback_b, "관심후보(B·거시경고)")
+
+    def test_gap_e_relaxation_keeps_breakout_blocked_and_stale_data_conservative(self):
+        breakout = trend_status_label("breakout", "A", REGIME_STRONG_BULL, "G-E", [], rise_justified=True, gap_is_fresh=True)
+        stale_pullback = trend_status_label("pullback", "A", REGIME_STRONG_BULL, "G-E", [], rise_justified=True, gap_is_fresh=False)
+        box_pullback = trend_status_label("pullback", "A", "박스권 ⚠️", "G-E", [], rise_justified=True, gap_is_fresh=True)
+        self.assertEqual(breakout, "매매금지(갭다운 경고 · 신규 진입 금지)")
+        self.assertEqual(stale_pullback, "매매금지(갭다운 경고 · 신규 진입 금지)")
+        self.assertEqual(box_pullback, "매매금지(갭다운 경고 · 신규 진입 금지)")
+
+    def test_reversal_status_label_relaxes_only_a_or_s_when_gap_e_is_fresh(self):
+        s_label = reversal_status_label("S", REGIME_STRONG_BULL, "G-E", [], [], rise_justified=True, gap_is_fresh=True)
+        a_label = reversal_status_label("A", REGIME_ROTATION_BUFFERED, "G-E", [], [], rise_justified=True, gap_is_fresh=True)
+        b_label = reversal_status_label("B", REGIME_STRONG_BULL, "G-E", [], [], rise_justified=True, gap_is_fresh=True)
+        blocked = reversal_status_label("A", REGIME_STRONG_BULL, "G-E", [{"status": "⛔", "code": "F2"}], [], rise_justified=True, gap_is_fresh=True)
+        self.assertEqual(s_label, "최우선 진입(거시경고·축소)")
+        self.assertEqual(a_label, "진입 가능(거시경고·축소)")
+        self.assertEqual(b_label, "매매금지")
+        self.assertEqual(blocked, "매매금지")
 
     def test_pullback_g5_warns_above_30_even_without_macro_until_warn_cap(self):
         gate = build_pullback_g5_gate(

@@ -609,6 +609,22 @@ body.modal-scroll-locked {
   padding: 12px;
 }
 
+.replay-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.replay-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .replay-day-head,
 .replay-strategy-card strong {
   font-size: 13px;
@@ -732,6 +748,15 @@ body.modal-scroll-locked {
   font-weight: 700;
   line-height: 1.2;
   white-space: nowrap;
+}
+
+.replay-section-collapsed-note {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: var(--text-tertiary);
+  font-size: 12px;
 }
 
 .replay-day-trades {
@@ -874,12 +899,38 @@ body.modal-scroll-locked {
   line-height: 1.5;
 }
 
+.replay-day-pager {
+  display: flex;
+  align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.replay-day-pager-meta,
+.replay-day-pager-page {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+
+.replay-day-pager-buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 780px) {
   .replay-summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .strategy-replay-inline {
+    justify-content: flex-start;
+  }
+
+  .replay-section-actions,
+  .replay-day-pager {
     justify-content: flex-start;
   }
 }
@@ -3313,6 +3364,26 @@ body.modal-scroll-locked {
   margin-bottom: 8px;
 }
 
+.modal-collapsible-section {
+  margin-bottom: 16px;
+}
+
+.modal-collapsible-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.modal-collapsible-header .modal-section-label {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.modal-collapsible-body.is-collapsed {
+  display: none;
+}
+
 .modal-ind-list {
   display: flex;
   flex-direction: column;
@@ -3435,6 +3506,66 @@ body.modal-scroll-locked {
   color: var(--text-danger);
 }
 
+.strategy-indicators-block {
+  margin-bottom: 18px;
+}
+
+.strategy-indicators-panel {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.45);
+  padding: 10px 12px;
+}
+
+.strategy-indicator-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.2fr) minmax(72px, 0.9fr) minmax(64px, 0.7fr);
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.strategy-indicator-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.strategy-indicator-label {
+  color: var(--text-muted, #94a3b8);
+}
+
+.strategy-indicator-value {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.strategy-indicator-verdict {
+  font-size: 10px;
+  color: var(--text-secondary, #cbd5e1);
+  text-align: right;
+}
+
+.strategy-indicators-meta {
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-muted, #94a3b8);
+}
+
+.indicator-tone-stable {
+  color: #6ee7b7;
+}
+
+.indicator-tone-warn {
+  color: #fcd34d;
+}
+
+.indicator-tone-abnormal {
+  color: #fca5a5;
+}
+
 .report-verdict {
   display: inline-flex;
   align-items: center;
@@ -3493,6 +3624,44 @@ body.modal-scroll-locked {
 .buy-detail-note span {
   font-size: 11px;
   line-height: 1.5;
+}
+
+.buy-detail-summary-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: var(--border-radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.buy-detail-summary-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.buy-detail-summary-label {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.buy-detail-summary-label::after {
+  content: ' —';
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.buy-detail-summary-value {
+  color: var(--text-secondary);
+  min-width: 0;
 }
 
 .buy-detail-mode .modal-triggered-rule .modal-ind-card {

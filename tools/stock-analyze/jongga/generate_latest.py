@@ -8,7 +8,7 @@ import os
 import re
 import sys
 from time import perf_counter
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -106,6 +106,9 @@ from jongga.rule_evaluation import (
     split_rule_lists,
 )
 from jongga.output_contract import (
+    INPUT_ARCHIVE_VERSION,
+    KST,
+    PAYLOAD_SOURCE_LIVE,
     VARIANT_CANARY,
     VARIANT_STABLE,
     compact_date,
@@ -113,6 +116,7 @@ from jongga.output_contract import (
     payload_with_analysis_date,
     read_js_assignment,
     resolve_analysis_date,
+    resolve_generation_variants,
     variant_label,
     write_daily_outputs,
 )
@@ -292,6 +296,14 @@ def parse_float(value: Any) -> float:
     return float(match.group(0)) if match else 0.0
 
 
+def _optional_metric(value: Any) -> float | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    parsed = parse_float(text)
+    return parsed if math.isfinite(parsed) else None
+
+
 def signed_number(value: float, digits: int = 1, suffix: str = "") -> str:
     if not math.isfinite(value):
         return "-"
@@ -357,10 +369,85 @@ def fetch_yahoo_chart_result(symbol: str, *, range_value: str = "5d", interval: 
 
 
 def fetch_yahoo_meta(symbol: str) -> dict[str, Any]:
-    meta = fetch_yahoo_chart_result(symbol, range_value="5d", interval="1d").get("meta")
+    result = fetch_yahoo_chart_result(symbol, range_value="5d", interval="1d")
+    meta = dict(result.get("meta") or {})
     if meta:
+        as_of = yahoo_result_as_of(result)
+        if as_of:
+            meta["asOf"] = as_of
         return meta
     raise RuntimeError(f"failed to fetch yahoo meta for {symbol}: meta missing")
+
+
+def yahoo_result_as_of(result: dict[str, Any]) -> str:
+    meta = result.get("meta") or {}
+    timestamps = [float(value) for value in (result.get("timestamp") or []) if isinstance(value, (int, float))]
+    candidates = [float(meta.get("regularMarketTime"))] if isinstance(meta.get("regularMarketTime"), (int, float)) else []
+    current_period = meta.get("currentTradingPeriod") or {}
+    for session_key in ("pre", "regular", "post"):
+        session = current_period.get(session_key) or {}
+        for field_key in ("end", "start"):
+            value = session.get(field_key)
+            if isinstance(value, (int, float)):
+                candidates.append(float(value))
+    if timestamps:
+        candidates.append(max(timestamps))
+    if not candidates:
+        return ""
+    return datetime.fromtimestamp(max(candidates), timezone.utc).replace(microsecond=0).isoformat()
+
+
+def _coerce_iso_datetime(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    normalized = text.replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def annotate_macro_metric_freshness(
+    live_metrics: dict[str, dict[str, Any]],
+    analysis_date: date | str | None,
+) -> dict[str, Any]:
+    resolved_analysis_date = (
+        analysis_date
+        if isinstance(analysis_date, date)
+        else resolve_analysis_date(str(analysis_date) if analysis_date else None)
+    )
+    stale_keys: list[str] = []
+    as_of_map: dict[str, str] = {}
+    for metric_key in ("nq", "vix", "tnx", "krw", "sox"):
+        metric = live_metrics.get(metric_key) or {}
+        parsed = _coerce_iso_datetime(metric.get("asOf"))
+        if parsed is None:
+            metric["freshnessStatus"] = "unknown"
+            metric["stale"] = True
+            metric["freshnessLagDays"] = None
+            stale_keys.append(f"macro_{metric_key}")
+            continue
+        as_of_text = parsed.astimezone(timezone.utc).replace(microsecond=0).isoformat()
+        as_of_map[metric_key] = as_of_text
+        lag_days = (resolved_analysis_date - parsed.astimezone(KST).date()).days
+        is_stale = lag_days > 3
+        metric["asOf"] = as_of_text
+        metric["freshnessStatus"] = "stale" if is_stale else "fresh"
+        metric["stale"] = is_stale
+        metric["freshnessLagDays"] = lag_days
+        if is_stale:
+            stale_keys.append(f"macro_{metric_key}")
+    return {
+        "isFresh": not stale_keys,
+        "staleKeys": stale_keys,
+        "staleCount": len(stale_keys),
+        "freshCount": 5 - len(stale_keys),
+        "asOf": as_of_map,
+    }
 
 
 def parse_yahoo_chart_candles(result: dict[str, Any]) -> list[dict[str, float]]:
@@ -1430,6 +1517,11 @@ class StockSnapshot:
     orderbook: dict[str, Any] | None = None
     market_cap_rank: int | None = None
     market_cap_universe_count: int | None = None
+    per: float | None = None
+    pbr: float | None = None
+    cns_per: float | None = None
+    low_52w: float | None = None
+    foreign_rate: float | None = None
     open_history: list[float] | None = None
     date_history: list[str] | None = None
 
@@ -1486,6 +1578,7 @@ def build_stock_snapshot(
 
     history_high_window = high_history[:120] or [parse_float(basic.get("highPrice") or basic.get("closePrice") or basic.get("stockPrice")) or 0.0]
     high_52w = parse_float(find_total_info(total_infos, "highPriceOf52Weeks")) or max(history_high_window)
+    low_52w = parse_float(find_total_info(total_infos, "lowPriceOf52Weeks")) or (min(low_history[:120]) if low_history else 0.0)
     historical_current = parse_float(analysis_row["closePrice"]) if analysis_row else 0.0
     current_price = historical_current or parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
     prev_close = parse_float(analysis_rows[1]["closePrice"]) if len(analysis_rows) > 1 else 0.0
@@ -1561,6 +1654,11 @@ def build_stock_snapshot(
         orderbook=None,
         market_cap_rank=(market_cap_rank_lookup or {}).get(code),
         market_cap_universe_count=market_cap_universe_count,
+        per=_optional_metric(find_total_info(total_infos, "per")),
+        pbr=_optional_metric(find_total_info(total_infos, "pbr")),
+        cns_per=_optional_metric(find_total_info(total_infos, "cnsPer")),
+        low_52w=low_52w or None,
+        foreign_rate=_optional_metric(find_total_info(total_infos, "foreignRate")),
     )
 
 
@@ -1748,8 +1846,8 @@ def build_gap_score(live_metrics: dict[str, dict[str, float]]) -> dict[str, Any]
     else:
         grade_code = "G-E"
         grade = "G-E 🔴"
-        entry_adjustment = "❌ 전 등급 신규 진입 금지 / ❌ 신규 진입 금지"
-        sell_adjustment = "진입 없음 | 해당 없음"
+        entry_adjustment = "⚠️ 눌림목·매집 A/S만 50% 허용 · 돌파 금지 / ⚠️ A/S만 50% 허용"
+        sell_adjustment = "프리마켓 첫 가격 즉시 50% 정리 | 손절폭 -1%p 축소"
         swing_adjustment = "금지"
 
     return {
@@ -1940,6 +2038,7 @@ def macro_status_kwargs(context: dict[str, Any]) -> dict[str, Any]:
     return {
         "rise_justified": bool(context.get("riseJustifiedByMacro")),
         "technical_regime": str(context.get("technicalRegimeLabel") or context.get("regimeLabel") or ""),
+        "gap_is_fresh": bool((context.get("gapScore") or {}).get("isFresh")),
     }
 
 
@@ -4051,10 +4150,16 @@ def finalize_scored_buy_entry(
     entry: dict[str, Any],
     context: dict[str, Any] | None = None,
     marking_meta: dict[str, Any] | None = None,
+    snapshot: StockSnapshot | None = None,
 ) -> dict[str, Any]:
     if context is not None:
         attach_marking(entry, context, marking_meta)
-    return attach_entry_eligibility(entry, context)
+    finalized = attach_entry_eligibility(entry, context)
+    if snapshot is not None:
+        from jongga.stock_indicators import attach_stock_indicators_to_entry
+
+        attach_stock_indicators_to_entry(finalized, snapshot)
+    return finalized
 
 
 def build_pullback_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str, Any]:
@@ -4168,7 +4273,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
-    return finalize_scored_buy_entry(entry, context, build_pullback_take_profit_marking_meta(snapshot))
+    return finalize_scored_buy_entry(entry, context, build_pullback_take_profit_marking_meta(snapshot), snapshot)
 
 
 def build_breakout_entry(
@@ -4246,7 +4351,7 @@ def build_breakout_entry(
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "breakout")
-    return finalize_scored_buy_entry(entry, context, build_breakout_take_profit_marking_meta(snapshot))
+    return finalize_scored_buy_entry(entry, context, build_breakout_take_profit_marking_meta(snapshot), snapshot)
 
 
 def build_momentum_entry(
@@ -4344,7 +4449,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "accumulation")
-    return finalize_scored_buy_entry(entry, context, build_accumulation_take_profit_marking_meta(snapshot))
+    return finalize_scored_buy_entry(entry, context, build_accumulation_take_profit_marking_meta(snapshot), snapshot)
 
 
 def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
@@ -4431,7 +4536,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "reversal")
-    return finalize_scored_buy_entry(entry, context, build_reversal_take_profit_marking_meta(snapshot))
+    return finalize_scored_buy_entry(entry, context, build_reversal_take_profit_marking_meta(snapshot), snapshot)
 
 
 def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -4440,14 +4545,70 @@ def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return entries
 
 
+def build_input_archive_payload(
+    *,
+    analysis_date: date,
+    mode: str,
+    top_limit: int,
+    collection_log: list[dict[str, Any]],
+    vkospi_quote: dict[str, Any],
+    yahoo_meta: dict[str, dict[str, Any]],
+    live_metrics: dict[str, dict[str, Any]],
+    macro_freshness: dict[str, Any],
+    gap_score: dict[str, Any],
+    kospi_history: list[dict[str, Any]],
+    market_snapshot: dict[str, Any] | None,
+    market_value_rows: list[dict[str, Any]],
+    top_trading: list[tuple[int, str, str]],
+    snapshots: list["StockSnapshot"],
+    rollups: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "schemaVersion": INPUT_ARCHIVE_VERSION,
+        "analysisDate": analysis_date.isoformat(),
+        "variant": normalize_variant(mode),
+        "generatedAt": utc_now_iso(),
+        "payloadSourceMode": PAYLOAD_SOURCE_LIVE,
+        "rebuildable": True,
+        "topLimit": int(top_limit),
+        "collectionLog": collection_log,
+        "market": {
+            "vkospiQuote": vkospi_quote,
+            "yahooMeta": yahoo_meta,
+            "liveMetrics": live_metrics,
+            "macroFreshness": macro_freshness,
+            "gapScore": gap_score,
+            "kospiHistory": kospi_history,
+            "marketAnalyzeSnapshot": market_snapshot,
+        },
+        "universe": {
+            "marketValueRows": market_value_rows,
+            "topTrading": [
+                {"rank": rank, "code": code, "name": name}
+                for rank, code, name in top_trading
+            ],
+        },
+        "stocks": {
+            "count": len(snapshots),
+            "snapshots": [asdict(snapshot) for snapshot in snapshots],
+        },
+        "rollups": rollups,
+    }
+
+
 def collect_live_payload(
     top_limit: int = TOP_TRADING_VALUE_LIMIT,
     *,
     mode: str = VARIANT_STABLE,
     analysis_date: str | date | None = None,
-) -> dict[str, Any]:
+) -> tuple[dict[str, Any], dict[str, Any]]:
     resolved_mode = normalize_variant(mode)
     collection_log: list[dict[str, Any]] = []
+    resolved_analysis_date = (
+        analysis_date
+        if isinstance(analysis_date, date)
+        else resolve_analysis_date(str(analysis_date) if analysis_date else None)
+    )
 
     def log_step(step: str, label: str, started_at: float, *, status: str = "ok", detail: str = "", count: int | None = None) -> None:
         duration_ms = round((perf_counter() - started_at) * 1000, 1)
@@ -4489,13 +4650,13 @@ def collect_live_payload(
         "krw": fetch_yahoo_meta("KRW=X"),
         "sox": fetch_yahoo_meta("^SOX"),
     }
-    log_step("macro_quotes", "글로벌 매크로 지표 수집", started_at, detail="Yahoo chart 5종", count=len(yahoo_meta))
 
     live_metrics = {
         "nq": {
             "current": float(yahoo_meta["nq"]["regularMarketPrice"]),
             "previousClose": float(yahoo_meta["nq"]["chartPreviousClose"]),
             "changePct": ((float(yahoo_meta["nq"]["regularMarketPrice"]) - float(yahoo_meta["nq"]["chartPreviousClose"])) / float(yahoo_meta["nq"]["chartPreviousClose"])) * 100,
+            "asOf": str(yahoo_meta["nq"].get("asOf") or ""),
         },
         "vkospi": {
             "current": float(vkospi_quote["current"]),
@@ -4509,26 +4670,49 @@ def collect_live_payload(
         "vix": {
             "current": float(yahoo_meta["vix"]["regularMarketPrice"]),
             "previousClose": float(yahoo_meta["vix"]["chartPreviousClose"]),
+            "asOf": str(yahoo_meta["vix"].get("asOf") or ""),
         },
         "tnx": {
             "current": float(yahoo_meta["tnx"]["regularMarketPrice"]),
             "previousClose": float(yahoo_meta["tnx"]["chartPreviousClose"]),
             "bpChange": (float(yahoo_meta["tnx"]["regularMarketPrice"]) - float(yahoo_meta["tnx"]["chartPreviousClose"])) * 100,
+            "asOf": str(yahoo_meta["tnx"].get("asOf") or ""),
         },
         "krw": {
             "current": float(yahoo_meta["krw"]["regularMarketPrice"]),
             "previousClose": float(yahoo_meta["krw"]["chartPreviousClose"]),
             "changeWon": float(yahoo_meta["krw"]["regularMarketPrice"]) - float(yahoo_meta["krw"]["chartPreviousClose"]),
+            "asOf": str(yahoo_meta["krw"].get("asOf") or ""),
         },
         "sox": {
             "current": float(yahoo_meta["sox"]["regularMarketPrice"]),
             "previousClose": float(yahoo_meta["sox"]["chartPreviousClose"]),
             "changePct": ((float(yahoo_meta["sox"]["regularMarketPrice"]) - float(yahoo_meta["sox"]["chartPreviousClose"])) / float(yahoo_meta["sox"]["chartPreviousClose"])) * 100,
+            "asOf": str(yahoo_meta["sox"].get("asOf") or ""),
         },
     }
+    macro_freshness = annotate_macro_metric_freshness(live_metrics, resolved_analysis_date)
+    log_step(
+        "macro_quotes",
+        "글로벌 매크로 지표 수집",
+        started_at,
+        status="warning" if macro_freshness["staleKeys"] else "ok",
+        detail=(
+            f"Yahoo chart 5종 · fresh {macro_freshness['freshCount']} / stale {macro_freshness['staleCount']}"
+            if macro_freshness["staleKeys"]
+            else "Yahoo chart 5종"
+        ),
+        count=len(yahoo_meta),
+    )
 
     started_at = perf_counter()
     gap_score = build_gap_score(live_metrics)
+    gap_score["isFresh"] = bool(macro_freshness["isFresh"])
+    gap_score["freshnessStatus"] = "fresh" if macro_freshness["isFresh"] else "stale"
+    gap_score["macroAsOf"] = dict(macro_freshness["asOf"])
+    gap_score["staleKeys"] = list(macro_freshness["staleKeys"])
+    if macro_freshness["staleKeys"]:
+        gap_score["note"] = f"{gap_score['note']} 거시 시세 freshness 미확인"
     log_step("gap_score", "갭 스코어 계산", started_at, detail=str(gap_score.get("grade") or ""))
 
     started_at = perf_counter()
@@ -4536,7 +4720,6 @@ def collect_live_payload(
     log_step("kospi_history", "KOSPI 히스토리 수집", started_at, count=len(kospi_history))
 
     started_at = perf_counter()
-    resolved_analysis_date = analysis_date or resolve_analysis_date(None)
     market_snapshot = load_market_analyze_snapshot()
     context = build_market_context(kospi_history, gap_score, live_metrics["vkospi"], analysis_date=resolved_analysis_date)
     context["outcomesRollup"] = load_outcomes_rollup()
@@ -4699,7 +4882,8 @@ def collect_live_payload(
         manual_keys.append("toss_metrics")
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
-    data_quality_status = "partial" if errors or http_errors or browser_errors or missing_public_metrics or fallback_keys else "success"
+    stale_keys = list(macro_freshness["staleKeys"])
+    data_quality_status = "partial" if errors or http_errors or browser_errors or missing_public_metrics or fallback_keys or stale_keys else "success"
     intraday_ok = sum(1 for snapshot in snapshots if snapshot.intraday_30m.get("available"))
     event_schedule_ok = sum(1 for snapshot in snapshots if snapshot.event_filter)
     toss_strength_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("avgStrength") is not None)
@@ -4711,25 +4895,28 @@ def collect_live_payload(
         "schemaVersion": "jongga_result.v1",
         "generatedAt": utc_now_iso(),
         "variant": resolved_mode,
+        "payloadSourceMode": PAYLOAD_SOURCE_LIVE,
+        "rebuildable": True,
+        "inputArchiveVersion": INPUT_ARCHIVE_VERSION,
         "dataQuality": {
             "status": data_quality_status,
             "counts": {
                 "total": len(snapshots),
                 "failed": len(errors),
-                "stale": 0,
+                "stale": len(stale_keys),
                 "manual": missing_public_metrics,
                 "fallback": len(fallback_keys),
                 "slots": 1,
             },
             "failedKeys": errors + http_errors + browser_errors,
-            "staleKeys": [],
+            "staleKeys": stale_keys,
             "manualKeys": manual_keys,
             "fallbackKeys": fallback_keys,
             "providerHealth": {
                 "naver_mobile": {"ok": len(snapshots)},
                 "naver_chart": {"ok": len(snapshots)},
                 "naver_integration_schedule": {"ok": event_schedule_ok},
-                "yahoo_chart": {"ok": 5 + (1 if live_metrics["vkospi"]["isFallback"] else 0)},
+                "yahoo_chart": {"ok": 5 + (1 if live_metrics["vkospi"]["isFallback"] else 0), "stale": len(stale_keys)},
                 "yahoo_intraday_30m": {"ok": intraday_ok},
                 "toss_http_strength": {"ok": toss_strength_ok},
                 "toss_ticks_strength_proxy": {"ok": toss_ticks_proxy_ok},
@@ -4778,11 +4965,33 @@ def collect_live_payload(
                 "dataQuality": {
                     "status": data_quality_status,
                     "source": "live-public-run",
+                    "counts": {"stale": len(stale_keys)},
+                    "staleKeys": stale_keys,
                 },
             }
         ],
     }
-    return payload
+    input_archive = build_input_archive_payload(
+        analysis_date=resolved_analysis_date,
+        mode=resolved_mode,
+        top_limit=top_limit,
+        collection_log=collection_log,
+        vkospi_quote=vkospi_quote,
+        yahoo_meta=yahoo_meta,
+        live_metrics=live_metrics,
+        macro_freshness=macro_freshness,
+        gap_score=gap_score,
+        kospi_history=kospi_history,
+        market_snapshot=market_snapshot,
+        market_value_rows=market_value_rows,
+        top_trading=top_trading,
+        snapshots=snapshots,
+        rollups={
+            "outcomesRollup": context.get("outcomesRollup") or {},
+            "replayProfileRollup": context.get("replayProfileRollup") or {},
+        },
+    )
+    return payload, input_archive
 
 
 def write_outputs(payload: dict[str, Any], output_path: str | Path, bridge_js_path: str | Path | None) -> None:
@@ -4798,7 +5007,12 @@ def write_outputs(payload: dict[str, Any], output_path: str | Path, bridge_js_pa
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Generate dated jongga JSON/JS from live public data")
     parser.add_argument("--date", help="Analysis date in YYYY-MM-DD. Defaults to Asia/Seoul today")
-    parser.add_argument("--variant", choices=["all", VARIANT_STABLE, VARIANT_CANARY], default="all", help="Output channel to generate. Defaults to both stable and canary")
+    parser.add_argument(
+        "--variant",
+        choices=["all", VARIANT_STABLE, VARIANT_CANARY],
+        default="all",
+        help="Output channel to generate. Defaults to stable only while canary is disabled",
+    )
     parser.add_argument("--out-dir", default="jongga/output", help="Daily output directory")
     parser.add_argument("--history-js", default="jongga/output/jongga_history.js", help="History manifest JS path")
     parser.add_argument("--out", help="Legacy latest.json output path")
@@ -4810,18 +5024,36 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     prepare_console_output()
     args = build_parser().parse_args()
-    analysis_date = resolve_analysis_date(args.date)
-    variants = [VARIANT_STABLE, VARIANT_CANARY] if args.variant == "all" else [normalize_variant(args.variant)]
+    try:
+        analysis_date = resolve_analysis_date(args.date)
+    except ValueError as exc:
+        emit_cli_log("FAIL", str(exc), tone="red")
+        return 2
+    variants = resolve_generation_variants(args.variant)
+    if not variants:
+        emit_cli_log(
+            "FAIL",
+            "카나리 채널이 비활성화되어 있습니다. --variant stable 을 사용하세요.",
+            tone="red",
+        )
+        return 2
     generated_runs: list[dict[str, Any]] = []
 
     for variant in variants:
         print_variant_header(variant, analysis_date)
-        payload = payload_with_analysis_date(
-            collect_live_payload(top_limit=args.top_limit, mode=variant, analysis_date=analysis_date),
-            analysis_date,
-            variant=variant,
+        collected_payload, input_archive = collect_live_payload(
+            top_limit=args.top_limit,
+            mode=variant,
+            analysis_date=analysis_date,
         )
-        json_path, js_path, history_path = write_daily_outputs(payload, args.out_dir, args.history_js, variant=variant)
+        payload = payload_with_analysis_date(collected_payload, analysis_date, variant=variant)
+        json_path, js_path, history_path = write_daily_outputs(
+            payload,
+            args.out_dir,
+            args.history_js,
+            variant=variant,
+            input_archive=input_archive,
+        )
         generated_runs.append({
             "variant": variant,
             "payload": payload,

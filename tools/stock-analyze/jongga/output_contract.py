@@ -15,16 +15,58 @@ except ZoneInfoNotFoundError:
 STRATEGY_ORDER = ("pullback", "accumulation", "breakout", "reversal", "swing")
 VARIANT_STABLE = "stable"
 VARIANT_CANARY = "canary"
+INPUT_ARCHIVE_VERSION = "jongga_inputs.v1"
+PAYLOAD_SOURCE_LIVE = "live"
+PAYLOAD_SOURCE_ARCHIVE_REBUILD = "archive_rebuild"
+PAYLOAD_SOURCE_BEST_EFFORT_LEGACY = "best_effort_legacy"
+CANARY_CHANNEL_ENABLED = False
 VARIANT_LABELS = {
     VARIANT_STABLE: "현재 버전",
     VARIANT_CANARY: "카나리",
 }
 
 
-def resolve_analysis_date(value: str | None = None) -> date:
+def is_canary_channel_enabled() -> bool:
+    return CANARY_CHANNEL_ENABLED
+
+
+def resolve_generation_variants(value: str | None = None) -> list[str]:
+    text = str(value or "all").strip().lower()
+    if text == "all":
+        return [VARIANT_STABLE, VARIANT_CANARY] if is_canary_channel_enabled() else [VARIANT_STABLE]
+    if text == VARIANT_CANARY:
+        return [VARIANT_CANARY] if is_canary_channel_enabled() else []
+    return [VARIANT_STABLE]
+
+
+def resolve_outcome_variant_filter(value: str | None = None) -> str:
+    text = str(value or "all").strip().lower()
+    if text == "all":
+        return "all" if is_canary_channel_enabled() else VARIANT_STABLE
+    if text == VARIANT_CANARY and not is_canary_channel_enabled():
+        raise ValueError("canary channel is disabled")
+    return normalize_variant(text)
+
+
+def is_weekend_day(value: date) -> bool:
+    return value.weekday() >= 5
+
+
+def previous_trading_day(value: date) -> date:
+    current = value
+    while is_weekend_day(current):
+        current -= timedelta(days=1)
+    return current
+
+
+def resolve_analysis_date(value: str | None = None, *, today: date | None = None) -> date:
     if value:
-        return date.fromisoformat(value)
-    return datetime.now(KST).date()
+        resolved = date.fromisoformat(value)
+        if is_weekend_day(resolved):
+            raise ValueError(f"주말 날짜({resolved.isoformat()})는 일별 분석일로 사용할 수 없습니다.")
+        return resolved
+    base_day = today or datetime.now(KST).date()
+    return previous_trading_day(base_day)
 
 
 def compact_date(value: date | str) -> str:
@@ -58,6 +100,14 @@ def build_daily_output_paths(out_dir: str | Path, analysis_date: date, *, varian
     compact = compact_date(analysis_date)
     suffix = variant_suffix(variant)
     return directory / f"latest_{compact}{suffix}.json", directory / f"jongga_data_{compact}{suffix}.js"
+
+
+def build_input_archive_path(out_dir: str | Path, analysis_date: date, *, variant: str = VARIANT_STABLE) -> Path:
+    month_folder = analysis_date.strftime("%Y%m")
+    directory = Path(out_dir) / "archive" / month_folder
+    compact = compact_date(analysis_date)
+    suffix = variant_suffix(variant)
+    return directory / f"inputs_{compact}{suffix}.json"
 
 
 def payload_with_analysis_date(payload: dict[str, Any], analysis_date: date, *, variant: str = VARIANT_STABLE) -> dict[str, Any]:
@@ -132,22 +182,43 @@ def web_path(path: str | Path) -> str:
     return candidate.as_posix()
 
 
+def write_input_archive(
+    archive_payload: dict[str, Any],
+    out_dir: str | Path,
+    analysis_date: date,
+    *,
+    variant: str = VARIANT_STABLE,
+) -> Path:
+    archive_path = build_input_archive_path(out_dir, analysis_date, variant=variant)
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+    archive_path.write_text(json.dumps(archive_payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return archive_path
+
+
 def build_history_entry(
     payload: dict[str, Any],
     daily_js_path: str | Path,
     daily_json_path: str | Path,
     *,
     variant: str | None = None,
+    input_archive_path: str | Path | None = None,
     top_limit: int = 10,
 ) -> dict[str, Any]:
     quality = payload.get("dataQuality") if isinstance(payload.get("dataQuality"), dict) else {}
     resolved_variant = normalize_variant(variant or str(payload.get("variant") or ""))
+    payload_source_mode = str(payload.get("payloadSourceMode") or PAYLOAD_SOURCE_LIVE)
+    input_archive_version = str(payload.get("inputArchiveVersion") or "")
+    rebuildable = bool(payload.get("rebuildable")) or input_archive_path is not None
     return {
         "date": str(payload.get("analysisDate") or ""),
         "variant": resolved_variant,
         "variantLabel": variant_label(resolved_variant),
         "jsFile": web_path(daily_js_path),
         "jsonFile": web_path(daily_json_path),
+        "inputArchiveFile": web_path(input_archive_path) if input_archive_path else "",
+        "inputArchiveVersion": input_archive_version,
+        "payloadSourceMode": payload_source_mode,
+        "rebuildable": rebuildable,
         "generatedAt": payload.get("generatedAt") or "",
         "status": quality.get("status") or "unknown",
         "buyCount": count_buy_entries(payload),
@@ -160,7 +231,10 @@ def update_history_index(existing: list[dict[str, Any]], entry: dict[str, Any]) 
     target_variant = normalize_variant(str(entry.get("variant") or ""))
     merged = [
         item for item in existing
-        if item.get("date") != target_date or normalize_variant(str(item.get("variant") or "")) != target_variant
+        if (
+            (item.get("date") != target_date or normalize_variant(str(item.get("variant") or "")) != target_variant)
+            and not _history_entry_is_weekend(item)
+        )
     ]
     merged.append(entry)
     return sorted(
@@ -173,12 +247,20 @@ def update_history_index(existing: list[dict[str, Any]], entry: dict[str, Any]) 
     )
 
 
+def _history_entry_is_weekend(entry: dict[str, Any]) -> bool:
+    try:
+        return is_weekend_day(date.fromisoformat(str(entry.get("date") or "")))
+    except ValueError:
+        return False
+
+
 def write_daily_outputs(
     payload: dict[str, Any],
     out_dir: str | Path,
     history_js_path: str | Path,
     *,
     variant: str | None = None,
+    input_archive: dict[str, Any] | None = None,
     top_limit: int = 10,
 ) -> tuple[Path, Path, Path]:
     raw_date = payload.get("analysisDate")
@@ -186,14 +268,24 @@ def write_daily_outputs(
     resolved_variant = normalize_variant(variant or str(payload.get("variant") or ""))
     json_path, js_path = build_daily_output_paths(out_dir, analysis_date, variant=resolved_variant)
     history_path = Path(history_js_path)
+    input_archive_path = None
 
     json_path.parent.mkdir(parents=True, exist_ok=True)
     history_path.parent.mkdir(parents=True, exist_ok=True)
 
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
     js_path.write_text(render_daily_bridge_js(payload, variant=resolved_variant), encoding="utf-8")
+    if input_archive is not None:
+        input_archive_path = write_input_archive(input_archive, out_dir, analysis_date, variant=resolved_variant)
 
-    entry = build_history_entry(payload, js_path, json_path, variant=resolved_variant, top_limit=top_limit)
+    entry = build_history_entry(
+        payload,
+        js_path,
+        json_path,
+        variant=resolved_variant,
+        input_archive_path=input_archive_path,
+        top_limit=top_limit,
+    )
     history = update_history_index(read_history_index(history_path), entry)
     history_path.write_text(render_history_bridge_js(history), encoding="utf-8")
     return json_path, js_path, history_path

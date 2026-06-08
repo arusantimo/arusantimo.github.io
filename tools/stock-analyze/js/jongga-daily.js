@@ -1,6 +1,7 @@
 const JONGGA_MANUAL_JSON_STORAGE_KEY = 'stockAnalyzeJonggaManualJsonByDateVariantV1';
 const JONGGA_LEGACY_MANUAL_JSON_STORAGE_KEY = 'stockAnalyzeJonggaManualJsonByDateV1';
 const JONGGA_ACTIVE_VARIANT_STORAGE_KEY = 'stockAnalyzeJonggaActiveVariantV1';
+const JONGGA_CANARY_ENABLED = false;
 const JONGGA_VARIANTS = ['stable', 'canary'];
 const JONGGA_VARIANT_LABELS = {
   stable: '현재 버전',
@@ -23,8 +24,20 @@ const jonggaVariantAvailability = {
   canary: { available: null }
 };
 
-function normalizeJonggaVariant(value) {
+function isJonggaCanaryEnabled() {
+  return JONGGA_CANARY_ENABLED;
+}
+
+function getJonggaRawVariant(value) {
   return String(value || '').trim().toLowerCase() === 'canary' ? 'canary' : 'stable';
+}
+
+function normalizeJonggaVariant(value) {
+  const text = String(value || '').trim().toLowerCase();
+  if (text === 'canary') {
+    return isJonggaCanaryEnabled() ? 'canary' : 'stable';
+  }
+  return 'stable';
 }
 
 function getJonggaVariantLabel(value) {
@@ -45,7 +58,12 @@ function buildJonggaVariantDateKey(dateKey, variant = getJonggaActiveVariant()) 
 
 function readStoredJonggaVariant() {
   try {
-    return normalizeJonggaVariant(localStorage.getItem(JONGGA_ACTIVE_VARIANT_STORAGE_KEY) || 'stable');
+    const stored = localStorage.getItem(JONGGA_ACTIVE_VARIANT_STORAGE_KEY) || 'stable';
+    const normalized = normalizeJonggaVariant(stored);
+    if (!isJonggaCanaryEnabled() && stored === 'canary') {
+      localStorage.setItem(JONGGA_ACTIVE_VARIANT_STORAGE_KEY, 'stable');
+    }
+    return normalized;
   } catch {
     return 'stable';
   }
@@ -77,18 +95,27 @@ function markJonggaVariantAvailability(variant, available) {
 function updateJonggaVariantControls() {
   const activeVariant = getJonggaActiveVariant();
   document.querySelectorAll('[data-jongga-variant]').forEach(button => {
-    const variant = normalizeJonggaVariant(button.dataset.jonggaVariant);
+    const rawVariant = getJonggaRawVariant(button.dataset.jonggaVariant);
+    const variant = normalizeJonggaVariant(rawVariant);
     const availability = jonggaVariantAvailability[variant]?.available;
+    const channelDisabled = rawVariant === 'canary' && !isJonggaCanaryEnabled();
     button.classList.toggle('active', variant === activeVariant);
-    button.disabled = availability === false && variant !== activeVariant;
-    button.classList.toggle('is-disabled', availability === false && variant !== activeVariant);
-    button.title = availability === false
-      ? `${getJonggaVariantLabel(variant)} 데이터 파일이 아직 없습니다.`
-      : `${getJonggaVariantLabel(variant)} 결과를 불러옵니다.`;
+    button.disabled = channelDisabled || (availability === false && variant !== activeVariant);
+    button.classList.toggle('is-disabled', button.disabled);
+    button.title = channelDisabled
+      ? '카나리 채널은 당분간 사용하지 않습니다.'
+      : availability === false
+        ? `${getJonggaVariantLabel(variant)} 데이터 파일이 아직 없습니다.`
+        : `${getJonggaVariantLabel(variant)} 결과를 불러옵니다.`;
   });
 }
 
 function setActiveJonggaVariant(nextVariant, { persist = true, reload = true, dateKey = getJonggaKstTodayKey() } = {}) {
+  const rawVariant = String(nextVariant || '').trim().toLowerCase();
+  if (!isJonggaCanaryEnabled() && rawVariant === 'canary') {
+    updateJonggaVariantControls();
+    return getJonggaActiveVariant();
+  }
   const currentVariant = getJonggaActiveVariant();
   const variant = persist ? persistJonggaActiveVariant(nextVariant) : normalizeJonggaVariant(nextVariant);
   if (!persist) activeJonggaVariant = variant;
@@ -174,7 +201,7 @@ function getJonggaCompactDate(dateKey) {
 }
 
 function getJonggaDailyScriptPath(dateKey = getJonggaKstTodayKey(), variant = getJonggaActiveVariant()) {
-  const suffix = normalizeJonggaVariant(variant) === 'canary' ? '_canary' : '';
+  const suffix = getJonggaRawVariant(variant) === 'canary' ? '_canary' : '';
   const compactDate = getJonggaCompactDate(dateKey);
   const monthFolder = compactDate.substring(0, 6);
   return `jongga/output/${monthFolder}/jongga_data_${compactDate}${suffix}.js`;
@@ -234,6 +261,10 @@ function readJonggaManualJsonForDate(dateKey = getJonggaKstTodayKey(), variant =
 }
 
 function saveJonggaManualJsonForDate(dateKey, payload, variant = getJonggaActiveVariant()) {
+  const rawVariant = getJonggaRawVariant(variant);
+  if (!isJonggaCanaryEnabled() && rawVariant === 'canary') {
+    throw new Error('카나리 채널은 당분간 사용하지 않습니다.');
+  }
   const resolvedVariant = normalizeJonggaVariant(variant);
   const map = readJonggaManualJsonMap();
   const slotKey = buildJonggaManualJsonSlotKey(dateKey, resolvedVariant);
@@ -249,6 +280,10 @@ function saveJonggaManualJsonForDate(dateKey, payload, variant = getJonggaActive
 }
 
 function validateManualJonggaPayloadForDate(payload, dateKey, variant = getJonggaActiveVariant()) {
+  const rawVariant = getJonggaRawVariant(variant);
+  if (!isJonggaCanaryEnabled() && rawVariant === 'canary') {
+    throw new Error('카나리 채널은 당분간 사용하지 않습니다.');
+  }
   const resolvedVariant = normalizeJonggaVariant(variant);
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     throw new Error('JSON 객체가 필요합니다.');
@@ -294,6 +329,7 @@ function clearJonggaDailyNotice(dateKey, variant) {
 }
 
 function setJonggaTodayStatus(state, dateKey = getJonggaEffectiveDateKey(), detail = '', timeValue = '', variant = getJonggaActiveVariant()) {
+  variant = normalizeJonggaVariant(variant);
   const target = document.getElementById('jongga-today-status');
   const button = document.getElementById('btn-open-jongga-json-modal');
   const statusTime = ['loaded', 'manual'].includes(state) ? formatJonggaStatusTime(timeValue) : '';
@@ -501,7 +537,11 @@ function getJonggaHistoryEntries(variant = getJonggaActiveVariant()) {
   const resolvedVariant = normalizeJonggaVariant(variant);
   const entries = Array.isArray(window.JONGGA_HISTORY_INDEX) ? window.JONGGA_HISTORY_INDEX : [];
   return [...entries]
-    .filter(entry => normalizeJonggaVariant(entry.variant || 'stable') === resolvedVariant)
+    .filter(entry => {
+      const entryVariant = getJonggaRawVariant(entry?.variant || 'stable');
+      if (!isJonggaCanaryEnabled() && entryVariant === 'canary') return false;
+      return normalizeJonggaVariant(entryVariant) === resolvedVariant;
+    })
     .sort((left, right) => String(right.date || '').localeCompare(String(left.date || '')));
 }
 

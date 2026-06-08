@@ -31,6 +31,7 @@ from jongga.output_contract import (
     read_history_index,
     read_js_assignment,
     resolve_analysis_date,
+    resolve_outcome_variant_filter,
 )
 
 OUTCOMES_INDEX_MARKER = "JONGGA_OUTCOMES_INDEX"
@@ -495,13 +496,22 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    today = resolve_analysis_date(args.date)
+    try:
+        variant_filter = resolve_outcome_variant_filter(args.variant)
+    except ValueError:
+        print("카나리 채널이 비활성화되어 있습니다. --variant stable 또는 all(=stable만)을 사용하세요.", file=sys.stderr)
+        return 2
+    try:
+        today = resolve_analysis_date(args.date)
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     backfill(
         history_js=args.history_js,
         outcomes_js=args.outcomes_js,
         out_dir=args.out_dir,
         lookback_days=args.lookback_days,
-        variant_filter=args.variant,
+        variant_filter=variant_filter,
         today=today,
         max_fetches=args.max_fetches,
     )

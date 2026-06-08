@@ -47,7 +47,9 @@ function loadReplayContext() {
       }
     },
     document: {
+      body: createElementStub(),
       getElementById(id) { return elements.get(id) || null; },
+      querySelector() { return null; },
       querySelectorAll() { return []; }
     },
     escapeHtml(value) {
@@ -793,6 +795,40 @@ function sampleReplayBridgeWithSecondDay() {
   return bridge;
 }
 
+function buildReplayDayFixture(date, index) {
+  return {
+    date,
+    summaryFile: `replay_summary_${date.replace(/-/g, '')}.json`,
+    ordersFile: `sim_orders_${date.replace(/-/g, '')}.json`,
+    fillsFile: `sim_fills_${date.replace(/-/g, '')}.json`,
+    includedCount: 1,
+    tradeCount: 1,
+    winRate: index % 2 === 0 ? 1 : 0,
+    avgNetReturnPct: index % 2 === 0 ? 1.2 : -0.4,
+    cumNetReturnPct: index % 2 === 0 ? 1.2 : -0.4,
+    maxDrawdownPct: index % 2 === 0 ? 0.0 : 0.4,
+    degradedCount: 0,
+    ambiguousCount: 0,
+    trades: [
+      {
+        strategy: 'pullback',
+        code: `0000${index + 1}`.slice(-6),
+        name: `Stock-${index + 1}`,
+        date,
+        sourceEntryKey: `entry-${index + 1}`,
+        entryFilledAt: `${date}T15:30:00+09:00`,
+        entryFillPrice: 10000 + index,
+        exitFilledAt: `${date}T15:00:00+09:00`,
+        exitAvgFillPrice: 10010 + index,
+        exitLastFillPrice: 10010 + index,
+        tradeStatus: 'closed',
+        closedReason: index % 2 === 0 ? 'openPhase_touch' : 'stop_close',
+        netReturnPct: index % 2 === 0 ? 1.2 : -0.4
+      }
+    ]
+  };
+}
+
 test('strategy section renders selected case summary and button state', () => {
   const context = loadReplayContext();
   context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
@@ -847,6 +883,55 @@ test('strategy modal renders selected case summary, stock table, and day files',
   assert.match(body.innerHTML, /replay-fill-badge buy/);
   assert.match(body.innerHTML, /replay-fill-badge profit/);
   assert.match(body.innerHTML, /sim_orders_20260603\.json/);
+});
+
+test('strategy modal stock section can collapse and expand', () => {
+  const context = loadReplayContext();
+  const body = createElementStub();
+  const title = createElementStub();
+  const subtitle = createElementStub();
+  const overlay = createElementStub();
+  context.elements.set('jongga-replay-body', body);
+  context.elements.set('jongga-replay-modal-title', title);
+  context.elements.set('jongga-replay-modal-subtitle', subtitle);
+  context.elements.set('jongga-replay-overlay', overlay);
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+
+  context.openJonggaReplayModal('pullback');
+  assert.match(body.innerHTML, /btn-jongga-replay-stock-toggle[^>]*aria-expanded="true"[^>]*>접기</);
+  assert.match(body.innerHTML, /Alpha/);
+
+  context.toggleReplayStockSection();
+  assert.match(body.innerHTML, /btn-jongga-replay-stock-toggle[^>]*aria-expanded="false"[^>]*>펼치기</);
+  assert.match(body.innerHTML, /종목별 수익 표를 접어둔 상태입니다/);
+});
+
+test('day list sorts newest first and paginates by five days', () => {
+  const context = loadReplayContext();
+  const days = [
+    buildReplayDayFixture('2026-05-29', 0),
+    buildReplayDayFixture('2026-06-03', 1),
+    buildReplayDayFixture('2026-06-05', 2),
+    buildReplayDayFixture('2026-06-01', 3),
+    buildReplayDayFixture('2026-06-04', 4),
+    buildReplayDayFixture('2026-05-30', 5),
+    buildReplayDayFixture('2026-06-02', 6)
+  ];
+
+  context.setReplayDayPageIndex(0, { rerender: false });
+  const firstPage = context.renderReplayDayList(days, 'stable');
+  assert.ok(firstPage.indexOf('2026.06.05') < firstPage.indexOf('2026.06.04'));
+  assert.ok(firstPage.indexOf('2026.06.04') < firstPage.indexOf('2026.06.03'));
+  assert.match(firstPage, /2026\.06\.05/);
+  assert.match(firstPage, /2026\.06\.01/);
+  assert.doesNotMatch(firstPage, /2026\.05\.30/);
+  assert.doesNotMatch(firstPage, /2026\.05\.29/);
+
+  context.setReplayDayPageIndex(1, { rerender: false });
+  const secondPage = context.renderReplayDayList(days, 'stable');
+  assert.match(secondPage, /2026\.05\.30/);
+  assert.match(secondPage, /2026\.05\.29/);
+  assert.doesNotMatch(secondPage, /2026\.06\.05/);
 });
 
 test('replay period filter narrows modal content to the selected dates', () => {

@@ -59,6 +59,27 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
 
             self.assertEqual(replay_dates, [date(2026, 6, 1), date(2026, 6, 2), date(2026, 6, 3), date(2026, 6, 4)])
 
+    def test_select_replay_dates_can_use_cutoff_day_as_followup(self):
+        with TemporaryDirectory() as tmp:
+            history_path = Path(tmp) / "jongga_history.js"
+            history_path.write_text(
+                _render_history([
+                    {"date": "2026-06-09", "variant": "stable"},
+                    {"date": "2026-06-08", "variant": "stable"},
+                    {"date": "2026-06-05", "variant": "stable"},
+                ]),
+                encoding="utf-8",
+            )
+
+            replay_dates = pipeline.select_replay_dates_from_history(
+                history_js=history_path,
+                cutoff_date=date(2026, 6, 9),
+                variant="stable",
+                include_cutoff_date=True,
+            )
+
+            self.assertEqual(replay_dates, [date(2026, 6, 5), date(2026, 6, 8)])
+
     def test_build_replay_recommendation_keys_uses_entry_eligible_rows(self):
         with TemporaryDirectory() as tmp:
             out_dir = Path(tmp) / "jongga" / "output"
@@ -106,6 +127,44 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
                 },
             )
 
+    def test_build_replay_recommendation_keys_skips_best_effort_legacy_history(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            daily_json = out_dir / "202606" / "latest_20260603.json"
+            daily_json.parent.mkdir(parents=True, exist_ok=True)
+            daily_json.write_text(json.dumps({
+                "slots": [
+                    {
+                        "entries": {
+                            "pullback": [
+                                {"code": "000001", "strategy": "pullback", "entryEligible": True},
+                            ],
+                        }
+                    }
+                ]
+            }, ensure_ascii=False), encoding="utf-8")
+
+            history_path = Path(tmp) / "jongga_history.js"
+            history_path.write_text(
+                _render_history([
+                    {
+                        "date": "2026-06-03",
+                        "variant": "stable",
+                        "jsonFile": str(daily_json),
+                        "payloadSourceMode": "best_effort_legacy",
+                    }
+                ]),
+                encoding="utf-8",
+            )
+
+            keys = pipeline.build_replay_recommendation_keys_from_history(
+                history_js=history_path,
+                variant="stable",
+                analysis_dates=[date(2026, 6, 3)],
+            )
+
+            self.assertEqual(keys, set())
+
     def test_run_replay_backtest_uses_current_stable_recent_days_defaults(self):
         with TemporaryDirectory() as tmp:
             history_path = Path(tmp) / "jongga_history.js"
@@ -135,7 +194,7 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
             kwargs = run_replay.call_args.kwargs
             self.assertEqual(kwargs["variant"], "stable")
             self.assertEqual(kwargs["threshold_profile"], "current")
-            self.assertEqual(kwargs["analysis_dates"], [date(2026, 6, 1), date(2026, 6, 2), date(2026, 6, 3)])
+            self.assertEqual(kwargs["analysis_dates"], [date(2026, 6, 1), date(2026, 6, 2), date(2026, 6, 3), date(2026, 6, 4)])
 
     def test_run_replay_backtest_rebuilds_when_rule_signature_changes(self):
         with TemporaryDirectory() as tmp:
@@ -177,7 +236,48 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
             self.assertTrue(meta["runId"])
             kwargs = run_replay.call_args.kwargs
             self.assertTrue(kwargs["replace_existing_runs"])
-            self.assertEqual(kwargs["analysis_dates"], [date(2026, 6, 3)])
+            self.assertEqual(kwargs["analysis_dates"], [date(2026, 6, 3), date(2026, 6, 4)])
+
+    def test_run_replay_backtest_includes_previous_trading_day_when_cutoff_day_exists(self):
+        with TemporaryDirectory() as tmp:
+            history_path = Path(tmp) / "jongga_history.js"
+            out_dir = Path(tmp) / "jongga" / "output"
+            daily_json = out_dir / "202606" / "latest_20260608.json"
+            daily_json.parent.mkdir(parents=True, exist_ok=True)
+            daily_json.write_text(json.dumps({
+                "slots": [
+                    {
+                        "entries": {
+                            "pullback": [
+                                {"code": "000001", "strategy": "pullback", "entryEligible": True},
+                            ],
+                        }
+                    }
+                ]
+            }, ensure_ascii=False), encoding="utf-8")
+            history_path.write_text(
+                _render_history([
+                    {"date": "2026-06-09", "variant": "stable"},
+                    {"date": "2026-06-08", "variant": "stable", "jsonFile": str(daily_json)},
+                    {"date": "2026-06-05", "variant": "stable"},
+                ]),
+                encoding="utf-8",
+            )
+
+            with mock.patch("jongga.replay_backtest.run_replay", return_value={"runId": "run-3", "summary": {"candidateCount": 1, "eligibleCount": 1, "includedCount": 1, "tradeCount": 1}}) as run_replay:
+                code, meta = pipeline.run_replay_backtest(
+                    analysis_date="2026-06-09",
+                    history_js=history_path,
+                    out_dir=out_dir,
+                    variant="stable",
+                    threshold_profile="current",
+                )
+
+            self.assertEqual(code, 0)
+            self.assertEqual(meta["status"], "complete")
+            kwargs = run_replay.call_args.kwargs
+            self.assertEqual(kwargs["analysis_dates"], [date(2026, 6, 5), date(2026, 6, 8)])
+            self.assertIn("2026-06-08|stable|pullback|000001", kwargs["recommendation_keys"])
 
     def test_run_replay_backtest_skips_when_no_new_dates_exist(self):
         with TemporaryDirectory() as tmp:

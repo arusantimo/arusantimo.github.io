@@ -31,7 +31,7 @@
             <div class="daily-data-toolbar">
               <div class="tab-switcher channel-switcher" role="tablist" aria-label="Jongga 데이터 채널">
                 <button class="tab-button active" type="button" data-jongga-variant="stable">현재 버전</button>
-                <button class="tab-button" type="button" data-jongga-variant="canary">카나리</button>
+                <button class="tab-button" type="button" data-jongga-variant="canary" disabled title="카나리 채널은 당분간 사용하지 않습니다.">카나리</button>
               </div>
               <span id="jongga-today-status" class="today-data-status unknown">금일 데이터 확인 중</span>
               <button id="btn-open-jongga-json-modal" type="button" class="btn btn-secondary small is-hidden">직접 JSON 입력</button>
@@ -141,7 +141,7 @@
 
       <div class="section-title section-title-collapsible strategy-replay-section">
         <div class="section-title-main">
-          <span>🔻 주도주 급락 반등 후보 (전략 ③)</span>
+          <span>🔻 주도주 급락 반등 후보</span>
           <span class="section-help">역추세 전용 채점표입니다. 수급 매집형 점수와 크기를 비교하지 마세요.</span>
           <button class="icon-btn strategy-info-btn" data-strategy="reversal" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
           <span id="jongga-replay-badge-reversal" class="quality-status unknown">미확인</span>
@@ -225,7 +225,7 @@
       </div>
 
       <div class="section-title split-title">
-        <div>🔻 주도주 급락 반등 (전략 ③) <span class="section-help">9:08 이전/이후 모두 분석</span>
+        <div>🔻 주도주 급락 반등<span class="section-help">9:08 이전/이후 모두 분석</span>
           <button class="icon-btn strategy-info-btn" data-strategy="reversal" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
         </div>
         <div class="inline-inputs">
@@ -397,11 +397,12 @@
   <script src="js/jongga-manual-overrides.js"></script>
   <script src="js/market-analyze-bridge.js?v=20260606-status-reason"></script>
   <script src="js/support-levels.js?v=20260606-pullback-support"></script>
-  <script src="js/jongga-adapter.js?v=20260606-status-reason"></script>
+  <script src="js/strategy-stock-indicators.js?v=20260608-indicator-health"></script>
+  <script src="js/jongga-adapter.js?v=20260608-indicator-health"></script>
   <script src="js/jongga-loader.js?v=20260604-safety-status"></script>
   <script src="js/jongga-daily.js"></script>
   <script src="js/jongga-replay.js"></script>
-  <script src="js/ui.js?v=20260607-market-cap-tone"></script>
+  <script src="js/ui.js?v=20260608-indicator-health"></script>
   <script src="js/sell-tracking.js"></script>
   <script src="js/sell-score.js"></script>
   <script src="js/sell-rules.js"></script>

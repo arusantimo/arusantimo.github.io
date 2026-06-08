@@ -377,10 +377,14 @@ function normalizeJonggaGapScore(slot = {}, root = {}) {
     })),
     totalScore: String(pickJonggaValue(source, ['totalScore', 'score', 'total'])),
     grade: String(pickJonggaValue(source, ['grade', 'code'])),
+    code: String(pickJonggaValue(source, ['code', 'grade'])),
     entryAdjustment: String(pickJonggaValue(source, ['entryAdjustment', 'entry'])),
     sellAdjustment: String(pickJonggaValue(source, ['sellAdjustment', 'sell'])),
     swingAdjustment: String(pickJonggaValue(source, ['swingAdjustment', 'swing'])),
-    note: String(pickJonggaValue(source, ['note', 'summary']))
+    note: String(pickJonggaValue(source, ['note', 'summary'])),
+    isFresh: source.isFresh === true,
+    freshnessStatus: String(pickJonggaValue(source, ['freshnessStatus'])),
+    staleKeys: Array.isArray(source.staleKeys) ? source.staleKeys.map(key => String(key || '')) : []
   };
 }
 
@@ -562,7 +566,29 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
   const withMacro = typeof applyMacroOverlayToEntry === 'function'
     ? applyMacroOverlayToEntry(normalized, strategy, context)
     : normalized;
-  return applyJonggaSafety(typeof attachEntryEligibility === 'function' ? attachEntryEligibility(withMacro, context) : withMacro, context);
+  const withEligibility = typeof attachEntryEligibility === 'function'
+    ? attachEntryEligibility(withMacro, context)
+    : withMacro;
+  const safeEntry = applyJonggaSafety(withEligibility, context);
+  if (typeof attachStockIndicatorsToEntry === 'function') {
+    const strategyKey = typeof normalizeStrategyKeyForIndicators === 'function'
+      ? normalizeStrategyKeyForIndicators(strategy)
+      : strategy;
+    const precomputed = effectiveRawEntry.stockIndicators;
+    if (precomputed?.snapshot && typeof getStrategyIndicatorRows === 'function') {
+      safeEntry.stockIndicators = {
+        snapshot: precomputed.snapshot,
+        rows: Array.isArray(precomputed.rows) && precomputed.rows.length
+          ? precomputed.rows
+          : getStrategyIndicatorRows(strategyKey, precomputed.snapshot),
+        evaluatedAt: precomputed.evaluatedAt || '',
+        source: precomputed.source || 'jongga_analysis'
+      };
+    } else {
+      attachStockIndicatorsToEntry(safeEntry, {}, {}, []);
+    }
+  }
+  return safeEntry;
 }
 
 function normalizeJonggaSwingEntry(rawEntry, rank) {
@@ -590,7 +616,7 @@ function buildSnapshotFromJonggaSlot(slot, root = {}) {
     : {};
   const context = {
     gapScore,
-    dataQuality: slot.dataQuality || root.dataQuality || {},
+    dataQuality: { ...(root.dataQuality || {}), ...(slot.dataQuality || {}) },
     macroOverlay: {
       ...regime.macroOverlay,
       ...macroContext.macroOverlay,

@@ -100,10 +100,52 @@ test('buildPullbackG5Gate blocks above warn cap without macro-friendly context',
 
 test('gap code labels distinguish G-D holdback and G-E entry ban', () => {
   const ctx = loadBridgeContext();
-  const trendLabel = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅', 'G-E', [], {});
+  const trendLabel = ctx.recalculateTrendStatusLabel('pullback', 'A', '강세장 ✅', 'G-E', [], { gapIsFresh: false });
   const reversalLabel = ctx.recalculateReversalStatusLabel('A', '강세장 ✅', 'G-D', [], [], {});
   assert.equal(trendLabel, '매매금지(갭다운 경고 · 신규 진입 금지)');
   assert.equal(reversalLabel, '매매금지(갭다운 주의 · 신규 진입 보류)');
+});
+
+test('fresh G-E pullback A uses relaxed status label', () => {
+  const ctx = loadBridgeContext();
+  const label = ctx.recalculateTrendStatusLabel('pullback', 'A', '순환매장 🔄 (거시·지수 완충)', 'G-E', [], {
+    gapIsFresh: true
+  });
+  assert.equal(label, '진입 가능(거시경고·축소)');
+});
+
+test('fresh G-E reversal A uses relaxed status label', () => {
+  const ctx = loadBridgeContext();
+  const label = ctx.recalculateReversalStatusLabel('A', '순환매장 🔄 (거시·지수 완충)', 'G-E', [], [], {
+    gapIsFresh: true
+  });
+  assert.equal(label, '진입 가능(거시경고·축소)');
+});
+
+test('fresh G-E breakout stays blocked', () => {
+  const ctx = loadBridgeContext();
+  const label = ctx.recalculateTrendStatusLabel('breakout', 'A', '강세장 ✅', 'G-E', [], {
+    gapIsFresh: true
+  });
+  assert.equal(label, '매매금지(갭다운 경고 · 신규 진입 금지)');
+});
+
+test('applyMacroOverlayToEntry preserves fresh G-E relaxed label for eligible card entries', () => {
+  const ctx = loadBridgeContext();
+  ctx.attachEntryEligibility = entry => entry;
+  const entry = {
+    strategy: 'pullback',
+    grade: 'A',
+    statusLabel: '진입 가능(거시경고·축소)',
+    entryEligible: true,
+    gates: [{ code: 'G1', status: '✅' }]
+  };
+  const next = ctx.applyMacroOverlayToEntry(entry, 'pullback', {
+    gapScore: { code: 'G-E', isFresh: true },
+    macroOverlay: { effectiveRegimeLabel: '순환매장 🔄 (거시·지수 완충)' }
+  });
+  assert.equal(next.statusLabel, '진입 가능(거시경고·축소)');
+  assert.equal(next.entryEligible, true);
 });
 
 test('isRiseJustifiedByMacro rejects critical bubble', () => {

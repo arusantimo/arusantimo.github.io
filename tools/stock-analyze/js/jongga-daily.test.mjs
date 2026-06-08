@@ -138,10 +138,30 @@ test('getJonggaPrevTradingDateKey handles all weekend cases', () => {
 test('manual JSON is saved and read by date and variant', () => {
   const context = loadDailyContext();
   context.saveJonggaManualJsonForDate('2026-05-22', samplePayload('2026-05-22', 'stable'), 'stable');
-  context.saveJonggaManualJsonForDate('2026-05-22', samplePayload('2026-05-22', 'canary'), 'canary');
+  assert.throws(
+    () => context.saveJonggaManualJsonForDate('2026-05-22', samplePayload('2026-05-22', 'canary'), 'canary'),
+    /카나리/
+  );
   assert.equal(context.readJonggaManualJsonForDate('2026-05-22', 'stable').variant, 'stable');
-  assert.equal(context.readJonggaManualJsonForDate('2026-05-22', 'canary').variant, 'canary');
   assert.equal(context.readJonggaManualJsonForDate('2026-05-21', 'stable'), null);
+});
+
+test('canary channel is disabled and controls stay on stable', () => {
+  const context = loadDailyContext();
+  const stableButton = createElementStub({ jonggaVariant: 'stable' });
+  const canaryButton = createElementStub({ jonggaVariant: 'canary' });
+  context.selectors.set('[data-jongga-variant]', [stableButton, canaryButton]);
+
+  assert.equal(context.isJonggaCanaryEnabled(), false);
+  context.localStorage.setItem('stockAnalyzeJonggaActiveVariantV1', 'canary');
+  assert.equal(context.readStoredJonggaVariant(), 'stable');
+  assert.equal(context.localStorage.getItem('stockAnalyzeJonggaActiveVariantV1'), 'stable');
+
+  context.setActiveJonggaVariant('canary', { reload: false });
+  assert.equal(context.getJonggaActiveVariant(), 'stable');
+  context.updateJonggaVariantControls();
+  assert.equal(canaryButton.disabled, true);
+  assert.match(canaryButton.title, /당분간/);
 });
 
 test('active variant is persisted and controls reflect availability', () => {
@@ -150,23 +170,21 @@ test('active variant is persisted and controls reflect availability', () => {
   const canaryButton = createElementStub({ jonggaVariant: 'canary' });
   context.selectors.set('[data-jongga-variant]', [stableButton, canaryButton]);
 
-  context.setActiveJonggaVariant('canary', { reload: false });
-  assert.equal(context.getJonggaActiveVariant(), 'canary');
-  assert.equal(context.localStorage.getItem('stockAnalyzeJonggaActiveVariantV1'), 'canary');
-  assert.equal(canaryButton.classList.contains('active'), true);
+  context.setActiveJonggaVariant('stable', { reload: false });
+  assert.equal(context.getJonggaActiveVariant(), 'stable');
+  assert.equal(context.localStorage.getItem('stockAnalyzeJonggaActiveVariantV1'), 'stable');
+  assert.equal(stableButton.classList.contains('active'), true);
+  assert.equal(canaryButton.disabled, true);
 
   context.markJonggaVariantAvailability('canary', false);
   assert.equal(stableButton.disabled, false);
-  assert.equal(canaryButton.disabled, false);
-
-  context.setActiveJonggaVariant('stable', { reload: false });
   assert.equal(canaryButton.disabled, true);
 });
 
 test('manual JSON validation rejects other dates and variant mismatch', () => {
   const context = loadDailyContext();
   assert.throws(() => context.validateManualJonggaPayloadForDate(samplePayload('2026-05-21', 'stable'), '2026-05-22', 'stable'), /analysisDate/);
-  assert.throws(() => context.validateManualJonggaPayloadForDate(samplePayload('2026-05-22', 'stable'), '2026-05-22', 'canary'), /variant/);
+  assert.throws(() => context.validateManualJonggaPayloadForDate(samplePayload('2026-05-22', 'stable'), '2026-05-22', 'canary'), /카나리/);
   assert.throws(() => context.validateManualJonggaPayloadForDate({ schemaVersion: 'bad' }, '2026-05-22', 'stable'), /schemaVersion invalid/);
 });
 
@@ -188,7 +206,7 @@ test('today status exposes channel label and direct input only when data is miss
   assert.equal(button.classList.contains('is-hidden'), true);
 
   context.setJonggaTodayStatus('missing', effectiveDateKey, '', '', 'canary');
-  const expectedMissingLabel = isToday ? '카나리 데이터 없음' : `어제 버전 (카나리) 데이터 없음`;
+  const expectedMissingLabel = isToday ? '현재 버전 데이터 없음' : `어제 버전 (현재 버전) 데이터 없음`;
   assert.match(status.textContent, new RegExp(expectedMissingLabel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.equal(button.classList.contains('is-hidden'), false);
 });
@@ -197,8 +215,9 @@ test('history modal filters by active variant and renders variant badge', () => 
   const context = loadDailyContext();
   const body = createElementStub();
   context.elements.set('jongga-history-body', body);
+  // 카나리 비활성 시 canary 선택은 stable로 유지된다.
   context.setActiveJonggaVariant('canary', { reload: false });
-  // 히스토리 항목에 오늘 날짜를 동적으로 설정해서 canary 뱃지가 표시되도록 함
+  assert.equal(context.getJonggaActiveVariant(), 'stable');
   const todayKey = context.getJonggaKstTodayKey();
   context.window.JONGGA_HISTORY_INDEX = [{
     date: todayKey,
@@ -219,9 +238,9 @@ test('history modal filters by active variant and renders variant badge', () => 
   }];
 
   context.renderJonggaHistoryModal();
-  assert.match(body.innerHTML, /SK하이닉스/);
-  assert.doesNotMatch(body.innerHTML, /삼성전자/);
-  assert.match(body.innerHTML, /history-variant-badge canary/);
+  assert.match(body.innerHTML, /삼성전자/);
+  assert.doesNotMatch(body.innerHTML, /SK하이닉스/);
+  assert.match(body.innerHTML, /history-variant-badge stable/);
   assert.equal(context.applied, undefined);
 });
 

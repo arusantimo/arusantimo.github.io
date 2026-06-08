@@ -759,8 +759,15 @@ def run_replay(
 
         if payload is not None:
             dims = extract_context_dims(payload)
+            payload_source_mode = str(payload.get("payloadSourceMode") or "legacy").strip() or "legacy"
+            input_archive_version = str(payload.get("inputArchiveVersion") or "").strip()
+            payload_rebuildable = bool(payload.get("rebuildable"))
             for strategy, entry in iter_buy_entries(payload):
                 candidate = replay_entry_view(entry, strategy, threshold_profile)
+                candidate["payloadSourceMode"] = payload_source_mode
+                candidate["inputArchiveVersion"] = input_archive_version
+                candidate["rebuildable"] = payload_rebuildable
+                candidate["historyRecommendationSourceMode"] = payload_source_mode if candidate.get("entryEligibleOriginal") else ""
                 daily_candidates.append(candidate)
                 code = candidate["code"]
                 if not code:
@@ -768,6 +775,7 @@ def run_replay(
                 candidate_key = f"{date_str}|{variant}|{strategy}|{code}"
                 if candidate_key in recommendation_key_set:
                     candidate["historyRecommendation"] = True
+                    candidate["historyRecommendationSourceMode"] = payload_source_mode
                 if code not in history_cache:
                     history_cache[code] = entry.get("_historyRows") or []
                     if not history_cache[code]:
@@ -827,11 +835,15 @@ def run_replay(
                     "replayIncluded": candidate["replayIncluded"],
                     "replayIncludeRule": candidate["replayIncludeRule"],
                     "historyRecommendation": candidate["historyRecommendation"],
+                    "historyRecommendationSourceMode": candidate.get("historyRecommendationSourceMode") or "",
                     "entryEligible": candidate["entryEligible"],
                     "entryEligibleOriginal": candidate["entryEligibleOriginal"],
                     "setupQuality": candidate["setupQuality"],
                     "takeProfitProfileKey": candidate["takeProfitProfileKey"],
                     "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
+                    "payloadSourceMode": payload_source_mode,
+                    "inputArchiveVersion": input_archive_version,
+                    "rebuildable": payload_rebuildable,
                 }
                 daily_orders.extend(simulation["orders"])
                 daily_fills.extend(simulation["fills"])

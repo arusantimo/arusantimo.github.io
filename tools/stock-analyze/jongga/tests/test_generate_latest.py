@@ -6,10 +6,10 @@ from datetime import date
 from types import SimpleNamespace
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
 from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
-from jongga.macro_overlay import REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
+from jongga.macro_overlay import REGIME_ROTATION_BUFFERED, REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, build_daily_output_paths, build_history_entry, payload_with_analysis_date, render_daily_bridge_js, update_history_index, write_daily_outputs
 from jongga.rule_evaluation import evaluate_reversal_f2, evaluate_reversal_g1, evaluate_reversal_g2, evaluate_reversal_g4
 from pathlib import Path
@@ -17,6 +17,101 @@ from tempfile import TemporaryDirectory
 
 
 class GenerateLatestTest(unittest.TestCase):
+    def _stock_indicator_snapshot(self) -> StockSnapshot:
+        return StockSnapshot(
+            rank=17,
+            code="005930",
+            name="삼성전자",
+            current_price=279000.0,
+            prev_close=255500.0,
+            open_price=239500.0,
+            high_price=279500.0,
+            low_price=238500.0,
+            volume=1000000.0,
+            trading_value_text="1조",
+            market_cap_trillion=43.7,
+            foreign_net=-147900.0,
+            institution_net=135906.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            close_history=[279000.0, 255500.0, 250000.0, 245000.0, 240000.0] + [230000.0] * 20,
+            open_history=[270000.0] * 25,
+            high_history=[280000.0] * 25,
+            low_history=[230000.0] * 25,
+            volume_history=[1000000.0, 800000.0] + [700000.0] * 20,
+            date_history=[f"202606{day:02d}" for day in range(8, 0, -1)] + [f"202605{day:02d}" for day in range(31, 14, -1)],
+            ma5=260000.0,
+            ma10=250000.0,
+            ma20=221620.0,
+            ma60=210000.0,
+            ma5_prev=255000.0,
+            ma20_prev=218045.0,
+            ma60_prev=205000.0,
+            weekly_rsi=63.0,
+            macd_hist=[],
+            high_20d=280000.0,
+            low_5d=235000.0,
+            high_52w=307000.0,
+            return_5d=5.0,
+            return_20d=12.5,
+            return_21d=11.0,
+            volume_avg_5d=750000.0,
+            volume_avg_20d=680000.0,
+            industry_code="001",
+            industry_compare_change_pct=-6.6,
+            industry_compare_count=10,
+            intraday_30m={},
+            event_filter=None,
+            market_cap_rank=17,
+            market_cap_universe_count=2560,
+            per=24.2,
+            pbr=1.4,
+            cns_per=22.0,
+            low_52w=190800.0,
+            foreign_rate=34.6,
+        )
+
+    def test_finalize_scored_buy_entry_attaches_stock_indicators_for_all_strategies(self):
+        snapshot = self._stock_indicator_snapshot()
+        entries = [
+            {
+                "strategy": "pullback",
+                "name": "삼성전자",
+                "code": "005930",
+                "currentPrice": 279000.0,
+                "entryPrice": 279000.0,
+                "pullbackContext": {"support": {"primaryLine": {"price": 269062.0, "distancePct": 3.56}}},
+            },
+            {
+                "strategy": "accumulation",
+                "name": "삼성전자",
+                "code": "005930",
+                "currentPrice": 279000.0,
+                "entryPrice": 279000.0,
+            },
+            {
+                "strategy": "breakout",
+                "name": "삼성전자",
+                "code": "005930",
+                "currentPrice": 279000.0,
+                "entryPrice": 279000.0,
+            },
+            {
+                "strategy": "reversal",
+                "name": "삼성전자",
+                "code": "005930",
+                "currentPrice": 279000.0,
+                "entryPrice": 279000.0,
+            },
+        ]
+        for entry in entries:
+            finalized = finalize_scored_buy_entry(dict(entry), context={}, snapshot=snapshot)
+            self.assertIn("stockIndicators", finalized, entry["strategy"])
+            self.assertEqual(finalized["stockIndicators"]["source"], "jongga_analysis", entry["strategy"])
+            self.assertIn("snapshot", finalized["stockIndicators"], entry["strategy"])
+            self.assertTrue(finalized["stockIndicators"]["snapshot"], entry["strategy"])
+            self.assertIn("currentPrice", finalized["stockIndicators"]["snapshot"], entry["strategy"])
+
     def test_status_labels_separate_gapdown_ban_and_market_gate_hold(self):
         self.assertEqual(
             trend_status_label("pullback", "A", "강세장 ✅", "G-A", [{"code": "G5", "status": "⛔"}]),
@@ -51,6 +146,119 @@ class GenerateLatestTest(unittest.TestCase):
         })
         self.assertEqual(payload["code"], "G-A")
         self.assertTrue(payload["totalScore"].startswith("+"))
+
+    def test_annotate_macro_metric_freshness_marks_old_yahoo_quotes_stale(self):
+        live_metrics = {
+            "nq": {"asOf": "2026-05-30T20:00:00+00:00"},
+            "vix": {"asOf": "2026-06-07T20:00:00+00:00"},
+            "tnx": {"asOf": "2026-06-07T20:00:00+00:00"},
+            "krw": {"asOf": "2026-06-07T20:00:00+00:00"},
+            "sox": {"asOf": "2026-06-07T20:00:00+00:00"},
+        }
+        summary = annotate_macro_metric_freshness(live_metrics, "2026-06-08")
+        self.assertFalse(summary["isFresh"])
+        self.assertIn("macro_nq", summary["staleKeys"])
+        self.assertEqual(live_metrics["nq"]["freshnessStatus"], "stale")
+        self.assertTrue(live_metrics["nq"]["stale"])
+        self.assertEqual(live_metrics["vix"]["freshnessStatus"], "fresh")
+
+    def test_build_pullback_entry_relaxes_fresh_gap_e_in_supportive_regime(self):
+        snapshot = replace(
+            self._stock_indicator_snapshot(),
+            current_price=250000.0,
+            prev_close=247000.0,
+            open_price=246000.0,
+            high_price=251000.0,
+            low_price=244000.0,
+            close_history=[250000.0, 247000.0, 245000.0, 240000.0, 238000.0] + [230000.0] * 20,
+            volume_history=[1000000.0, 1500000.0] + [700000.0] * 20,
+            high_20d=251000.0,
+            return_5d=4.0,
+            return_20d=9.0,
+            return_21d=8.5,
+            volume_avg_20d=680000.0,
+        )
+        context = {
+            "regimeLabel": REGIME_STRONG_BULL,
+            "effectiveRegimeLabel": REGIME_STRONG_BULL,
+            "gapScore": {"code": "G-E", "isFresh": True},
+            "riseJustifiedByMacro": True,
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": 0.4,
+        }
+
+        entry = build_pullback_entry(snapshot, context)
+
+        self.assertIn(entry["statusLabel"], {"강력매수(거시경고·축소)", "진입 가능(거시경고·축소)"})
+        self.assertTrue(entry["entryEligible"])
+
+    def test_build_accumulation_entry_relaxes_fresh_gap_e_in_rotation_regime(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=85.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=1500.0,
+            institution_net=500.0,
+            foreign_previous=200.0,
+            institution_previous=100.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[85.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=94600.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=94500.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=110000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            toss={
+                "avgStrength": 96.0,
+                "lastHourAvgStrength": 118.0,
+                "last30AvgStrength": 122.0,
+                "last30BuySellRatio": 1.42,
+            },
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": REGIME_ROTATION_BUFFERED,
+            "effectiveRegimeLabel": REGIME_ROTATION_BUFFERED,
+            "gapScore": {"code": "G-E", "isFresh": True},
+            "riseJustifiedByMacro": True,
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+
+        self.assertIn(entry["statusLabel"], {"강력매수(거시경고·축소)", "진입 가능(거시경고·축소)"})
+        self.assertTrue(entry["entryEligible"])
 
     def test_build_market_context_detects_bear_when_proxy_is_high(self):
         history = []
@@ -1145,6 +1353,65 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIn("0.92", c2_rule["note"])
         self.assertEqual(c3_rule["evalStatus"], "not_met")
         self.assertIn("미달", c3_rule["note"])
+
+    def test_build_reversal_entry_keeps_gap_e_blocked_when_macro_is_stale(self):
+        snapshot = StockSnapshot(
+            rank=7,
+            code="005930",
+            name="삼성전자",
+            current_price=10000.0,
+            prev_close=9800.0,
+            open_price=9700.0,
+            high_price=10100.0,
+            low_price=9600.0,
+            volume=300.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=35.0,
+            foreign_net=1000.0,
+            institution_net=500.0,
+            foreign_previous=-100.0,
+            institution_previous=-50.0,
+            close_history=[10000.0, 9800.0, 9700.0, 9600.0, 9300.0, 9400.0, 9300.0, 9200.0, 9100.0, 9000.0, 8900.0, 8800.0, 8700.0, 8600.0, 8500.0, 8400.0, 8300.0, 8200.0, 8100.0, 8000.0, 7900.0],
+            high_history=[10100.0] * 21,
+            low_history=[9500.0] * 21,
+            volume_history=[300.0, 120.0, 110.0, 100.0, 95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 55.0, 50.0, 45.0, 40.0, 35.0, 30.0, 25.0, 20.0, 15.0],
+            ma5=9800.0,
+            ma10=9700.0,
+            ma20=9600.0,
+            ma60=9400.0,
+            ma5_prev=9700.0,
+            ma20_prev=9500.0,
+            ma60_prev=9300.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.3, -0.1, -0.2],
+            high_20d=12000.0,
+            low_5d=9300.0,
+            high_52w=12500.0,
+            return_5d=7.0,
+            return_20d=25.0,
+            return_21d=35.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True, "note": "직전 30분봉 종가 10,000, 전봉 종가 9,800"},
+            event_filter={"blocked": False, "note": "이벤트 필터 통과"},
+            toss={"avgStrength": 94.0},
+            orderbook={"bidAskRatio": 1.1},
+        )
+        context = {
+            "regimeLabel": REGIME_STRONG_BULL,
+            "effectiveRegimeLabel": REGIME_STRONG_BULL,
+            "gapScore": {"code": "G-E", "isFresh": False},
+            "riseJustifiedByMacro": True,
+            "vkospiValue": 18.0,
+        }
+
+        entry = build_reversal_entry(snapshot, context)
+
+        self.assertIn(entry["statusLabel"], {"매매금지", "매매금지(갭다운 경고 · 신규 진입 금지)"})
+        self.assertFalse(entry["entryEligible"])
 
     def test_reversal_thresholds_are_relaxed_for_practical_candidates(self):
         snapshot = SimpleNamespace(
