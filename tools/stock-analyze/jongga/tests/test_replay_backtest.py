@@ -100,7 +100,29 @@ class ReplayBacktestTests(unittest.TestCase):
         )
         self.assertFalse(candidate["entryEligible"])
         self.assertTrue(candidate["replayIncluded"])
+        self.assertFalse(candidate["replayA8Plus"])
         self.assertTrue(candidate["replayA7Plus"])
+
+        a8plus = replay_entry_view(
+            {
+                "name": "S",
+                "code": "000009",
+                "grade": "S",
+                "gradeScore": 8.0,
+                "signalScore": 8.0,
+                "score": 8.0,
+                "entryEligible": False,
+                "statusLabel": "관심후보",
+                "gates": [{"code": "G1", "status": "✅", "note": "ok"}],
+                "filters": [],
+            },
+            "pullback",
+            "current",
+        )
+        self.assertTrue(a8plus["replayIncluded"])
+        self.assertTrue(a8plus["replayA8Plus"])
+        self.assertEqual(a8plus["replayA8PlusRule"], "gradeScore>=8.0 AND replayGrade in {A,S}")
+        self.assertTrue(a8plus["replayA7Plus"])
 
         min_cut = replay_entry_view(
             {
@@ -252,18 +274,28 @@ class ReplayBacktestTests(unittest.TestCase):
             self.assertEqual(len(run_record["summary"]["byStock"]), 2)
             self.assertIn("lastEntryFillPrice", run_record["summary"]["byStock"][0])
             self.assertIn("lastExitAvgFillPrice", run_record["summary"]["byStock"][0])
+            self.assertIn("gradeScore", run_record["summary"]["byStock"][0])
+            self.assertIn("replayGrade", run_record["summary"]["byStock"][0])
             self.assertTrue(any(item.get("entryFillPrice") for item in summary["results"]))
             self.assertTrue(any(item.get("exitAvgFillPrice") for item in summary["results"]))
             self.assertIn("strategyViews", run_record)
             self.assertIn("pullback", run_record["strategyViews"])
             self.assertTrue(summary["trades"])
             self.assertTrue(run_record["days"][0]["trades"])
+            self.assertTrue(run_record["days"][0]["fills"])
+            self.assertIn("sourceEntryKey", run_record["days"][0]["fills"][0])
+            self.assertIn("side", run_record["days"][0]["fills"][0])
             self.assertTrue(run_record["strategyViews"]["pullback"]["days"][0]["trades"])
+            self.assertTrue(run_record["strategyViews"]["pullback"]["days"][0]["fills"])
+            self.assertIn("gradeScore", run_record["strategyViews"]["pullback"]["days"][0]["trades"][0])
+            self.assertIn("replayGrade", run_record["strategyViews"]["pullback"]["days"][0]["trades"][0])
             self.assertEqual(
                 [item["name"] for item in run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["days"][0]["trades"]],
                 ["A"],
             )
+            self.assertTrue(run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["days"][0]["fills"])
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["summary"]["candidateCount"], 1)
+            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a8plus"]["summary"]["candidateCount"], 0)
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["summary"]["candidateCount"], 1)
             self.assertEqual(
                 [item["name"] for item in run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["days"][0]["trades"]],

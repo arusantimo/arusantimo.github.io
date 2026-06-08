@@ -698,10 +698,40 @@ body.modal-scroll-locked {
   color: var(--text-primary);
 }
 
+.replay-stock-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.replay-stock-name-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.replay-stock-name-link:hover {
+  color: var(--accent-primary, #00d9ff);
+  text-decoration: underline;
+}
+
 .replay-cell-sub {
   margin-top: 2px;
   color: var(--text-tertiary);
   font-size: 11px;
+}
+
+.replay-stock-score {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .replay-day-trades {
@@ -725,6 +755,108 @@ body.modal-scroll-locked {
 .replay-trade-table th:nth-child(4),
 .replay-trade-table td:nth-child(4) {
   white-space: nowrap;
+}
+
+.replay-trade-row.is-expandable {
+  cursor: pointer;
+}
+
+.replay-trade-row.is-expandable:hover,
+.replay-trade-row.is-expandable.open {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.replay-trade-hint {
+  color: var(--text-info);
+}
+
+.replay-trade-detail-row td.replay-trade-detail-cell {
+  padding: 0;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.replay-fill-history {
+  padding: 10px 12px 12px;
+}
+
+.replay-fill-history-title {
+  margin-bottom: 8px;
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.replay-fill-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.replay-fill-table th,
+.replay-fill-table td {
+  padding: 7px 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: left;
+  vertical-align: top;
+}
+
+.replay-fill-table th {
+  color: var(--text-tertiary);
+  font-weight: 700;
+}
+
+.replay-fill-table td {
+  color: var(--text-secondary);
+}
+
+.replay-fill-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.replay-fill-badge.buy {
+  background: rgba(250, 204, 21, 0.16);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.28);
+}
+
+.replay-fill-badge.profit {
+  background: rgba(248, 113, 113, 0.14);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+}
+
+.replay-fill-badge.stop {
+  background: rgba(96, 165, 250, 0.14);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+}
+
+.replay-fill-price {
+  font-weight: 700;
+}
+
+.replay-fill-price.buy {
+  color: #facc15;
+}
+
+.replay-fill-price.profit {
+  color: #f87171;
+}
+
+.replay-fill-price.stop {
+  color: #60a5fa;
+}
+
+.replay-fill-empty {
+  padding: 10px 12px 12px;
+  color: var(--text-tertiary);
+  font-size: 11px;
 }
 
 .replay-metric-help {
@@ -3056,6 +3188,21 @@ body.modal-scroll-locked {
   overflow: hidden;
 }
 
+.buy-trade-plan-block .compact-table {
+  font-size: 10px;
+}
+
+.buy-trade-plan-block .guide-table th,
+.buy-trade-plan-block .guide-table td {
+  padding: 6px 8px;
+}
+
+.buy-trade-plan-block .modal-ind-card {
+  padding: 11px 13px;
+  gap: 10px;
+  font-size: 11px;
+}
+
 .buy-modal-scroll {
   padding: 18px 24px 24px;
   display: flex;
@@ -3329,22 +3476,40 @@ body.modal-scroll-locked {
 .buy-detail-note {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 12px 14px;
+  gap: 4px;
+  padding: 10px 12px;
   border-radius: var(--border-radius-md);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .buy-detail-note strong {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .buy-detail-note span {
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.buy-detail-mode .modal-triggered-rule .modal-ind-card {
+  padding: 12px 14px;
+}
+
+.buy-detail-mode .modal-triggered-rule .modal-ind-title {
+  font-size: 12px;
+}
+
+.buy-detail-mode .modal-triggered-rule .modal-ind-result {
+  font-size: 11px;
+}
+
+.buy-detail-mode .modal-triggered-rule .modal-ind-criterion {
+  font-size: 10px;
+  line-height: 1.5;
 }
 
 .modal-verdict {
@@ -4035,3 +4200,6 @@ body.modal-scroll-locked {
 .buy-entry-badge.entry-watch { color: #f5c842; }
 .buy-entry-badge.entry-blocked { color: #ff7b7b; }
 .buy-score-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.pct-plus { color: var(--text-danger) !important; }
+.pct-minus { color: var(--text-info) !important; }

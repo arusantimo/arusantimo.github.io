@@ -43,7 +43,8 @@ def parse_trade_plan_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     stop: dict[str, Any] | None = None
     for row in rows or []:
         stage = str(row.get("stage") or "")
-        if "손절" in stage:
+        stage_key = stage_key_from_row(row)
+        if stage_key == "stop" or "손절" in stage:
             stop = {
                 "stage": stage,
                 "stageKey": "stop",
@@ -52,7 +53,6 @@ def parse_trade_plan_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
                 "quantityPct": 100.0,
             }
             continue
-        stage_key = stage_key_from_row(row)
         if not stage_key:
             continue
         targets.append({
@@ -116,6 +116,13 @@ def fill_entry_order(order: dict[str, Any], entry_bar: dict[str, Any], *, slippa
     order["finalStatus"] = "filled"
     return {
         "orderId": order["orderId"],
+        "sourceEntryKey": order.get("sourceEntryKey") or "",
+        "strategy": order.get("strategy") or "",
+        "code": order.get("code") or "",
+        "name": order.get("name") or "",
+        "side": order.get("side") or "",
+        "stageKey": order.get("stageKey") or "",
+        "reason": order.get("reason") or "",
         "fillStatus": "filled",
         "filledAt": entry_bar.get("timestamp") or order.get("requestedAt"),
         "fillPrice": round(fill_price, 4),
@@ -166,6 +173,13 @@ def _fill_from_bar(
     resolved_fill_price = float(fill_price if fill_price is not None else order.get("requestedPrice") or 0.0)
     return {
         "orderId": order["orderId"],
+        "sourceEntryKey": order.get("sourceEntryKey") or "",
+        "strategy": order.get("strategy") or "",
+        "code": order.get("code") or "",
+        "name": order.get("name") or "",
+        "side": order.get("side") or "",
+        "stageKey": order.get("stageKey") or "",
+        "reason": order.get("reason") or "",
         "fillStatus": fill_status,
         "filledAt": bar.get("timestamp") or "",
         "fillPrice": round(resolved_fill_price, 4),
@@ -188,55 +202,86 @@ def _is_session_close_bar(bar: dict[str, Any]) -> bool:
     return "T15:00" in timestamp or "T15:30" in timestamp
 
 
+def _is_target_order(order: dict[str, Any]) -> bool:
+    if order.get("side") != "SELL":
+        return False
+    stage_key = str(order.get("stageKey") or "")
+    return stage_key not in {"", "stop", "finalCutoff"}
+
+
+def _is_order_active(order: dict[str, Any], timestamp: str) -> bool:
+    active_from = str(order.get("activeFrom") or "")
+    active_until = str(order.get("activeUntil") or "")
+    if active_from and timestamp < active_from:
+        return False
+    if active_until and timestamp > active_until:
+        return False
+    return True
+
+
+def _extract_time_hhmm(timestamp: str) -> str:
+    text = str(timestamp or "")
+    if "T" not in text:
+        return ""
+    return text[11:16]
+
+
+def _is_time_between(timestamp: str, start: str, end: str) -> bool:
+    hhmm = _extract_time_hhmm(timestamp)
+    return bool(hhmm and start <= hhmm <= end)
+
+
 def simulate_exit_plan(
     *,
     orders: list[dict[str, Any]],
     bars: list[dict[str, Any]],
     replay_schedule: dict[str, Any],
+    strategy: str = "",
+    entry_fill_price: float = 0.0,
+    reversal_live_exit_policy: dict[str, Any] | None = None,
     auto_flatten: bool = False,
     ambiguous_policy: str = "stop_first",
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    del ambiguous_policy
     fills: list[dict[str, Any]] = []
     remaining = 100.0
     pending_targets = {
         order["orderId"]: order
         for order in orders
-        if order["side"] == "SELL" and order.get("stageKey") in {"takeProfitPrimary", "takeProfitSecondary"}
+        if _is_target_order(order)
     }
-    primary_target = next((order for order in pending_targets.values() if order.get("stageKey") == "takeProfitPrimary"), None)
-    secondary_target = next((order for order in pending_targets.values() if order.get("stageKey") == "takeProfitSecondary"), None)
     stop_order = next((order for order in orders if order["side"] == "SELL" and order.get("stageKey") == "stop"), None)
     final_order = next((order for order in orders if order["side"] == "SELL" and order.get("stageKey") == "finalCutoff"), None)
     ambiguous = 0
     closed_reason = "open"
     final_exit_at = str(replay_schedule.get("finalExitAt") or "")
-    primary_target_until = str(replay_schedule.get("primaryTargetUntil") or "")
-    secondary_target_until = str(replay_schedule.get("secondaryTargetUntil") or "")
+    reversal_session_high = 0.0
+    reversal_time_stop_cutoff = str((reversal_live_exit_policy or {}).get("timeStopCutoff") or "09:15")
+    reversal_time_stop_min_bounce = float((reversal_live_exit_policy or {}).get("timeStopMinBouncePct") or 1.0)
+    reversal_breakeven_activation = float((reversal_live_exit_policy or {}).get("breakevenActivationPct") or 3.0)
 
     for bar in bars:
         if remaining <= 0:
             break
         timestamp = str(bar.get("timestamp") or "")
         high_price = float(bar.get("high") or 0.0)
+        low_price = float(bar.get("low") or 0.0)
+        open_price = float(bar.get("open") or 0.0)
         close_price = float(bar.get("close") or 0.0)
-        hit_targets: list[dict[str, Any]] = []
-        if (
-            primary_target
-            and primary_target.get("finalStatus") == "open"
-            and primary_target_until
-            and timestamp <= primary_target_until
-            and high_price >= float(primary_target.get("requestedPrice") or 0.0)
-        ):
-            hit_targets.append(primary_target)
-        if (
-            secondary_target
-            and secondary_target.get("finalStatus") == "open"
-            and secondary_target_until
-            and primary_target_until
-            and primary_target_until < timestamp <= secondary_target_until
-            and high_price >= float(secondary_target.get("requestedPrice") or 0.0)
-        ):
-            hit_targets.append(secondary_target)
+        if strategy == "reversal":
+            reversal_session_high = max(reversal_session_high, high_price, close_price)
+        hit_targets = sorted(
+            [
+                order for order in pending_targets.values()
+                if order.get("finalStatus") == "open"
+                and _is_order_active(order, timestamp)
+                and high_price >= float(order.get("requestedPrice") or 0.0)
+            ],
+            key=lambda order: (
+                float(order.get("requestedPrice") or 0.0),
+                str(order.get("stageKey") or ""),
+            ),
+        )
 
         for order in hit_targets:
             if remaining <= 0:
@@ -247,19 +292,81 @@ def simulate_exit_plan(
                 pending_targets.pop(order["orderId"], None)
                 continue
             order["finalStatus"] = "filled"
-            fill_rule = "primary_target_touch" if order.get("stageKey") == "takeProfitPrimary" else "secondary_target_touch"
+            fill_rule = f"{order.get('stageKey')}_touch"
             fills.append(_fill_from_bar(order, bar, qty=qty, fill_rule=fill_rule))
             remaining = round(max(0.0, remaining - qty), 4)
             pending_targets.pop(order["orderId"], None)
+            closed_reason = fill_rule
+        if remaining <= 0:
             for other in pending_targets.values():
                 if other.get("finalStatus") == "open":
                     other["finalStatus"] = "cancelled"
             if final_order and final_order.get("finalStatus") == "open":
                 final_order["finalStatus"] = "cancelled"
-            closed_reason = fill_rule
-            remaining = 0.0
 
         if remaining <= 0:
+            break
+
+        reversal_session_high_pct = ((reversal_session_high / entry_fill_price - 1.0) * 100.0) if entry_fill_price > 0 else 0.0
+        reversal_time_stop_hit = bool(
+            strategy == "reversal"
+            and remaining > 0
+            and _extract_time_hhmm(timestamp) >= reversal_time_stop_cutoff
+            and reversal_session_high_pct < reversal_time_stop_min_bounce
+            and close_price > 0
+            and close_price <= max(open_price, entry_fill_price)
+        )
+        if reversal_time_stop_hit:
+            market_order = final_order or stop_order or orders[0]
+            market_order["finalStatus"] = "filled"
+            fills.append(
+                _fill_from_bar(
+                    market_order,
+                    bar,
+                    qty=remaining,
+                    fill_rule="time_stop_0915_market",
+                    fill_price=close_price,
+                )
+            )
+            if stop_order and stop_order is not market_order and stop_order.get("finalStatus") == "open":
+                stop_order["finalStatus"] = "cancelled"
+            for order in pending_targets.values():
+                if order.get("finalStatus") == "open":
+                    order["finalStatus"] = "cancelled"
+            if final_order and final_order is not market_order and final_order.get("finalStatus") == "open":
+                final_order["finalStatus"] = "cancelled"
+            remaining = 0.0
+            closed_reason = "time_stop_0915"
+            break
+
+        reversal_breakeven_hit = bool(
+            strategy == "reversal"
+            and remaining > 0
+            and reversal_session_high_pct >= reversal_breakeven_activation
+            and close_price > 0
+            and close_price <= entry_fill_price
+        )
+        if reversal_breakeven_hit:
+            market_order = final_order or stop_order or orders[0]
+            market_order["finalStatus"] = "filled"
+            fills.append(
+                _fill_from_bar(
+                    market_order,
+                    bar,
+                    qty=remaining,
+                    fill_rule="breakeven_fail_market",
+                    fill_price=close_price,
+                )
+            )
+            if stop_order and stop_order is not market_order and stop_order.get("finalStatus") == "open":
+                stop_order["finalStatus"] = "cancelled"
+            for order in pending_targets.values():
+                if order.get("finalStatus") == "open":
+                    order["finalStatus"] = "cancelled"
+            if final_order and final_order is not market_order and final_order.get("finalStatus") == "open":
+                final_order["finalStatus"] = "cancelled"
+            remaining = 0.0
+            closed_reason = "breakeven_fail"
             break
 
         stop_hit = bool(
@@ -326,8 +433,7 @@ def simulate_exit_plan(
                 )
             )
             remaining = 0.0
-            if closed_reason == "open":
-                closed_reason = "third_day_cutoff_market"
+            closed_reason = "third_day_cutoff_market"
 
     return fills, {
         "remainingQuantityPct": round(remaining, 4),
@@ -347,6 +453,7 @@ def simulate_trade(
     source_entry_key: str,
     trade_plan_rows: list[dict[str, Any]],
     market_data: dict[str, Any],
+    reversal_live_exit_policy: dict[str, Any] | None = None,
     entry_mode: str = "close",
     auto_flatten: bool = True,
 ) -> dict[str, Any]:
@@ -397,55 +504,56 @@ def simulate_trade(
     entry_fill = fill_entry_order(entry_order, entry_ref_bar, slippage_pct=slippage_pct, fill_rule=fill_rule)
     fills.append(entry_fill)
 
-    primary_target_price = _price_with_return(float(entry_fill.get("fillPrice") or 0.0), PRIMARY_TAKE_PROFIT_PCT)
-    secondary_target_price = _price_with_return(float(entry_fill.get("fillPrice") or 0.0), SECONDARY_TAKE_PROFIT_PCT)
     primary_active_until = str(replay_schedule.get("primaryTargetUntil") or (replay_bars[1].get("timestamp") if len(replay_bars) > 1 else requested_at))
     secondary_active_from = str(replay_schedule.get("secondaryTargetFrom") or primary_active_until)
     secondary_active_until = str(replay_schedule.get("secondaryTargetUntil") or (replay_bars[2].get("timestamp") if len(replay_bars) > 2 else primary_active_until))
     final_exit_at = str(replay_schedule.get("finalExitAt") or (replay_bars[-1].get("timestamp") if replay_bars else requested_at))
-
-    orders.append(
-        make_order(
-            order_id=f"{source_entry_key}-takeProfitPrimary",
-            run_id=run_id,
-            date=date,
-            variant=variant,
-            strategy=strategy,
-            code=code,
-            name=name,
-            side="SELL",
-            order_type="LIMIT",
-            requested_at=str(replay_bars[0].get("timestamp") if replay_bars else requested_at),
-            requested_price=primary_target_price,
-            quantity_pct=100.0,
-            reason=f"익일 10시 {PRIMARY_TAKE_PROFIT_PCT:.1f}% 자동익절",
-            source_entry_key=source_entry_key,
-            stage_key="takeProfitPrimary",
-            active_from=str(replay_bars[0].get("timestamp") if replay_bars else requested_at),
-            active_until=primary_active_until,
+    target_window_map = {
+        "premarket": (
+            str(replay_bars[0].get("timestamp") if replay_bars else requested_at),
+            primary_active_until,
+        ),
+        "openPhase": (
+            str(replay_bars[0].get("timestamp") if replay_bars else requested_at),
+            primary_active_until,
+        ),
+        "intraday1": (
+            secondary_active_from,
+            secondary_active_until,
+        ),
+        "intraday2": (
+            secondary_active_from,
+            secondary_active_until,
+        ),
+        "swing": (
+            secondary_active_until,
+            final_exit_at,
+        ),
+    }
+    for target in plan["targets"]:
+        stage_key = str(target.get("stageKey") or "")
+        active_from, active_until = target_window_map.get(stage_key, (secondary_active_from, secondary_active_until))
+        orders.append(
+            make_order(
+                order_id=f"{source_entry_key}-{stage_key}",
+                run_id=run_id,
+                date=date,
+                variant=variant,
+                strategy=strategy,
+                code=code,
+                name=name,
+                side="SELL",
+                order_type="LIMIT",
+                requested_at=active_from or requested_at,
+                requested_price=float(target.get("targetPrice") or 0.0),
+                quantity_pct=float(target.get("quantityPct") or 0.0),
+                reason=str(target.get("stage") or "익절"),
+                source_entry_key=source_entry_key,
+                stage_key=stage_key,
+                active_from=active_from,
+                active_until=active_until,
+            )
         )
-    )
-    orders.append(
-        make_order(
-            order_id=f"{source_entry_key}-takeProfitSecondary",
-            run_id=run_id,
-            date=date,
-            variant=variant,
-            strategy=strategy,
-            code=code,
-            name=name,
-            side="SELL",
-            order_type="LIMIT",
-            requested_at=secondary_active_from,
-            requested_price=secondary_target_price,
-            quantity_pct=100.0,
-            reason=f"익일 15시 {SECONDARY_TAKE_PROFIT_PCT:.1f}% 자동익절",
-            source_entry_key=source_entry_key,
-            stage_key="takeProfitSecondary",
-            active_from=secondary_active_from,
-            active_until=secondary_active_until,
-        )
-    )
     stop = plan["stop"]
     orders.append(
         make_order(
@@ -492,6 +600,9 @@ def simulate_trade(
         orders=orders,
         bars=replay_bars,
         replay_schedule=replay_schedule,
+        strategy=strategy,
+        entry_fill_price=float(entry_fill.get("fillPrice") or 0.0),
+        reversal_live_exit_policy=reversal_live_exit_policy,
         auto_flatten=auto_flatten,
     )
     fills.extend(exit_fills)

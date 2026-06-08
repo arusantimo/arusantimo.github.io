@@ -7,6 +7,20 @@ function loadUiContext() {
   const context = {
     console,
     window: null,
+    localStorage: {
+      store: new Map(),
+      getItem(key) {
+        return this.store.has(key) ? this.store.get(key) : null;
+      },
+      setItem(key, value) {
+        this.store.set(key, String(value));
+      }
+    },
+    document: {
+      getElementById() {
+        return null;
+      }
+    },
     escapeHtml(value) {
       return String(value ?? '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     },
@@ -18,9 +32,20 @@ function loadUiContext() {
   context.window = context;
   vm.createContext(context);
   vm.runInContext(fs.readFileSync(new URL('./config.js', import.meta.url), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(new URL('./gap.js', import.meta.url), 'utf8'), context);
   vm.runInContext(fs.readFileSync(new URL('./utils.js', import.meta.url), 'utf8'), context);
+  vm.runInContext(fs.readFileSync(new URL('./state.js', import.meta.url), 'utf8'), context);
   vm.runInContext(fs.readFileSync(new URL('./ui.js', import.meta.url), 'utf8'), context);
   return context;
+}
+
+function createContainerStub() {
+  return {
+    innerHTML: '',
+    querySelectorAll() {
+      return [];
+    }
+  };
 }
 
 test('volatility card insight renders summary and blended state', () => {
@@ -132,6 +157,162 @@ test('market cap inline helper can insert a rank badge before the amount', () =>
     { entryKey: 'C', marketCapTrillion: 5 }
   ]);
 
-  const html = context.renderMarketCapInlineHtml({ entryKey: 'A', marketCapTrillion: 40 }, rankMap);
+  const html = context.renderMarketCapInlineHtml({ entryKey: 'A', marketCapTrillion: 40, marketCapRank: 1, marketCapUniverseCount: 3 }, rankMap);
   assert.match(html, /^<span class="market-cap-rank-badge market-cap-rank-top10">시총 1위<\/span><span class="stock-code-cap stock-code-cap-inline market-cap-amount" style="color: rgb\(59, 130, 246\);">40\.0조<\/span>$/);
+});
+
+test('trade plan stage tags render full staged exits including swing quantity and stop', () => {
+  const context = loadUiContext();
+  const html = context.buildTradePlanStageTagHtml({
+    tradePlanRows: [
+      { stage: '🌅 프리마켓', stageKey: 'premarket', quantity: '30% 익절', targetPrice: '261,887원' },
+      { stage: '🔔 장초반', stageKey: 'openPhase', quantity: '30% 익절', targetPrice: '265,720원' },
+      { stage: '📈 장중 1차', stageKey: 'intraday1', quantity: '25% 익절', targetPrice: '270,830원' },
+      { stage: '📈 장중 2차', stageKey: 'intraday2', quantity: '10% 익절', targetPrice: '275,940원' },
+      { stage: '📊 스윙 전환', stageKey: 'swing', quantity: '5% 익절', targetPrice: '281,050원' },
+      { stage: '🛑 손절', stageKey: 'stop', quantity: '전량', targetPrice: '247,835원' }
+    ]
+  }, {
+    recommendedProfile: { label: '저항 우선형', profileKey: 'conservative' }
+  }).join('');
+
+  assert.match(html, /추천 저항 우선형/);
+  assert.match(html, /🌅 30% 익절 261,887원/);
+  assert.match(html, /🔔 30% 익절 265,720원/);
+  assert.match(html, /📈1 25% 익절 270,830원/);
+  assert.match(html, /📈2 10% 익절 275,940원/);
+  assert.match(html, /plan-tag swing">📊 5% 익절 281,050원/);
+  assert.match(html, /plan-tag stop">🛑 전량 247,835원/);
+});
+
+test('trade plan table keeps profile comparison and also shows recommended profile stage rows', () => {
+  const context = loadUiContext();
+  const html = context.renderTradePlanTable({
+    strategy: 'pullback',
+    recommendedTakeProfitProfile: {
+      profileKey: 'conservative',
+      label: '저항 우선형'
+    },
+    pullbackTakeProfitProfiles: [
+      {
+        profileKey: 'conservative',
+        label: '저항 우선형',
+        recommended: true,
+        reasonSummary: '1차 저항 반영형',
+        tradePlanRows: [
+          { stage: '🌅 프리마켓', stageKey: 'premarket', condition: '+2.0% 도달', quantity: '35% 익절', targetYield: '+2.0%', targetPrice: '112,914원' },
+          { stage: '🔔 장초반', stageKey: 'openPhase', condition: '+3.0% 도달', quantity: '30% 익절', targetYield: '+3.0%', targetPrice: '114,021원' },
+          { stage: '📈 장중 1차', stageKey: 'intraday1', condition: '+4.5% 도달', quantity: '25% 익절', targetYield: '+4.5%', targetPrice: '115,681원', recommended: true },
+          { stage: '📈 장중 2차', stageKey: 'intraday2', condition: '+6.0% 도달', quantity: '10% 익절', targetYield: '+6.0%', targetPrice: '117,342원' },
+          { stage: '📊 스윙 전환', stageKey: 'swing', condition: 'D+2 고점 돌파', quantity: '잔량 전량', targetYield: '+8.0%', targetPrice: '119,556원' },
+          { stage: '🛑 손절', stageKey: 'stop', condition: '유효 손절가 107,932원 하향 이탈', quantity: '전량', targetYield: '-2.5%', targetPrice: '107,932원' }
+        ]
+      }
+    ]
+  });
+
+  assert.match(html, /1차 익절가/);
+  assert.match(html, /추천 프로필 단계 · 저항 우선형/);
+  assert.match(html, /<th>단계<\/th><th>조건<\/th><th>수량<\/th><th>목표 수익률<\/th><th>목표가<\/th>/);
+  assert.match(html, /🌅 프리마켓/);
+  assert.match(html, /📈 장중 1차/);
+  assert.match(html, /📊 스윙 전환/);
+  assert.match(html, /🛑 손절/);
+});
+
+test('buy cards render staged exit tags including swing stage', () => {
+  const context = loadUiContext();
+  vm.runInContext(fs.readFileSync(new URL('./sell-ui.js', import.meta.url), 'utf8'), context);
+  const containers = new Map([
+    ['buy-list-pullback', createContainerStub()],
+    ['buy-list-accumulation', createContainerStub()],
+    ['buy-list-breakout', createContainerStub()],
+    ['buy-list-reversal', createContainerStub()]
+  ]);
+
+  context.document = {
+    getElementById(id) {
+      return containers.get(id) || null;
+    },
+    querySelectorAll() {
+      return [];
+    }
+  };
+  context.getJonggaReplayViewMode = () => 'recommendation';
+  context.filterJonggaReplayViewEntries = entries => entries.filter(entry => entry.entryEligible);
+  context.buildMarketCapRankMap = () => new Map();
+  context.summarizeGateStatus = () => ({ passed: 6, total: 7 });
+  context.getBuyPresentation = () => ({
+    verdictClass: 'candidate',
+    liveRefresh: false,
+    changed: {
+      score: false,
+      grade: false,
+      adjustment: false,
+      statusLabel: false
+    },
+    primaryGrade: 'A',
+    primarySummary: '신호 8.2 / 진입 8.2 · A',
+    primaryStatusLabel: '매매가능',
+    primaryStatusReasonShort: '',
+    strategyStatusLabel: '매매가능'
+  });
+  context.getBuyDisplayScore = () => '8.2';
+  context.buildBuyScoreDisplayHtml = () => ({ signalText: '8.2', strictLine: '', badgeHtml: '' });
+  context.renderVolatilityTopBadges = () => '';
+  context.renderPullbackCardInsights = () => '';
+  context.renderVolatilityCardInsights = () => '';
+  context.buildStockNameLinksHtml = name => name;
+  context.buildBuyTrackingButtonHtml = () => '';
+  context.bindBuyTrackingButtons = () => {};
+  context.getEntryByCode = entryKeyOrCode => context.__testPullbackEntries.find(entry =>
+    entry.entryKey === entryKeyOrCode || entry.code === entryKeyOrCode
+  ) || null;
+  context.getTradingValueRankBadgeHtml = () => '';
+  context.renderMarketCapInlineHtml = () => '';
+  context.renderBuyPriceWithDailyChange = () => '<span>110,700원</span>';
+  context.openModal = () => {};
+  context.__testPullbackEntries = [{
+    entryKey: 'slotA:pullback:035420',
+    strategy: 'pullback',
+    rank: 1,
+    name: 'NAVER',
+    code: '035420',
+    rr: '1 : 1.3',
+    entryEligible: true,
+    matchedRules: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'],
+    unmatchedRules: [],
+    notes: [],
+    rationale: '목표가와 스윙 단계를 카드에서도 바로 확인합니다.',
+    tradePlanRows: [
+      { stage: '🌅 프리마켓', stageKey: 'premarket', quantity: '30% 익절', targetPrice: '261,887원' },
+      { stage: '🔔 장초반', stageKey: 'openPhase', quantity: '30% 익절', targetPrice: '265,720원' },
+      { stage: '📈 장중 1차', stageKey: 'intraday1', quantity: '25% 익절', targetPrice: '270,830원' },
+      { stage: '📈 장중 2차', stageKey: 'intraday2', quantity: '10% 익절', targetPrice: '275,940원' },
+      { stage: '📊 스윙 전환', stageKey: 'swing', quantity: '5% 익절', targetPrice: '281,050원' },
+      { stage: '🛑 손절', stageKey: 'stop', quantity: '전량', targetPrice: '247,835원' }
+    ]
+  }];
+  context.setNotionPageState('slotA', {
+    snapshot: {
+      pullbackEntries: context.__testPullbackEntries,
+      accumulationEntries: [],
+      breakoutEntries: [],
+      momentumEntries: [],
+      reversalEntries: [],
+      regimeTable: [],
+      regimeEvidence: [],
+      gapScore: { grade: '', rows: [] }
+    }
+  });
+  context.setActiveBuySlot('slotA');
+
+  context.renderBuyStockCards();
+
+  const html = containers.get('buy-list-pullback').innerHTML;
+  assert.match(html, /plan-prices/);
+  assert.match(html, /🌅 30% 익절 261,887원/);
+  assert.match(html, /📈1 25% 익절 270,830원/);
+  assert.match(html, /📊 5% 익절 281,050원/);
+  assert.match(html, /🛑 전량 247,835원/);
 });

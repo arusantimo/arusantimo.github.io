@@ -90,6 +90,9 @@ def update_outcomes_index(existing: list[dict[str, Any]], record: dict[str, Any]
 
 
 def stage_key_from_row(row: dict[str, Any]) -> str:
+    explicit = str(row.get("stageKey") or "").strip()
+    if explicit:
+        return explicit
     stage = str(row.get("stage") or "")
     for keyword, key in STAGE_KEY_BY_KEYWORD:
         if keyword in stage:
@@ -151,6 +154,7 @@ def compute_outcome(
     next_trading_date: str,
     ohlc: dict[str, float],
 ) -> dict[str, Any]:
+    strategy = str(identity.get("strategy") or "")
     high = float(ohlc.get("high") or 0)
     low = float(ohlc.get("low") or 0)
     close = float(ohlc.get("close") or 0)
@@ -159,7 +163,7 @@ def compute_outcome(
     stop_price = 0.0
     stop_rate = 0.0
     for row in trade_plan_rows:
-        if "손절" in str(row.get("stage") or ""):
+        if stage_key_from_row(row) == "stop" or "손절" in str(row.get("stage") or ""):
             stop_price = _parse_price(row.get("targetPrice"))
             stop_rate = _parse_rate(row.get("targetYield"))
             continue
@@ -175,7 +179,8 @@ def compute_outcome(
             "hit": bool(high > 0 and target_price > 0 and high >= target_price),
         })
 
-    stop_hit = bool(low > 0 and stop_price > 0 and low <= stop_price)
+    stop_hit = bool(close > 0 and stop_price > 0 and close <= stop_price) if strategy == "reversal" else bool(low > 0 and stop_price > 0 and low <= stop_price)
+    stop_execution_mode = "close_only" if strategy == "reversal" else "daily_ohlc_proxy"
     hit_stages = [s for s in stages if s["hit"]]
     best_stage_hit = None
     for stage_key in reversed(STAGE_LADDER):
@@ -230,6 +235,7 @@ def compute_outcome(
         "stopPrice": stop_price,
         "stopRate": stop_rate,
         "stopHit": stop_hit,
+        "stopExecutionMode": stop_execution_mode,
         "bestStageHit": best_stage_hit,
         "realizedReturnProxy": round(realized, 5),
         "outcomeStatus": status,
@@ -281,6 +287,8 @@ def build_rollup(index: list[dict[str, Any]]) -> dict[str, Any]:
     """
     by_cell: dict[str, dict[str, float]] = {}
     by_strategy_stage: dict[str, dict[str, float]] = {}
+    by_take_profit_profile_cell: dict[str, dict[str, float]] = {}
+    by_take_profit_profile: dict[str, dict[str, float]] = {}
 
     def accumulate(
         bucket: dict[str, dict[str, float]],
@@ -309,8 +317,24 @@ def build_rollup(index: list[dict[str, Any]]) -> dict[str, Any]:
         regime = str(record.get("regimeBucket") or "")
         vk = str(record.get("vkospiTier") or "")
         gap = str(record.get("gapGrade") or "")
+        take_profit_profile_key = str(record.get("takeProfitProfileKey") or "")
         realized = record.get("realizedReturnProxy")
         realized = None if status == "stop_first_ambiguous" else (float(realized) if realized is not None else None)
+        if take_profit_profile_key:
+            accumulate(
+                by_take_profit_profile_cell,
+                f"{strategy}|{regime}|{vk}|{gap}|{take_profit_profile_key}",
+                False,
+                realized,
+                None,
+            )
+            accumulate(
+                by_take_profit_profile,
+                f"{strategy}|{take_profit_profile_key}",
+                False,
+                realized,
+                None,
+            )
         for stage in record.get("stages") or []:
             stage_key = str(stage.get("stageKey") or "")
             if not stage_key:
@@ -337,6 +361,8 @@ def build_rollup(index: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "byCell": finalize(by_cell),
         "byStrategyStage": finalize(by_strategy_stage),
+        "byTakeProfitProfileCell": finalize(by_take_profit_profile_cell),
+        "byTakeProfitProfile": finalize(by_take_profit_profile),
     }
 
 
@@ -406,6 +432,8 @@ def backfill(
                 "strategy": strategy,
                 "code": code,
                 "name": str(entry.get("name") or ""),
+                "takeProfitProfileKey": str(((entry.get("recommendedTakeProfitProfile") or {}).get("profileKey")) or ""),
+                "takeProfitProfileLabel": str(((entry.get("recommendedTakeProfitProfile") or {}).get("label")) or ""),
                 **dims,
             }
 

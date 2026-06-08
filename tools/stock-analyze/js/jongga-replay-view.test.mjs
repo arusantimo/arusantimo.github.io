@@ -37,12 +37,14 @@ function loadStateContext() {
     createElementStub(),
     createElementStub(),
     createElementStub(),
+    createElementStub(),
     createElementStub()
   ];
   buttons[0].dataset.jonggaReplayView = 'recommendation';
-  buttons[1].dataset.jonggaReplayView = 'a7plus';
-  buttons[2].dataset.jonggaReplayView = 'replay';
-  buttons[3].dataset.jonggaReplayView = 'all';
+  buttons[1].dataset.jonggaReplayView = 'a8plus';
+  buttons[2].dataset.jonggaReplayView = 'a7plus';
+  buttons[3].dataset.jonggaReplayView = 'replay';
+  buttons[4].dataset.jonggaReplayView = 'all';
 
   const context = {
     console,
@@ -87,6 +89,7 @@ function sampleSnapshot() {
     pullbackEntries: [
       { name: 'Reco A', code: '000001', gradeScore: 7.2, grade: 'A', entryEligible: true, statusLabel: '매수추천' },
       { name: 'Replay B', code: '000002', gradeScore: 6.1, grade: 'B', entryEligible: false, statusLabel: '관심후보' },
+      { name: 'A8 Candidate', code: '000006', gradeScore: 8.1, grade: 'A', entryEligible: false, statusLabel: '관심후보' },
       { name: 'Too Low', code: '000003', gradeScore: 5.9, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
     ],
     accumulationEntries: [
@@ -135,7 +138,7 @@ function sampleReplayBridge() {
   };
 }
 
-test('replay view mode filters buy entries by recommendation, 6.0&B, or 7&A', () => {
+test('replay view mode filters buy entries by recommendation, 8&A+, 6.0&B, or 7&A', () => {
   const { context } = loadStateContext();
   const snapshot = sampleSnapshot();
 
@@ -154,6 +157,11 @@ test('replay view mode filters buy entries by recommendation, 6.0&B, or 7&A', ()
     ...snapshot.accumulationEntries,
     ...snapshot.reversalEntries
   ], 'a7plus');
+  const a8plus = context.filterJonggaReplayViewEntries([
+    ...snapshot.pullbackEntries,
+    ...snapshot.accumulationEntries,
+    ...snapshot.reversalEntries
+  ], 'a8plus');
   const all = context.filterJonggaReplayViewEntries([
     ...snapshot.pullbackEntries,
     ...snapshot.accumulationEntries,
@@ -161,9 +169,10 @@ test('replay view mode filters buy entries by recommendation, 6.0&B, or 7&A', ()
   ], 'all');
 
   assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Reco C']);
-  assert.deepEqual(replay.map(item => item.name), ['Replay B', 'Replay D']);
-  assert.deepEqual(a7plus.map(item => item.name), ['Reco A']);
-  assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'Too Low', 'Reco C', 'Replay D']);
+  assert.deepEqual(replay.map(item => item.name), ['Replay B', 'A8 Candidate', 'Replay D']);
+  assert.deepEqual(a8plus.map(item => item.name), ['A8 Candidate', 'Reco C']);
+  assert.deepEqual(a7plus.map(item => item.name), ['Reco A', 'A8 Candidate']);
+  assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Too Low', 'Reco C', 'Replay D']);
 });
 
 test('replay view controls show counts and active mode', () => {
@@ -178,13 +187,15 @@ test('replay view controls show counts and active mode', () => {
 
   assert.equal(buttons[0].classList.contains('active'), false);
   assert.equal(buttons[1].classList.contains('active'), false);
-  assert.equal(buttons[2].classList.contains('active'), true);
+  assert.equal(buttons[2].classList.contains('active'), false);
+  assert.equal(buttons[3].classList.contains('active'), true);
   assert.match(summary.innerHTML, /매수추천 2건/);
-  assert.match(summary.innerHTML, /A 7\+ 1건/);
-  assert.match(summary.innerHTML, /6\.0 & B 2건/);
-  assert.match(summary.innerHTML, /전체 5건/);
+  assert.match(summary.innerHTML, /8 & A\+ 2건/);
+  assert.match(summary.innerHTML, /7 & A 2건/);
+  assert.match(summary.innerHTML, /6\.0 & B 3건/);
+  assert.match(summary.innerHTML, /전체 6건/);
   assert.match(summary.innerHTML, /누적 수익률 -0\.60%/);
-  assert.match(summary.innerHTML, /jongga-replay-view-current">6\.0 & B 2건/);
+  assert.match(summary.innerHTML, /jongga-replay-view-current">6\.0 & B 3건/);
 });
 
 test('setJonggaReplayViewMode rerenders strategy replay sections on tab switch', () => {

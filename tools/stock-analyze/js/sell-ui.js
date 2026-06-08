@@ -245,11 +245,9 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
       ? filterJonggaReplayViewEntries(entries, replayViewMode)
       : (Array.isArray(entries) ? entries : [])
   );
-  const emptyMessage = replayViewMode === 'replay'
-    ? '6.0 & B 조건을 만족하는 종목이 없습니다.'
-    : replayViewMode === 'all'
-      ? '전체 후보가 없습니다.'
-    : '매수추천 조건을 만족하는 종목이 없습니다.';
+  const emptyMessage = replayViewMode === 'all'
+    ? '전체 후보가 없습니다.'
+    : `${typeof getJonggaReplayViewMeta === 'function' ? getJonggaReplayViewMeta(replayViewMode).label : '매수추천'} 조건을 만족하는 종목이 없습니다.`;
 
   if (typeof updateJonggaReplayViewControls === 'function') {
     updateJonggaReplayViewControls(getActiveBuySnapshot());
@@ -275,6 +273,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
       const gateSummary = summarizeGateStatus(entry);
       const presentation = getBuyPresentation(entry);
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';
+      const planHtml = buildSellCardPlanSummary(entry.entryKey || entry.code);
       const scoreDisplay = getBuyDisplayScore(entry, presentation.primaryScore);
       const slotLabel = shouldShowSlotLabel() ? escapeHtml(entry.slotLabel || getSlotLabel(entry.slotId)) : '';
       const liveMetaHtml = presentation.liveRefresh
@@ -309,6 +308,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
             <span class="buy-tag muted">미충족 ${entry.unmatchedRules.length}</span>
           </div>
           <div class="buy-card-summary">${escapeHtml(rationale)}</div>
+          ${planHtml}
           ${liveMetaHtml}
           <div class="buy-card-footer">
             ${renderBuyPriceWithDailyChange(entry)}
@@ -448,6 +448,41 @@ function buildSellStrategyPlan(detail) {
 
   if (currentItem) items.push(currentItem);
 
+  if (typeof hasEntryTakeProfitProfiles === 'function' && hasEntryTakeProfitProfiles(entry)) {
+    const indicatorItems = (Array.isArray(detail?.indicators) ? detail.indicators : [])
+      .filter(indicator => {
+        const title = String(indicator?.title || '');
+        return indicator
+          && title !== '분석 단계'
+          && title !== '매도 단계 판정'
+          && (indicator.status === 'triggered' || indicator.status === 'warning' || indicator.status === 'clear');
+      })
+      .slice(0, 4)
+      .map(indicator => ({
+        status: indicator.status === 'triggered' ? 'blocked' : indicator.status === 'warning' ? 'guard' : 'available',
+        icon: indicator.status === 'triggered' ? '🚨' : indicator.status === 'warning' ? '⚠️' : '👀',
+        title: String(indicator.title || '라이브 규칙'),
+        description: String(indicator.result || indicator.criterion || ''),
+        note: String(indicator.value || '')
+      }));
+    const liveItems = items.concat(indicatorItems);
+    const normalizedItems = liveItems.length ? liveItems : [{
+      status: 'available',
+      icon: '🛰️',
+      title: '현재 유효 라이브 규칙',
+      description: '프로필 표와 별도로 실시간 손절/익절 규칙만 표시합니다.',
+      note: ''
+    }];
+    const headlineItem = normalizedItems[0];
+    const scoreHeadline = buildSellActionHeadline(detail);
+    const scoreMeta = buildSellActionMeta(detail);
+    return {
+      headline: scoreHeadline || headlineItem.title,
+      headlineDetail: scoreMeta || headlineItem.description,
+      items: normalizedItems
+    };
+  }
+
   stageOrder.forEach(stage => {
     const target = targets?.[stage];
     if (!target?.row) return;
@@ -542,19 +577,34 @@ buildSellCardPlanSummary = function buildSellCardPlanSummaryOverride(codeOrEntry
     return '<div class="scard-plan-empty">매매 단계 정보 없음</div>';
   }
 
-  const findRow = prefix => entry.tradePlanRows.find(r => r.stage && r.stage.includes(prefix));
-  const premarket = findRow('프리마켓') || findRow('🌅');
-  const openPhase = findRow('장초반') || findRow('🔔');
-  const intraday = findRow('장중') || findRow('📈');
-  const swing = findRow('스윙') || findRow('📊');
-  const stopLoss = findRow('손절') || findRow('🛑');
+  if (typeof hasEntryTakeProfitProfiles === 'function' && hasEntryTakeProfitProfiles(entry)) {
+    const recommendedProfile = typeof getRecommendedTakeProfitProfileEntry === 'function'
+      ? getRecommendedTakeProfitProfileEntry(entry)
+      : null;
+    const tags = typeof buildTradePlanStageTagHtml === 'function'
+      ? buildTradePlanStageTagHtml(recommendedProfile || entry, { recommendedProfile })
+      : [];
+    const entryPrice = entry.entryPriceValue ? `진입가: ${entry.entryPriceValue.toLocaleString()}원` : '';
+    if (detail?.mode === 'sell') {
+      return `
+        ${renderSellStrategyPlan(detail, true)}
+        <div class="scard-plan scard-plan-tags">
+          <div class="plan-prices">${tags.join('')}</div>
+          ${entryPrice ? `<div class="plan-entry">${entryPrice}</div>` : ''}
+        </div>
+      `;
+    }
+    return `
+      <div class="scard-plan">
+        <div class="plan-prices">${tags.join('')}</div>
+        ${entryPrice ? `<div class="plan-entry">${entryPrice}</div>` : ''}
+      </div>
+    `;
+  }
 
-  const tags = [];
-  if (premarket) tags.push(`<span class="plan-tag target">🌅 ${escapeHtml(premarket.targetYield || premarket.targetPrice || '')}</span>`);
-  if (openPhase) tags.push(`<span class="plan-tag target">🔔 ${escapeHtml(openPhase.targetYield || openPhase.targetPrice || '')}</span>`);
-  if (intraday) tags.push(`<span class="plan-tag target">📈 ${escapeHtml(intraday.targetYield || intraday.targetPrice || '')}</span>`);
-  if (swing) tags.push('<span class="plan-tag swing">📊 스윙전환</span>');
-  if (stopLoss) tags.push(`<span class="plan-tag stop">🛑 ${escapeHtml(stopLoss.targetYield || stopLoss.targetPrice || '')}</span>`);
+  const tags = typeof buildTradePlanStageTagHtml === 'function'
+    ? buildTradePlanStageTagHtml(entry)
+    : [];
 
   const entryPrice = entry.entryPriceValue ? `진입가: ${entry.entryPriceValue.toLocaleString()}원` : '';
   if (detail?.mode === 'sell') {

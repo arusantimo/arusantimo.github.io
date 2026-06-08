@@ -132,6 +132,7 @@ ETF_NAME_PATTERN = re.compile(
     r"KODEX|TIGER|KOSEF|KBSTAR|ARIRANG|HANARO|ACE|SOL|TIMEFOLIO|PLUS|ETF|ETN|스팩|우B?$",
     re.IGNORECASE,
 )
+STOCK_CODE_PATTERN = re.compile(r"^\d{6}$")
 KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업\(잠정\)실적|잠정실적|실적발표|결산실적", re.IGNORECASE)
 KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
 TOP_TRADING_VALUE_LIMIT = 100
@@ -1224,6 +1225,49 @@ def fetch_naver_market_value_rows(market: str, *, page_size: int = 100) -> list[
     return rows
 
 
+def fetch_naver_market_value_universe() -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for market in ("KOSPI", "KOSDAQ"):
+        rows.extend(fetch_naver_market_value_rows(market))
+    return rows
+
+
+def _is_market_cap_rank_candidate(row: dict[str, Any]) -> bool:
+    code = str(row.get("itemCode") or row.get("code") or "").strip()
+    name = str(row.get("stockName") or row.get("name") or "").strip()
+    stock_end_type = str(row.get("stockEndType") or "").strip().lower()
+    if not code or not name:
+        return False
+    if not STOCK_CODE_PATTERN.fullmatch(code):
+        return False
+    if stock_end_type and stock_end_type != "stock":
+        return False
+    if ETF_NAME_PATTERN.search(name):
+        return False
+    return True
+
+
+def build_market_cap_rank_lookup(rows: list[dict[str, Any]]) -> tuple[dict[str, int], int]:
+    candidates: list[tuple[float, str, str]] = []
+    for row in rows:
+        if not _is_market_cap_rank_candidate(row):
+            continue
+        code = str(row.get("itemCode") or row.get("code") or "").strip()
+        name = str(row.get("stockName") or row.get("name") or "").strip()
+        market_cap = parse_float(row.get("marketValueRaw"))
+        if market_cap <= 0:
+            market_cap = parse_market_cap_trillion(str(row.get("marketValue") or row.get("marketValueHangeul") or ""))
+        if market_cap <= 0:
+            continue
+        candidates.append((market_cap, code, name))
+
+    ranked_entries = sorted(candidates, key=lambda item: (-item[0], item[1], item[2]))
+    lookup: dict[str, int] = {}
+    for index, (_, code, _) in enumerate(ranked_entries, start=1):
+        lookup[code] = index
+    return lookup, len(ranked_entries)
+
+
 def select_top_trading_value_codes(rows: list[dict[str, Any]], limit: int = TOP_TRADING_VALUE_LIMIT) -> list[tuple[int, str, str]]:
     candidates: list[tuple[float, str, str]] = []
     for row in rows:
@@ -1231,6 +1275,8 @@ def select_top_trading_value_codes(rows: list[dict[str, Any]], limit: int = TOP_
         name = str(row.get("stockName") or row.get("name") or "").strip()
         trading_value = parse_float(row.get("accumulatedTradingValueRaw") or row.get("accumulatedTradingValue"))
         if not code or not name or trading_value <= 0:
+            continue
+        if not STOCK_CODE_PATTERN.fullmatch(code):
             continue
         candidates.append((trading_value, code, name))
 
@@ -1246,12 +1292,10 @@ def select_top_trading_value_codes(rows: list[dict[str, Any]], limit: int = TOP_
     return results
 
 
-def fetch_top_trading_codes(limit: int = TOP_TRADING_VALUE_LIMIT) -> list[tuple[int, str, str]]:
+def fetch_top_trading_codes(limit: int = TOP_TRADING_VALUE_LIMIT, rows: list[dict[str, Any]] | None = None) -> list[tuple[int, str, str]]:
     effective_limit = min(limit, TOP_TRADING_VALUE_LIMIT)
-    rows: list[dict[str, Any]] = []
-    for market in ("KOSPI", "KOSDAQ"):
-        rows.extend(fetch_naver_market_value_rows(market))
-    results = select_top_trading_value_codes(rows, effective_limit)
+    market_rows = rows if rows is not None else fetch_naver_market_value_universe()
+    results = select_top_trading_value_codes(market_rows, effective_limit)
     if not results:
         raise RuntimeError("failed to fetch top trading-value codes from Naver mobile API")
     return results
@@ -1384,6 +1428,10 @@ class StockSnapshot:
     event_filter: dict[str, Any] | None
     toss: dict[str, Any] | None = None
     orderbook: dict[str, Any] | None = None
+    market_cap_rank: int | None = None
+    market_cap_universe_count: int | None = None
+    open_history: list[float] | None = None
+    date_history: list[str] | None = None
 
 
 def _analysis_history_rows(
@@ -1404,7 +1452,12 @@ def _analysis_history_rows(
     return filtered_rows, analysis_row
 
 
-def build_stock_snapshot(item: tuple[int, str, str], analysis_date: date | str | None = None) -> StockSnapshot:
+def build_stock_snapshot(
+    item: tuple[int, str, str],
+    analysis_date: date | str | None = None,
+    market_cap_rank_lookup: dict[str, int] | None = None,
+    market_cap_universe_count: int | None = None,
+) -> StockSnapshot:
     rank, code, name = item
     basic = request_json(f"https://m.stock.naver.com/api/stock/{code}/basic", timeout=20.0)
     integration = request_json(f"https://m.stock.naver.com/api/stock/{code}/integration", timeout=20.0)
@@ -1413,10 +1466,12 @@ def build_stock_snapshot(item: tuple[int, str, str], analysis_date: date | str |
         raise RuntimeError(f"price history unavailable for {code}")
 
     analysis_rows, analysis_row = _analysis_history_rows(history_rows, analysis_date)
+    open_history = [float(parse_int(row["openPrice"])) for row in analysis_rows]
     close_history = [float(parse_int(row["closePrice"])) for row in analysis_rows]
     high_history = [float(parse_int(row["highPrice"])) for row in analysis_rows]
     low_history = [float(parse_int(row["lowPrice"])) for row in analysis_rows]
     volume_history = [float(parse_int(row["accumulatedTradingVolume"])) for row in analysis_rows]
+    date_history = [str(row.get("localTradedAt") or "") for row in analysis_rows]
     total_infos = integration.get("totalInfos", []) or []
     deals = integration.get("dealTrendInfos", []) or []
     industry_compare_rows = integration.get("industryCompareInfo", []) or []
@@ -1475,9 +1530,11 @@ def build_stock_snapshot(item: tuple[int, str, str], analysis_date: date | str |
         foreign_previous=parse_float(previous_deal.get("foreignerPureBuyQuant")),
         institution_previous=parse_float(previous_deal.get("organPureBuyQuant")),
         close_history=close_history,
+        open_history=open_history,
         high_history=high_history,
         low_history=low_history,
         volume_history=volume_history,
+        date_history=date_history,
         ma5=ma5,
         ma10=ma10,
         ma20=ma20,
@@ -1502,6 +1559,8 @@ def build_stock_snapshot(item: tuple[int, str, str], analysis_date: date | str |
         event_filter=event_filter,
         toss=None,
         orderbook=None,
+        market_cap_rank=(market_cap_rank_lookup or {}).get(code),
+        market_cap_universe_count=market_cap_universe_count,
     )
 
 
@@ -1518,6 +1577,14 @@ def build_price_change_meta(snapshot: StockSnapshot) -> dict[str, Any]:
         "dailyChange": round(daily_change),
         "dailyChangePct": round(daily_change_pct, 2),
         "dailyDirection": "up" if daily_change > 0 else "down" if daily_change < 0 else "flat",
+    }
+
+
+def build_market_cap_meta(snapshot: StockSnapshot) -> dict[str, Any]:
+    return {
+        "marketCapTrillion": snapshot.market_cap_trillion,
+        "marketCapRank": snapshot.market_cap_rank,
+        "marketCapUniverseCount": snapshot.market_cap_universe_count,
     }
 
 
@@ -1892,14 +1959,14 @@ def relative_strength_rank(snapshot: StockSnapshot, universe_returns: list[tuple
     return any(code == snapshot.code for code, _ in ordered[:top_count])
 
 
-# 매매 단계 행 정의: (스테이지 라벨, 조건 문구, targets 인덱스, intraday 여부)
+# 매매 단계 행 정의: (스테이지 라벨, 조건 문구, targets 인덱스, intraday 여부, stageKey)
 # targets 튜플 인덱스: 0=프리마켓 1=장초반 2=장중1차 3=장중2차 4=스윙
-TRADE_PLAN_STAGE_DEFS: tuple[tuple[str, str, int, bool], ...] = (
-    ("🌅 프리마켓", "{yield} 도달", 0, False),
-    ("🔔 장초반", "{yield} 도달", 1, False),
-    ("📈 장중 1차", "{yield} 도달", 2, True),
-    ("📈 장중 2차", "추세 유지 시", 3, True),
-    ("📊 스윙 전환", "V 조건 충족 시", 4, True),
+TRADE_PLAN_STAGE_DEFS: tuple[tuple[str, str, int, bool, str], ...] = (
+    ("🌅 프리마켓", "{yield} 도달", 0, False, "premarket"),
+    ("🔔 장초반", "{yield} 도달", 1, False, "openPhase"),
+    ("📈 장중 1차", "{yield} 도달", 2, True, "intraday1"),
+    ("📈 장중 2차", "추세 유지 시", 3, True, "intraday2"),
+    ("📊 스윙 전환", "V 조건 충족 시", 4, True, "swing"),
 )
 
 # 전략 × 레짐 버킷별 매매 단계 행렬.
@@ -1978,7 +2045,7 @@ def build_trade_plan(strategy: str, entry_price: float, regime_label: str, gap_c
     is_reversal = (strategy == "reversal")
 
     rows: list[dict[str, str]] = []
-    for stage_label, condition_tpl, idx, is_intraday in TRADE_PLAN_STAGE_DEFS:
+    for stage_label, condition_tpl, idx, is_intraday, stage_key in TRADE_PLAN_STAGE_DEFS:
         rate = targets[idx]
         weight = qty[idx]
         if rate is None or weight <= 0:
@@ -1991,12 +2058,20 @@ def build_trade_plan(strategy: str, entry_price: float, regime_label: str, gap_c
             quantity_text = f"{weight}% 익절"
         rows.append({
             "stage": stage_label,
+            "stageKey": stage_key,
             "condition": condition_tpl.format(**{"yield": yield_text}),
             "quantity": quantity_text,
             "targetYield": yield_text,
             "targetPrice": target(adjusted),
         })
-    rows.append({"stage": "🛑 손절", "condition": f"{signed_number(stop, 1, '%')} 이탈", "quantity": "전량", "targetYield": signed_number(stop, 1, "%"), "targetPrice": target(stop)})
+    rows.append({
+        "stage": "🛑 손절",
+        "stageKey": "stop",
+        "condition": f"{signed_number(stop, 1, '%')} 이탈",
+        "quantity": "전량",
+        "targetYield": signed_number(stop, 1, "%"),
+        "targetPrice": target(stop),
+    })
     return rows
 
 
@@ -2005,7 +2080,7 @@ def blended_reward_from_plan(rows: list[dict[str, str]]) -> float:
     weighted = 0.0
     total = 0.0
     for row in rows:
-        if "손절" in str(row.get("stage") or ""):
+        if str(row.get("stageKey") or "") == "stop" or "손절" in str(row.get("stage") or ""):
             continue
         qty_match = re.match(r"\s*(\d+)", str(row.get("quantity") or ""))
         weight = float(qty_match.group(1)) if qty_match else 0.0
@@ -2024,10 +2099,688 @@ def rr_text(entry_price: float, stop_rate: float, target_rate: float) -> str:
     return f"1 : {reward / risk:.1f}"
 
 
+PULLBACK_STOP_POLICY_VERSION = "pullback-stop-v1"
+PULLBACK_STOP_ANCHOR_LOOKBACK_DAYS = 20
+PULLBACK_STOP_MIN_BODY_RATIO = 0.55
+PULLBACK_STOP_MIN_VOLUME_RATIO = 2.0
+PULLBACK_STOP_MIN_AVG_DAYS = 5
+ACCUMULATION_STOP_POLICY_VERSION = "accumulation-stop-v1-live"
+ACCUMULATION_OPEN_EXIT_CHECK_CUTOFF = "10:00"
+ACCUMULATION_OPEN_EXIT_MODE = "flow_and_price_confirm"
+BREAKOUT_STOP_POLICY_VERSION = "breakout-stop-v1-live"
+BREAKOUT_LIVE_EXIT_POLICY_VERSION = "breakout-live-exit-v1"
+BREAKOUT_REFERENCE_LOOKBACK_DAYS = 60
+BREAKOUT_REFERENCE_CLUSTER_PCT = 1.0
+BREAKOUT_OVERHEAD_LOOKBACK_DAYS = 120
+BREAKOUT_FALLBACK_SWING_LOOKBACK_DAYS = 20
+REVERSAL_STOP_POLICY_VERSION = "reversal-stop-v1"
+REVERSAL_LIVE_EXIT_POLICY_VERSION = "reversal-live-exit-v1"
+REVERSAL_RESISTANCE_LOOKBACK_DAYS = 20
+REVERSAL_RESISTANCE_CLUSTER_PCT = 1.0
+
+
+def _format_price_won(value: float | None) -> str:
+    if value is None or not math.isfinite(float(value)):
+        return "-"
+    return f"{round(float(value)):,}원"
+
+
+def _round_price(value: float | None) -> int | None:
+    if value is None:
+        return None
+    number = float(value)
+    if not math.isfinite(number):
+        return None
+    return round(number)
+
+
+def _rate_from_price(entry_price: float, target_price: float | None) -> float | None:
+    if not entry_price or target_price is None:
+        return None
+    return ((float(target_price) - float(entry_price)) / float(entry_price)) * 100.0
+
+
+def _volume_ratio_from_history(volumes: list[float], index: int, lookback_days: int = 20) -> float | None:
+    if index >= len(volumes):
+        return None
+    volume = parse_float(volumes[index])
+    if volume <= 0:
+        return None
+    previous_volumes = [parse_float(value) for value in volumes[index + 1 : index + 1 + lookback_days] if parse_float(value) > 0]
+    if not previous_volumes:
+        return None
+    average_volume = sum(previous_volumes) / len(previous_volumes)
+    if average_volume <= 0:
+        return None
+    return volume / average_volume
+
+
+def _pullback_anchor_candidate(snapshot: StockSnapshot, *, lookback_days: int = PULLBACK_STOP_ANCHOR_LOOKBACK_DAYS) -> dict[str, Any] | None:
+    opens = list(snapshot.open_history or [])
+    closes = list(snapshot.close_history or [])
+    highs = list(snapshot.high_history or [])
+    lows = list(snapshot.low_history or [])
+    volumes = list(snapshot.volume_history or [])
+    dates = list(snapshot.date_history or [])
+    length = min(len(opens), len(closes), len(highs), len(lows), len(volumes))
+    if length <= 0:
+        return None
+
+    candidates: list[dict[str, Any]] = []
+    limit = min(lookback_days, length)
+    for index in range(limit):
+        open_price = float(opens[index])
+        close_price = float(closes[index])
+        high_price = float(highs[index])
+        low_price = float(lows[index])
+        volume = float(volumes[index])
+        if close_price <= open_price or high_price <= low_price or volume <= 0:
+            continue
+
+        range_price = high_price - low_price
+        body_ratio = ((close_price - open_price) / range_price) if range_price > 0 else 0.0
+        if body_ratio < PULLBACK_STOP_MIN_BODY_RATIO:
+            continue
+
+        previous_volumes = [value for value in volumes[index + 1 : index + 21] if float(value) > 0]
+        if len(previous_volumes) < PULLBACK_STOP_MIN_AVG_DAYS:
+            continue
+        average_volume = sum(previous_volumes) / len(previous_volumes)
+        if average_volume <= 0:
+            continue
+
+        volume_ratio = volume / average_volume
+        if volume_ratio < PULLBACK_STOP_MIN_VOLUME_RATIO:
+            continue
+
+        candidates.append({
+            "index": index,
+            "date": dates[index] if index < len(dates) else "",
+            "open": open_price,
+            "close": close_price,
+            "high": high_price,
+            "low": low_price,
+            "bodyMid": (open_price + close_price) / 2.0,
+            "volume": volume,
+            "volumeRatio": volume_ratio,
+            "bodyRatio": body_ratio,
+        })
+
+    if not candidates:
+        return None
+    return sorted(candidates, key=lambda item: (-item["volumeRatio"], -item["volume"], -item["index"]))[0]
+
+
+def _is_pullback_stop_candidate_below_current(candidate_price: float | None, current_price: float | None) -> bool:
+    if not candidate_price or not current_price:
+        return False
+    return float(candidate_price) < float(current_price)
+
+
+def compute_pullback_stop_policy(
+    snapshot: StockSnapshot,
+    context: dict[str, Any],
+    fallback_stop_price: float,
+) -> dict[str, Any]:
+    fallback_price = _round_price(fallback_stop_price) or 0
+    current_price = _round_price(snapshot.current_price) or 0
+    ma10_price = _round_price(snapshot.ma10)
+    ma10_prev_raw = moving_average(snapshot.close_history, 10, 1)
+    ma10_prev_price = _round_price(ma10_prev_raw)
+    ma20_price = _round_price(snapshot.ma20)
+    ma20_prev_price = _round_price(snapshot.ma20_prev)
+    warning_triggered = bool(
+        snapshot.ma10
+        and ma10_prev_raw
+        and snapshot.current_price < float(snapshot.ma10)
+        and float(snapshot.ma10) <= float(ma10_prev_raw)
+    )
+    anchor = _pullback_anchor_candidate(snapshot)
+    policy: dict[str, Any] = {
+        "version": PULLBACK_STOP_POLICY_VERSION,
+        "anchorSource": "fallback_percent_stop",
+        "anchorLookbackDays": PULLBACK_STOP_ANCHOR_LOOKBACK_DAYS,
+        "anchorDate": "",
+        "anchorOpen": None,
+        "anchorClose": None,
+        "anchorHigh": None,
+        "anchorLow": None,
+        "anchorBodyMid": None,
+        "anchorVolumeRatio": None,
+        "anchorStopMode": "",
+        "anchorStopPrice": None,
+        "ma10Price": ma10_price,
+        "ma10PrevPrice": ma10_prev_price,
+        "ma20Price": ma20_price,
+        "ma20PrevPrice": ma20_prev_price,
+        "ma10WarningPrice": ma10_price if warning_triggered else None,
+        "hardStopPrice": fallback_price,
+        "fallbackStopPrice": fallback_price,
+        "effectiveStopPrice": fallback_price,
+        "warningRuleSummary": (
+            f"종가 {_format_price_won(snapshot.current_price)} < 10일선 {_format_price_won(ma10_price)}"
+            f" and 10일선 {_format_price_won(ma10_price)} <= 전일 10일선 {_format_price_won(ma10_prev_price)}"
+            if warning_triggered
+            else "10일선 경고 없음"
+        ),
+        "hardStopRuleSummary": f"앵커 부재 → 기존 % 손절 {_format_price_won(fallback_price)} 사용",
+        "reasonSummary": f"앵커 부재로 기존 % 손절 {_format_price_won(fallback_price)}를 유지합니다.",
+    }
+    if anchor is None:
+        return policy
+
+    anchor_open = _round_price(anchor["open"])
+    anchor_close = _round_price(anchor["close"])
+    anchor_high = _round_price(anchor["high"])
+    anchor_low = _round_price(anchor["low"])
+    anchor_body_mid = _round_price(anchor["bodyMid"])
+    is_bull_regime = str(context.get("regimeLabel") or "").startswith("강세장")
+    anchor_stop_mode = "open" if is_bull_regime else "body_mid"
+    anchor_stop_price = anchor_open if anchor_stop_mode == "open" else anchor_body_mid
+    valid_structural_stops = [
+        price
+        for price in [anchor_stop_price, ma20_price]
+        if _is_pullback_stop_candidate_below_current(price, current_price)
+    ]
+    hard_stop_price = max(valid_structural_stops) if valid_structural_stops else fallback_price
+    effective_stop_price = max(hard_stop_price, fallback_price)
+    invalid_reasons: list[str] = []
+    if anchor_stop_price and not _is_pullback_stop_candidate_below_current(anchor_stop_price, current_price):
+        invalid_reasons.append(
+            f"앵커 {'시가' if anchor_stop_mode == 'open' else '몸통 중심'} {_format_price_won(anchor_stop_price)}가 현재가 {_format_price_won(current_price)} 이상이라 제외"
+        )
+    if ma20_price and not _is_pullback_stop_candidate_below_current(ma20_price, current_price):
+        invalid_reasons.append(f"20일선 {_format_price_won(ma20_price)}이 현재가 {_format_price_won(current_price)} 이상이라 제외")
+    valid_stop_labels: list[str] = []
+    if anchor_stop_price and _is_pullback_stop_candidate_below_current(anchor_stop_price, current_price):
+        valid_stop_labels.append(f"앵커 {'시가' if anchor_stop_mode == 'open' else '몸통 중심'} {_format_price_won(anchor_stop_price)}")
+    if ma20_price and _is_pullback_stop_candidate_below_current(ma20_price, current_price):
+        valid_stop_labels.append(f"20일선 {_format_price_won(ma20_price)}")
+    valid_stop_text = ", ".join(valid_stop_labels) if valid_stop_labels else "유효 구조 손절 후보 없음"
+
+    policy.update({
+        "anchorSource": "volume_surge_bullish_candle",
+        "anchorDate": str(anchor["date"] or ""),
+        "anchorOpen": anchor_open,
+        "anchorClose": anchor_close,
+        "anchorHigh": anchor_high,
+        "anchorLow": anchor_low,
+        "anchorBodyMid": anchor_body_mid,
+        "anchorVolumeRatio": round(float(anchor["volumeRatio"]), 2),
+        "anchorStopMode": anchor_stop_mode,
+        "anchorStopPrice": anchor_stop_price,
+        "hardStopPrice": hard_stop_price,
+        "effectiveStopPrice": effective_stop_price,
+        "hardStopRuleSummary": (
+            f"1차 hard stop = MAX({valid_stop_text}) = {_format_price_won(hard_stop_price)} / "
+            f"최종 stop = MAX(1차 hard stop, 기존 % 손절 {_format_price_won(fallback_price)}) = {_format_price_won(effective_stop_price)}"
+            + (f" / 제외: {' / '.join(invalid_reasons)}" if invalid_reasons else "")
+        ),
+        "reasonSummary": (
+            f"앵커 봉 {policy['anchorDate'] or '-'} 기준 현재가 아래 유효 손절 후보({valid_stop_text}) 중 더 보수적인 가격을 쓰고, "
+            f"기존 % 손절 {_format_price_won(fallback_price)}를 하한으로 유지합니다."
+            + (f" {' / '.join(invalid_reasons)}." if invalid_reasons else "")
+        ),
+    })
+    return policy
+
+
+def apply_pullback_stop_policy_to_trade_plan(
+    rows: list[dict[str, Any]],
+    entry_price: float,
+    stop_policy: dict[str, Any],
+) -> list[dict[str, Any]]:
+    stop_price = parse_float(stop_policy.get("effectiveStopPrice"))
+    if stop_price <= 0:
+        return rows
+
+    stop_rate = _rate_from_price(entry_price, stop_price) or 0.0
+    target_price = _format_price_won(stop_price)
+    target_yield = signed_number(stop_rate, 1, "%")
+    condition = f"유효 손절가 {target_price} 하향 이탈"
+    next_rows: list[dict[str, Any]] = []
+    stop_updated = False
+    for row in rows:
+        if not _is_stop_trade_plan_row(row):
+            next_rows.append(dict(row))
+            continue
+        next_rows.append({
+            **row,
+            "stageKey": "stop",
+            "condition": condition,
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+        stop_updated = True
+    if not stop_updated:
+        next_rows.append({
+            "stage": "🛑 손절",
+            "stageKey": "stop",
+            "condition": condition,
+            "quantity": "전량",
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+    return next_rows
+
+
+def _accumulation_sponsor_mode(snapshot: StockSnapshot) -> str:
+    foreign_positive = snapshot.foreign_net > 0
+    institution_positive = snapshot.institution_net > 0
+    if foreign_positive and institution_positive:
+        return "both"
+    if foreign_positive:
+        return "foreign"
+    if institution_positive:
+        return "institution"
+    return "none"
+
+
+def _accumulation_anchor_candidate(snapshot: StockSnapshot, sponsor_mode: str) -> dict[str, Any] | None:
+    opens = list(snapshot.open_history or [])
+    closes = list(snapshot.close_history or [])
+    dates = list(snapshot.date_history or [])
+    volumes = list(snapshot.volume_history or [])
+
+    def build_candidate(index: int, source: str) -> dict[str, Any] | None:
+        if index >= len(opens) or index >= len(closes):
+            return None
+        open_price = parse_float(opens[index])
+        close_price = parse_float(closes[index])
+        if open_price <= 0 or close_price <= 0:
+            return None
+        volume_ratio = _volume_ratio_from_history(volumes, index)
+        return {
+            "source": source,
+            "date": dates[index] if index < len(dates) else "",
+            "open": open_price,
+            "close": close_price,
+            "volumeRatio20d": volume_ratio,
+        }
+
+    prior_candidate = None
+    if (
+        len(opens) > 1
+        and len(closes) > 1
+        and (snapshot.foreign_previous > 0 or snapshot.institution_previous > 0)
+        and parse_float(closes[1]) >= parse_float(opens[1])
+    ):
+        prior_candidate = build_candidate(1, "prior_sponsor_candle")
+    if prior_candidate is not None:
+        return prior_candidate
+
+    if sponsor_mode != "none" and snapshot.current_price >= snapshot.open_price:
+        return build_candidate(0, "entry_sponsor_candle")
+    return None
+
+
+def compute_accumulation_stop_policy(
+    snapshot: StockSnapshot,
+    context: dict[str, Any],
+    fallback_stop_price: float,
+) -> dict[str, Any]:
+    sponsor_mode = _accumulation_sponsor_mode(snapshot)
+    fallback_price = _round_price(fallback_stop_price) or 0
+    policy: dict[str, Any] = {
+        "version": ACCUMULATION_STOP_POLICY_VERSION,
+        "anchorSource": "fallback_percent_stop",
+        "sponsorMode": sponsor_mode,
+        "anchorDate": "",
+        "anchorOpen": None,
+        "anchorClose": None,
+        "anchorVolumeRatio20d": None,
+        "anchorStopPrice": None,
+        "fallbackStopPrice": fallback_price,
+        "effectiveHardStopPrice": fallback_price,
+        "openExitCheckCutoff": ACCUMULATION_OPEN_EXIT_CHECK_CUTOFF,
+        "openExitMode": ACCUMULATION_OPEN_EXIT_MODE,
+        "openExitRuleSummary": (
+            "09:00~10:00 장초반에 수급 주체가 순매도로 돌아섰고 현재가가 진입가/하드 스톱 이하이면 즉시 손절합니다."
+            if sponsor_mode != "none"
+            else "수급 주체가 고정되지 않아 장초반 수급 이탈 즉시 손절은 비활성입니다."
+        ),
+        "hardStopRuleSummary": f"앵커 부재 → 기존 % 손절 {_format_price_won(fallback_price)} 사용",
+        "marketShockHoldRuleSummary": (
+            f"갭 등급 {context.get('gapScore', {}).get('code') or '-'} 또는 고변동성 장세에서 수급 주체 순매수가 유지되면 "
+            "장초반 흔들림 손절은 보류하고 종가형 하드 스톱만 유지합니다."
+        ),
+        "reasonSummary": f"앵커가 없어 기존 % 손절 {_format_price_won(fallback_price)}만 유지합니다.",
+    }
+
+    anchor = _accumulation_anchor_candidate(snapshot, sponsor_mode)
+    if anchor is None:
+        return policy
+
+    anchor_open = _round_price(anchor.get("open"))
+    anchor_close = _round_price(anchor.get("close"))
+    anchor_stop_price = anchor_open
+    effective_hard_stop = max(anchor_stop_price or 0, fallback_price)
+    sponsor_label = {
+        "foreign": "외인",
+        "institution": "기관",
+        "both": "외인·기관",
+    }.get(sponsor_mode, "수급")
+
+    policy.update({
+        "anchorSource": str(anchor.get("source") or "fallback_percent_stop"),
+        "anchorDate": str(anchor.get("date") or ""),
+        "anchorOpen": anchor_open,
+        "anchorClose": anchor_close,
+        "anchorVolumeRatio20d": round(float(anchor["volumeRatio20d"]), 2) if anchor.get("volumeRatio20d") is not None else None,
+        "anchorStopPrice": anchor_stop_price,
+        "effectiveHardStopPrice": effective_hard_stop,
+        "hardStopRuleSummary": (
+            f"{'전일' if policy['anchorSource'] == 'prior_sponsor_candle' else '당일'} 매집 시작 봉 시가 {_format_price_won(anchor_stop_price)}와 "
+            f"기존 % 손절 {_format_price_won(fallback_price)} 중 더 높은 {_format_price_won(effective_hard_stop)}를 하드 스톱으로 사용합니다."
+        ),
+        "reasonSummary": (
+            f"{sponsor_label} 매집 시작 봉({policy['anchorDate'] or '-'}) 시가 {_format_price_won(anchor_stop_price)}를 기준으로 잡고, "
+            f"기존 % 손절 {_format_price_won(fallback_price)}보다 느슨해지지 않게 {_format_price_won(effective_hard_stop)}로 고정합니다."
+        ),
+    })
+    return policy
+
+
+def apply_accumulation_stop_policy_to_trade_plan(
+    rows: list[dict[str, Any]],
+    entry_price: float,
+    stop_policy: dict[str, Any],
+) -> list[dict[str, Any]]:
+    stop_price = parse_float(stop_policy.get("effectiveHardStopPrice"))
+    if stop_price <= 0:
+        return rows
+
+    stop_rate = _rate_from_price(entry_price, stop_price) or 0.0
+    target_price = _format_price_won(stop_price)
+    target_yield = signed_number(stop_rate, 1, "%")
+    condition = f"유효 하드 스톱 {target_price} 종가 이탈"
+    next_rows: list[dict[str, Any]] = []
+    stop_updated = False
+    for row in rows:
+        if not _is_stop_trade_plan_row(row):
+            next_rows.append(dict(row))
+            continue
+        next_rows.append({
+            **row,
+            "stageKey": "stop",
+            "condition": condition,
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+        stop_updated = True
+    if not stop_updated:
+        next_rows.append({
+            "stage": "🛑 손절",
+            "stageKey": "stop",
+            "condition": condition,
+            "quantity": "전량",
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+    return next_rows
+
+
+def compute_breakout_stop_policy(
+    snapshot: StockSnapshot,
+    context: dict[str, Any],
+    fallback_stop_price: float,
+) -> dict[str, Any]:
+    fallback_price = _round_price(fallback_stop_price) or 0
+    history = list(snapshot.high_history or [])
+    reference_bands = _breakout_reference_bands(snapshot.current_price, history, BREAKOUT_REFERENCE_LOOKBACK_DAYS)
+    chosen_band = reference_bands[-1] if reference_bands else None
+    reference_price = chosen_band["high"] if chosen_band else None
+    reference_source = "prior_resistance_band" if chosen_band else "fallback_percent_stop"
+    reference_band_low = chosen_band["low"] if chosen_band else None
+    reference_band_high = chosen_band["high"] if chosen_band else None
+
+    if reference_price is None:
+        recent_swing_candidates = [
+            _round_price(parse_float(value))
+            for value in history[:BREAKOUT_FALLBACK_SWING_LOOKBACK_DAYS]
+            if (_round_price(parse_float(value)) or 0) <= round(float(snapshot.current_price or 0))
+        ]
+        recent_swing_candidates = [value for value in recent_swing_candidates if value is not None]
+        if recent_swing_candidates:
+            reference_price = max(recent_swing_candidates)
+            reference_source = "prior_swing_high"
+            reference_band_low = reference_price
+            reference_band_high = reference_price
+
+    effective_hard_stop = max(reference_price or 0, fallback_price)
+    reference_label = {
+        "prior_resistance_band": "직전 돌파 저항 밴드",
+        "prior_swing_high": "최근 스윙 고점",
+        "fallback_percent_stop": "기존 % 손절",
+    }.get(reference_source, "기존 % 손절")
+    policy = {
+        "version": BREAKOUT_STOP_POLICY_VERSION,
+        "referenceSource": reference_source,
+        "referenceLookbackDays": BREAKOUT_REFERENCE_LOOKBACK_DAYS,
+        "referenceClusterPct": BREAKOUT_REFERENCE_CLUSTER_PCT,
+        "referencePrice": reference_price,
+        "referenceBandLow": reference_band_low,
+        "referenceBandHigh": reference_band_high,
+        "entryDayOpenPrice": _round_price(snapshot.open_price),
+        "fallbackStopPrice": fallback_price,
+        "effectiveHardStopPrice": effective_hard_stop,
+        "openExitCheckCutoff": "10:00",
+        "microTrendBarUnit": "3m",
+        "microTrendShortMa": 8,
+        "microTrendLongMa": 10,
+        "hardStopRuleSummary": (
+            f"{reference_label} {_format_price_won(reference_price)}와 기존 % 손절 {_format_price_won(fallback_price)} 중 "
+            f"더 높은 {_format_price_won(effective_hard_stop)}을 하드 스톱으로 사용합니다."
+        ),
+        "openExitRuleSummary": (
+            "09:00~10:00에 돌파 기준선 재이탈 또는 갭 시가 이탈이 나오면 즉시 손절합니다."
+        ),
+        "microTrendRuleSummary": "09:05~10:00에는 3분 프록시 8EMA/10EMA 아래 2개 연속 마감 시 즉시 손절합니다.",
+        "reasonSummary": (
+            f"돌파 기준선은 {reference_label} {_format_price_won(reference_price)}이며, "
+            f"기존 % 손절 {_format_price_won(fallback_price)}보다 느슨해지지 않게 {_format_price_won(effective_hard_stop)}으로 고정합니다."
+        ),
+    }
+    if reference_source == "fallback_percent_stop":
+        policy["reasonSummary"] = f"직전 저항 기준선을 찾지 못해 기존 % 손절 {_format_price_won(fallback_price)}만 사용합니다."
+    return policy
+
+
+def apply_breakout_stop_policy_to_trade_plan(
+    rows: list[dict[str, Any]],
+    entry_price: float,
+    stop_policy: dict[str, Any],
+) -> list[dict[str, Any]]:
+    stop_price = parse_float(stop_policy.get("effectiveHardStopPrice"))
+    if stop_price <= 0:
+        return rows
+
+    stop_rate = _rate_from_price(entry_price, stop_price) or 0.0
+    target_price = _format_price_won(stop_price)
+    target_yield = signed_number(stop_rate, 1, "%")
+    condition = f"유효 하드 스톱 {target_price} 종가 이탈"
+    next_rows: list[dict[str, Any]] = []
+    stop_updated = False
+    for row in rows:
+        if not _is_stop_trade_plan_row(row):
+            next_rows.append(dict(row))
+            continue
+        next_rows.append({
+            **row,
+            "stageKey": "stop",
+            "condition": condition,
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+        stop_updated = True
+    if not stop_updated:
+        next_rows.append({
+            "stage": "손절",
+            "stageKey": "stop",
+            "condition": condition,
+            "quantity": "전량",
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+    return next_rows
+
+
+def compute_reversal_stop_policy(
+    snapshot: StockSnapshot,
+    context: dict[str, Any],
+    fallback_stop_price: float,
+) -> dict[str, Any]:
+    del context
+    fallback_price = _round_price(fallback_stop_price) or 0
+    anchor_low = _round_price(snapshot.low_price)
+    effective_hard_stop = max(anchor_low or 0, fallback_price)
+    anchor_source = "entry_day_low" if anchor_low else "fallback_percent_stop"
+    hard_stop_rule = (
+        f"진입 당일 저가 {_format_price_won(anchor_low)}와 기존 % 손절 {_format_price_won(fallback_price)} 중 "
+        f"더 높은 {_format_price_won(effective_hard_stop)}을 종가 손절가로 사용합니다."
+        if anchor_low
+        else f"당일 저가를 확정하지 못해 기존 % 손절 {_format_price_won(fallback_price)}만 종가 손절가로 사용합니다."
+    )
+    return {
+        "version": REVERSAL_STOP_POLICY_VERSION,
+        "anchorSource": anchor_source,
+        "anchorLowPrice": anchor_low,
+        "fallbackStopPrice": fallback_price,
+        "effectiveHardStopPrice": effective_hard_stop,
+        "stopExecutionMode": "close_only",
+        "hardStopRuleSummary": hard_stop_rule,
+        "reasonSummary": (
+            f"반등 가정의 핵심 지지선은 진입 당일 저가 {_format_price_won(anchor_low)}이며, "
+            f"기존 % 손절 {_format_price_won(fallback_price)}보다 느슨해지지 않게 {_format_price_won(effective_hard_stop)}으로 고정하고 종가 기준으로 확인합니다."
+            if anchor_low
+            else f"진입 당일 저가를 쓰지 못해 기존 % 손절 {_format_price_won(fallback_price)}을 그대로 유지하고 종가 기준으로 확인합니다."
+        ),
+    }
+
+
+def apply_reversal_stop_policy_to_trade_plan(
+    rows: list[dict[str, Any]],
+    entry_price: float,
+    stop_policy: dict[str, Any],
+) -> list[dict[str, Any]]:
+    stop_price = parse_float(stop_policy.get("effectiveHardStopPrice"))
+    if stop_price <= 0:
+        return rows
+
+    stop_rate = _rate_from_price(entry_price, stop_price) or 0.0
+    target_price = _format_price_won(stop_price)
+    target_yield = signed_number(stop_rate, 1, "%")
+    condition = f"유효 하드 스톱 {target_price} 종가 이탈"
+    next_rows: list[dict[str, Any]] = []
+    stop_updated = False
+    for row in rows:
+        if not _is_stop_trade_plan_row(row):
+            next_rows.append(dict(row))
+            continue
+        next_rows.append({
+            **row,
+            "stageKey": "stop",
+            "condition": condition,
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+        stop_updated = True
+    if not stop_updated:
+        next_rows.append({
+            "stage": "🛑 손절",
+            "stageKey": "stop",
+            "condition": condition,
+            "quantity": "전량",
+            "targetYield": target_yield,
+            "targetPrice": target_price,
+        })
+    return next_rows
+
+
+ACCUMULATION_STAGE_LABELS = {
+    "premarket": "1차 익절",
+    "openPhase": "2차 익절",
+    "intraday1": "3차 익절",
+    "intraday2": "4차 익절",
+    "swing": "추세 홀딩",
+    "stop": "손절",
+}
+
+
+def apply_accumulation_display_stage_labels(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    next_rows: list[dict[str, Any]] = []
+    for row in rows or []:
+        stage_key = _trade_plan_row_stage_key(row)
+        next_rows.append({
+            **row,
+            "stageKey": stage_key or str(row.get("stageKey") or ""),
+            "stage": ACCUMULATION_STAGE_LABELS.get(stage_key, str(row.get("stage") or "")),
+        })
+    return next_rows
+
+
+def build_breakout_live_exit_policy(profile: dict[str, Any] | None) -> dict[str, Any]:
+    resolved_profile = profile if isinstance(profile, dict) else {}
+    return {
+        "version": BREAKOUT_LIVE_EXIT_POLICY_VERSION,
+        "wickClimaxLookbackBars": 20,
+        "wickClimaxVolumeRatioMin": 2.5,
+        "wickUpperShadowRatioMin": 0.45,
+        "orderbookLookbackMinutes": 5,
+        "orderbookBidAskSpikeMin": 2.0,
+        "orderbookAskDropRatioMax": 0.6,
+        "trailingActivationPct": float(resolved_profile.get("trailingActivationPct") or 0.0),
+        "trailingBufferPct": float(resolved_profile.get("trailingBufferPct") or 0.0),
+        "activeSessionCutoff": "10:30",
+        "wickClimaxRuleSummary": "09:00~10:30에 대량 거래량 위꼬리와 고점 대비 -1% 밀림이 함께 나오면 전량 익절합니다.",
+        "orderbookRuleSummary": "09:00~10:30에 호가 분산 신호가 나오면 기본 50% 익절하고, 약한 체결강도/트레일링 동시 충족 시 전량 익절로 승격합니다.",
+        "trailingRuleSummary": (
+            f"+{float(resolved_profile.get('trailingActivationPct') or 0.0):.1f}% 도달 후 "
+            f"세션 고점 대비 {float(resolved_profile.get('trailingBufferPct') or 0.0):.1f}% 이탈 시 잔량 전량 매도합니다."
+        ),
+    }
+
+
+def build_reversal_live_exit_policy() -> dict[str, Any]:
+    return {
+        "version": REVERSAL_LIVE_EXIT_POLICY_VERSION,
+        "timeStopCutoff": "09:15",
+        "timeStopMinBouncePct": 1.0,
+        "breakevenActivationPct": 3.0,
+        "earlySpikeWindowEnd": "09:10",
+        "timeStopRuleSummary": "09:15까지 세션 고점이 +1.0% 미만이고 시가/진입가도 회복하지 못하면 조건형 시간손절을 실행합니다.",
+        "breakevenRuleSummary": "+3.0% 이상 반등이 나온 뒤 본전까지 밀리면 기술적 반등 실패로 보고 잔량 전량 정리합니다.",
+    }
+
+
 # --- 추천 마킹 (진입가 밴드 + 최적 익절 단계) ---
 
 OUTCOMES_DEFAULT_PATH = "jongga/output/jongga_outcomes.js"
+REPLAY_RUNS_DEFAULT_PATH = "jongga/output/replay/replay_runs.js"
 MARKING_MIN_SAMPLES = 8  # 신뢰 하한: 셀 표본이 이보다 적으면 상위(coarse) 셀로 폴백
+TAKE_PROFIT_PROFILE_LABELS = {
+    "conservative": "보수형",
+    "balanced": "중립형",
+    "aggressive": "공격형",
+}
+
+STRATEGY_TAKE_PROFIT_PROFILE_LABELS = {
+    "pullback": {
+        "aggressive": "기본 목표형",
+        "balanced": "1차 저항 반영형",
+        "conservative": "저항 우선형",
+    },
+    "accumulation": {
+        "aggressive": "기본 목표형",
+        "balanced": "1차 저항 반영형",
+        "conservative": "저항 우선형",
+    },
+    "breakout": {
+        "aggressive": "기본 목표형",
+        "balanced": "1차 저항 반영형",
+        "conservative": "저항 우선형",
+    },
+}
 
 # 스테이지 라벨 키워드 → stageKey (outcome_tracker.STAGE_KEY_BY_KEYWORD와 동일)
 _STAGE_KEY_BY_KEYWORD: tuple[tuple[str, str], ...] = (
@@ -2052,11 +2805,33 @@ def load_outcomes_index(path: str = OUTCOMES_DEFAULT_PATH) -> list[dict[str, Any
     return value if isinstance(value, list) else []
 
 
+def load_replay_profile_rollup(path: str = REPLAY_RUNS_DEFAULT_PATH) -> dict[str, Any]:
+    value = read_js_assignment(path, "JONGGA_REPLAY_RUNS")
+    if not isinstance(value, dict):
+        return {}
+    latest_summary = value.get("latestSummary")
+    if isinstance(latest_summary, dict):
+        return latest_summary
+    latest_run = value.get("latestRun")
+    if isinstance(latest_run, dict) and isinstance(latest_run.get("summary"), dict):
+        return latest_run["summary"]
+    return {}
+
+
 def _row_stage_key(stage_label: str) -> str:
     for keyword, key in _STAGE_KEY_BY_KEYWORD:
         if keyword in str(stage_label or ""):
             return key
     return ""
+
+
+def _trade_plan_row_stage_key(row: dict[str, Any]) -> str:
+    explicit = str((row or {}).get("stageKey") or "").strip()
+    return explicit or _row_stage_key(str((row or {}).get("stage") or ""))
+
+
+def _is_stop_trade_plan_row(row: dict[str, Any]) -> bool:
+    return str((row or {}).get("stageKey") or "") == "stop" or "손절" in str((row or {}).get("stage") or "")
 
 
 def _lookup_hit_rate(rollup: dict[str, Any], strategy: str, dims: dict[str, str], stage_key: str) -> dict[str, Any] | None:
@@ -2073,37 +2848,110 @@ def _lookup_hit_rate(rollup: dict[str, Any], strategy: str, dims: dict[str, str]
     return None
 
 
-def compute_recommended_entry_band(entry_price: float, regime_label: str, gap_code: str) -> dict[str, Any]:
-    bucket = regime_bucket(regime_label)
-    gap_offset = -0.5 if gap_code == "G-C" else -1.0 if gap_code == "G-D" else 0.0
-    skew = {"bull": 0.0, "box": -0.3, "weak": -0.6}[bucket] + gap_offset * 0.5
-    low = round(entry_price * (1 + (skew - 0.7) / 100))
-    high = round(entry_price * (1 + (skew + 0.3) / 100))
-    return {
-        "low": low,
-        "high": high,
-        "anchor": round(entry_price),
-        "label": f"{low:,}~{high:,}원 (종가 ±, 분할매수)",
-    }
+def _lookup_profile_rollup(rollup: dict[str, Any], strategy: str, dims: dict[str, str], profile_key: str) -> dict[str, Any] | None:
+    by_cell = rollup.get("byTakeProfitProfileCell") if isinstance(rollup.get("byTakeProfitProfileCell"), dict) else {}
+    by_profile = rollup.get("byTakeProfitProfile") if isinstance(rollup.get("byTakeProfitProfile"), dict) else {}
+    cell_key = f"{strategy}|{dims.get('regimeBucket', '')}|{dims.get('vkospiTier', '')}|{dims.get('gapGrade', '')}|{profile_key}"
+    cell = by_cell.get(cell_key)
+    if isinstance(cell, dict) and int(cell.get("sampleCount") or cell.get("tradeCount") or 0) >= MARKING_MIN_SAMPLES:
+        return {**cell, "basis": "profileCell"}
+    coarse = by_profile.get(f"{strategy}|{profile_key}")
+    if isinstance(coarse, dict) and int(coarse.get("sampleCount") or coarse.get("tradeCount") or 0) >= MARKING_MIN_SAMPLES:
+        return {**coarse, "basis": "strategyProfile"}
+    return None
 
 
-def attach_marking(entry: dict[str, Any], context: dict[str, Any]) -> dict[str, Any]:
-    """엔트리에 recommendedEntryBand·recommendedStage를 추가하고, tradePlanRows에
-    recommended/historicalHitRate를 표기한다. 과거 적중 롤업이 있으면 EV(=적중률×목표)로,
-    없으면 현재 시장 휴리스틱으로 최적 익절 단계를 선택한다."""
-    strategy = "breakout" if entry.get("strategy") == "momentum" else str(entry.get("strategy") or "")
-    rows = entry.get("tradePlanRows") or []
-    regime_label = str(context.get("regimeLabel") or "")
+def _clone_trade_plan_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [dict(row) for row in rows or []]
+
+
+def _take_profit_profile_label(strategy: str, profile_key: str) -> str:
+    return (
+        STRATEGY_TAKE_PROFIT_PROFILE_LABELS.get(strategy, {}).get(profile_key)
+        or TAKE_PROFIT_PROFILE_LABELS.get(profile_key)
+        or profile_key
+    )
+
+
+def _sync_pullback_profile_stop_rows(entry: dict[str, Any], rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    stop_policy = entry.get("pullbackStopPolicy") if isinstance(entry.get("pullbackStopPolicy"), dict) else {}
     entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
-    gap_code = str((context.get("gapScore") or {}).get("code") or "")
-    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
-    dims = {
-        "regimeBucket": regime_bucket(regime_label),
-        "vkospiTier": str(context.get("kospiBullTier") or "unknown"),
-        "gapGrade": gap_code,
-    }
+    if entry_price <= 0 or not rows:
+        return _clone_trade_plan_rows(rows)
+    return apply_pullback_stop_policy_to_trade_plan(_clone_trade_plan_rows(rows), entry_price, stop_policy)
 
-    take_profit = [(row, _row_stage_key(row.get("stage"))) for row in rows if "손절" not in str(row.get("stage") or "")]
+
+def _cluster_price_bands(prices: list[int], cluster_pct: float) -> list[dict[str, Any]]:
+    clusters: list[dict[str, Any]] = []
+    for price in sorted({int(value) for value in prices if int(value) > 0}):
+        if not clusters:
+            clusters.append({"low": price, "high": price, "count": 1})
+            continue
+        last = clusters[-1]
+        if price <= round(last["high"] * (1 + cluster_pct / 100.0)):
+            last["high"] = price
+            last["count"] += 1
+        else:
+            clusters.append({"low": price, "high": price, "count": 1})
+    return clusters
+
+
+def _pullback_take_profit_resistances(entry_price: float, marking_meta: dict[str, Any] | None) -> list[dict[str, Any]]:
+    meta = marking_meta if isinstance(marking_meta, dict) else {}
+    candidates = [
+        {
+            "type": "ma5",
+            "label": "5일선",
+            "price": _round_price(meta.get("ma5Price")),
+            "prevPrice": _round_price(meta.get("ma5PrevPrice")),
+        },
+        {
+            "type": "ma10",
+            "label": "10일선",
+            "price": _round_price(meta.get("ma10Price")),
+            "prevPrice": _round_price(meta.get("ma10PrevPrice")),
+        },
+    ]
+    valid = [
+        row for row in candidates
+        if row["price"] is not None
+        and row["prevPrice"] is not None
+        and row["price"] > round(float(entry_price or 0))
+        and row["price"] <= row["prevPrice"]
+    ]
+    valid.sort(key=lambda row: (int(row["price"]), row["type"]))
+    return valid
+
+
+def _set_trade_plan_target(row: dict[str, Any], entry_price: float, target_price: int, condition: str | None = None) -> None:
+    row["targetPrice"] = _format_price_won(target_price)
+    rate = _rate_from_price(entry_price, target_price) or 0.0
+    row["targetYield"] = signed_number(rate, 1, "%")
+    if condition is not None:
+        row["condition"] = condition
+
+
+def _enforce_non_decreasing_targets(rows: list[dict[str, Any]], entry_price: float) -> None:
+    previous_price = 0
+    for row in rows:
+        if _is_stop_trade_plan_row(row):
+            continue
+        target_price = _round_price(parse_float(row.get("targetPrice")))
+        if not target_price:
+            continue
+        if previous_price and target_price < previous_price:
+            _set_trade_plan_target(row, entry_price, previous_price)
+            target_price = previous_price
+        previous_price = target_price
+
+
+def _stage_recommendation_from_rows(
+    strategy: str,
+    rows: list[dict[str, Any]],
+    dims: dict[str, str],
+    rollup: dict[str, Any],
+) -> dict[str, Any]:
+    take_profit = [(row, _trade_plan_row_stage_key(row)) for row in rows if not _is_stop_trade_plan_row(row)]
     take_profit = [(row, key) for row, key in take_profit if key]
 
     best_key = None
@@ -2112,32 +2960,26 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any]) -> dict[str, 
     sample_count = 0
     best_hit_rate = None
 
-    # EV 계산 우선순위:
-    # 1. avgStageReturn(단계별 하방 포함 실현수익 평균) — 가장 정직한 신호
-    # 2. avgStageReturn 없으면 hitRate×targetYield(낙관적 상한) 폴백
-    # 두 경우 모두 MIN_SAMPLES 미달이면 None(콜드스타트로 이동)
     for row, stage_key in take_profit:
         stat = _lookup_hit_rate(rollup, strategy, dims, stage_key)
         hit_rate = float(stat["hitRate"]) if stat else None
         row["historicalHitRate"] = round(hit_rate, 4) if hit_rate is not None else None
-        if stat is not None:
-            avg_stage_ret = stat.get("avgStageReturn")
-            if avg_stage_ret is not None:
-                # 단계별 실현수익이 있으면 그것으로 비교 (하방 포함, 단위 소수)
-                ev = float(avg_stage_ret) * 100  # % 스케일로 통일
-                ev_basis_local = "netStageReturn"
-            else:
-                # 폴백: hitRate × 목표수익률(%) — 모호건 포함 낙관 상한
-                ev = hit_rate * parse_float(row.get("targetYield"))
-                ev_basis_local = "hitRateXTarget"
-            if best_ev is None or ev > best_ev:
-                best_ev, best_key = ev, stage_key
-                used_basis = f"historical:{ev_basis_local}"
-                sample_count = int(stat.get("sampleCount") or 0)
-                best_hit_rate = hit_rate
+        if stat is None:
+            continue
+        avg_stage_ret = stat.get("avgStageReturn")
+        if avg_stage_ret is not None:
+            ev = float(avg_stage_ret) * 100
+            ev_basis_local = "netStageReturn"
+        else:
+            ev = hit_rate * parse_float(row.get("targetYield"))
+            ev_basis_local = "hitRateXTarget"
+        if best_ev is None or ev > best_ev:
+            best_ev, best_key = ev, stage_key
+            used_basis = f"historical:{ev_basis_local}"
+            sample_count = int(stat.get("sampleCount") or 0)
+            best_hit_rate = hit_rate
 
     if best_key is None:
-        # 콜드스타트: 현재 시장 휴리스틱
         bucket = dims["regimeBucket"]
         vk = dims["vkospiTier"]
         heuristic_key = "premarket" if (bucket == "weak" or vk == "weak") else _COLDSTART_STAGE_BY_BUCKET.get(bucket, "openPhase")
@@ -2165,8 +3007,892 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any]) -> dict[str, 
     for row, stage_key in take_profit:
         row["recommended"] = (stage_key == best_key)
 
+    return recommended_stage
+
+
+def _build_pullback_take_profit_profiles(
+    entry: dict[str, Any],
+    context: dict[str, Any],
+    dims: dict[str, str],
+    marking_meta: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+    base_rows = _sync_pullback_profile_stop_rows(entry, entry.get("tradePlanRows") or [])
+    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
+    replay_rollup = context.get("replayProfileRollup") if isinstance(context.get("replayProfileRollup"), dict) else {}
+    resistances = _pullback_take_profit_resistances(entry_price, marking_meta)
+    nearest = resistances[0] if resistances else None
+    secondary = resistances[1] if len(resistances) > 1 else None
+
+    profiles: list[dict[str, Any]] = []
+    base_profile = {
+        "profileKey": "aggressive",
+        "label": _take_profit_profile_label("pullback", "aggressive"),
+        "recommended": False,
+        "selectionBasis": "market_stock_heuristic",
+        "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
+        "nearestResistanceType": nearest["type"] if nearest else "none",
+        "nearestResistancePrice": nearest["price"] if nearest else None,
+        "secondaryResistanceType": secondary["type"] if secondary else "none",
+        "secondaryResistancePrice": secondary["price"] if secondary else None,
+        "tradePlanRows": _clone_trade_plan_rows(base_rows),
+    }
+    base_profile["recommendedStage"] = _stage_recommendation_from_rows("pullback", base_profile["tradePlanRows"], dims, rollup)
+    profiles.append(base_profile)
+
+    for profile_key in ("balanced", "conservative"):
+        rows = _sync_pullback_profile_stop_rows(entry, base_rows)
+        take_profit_rows = [row for row in rows if not _is_stop_trade_plan_row(row)]
+        selection_basis = "market_stock_heuristic"
+        reason_summary = ""
+        if nearest is None or not take_profit_rows:
+            selection_basis = "fallback_same_as_aggressive"
+            reason_summary = "가까운 5일선/10일선 저항이 없어 기본 목표형과 동일합니다."
+        else:
+            if profile_key == "balanced":
+                base_price = _round_price(parse_float(take_profit_rows[0].get("targetPrice"))) or nearest["price"]
+                adjusted_price = min(base_price, nearest["price"])
+                if adjusted_price < base_price:
+                    _set_trade_plan_target(
+                        take_profit_rows[0],
+                        entry_price,
+                        adjusted_price,
+                        f"{nearest['label']} 저항 도달",
+                    )
+                    reason_summary = f"가장 가까운 {nearest['label']} 저항만 1차 목표가에 반영합니다."
+                else:
+                    selection_basis = "fallback_same_as_aggressive"
+                    reason_summary = f"{nearest['label']}이 기존 1차 목표보다 높아 기본 목표형과 동일합니다."
+            else:
+                _set_trade_plan_target(
+                    take_profit_rows[0],
+                    entry_price,
+                    nearest["price"],
+                    f"{nearest['label']} 저항 도달",
+                )
+                if len(take_profit_rows) > 1 and secondary is not None:
+                    _set_trade_plan_target(
+                        take_profit_rows[1],
+                        entry_price,
+                        secondary["price"],
+                        f"{secondary['label']} 저항 도달",
+                    )
+                    reason_summary = f"{nearest['label']}과 {secondary['label']} 저항을 앞단 목표가에 우선 반영합니다."
+                elif len(take_profit_rows) > 1:
+                    reason_summary = f"가장 가까운 {nearest['label']} 저항을 앞단 목표가에 반영하고 다음 목표는 기존값을 유지합니다."
+                else:
+                    reason_summary = f"가장 가까운 {nearest['label']} 저항을 앞단 목표가에 반영합니다."
+            _enforce_non_decreasing_targets(rows, entry_price)
+            rows = _sync_pullback_profile_stop_rows(entry, rows)
+            if rows == base_rows:
+                selection_basis = "fallback_same_as_aggressive"
+                if not reason_summary:
+                    reason_summary = "조정 후에도 목표가가 같아 기본 목표형과 동일합니다."
+
+        profile = {
+            "profileKey": profile_key,
+            "label": _take_profit_profile_label("pullback", profile_key),
+            "recommended": False,
+            "selectionBasis": selection_basis,
+            "reasonSummary": reason_summary or "현재 시장·종목 상태를 반영한 기본 프로필입니다.",
+            "nearestResistanceType": nearest["type"] if nearest else "none",
+            "nearestResistancePrice": nearest["price"] if nearest else None,
+            "secondaryResistanceType": secondary["type"] if secondary else "none",
+            "secondaryResistancePrice": secondary["price"] if secondary else None,
+            "tradePlanRows": rows,
+        }
+        profile["recommendedStage"] = _stage_recommendation_from_rows("pullback", profile["tradePlanRows"], dims, rollup)
+        profiles.append(profile)
+
+    chosen_profile_key = None
+    chosen_profile_stat = None
+    for profile in profiles:
+        stat = _lookup_profile_rollup(replay_rollup, "pullback", dims, profile["profileKey"])
+        if stat is None or stat.get("avgNetReturnPct") is None:
+            continue
+        avg_net_return = float(stat.get("avgNetReturnPct") or 0.0)
+        if chosen_profile_stat is None or avg_net_return > float(chosen_profile_stat.get("avgNetReturnPct") or 0.0):
+            chosen_profile_key = profile["profileKey"]
+            chosen_profile_stat = stat
+
+    if chosen_profile_key is None:
+        gap_code = dims.get("gapGrade") or ""
+        bucket = dims.get("regimeBucket") or ""
+        if bucket == "weak" or gap_code in {"G-D", "G-E"} or len(resistances) >= 2:
+            chosen_profile_key = "conservative"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "약한 레짐/위험 갭/복수 저항 구간이라 저항 우선형을 추천합니다."
+        elif bucket == "bull" and gap_code in {"G-A", "G-B"} and not resistances:
+            chosen_profile_key = "aggressive"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "강세 레짐이고 유효 저항이 없어 기본 목표형을 추천합니다."
+        else:
+            chosen_profile_key = "balanced"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "극단 신호가 아니어서 1차 저항 반영형을 추천합니다."
+    else:
+        recommended_selection_basis = "historical_profile_ev"
+        recommended_reason = f"리플레이 평균 수익률 기준 최적 프로필입니다. (과거 {int(chosen_profile_stat.get('sampleCount') or chosen_profile_stat.get('tradeCount') or 0)}건)"
+
+    chosen_profile = next((profile for profile in profiles if profile["profileKey"] == chosen_profile_key), profiles[0])
+    chosen_profile["recommended"] = True
+    if chosen_profile.get("selectionBasis") == "fallback_same_as_aggressive":
+        recommended_selection_basis = "fallback_same_as_aggressive"
+    chosen_profile["selectionBasis"] = recommended_selection_basis
+    chosen_profile["reasonSummary"] = recommended_reason
+
+    recommended_profile = {
+        "profileKey": chosen_profile["profileKey"],
+        "label": chosen_profile["label"],
+        "selectionBasis": recommended_selection_basis,
+        "reasonSummary": recommended_reason,
+        "sampleCount": int((chosen_profile_stat or {}).get("sampleCount") or (chosen_profile_stat or {}).get("tradeCount") or 0),
+        "ev": round(float((chosen_profile_stat or {}).get("avgNetReturnPct") or 0.0), 4) if chosen_profile_stat and chosen_profile_stat.get("avgNetReturnPct") is not None else None,
+    }
+
+    return profiles, recommended_profile
+
+
+ACCUMULATION_RESISTANCE_LOOKBACK_DAYS = 60
+ACCUMULATION_RESISTANCE_CLUSTER_PCT = 1.0
+
+
+def _accumulation_take_profit_resistances(entry_price: float, marking_meta: dict[str, Any] | None) -> list[dict[str, Any]]:
+    meta = marking_meta if isinstance(marking_meta, dict) else {}
+    history = meta.get("highHistory") if isinstance(meta.get("highHistory"), list) else []
+    base_price = round(float(entry_price or 0))
+    candidates = [
+        _round_price(parse_float(value))
+        for value in history[:ACCUMULATION_RESISTANCE_LOOKBACK_DAYS]
+        if (_round_price(parse_float(value)) or 0) > base_price
+    ]
+    clusters = _cluster_price_bands([int(price) for price in candidates if price is not None], ACCUMULATION_RESISTANCE_CLUSTER_PCT)
+    return [
+        {
+            "label": f"상단 매물대 {index + 1}",
+            "price": cluster["low"],
+            "bandHigh": cluster["high"],
+            "count": cluster["count"],
+        }
+        for index, cluster in enumerate(clusters[:2])
+    ]
+
+
+def _breakout_reference_bands(current_price: float, history: list[Any], lookback_days: int) -> list[dict[str, Any]]:
+    base_price = round(float(current_price or 0))
+    candidates = [
+        _round_price(parse_float(value))
+        for value in history[:lookback_days]
+        if (_round_price(parse_float(value)) or 0) <= base_price
+    ]
+    return _cluster_price_bands([int(price) for price in candidates if price is not None], BREAKOUT_REFERENCE_CLUSTER_PCT)
+
+
+def _breakout_take_profit_resistances(entry_price: float, marking_meta: dict[str, Any] | None) -> list[dict[str, Any]]:
+    meta = marking_meta if isinstance(marking_meta, dict) else {}
+    history = meta.get("highHistory") if isinstance(meta.get("highHistory"), list) else []
+    base_price = round(float(entry_price or 0))
+    candidates = [
+        _round_price(parse_float(value))
+        for value in history[:BREAKOUT_OVERHEAD_LOOKBACK_DAYS]
+        if (_round_price(parse_float(value)) or 0) > base_price
+    ]
+    clusters = _cluster_price_bands([int(price) for price in candidates if price is not None], BREAKOUT_REFERENCE_CLUSTER_PCT)
+    return [
+        {
+            "label": f"상단 매물대 {index + 1}",
+            "price": cluster["low"],
+            "bandHigh": cluster["high"],
+            "count": cluster["count"],
+        }
+        for index, cluster in enumerate(clusters[:2])
+    ]
+
+
+def _reversal_take_profit_resistances(entry_price: float, marking_meta: dict[str, Any] | None) -> list[dict[str, Any]]:
+    meta = marking_meta if isinstance(marking_meta, dict) else {}
+    history = meta.get("highHistory") if isinstance(meta.get("highHistory"), list) else []
+    base_price = round(float(entry_price or 0))
+    candidates = [
+        _round_price(parse_float(value))
+        for value in history[:REVERSAL_RESISTANCE_LOOKBACK_DAYS]
+        if (_round_price(parse_float(value)) or 0) > base_price
+    ]
+    clusters = _cluster_price_bands([int(price) for price in candidates if price is not None], REVERSAL_RESISTANCE_CLUSTER_PCT)
+    return [
+        {
+            "label": f"상단 매물대 {index + 1}",
+            "price": cluster["low"],
+            "bandHigh": cluster["high"],
+            "count": cluster["count"],
+        }
+        for index, cluster in enumerate(clusters[:2])
+    ]
+
+
+def _parse_trade_plan_quantity_pct(value: Any) -> float:
+    match = re.match(r"\s*(\d+(?:\.\d+)?)", str(value or ""))
+    return float(match.group(1)) if match else 0.0
+
+
+def _format_trade_plan_quantity_pct(qty_pct: float, *, remainder: bool = False) -> str:
+    qty_value = float(qty_pct or 0.0)
+    if qty_value <= 0:
+        return "전량" if remainder else "0% 익절"
+    qty_text = str(int(qty_value)) if qty_value.is_integer() else f"{qty_value:.1f}".rstrip("0").rstrip(".")
+    return f"{qty_text}% 익절 (잔량 전량)" if remainder else f"{qty_text}% 익절"
+
+
+def _reversal_pick_target(
+    entry_price: float,
+    fallback_price: float | None,
+    fallback_condition: str,
+    candidates: list[tuple[str, float | None]],
+) -> dict[str, Any]:
+    rounded_entry = round(float(entry_price or 0))
+    rounded_floor = _round_price(fallback_price)
+    valid_candidates: list[tuple[str, int]] = []
+    for label, price in candidates:
+        rounded_price = _round_price(price)
+        if rounded_price is None or rounded_price <= rounded_entry:
+            continue
+        if rounded_floor is not None and rounded_price < rounded_floor:
+            continue
+        valid_candidates.append((label, rounded_price))
+    if valid_candidates:
+        chosen_label, chosen_price = min(valid_candidates, key=lambda item: item[1])
+        return {
+            "price": chosen_price,
+            "condition": f"{chosen_label} 도달",
+            "source": chosen_label,
+        }
+    rounded_fallback = _round_price(fallback_price) or rounded_entry
+    return {
+        "price": rounded_fallback,
+        "condition": fallback_condition,
+        "source": "기존 reversal 목표",
+    }
+
+
+def _reversal_rebuild_trade_plan_rows(
+    base_rows: list[dict[str, Any]],
+    entry_price: float,
+    target_specs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    take_profit_rows = [dict(row) for row in base_rows if not _is_stop_trade_plan_row(row)]
+    stop_row = next((dict(row) for row in base_rows if _is_stop_trade_plan_row(row)), None)
+    if not take_profit_rows:
+        return _clone_trade_plan_rows(base_rows)
+
+    base_qty = [_parse_trade_plan_quantity_pct(row.get("quantity")) for row in take_profit_rows]
+    next_rows: list[dict[str, Any]] = []
+    for index, spec in enumerate(target_specs):
+        source_row = dict(take_profit_rows[min(index, len(take_profit_rows) - 1)])
+        if index == len(target_specs) - 1:
+            quantity_pct = sum(base_qty[index:]) if index < len(base_qty) else 0.0
+        else:
+            quantity_pct = base_qty[index] if index < len(base_qty) else 0.0
+        source_row["stageKey"] = _trade_plan_row_stage_key(source_row)
+        source_row["quantity"] = _format_trade_plan_quantity_pct(quantity_pct, remainder=(index == len(target_specs) - 1))
+        _set_trade_plan_target(source_row, entry_price, spec["price"], spec["condition"])
+        next_rows.append(source_row)
+
+    if stop_row is not None:
+        stop_row["stageKey"] = "stop"
+        next_rows.append(stop_row)
+    return next_rows
+
+
+def _build_accumulation_take_profit_profiles(
+    entry: dict[str, Any],
+    context: dict[str, Any],
+    dims: dict[str, str],
+    marking_meta: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+    base_rows = _clone_trade_plan_rows(entry.get("tradePlanRows") or [])
+    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
+    replay_rollup = context.get("replayProfileRollup") if isinstance(context.get("replayProfileRollup"), dict) else {}
+    resistances = _accumulation_take_profit_resistances(entry_price, marking_meta)
+    nearest = resistances[0] if resistances else None
+    secondary = resistances[1] if len(resistances) > 1 else None
+    sponsor_mode = str(((entry.get("accumulationStopPolicy") or {}).get("sponsorMode")) or "")
+
+    profiles: list[dict[str, Any]] = []
+    aggressive_profile = {
+        "profileKey": "aggressive",
+        "label": _take_profit_profile_label("accumulation", "aggressive"),
+        "recommended": False,
+        "selectionBasis": "market_stock_heuristic",
+        "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
+        "nearestResistancePrice": nearest["price"] if nearest else None,
+        "secondaryResistancePrice": secondary["price"] if secondary else None,
+        "tradePlanRows": _clone_trade_plan_rows(base_rows),
+    }
+    aggressive_profile["recommendedStage"] = _stage_recommendation_from_rows("accumulation", aggressive_profile["tradePlanRows"], dims, rollup)
+    profiles.append(aggressive_profile)
+
+    for profile_key in ("balanced", "conservative"):
+        rows = _clone_trade_plan_rows(base_rows)
+        take_profit_rows = [row for row in rows if not _is_stop_trade_plan_row(row)]
+        selection_basis = "market_stock_heuristic"
+        reason_summary = ""
+        if not take_profit_rows or nearest is None:
+            selection_basis = "fallback_same_as_aggressive"
+            reason_summary = "가까운 상단 매물대가 없어 기본 목표형과 동일합니다."
+        else:
+            if profile_key == "balanced":
+                clips = ((0, nearest), (1, secondary))
+                changed_labels: list[str] = []
+                for index, resistance in clips:
+                    if resistance is None or index >= len(take_profit_rows):
+                        continue
+                    base_price = _round_price(parse_float(take_profit_rows[index].get("targetPrice"))) or resistance["price"]
+                    adjusted_price = min(base_price, resistance["price"])
+                    if adjusted_price < base_price:
+                        _set_trade_plan_target(
+                            take_profit_rows[index],
+                            entry_price,
+                            adjusted_price,
+                            f"{resistance['label']} 도달",
+                        )
+                        changed_labels.append(resistance["label"])
+                if changed_labels:
+                    reason_summary = f"{' / '.join(changed_labels)} 저항만 앞단 목표가에 반영합니다."
+                else:
+                    selection_basis = "fallback_same_as_aggressive"
+                    reason_summary = "가까운 상단 매물대가 기존 목표보다 높아 기본 목표형과 동일합니다."
+            else:
+                _set_trade_plan_target(
+                    take_profit_rows[0],
+                    entry_price,
+                    nearest["price"],
+                    f"{nearest['label']} 도달",
+                )
+                if len(take_profit_rows) > 1 and secondary is not None:
+                    _set_trade_plan_target(
+                        take_profit_rows[1],
+                        entry_price,
+                        secondary["price"],
+                        f"{secondary['label']} 도달",
+                    )
+                    reason_summary = f"{nearest['label']}과 {secondary['label']}을 앞단 목표가에 우선 반영합니다."
+                elif len(take_profit_rows) > 1:
+                    reason_summary = f"{nearest['label']}을 앞단 목표가에 반영하고 다음 목표는 기존값을 유지합니다."
+                else:
+                    reason_summary = f"{nearest['label']}을 앞단 목표가에 반영합니다."
+            _enforce_non_decreasing_targets(rows, entry_price)
+            if rows == base_rows:
+                selection_basis = "fallback_same_as_aggressive"
+                if not reason_summary:
+                    reason_summary = "조정 후에도 목표가가 같아 기본 목표형과 동일합니다."
+
+        profile = {
+            "profileKey": profile_key,
+            "label": _take_profit_profile_label("accumulation", profile_key),
+            "recommended": False,
+            "selectionBasis": selection_basis,
+            "reasonSummary": reason_summary or "현재 시장·종목 상태를 반영한 기본 프로필입니다.",
+            "nearestResistancePrice": nearest["price"] if nearest else None,
+            "secondaryResistancePrice": secondary["price"] if secondary else None,
+            "tradePlanRows": rows,
+        }
+        profile["recommendedStage"] = _stage_recommendation_from_rows("accumulation", profile["tradePlanRows"], dims, rollup)
+        profiles.append(profile)
+
+    chosen_profile_key = None
+    chosen_profile_stat = None
+    for profile in profiles:
+        stat = _lookup_profile_rollup(replay_rollup, "accumulation", dims, profile["profileKey"])
+        if stat is None or stat.get("avgNetReturnPct") is None:
+            continue
+        avg_net_return = float(stat.get("avgNetReturnPct") or 0.0)
+        if chosen_profile_stat is None or avg_net_return > float(chosen_profile_stat.get("avgNetReturnPct") or 0.0):
+            chosen_profile_key = profile["profileKey"]
+            chosen_profile_stat = stat
+
+    if chosen_profile_key is None:
+        gap_code = dims.get("gapGrade") or ""
+        bucket = dims.get("regimeBucket") or ""
+        if bucket == "weak" or gap_code in {"G-D", "G-E"} or len(resistances) >= 2:
+            chosen_profile_key = "conservative"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "약한 레짐/위험 갭/복수 상단 매물대 구간이라 저항 우선형을 추천합니다."
+        elif bucket == "bull" and gap_code in {"G-A", "G-B"} and len(resistances) < 2 and sponsor_mode == "both":
+            chosen_profile_key = "aggressive"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "강세 레짐이고 상단 저항이 약하며 외인·기관 동시 매집이라 기본 목표형을 추천합니다."
+        else:
+            chosen_profile_key = "balanced"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "극단 신호가 아니어서 1차 저항 반영형을 추천합니다."
+    else:
+        recommended_selection_basis = "historical_profile_ev"
+        recommended_reason = f"리플레이 평균 수익률 기준 최적 프로필입니다. (과거 {int(chosen_profile_stat.get('sampleCount') or chosen_profile_stat.get('tradeCount') or 0)}건)"
+
+    chosen_profile = next((profile for profile in profiles if profile["profileKey"] == chosen_profile_key), profiles[0])
+    chosen_profile["recommended"] = True
+    if chosen_profile.get("selectionBasis") == "fallback_same_as_aggressive":
+        recommended_selection_basis = "fallback_same_as_aggressive"
+    chosen_profile["selectionBasis"] = recommended_selection_basis
+    chosen_profile["reasonSummary"] = recommended_reason
+
+    recommended_profile = {
+        "profileKey": chosen_profile["profileKey"],
+        "label": chosen_profile["label"],
+        "selectionBasis": recommended_selection_basis,
+        "reasonSummary": recommended_reason,
+        "sampleCount": int((chosen_profile_stat or {}).get("sampleCount") or (chosen_profile_stat or {}).get("tradeCount") or 0),
+        "ev": round(float((chosen_profile_stat or {}).get("avgNetReturnPct") or 0.0), 4) if chosen_profile_stat and chosen_profile_stat.get("avgNetReturnPct") is not None else None,
+    }
+
+    return profiles, recommended_profile
+
+
+def _build_breakout_take_profit_profiles(
+    entry: dict[str, Any],
+    context: dict[str, Any],
+    dims: dict[str, str],
+    marking_meta: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+    base_rows = _clone_trade_plan_rows(entry.get("tradePlanRows") or [])
+    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
+    replay_rollup = context.get("replayProfileRollup") if isinstance(context.get("replayProfileRollup"), dict) else {}
+    resistances = _breakout_take_profit_resistances(entry_price, marking_meta)
+    nearest = resistances[0] if resistances else None
+    secondary = resistances[1] if len(resistances) > 1 else None
+    toss = entry.get("toss") if isinstance(entry.get("toss"), dict) else {}
+    orderbook = entry.get("orderbook") if isinstance(entry.get("orderbook"), dict) else {}
+    last30_avg_strength = parse_float(toss.get("last30AvgStrength"))
+    bid_ask_ratio = parse_float(orderbook.get("bidAskRatio"))
+
+    def with_trailing(profile: dict[str, Any], activation_pct: float, buffer_pct: float) -> dict[str, Any]:
+        return {
+            **profile,
+            "trailingActivationPct": activation_pct,
+            "trailingBufferPct": buffer_pct,
+        }
+
+    profiles: list[dict[str, Any]] = []
+    aggressive_profile = with_trailing({
+        "profileKey": "aggressive",
+        "label": _take_profit_profile_label("breakout", "aggressive"),
+        "recommended": False,
+        "selectionBasis": "market_stock_heuristic",
+        "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
+        "nearestResistancePrice": nearest["price"] if nearest else None,
+        "secondaryResistancePrice": secondary["price"] if secondary else None,
+        "tradePlanRows": _clone_trade_plan_rows(base_rows),
+    }, 8.0, 3.0)
+    aggressive_profile["recommendedStage"] = _stage_recommendation_from_rows("breakout", aggressive_profile["tradePlanRows"], dims, rollup)
+    profiles.append(aggressive_profile)
+
+    for profile_key, trailing_activation, trailing_buffer in (
+        ("balanced", 6.0, 2.5),
+        ("conservative", 4.5, 2.0),
+    ):
+        rows = _clone_trade_plan_rows(base_rows)
+        take_profit_rows = [row for row in rows if not _is_stop_trade_plan_row(row)]
+        selection_basis = "market_stock_heuristic"
+        reason_summary = ""
+        if not take_profit_rows or nearest is None:
+            selection_basis = "fallback_same_as_aggressive"
+            reason_summary = "가까운 상단 매물대가 없어 기본 목표형과 동일합니다."
+        else:
+            if profile_key == "balanced":
+                changed_labels: list[str] = []
+                for index, resistance in ((0, nearest), (1, secondary)):
+                    if resistance is None or index >= len(take_profit_rows):
+                        continue
+                    base_price = _round_price(parse_float(take_profit_rows[index].get("targetPrice"))) or resistance["price"]
+                    adjusted_price = min(base_price, resistance["price"])
+                    if adjusted_price < base_price:
+                        _set_trade_plan_target(
+                            take_profit_rows[index],
+                            entry_price,
+                            adjusted_price,
+                            f"{resistance['label']} 도달",
+                        )
+                        changed_labels.append(resistance["label"])
+                if changed_labels:
+                    reason_summary = f"{' / '.join(changed_labels)} 저항만 앞단 목표가에 반영합니다."
+                else:
+                    selection_basis = "fallback_same_as_aggressive"
+                    reason_summary = "가까운 상단 매물대가 기존 목표보다 높아 기본 목표형과 동일합니다."
+            else:
+                _set_trade_plan_target(
+                    take_profit_rows[0],
+                    entry_price,
+                    nearest["price"],
+                    f"{nearest['label']} 도달",
+                )
+                if len(take_profit_rows) > 1 and secondary is not None:
+                    _set_trade_plan_target(
+                        take_profit_rows[1],
+                        entry_price,
+                        secondary["price"],
+                        f"{secondary['label']} 도달",
+                    )
+                    reason_summary = f"{nearest['label']}과 {secondary['label']}을 앞단 목표가에 우선 반영합니다."
+                elif len(take_profit_rows) > 1:
+                    reason_summary = f"{nearest['label']}을 앞단 목표가에 반영하고 다음 목표는 기존값을 유지합니다."
+                else:
+                    reason_summary = f"{nearest['label']}을 앞단 목표가에 반영합니다."
+            _enforce_non_decreasing_targets(rows, entry_price)
+            if rows == base_rows:
+                selection_basis = "fallback_same_as_aggressive"
+                if not reason_summary:
+                    reason_summary = "조정 후에도 목표가가 같아 기본 목표형과 동일합니다."
+
+        profile = with_trailing({
+            "profileKey": profile_key,
+            "label": _take_profit_profile_label("breakout", profile_key),
+            "recommended": False,
+            "selectionBasis": selection_basis,
+            "reasonSummary": reason_summary or "현재 시장·종목 상태를 반영한 기본 프로필입니다.",
+            "nearestResistancePrice": nearest["price"] if nearest else None,
+            "secondaryResistancePrice": secondary["price"] if secondary else None,
+            "tradePlanRows": rows,
+        }, trailing_activation, trailing_buffer)
+        profile["recommendedStage"] = _stage_recommendation_from_rows("breakout", profile["tradePlanRows"], dims, rollup)
+        profiles.append(profile)
+
+    chosen_profile_key = None
+    chosen_profile_stat = None
+    for profile in profiles:
+        stat = _lookup_profile_rollup(replay_rollup, "breakout", dims, profile["profileKey"])
+        if stat is None or stat.get("avgNetReturnPct") is None:
+            continue
+        avg_net_return = float(stat.get("avgNetReturnPct") or 0.0)
+        if chosen_profile_stat is None or avg_net_return > float(chosen_profile_stat.get("avgNetReturnPct") or 0.0):
+            chosen_profile_key = profile["profileKey"]
+            chosen_profile_stat = stat
+
+    if chosen_profile_key is None:
+        gap_code = dims.get("gapGrade") or ""
+        bucket = dims.get("regimeBucket") or ""
+        if bucket == "weak" or gap_code in {"G-D", "G-E"} or len(resistances) >= 2:
+            chosen_profile_key = "conservative"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "약한 레짐/위험 갭/복수 저항 구간이라 저항 우선형을 추천합니다."
+        elif (
+            bucket == "bull"
+            and gap_code in {"G-A", "G-B"}
+            and not resistances
+            and last30_avg_strength >= 150.0
+            and bid_ask_ratio >= 1.2
+        ):
+            chosen_profile_key = "aggressive"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "강세 레짐이고 저항이 비어 있으며 체결강도/호가가 강해 기본 목표형을 추천합니다."
+        else:
+            chosen_profile_key = "balanced"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "극단 신호가 아니어서 1차 저항 반영형을 추천합니다."
+    else:
+        recommended_selection_basis = "historical_profile_ev"
+        recommended_reason = f"리플레이 평균 수익률 기준 최적 프로필입니다. (과거 {int(chosen_profile_stat.get('sampleCount') or chosen_profile_stat.get('tradeCount') or 0)}건)"
+
+    chosen_profile = next((profile for profile in profiles if profile["profileKey"] == chosen_profile_key), profiles[0])
+    chosen_profile["recommended"] = True
+    if chosen_profile.get("selectionBasis") == "fallback_same_as_aggressive":
+        recommended_selection_basis = "fallback_same_as_aggressive"
+    chosen_profile["selectionBasis"] = recommended_selection_basis
+    chosen_profile["reasonSummary"] = recommended_reason
+
+    recommended_profile = {
+        "profileKey": chosen_profile["profileKey"],
+        "label": chosen_profile["label"],
+        "selectionBasis": recommended_selection_basis,
+        "reasonSummary": recommended_reason,
+        "sampleCount": int((chosen_profile_stat or {}).get("sampleCount") or (chosen_profile_stat or {}).get("tradeCount") or 0),
+        "ev": round(float((chosen_profile_stat or {}).get("avgNetReturnPct") or 0.0), 4) if chosen_profile_stat and chosen_profile_stat.get("avgNetReturnPct") is not None else None,
+    }
+    return profiles, recommended_profile
+
+
+def _build_reversal_take_profit_profiles(
+    entry: dict[str, Any],
+    context: dict[str, Any],
+    dims: dict[str, str],
+    marking_meta: dict[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+    base_rows = _clone_trade_plan_rows(entry.get("tradePlanRows") or [])
+    base_target_rows = [row for row in base_rows if not _is_stop_trade_plan_row(row)]
+    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
+    replay_rollup = context.get("replayProfileRollup") if isinstance(context.get("replayProfileRollup"), dict) else {}
+    resistances = _reversal_take_profit_resistances(entry_price, marking_meta)
+    nearest = resistances[0] if resistances else None
+    secondary = resistances[1] if len(resistances) > 1 else None
+    high_history = (marking_meta or {}).get("highHistory") if isinstance(marking_meta, dict) else []
+    recent_high_price = _round_price(max([parse_float(value) for value in high_history[:REVERSAL_RESISTANCE_LOOKBACK_DAYS]], default=entry_price))
+    retrace33_price = _round_price(entry_price + ((float(recent_high_price or entry_price) - entry_price) * 0.33))
+    retrace50_price = _round_price(entry_price + ((float(recent_high_price or entry_price) - entry_price) * 0.50))
+    toss = entry.get("toss") if isinstance(entry.get("toss"), dict) else {}
+    orderbook = entry.get("orderbook") if isinstance(entry.get("orderbook"), dict) else {}
+    avg_strength = parse_float(toss.get("avgStrength"))
+    bid_ask_ratio = parse_float(orderbook.get("bidAskRatio"))
+
+    if not base_target_rows:
+        return [], {}
+
+    profiles: list[dict[str, Any]] = []
+
+    aggressive_specs = [
+        _reversal_pick_target(
+            entry_price,
+            parse_float(base_target_rows[0].get("targetPrice")) if len(base_target_rows) > 0 else None,
+            str(base_target_rows[0].get("condition") or "1차 익절"),
+            [
+                ("하락폭 33% 되돌림", retrace33_price),
+                (nearest["label"], nearest["price"]) if nearest else ("", None),
+            ],
+        ),
+        _reversal_pick_target(
+            entry_price,
+            parse_float(base_target_rows[1].get("targetPrice")) if len(base_target_rows) > 1 else None,
+            str(base_target_rows[1].get("condition") or "2차 익절"),
+            [
+                ("하락폭 50% 되돌림", retrace50_price),
+                (secondary["label"], secondary["price"]) if secondary else ("최근 고점", recent_high_price),
+            ],
+        ),
+    ]
+    if len(base_target_rows) > 2:
+        third_price = max(
+            aggressive_specs[-1]["price"],
+            _round_price(recent_high_price) or 0,
+            _round_price(parse_float(base_target_rows[2].get("targetPrice"))) or 0,
+        )
+        aggressive_specs.append({
+            "price": third_price,
+            "condition": "최근 고점 재도전",
+            "source": "최근 고점",
+        })
+    aggressive_rows = _reversal_rebuild_trade_plan_rows(base_rows, entry_price, aggressive_specs)
+    aggressive_profile = {
+        "profileKey": "aggressive",
+        "label": TAKE_PROFIT_PROFILE_LABELS["aggressive"],
+        "recommended": False,
+        "selectionBasis": "market_stock_heuristic",
+        "reasonSummary": "하락폭 33%·50% 되돌림과 최근 고점 재도전까지 열어둔 공격형입니다.",
+        "recentHighPrice": recent_high_price,
+        "retrace33Price": retrace33_price,
+        "retrace50Price": retrace50_price,
+        "nearestResistancePrice": nearest["price"] if nearest else None,
+        "secondaryResistancePrice": secondary["price"] if secondary else None,
+        "tradePlanRows": aggressive_rows,
+    }
+    aggressive_profile["recommendedStage"] = _stage_recommendation_from_rows("reversal", aggressive_rows, dims, rollup)
+    profiles.append(aggressive_profile)
+
+    profile_specs = {
+        "balanced": [
+            _reversal_pick_target(
+                entry_price,
+                parse_float(base_target_rows[0].get("targetPrice")) if len(base_target_rows) > 0 else None,
+                str(base_target_rows[0].get("condition") or "1차 익절"),
+                [
+                    ("하락폭 33% 되돌림", retrace33_price),
+                    (nearest["label"], nearest["price"]) if nearest else ("", None),
+                ],
+            ),
+            _reversal_pick_target(
+                entry_price,
+                parse_float(base_target_rows[1].get("targetPrice")) if len(base_target_rows) > 1 else None,
+                str(base_target_rows[1].get("condition") or "2차 익절"),
+                [
+                    ("하락폭 50% 되돌림", retrace50_price),
+                    (secondary["label"], secondary["price"]) if secondary else ("", None),
+                ],
+            ),
+        ],
+        "conservative": [
+            _reversal_pick_target(
+                entry_price,
+                parse_float(base_target_rows[0].get("targetPrice")) if len(base_target_rows) > 0 else None,
+                str(base_target_rows[0].get("condition") or "1차 익절"),
+                [
+                    ("+3% 조기 반등", entry_price * 1.03),
+                    ("하락폭 33% 되돌림", retrace33_price),
+                    (nearest["label"], nearest["price"]) if nearest else ("", None),
+                ],
+            ),
+            _reversal_pick_target(
+                entry_price,
+                parse_float(base_target_rows[1].get("targetPrice")) if len(base_target_rows) > 1 else None,
+                str(base_target_rows[1].get("condition") or "2차 익절"),
+                [
+                    ("+5% 조기 회수", entry_price * 1.05),
+                    (secondary["label"], secondary["price"]) if secondary else ((nearest["label"], nearest["price"]) if nearest else ("", None)),
+                    ("하락폭 50% 되돌림", retrace50_price),
+                ],
+            ),
+        ],
+    }
+
+    default_reasons = {
+        "balanced": "하락폭 33%·50% 수학적 반등 구간을 우선 추적하는 중립형입니다.",
+        "conservative": "아침 급반등 +3%·+5% 구간을 우선 회수하는 보수형입니다.",
+    }
+    for profile_key in ("balanced", "conservative"):
+        rows = _reversal_rebuild_trade_plan_rows(base_rows, entry_price, profile_specs[profile_key])
+        _enforce_non_decreasing_targets(rows, entry_price)
+        selection_basis = "market_stock_heuristic"
+        reason_summary = default_reasons[profile_key]
+        if rows == aggressive_rows:
+            selection_basis = "fallback_same_as_aggressive"
+            reason_summary = "유효 저항/되돌림 차이가 없어 공격형과 동일합니다."
+        profile = {
+            "profileKey": profile_key,
+            "label": TAKE_PROFIT_PROFILE_LABELS[profile_key],
+            "recommended": False,
+            "selectionBasis": selection_basis,
+            "reasonSummary": reason_summary,
+            "recentHighPrice": recent_high_price,
+            "retrace33Price": retrace33_price,
+            "retrace50Price": retrace50_price,
+            "nearestResistancePrice": nearest["price"] if nearest else None,
+            "secondaryResistancePrice": secondary["price"] if secondary else None,
+            "tradePlanRows": rows,
+        }
+        profile["recommendedStage"] = _stage_recommendation_from_rows("reversal", rows, dims, rollup)
+        profiles.append(profile)
+
+    chosen_profile_key = None
+    chosen_profile_stat = None
+    for profile in profiles:
+        stat = _lookup_profile_rollup(replay_rollup, "reversal", dims, profile["profileKey"])
+        if stat is None or stat.get("avgNetReturnPct") is None:
+            continue
+        avg_net_return = float(stat.get("avgNetReturnPct") or 0.0)
+        if chosen_profile_stat is None or avg_net_return > float(chosen_profile_stat.get("avgNetReturnPct") or 0.0):
+            chosen_profile_key = profile["profileKey"]
+            chosen_profile_stat = stat
+
+    if chosen_profile_key is None:
+        gap_code = dims.get("gapGrade") or ""
+        bucket = dims.get("regimeBucket") or ""
+        if bucket == "weak" or gap_code in {"G-D", "G-E"} or (nearest is not None and secondary is not None):
+            chosen_profile_key = "conservative"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "약한 레짐/위험 갭/복수 저항 구간이라 보수형을 추천합니다."
+        elif (
+            bucket == "bull"
+            and gap_code in {"G-A", "G-B"}
+            and nearest is None
+            and avg_strength >= 130.0
+            and bid_ask_ratio >= 1.2
+        ):
+            chosen_profile_key = "aggressive"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "강한 반등 에너지와 비어 있는 상단 저항을 고려해 공격형을 추천합니다."
+        else:
+            chosen_profile_key = "balanced"
+            recommended_selection_basis = "market_stock_heuristic"
+            recommended_reason = "33%·50% 되돌림 중심의 중립형이 현재 구간에 가장 적합합니다."
+    else:
+        recommended_selection_basis = "historical_profile_ev"
+        recommended_reason = f"리플레이 평균 수익률 기준 최적 프로필입니다. (과거 {int(chosen_profile_stat.get('sampleCount') or chosen_profile_stat.get('tradeCount') or 0)}건)"
+
+    chosen_profile = next((profile for profile in profiles if profile["profileKey"] == chosen_profile_key), profiles[0])
+    chosen_profile["recommended"] = True
+    if chosen_profile.get("selectionBasis") == "fallback_same_as_aggressive":
+        recommended_selection_basis = "fallback_same_as_aggressive"
+    chosen_profile["selectionBasis"] = recommended_selection_basis
+    chosen_profile["reasonSummary"] = recommended_reason
+
+    recommended_profile = {
+        "profileKey": chosen_profile["profileKey"],
+        "label": chosen_profile["label"],
+        "selectionBasis": recommended_selection_basis,
+        "reasonSummary": recommended_reason,
+        "sampleCount": int((chosen_profile_stat or {}).get("sampleCount") or (chosen_profile_stat or {}).get("tradeCount") or 0),
+        "ev": round(float((chosen_profile_stat or {}).get("avgNetReturnPct") or 0.0), 4) if chosen_profile_stat and chosen_profile_stat.get("avgNetReturnPct") is not None else None,
+    }
+    return profiles, recommended_profile
+
+
+def compute_recommended_entry_band(entry_price: float, regime_label: str, gap_code: str) -> dict[str, Any]:
+    bucket = regime_bucket(regime_label)
+    gap_offset = -0.5 if gap_code == "G-C" else -1.0 if gap_code == "G-D" else 0.0
+    skew = {"bull": 0.0, "box": -0.3, "weak": -0.6}[bucket] + gap_offset * 0.5
+    low = round(entry_price * (1 + (skew - 0.7) / 100))
+    high = round(entry_price * (1 + (skew + 0.3) / 100))
+    return {
+        "low": low,
+        "high": high,
+        "anchor": round(entry_price),
+        "label": f"{low:,}~{high:,}원 (종가 ±, 분할매수)",
+    }
+
+
+def attach_marking(entry: dict[str, Any], context: dict[str, Any], marking_meta: dict[str, Any] | None = None) -> dict[str, Any]:
+    """엔트리에 recommendedEntryBand·recommendedStage를 추가하고, tradePlanRows에
+    recommended/historicalHitRate를 표기한다. 과거 적중 롤업이 있으면 EV(=적중률×목표)로,
+    없으면 현재 시장 휴리스틱으로 최적 익절 단계를 선택한다."""
+    strategy = "breakout" if entry.get("strategy") == "momentum" else str(entry.get("strategy") or "")
+    rows = entry.get("tradePlanRows") or []
+    regime_label = str(context.get("regimeLabel") or "")
+    entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+    gap_code = str((context.get("gapScore") or {}).get("code") or "")
+    rollup = context.get("outcomesRollup") if isinstance(context.get("outcomesRollup"), dict) else {}
+    dims = {
+        "regimeBucket": regime_bucket(regime_label),
+        "vkospiTier": str(context.get("kospiBullTier") or "unknown"),
+        "gapGrade": gap_code,
+    }
     entry["recommendedEntryBand"] = compute_recommended_entry_band(entry_price, regime_label, gap_code)
-    entry["recommendedStage"] = recommended_stage
+    if strategy == "pullback":
+        profiles, recommended_profile = _build_pullback_take_profit_profiles(entry, context, dims, marking_meta)
+        chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
+        if chosen_profile is not None:
+            entry["pullbackTakeProfitProfiles"] = profiles
+            entry["recommendedTakeProfitProfile"] = recommended_profile
+            entry["tradePlanRows"] = _clone_trade_plan_rows(chosen_profile.get("tradePlanRows") or [])
+            entry["recommendedStage"] = dict(chosen_profile.get("recommendedStage") or {})
+            stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if "손절" in str(row.get("stage") or "")), "0"))
+            entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
+            return entry
+    if strategy == "accumulation":
+        profiles, recommended_profile = _build_accumulation_take_profit_profiles(entry, context, dims, marking_meta)
+        chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
+        if chosen_profile is not None:
+            entry["accumulationTakeProfitProfiles"] = profiles
+            entry["recommendedTakeProfitProfile"] = recommended_profile
+            entry["tradePlanRows"] = _clone_trade_plan_rows(chosen_profile.get("tradePlanRows") or [])
+            entry["recommendedStage"] = dict(chosen_profile.get("recommendedStage") or {})
+            stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if _is_stop_trade_plan_row(row)), "0"))
+            entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
+            return entry
+    if strategy == "breakout":
+        profiles, recommended_profile = _build_breakout_take_profit_profiles(entry, context, dims, marking_meta)
+        chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
+        if chosen_profile is not None:
+            entry["breakoutTakeProfitProfiles"] = profiles
+            entry["recommendedTakeProfitProfile"] = recommended_profile
+            entry["tradePlanRows"] = _clone_trade_plan_rows(chosen_profile.get("tradePlanRows") or [])
+            entry["recommendedStage"] = dict(chosen_profile.get("recommendedStage") or {})
+            entry["breakoutLiveExitPolicy"] = build_breakout_live_exit_policy(chosen_profile)
+            stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if _is_stop_trade_plan_row(row)), "0"))
+            entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
+            return entry
+    if strategy == "reversal":
+        profiles, recommended_profile = _build_reversal_take_profit_profiles(entry, context, dims, marking_meta)
+        chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
+        if chosen_profile is not None:
+            entry["reversalTakeProfitProfiles"] = profiles
+            entry["recommendedTakeProfitProfile"] = recommended_profile
+            entry["tradePlanRows"] = _clone_trade_plan_rows(chosen_profile.get("tradePlanRows") or [])
+            entry["recommendedStage"] = dict(chosen_profile.get("recommendedStage") or {})
+            entry["reversalLiveExitPolicy"] = build_reversal_live_exit_policy()
+            stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if _is_stop_trade_plan_row(row)), "0"))
+            entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
+            return entry
+
+    entry["recommendedStage"] = _stage_recommendation_from_rows(strategy, rows, dims, rollup)
     return entry
 
 
@@ -2321,10 +4047,53 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
 
 
 
-def finalize_scored_buy_entry(entry: dict[str, Any], context: dict[str, Any] | None = None) -> dict[str, Any]:
+def finalize_scored_buy_entry(
+    entry: dict[str, Any],
+    context: dict[str, Any] | None = None,
+    marking_meta: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     if context is not None:
-        attach_marking(entry, context)
+        attach_marking(entry, context, marking_meta)
     return attach_entry_eligibility(entry, context)
+
+
+def build_pullback_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str, Any]:
+    return {
+        "ma5Price": _round_price(snapshot.ma5),
+        "ma5PrevPrice": _round_price(snapshot.ma5_prev),
+        "ma10Price": _round_price(snapshot.ma10),
+        "ma10PrevPrice": _round_price(moving_average(snapshot.close_history, 10, 1)),
+    }
+
+
+def build_accumulation_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str, Any]:
+    return {
+        "highHistory": [
+            _round_price(value)
+            for value in list(snapshot.high_history or [])[:ACCUMULATION_RESISTANCE_LOOKBACK_DAYS]
+            if _round_price(value) is not None
+        ],
+    }
+
+
+def build_breakout_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str, Any]:
+    return {
+        "highHistory": [
+            _round_price(value)
+            for value in list(snapshot.high_history or [])[:BREAKOUT_OVERHEAD_LOOKBACK_DAYS]
+            if _round_price(value) is not None
+        ],
+    }
+
+
+def build_reversal_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str, Any]:
+    return {
+        "highHistory": [
+            _round_price(value)
+            for value in list(snapshot.high_history or [])[:REVERSAL_RESISTANCE_LOOKBACK_DAYS]
+            if _round_price(value) is not None
+        ],
+    }
 
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
@@ -2355,6 +4124,9 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("pullback", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    fallback_stop_price = parse_float(trade_plan[-1]["targetPrice"]) if trade_plan else 0.0
+    pullback_stop_policy = compute_pullback_stop_policy(snapshot, context, fallback_stop_price)
+    trade_plan = apply_pullback_stop_policy_to_trade_plan(trade_plan, snapshot.current_price, pullback_stop_policy)
     scoring = apply_buy_scoring(
         strategy="pullback",
         score_map=score_map,
@@ -2378,7 +4150,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "marketCapTrillion": snapshot.market_cap_trillion,
+        **build_market_cap_meta(snapshot),
         "keyPoint": join_keypoint_parts(
             f"5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
             build_volatility_keypoint_suffix(volatility_context),
@@ -2391,11 +4163,12 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         },
         "volatilityContext": volatility_context,
         "manualInput": manual_input,
+        "pullbackStopPolicy": pullback_stop_policy,
         "tradePlanRows": trade_plan,
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
-    return finalize_scored_buy_entry(entry, context)
+    return finalize_scored_buy_entry(entry, context, build_pullback_take_profit_marking_meta(snapshot))
 
 
 def build_breakout_entry(
@@ -2429,6 +4202,10 @@ def build_breakout_entry(
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("breakout", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    fallback_stop_price = parse_float(trade_plan[-1]["targetPrice"]) if trade_plan else 0.0
+    breakout_stop_policy = compute_breakout_stop_policy(snapshot, context, fallback_stop_price)
+    trade_plan = apply_breakout_stop_policy_to_trade_plan(trade_plan, snapshot.current_price, breakout_stop_policy)
+    stop_rate = parse_float(next((row.get("targetYield") for row in trade_plan if _is_stop_trade_plan_row(row)), "0"))
     scoring = apply_buy_scoring(
         strategy="breakout",
         score_map=score_map,
@@ -2453,7 +4230,7 @@ def build_breakout_entry(
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "marketCapTrillion": snapshot.market_cap_trillion,
+        **build_market_cap_meta(snapshot),
         "keyPoint": join_keypoint_parts(
             f"주도주 돌파형 — RS·거래량·강마감·5MA 추세를 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주.",
             build_volatility_keypoint_suffix(volatility_context),
@@ -2463,12 +4240,13 @@ def build_breakout_entry(
         "orderbook": snapshot.orderbook or {},
         "volatilityContext": volatility_context,
         "manualInput": manual_input,
+        "breakoutStopPolicy": breakout_stop_policy,
         "tradePlanRows": trade_plan,
-        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
+        "rr": rr_text(snapshot.current_price, stop_rate, blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "breakout")
-    return finalize_scored_buy_entry(entry, context)
+    return finalize_scored_buy_entry(entry, context, build_breakout_take_profit_marking_meta(snapshot))
 
 
 def build_momentum_entry(
@@ -2511,6 +4289,14 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("accumulation", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    fallback_stop_price = next(
+        (parse_float(row.get("targetPrice")) for row in trade_plan if "손절" in str(row.get("stage") or "")),
+        0.0,
+    )
+    accumulation_stop_policy = compute_accumulation_stop_policy(snapshot, context, fallback_stop_price)
+    trade_plan = apply_accumulation_stop_policy_to_trade_plan(trade_plan, snapshot.current_price, accumulation_stop_policy)
+    trade_plan = apply_accumulation_display_stage_labels(trade_plan)
+    stop_rate = _rate_from_price(snapshot.current_price, accumulation_stop_policy.get("effectiveHardStopPrice")) or parse_float(trade_plan[-1]["targetYield"])
     scoring = apply_buy_scoring(
         strategy="accumulation",
         score_map=score_map,
@@ -2543,7 +4329,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "marketCapTrillion": snapshot.market_cap_trillion,
+        **build_market_cap_meta(snapshot),
         "keyPoint": join_keypoint_parts(
             f"수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주{flow_summary}.",
             build_volatility_keypoint_suffix(volatility_context),
@@ -2553,11 +4339,12 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "volatilityContext": volatility_context,
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
-        "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
+        "accumulationStopPolicy": accumulation_stop_policy,
+        "rr": rr_text(snapshot.current_price, stop_rate, blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "accumulation")
-    return finalize_scored_buy_entry(entry, context)
+    return finalize_scored_buy_entry(entry, context, build_accumulation_take_profit_marking_meta(snapshot))
 
 
 def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
@@ -2598,6 +4385,9 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("reversal", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
+    fallback_stop_price = parse_float(trade_plan[-1]["targetPrice"]) if trade_plan else 0.0
+    reversal_stop_policy = compute_reversal_stop_policy(snapshot, context, fallback_stop_price)
+    trade_plan = apply_reversal_stop_policy_to_trade_plan(trade_plan, snapshot.current_price, reversal_stop_policy)
     scoring = apply_buy_scoring(
         strategy="reversal",
         score_map=score_map,
@@ -2622,7 +4412,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "entryPriceText": f"{round(snapshot.current_price):,}원 (당일 종가 기준)",
         "entryPrice": round(snapshot.current_price),
         "entryMeta": "당일 종가 기준",
-        "marketCapTrillion": snapshot.market_cap_trillion,
+        **build_market_cap_meta(snapshot),
         "keyPoint": join_keypoint_parts(
             f"20일 고점 대비 {drawdown_20d:.1f}% 조정 후 안정화 패턴 여부를 점검했습니다.",
             build_volatility_keypoint_suffix(volatility_context),
@@ -2635,11 +4425,13 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "orderbook": snapshot.orderbook or {},
         "volatilityContext": volatility_context,
         "tradePlanRows": trade_plan,
+        "reversalStopPolicy": reversal_stop_policy,
+        "reversalLiveExitPolicy": build_reversal_live_exit_policy(),
         "rr": rr_text(snapshot.current_price, parse_float(trade_plan[-1]["targetYield"]), blended_reward_from_plan(trade_plan)),
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "reversal")
-    return finalize_scored_buy_entry(entry, context)
+    return finalize_scored_buy_entry(entry, context, build_reversal_take_profit_marking_meta(snapshot))
 
 
 def assign_ranks(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -2749,6 +4541,7 @@ def collect_live_payload(
     context = build_market_context(kospi_history, gap_score, live_metrics["vkospi"], analysis_date=resolved_analysis_date)
     context["outcomesRollup"] = load_outcomes_rollup()
     context["outcomesIndex"] = load_outcomes_index()
+    context["replayProfileRollup"] = load_replay_profile_rollup()
     context["analysisDate"] = resolved_analysis_date.isoformat()
     log_step(
         "market_context",
@@ -2758,14 +4551,25 @@ def collect_live_payload(
     )
 
     started_at = perf_counter()
-    top_trading = fetch_top_trading_codes(top_limit)
+    market_value_rows = fetch_naver_market_value_universe()
+    market_cap_rank_lookup, market_cap_universe_count = build_market_cap_rank_lookup(market_value_rows)
+    top_trading = fetch_top_trading_codes(top_limit, market_value_rows)
     log_step("top_trading", "거래대금 상위 종목 수집", started_at, count=len(top_trading))
 
     snapshots: list[StockSnapshot] = []
     errors: list[str] = []
     started_at = perf_counter()
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
-        future_map = {executor.submit(build_stock_snapshot, item, resolved_analysis_date): item for item in top_trading}
+        future_map = {
+            executor.submit(
+                build_stock_snapshot,
+                item,
+                resolved_analysis_date,
+                market_cap_rank_lookup,
+                market_cap_universe_count,
+            ): item
+            for item in top_trading
+        }
         for future in concurrent.futures.as_completed(future_map):
             item = future_map[future]
             try:

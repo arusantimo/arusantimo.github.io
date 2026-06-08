@@ -50,6 +50,7 @@ function normalizeJonggaTradePlanRows(value) {
     const hitRate = row.historicalHitRate;
     return {
       stage: String(pickJonggaValue(row, ['stage', 'step', 'label'])),
+      stageKey: String(pickJonggaValue(row, ['stageKey', 'stage_key', 'stageCode'])),
       condition: String(pickJonggaValue(row, ['condition', 'trigger', 'rule'])),
       quantity: String(pickJonggaValue(row, ['quantity', 'qty', 'size'])),
       targetYield: String(pickJonggaValue(row, ['targetYield', 'yield', 'rate'])),
@@ -81,6 +82,46 @@ function normalizeJonggaRecommendedStage(value) {
     ev: (value.ev === null || value.ev === undefined) ? null : Number(value.ev),
     sampleCount: Number(value.sampleCount || 0)
   };
+}
+
+function normalizeJonggaRecommendedTakeProfitProfile(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    profileKey: String(value.profileKey || ''),
+    label: String(value.label || ''),
+    selectionBasis: String(value.selectionBasis || ''),
+    reasonSummary: String(value.reasonSummary || ''),
+    sampleCount: Number(value.sampleCount || 0),
+    ev: (value.ev === null || value.ev === undefined) ? null : Number(value.ev)
+  };
+}
+
+function normalizeJonggaTakeProfitProfile(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    profileKey: String(value.profileKey || ''),
+    label: String(value.label || ''),
+    recommended: Boolean(value.recommended),
+    selectionBasis: String(value.selectionBasis || ''),
+    reasonSummary: String(value.reasonSummary || ''),
+    nearestResistanceType: String(value.nearestResistanceType || ''),
+    nearestResistancePrice: toJonggaNumber(value.nearestResistancePrice),
+    secondaryResistanceType: String(value.secondaryResistanceType || ''),
+    secondaryResistancePrice: toJonggaNumber(value.secondaryResistancePrice),
+    recentHighPrice: toJonggaNumber(value.recentHighPrice),
+    retrace33Price: toJonggaNumber(value.retrace33Price),
+    retrace50Price: toJonggaNumber(value.retrace50Price),
+    trailingActivationPct: toJonggaNumber(value.trailingActivationPct, null),
+    trailingBufferPct: toJonggaNumber(value.trailingBufferPct, null),
+    tradePlanRows: normalizeJonggaTradePlanRows(value.tradePlanRows),
+    recommendedStage: normalizeJonggaRecommendedStage(value.recommendedStage)
+  };
+}
+
+function normalizeJonggaTakeProfitProfiles(value) {
+  return asJonggaArray(value)
+    .map(normalizeJonggaTakeProfitProfile)
+    .filter(Boolean);
 }
 
 function normalizeJonggaPullbackContext(value) {
@@ -168,6 +209,158 @@ function normalizeJonggaVolatilityContext(value) {
       todayRangePct: toJonggaNumber(metrics.todayRangePct, null),
       vkospi: toJonggaNumber(metrics.vkospi, null)
     }
+  };
+}
+
+function normalizeJonggaPullbackStopPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    anchorSource: String(value.anchorSource || ''),
+    anchorLookbackDays: Number(value.anchorLookbackDays || 0),
+    anchorDate: String(value.anchorDate || ''),
+    anchorOpen: toJonggaNumber(value.anchorOpen),
+    anchorClose: toJonggaNumber(value.anchorClose),
+    anchorHigh: toJonggaNumber(value.anchorHigh),
+    anchorLow: toJonggaNumber(value.anchorLow),
+    anchorBodyMid: toJonggaNumber(value.anchorBodyMid),
+    anchorVolumeRatio: toJonggaNumber(value.anchorVolumeRatio),
+    anchorStopMode: String(value.anchorStopMode || ''),
+    anchorStopPrice: toJonggaNumber(value.anchorStopPrice),
+    ma10Price: toJonggaNumber(value.ma10Price),
+    ma10PrevPrice: toJonggaNumber(value.ma10PrevPrice),
+    ma20Price: toJonggaNumber(value.ma20Price),
+    ma20PrevPrice: toJonggaNumber(value.ma20PrevPrice),
+    ma10WarningPrice: toJonggaNumber(value.ma10WarningPrice),
+    hardStopPrice: toJonggaNumber(value.hardStopPrice),
+    fallbackStopPrice: toJonggaNumber(value.fallbackStopPrice),
+    effectiveStopPrice: toJonggaNumber(value.effectiveStopPrice),
+    warningRuleSummary: String(value.warningRuleSummary || ''),
+    hardStopRuleSummary: String(value.hardStopRuleSummary || ''),
+    reasonSummary: String(value.reasonSummary || '')
+  };
+}
+
+function normalizeJonggaAccumulationStopPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    anchorSource: String(value.anchorSource || ''),
+    sponsorMode: String(value.sponsorMode || ''),
+    anchorDate: String(value.anchorDate || ''),
+    anchorOpen: toJonggaNumber(value.anchorOpen),
+    anchorClose: toJonggaNumber(value.anchorClose),
+    anchorVolumeRatio20d: toJonggaNumber(value.anchorVolumeRatio20d),
+    anchorStopPrice: toJonggaNumber(value.anchorStopPrice),
+    fallbackStopPrice: toJonggaNumber(value.fallbackStopPrice),
+    effectiveHardStopPrice: toJonggaNumber(value.effectiveHardStopPrice),
+    openExitCheckCutoff: String(value.openExitCheckCutoff || ''),
+    openExitMode: String(value.openExitMode || ''),
+    openExitRuleSummary: String(value.openExitRuleSummary || ''),
+    hardStopRuleSummary: String(value.hardStopRuleSummary || ''),
+    marketShockHoldRuleSummary: String(value.marketShockHoldRuleSummary || ''),
+    reasonSummary: String(value.reasonSummary || '')
+  };
+}
+
+function normalizeJonggaBreakoutStopPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    referenceSource: String(value.referenceSource || ''),
+    referenceLookbackDays: Number(value.referenceLookbackDays || 0),
+    referenceClusterPct: toJonggaNumber(value.referenceClusterPct, null),
+    referencePrice: toJonggaNumber(value.referencePrice),
+    referenceBandLow: toJonggaNumber(value.referenceBandLow),
+    referenceBandHigh: toJonggaNumber(value.referenceBandHigh),
+    entryDayOpenPrice: toJonggaNumber(value.entryDayOpenPrice),
+    fallbackStopPrice: toJonggaNumber(value.fallbackStopPrice),
+    effectiveHardStopPrice: toJonggaNumber(value.effectiveHardStopPrice),
+    openExitCheckCutoff: String(value.openExitCheckCutoff || ''),
+    microTrendBarUnit: String(value.microTrendBarUnit || ''),
+    microTrendShortMa: Number(value.microTrendShortMa || 0),
+    microTrendLongMa: Number(value.microTrendLongMa || 0),
+    hardStopRuleSummary: String(value.hardStopRuleSummary || ''),
+    openExitRuleSummary: String(value.openExitRuleSummary || ''),
+    microTrendRuleSummary: String(value.microTrendRuleSummary || ''),
+    reasonSummary: String(value.reasonSummary || '')
+  };
+}
+
+function normalizeJonggaBreakoutLiveExitPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    wickClimaxLookbackBars: Number(value.wickClimaxLookbackBars || 0),
+    wickClimaxVolumeRatioMin: toJonggaNumber(value.wickClimaxVolumeRatioMin, null),
+    wickUpperShadowRatioMin: toJonggaNumber(value.wickUpperShadowRatioMin, null),
+    orderbookLookbackMinutes: Number(value.orderbookLookbackMinutes || 0),
+    orderbookBidAskSpikeMin: toJonggaNumber(value.orderbookBidAskSpikeMin, null),
+    orderbookAskDropRatioMax: toJonggaNumber(value.orderbookAskDropRatioMax, null),
+    trailingActivationPct: toJonggaNumber(value.trailingActivationPct, null),
+    trailingBufferPct: toJonggaNumber(value.trailingBufferPct, null),
+    activeSessionCutoff: String(value.activeSessionCutoff || ''),
+    wickClimaxRuleSummary: String(value.wickClimaxRuleSummary || ''),
+    orderbookRuleSummary: String(value.orderbookRuleSummary || ''),
+    trailingRuleSummary: String(value.trailingRuleSummary || '')
+  };
+}
+
+function normalizeJonggaReversalStopPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    anchorSource: String(value.anchorSource || ''),
+    anchorLowPrice: toJonggaNumber(value.anchorLowPrice),
+    fallbackStopPrice: toJonggaNumber(value.fallbackStopPrice),
+    effectiveHardStopPrice: toJonggaNumber(value.effectiveHardStopPrice),
+    stopExecutionMode: String(value.stopExecutionMode || ''),
+    hardStopRuleSummary: String(value.hardStopRuleSummary || ''),
+    reasonSummary: String(value.reasonSummary || '')
+  };
+}
+
+function normalizeJonggaReversalLiveExitPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    timeStopCutoff: String(value.timeStopCutoff || ''),
+    timeStopMinBouncePct: toJonggaNumber(value.timeStopMinBouncePct, null),
+    breakevenActivationPct: toJonggaNumber(value.breakevenActivationPct, null),
+    earlySpikeWindowEnd: String(value.earlySpikeWindowEnd || ''),
+    timeStopRuleSummary: String(value.timeStopRuleSummary || ''),
+    breakevenRuleSummary: String(value.breakevenRuleSummary || '')
+  };
+}
+
+function normalizeJonggaToss(value) {
+  if (!value || typeof value !== 'object') return {};
+  return {
+    avgStrength: toJonggaNumber(value.avgStrength, null),
+    lastHourAvgStrength: toJonggaNumber(value.lastHourAvgStrength, null),
+    last30AvgStrength: toJonggaNumber(value.last30AvgStrength, null),
+    intradayAbove100Ratio: toJonggaNumber(value.intradayAbove100Ratio, null),
+    last30BuySellRatio: toJonggaNumber(value.last30BuySellRatio, null),
+    last30BuyVolume: toJonggaNumber(value.last30BuyVolume, null),
+    last30SellVolume: toJonggaNumber(value.last30SellVolume, null),
+    observedMinutes: Number(value.observedMinutes || 0),
+    observedTickCount: Number(value.observedTickCount || 0),
+    source: String(value.source || ''),
+    sourceUrl: String(value.sourceUrl || ''),
+    note: String(value.note || ''),
+    asOf: String(value.asOf || '')
+  };
+}
+
+function normalizeJonggaOrderbook(value) {
+  if (!value || typeof value !== 'object') return {};
+  return {
+    bidAskRatio: toJonggaNumber(value.bidAskRatio, null),
+    bidTotal: toJonggaNumber(value.bidTotal, null),
+    askTotal: toJonggaNumber(value.askTotal, null),
+    source: String(value.source || ''),
+    sourceUrl: String(value.sourceUrl || ''),
+    note: String(value.note || '')
   };
 }
 
@@ -279,6 +472,10 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     false
   );
   const entryPrice = pickJonggaValue(effectiveRawEntry, ['entryPriceText', 'entryPrice', 'entry']);
+  const breakoutProfilesRaw = effectiveRawEntry.breakoutTakeProfitProfiles
+    || ((strategy === 'breakout' || strategy === 'momentum') ? effectiveRawEntry.pullbackTakeProfitProfiles : null);
+  const breakoutStopPolicyRaw = effectiveRawEntry.breakoutStopPolicy
+    || ((strategy === 'breakout' || strategy === 'momentum') ? effectiveRawEntry.pullbackStopPolicy : null);
   const normalized = {
     rank: Number(effectiveRawEntry.rank) || rank,
     name: getJonggaName(effectiveRawEntry),
@@ -318,6 +515,16 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
       ?? effectiveRawEntry.market_cap,
       null
     ),
+    marketCapRank: toJonggaNumber(
+      effectiveRawEntry.marketCapRank
+      ?? effectiveRawEntry.market_cap_rank,
+      null
+    ),
+    marketCapUniverseCount: toJonggaNumber(
+      effectiveRawEntry.marketCapUniverseCount
+      ?? effectiveRawEntry.market_cap_universe_count,
+      null
+    ),
     currentPrice: toJonggaNumber(effectiveRawEntry.currentPrice || effectiveRawEntry.price, null),
     previousClose: toJonggaNumber(effectiveRawEntry.previousClose || effectiveRawEntry.prevClose, null),
     dailyChange: toJonggaNumber(effectiveRawEntry.dailyChange || effectiveRawEntry.change, null),
@@ -332,7 +539,20 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     tradePlanRows: normalizeJonggaTradePlanRows(effectiveRawEntry.tradePlanRows || effectiveRawEntry.tradePlan),
     recommendedEntryBand: normalizeJonggaRecommendedBand(effectiveRawEntry.recommendedEntryBand),
     recommendedStage: normalizeJonggaRecommendedStage(effectiveRawEntry.recommendedStage),
+    pullbackTakeProfitProfiles: normalizeJonggaTakeProfitProfiles(effectiveRawEntry.pullbackTakeProfitProfiles),
+    breakoutTakeProfitProfiles: normalizeJonggaTakeProfitProfiles(breakoutProfilesRaw),
+    accumulationTakeProfitProfiles: normalizeJonggaTakeProfitProfiles(effectiveRawEntry.accumulationTakeProfitProfiles),
+    reversalTakeProfitProfiles: normalizeJonggaTakeProfitProfiles(effectiveRawEntry.reversalTakeProfitProfiles),
+    recommendedTakeProfitProfile: normalizeJonggaRecommendedTakeProfitProfile(effectiveRawEntry.recommendedTakeProfitProfile),
     pullbackContext: normalizeJonggaPullbackContext(effectiveRawEntry.pullbackContext),
+    pullbackStopPolicy: normalizeJonggaPullbackStopPolicy(effectiveRawEntry.pullbackStopPolicy),
+    accumulationStopPolicy: normalizeJonggaAccumulationStopPolicy(effectiveRawEntry.accumulationStopPolicy),
+    breakoutStopPolicy: normalizeJonggaBreakoutStopPolicy(breakoutStopPolicyRaw),
+    breakoutLiveExitPolicy: normalizeJonggaBreakoutLiveExitPolicy(effectiveRawEntry.breakoutLiveExitPolicy),
+    reversalStopPolicy: normalizeJonggaReversalStopPolicy(effectiveRawEntry.reversalStopPolicy),
+    reversalLiveExitPolicy: normalizeJonggaReversalLiveExitPolicy(effectiveRawEntry.reversalLiveExitPolicy),
+    toss: normalizeJonggaToss(effectiveRawEntry.toss),
+    orderbook: normalizeJonggaOrderbook(effectiveRawEntry.orderbook),
     volatilityContext: normalizeJonggaVolatilityContext(effectiveRawEntry.volatilityContext),
     liveRefresh: buildJonggaLiveRefresh(effectiveRawEntry),
     source: 'jongga-json',

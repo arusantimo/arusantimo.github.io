@@ -143,8 +143,20 @@ async function analyzeStock(stock, isBefore0908) {
       const prevClose = parseNum(findInfo('lastClosePrice')?.value ?? 0) || currentPrice;
       const openPrice = parseNum(findInfo('openPrice')?.value ?? 0);
       const chgRate = chgRateRaw !== 0 ? chgRateRaw : (prevClose > 0 ? ((currentPrice - prevClose) / prevClose) * 100 : 0);
-      const strength = null;
       const todayVolume = parseNum(findInfo('accumulatedTradingVolume')?.value ?? 0);
+      const entry = typeof getEntryByCode === 'function'
+        ? getEntryByCode(stock.entryKey || stock.code, stock.slotId)
+        : null;
+      const toss = entry?.toss && typeof entry.toss === 'object' ? entry.toss : {};
+      const orderbook = entry?.orderbook && typeof entry.orderbook === 'object' ? entry.orderbook : {};
+      const numberOrNull = value => {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : null;
+      };
+      const strength = numberOrNull(toss.last30AvgStrength ?? toss.avgStrength);
+      const bidAskRatio = numberOrNull(orderbook.bidAskRatio);
+      const bidTotal = numberOrNull(orderbook.bidTotal);
+      const askTotal = numberOrNull(orderbook.askTotal);
 
       const priceHistory = Array.isArray(priceJson) ? priceJson : [];
       const pastPrices = priceHistory.map(d => parseNum(d.closePrice)).filter(p => p > 0);
@@ -200,7 +212,30 @@ async function analyzeStock(stock, isBefore0908) {
         })
         : { phase: 'NEUTRAL', confidence: 0, reason: '데이터 부족/수집 실패', metrics: {} };
 
-      const rawData = { currentPrice, prevClose, openPrice, chgRate, strength, ma5, ma20, ma60, todayVolume, volMa5, foreignNet, institutionNet, low5d, high20d, ma5Direction, foreignNetSeries, instNetSeries, ohlcvSeries, wyckoff };
+      const rawData = {
+        currentPrice,
+        prevClose,
+        openPrice,
+        chgRate,
+        strength,
+        bidAskRatio,
+        bidTotal,
+        askTotal,
+        ma5,
+        ma20,
+        ma60,
+        todayVolume,
+        volMa5,
+        foreignNet,
+        institutionNet,
+        low5d,
+        high20d,
+        ma5Direction,
+        foreignNetSeries,
+        instNetSeries,
+        ohlcvSeries,
+        wyckoff
+      };
       const data = typeof applyJonggaManualOverridesToMarketData === 'function'
         ? applyJonggaManualOverridesToMarketData(stock, rawData)
         : rawData;
@@ -223,7 +258,8 @@ async function analyzeStock(stock, isBefore0908) {
 function parseTradePlanTargets(entry) {
   if (!entry || !entry.tradePlanRows || !entry.tradePlanRows.length) return null;
 
-  const findRow = prefix => entry.tradePlanRows.find(r => r.stage && r.stage.includes(prefix));
+  const findRowByStageKey = stageKey => entry.tradePlanRows.find(r => String(r?.stageKey || '') === stageKey);
+  const findRowByLabel = prefix => entry.tradePlanRows.find(r => r.stage && r.stage.includes(prefix));
   const extractPrice = row => {
     if (!row) return null;
     const priceStr = row.targetPrice || row.condition || '';
@@ -237,12 +273,12 @@ function parseTradePlanTargets(entry) {
     return match ? parseFloat(match[0]) : null;
   };
 
-  const premarket = findRow('프리마켓') || findRow('🌅');
-  const openPhase = findRow('장초반') || findRow('🔔');
-  const intraday1 = findRow('장중 1차') || findRow('📈');
-  const intraday2 = findRow('장중 2차');
-  const swing = findRow('스윙') || findRow('📊');
-  const stopLoss = findRow('손절') || findRow('🛑');
+  const premarket = findRowByStageKey('premarket') || findRowByLabel('프리마켓') || findRowByLabel('🌅');
+  const openPhase = findRowByStageKey('openPhase') || findRowByLabel('장초반') || findRowByLabel('🔔');
+  const intraday1 = findRowByStageKey('intraday1') || findRowByLabel('장중 1차') || findRowByLabel('📈');
+  const intraday2 = findRowByStageKey('intraday2') || findRowByLabel('장중 2차');
+  const swing = findRowByStageKey('swing') || findRowByLabel('스윙') || findRowByLabel('📊');
+  const stopLoss = findRowByStageKey('stop') || findRowByLabel('손절') || findRowByLabel('🛑');
 
   return {
     entryPrice: entry.entryPriceValue,

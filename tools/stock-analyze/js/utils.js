@@ -139,6 +139,16 @@ function getMarketCapTrillionValue(entryOrStock) {
   return Number.isFinite(num) && num > 0 ? num : null;
 }
 
+function getMarketCapRankValue(entryOrStock) {
+  const num = Number(entryOrStock?.marketCapRank ?? entryOrStock?.market_cap_rank);
+  return Number.isFinite(num) && num > 0 ? num : null;
+}
+
+function getMarketCapUniverseCountValue(entryOrStock) {
+  const num = Number(entryOrStock?.marketCapUniverseCount ?? entryOrStock?.market_cap_universe_count);
+  return Number.isFinite(num) && num > 1 ? num : null;
+}
+
 function getMarketCapRankKey(entryOrStock) {
   const code = String(entryOrStock?.code || '').trim();
   const slotId = String(entryOrStock?.slotId || '').trim();
@@ -165,6 +175,8 @@ function buildMarketCapRankMap(entries) {
 }
 
 function getMarketCapRank(entryOrStock, rankMap) {
+  const directRank = getMarketCapRankValue(entryOrStock);
+  if (directRank) return directRank;
   if (!(rankMap instanceof Map)) return null;
   const rank = rankMap.get(getMarketCapRankKey(entryOrStock));
   return Number.isFinite(rank) ? rank : null;
@@ -218,7 +230,7 @@ function hexToRgb(hex) {
 
 function getMarketCapInlineStyle(entryOrStock, rankMap) {
   const rank = getMarketCapRank(entryOrStock, rankMap);
-  const total = rankMap instanceof Map ? rankMap.size : 0;
+  const total = getMarketCapUniverseCountValue(entryOrStock) || (rankMap instanceof Map ? rankMap.size : 0);
   if (!rank || !total) return '';
   const t = total <= 1 ? 0 : (rank - 1) / (total - 1);
   return ` style="color: ${interpolateMarketCapColor(t)};"`;

@@ -18,9 +18,10 @@ from jongga.sim_broker import simulate_trade
 REPLAY_RUNS_MARKER = "JONGGA_REPLAY_RUNS"
 REPLAY_INCLUDE_GRADE_SCORE_MIN = 6.0
 REPLAY_INCLUDE_GRADE_MIN = "B"
-REPLAY_RULE_VERSION = "2026-06-06-cumulative-v1"
+REPLAY_RULE_VERSION = "2026-06-08-cumulative-v2"
 REPLAY_CASE_RECOMMENDATION = "recommendation"
 REPLAY_CASE_REPLAY = "replay"
+REPLAY_CASE_A8PLUS = "a8plus"
 REPLAY_CASE_A7PLUS = "a7plus"
 REPLAY_VALIDATION_POLICY = {
     "mode": "relaxed",
@@ -115,6 +116,7 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
     grade_score = float(entry.get("gradeScore") or 0.0)
     replay_grade = grade_from_threshold_profile(float(entry.get("gradeScore") or 0.0), strategy, threshold_profile)
     replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A", "B"}
+    replay_a8plus = grade_score >= 8.0 and replay_grade in {"S", "A"}
     replay_a7plus = grade_score >= 7.0 and replay_grade == "A"
     eligibility = compute_entry_eligibility(
         strategy,
@@ -127,6 +129,8 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "strategy": strategy,
         "name": str(entry.get("name") or ""),
         "code": str(entry.get("code") or ""),
+        "takeProfitProfileKey": str(((entry.get("recommendedTakeProfitProfile") or {}).get("profileKey")) or ""),
+        "takeProfitProfileLabel": str(((entry.get("recommendedTakeProfitProfile") or {}).get("label")) or ""),
         "originalGrade": str(entry.get("grade") or ""),
         "replayGrade": replay_grade,
         "gradeScore": grade_score,
@@ -137,6 +141,8 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "historyRecommendation": bool(entry.get("historyRecommendation")),
         "replayIncluded": replay_included,
         "replayIncludeRule": f"gradeScore>={REPLAY_INCLUDE_GRADE_SCORE_MIN:.1f} AND replayGrade>={REPLAY_INCLUDE_GRADE_MIN}",
+        "replayA8Plus": replay_a8plus,
+        "replayA8PlusRule": "gradeScore>=8.0 AND replayGrade in {A,S}",
         "replayA7Plus": replay_a7plus,
         "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade==A",
         **eligibility,
@@ -151,6 +157,12 @@ def matches_replay_case(item: dict[str, Any], case_key: str) -> bool:
         return bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal"))
     if normalized == REPLAY_CASE_REPLAY:
         return bool(item.get("replayIncluded"))
+    if normalized == REPLAY_CASE_A8PLUS:
+        if bool(item.get("replayA8Plus")):
+            return True
+        grade_score = float(item.get("gradeScore") or 0.0)
+        replay_grade = str(item.get("replayGrade") or item.get("grade") or "").strip().upper()
+        return grade_score >= 8.0 and replay_grade in {"A", "S"}
     if normalized == REPLAY_CASE_A7PLUS:
         if bool(item.get("replayA7Plus")):
             return True
@@ -278,6 +290,9 @@ def build_stock_stats(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "strategy": strategy,
             "code": code,
             "name": name,
+            "grade": latest_item.get("replayGrade") or latest_item.get("grade"),
+            "replayGrade": latest_item.get("replayGrade") or latest_item.get("grade"),
+            "gradeScore": latest_item.get("gradeScore") if latest_item.get("gradeScore") is not None else latest_item.get("score"),
             "tradeCount": len(items),
             "winRate": round(len(wins) / len(returns), 4) if returns else None,
             "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
@@ -301,6 +316,40 @@ def build_stock_stats(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
 
 
+def build_take_profit_profile_stats(results: list[dict[str, Any]]) -> dict[str, Any]:
+    grouped_profile: dict[str, list[dict[str, Any]]] = {}
+    grouped_cell: dict[str, list[dict[str, Any]]] = {}
+    for item in results:
+        strategy = str(item.get("strategy") or "")
+        profile_key = str(item.get("takeProfitProfileKey") or "")
+        if not strategy or not profile_key:
+            continue
+        regime = str(item.get("regimeBucket") or "")
+        vk = str(item.get("vkospiTier") or "")
+        gap = str(item.get("gapGrade") or "")
+        grouped_profile.setdefault(f"{strategy}|{profile_key}", []).append(item)
+        grouped_cell.setdefault(f"{strategy}|{regime}|{vk}|{gap}|{profile_key}", []).append(item)
+
+    def finalize(grouped: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+        output: dict[str, Any] = {}
+        for key, items in grouped.items():
+            returns = _metric_returns(items)
+            wins = [ret for ret in returns if ret > 0]
+            output[key] = {
+                "tradeCount": len(items),
+                "sampleCount": len(items),
+                "winRate": round(len(wins) / len(returns), 4) if returns else None,
+                "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
+                "cumNetReturnPct": cumulative_return_pct(returns),
+            }
+        return output
+
+    return {
+        "byTakeProfitProfile": finalize(grouped_profile),
+        "byTakeProfitProfileCell": finalize(grouped_cell),
+    }
+
+
 def build_summary_payload(
     *,
     candidates: list[dict[str, Any]],
@@ -310,12 +359,14 @@ def build_summary_payload(
     overall = build_summary_metrics(candidates=candidates, results=results, orders=orders)
     by_strategy = build_strategy_stats(candidates=candidates, results=results, orders=orders)
     by_stock = build_stock_stats(results)
+    by_take_profit_profile = build_take_profit_profile_stats(results)
     return {
         **overall,
         "overall": overall,
         "byStrategy": by_strategy,
         "byStock": by_stock,
         "strategyStats": by_strategy,
+        **by_take_profit_profile,
     }
 
 
@@ -326,6 +377,9 @@ def summarize_trade_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "strategy": item.get("strategy"),
             "code": item.get("code"),
             "name": item.get("name"),
+            "grade": item.get("replayGrade") or item.get("grade"),
+            "replayGrade": item.get("replayGrade") or item.get("grade"),
+            "gradeScore": item.get("gradeScore") if item.get("gradeScore") is not None else item.get("score"),
             "entryFilledAt": item.get("entryFilledAt"),
             "entryFillPrice": item.get("entryFillPrice"),
             "exitFilledAt": item.get("exitFilledAt"),
@@ -362,6 +416,7 @@ def build_daily_summary(
         "candidates": candidates,
         "trades": summarize_trade_rows(results),
         "results": results,
+        "fills": fills,
     }
 
 
@@ -392,11 +447,23 @@ def build_strategy_views(
             for item in (day.get("orders") or [])
             if item.get("strategy") == strategy and item.get("side") == "SELL"
         ]
+        strategy_fills = [
+            item
+            for day in run_days
+            for item in (day.get("fills") or [])
+            if item.get("strategy") == strategy
+        ]
         strategy_days: list[dict[str, Any]] = []
         for day in run_days:
             day_results = [item for item in (day.get("results") or []) if item.get("strategy") == strategy]
             day_candidates = [item for item in (day.get("candidates") or []) if item.get("strategy") == strategy]
             day_orders = [item for item in (day.get("orders") or []) if item.get("strategy") == strategy and item.get("side") == "SELL"]
+            day_entry_keys = {
+                str(item.get("sourceEntryKey") or "")
+                for item in day_results
+                if item.get("sourceEntryKey")
+            }
+            day_fills = [item for item in (day.get("fills") or []) if str(item.get("sourceEntryKey") or "") in day_entry_keys]
             day_stats = (day.get("byStrategy") or {}).get(strategy)
             if not isinstance(day_stats, dict):
                 continue
@@ -409,11 +476,12 @@ def build_strategy_views(
                 "candidates": day_candidates,
                 "results": day_results,
                 "orders": day_orders,
+                "fills": day_fills,
                 **day_stats,
             })
 
         case_views: dict[str, Any] = {}
-        for case_key in (REPLAY_CASE_RECOMMENDATION, REPLAY_CASE_REPLAY, REPLAY_CASE_A7PLUS):
+        for case_key in (REPLAY_CASE_RECOMMENDATION, REPLAY_CASE_A8PLUS, REPLAY_CASE_A7PLUS, REPLAY_CASE_REPLAY):
             case_candidates = filter_replay_case_items(strategy_candidates, case_key)
             case_results = filter_replay_case_items(strategy_results, case_key)
             case_entry_keys = {
@@ -422,6 +490,7 @@ def build_strategy_views(
                 if item.get("sourceEntryKey")
             }
             case_orders = [item for item in strategy_orders if str(item.get("sourceEntryKey") or "") in case_entry_keys]
+            case_fills = [item for item in strategy_fills if str(item.get("sourceEntryKey") or "") in case_entry_keys]
             case_days: list[dict[str, Any]] = []
             for day in strategy_days:
                 day_case_candidates = filter_replay_case_items(day.get("candidates") or [], case_key)
@@ -434,6 +503,7 @@ def build_strategy_views(
                     if item.get("sourceEntryKey")
                 }
                 day_case_orders = [item for item in (day.get("orders") or []) if str(item.get("sourceEntryKey") or "") in day_case_entry_keys]
+                day_case_fills = [item for item in (day.get("fills") or []) if str(item.get("sourceEntryKey") or "") in day_case_entry_keys]
                 case_days.append({
                     "date": day.get("date"),
                     "summaryFile": day.get("summaryFile"),
@@ -443,6 +513,7 @@ def build_strategy_views(
                     "candidates": day_case_candidates,
                     "results": day_case_results,
                     "orders": day_case_orders,
+                    "fills": day_case_fills,
                     **build_summary_metrics(
                         candidates=day_case_candidates,
                         results=day_case_results,
@@ -457,11 +528,13 @@ def build_strategy_views(
                 ),
                 "stocks": build_stock_stats(case_results),
                 "days": case_days,
+                "fills": case_fills,
             }
         views[strategy] = {
             "summary": strategy_summary,
             "stocks": [item for item in by_stock if item.get("strategy") == strategy],
             "days": strategy_days,
+            "fills": strategy_fills,
             "caseViews": case_views,
         }
     return views
@@ -721,6 +794,7 @@ def run_replay(
                     source_entry_key=source_entry_key,
                     trade_plan_rows=entry.get("tradePlanRows") or [],
                     market_data=market_data,
+                    reversal_live_exit_policy=entry.get("reversalLiveExitPolicy") if strategy == "reversal" else None,
                     entry_mode="close",
                     auto_flatten=True,
                 )
@@ -731,6 +805,8 @@ def run_replay(
                         "strategy": strategy,
                         "code": code,
                         "name": candidate["name"],
+                        "takeProfitProfileKey": candidate["takeProfitProfileKey"],
+                        "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
                         **dims,
                     },
                     entry.get("tradePlanRows") or [],
@@ -754,6 +830,8 @@ def run_replay(
                     "entryEligible": candidate["entryEligible"],
                     "entryEligibleOriginal": candidate["entryEligibleOriginal"],
                     "setupQuality": candidate["setupQuality"],
+                    "takeProfitProfileKey": candidate["takeProfitProfileKey"],
+                    "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
                 }
                 daily_orders.extend(simulation["orders"])
                 daily_fills.extend(simulation["fills"])
@@ -791,6 +869,7 @@ def run_replay(
             "trades": daily_summary["trades"],
             "results": daily_results,
             "orders": daily_orders,
+            "fills": daily_fills,
         })
 
     runs_path = replay_dir / "replay_runs.json"

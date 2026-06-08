@@ -371,6 +371,82 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(gates["G7"]["status"], "✅")  # RSI 58
         self.assertEqual(gates["G8"]["status"], "✅")  # 20MA +1.4%, 60MA 이격 정상 범위
 
+    def test_pullback_stop_policy_ignores_anchor_above_current_price(self):
+        from jongga.generate_latest import compute_pullback_stop_policy
+
+        snapshot = StockSnapshot(
+            rank=1,
+            code="000001",
+            name="테스트",
+            current_price=100.0,
+            prev_close=99.0,
+            open_price=98.0,
+            high_price=101.0,
+            low_price=97.0,
+            volume=1000.0,
+            trading_value_text="100억",
+            market_cap_trillion=1.0,
+            foreign_net=0.0,
+            institution_net=0.0,
+            foreign_previous=0.0,
+            institution_previous=0.0,
+            open_history=[110.0] + [90.0] * 20,
+            close_history=[150.0] + [90.0] * 20,
+            high_history=[160.0] + [91.0] * 20,
+            low_history=[100.0] + [89.0] * 20,
+            volume_history=[1000.0] + [100.0] * 20,
+            date_history=["20260608"] + [f"202605{day:02d}" for day in range(31, 11, -1)],
+            ma5=95.0,
+            ma10=90.0,
+            ma20=80.0,
+            ma60=70.0,
+            ma5_prev=94.0,
+            ma20_prev=79.0,
+            ma60_prev=69.0,
+            weekly_rsi=55.0,
+            macd_hist=[0.1, 0.2, 0.3],
+            high_20d=160.0,
+            low_5d=89.0,
+            high_52w=160.0,
+            return_5d=2.0,
+            return_20d=5.0,
+            return_21d=5.5,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="001",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+        )
+
+        policy = compute_pullback_stop_policy(snapshot, {"regimeLabel": "박스권 ⚠️"}, 95.0)
+        self.assertEqual(policy["anchorStopPrice"], 130)
+        self.assertEqual(policy["hardStopPrice"], 80)
+        self.assertEqual(policy["effectiveStopPrice"], 95)
+        self.assertIn("현재가 100원 이상이라 제외", policy["hardStopRuleSummary"])
+
+    def test_reversal_stop_policy_uses_close_only_wording_and_trade_plan(self):
+        from jongga.generate_latest import apply_reversal_stop_policy_to_trade_plan, compute_reversal_stop_policy
+
+        policy = compute_reversal_stop_policy(SimpleNamespace(low_price=97.0), {}, 95.0)
+        self.assertEqual(policy["stopExecutionMode"], "close_only")
+        self.assertIn("종가 손절가", policy["hardStopRuleSummary"])
+        self.assertIn("종가 기준", policy["reasonSummary"])
+
+        updated_rows = apply_reversal_stop_policy_to_trade_plan([
+            {
+                "stage": "🛑 손절",
+                "stageKey": "stop",
+                "condition": "기존 손절",
+                "quantity": "전량",
+                "targetYield": "-5.0%",
+                "targetPrice": "95원",
+            }
+        ], 100.0, policy)
+        self.assertEqual(updated_rows[-1]["condition"], "유효 하드 스톱 97원 종가 이탈")
+        self.assertEqual(updated_rows[-1]["targetYield"], "-3.0%")
+
     def test_daily_output_paths_use_compact_date(self):
         json_path, js_path = build_daily_output_paths("jongga/output", date(2026, 5, 22), variant=VARIANT_STABLE)
         self.assertEqual(json_path.as_posix(), "jongga/output/202605/latest_20260522.json")
@@ -1508,6 +1584,7 @@ class MarkingTest(unittest.TestCase):
         entry = self._entry("pullback")
         ctx = {"regimeLabel": "강세장 ✅", "gapScore": {"code": "G-A"}, "kospiBullTier": "strong", "outcomesRollup": {}}
         attach_marking(entry, ctx)
+        self.assertEqual(entry["recommendedTakeProfitProfile"]["label"], "기본 목표형")
         self.assertEqual(entry["recommendedStage"]["evBasis"], "heuristic")
         self.assertEqual(entry["recommendedStage"]["stageKey"], "intraday1")  # bull → intraday1
         tp = [r for r in entry["tradePlanRows"] if "손절" not in r["stage"]]
@@ -1556,6 +1633,125 @@ class MarkingTest(unittest.TestCase):
         attach_marking(entry, ctx)
         pre = next(r for r in entry["tradePlanRows"] if "프리마켓" in r["stage"])
         self.assertEqual(pre["historicalHitRate"], 0.6)  # coarse, not the sparse 0.99 cell
+
+    def test_pullback_profiles_use_friendly_labels_and_reason_copy(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("pullback")
+        ctx = {"regimeLabel": "박스권 ⚠️", "gapScore": {"code": "G-C"}, "kospiBullTier": "neutral", "outcomesRollup": {}, "replayProfileRollup": {}}
+        marking_meta = {"ma5Price": 10150, "ma5PrevPrice": 10200, "ma10Price": 10300, "ma10PrevPrice": 10320}
+
+        attach_marking(entry, ctx, marking_meta)
+
+        profiles = {profile["profileKey"]: profile for profile in entry["pullbackTakeProfitProfiles"]}
+        self.assertEqual(profiles["aggressive"]["label"], "기본 목표형")
+        self.assertEqual(profiles["balanced"]["label"], "1차 저항 반영형")
+        self.assertEqual(profiles["conservative"]["label"], "저항 우선형")
+        self.assertIn("기존 퍼센트 목표가", profiles["aggressive"]["reasonSummary"])
+        self.assertIn("1차 목표가", profiles["balanced"]["reasonSummary"])
+        self.assertIn("저항 우선형", entry["recommendedTakeProfitProfile"]["label"])
+        self.assertIn("저항 우선형", profiles["conservative"]["reasonSummary"])
+
+    def test_pullback_profile_fallback_reason_uses_friendly_label_copy(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("pullback")
+        ctx = {"regimeLabel": "박스권 ⚠️", "gapScore": {"code": "G-C"}, "kospiBullTier": "neutral", "outcomesRollup": {}, "replayProfileRollup": {}}
+
+        attach_marking(entry, ctx, {"ma5Price": 9950, "ma5PrevPrice": 10020, "ma10Price": 10000, "ma10PrevPrice": 10080})
+
+        profiles = {profile["profileKey"]: profile for profile in entry["pullbackTakeProfitProfiles"]}
+        self.assertIn("기본 목표형과 동일", profiles["conservative"]["reasonSummary"])
+        self.assertIn("1차 저항 반영형", entry["recommendedTakeProfitProfile"]["reasonSummary"])
+
+    def test_pullback_profiles_sync_stop_row_with_effective_stop_price(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("pullback")
+        entry["pullbackStopPolicy"] = {
+            "effectiveStopPrice": 9750,
+            "fallbackStopPrice": 9750,
+            "hardStopPrice": 9600,
+            "anchorStopPrice": 12000,
+        }
+        entry["tradePlanRows"][-1] = {
+            "stage": "🛑 손절",
+            "stageKey": "stop",
+            "condition": "유효 손절가 12,000원 하향 이탈",
+            "quantity": "전량",
+            "targetYield": "+20.0%",
+            "targetPrice": "12,000원",
+        }
+        ctx = {"regimeLabel": "박스권 ⚠️", "gapScore": {"code": "G-C"}, "kospiBullTier": "neutral", "outcomesRollup": {}, "replayProfileRollup": {}}
+
+        attach_marking(entry, ctx)
+
+        stop_row = next(row for row in entry["tradePlanRows"] if row["stageKey"] == "stop")
+        self.assertEqual(stop_row["targetPrice"], "9,750원")
+        self.assertEqual(stop_row["targetYield"], "-2.5%")
+        for profile in entry["pullbackTakeProfitProfiles"]:
+            profile_stop_row = next(row for row in profile["tradePlanRows"] if row["stageKey"] == "stop")
+            self.assertEqual(profile_stop_row["targetPrice"], "9,750원")
+            self.assertEqual(profile_stop_row["targetYield"], "-2.5%")
+            self.assertIn("유효 손절가 9,750원 하향 이탈", profile_stop_row["condition"])
+
+    def test_reversal_profiles_do_not_drop_below_base_targets_when_rebound_is_shallow(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("reversal")
+        ctx = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "kospiBullTier": "strong",
+            "outcomesRollup": {},
+            "replayProfileRollup": {},
+        }
+
+        attach_marking(entry, ctx, {"highHistory": [10120, 10100, 10080]})
+
+        profiles = {profile["profileKey"]: profile for profile in entry["reversalTakeProfitProfiles"]}
+        aggressive_targets = [row["targetPrice"] for row in profiles["aggressive"]["tradePlanRows"] if row["stageKey"] != "stop"]
+        balanced_targets = [row["targetPrice"] for row in profiles["balanced"]["tradePlanRows"] if row["stageKey"] != "stop"]
+        conservative_targets = [row["targetPrice"] for row in profiles["conservative"]["tradePlanRows"] if row["stageKey"] != "stop"]
+
+        self.assertEqual(aggressive_targets[:2], ["10,200원", "10,350원"])
+        self.assertEqual(balanced_targets[:2], ["10,200원", "10,350원"])
+        self.assertEqual(conservative_targets[:2], ["10,300원", "10,500원"])
+
+    def test_accumulation_profiles_use_friendly_labels_and_reason_copy(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("accumulation")
+        entry["accumulationStopPolicy"] = {"sponsorMode": "both"}
+        ctx = {"regimeLabel": "강세장 ✅", "gapScore": {"code": "G-A"}, "kospiBullTier": "strong", "outcomesRollup": {}, "replayProfileRollup": {}}
+
+        attach_marking(entry, ctx, {"highHistory": [10150, 10300, 11100, 9950]})
+
+        profiles = {profile["profileKey"]: profile for profile in entry["accumulationTakeProfitProfiles"]}
+        self.assertEqual(profiles["aggressive"]["label"], "기본 목표형")
+        self.assertEqual(profiles["balanced"]["label"], "1차 저항 반영형")
+        self.assertEqual(profiles["conservative"]["label"], "저항 우선형")
+        self.assertIn("기존 퍼센트 목표가", profiles["aggressive"]["reasonSummary"])
+        self.assertIn("앞단 목표가", profiles["balanced"]["reasonSummary"])
+        self.assertIn("저항 우선형", profiles["conservative"]["label"])
+        self.assertIn("저항 우선형", entry["recommendedTakeProfitProfile"]["reasonSummary"])
+
+    def test_breakout_profiles_use_friendly_labels_and_reason_copy(self):
+        from jongga.generate_latest import attach_marking
+
+        entry = self._entry("breakout")
+        ctx = {"regimeLabel": "강세장 ✅", "gapScore": {"code": "G-A"}, "kospiBullTier": "strong", "outcomesRollup": {}, "replayProfileRollup": {}}
+
+        attach_marking(entry, ctx, {"highHistory": [10150, 10300, 11100, 9950]})
+
+        profiles = {profile["profileKey"]: profile for profile in entry["breakoutTakeProfitProfiles"]}
+        self.assertEqual(profiles["aggressive"]["label"], "기본 목표형")
+        self.assertEqual(profiles["balanced"]["label"], "1차 저항 반영형")
+        self.assertEqual(profiles["conservative"]["label"], "저항 우선형")
+        self.assertIn("기존 퍼센트 목표가", profiles["aggressive"]["reasonSummary"])
+        self.assertIn("앞단 목표가", profiles["balanced"]["reasonSummary"])
+        self.assertIn("저항 우선형", profiles["conservative"]["label"])
+        self.assertIn("저항 우선형", entry["recommendedTakeProfitProfile"]["reasonSummary"])
 
     def test_entry_band_brackets_anchor(self):
         from jongga.generate_latest import compute_recommended_entry_band

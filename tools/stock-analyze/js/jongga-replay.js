@@ -51,6 +51,15 @@ function formatReplayPercent(value, digits = 2) {
   return `${num > 0 ? '+' : ''}${num.toFixed(digits)}%`;
 }
 
+function renderColoredPercent(value, digits = 2) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '—';
+  const formatted = `${num > 0 ? '+' : ''}${num.toFixed(digits)}%`;
+  if (num > 0) return `<span class="pct-plus">${formatted}</span>`;
+  if (num < 0) return `<span class="pct-minus">${formatted}</span>`;
+  return formatted;
+}
+
 function formatReplayRate(value) {
   const num = Number(value);
   if (!Number.isFinite(num)) return '—';
@@ -69,6 +78,81 @@ function formatReplayPrice(value) {
   return `${Math.round(num).toLocaleString('ko-KR')}원`;
 }
 
+function formatReplayDateTime(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '—';
+  const dateOnly = formatReplayDate(raw);
+  const match = raw.match(/T(\d{2}:\d{2})/);
+  return match ? `${dateOnly} ${match[1]}` : dateOnly;
+}
+
+function formatReplayQuantityPct(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '—';
+  return `${num.toFixed(num % 1 === 0 ? 0 : 1)}%`;
+}
+
+function getReplayFillSourceEntryKey(fill = {}) {
+  const explicit = String(fill?.sourceEntryKey || '').trim();
+  if (explicit) return explicit;
+  const orderId = String(fill?.orderId || '').trim();
+  const lastDash = orderId.lastIndexOf('-');
+  return lastDash > 0 ? orderId.slice(0, lastDash) : '';
+}
+
+function getReplayTradeKey(item = {}) {
+  return [
+    String(item?.date || '').trim(),
+    String(item?.sourceEntryKey || '').trim(),
+    String(item?.code || '').trim(),
+  ].filter(Boolean).join('|');
+}
+
+function toReplayDomToken(value) {
+  return String(value || '').replace(/[^a-zA-Z0-9_-]+/g, '_');
+}
+
+function buildReplayTradeRowId(item = {}) {
+  return `replay-trade-row-${toReplayDomToken(getReplayTradeKey(item))}`;
+}
+
+function buildReplayTradeDetailRowId(item = {}) {
+  return `replay-trade-detail-${toReplayDomToken(getReplayTradeKey(item))}`;
+}
+
+function getReplayStockGradeScore(item = {}) {
+  const gradeScore = Number(item?.gradeScore ?? item?.score);
+  return Number.isFinite(gradeScore) ? gradeScore : null;
+}
+
+function getReplayStockGradeLabel(item = {}) {
+  const grade = String(item?.replayGrade || item?.grade || '').trim().toUpperCase();
+  return grade || '';
+}
+
+function formatReplayStockGradeMeta(item = {}) {
+  const gradeLabel = getReplayStockGradeLabel(item);
+  const gradeScore = getReplayStockGradeScore(item);
+  if (gradeLabel && Number.isFinite(gradeScore)) return `${gradeLabel} · ${gradeScore.toFixed(1)}점`;
+  if (gradeLabel) return gradeLabel;
+  if (Number.isFinite(gradeScore)) return `${gradeScore.toFixed(1)}점`;
+  return '';
+}
+
+function renderReplayStockNameCell(item = {}) {
+  const code = String(item?.code || '').trim();
+  const scoreText = formatReplayStockGradeMeta(item);
+  const nameLink = code
+    ? `<a class="replay-stock-name-link" href="https://stock.naver.com/domestic/stock/${encodeURIComponent(code)}/price" target="_blank" rel="noopener noreferrer" title="네이버 종목 페이지 새 창" onclick="event.stopPropagation()">${escapeHtml(item?.name || '-')}</a>`
+    : `<strong>${escapeHtml(item?.name || '-')}</strong>`;
+  return `
+    <div class="replay-stock-name">
+      ${nameLink}
+      ${scoreText ? `<span class="replay-stock-score">${escapeHtml(scoreText)}</span>` : ''}
+    </div>
+  `.trim();
+}
+
 function getReplayStrategyLabel(strategy) {
   const item = JONGGA_REPLAY_STRATEGIES.find(entry => entry.key === String(strategy || '').trim());
   return item?.label || String(strategy || '-');
@@ -81,8 +165,21 @@ function getReplayValidationPolicy(bridge = getJonggaReplayBridge()) {
 
 function getReplayClosedReasonLabel(value) {
   const labels = {
-    primary_target_touch: '익일 10시 2.0% 익절',
-    secondary_target_touch: '익일 15시 1.2% 익절',
+    close_slippage: '종가 매수 체결',
+    next_open_slippage: '익일 시가 매수 체결',
+    premarket_touch: '프리마켓 목표가 도달',
+    premarket_target_touch: '프리마켓 목표가 도달',
+    primary_target_touch: '익일 10시 이전 목표가 도달',
+    secondary_target_touch: '익일 15시 이전 목표가 도달',
+    tertiary_target_touch: '익일 15시 이전 목표가 도달',
+    openPhase_touch: '시가/장초반 목표가 도달',
+    intraday1_touch: '장중 1차 목표가 도달',
+    intraday2_touch: '장중 2차/스윙 목표가 도달',
+    swing_touch: '스윙 목표가 도달',
+    breakeven_fail: '본절가 이탈 청산',
+    breakeven_fail_market: '본절가 실패 청산',
+    time_stop_0915_market: '09:15 시간 청산',
+    reversal_intraday_stop: '장중 데드라인 이탈 손절',
     third_day_cutoff_market: '3일차 종가 컷오프 청산',
     stop_close: '종가 손절',
     stop_touch: '손절',
@@ -93,11 +190,20 @@ function getReplayClosedReasonLabel(value) {
 
 function getReplaySellStageLabel(value) {
   const labels = {
-    premarket_target_touch: '🌅 프리마켓',
-    primary_target_touch: '🔔 장초반',
-    secondary_target_touch: '📈 장중 1차',
-    tertiary_target_touch: '📈 장중 2차',
+    premarket_touch: '💚 프리마켓 익절',
+    premarket_target_touch: '💚 프리마켓 익절',
+    primary_target_touch: '💚 장초반 익절',
+    secondary_target_touch: '💚 장중 1차 익절',
+    tertiary_target_touch: '💚 장중 2차 익절',
+    openPhase_touch: '💚 시가/장초반 익절',
+    intraday1_touch: '💚 장중 1차 익절',
+    intraday2_touch: '💚 장중 2차 익절',
+    swing_touch: '💚 스윙 익절',
+    breakeven_fail: '🛡️ 본절 청산',
+    breakeven_fail_market: '🛡️ 본절 실패 청산',
+    time_stop_0915_market: '🕘 시간 청산',
     third_day_cutoff_market: '📊 스윙 전환',
+    reversal_intraday_stop: '🛑 장중 손절',
     stop_close: '🛑 손절',
     stop_touch: '🛑 손절',
     ambiguous_stop_first: '🛑 손절'
@@ -148,6 +254,12 @@ function matchesReplayCaseItem(item = {}, caseKey = 'all') {
   if (normalizedCase === 'all') return true;
   if (normalizedCase === 'recommendation') {
     return Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal);
+  }
+  if (normalizedCase === 'a8plus') {
+    if (Boolean(item.replayA8Plus)) return true;
+    const gradeScore = Number(item.gradeScore);
+    const gradeCode = String(item.replayGrade || item.grade || '').trim().charAt(0).toUpperCase();
+    return Number.isFinite(gradeScore) && gradeScore >= 8.0 && ['A', 'S'].includes(gradeCode);
   }
   if (normalizedCase === 'replay') return Boolean(item.replayIncluded);
   if (normalizedCase === 'a7plus') {
@@ -227,19 +339,32 @@ function buildReplaySummaryMetrics(candidates = [], results = [], orders = []) {
   };
 }
 
-function summarizeReplayTradeRows(results = []) {
+function summarizeReplayTradeRows(results = [], fills = []) {
+  const fillsByEntryKey = new Map();
+  (Array.isArray(fills) ? fills : []).forEach(fill => {
+    const entryKey = getReplayFillSourceEntryKey(fill);
+    if (!entryKey) return;
+    if (!fillsByEntryKey.has(entryKey)) fillsByEntryKey.set(entryKey, []);
+    fillsByEntryKey.get(entryKey).push(fill);
+  });
   return sortReplayResultsForReturns(Array.isArray(results) ? results : []).map(item => ({
+    date: item?.date,
     strategy: item?.strategy,
     code: item?.code,
     name: item?.name,
+    grade: item?.replayGrade ?? item?.grade,
+    replayGrade: item?.replayGrade ?? item?.grade,
+    gradeScore: item?.gradeScore,
     entryFilledAt: item?.entryFilledAt,
     entryFillPrice: item?.entryFillPrice,
     exitFilledAt: item?.exitFilledAt,
     exitAvgFillPrice: item?.exitAvgFillPrice,
     exitLastFillPrice: item?.exitLastFillPrice,
+    sourceEntryKey: item?.sourceEntryKey,
     tradeStatus: item?.tradeStatus,
     closedReason: item?.closedReason,
-    netReturnPct: item?.netReturnPct
+    netReturnPct: item?.netReturnPct,
+    fills: fillsByEntryKey.get(String(item?.sourceEntryKey || '')) || []
   }));
 }
 
@@ -261,6 +386,9 @@ function buildReplayStockStats(results = []) {
       strategy,
       code,
       name,
+      grade: latest?.replayGrade ?? latest?.grade,
+      replayGrade: latest?.replayGrade ?? latest?.grade,
+      gradeScore: latest?.gradeScore ?? latest?.score,
       tradeCount: items.length,
       winRate: returns.length ? Number((wins.length / returns.length).toFixed(4)) : null,
       avgNetReturnPct: returns.length ? Number((returns.reduce((sum, value) => sum + value, 0) / returns.length).toFixed(4)) : null,
@@ -303,6 +431,12 @@ function buildReplayDayView(day = {}, { strategy = null, caseKey = 'all' } = {})
     if (caseKey === 'all') return true;
     return dayResultEntryKeys.has(String(item?.sourceEntryKey || ''));
   });
+  const dayFills = (day?.fills || []).filter(item => {
+    const entryKey = getReplayFillSourceEntryKey(item);
+    if (!entryKey || !dayResultEntryKeys.has(entryKey)) return false;
+    if (strategy && item?.strategy && item?.strategy !== strategy) return false;
+    return true;
+  });
   return {
     date: day?.date,
     summaryFile: day?.summaryFile,
@@ -311,7 +445,8 @@ function buildReplayDayView(day = {}, { strategy = null, caseKey = 'all' } = {})
     candidates: dayCandidates,
     results: dayResults,
     orders: dayOrders,
-    trades: summarizeReplayTradeRows(dayResults),
+    fills: dayFills,
+    trades: summarizeReplayTradeRows(dayResults, dayFills),
     ...buildReplaySummaryMetrics(dayCandidates, dayResults, dayOrders)
   };
 }
@@ -415,7 +550,7 @@ function getReplayStrategyView(strategy, bridge = getJonggaReplayBridge(), mode 
   const latestRun = bridge?.latestRun;
   if (!latestRun) return null;
   const period = typeof getJonggaReplayPeriod === 'function' ? getJonggaReplayPeriod() : { from: '', to: '' };
-  if (hasReplayPeriodFilter(period)) {
+  if (Array.isArray(latestRun.days) && latestRun.days.length) {
     return buildJonggaReplayPeriodSummary(bridge, strategy, mode, period);
   }
   const explicit = latestRun.strategyViews?.[strategy];
@@ -449,14 +584,91 @@ function getReplayStrategyView(strategy, bridge = getJonggaReplayBridge(), mode 
   return { summary, stocks, days, selectedCase: normalizeJonggaReplayViewMode(mode) };
 }
 
+function isReplayStopLikeRule(value) {
+  const normalized = String(value || '').trim();
+  return normalized.includes('stop')
+    || normalized.includes('breakeven')
+    || normalized.includes('time_stop')
+    || normalized.includes('ambiguous');
+}
+
+function getReplayFillTone(fill = {}) {
+  const side = String(fill?.side || '').trim().toUpperCase();
+  if (side === 'BUY') return 'buy';
+  return isReplayStopLikeRule(fill?.fillRule) ? 'stop' : 'profit';
+}
+
+function getReplayFillHeadline(fill = {}) {
+  const side = String(fill?.side || '').trim().toUpperCase();
+  if (side === 'BUY') {
+    return fill?.fillRule === 'next_open_slippage' ? '🟡 익일 시가 매수' : '🟡 종가 매수';
+  }
+  return getReplaySellStageLabel(fill?.fillRule);
+}
+
+function renderReplayFillHistory(item = {}) {
+  const fills = Array.isArray(item?.fills) ? item.fills : [];
+  if (!fills.length) {
+    return '<div class="replay-fill-empty">체결 이력이 없습니다.</div>';
+  }
+  return `
+    <div class="replay-fill-history">
+      <div class="replay-fill-history-title">순차 체결 이력</div>
+      <table class="replay-fill-table">
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>체결가</th>
+            <th>비중</th>
+            <th>체결 시각</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${fills.map(fill => {
+            const tone = getReplayFillTone(fill);
+            const headline = getReplayFillHeadline(fill);
+            const reason = getReplayClosedReasonLabel(fill?.fillRule || fill?.reason || '');
+            return `
+              <tr class="replay-fill-row ${tone}">
+                <td>
+                  <span class="replay-fill-badge ${tone}">${escapeHtml(headline)}</span>
+                  <div class="replay-cell-sub">${escapeHtml(reason)}</div>
+                </td>
+                <td><span class="replay-fill-price ${tone}">${escapeHtml(formatReplayPrice(fill?.fillPrice))}</span></td>
+                <td>${escapeHtml(formatReplayQuantityPct(fill?.filledQuantityPct))}</td>
+                <td>${escapeHtml(formatReplayDateTime(fill?.filledAt || fill?.barTimestamp))}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+function toggleReplayTradeHistory(itemKey) {
+  const token = toReplayDomToken(itemKey);
+  const row = document.getElementById(`replay-trade-row-${token}`);
+  const detailRow = document.getElementById(`replay-trade-detail-${token}`);
+  if (!row || !detailRow) return;
+  const willOpen = detailRow.hidden;
+  detailRow.hidden = !willOpen;
+  row.classList.toggle('open', willOpen);
+  if (typeof row.setAttribute === 'function') {
+    row.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+  } else {
+    row.ariaExpanded = willOpen ? 'true' : 'false';
+  }
+}
+
 function renderReplayMetricPills(summary = {}, labels = {}) {
   const items = [
     ['includedCount', labels.includedCount || '포함'],
     ['tradeCount', labels.tradeCount || '체결'],
-    ['winRate', labels.winRate || '승률', value => formatReplayRate(value)],
-    ['avgNetReturnPct', labels.avgNetReturnPct || '평균', value => formatReplayPercent(value)],
-    ['cumNetReturnPct', labels.cumNetReturnPct || '누적', value => formatReplayPercent(value)],
-    ['maxDrawdownPct', labels.maxDrawdownPct || 'MDD', value => formatReplayPercent(value)],
+    ['winRate', labels.winRate || '승률', value => escapeHtml(formatReplayRate(value))],
+    ['avgNetReturnPct', labels.avgNetReturnPct || '평균', value => renderColoredPercent(value)],
+    ['cumNetReturnPct', labels.cumNetReturnPct || '누적', value => renderColoredPercent(value)],
+    ['maxDrawdownPct', labels.maxDrawdownPct || 'MDD', value => renderColoredPercent(value)],
     ['degradedCount', labels.degradedCount || 'degraded'],
     ['ambiguousCount', labels.ambiguousCount || 'ambiguous']
   ];
@@ -464,7 +676,7 @@ function renderReplayMetricPills(summary = {}, labels = {}) {
     <div class="quality-grid replay-summary-grid">
       ${items.map(([key, label, formatter]) => `
         <div class="quality-card" title="${escapeHtml(getReplayMetricMeta(key).help)}">
-          <strong>${escapeHtml(formatter ? formatter(summary?.[key]) : formatReplayNumber(summary?.[key]))}</strong>
+          <strong>${formatter ? formatter(summary?.[key]) : escapeHtml(formatReplayNumber(summary?.[key]))}</strong>
           <span>${escapeHtml(label)}</span>
           ${getReplayMetricMeta(key).help ? `<small class="replay-metric-help">${escapeHtml(getReplayMetricMeta(key).help)}</small>` : ''}
         </div>
@@ -486,8 +698,8 @@ function renderReplayAttemptLine(attempt = {}) {
 
 function renderReplayStrategyInline(summary = {}) {
   return `
-    <span class="strategy-replay-pill"><strong>${escapeHtml(formatReplayPercent(summary.cumNetReturnPct))}</strong><span>누적</span></span>
-    <span class="strategy-replay-pill"><strong>${escapeHtml(formatReplayPercent(summary.avgNetReturnPct))}</strong><span>평균</span></span>
+    <span class="strategy-replay-pill"><strong>${renderColoredPercent(summary.cumNetReturnPct)}</strong><span>누적</span></span>
+    <span class="strategy-replay-pill"><strong>${renderColoredPercent(summary.avgNetReturnPct)}</strong><span>평균</span></span>
     <span class="strategy-replay-pill"><strong>${escapeHtml(formatReplayNumber(summary.tradeCount))}</strong><span>체결</span></span>
   `;
 }
@@ -571,7 +783,10 @@ function renderReplayStockTable(rows = []) {
         <tbody>
           ${rows.map(item => `
             <tr>
-              <td><strong>${escapeHtml(item.name || '-')}</strong><div class="replay-cell-sub">${escapeHtml(item.code || '-')}</div></td>
+              <td>
+                ${renderReplayStockNameCell(item)}
+                <div class="replay-cell-sub">${escapeHtml(item.code || '-')}</div>
+              </td>
               <td>
                 ${escapeHtml(formatReplayPrice(item.lastEntryFillPrice))}
                 <div class="replay-cell-sub">${escapeHtml(formatReplayDate(item.lastEntryFilledAt || item.lastReplayDate))}</div>
@@ -582,8 +797,8 @@ function renderReplayStockTable(rows = []) {
               </td>
               <td>${escapeHtml(formatReplayNumber(item.tradeCount))}</td>
               <td>${escapeHtml(formatReplayRate(item.winRate))}</td>
-              <td>${escapeHtml(formatReplayPercent(item.avgNetReturnPct))}</td>
-              <td>${escapeHtml(formatReplayPercent(item.cumNetReturnPct))}</td>
+              <td>${renderColoredPercent(item.avgNetReturnPct)}</td>
+              <td>${renderColoredPercent(item.cumNetReturnPct)}</td>
               <td>${escapeHtml(formatReplayDate(item.lastReplayDate))}</td>
             </tr>
           `).join('')}
@@ -611,9 +826,22 @@ function renderReplayTradeTable(rows = []) {
           </tr>
         </thead>
         <tbody>
-          ${rows.map(item => `
-            <tr>
-              <td><strong>${escapeHtml(item.name || '-')}</strong><div class="replay-cell-sub">${escapeHtml(item.code || '-')}</div></td>
+          ${rows.map(item => {
+            const tradeKey = getReplayTradeKey(item);
+            const rowId = buildReplayTradeRowId(item);
+            const detailId = buildReplayTradeDetailRowId(item);
+            const hasDetail = Array.isArray(item?.fills) && item.fills.length > 0;
+            return `
+            <tr
+              id="${escapeHtml(rowId)}"
+              class="replay-trade-row${hasDetail ? ' is-expandable' : ''}"
+              ${hasDetail ? `data-trade-key="${escapeHtml(tradeKey)}" aria-expanded="false" tabindex="0" onclick="toggleReplayTradeHistory('${escapeHtml(tradeKey)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReplayTradeHistory('${escapeHtml(tradeKey)}');}"` : ''}
+            >
+              <td>
+                ${renderReplayStockNameCell(item)}
+                <div class="replay-cell-sub">${escapeHtml(item.code || '-')}</div>
+                ${hasDetail ? '<div class="replay-cell-sub replay-trade-hint">클릭해 체결 이력 보기</div>' : ''}
+              </td>
               <td>
                 ${escapeHtml(formatReplayPrice(item.entryFillPrice))}
                 <div class="replay-cell-sub">${escapeHtml(formatReplayDate(item.entryFilledAt))}</div>
@@ -623,13 +851,19 @@ function renderReplayTradeTable(rows = []) {
                 <div class="replay-cell-sub">${escapeHtml(formatReplayDate(item.exitFilledAt))}</div>
               </td>
               <td>${escapeHtml(getReplaySellStageLabel(item.closedReason))}</td>
-              <td>${escapeHtml(formatReplayPercent(item.netReturnPct))}</td>
+              <td>${renderColoredPercent(item.netReturnPct)}</td>
               <td>
                 ${escapeHtml(item.tradeStatus || '-')}
                 <div class="replay-cell-sub">${escapeHtml(getReplayClosedReasonLabel(item.closedReason))}</div>
               </td>
             </tr>
-          `).join('')}
+            ${hasDetail ? `
+              <tr id="${escapeHtml(detailId)}" class="replay-trade-detail-row" hidden>
+                <td colspan="6" class="replay-trade-detail-cell">${renderReplayFillHistory(item)}</td>
+              </tr>
+            ` : ''}
+          `;
+          }).join('')}
         </tbody>
       </table>
     </div>
@@ -649,7 +883,7 @@ function renderReplayDayList(days = [], variant = 'stable') {
             <span class="history-variant-badge ${escapeHtml(variant)}">${escapeHtml(formatReplayNumber(day.tradeCount))}건</span>
           </div>
           <div class="replay-day-meta">포함 ${escapeHtml(formatReplayNumber(day.includedCount))} · 체결 ${escapeHtml(formatReplayNumber(day.tradeCount))} · 승률 ${escapeHtml(formatReplayRate(day.winRate))}</div>
-          <div class="replay-day-meta">평균 ${escapeHtml(formatReplayPercent(day.avgNetReturnPct))} · 누적 ${escapeHtml(formatReplayPercent(day.cumNetReturnPct))} · MDD ${escapeHtml(formatReplayPercent(day.maxDrawdownPct))}</div>
+          <div class="replay-day-meta">평균 ${renderColoredPercent(day.avgNetReturnPct)} · 누적 ${renderColoredPercent(day.cumNetReturnPct)} · MDD ${renderColoredPercent(day.maxDrawdownPct)}</div>
           <div class="replay-day-meta">degraded ${escapeHtml(formatReplayNumber(day.degradedCount))} · ambiguous ${escapeHtml(formatReplayNumber(day.ambiguousCount))}</div>
           <div class="replay-day-trades">
             <div class="replay-day-trades-title">매수/매도 종목</div>

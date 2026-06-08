@@ -79,8 +79,594 @@ function buildPullbackSupportIndicator(supportContext) {
   };
 }
 
+function getAccumulationStopPolicy(entry) {
+  return entry?.accumulationStopPolicy && typeof entry.accumulationStopPolicy === 'object'
+    ? entry.accumulationStopPolicy
+    : null;
+}
+
+function getAccumulationSponsorModeLabel(mode) {
+  if (mode === 'foreign') return '외인';
+  if (mode === 'institution') return '기관';
+  if (mode === 'both') return '외인·기관';
+  return '수급 주체 미확정';
+}
+
+function getAccumulationAnchorSourceLabel(source) {
+  if (source === 'prior_sponsor_candle') return '전일 매집 시작 봉';
+  if (source === 'entry_sponsor_candle') return '당일 매집 시작 봉';
+  return '기존 % 손절';
+}
+
+function isAccumulationSponsorMaintained(mode, data) {
+  if (mode === 'foreign') return Number(data.foreignNet || 0) > 0;
+  if (mode === 'institution') return Number(data.institutionNet || 0) > 0;
+  if (mode === 'both') return Number(data.foreignNet || 0) > 0 && Number(data.institutionNet || 0) > 0;
+  return false;
+}
+
+function buildAccumulationOpenExitRuleSet(stock, data, entry, targets, gapProfile, isBefore0908) {
+  const policy = getAccumulationStopPolicy(entry);
+  const entryPrice = targets?.entryPrice || stock.entryPrice || data.prevClose || 0;
+  const effectiveHardStopPrice = Number(policy?.effectiveHardStopPrice || targets?.stopLoss?.price || 0);
+  const rules = [];
+  const indicators = [];
+
+  if (stock.type !== 'accumulation' || !policy) {
+    return {
+      rules,
+      indicators,
+      hardSignals: [],
+      partialSignals: [],
+      warningSignals: [],
+      entryPrice,
+      effectiveStopPrice: effectiveHardStopPrice,
+      fallbackStopPrice: Number(policy?.fallbackStopPrice || 0),
+      adjustedStopLossRate: 0
+    };
+  }
+
+  const sponsorMode = String(policy.sponsorMode || 'none');
+  const sponsorLabel = getAccumulationSponsorModeLabel(sponsorMode);
+  const anchorLabel = getAccumulationAnchorSourceLabel(policy.anchorSource);
+  indicators.push({
+    title: '매집봉 시가 손절',
+    criterion: String(policy.hardStopRuleSummary || '매집 시작 봉 시가와 기존 % 손절 중 더 높은 가격을 하드 스톱으로 유지합니다.'),
+    status: 'unknown',
+    result: effectiveHardStopPrice > 0
+      ? `${anchorLabel} 기준 하드 스톱 ${effectiveHardStopPrice.toLocaleString()}원 유지`
+      : '하드 스톱 미산출',
+    value: policy.anchorDate
+      ? `${policy.anchorDate} / ${sponsorLabel} / 기준 시가 ${Number(policy.anchorOpen || 0).toLocaleString()}원`
+      : `${sponsorLabel} / 기존 % 손절 사용`
+  });
+
+  if (!isBefore0908 || sponsorMode === 'none') {
+    return {
+      rules,
+      indicators,
+      hardSignals: [],
+      partialSignals: [],
+      warningSignals: [],
+      entryPrice,
+      effectiveStopPrice: effectiveHardStopPrice,
+      fallbackStopPrice: Number(policy.fallbackStopPrice || 0),
+      adjustedStopLossRate: 0
+    };
+  }
+
+  const priceGuard = Math.max(entryPrice || 0, effectiveHardStopPrice || 0);
+  const priceWeak = data.currentPrice > 0 && priceGuard > 0 && data.currentPrice <= priceGuard;
+  const foreignExited = Number(data.foreignNet || 0) <= 0;
+  const institutionExited = Number(data.institutionNet || 0) <= 0;
+  const riskyGap = ['G-D', 'G-E'].includes(String(gapProfile?.code || '').trim());
+  const volatileMarket = String(entry?.volatilityContext?.blendedState || '') === 'volatile';
+  const sponsorMaintained = isAccumulationSponsorMaintained(sponsorMode, data);
+
+  let hardTriggered = false;
+  if (sponsorMode === 'foreign') hardTriggered = foreignExited && priceWeak;
+  if (sponsorMode === 'institution') hardTriggered = institutionExited && priceWeak;
+  if (sponsorMode === 'both') hardTriggered = foreignExited && institutionExited && priceWeak;
+
+  if (hardTriggered) {
+    rules.push(createSellRule({
+      code: 'A1',
+      title: '장초반 수급 이탈',
+      criterion: String(policy.openExitRuleSummary || '장초반에 수급 주체 순매수가 꺾이고 가격도 약하면 즉시 손절합니다.'),
+      triggered: true,
+      result: `${sponsorLabel} 순매수 이탈과 가격 약세가 동시에 확인돼 즉시 손절합니다.`,
+      value: `외국인 ${Number(data.foreignNet || 0).toLocaleString()}주 / 기관 ${Number(data.institutionNet || 0).toLocaleString()}주 / 현재가 ${Number(data.currentPrice || 0).toLocaleString()}원 / 기준 ${priceGuard.toLocaleString()}원`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  } else if (sponsorMode === 'both' && (foreignExited || institutionExited)) {
+    rules.push(createSellRule({
+      code: 'A1-W',
+      title: '장초반 수급 경고',
+      criterion: '외인·기관 동시 매집 종목은 한쪽 주체만 먼저 이탈해도 경고로 취급하고, 둘 다 이탈할 때만 즉시 손절합니다.',
+      triggered: true,
+      result: `${foreignExited ? '외인' : '기관'} 한쪽만 순매수 이탈 — 즉시 손절은 아니지만 수급 경고`,
+      value: `외국인 ${Number(data.foreignNet || 0).toLocaleString()}주 / 기관 ${Number(data.institutionNet || 0).toLocaleString()}주`,
+      severity: 'soft',
+      bucket: 'warning'
+    }));
+  }
+
+  if (!hardTriggered && sponsorMode !== 'none' && sponsorMaintained && (riskyGap || volatileMarket)) {
+    indicators.push({
+      title: '지수 급락 보류',
+      criterion: String(policy.marketShockHoldRuleSummary || '지수 급락 또는 고변동성 장세에서도 수급 주체 순매수가 유지되면 장초반 흔들림 손절은 보류합니다.'),
+      status: 'unknown',
+      result: `${sponsorLabel} 순매수가 유지돼 장초반 흔들림 손절은 보류하고 하드 스톱만 유지합니다.`,
+      value: `갭 ${gapProfile?.code || '-'} / 변동성 ${entry?.volatilityContext?.blendedState || '-'}`
+    });
+  }
+
+  return {
+    rules,
+    indicators,
+    hardSignals: rules.filter(rule => rule.triggered && rule.severity === 'hard'),
+    partialSignals: rules.filter(rule => rule.triggered && rule.bucket === 'partial'),
+    warningSignals: rules.filter(rule => rule.triggered && rule.bucket === 'warning'),
+    entryPrice,
+    effectiveStopPrice: effectiveHardStopPrice,
+    fallbackStopPrice: Number(policy.fallbackStopPrice || 0),
+    adjustedStopLossRate: 0
+  };
+}
+
+function getBreakoutStopPolicy(entry) {
+  return entry?.breakoutStopPolicy && typeof entry.breakoutStopPolicy === 'object'
+    ? entry.breakoutStopPolicy
+    : null;
+}
+
+function getBreakoutLiveExitPolicy(entry) {
+  return entry?.breakoutLiveExitPolicy && typeof entry.breakoutLiveExitPolicy === 'object'
+    ? entry.breakoutLiveExitPolicy
+    : null;
+}
+
+function getReversalStopPolicy(entry) {
+  return entry?.reversalStopPolicy && typeof entry.reversalStopPolicy === 'object'
+    ? entry.reversalStopPolicy
+    : null;
+}
+
+function getReversalLiveExitPolicy(entry) {
+  return entry?.reversalLiveExitPolicy && typeof entry.reversalLiveExitPolicy === 'object'
+    ? entry.reversalLiveExitPolicy
+    : null;
+}
+
+const breakoutLiveStateCache = new Map();
+const reversalLiveStateCache = new Map();
+
+function getBreakoutLiveStateKey(stock) {
+  return stock?.entryKey || buildEntryKey(stock?.slotId, stock?.code || '');
+}
+
+function getReversalLiveStateKey(stock) {
+  return stock?.entryKey || buildEntryKey(stock?.slotId, stock?.code || '');
+}
+
+function numberOrZero(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function numberOrNull(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
+function extractTimeHHMM(timestamp) {
+  if (typeof timestamp === 'string' && timestamp.includes('T')) return timestamp.slice(11, 16);
+  if (typeof timestamp === 'number' && Number.isFinite(timestamp)) {
+    const date = new Date(timestamp);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+  return '';
+}
+
+function isTimeBetween(timestamp, start, end) {
+  const hhmm = extractTimeHHMM(timestamp);
+  return Boolean(hhmm && hhmm >= start && hhmm <= end);
+}
+
+function median(values) {
+  const numbers = values.filter(value => Number.isFinite(value)).sort((a, b) => a - b);
+  if (!numbers.length) return null;
+  const middle = Math.floor(numbers.length / 2);
+  return numbers.length % 2 ? numbers[middle] : (numbers[middle - 1] + numbers[middle]) / 2;
+}
+
+function buildBreakoutSyntheticBars(snapshots) {
+  const ordered = (Array.isArray(snapshots) ? snapshots : []).slice(-30);
+  const bars = [];
+  for (let index = 0; index < ordered.length; index += 3) {
+    const chunk = ordered.slice(index, index + 3);
+    if (chunk.length < 3) continue;
+    const prices = chunk.map(item => numberOrZero(item.currentPrice)).filter(price => price > 0);
+    if (!prices.length) continue;
+    bars.push({
+      close: prices[prices.length - 1],
+      high: Math.max(...prices),
+      low: Math.min(...prices)
+    });
+  }
+  return bars;
+}
+
+function calculateEmaSeries(values, period) {
+  const numeric = values.filter(value => Number.isFinite(value) && value > 0);
+  if (!numeric.length) return [];
+  const multiplier = 2 / (period + 1);
+  let prev = numeric[0];
+  return numeric.map(value => {
+    prev = ((value - prev) * multiplier) + prev;
+    return prev;
+  });
+}
+
+function updateBreakoutLiveState(stock, data) {
+  const key = getBreakoutLiveStateKey(stock);
+  const existing = breakoutLiveStateCache.get(key) || { snapshots: [], sessionHigh: 0 };
+  const timestamp = numberOrZero(data?.timestamp) || Date.now();
+  const nextSnapshot = {
+    timestamp,
+    currentPrice: numberOrZero(data?.currentPrice),
+    todayVolume: numberOrZero(data?.todayVolume),
+    strength: numberOrNull(data?.strength),
+    bidAskRatio: numberOrNull(data?.bidAskRatio),
+    bidTotal: numberOrNull(data?.bidTotal),
+    askTotal: numberOrNull(data?.askTotal)
+  };
+  const snapshots = existing.snapshots.slice();
+  if (snapshots.length && snapshots[snapshots.length - 1].timestamp === timestamp) snapshots[snapshots.length - 1] = nextSnapshot;
+  else snapshots.push(nextSnapshot);
+  const compactSnapshots = snapshots.slice(-60);
+  const nextState = {
+    snapshots: compactSnapshots,
+    sessionHigh: Math.max(numberOrZero(existing.sessionHigh), nextSnapshot.currentPrice)
+  };
+  breakoutLiveStateCache.set(key, nextState);
+  return nextState;
+}
+
+function updateReversalLiveState(stock, data) {
+  const key = getReversalLiveStateKey(stock);
+  const existing = reversalLiveStateCache.get(key) || { snapshots: [], sessionHigh: 0 };
+  const timestamp = data?.timestamp ?? Date.now();
+  const nextSnapshot = {
+    timestamp,
+    currentPrice: numberOrZero(data?.currentPrice),
+    lowPrice: numberOrZero(data?.lowPrice ?? data?.barLow ?? data?.currentPrice),
+    openPrice: numberOrZero(data?.openPrice)
+  };
+  const snapshots = existing.snapshots.slice();
+  const last = snapshots[snapshots.length - 1];
+  if (last && last.timestamp === timestamp) snapshots[snapshots.length - 1] = nextSnapshot;
+  else snapshots.push(nextSnapshot);
+  const nextState = {
+    snapshots: snapshots.slice(-60),
+    sessionHigh: Math.max(numberOrZero(existing.sessionHigh), nextSnapshot.currentPrice),
+  };
+  reversalLiveStateCache.set(key, nextState);
+  return nextState;
+}
+
+function buildBreakoutLiveExitRuleSet(stock, data, entry, targets, gapProfile, isBefore0908) {
+  const stopPolicy = getBreakoutStopPolicy(entry);
+  const livePolicy = getBreakoutLiveExitPolicy(entry);
+  const entryPrice = targets?.entryPrice || stock.entryPrice || data.prevClose || 0;
+  const effectiveStopPrice = Number(stopPolicy?.effectiveHardStopPrice || targets?.stopLoss?.price || 0);
+  const fallbackStopPrice = Number(stopPolicy?.fallbackStopPrice || 0);
+  const rules = [];
+  const indicators = [];
+
+  if (!(stock.type === 'breakout' || stock.type === 'momentum') || !stopPolicy || !livePolicy) {
+    return {
+      rules,
+      indicators,
+      hardSignals: [],
+      partialSignals: [],
+      warningSignals: [],
+      entryPrice,
+      effectiveStopPrice,
+      fallbackStopPrice,
+      adjustedStopLossRate: 0
+    };
+  }
+
+  indicators.push({
+    title: '돌파 기준선 하드 스톱',
+    criterion: String(stopPolicy.hardStopRuleSummary || ''),
+    status: 'unknown',
+    result: effectiveStopPrice > 0
+      ? `기준선 ${Number(effectiveStopPrice).toLocaleString()}원`
+      : '하드 스톱 미산출',
+    value: stopPolicy.reasonSummary || ''
+  });
+  indicators.push({
+    title: '라이브 익절 규칙',
+    criterion: [
+      String(livePolicy.wickClimaxRuleSummary || ''),
+      String(livePolicy.orderbookRuleSummary || ''),
+      String(livePolicy.trailingRuleSummary || '')
+    ].filter(Boolean).join(' / '),
+    status: 'unknown',
+    result: `트레일링 활성 +${Number(livePolicy.trailingActivationPct || 0).toFixed(1)}% / 버퍼 ${Number(livePolicy.trailingBufferPct || 0).toFixed(1)}%`,
+    value: `세션 컷오프 ${livePolicy.activeSessionCutoff || '-'}`
+  });
+
+  const state = updateBreakoutLiveState(stock, data);
+  const snapshots = state.snapshots || [];
+  const latest = snapshots[snapshots.length - 1] || {};
+  const previous = snapshots[snapshots.length - 2] || {};
+  const gainRate = entryPrice > 0 ? ((Number(data.currentPrice || 0) - entryPrice) / entryPrice) * 100 : 0;
+  const currentStrength = numberOrNull(data?.strength);
+  const referencePrice = Number(stopPolicy.referencePrice || 0);
+  const priceGuard = Math.max(entryPrice || 0, effectiveStopPrice || 0);
+  const riskGap = ['G-D', 'G-E'].includes(String(gapProfile?.code || '').trim());
+  const activationPct = Number(livePolicy.trailingActivationPct || 0);
+  const trailingBufferPct = Number(livePolicy.trailingBufferPct || 0);
+  const trailingTriggered = Boolean(
+    activationPct > 0
+    && gainRate >= activationPct
+    && state.sessionHigh > 0
+    && Number(data.currentPrice || 0) <= state.sessionHigh * (1 - trailingBufferPct / 100)
+  );
+
+  if (isBefore0908 && referencePrice > 0 && Number(data.currentPrice || 0) < referencePrice) {
+    rules.push(createSellRule({
+      code: 'B1',
+      title: '돌파 기준선 재이탈',
+      criterion: String(stopPolicy.openExitRuleSummary || '장초반에 직전 돌파 기준선을 다시 깨면 즉시 손절합니다.'),
+      triggered: true,
+      result: `현재가 ${Number(data.currentPrice || 0).toLocaleString()}원이 기준선 ${referencePrice.toLocaleString()}원 아래입니다.`,
+      value: `기준선 ${referencePrice.toLocaleString()}원 / 하드 스톱 ${effectiveStopPrice.toLocaleString()}원`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  }
+
+  if (
+    isBefore0908
+    && Number(data.openPrice || 0) > entryPrice
+    && Number(data.currentPrice || 0) <= Number(data.openPrice || 0)
+    && Number(data.currentPrice || 0) <= priceGuard
+    && currentStrength !== null
+    && currentStrength < 100
+  ) {
+    rules.push(createSellRule({
+      code: 'B2',
+      title: '갭 시가 실패',
+      criterion: '갭 상승 후 시가를 못 지키고 체결강도까지 100 미만이면 즉시 손절합니다.',
+      triggered: true,
+      result: `시가 ${Number(data.openPrice || 0).toLocaleString()}원 재이탈 + 체결강도 ${currentStrength.toFixed(1)}%`,
+      value: `현재가 ${Number(data.currentPrice || 0).toLocaleString()}원 / 기준 ${priceGuard.toLocaleString()}원`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  }
+
+  const syntheticBars = buildBreakoutSyntheticBars(snapshots);
+  const closes = syntheticBars.map(bar => bar.close);
+  const ema8 = calculateEmaSeries(closes, Number(stopPolicy.microTrendShortMa || 8));
+  const ema10 = calculateEmaSeries(closes, Number(stopPolicy.microTrendLongMa || 10));
+  const microFail = syntheticBars.length >= 2
+    && [syntheticBars.length - 2, syntheticBars.length - 1].every(index => closes[index] < ema8[index] && closes[index] < ema10[index]);
+  if (isBefore0908 && microFail) {
+    rules.push(createSellRule({
+      code: 'B3',
+      title: '3분 미세추세 실패',
+      criterion: String(stopPolicy.microTrendRuleSummary || ''),
+      triggered: true,
+      result: '최근 3분 프록시 2개가 모두 8EMA/10EMA 아래에서 마감했습니다.',
+      value: `EMA8 ${ema8[ema8.length - 1]?.toFixed(0) || '-'} / EMA10 ${ema10[ema10.length - 1]?.toFixed(0) || '-'}`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  }
+
+  const volumeDeltas = snapshots.map((item, index) => {
+    if (index === 0) return numberOrZero(item.todayVolume);
+    return Math.max(0, numberOrZero(item.todayVolume) - numberOrZero(snapshots[index - 1]?.todayVolume));
+  });
+  const currentVolumeDelta = volumeDeltas[volumeDeltas.length - 1] || 0;
+  const averageRecentDelta = median(volumeDeltas.slice(-1 - Number(livePolicy.wickClimaxLookbackBars || 20), -1)) || 0;
+  const sessionHigh = Number(state.sessionHigh || 0);
+  const intradayRange = Math.max(sessionHigh - entryPrice, 1);
+  const wickRatioProxy = sessionHigh > 0 ? (sessionHigh - Number(data.currentPrice || 0)) / intradayRange : 0;
+  if (
+    currentVolumeDelta > 0
+    && averageRecentDelta > 0
+    && currentVolumeDelta >= averageRecentDelta * Number(livePolicy.wickClimaxVolumeRatioMin || 2.5)
+    && wickRatioProxy >= Number(livePolicy.wickUpperShadowRatioMin || 0.45)
+    && Number(data.currentPrice || 0) <= sessionHigh * 0.99
+  ) {
+    rules.push(createSellRule({
+      code: 'T1',
+      title: '대량 위꼬리 클라이맥스',
+      criterion: String(livePolicy.wickClimaxRuleSummary || ''),
+      triggered: true,
+      result: `대량 체결 후 세션 고점 ${sessionHigh.toLocaleString()}원 대비 1% 이상 밀렸습니다.`,
+      value: `직전 1분 거래량 ${currentVolumeDelta.toLocaleString()} / 최근 중앙값 ${Math.round(averageRecentDelta).toLocaleString()}`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  }
+
+  const recentAskMedian = median(snapshots.slice(-6, -1).map(item => numberOrNull(item.askTotal)).filter(value => value !== null)) || 0;
+  const currentAskTotal = numberOrZero(data.askTotal);
+  const askDropRatio = recentAskMedian > 0 ? currentAskTotal / recentAskMedian : 0;
+  const noNewHigh = sessionHigh > 0 && Number(data.currentPrice || 0) < sessionHigh && Number(previous.currentPrice || 0) <= sessionHigh;
+  if (
+    gainRate >= 5
+    && numberOrZero(data.bidAskRatio) >= Number(livePolicy.orderbookBidAskSpikeMin || 2.0)
+    && recentAskMedian > 0
+    && askDropRatio <= Number(livePolicy.orderbookAskDropRatioMax || 0.6)
+    && (noNewHigh || Number(data.currentPrice || 0) <= sessionHigh * 0.99)
+  ) {
+    const escalateToFull = trailingTriggered || (currentStrength !== null && currentStrength < 100);
+    rules.push(createSellRule({
+      code: 'T2',
+      title: '호가 분산 익절',
+      criterion: String(livePolicy.orderbookRuleSummary || ''),
+      triggered: true,
+      result: escalateToFull
+        ? '호가 분산 + 약한 체결/트레일링 동시 충족으로 전량 익절합니다.'
+        : '호가 분산 신호가 나와 50% 부분 익절합니다.',
+      value: `bid/ask ${Number(data.bidAskRatio || 0).toFixed(2)} / ask drop ${askDropRatio.toFixed(2)}`,
+      severity: escalateToFull ? 'hard' : 'soft',
+      bucket: escalateToFull ? 'sell' : 'partial'
+    }));
+  }
+
+  if (trailingTriggered) {
+    rules.push(createSellRule({
+      code: 'T3',
+      title: '트레일링 스톱',
+      criterion: String(livePolicy.trailingRuleSummary || ''),
+      triggered: true,
+      result: `세션 고점 ${sessionHigh.toLocaleString()}원 대비 ${Number(livePolicy.trailingBufferPct || 0).toFixed(1)}% 이탈로 잔량 전량 매도합니다.`,
+      value: `현재가 ${Number(data.currentPrice || 0).toLocaleString()}원 / 활성 수익률 +${Number(livePolicy.trailingActivationPct || 0).toFixed(1)}%`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  } else if (riskGap && sessionHigh > 0) {
+    indicators.push({
+      title: '고변동 돌파 주의',
+      criterion: '위험 갭 구간에서는 돌파형도 라이브 익절 신호를 더 보수적으로 해석합니다.',
+      status: 'warning',
+      result: `갭 ${gapProfile?.code || '-'} / 세션 고점 ${sessionHigh.toLocaleString()}원 추적 중`,
+      value: '트레일링과 기준선 이탈을 우선 감시합니다.'
+    });
+  }
+
+  return {
+    rules,
+    indicators,
+    hardSignals: rules.filter(rule => rule.triggered && rule.severity === 'hard'),
+    partialSignals: rules.filter(rule => rule.triggered && rule.bucket === 'partial'),
+    warningSignals: rules.filter(rule => rule.triggered && rule.bucket === 'warning'),
+    entryPrice,
+    effectiveStopPrice,
+    fallbackStopPrice,
+    adjustedStopLossRate: 0
+  };
+}
+
+function buildReversalLiveExitRuleSet(stock, data, entry, targets) {
+  const stopPolicy = getReversalStopPolicy(entry);
+  const livePolicy = getReversalLiveExitPolicy(entry);
+  const entryPrice = targets?.entryPrice || stock.entryPrice || data.prevClose || 0;
+  const effectiveStopPrice = Number(stopPolicy?.effectiveHardStopPrice || targets?.stopLoss?.price || 0);
+  const fallbackStopPrice = Number(stopPolicy?.fallbackStopPrice || 0);
+  const rules = [];
+  const indicators = [];
+
+  if (stock.type !== 'reversal' || !stopPolicy || !livePolicy) {
+    return {
+      rules,
+      indicators,
+      hardSignals: [],
+      partialSignals: [],
+      warningSignals: [],
+      entryPrice,
+      effectiveStopPrice,
+      fallbackStopPrice,
+      adjustedStopLossRate: 0
+    };
+  }
+
+  indicators.push({
+    title: '당일 저가 하드 스톱',
+    criterion: String(stopPolicy.hardStopRuleSummary || ''),
+    status: 'unknown',
+    result: effectiveStopPrice > 0
+      ? `하드 스톱 ${Number(effectiveStopPrice).toLocaleString()}원`
+      : '하드 스톱 미산출',
+    value: stopPolicy.reasonSummary || ''
+  });
+  indicators.push({
+    title: '09:15 조건형 손절',
+    criterion: String(livePolicy.timeStopRuleSummary || ''),
+    status: 'unknown',
+    result: `09:15 이전 반등 ${Number(livePolicy.timeStopMinBouncePct || 0).toFixed(1)}% 미만이면 시가/진입가 회복 여부를 재확인합니다.`,
+    value: `본전보호 활성 +${Number(livePolicy.breakevenActivationPct || 0).toFixed(1)}%`
+  });
+
+  const state = updateReversalLiveState(stock, data);
+  const sessionHigh = Number(state.sessionHigh || 0);
+  const sessionHighPct = entryPrice > 0 ? ((sessionHigh - entryPrice) / entryPrice) * 100 : 0;
+  const currentPrice = Number(data.currentPrice || 0);
+  const time = data?.timestamp;
+
+  if (
+    extractTimeHHMM(time) >= String(livePolicy.timeStopCutoff || '09:15')
+    && sessionHighPct < Number(livePolicy.timeStopMinBouncePct || 1.0)
+    && currentPrice <= Math.max(Number(data.openPrice || 0), entryPrice)
+  ) {
+    rules.push(createSellRule({
+      code: 'R2',
+      title: '09:15 조건형 시간손절',
+      criterion: String(livePolicy.timeStopRuleSummary || ''),
+      triggered: true,
+      result: `09:15까지 세션 고점이 +${sessionHighPct.toFixed(2)}%에 그쳤고 시가/진입가도 회복하지 못했습니다.`,
+      value: `현재가 ${currentPrice.toLocaleString()}원 / 시가 ${Number(data.openPrice || 0).toLocaleString()}원 / 진입가 ${Number(entryPrice).toLocaleString()}원`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  }
+
+  if (
+    sessionHighPct >= Number(livePolicy.breakevenActivationPct || 3.0)
+    && currentPrice > 0
+    && currentPrice <= entryPrice
+  ) {
+    rules.push(createSellRule({
+      code: 'R3',
+      title: '본전보호 실패',
+      criterion: String(livePolicy.breakevenRuleSummary || ''),
+      triggered: true,
+      result: `세션 고점 +${sessionHighPct.toFixed(2)}% 반등 후 현재가가 진입가 ${Number(entryPrice).toLocaleString()}원까지 밀렸습니다.`,
+      value: `현재가 ${currentPrice.toLocaleString()}원 / 세션고가 ${Number(sessionHigh).toLocaleString()}원`,
+      severity: 'hard',
+      bucket: 'sell'
+    }));
+  }
+
+  if (isTimeBetween(time, '09:00', String(livePolicy.earlySpikeWindowEnd || '09:10')) && sessionHighPct >= 3.0) {
+    indicators.push({
+      title: '초반 급반등 정보',
+      criterion: '09:00~09:10 구간 +3%/+5% 급등은 조기 익절/본전보호 판단의 참고 신호로만 표시합니다.',
+      status: 'clear',
+      result: `초반 급반등 +${sessionHighPct.toFixed(2)}% 확인`,
+      value: `세션고가 ${Number(sessionHigh).toLocaleString()}원`
+    });
+  }
+
+  return {
+    rules,
+    indicators,
+    hardSignals: rules.filter(rule => rule.triggered && rule.severity === 'hard'),
+    partialSignals: [],
+    warningSignals: [],
+    entryPrice,
+    effectiveStopPrice,
+    fallbackStopPrice,
+    adjustedStopLossRate: 0
+  };
+}
+
 function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile) {
   const entryPrice = targets?.entryPrice || data.prevClose;
+  const entry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
+  const accumulationStopPolicy = getAccumulationStopPolicy(entry);
   const rules = [];
   const baseLossRate = stock.type === 'reversal' ? -3 : -4;
   const adjustedStopLossRate = baseLossRate + (gapProfile?.tightenStopLossRate || 0);
@@ -129,8 +715,10 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
     const belowStopLoss = latestClosePrice <= effectiveStopPrice;
     rules.push(createSellRule({
       code: 'H1',
-      title: '유효 손절가 종가 이탈',
-      criterion: gapProfile?.tightenStopLossRate
+      title: stock.type === 'accumulation' ? '매집봉 시가 손절' : '유효 손절가 종가 이탈',
+      criterion: stock.type === 'accumulation' && accumulationStopPolicy?.hardStopRuleSummary
+        ? `${accumulationStopPolicy.hardStopRuleSummary}\n확정 종가가 유효 하드 스톱 아래면 전량 매도합니다.`
+        : gapProfile?.tightenStopLossRate
         ? `장중 저가 이탈은 손절로 보지 않고 확정 종가 기준으로만 판단합니다.\n기준: 최근 확정 종가 ≤ MAX(전략 손절가 ${targets.stopLoss.price.toLocaleString()}원, 갭 조정 손절가 ${effectiveStopPrice.toLocaleString()}원)`
         : `장중 변동은 무시하고 최근 확정 종가가 전략 손절가(${targets.stopLoss.price.toLocaleString()}원) 아래로 마감했을 때만 전량 매도합니다.`,
       triggered: belowStopLoss,
@@ -146,7 +734,7 @@ function buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile
     const belowDefault = lossRate <= adjustedStopLossRate;
     rules.push(createSellRule({
       code: 'H2',
-      title: `기본 손절선 (${adjustedStopLossRate.toFixed(1)}%) 종가 이탈`,
+      title: stock.type === 'accumulation' ? '기본 하드 스톱 종가 이탈' : `기본 손절선 (${adjustedStopLossRate.toFixed(1)}%) 종가 이탈`,
       criterion: gapProfile?.tightenStopLossRate
         ? `전략 손절가 미설정 시에도 장중 손절은 하지 않고 확정 종가 기준으로만 판단합니다.\n기준: (최근 확정 종가 - 진입가) / 진입가 ≤ ${adjustedStopLossRate.toFixed(1)}%`
         : `전략 손절가 미설정 시에도 장중 손절은 하지 않고 확정 종가가 진입가 대비 ${baseLossRate}% 이하로 마감했을 때만 전량 매도합니다.\n기준: (최근 확정 종가 - 진입가) / 진입가 ≤ ${baseLossRate}%`,
@@ -496,6 +1084,8 @@ function buildIndicators(stock, data, isBefore0908) {
   const stageLabel = '통합 매도 분석';
   const stageDesc = (stock.type === 'breakout' || stock.type === 'momentum')
     ? '매도 단계 판정 + 하드 손절/보조 경고 검증 + 시가 회복 여부 점검'
+    : stock.type === 'reversal'
+      ? '매도 단계 판정 + 전일 저가 하드 스톱 + 09:15 조건형 시간손절 점검'
     : '매도 단계 판정 + 하드 손절/보조 경고 검증';
   indicators.push({
     title: '분석 단계',
@@ -504,8 +1094,59 @@ function buildIndicators(stock, data, isBefore0908) {
     result: `${stageLabel} 진행 중`
   });
 
-  const ruleSet = buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile);
-  ruleSet.rules.forEach(rule => {
+  const reversalRuleSet = buildReversalLiveExitRuleSet(stock, data, entry, targets);
+  reversalRuleSet.indicators.forEach(indicator => {
+    indicators.push(indicator);
+  });
+  reversalRuleSet.rules.forEach(rule => {
+    indicators.push(buildSellIndicatorFromRule(rule));
+  });
+  if (reversalRuleSet.hardSignals.length > 0) {
+    decision = 'sell';
+    actionStage = 'reject';
+    triggeredRule = reversalRuleSet.hardSignals[0];
+    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile, pullbackSupport }, stock, { data, isBefore0908, ruleSet: reversalRuleSet });
+  }
+
+  const breakoutRuleSet = buildBreakoutLiveExitRuleSet(stock, data, entry, targets, gapProfile, isBefore0908);
+  breakoutRuleSet.indicators.forEach(indicator => {
+    indicators.push(indicator);
+  });
+  breakoutRuleSet.rules.forEach(rule => {
+    indicators.push(buildSellIndicatorFromRule(rule));
+  });
+  if (breakoutRuleSet.hardSignals.length > 0) {
+    decision = 'sell';
+    actionStage = 'reject';
+    triggeredRule = breakoutRuleSet.hardSignals[0];
+    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile, pullbackSupport }, stock, { data, isBefore0908, ruleSet: breakoutRuleSet });
+  }
+
+  const accumulationRuleSet = buildAccumulationOpenExitRuleSet(stock, data, entry, targets, gapProfile, isBefore0908);
+  accumulationRuleSet.indicators.forEach(indicator => {
+    indicators.push(indicator);
+  });
+  accumulationRuleSet.rules.forEach(rule => {
+    indicators.push(buildSellIndicatorFromRule(rule));
+  });
+  if (accumulationRuleSet.hardSignals.length > 0) {
+    decision = 'sell';
+    actionStage = 'reject';
+    triggeredRule = accumulationRuleSet.hardSignals[0];
+    return attachEntryContext({ indicators, decision, actionStage, triggeredRule, targets, gainRate, gapProfile, pullbackSupport }, stock, { data, isBefore0908, ruleSet: accumulationRuleSet });
+  }
+
+  const baseRuleSet = buildNonSwingSellRuleSet(stock, data, isBefore0908, targets, gapProfile);
+  const ruleSet = {
+    ...baseRuleSet,
+    rules: [...reversalRuleSet.rules, ...breakoutRuleSet.rules, ...accumulationRuleSet.rules, ...baseRuleSet.rules],
+    hardSignals: [...reversalRuleSet.hardSignals, ...breakoutRuleSet.hardSignals, ...accumulationRuleSet.hardSignals, ...baseRuleSet.hardSignals],
+    partialSignals: [...reversalRuleSet.partialSignals, ...breakoutRuleSet.partialSignals, ...accumulationRuleSet.partialSignals, ...baseRuleSet.partialSignals],
+    warningSignals: [...reversalRuleSet.warningSignals, ...breakoutRuleSet.warningSignals, ...accumulationRuleSet.warningSignals, ...baseRuleSet.warningSignals],
+    effectiveStopPrice: reversalRuleSet.effectiveStopPrice || breakoutRuleSet.effectiveStopPrice || accumulationRuleSet.effectiveStopPrice || baseRuleSet.effectiveStopPrice,
+    fallbackStopPrice: reversalRuleSet.fallbackStopPrice || breakoutRuleSet.fallbackStopPrice || accumulationRuleSet.fallbackStopPrice || baseRuleSet.fallbackStopPrice
+  };
+  baseRuleSet.rules.forEach(rule => {
     indicators.push(buildSellIndicatorFromRule(rule));
   });
 

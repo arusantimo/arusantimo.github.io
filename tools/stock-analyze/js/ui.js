@@ -74,7 +74,7 @@ function renderSellDetailToCard(detail) {
   const planBox = document.getElementById(`plan-${stock.code}`);
   const indBox = document.getElementById(`ind-${stock.code}`);
   const badge = document.getElementById(`badge-${stock.code}`);
-  const entry = getEntryByCode(stock.code);
+  const entry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
   const entryPrice = stock.entryPrice || targets?.entryPrice || entry?.entryPriceValue || data.prevClose;
   const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
   const chgPrefix = data.chgRate > 0 ? '▲ ' : (data.chgRate < 0 ? '▼ ' : '');
@@ -106,7 +106,7 @@ function renderSellDetailToCard(detail) {
 
   indBox.innerHTML = cardIndicatorHtml;
   if (planBox) {
-    planBox.innerHTML = buildSellCardPlanSummary(stock.code);
+    planBox.innerHTML = buildSellCardPlanSummary(stock.entryKey || stock.code);
   }
 
   card.className = `scard ${decision}`;
@@ -312,8 +312,9 @@ function renderGuideTables() {
 }
 
 function buildSellCardPlanSummary(code) {
-  const detail = stockDetailMap[code];
-  const entry = getEntryByCode(code);
+  const parsed = parseEntryKey(code, activeSellSlot);
+  const detail = stockDetailMap[parsed.entryKey] || stockDetailMap[code];
+  const entry = getEntryByCode(parsed.entryKey, parsed.slotId);
   if (!entry || !entry.tradePlanRows || !entry.tradePlanRows.length) {
     if (detail?.mode === 'sell') {
       return renderSellStrategyPlan(detail, true);
@@ -321,19 +322,28 @@ function buildSellCardPlanSummary(code) {
     return '<div class="scard-plan-empty">매매 단계 정보 없음</div>';
   }
 
-  const findRow = prefix => entry.tradePlanRows.find(r => r.stage && r.stage.includes(prefix));
-  const premarket = findRow('프리마켓') || findRow('🌅');
-  const openPhase = findRow('장초반') || findRow('🔔');
-  const intraday = findRow('장중') || findRow('📈');
-  const swing = findRow('스윙') || findRow('📊');
-  const stopLoss = findRow('손절') || findRow('🛑');
+  if (hasEntryTakeProfitProfiles(entry)) {
+    const recommendedProfile = getRecommendedTakeProfitProfileEntry(entry);
+    const tags = buildTradePlanStageTagHtml(recommendedProfile || entry, { recommendedProfile });
+    const entryPrice = entry.entryPriceValue ? `진입가: ${entry.entryPriceValue.toLocaleString()}원` : '';
+    if (detail?.mode === 'sell') {
+      return `
+        ${renderSellStrategyPlan(detail, true)}
+        <div class="scard-plan scard-plan-tags">
+          <div class="plan-prices">${tags.join('')}</div>
+          ${entryPrice ? `<div class="plan-entry">${entryPrice}</div>` : ''}
+        </div>
+      `;
+    }
+    return `
+      <div class="scard-plan">
+        <div class="plan-prices">${tags.join('')}</div>
+        ${entryPrice ? `<div class="plan-entry">${entryPrice}</div>` : ''}
+      </div>
+    `;
+  }
 
-  const tags = [];
-  if (premarket) tags.push(`<span class="plan-tag target">🌅 ${escapeHtml(premarket.targetYield || premarket.targetPrice || '')}</span>`);
-  if (openPhase) tags.push(`<span class="plan-tag target">🔔 ${escapeHtml(openPhase.targetYield || openPhase.targetPrice || '')}</span>`);
-  if (intraday) tags.push(`<span class="plan-tag target">📈 ${escapeHtml(intraday.targetYield || intraday.targetPrice || '')}</span>`);
-  if (swing) tags.push(`<span class="plan-tag swing">📊 스윙전환</span>`);
-  if (stopLoss) tags.push(`<span class="plan-tag stop">🛑 ${escapeHtml(stopLoss.targetYield || stopLoss.targetPrice || '')}</span>`);
+  const tags = buildTradePlanStageTagHtml(entry);
 
   const entryPrice = entry.entryPriceValue ? `진입가: ${entry.entryPriceValue.toLocaleString()}원` : '';
 
@@ -772,13 +782,46 @@ function buildSyntheticSellStrategyItem(detail) {
 }
 
 function buildSellStrategyPlan(detail) {
-  const entry = getEntryByCode(detail?.stock?.code || '');
+  const entry = getEntryByCode(detail?.stock?.entryKey || detail?.stock?.code || '', detail?.stock?.slotId);
   const targets = detail?.targets || parseTradePlanTargets(entry);
   const items = [];
   const currentItem = buildSyntheticSellStrategyItem(detail);
   const stageOrder = ['premarket', 'openPhase', 'intraday1', 'intraday2', 'swing'];
 
   if (currentItem) items.push(currentItem);
+
+  if (hasEntryTakeProfitProfiles(entry)) {
+    const indicatorItems = (Array.isArray(detail?.indicators) ? detail.indicators : [])
+      .filter(indicator => {
+        const title = String(indicator?.title || '');
+        return indicator
+          && title !== '분석 단계'
+          && title !== '매도 단계 판정'
+          && (indicator.status === 'triggered' || indicator.status === 'warning' || indicator.status === 'clear');
+      })
+      .slice(0, 4)
+      .map(indicator => ({
+        status: indicator.status === 'triggered' ? 'blocked' : indicator.status === 'warning' ? 'guard' : 'available',
+        icon: indicator.status === 'triggered' ? '🚨' : indicator.status === 'warning' ? '⚠️' : '👀',
+        title: String(indicator.title || '라이브 규칙'),
+        description: String(indicator.result || indicator.criterion || ''),
+        note: String(indicator.value || '')
+      }));
+    const liveItems = items.concat(indicatorItems);
+    const normalizedItems = liveItems.length ? liveItems : [{
+      status: 'available',
+      icon: '🛰️',
+      title: '현재 유효 라이브 규칙',
+      description: '프로필 표와 별도로 실시간 손절/익절 규칙만 표시합니다.',
+      note: ''
+    }];
+    const headlineItem = normalizedItems[0];
+    return {
+      headline: headlineItem.title,
+      headlineDetail: headlineItem.description,
+      items: normalizedItems
+    };
+  }
 
   stageOrder.forEach(stage => {
     const target = targets?.[stage];
@@ -1027,11 +1070,9 @@ function renderBuyStockCards() {
       ? filterJonggaReplayViewEntries(entries, replayViewMode)
       : (Array.isArray(entries) ? entries : [])
   );
-  const emptyMessage = replayViewMode === 'replay'
-    ? '6.0 & B 조건을 만족하는 종목이 없습니다.'
-    : replayViewMode === 'all'
-      ? '전체 후보가 없습니다.'
-    : '매수추천 조건을 만족하는 종목이 없습니다.';
+  const emptyMessage = replayViewMode === 'all'
+    ? '전체 후보가 없습니다.'
+    : `${typeof getJonggaReplayViewMeta === 'function' ? getJonggaReplayViewMeta(replayViewMode).label : '매수추천'} 조건을 만족하는 종목이 없습니다.`;
 
   if (typeof updateJonggaReplayViewControls === 'function') {
     updateJonggaReplayViewControls(getActiveBuySnapshot());
@@ -1058,6 +1099,7 @@ function renderBuyStockCards() {
       const presentation = getBuyPresentation(entry);
       const verdictClass = presentation.verdictClass;
       const rationale = entry.keyPoint || entry.rationale || entry.notes[0] || '세부 판단은 상세 보기에서 확인하세요.';
+      const planHtml = buildSellCardPlanSummary(entry.entryKey || entry.code);
       const scoreBox = typeof buildBuyScoreDisplayHtml === 'function'
         ? buildBuyScoreDisplayHtml(entry, presentation)
         : { signalText: getBuyDisplayScore(entry, presentation.primaryScore), strictLine: '', badgeHtml: '' };
@@ -1109,6 +1151,7 @@ function renderBuyStockCards() {
             <span class="buy-tag muted">미충족 ${entry.unmatchedRules.length}</span>
           </div>
           <div class="buy-card-summary">${escapeHtml(rationale)}</div>
+          ${planHtml}
           ${liveMetaHtml}
           <div class="buy-card-footer">
             ${renderBuyPriceWithDailyChange(entry)}
@@ -1555,37 +1598,327 @@ function renderFilterList(entry) {
 function renderTradePlanRecommendation(entry) {
   const band = entry.recommendedEntryBand;
   const stage = entry.recommendedStage;
-  if (!band && !stage) return '';
+  const profile = entry.recommendedTakeProfitProfile;
+  if (!band && !stage && !profile) return '';
   const bandText = band && band.label ? `💰 추천 진입가 ${escapeHtml(band.label)}` : '';
+  const profileReason = profile && profile.reasonSummary ? ` · ${escapeHtml(profile.reasonSummary)}` : '';
+  const profileText = profile && profile.profileKey
+    ? `🧭 추천 프로필: <strong>${escapeHtml(profile.label || profile.profileKey)}</strong>${profileReason}`
+    : '';
   let stageText = '';
-  if (stage && stage.stageKey) {
+  if (hasEntryTakeProfitProfiles(entry)) {
+    const recommendedProfile = getRecommendedTakeProfitProfileEntry(entry);
+    const recommendedTargetRow = getTradePlanRepresentativeTargetRow(recommendedProfile || entry);
+    const recommendedTargetIndex = getTradePlanRecommendedTargetIndex(recommendedProfile || entry);
+    if (recommendedTargetRow && recommendedTargetRow.targetPrice) {
+      const targetLabel = recommendedTargetIndex === 0
+        ? '1차 익절'
+        : recommendedTargetIndex === 1
+          ? '2차 익절'
+          : '추천 익절';
+      const reason = recommendedTargetRow.condition ? ` · ${escapeHtml(recommendedTargetRow.condition)}` : '';
+      stageText = `🎯 ${targetLabel}: <strong>${escapeHtml(recommendedTargetRow.targetPrice)}</strong>${reason}`;
+    }
+  } else if (stage && stage.stageKey) {
     const meta = (typeof getSellStrategyStageMeta === 'function')
       ? getSellStrategyStageMeta(stage.stageKey)
       : { icon: '🎯', title: stage.stageKey };
     const reason = stage.reason ? ` · ${escapeHtml(stage.reason)}` : '';
     stageText = `🎯 현재 추천 단계: <strong>${escapeHtml(meta.icon + ' ' + meta.title)}</strong>${reason}`;
   }
-  const lines = [bandText, stageText].filter(Boolean).map(line => `<div>${line}</div>`).join('');
+  const lines = [bandText, profileText, stageText].filter(Boolean).map(line => `<div>${line}</div>`).join('');
   if (!lines) return '';
   return `<div class="modal-ind-card clear" style="margin-bottom:8px;">${lines}</div>`;
 }
 
-function renderTradePlanTable(entry) {
-  if (!entry.tradePlanRows.length) {
-    return '<div class="empty-state compact">매매 단계 정보가 없습니다.</div>';
+function getEntryTakeProfitProfiles(entry) {
+  if (!entry || typeof entry !== 'object') return [];
+  if (entry.strategy === 'pullback' && Array.isArray(entry.pullbackTakeProfitProfiles)) {
+    return entry.pullbackTakeProfitProfiles;
   }
+  if ((entry.strategy === 'breakout' || entry.strategy === 'momentum') && Array.isArray(entry.breakoutTakeProfitProfiles)) {
+    return entry.breakoutTakeProfitProfiles;
+  }
+  if (entry.strategy === 'accumulation' && Array.isArray(entry.accumulationTakeProfitProfiles)) {
+    return entry.accumulationTakeProfitProfiles;
+  }
+  if (entry.strategy === 'reversal' && Array.isArray(entry.reversalTakeProfitProfiles)) {
+    return entry.reversalTakeProfitProfiles;
+  }
+  return [];
+}
+
+function hasEntryTakeProfitProfiles(entry) {
+  return getEntryTakeProfitProfiles(entry).length > 0;
+}
+
+function getTradePlanDisplayValue(value) {
+  return value === null || value === undefined || value === '' ? '-' : String(value);
+}
+
+function getTradePlanStopRow(rows) {
+  return (Array.isArray(rows) ? rows : []).find(row => {
+    const stage = String(row?.stage || '');
+    const stageKey = String(row?.stageKey || '');
+    return stage.includes('손절') || stageKey === 'stop';
+  }) || null;
+}
+
+function getTradePlanTargetRows(rows) {
+  return (Array.isArray(rows) ? rows : []).filter(row => {
+    const stage = String(row?.stage || '');
+    const stageKey = String(row?.stageKey || '');
+    return row && !stage.includes('손절') && stageKey !== 'stop';
+  });
+}
+
+function getTradePlanRepresentativeTargetRow(source) {
+  const rows = getTradePlanTargetRows(source?.tradePlanRows);
+  if (!rows.length) return null;
+  const recommendedKey = String(source?.recommendedStage?.stageKey || '');
+  if (recommendedKey) {
+    const recommendedRow = rows.find(row => String(row?.stageKey || '') === recommendedKey);
+    if (recommendedRow) return recommendedRow;
+  }
+  return rows[0];
+}
+
+function getTradePlanRecommendedTargetIndex(source) {
+  const rows = getTradePlanTargetRows(source?.tradePlanRows);
+  if (!rows.length) return -1;
+  const recommendedKey = String(source?.recommendedStage?.stageKey || '');
+  if (!recommendedKey) return 0;
+  return rows.findIndex(row => String(row?.stageKey || '') === recommendedKey);
+}
+
+function getTradePlanTargetRowByIndex(source, index) {
+  const rows = getTradePlanTargetRows(source?.tradePlanRows);
+  return rows[index] || null;
+}
+
+function getTradePlanStageTagTone(row) {
+  const stage = String(row?.stage || '');
+  const stageKey = String(row?.stageKey || '');
+  if (stage.includes('손절') || stageKey === 'stop') return 'stop';
+  if (stage.includes('스윙') || stageKey === 'swing') return 'swing';
+  return 'target';
+}
+
+function getTradePlanStageTagLabel(row, index = 0) {
+  const stage = String(row?.stage || '');
+  const stageKey = String(row?.stageKey || '').trim();
+  if (stageKey === 'premarket' || stage.includes('프리마켓') || stage.includes('🌅')) return '🌅';
+  if (stageKey === 'openPhase' || stage.includes('장초반') || stage.includes('🔔')) return '🔔';
+  if (stageKey === 'intraday1' || stage.includes('장중 1차')) return '📈1';
+  if (stageKey === 'intraday2' || stage.includes('장중 2차')) return '📈2';
+  if (stageKey === 'swing' || stage.includes('스윙') || stage.includes('📊')) return '📊';
+  if (stageKey === 'stop' || stage.includes('손절') || stage.includes('🛑')) return '🛑';
+  if (stage.includes('1차')) return '1차';
+  if (stage.includes('2차')) return '2차';
+  if (stage.includes('3차')) return '3차';
+  return `${index + 1}차`;
+}
+
+function formatTradePlanStageTagText(row, index = 0) {
+  if (!row) return '';
+  const label = getTradePlanStageTagLabel(row, index);
+  const quantity = String(row?.quantity || '').trim();
+  const target = String(row?.targetPrice || row?.targetYield || row?.condition || '').trim();
+  return [label, quantity, target].filter(Boolean).join(' ');
+}
+
+function buildTradePlanStageTagHtml(source, { recommendedProfile = null } = {}) {
+  const rows = Array.isArray(source?.tradePlanRows) ? source.tradePlanRows : [];
+  if (!rows.length) return [];
+  const targetRows = getTradePlanTargetRows(rows);
+  const stopRow = getTradePlanStopRow(rows);
+  const tags = [];
+  if (recommendedProfile) {
+    tags.push(`<span class="plan-tag target">추천 ${escapeHtml(recommendedProfile.label || recommendedProfile.profileKey || '')}</span>`);
+  }
+  targetRows.forEach((row, index) => {
+    const text = formatTradePlanStageTagText(row, index);
+    if (!text) return;
+    tags.push(`<span class="plan-tag ${getTradePlanStageTagTone(row)}">${escapeHtml(text)}</span>`);
+  });
+  if (stopRow) {
+    const stopText = formatTradePlanStageTagText(stopRow, targetRows.length);
+    if (stopText) tags.push(`<span class="plan-tag stop">${escapeHtml(stopText)}</span>`);
+  }
+  return tags;
+}
+
+function getOrderedTakeProfitProfiles(entry) {
+  const profiles = getEntryTakeProfitProfiles(entry);
+  const profileMap = new Map(profiles.map(profile => [String(profile?.profileKey || ''), profile]));
+  const preferredOrder = ['aggressive', 'balanced', 'conservative'];
+  const ordered = preferredOrder.map(key => profileMap.get(key)).filter(Boolean);
+  return ordered.length ? ordered : profiles;
+}
+
+function getRecommendedTakeProfitProfileEntry(entry) {
+  const profileKey = String(entry?.recommendedTakeProfitProfile?.profileKey || '');
+  if (!profileKey) {
+    return getOrderedTakeProfitProfiles(entry).find(profile => profile?.recommended) || null;
+  }
+  return getOrderedTakeProfitProfiles(entry).find(profile => String(profile?.profileKey || '') === profileKey) || null;
+}
+
+function getTakeProfitProfileGroupSignature(profile) {
+  const firstTargetRow = getTradePlanTargetRowByIndex(profile, 0);
+  const secondTargetRow = getTradePlanTargetRowByIndex(profile, 1);
+  const stopRow = getTradePlanStopRow(profile?.tradePlanRows);
+  return JSON.stringify({
+    firstTargetPrice: getTradePlanDisplayValue(firstTargetRow?.targetPrice),
+    secondTargetPrice: getTradePlanDisplayValue(secondTargetRow?.targetPrice),
+    stopPrice: getTradePlanDisplayValue(stopRow?.targetPrice),
+  });
+}
+
+function getTakeProfitProfileGroupLabel(group) {
+  const labelOrder = ['aggressive', 'balanced', 'conservative'];
+  const orderedProfiles = labelOrder
+    .map(key => group.profiles.find(profile => String(profile?.profileKey || '') === key))
+    .filter(Boolean);
+  const fallbackProfiles = group.profiles.filter(profile => !orderedProfiles.includes(profile));
+  const labels = [...orderedProfiles, ...fallbackProfiles]
+    .map(profile => String(profile?.label || profile?.profileKey || '-'))
+    .filter(Boolean);
+  if (labels.length <= 1) return labels[0] || '-';
+  return `${labels.join(' ')} 통합`;
+}
+
+function getTakeProfitProfileGroupReason(group) {
+  const reasons = [...new Set(group.profiles
+    .map(profile => String(profile?.reasonSummary || '').trim())
+    .filter(Boolean))];
+  if (group.profiles.length <= 1) return reasons[0] || '-';
+  if (reasons.length === 1) return reasons[0];
+  return '익절/손절 가격이 같아 통합 표시합니다.';
+}
+
+function getGroupedTakeProfitProfiles(entry) {
+  const groups = [];
+  for (const profile of getOrderedTakeProfitProfiles(entry)) {
+    const signature = getTakeProfitProfileGroupSignature(profile);
+    const existing = groups.find(group => group.signature === signature);
+    if (existing) {
+      existing.profiles.push(profile);
+      if (profile?.recommended) existing.recommended = true;
+      if (profile?.recommended) existing.recommendedTargetIndex = getTradePlanRecommendedTargetIndex(profile);
+      continue;
+    }
+    groups.push({
+      signature,
+      profiles: [profile],
+      recommended: Boolean(profile?.recommended),
+      recommendedTargetIndex: Boolean(profile?.recommended) ? getTradePlanRecommendedTargetIndex(profile) : -1,
+    });
+  }
+  return groups;
+}
+
+function renderTradePlanProfileComparison(entry) {
+  if (!hasEntryTakeProfitProfiles(entry)) return '';
+  const groups = getGroupedTakeProfitProfiles(entry);
+  if (!groups.length) return '';
+  return `
+    <table class="guide-table compact-table" style="margin-bottom:10px">
+      <thead>
+        <tr>
+          <th>구분</th>
+          ${groups.map(group => {
+            const label = escapeHtml(getTakeProfitProfileGroupLabel(group));
+            const badge = group.recommended ? '<span class="plan-tag target" style="margin-left:6px;">추천</span>' : '';
+            const headerStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10)"' : '';
+            return `<th${headerStyle}>${label}${badge}</th>`;
+          }).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>1차 익절가</th>
+          ${groups.map(group => {
+            const row = getTradePlanTargetRowByIndex(group.profiles[0], 0);
+            const isRecommendedTarget = group.recommended && group.recommendedTargetIndex === 0;
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10);font-weight:700;color:var(--text-success)"' : '';
+            const badge = isRecommendedTarget ? '<span class="plan-tag target" style="margin-left:6px;">추천 익절</span>' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(row?.targetPrice))}${badge}</td>`;
+          }).join('')}
+        </tr>
+        <tr>
+          <th>1차 익절 조건</th>
+          ${groups.map(group => {
+            const row = getTradePlanTargetRowByIndex(group.profiles[0], 0);
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10)"' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(row?.condition))}</td>`;
+          }).join('')}
+        </tr>
+        <tr>
+          <th>2차 익절가</th>
+          ${groups.map(group => {
+            const row = getTradePlanTargetRowByIndex(group.profiles[0], 1);
+            const isRecommendedTarget = group.recommended && group.recommendedTargetIndex === 1;
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10);font-weight:700;color:var(--text-success)"' : '';
+            const badge = isRecommendedTarget ? '<span class="plan-tag target" style="margin-left:6px;">추천 익절</span>' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(row?.targetPrice))}${badge}</td>`;
+          }).join('')}
+        </tr>
+        <tr>
+          <th>2차 익절 조건</th>
+          ${groups.map(group => {
+            const row = getTradePlanTargetRowByIndex(group.profiles[0], 1);
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10)"' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(row?.condition))}</td>`;
+          }).join('')}
+        </tr>
+        <tr>
+          <th>손절가</th>
+          ${groups.map(group => {
+            const row = getTradePlanStopRow(group.profiles[0]?.tradePlanRows);
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10);font-weight:700"' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(row?.targetPrice))}</td>`;
+          }).join('')}
+        </tr>
+        <tr>
+          <th>손절 조건</th>
+          ${groups.map(group => {
+            const row = getTradePlanStopRow(group.profiles[0]?.tradePlanRows);
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10)"' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(row?.condition))}</td>`;
+          }).join('')}
+        </tr>
+        <tr>
+          <th>이유</th>
+          ${groups.map(group => {
+            const cellStyle = group.recommended ? ' style="background:rgba(16,185,129,0.10)"' : '';
+            return `<td${cellStyle}>${escapeHtml(getTradePlanDisplayValue(getTakeProfitProfileGroupReason(group)))}</td>`;
+          }).join('')}
+        </tr>
+      </tbody>
+    </table>
+  `;
+}
+
+function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIndex = -1 } = {}) {
+  const rows = Array.isArray(source?.tradePlanRows) ? source.tradePlanRows : [];
+  if (!rows.length) return '';
 
   const recRowStyle = 'background:rgba(16,185,129,0.16);box-shadow:inset 3px 0 0 var(--text-success)';
   const recCellStyle = 'font-weight:700';
   const recYieldStyle = 'color:var(--text-success);font-weight:700';
   const recBadge = '<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천</span>';
+  let targetIndex = -1;
+
   return `
-    ${renderTradePlanRecommendation(entry)}
+    ${title ? `<div class="modal-section-label">${escapeHtml(title)}</div>` : ''}
     <table class="guide-table compact-table">
       <thead><tr><th>단계</th><th>조건</th><th>수량</th><th>목표 수익률</th><th>목표가</th></tr></thead>
       <tbody>
-        ${entry.tradePlanRows.map(row => {
-          const isRec = Boolean(row.recommended);
+        ${rows.map(row => {
+          const isTargetRow = getTradePlanStageTagTone(row) !== 'stop';
+          if (isTargetRow) targetIndex += 1;
+          const isRec = Boolean(row.recommended) || (isTargetRow && targetIndex === recommendedTargetIndex);
           const hitRate = (row.historicalHitRate === null || row.historicalHitRate === undefined)
             ? ''
             : ` <span style="color:var(--text-muted)">· 적중 ${Math.round(row.historicalHitRate * 100)}%</span>`;
@@ -1602,6 +1935,34 @@ function renderTradePlanTable(entry) {
         }).join('')}
       </tbody>
     </table>
+  `;
+}
+
+function renderTradePlanTable(entry) {
+  if (!(Array.isArray(entry.tradePlanRows) && entry.tradePlanRows.length) && !hasEntryTakeProfitProfiles(entry)) {
+    return '<div class="empty-state compact">매매 단계 정보가 없습니다.</div>';
+  }
+
+  if (hasEntryTakeProfitProfiles(entry)) {
+    const recommendedProfile = getRecommendedTakeProfitProfileEntry(entry) || getOrderedTakeProfitProfiles(entry)[0] || null;
+    const recommendedProfileLabel = String(recommendedProfile?.label || recommendedProfile?.profileKey || '').trim();
+    const recommendedTitle = recommendedProfileLabel
+      ? `추천 프로필 단계 · ${recommendedProfileLabel}`
+      : '추천 프로필 단계';
+    return `
+      ${renderTradePlanRecommendation(entry)}
+      ${renderTradePlanProfileComparison(entry)}
+      ${recommendedProfile ? renderTradePlanStageRowsTable(recommendedProfile, {
+        title: recommendedTitle,
+        recommendedTargetIndex: getTradePlanRecommendedTargetIndex(recommendedProfile)
+      }) : ''}
+    `;
+  }
+
+  return `
+    ${renderTradePlanRecommendation(entry)}
+    ${renderTradePlanProfileComparison(entry)}
+    ${renderTradePlanStageRowsTable(entry)}
   `;
 }
 
@@ -1656,6 +2017,9 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       title: `${STRATEGY_META[normalizeStrategyKey(entry.strategy)].shortLabel} 종목을 볼 때 먼저 확인할 점`,
       cardClass: 'triggered'
     });
+    const accumulationStopReasonHtml = entry.strategy === 'accumulation' && entry.accumulationStopPolicy?.reasonSummary
+      ? `<div class="buy-detail-note"><strong>손절</strong><span>${escapeHtml(entry.accumulationStopPolicy.reasonSummary)}</span></div>`
+      : '';
 
     document.getElementById('modal-body').innerHTML = `
       <div class="buy-modal-layout">
@@ -1691,6 +2055,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
               <div class="modal-section-label">요약</div>
               ${entry.rationale ? `<div class="buy-detail-note"><strong>근거</strong><span>${escapeHtml(entry.rationale)}</span></div>` : ''}
               ${entry.keyPoint ? `<div class="buy-detail-note"><strong>핵심</strong><span>${escapeHtml(entry.keyPoint)}</span></div>` : ''}
+              ${accumulationStopReasonHtml}
               ${entry.notes.map(note => `<div class="buy-detail-note"><strong>메모</strong><span>${escapeHtml(note)}</span></div>`).join('')}
             </div>
 
@@ -1742,7 +2107,9 @@ function openModal(codeOrEntryKey, mode = 'sell') {
         ? '📊 눌림목 종가베팅'
         : stock.type === 'accumulation'
           ? '🔥 수급 매집형 종가베팅'
-          : '🚀 주도주 돌파형 종가베팅';
+          : stock.type === 'reversal'
+            ? '🔻 주도주 급락 반등 종가베팅'
+            : '🚀 주도주 돌파형 종가베팅';
     document.getElementById('modal-type').textContent = typeLabel;
 
     const chgClass = data.chgRate > 0 ? 'up' : (data.chgRate < 0 ? 'dn' : 'nt');
@@ -1756,7 +2123,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
     const stageCls = isBefore0908 ? 'stage1' : 'stage2';
     const stageText = isBefore0908 ? '1차 분석 (9:08 이전)' : '2차 분석 (9:08 이후)';
 
-    const notionEntry = getEntryByCode(stock.code);
+    const notionEntry = getEntryByCode(stock.entryKey || stock.code, stock.slotId);
     const tradePlanHtml = notionEntry ? renderTradePlanTable(notionEntry) : '<div class="empty-state compact">매매 전략 정보가 전략 데이터에 없습니다.</div>';
     const strategyPlanHtml = renderSellStrategyPlan(detail, false);
     const strategyCautionHtml = renderStrategyCautionPanel(stock.type, {
