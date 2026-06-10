@@ -165,10 +165,13 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   });
 
   setAnalysisRunning(true);
-  btn.innerHTML = '<span>⚡</span> 통합 분석 진행 중...';
+  const universeMode = getSellUniverseMode(activeSellSlot);
+  const runningText = universeMode === 'all' ? '전체 분석 진행 중...' : '실매수 분석 진행 중...';
+  btn.innerHTML = `<span>⚡</span> ${runningText}`;
 
   try {
-    log(`▶ [현재 시각: ${timeStr}] 매도 통합 분석을 시작합니다.`);
+    const analysisTitle = universeMode === 'all' ? '매도 전체 분석' : '실매수 분석';
+    log(`▶ [현재 시각: ${timeStr}] ${analysisTitle}을 시작합니다.`);
     await refreshLiveGapScore('매도 분석');
 
     const universeMode = getSellUniverseMode(activeSellSlot);

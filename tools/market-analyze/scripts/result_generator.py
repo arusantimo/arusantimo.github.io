@@ -565,6 +565,8 @@ def write_manifest(latest_file: str, latest_date: str, generated_at: str) -> Dic
         "schemaVersion": SCHEMA_VERSION,
     }
     MANIFEST_PATH.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    manifest_js_path = RESULTS_DIR / "manifest.js"
+    manifest_js_path.write_text(f"window.__MARKET_ANALYZE_MANIFEST__ = {json.dumps(manifest, ensure_ascii=False, indent=2)};\n", encoding="utf-8")
     return manifest
 
 

@@ -930,7 +930,9 @@ updateCurrentTime = function updateCurrentTimeOverride() {
     return;
   }
 
-  analyzeBtn.innerHTML = `<span>⚡</span> 통합 분석${archiveSuffix}`;
+  const universeMode = getSellUniverseMode(activeSellSlot);
+  const buttonText = universeMode === 'all' ? '전체 분석' : '실매수 분석';
+  analyzeBtn.innerHTML = `<span>⚡</span> ${buttonText}${archiveSuffix}`;
 };
 
 updateCardError = function updateCardErrorOverride(codeOrEntryKey) {

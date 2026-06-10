@@ -1,4 +1,5 @@
 const inputSent = document.getElementById("input-sent");
+let cachedTimeSeriesData = null;
 
 function getSentimentMetricText() {
     const value = Number.isFinite(Number(marketData.sentiment)) ? `${Math.round(Number(marketData.sentiment))}점` : "-";
@@ -711,6 +712,7 @@ document.getElementById("file-import")?.addEventListener("change", event => {
                 portfolioData = { ...portfolioData, ...parsed.portfolioData };
             }
 
+            cachedTimeSeriesData = null;
             saveMarketData();
             updateDashboardUI();
             calculateCycle();
@@ -1561,11 +1563,22 @@ function renderTheorySubtabs() {
     renderKostolanyPanel();
     renderWyckoffPanel();
     renderMinskyPanel();
+
+    const activeBtn = document.querySelector('.theory-subtab-btn.is-active');
+    const activeSubtab = activeBtn ? activeBtn.dataset.subtab : null;
+    if (activeSubtab === 'trend') {
+        loadTimeSeriesData().then(data => {
+            renderTimeSeriesChart(data);
+            updateTrendSummary(data);
+            renderTrendTable(data);
+        });
+    }
 }
 
 initializeWyckoffHelpModal();
 
 async function reloadArtifactData() {
+    cachedTimeSeriesData = null;
     const artifactBundle = await loadMarketArtifact(artifactViewSettings.selectedResultDate || "latest");
     const hydrated = hydrateLegacyBubbleBundle(artifactBundle.data || {}, artifactBundle.status || {}, artifactBundle.meta?.schemaVersion || artifactBundle.meta?.loadedFile || "artifact");
     marketData = hydrated.data;
@@ -1626,6 +1639,238 @@ async function initData() {
         updateDashboardUI();
         calculateCycle();
     }
+}
+
+async function loadTimeSeriesData() {
+    if (cachedTimeSeriesData) return cachedTimeSeriesData;
+
+    const statusBadge = document.getElementById("trend-panel-status");
+    const statusMsg = document.getElementById("trend-panel-status-message");
+    if (statusBadge) {
+        statusBadge.className = "panel-status-badge is-partial";
+        statusBadge.innerText = "로드 중";
+    }
+    if (statusMsg) statusMsg.innerText = "과거 일자별 분석 데이터를 읽어오는 중...";
+
+    try {
+        const manifest = await loadMarketManifest();
+        const availableDates = Array.isArray(manifest?.availableDates)
+            ? manifest.availableDates.filter(Boolean)
+            : [];
+        const sortedDates = [...new Set(availableDates)].sort((a, b) => a.localeCompare(b)); // 과거 -> 최근 순
+
+        const timeSeries = [];
+        const backupResult = window.__MARKET_ANALYZE_RESULT__;
+
+        for (const dateKey of sortedDates) {
+            const filePath = buildResultArtifactPath(manifest.latestFile, dateKey);
+            try {
+                await loadScriptOrThrow(filePath);
+                const payload = window.__MARKET_ANALYZE_RESULT__;
+                if (payload && payload.data) {
+                    timeSeries.push({
+                        date: payload.meta?.resultDate || dateKey,
+                        riskIndex: payload.data.riskIndex ?? payload.data.greedScore ?? null,
+                        bubbleIndex: payload.data.bubbleIndex ?? null,
+                        fundamentalAnchorScore: payload.data.fundamentalAnchorScore ?? null,
+                        fx: payload.data.fx ?? null,
+                        vix: payload.data.vix ?? null,
+                        gold: payload.data.gold ?? null,
+                        disparity: payload.data.disparity ?? null,
+                        bullRatio: payload.data.bullRatio ?? null
+                    });
+                }
+            } catch (err) {
+                console.warn(`${dateKey} 시계열 데이터 로드 실패:`, err);
+            }
+        }
+
+        window.__MARKET_ANALYZE_RESULT__ = backupResult;
+        cachedTimeSeriesData = timeSeries;
+
+        if (statusBadge) {
+            statusBadge.className = "panel-status-badge is-ok";
+            statusBadge.innerText = "정상";
+        }
+        if (statusMsg) statusMsg.innerText = `총 ${timeSeries.length}개의 분석 데이터 수집 완료`;
+
+        return timeSeries;
+    } catch (err) {
+        console.error("시계열 데이터 구축 실패:", err);
+        if (statusBadge) {
+            statusBadge.className = "panel-status-badge is-error";
+            statusBadge.innerText = "오류";
+        }
+        if (statusMsg) statusMsg.innerText = `시계열 구축 실패 (${err.message || "네트워크 오류"})`;
+        return [];
+    }
+}
+
+let trendChartInstance = null;
+
+function renderTimeSeriesChart(timeSeries) {
+    const ctx = document.getElementById('trend-chart');
+    if (!ctx) return;
+
+    if (trendChartInstance) {
+        trendChartInstance.destroy();
+    }
+
+    const labels = timeSeries.map(item => formatOptionalBizDateLabel(item.date).replace(/^\d{4}\./, ''));
+    const riskIndexData = timeSeries.map(item => item.riskIndex);
+    const bubbleIndexData = timeSeries.map(item => item.bubbleIndex);
+    const anchorData = timeSeries.map(item => item.fundamentalAnchorScore);
+
+    trendChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '리스크 지수',
+                    data: riskIndexData,
+                    borderColor: '#f87171',
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.25,
+                    pointRadius: 3,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '버블 지수',
+                    data: bubbleIndexData,
+                    borderColor: '#fb923c',
+                    backgroundColor: 'rgba(251, 146, 60, 0.05)',
+                    borderWidth: 2,
+                    tension: 0.25,
+                    pointRadius: 3,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '펀더멘털 점수',
+                    data: anchorData,
+                    borderColor: '#34d399',
+                    backgroundColor: 'rgba(52, 211, 153, 0.05)',
+                    borderWidth: 2,
+                    tension: 0.25,
+                    pointRadius: 3,
+                    yAxisID: 'y'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)'
+                    },
+                    ticks: {
+                        color: '#94a3b8'
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(71, 85, 105, 0.2)'
+                    },
+                    ticks: {
+                        color: '#94a3b8'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#cbd5e1'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#475569',
+                    borderWidth: 1
+                }
+            }
+        }
+    });
+}
+
+function updateTrendSummary(timeSeries) {
+    const summaryTextEl = document.getElementById("trend-summary-text");
+    if (!summaryTextEl) return;
+
+    if (!timeSeries.length) {
+        summaryTextEl.innerText = "분석할 시계열 데이터가 존재하지 않습니다.";
+        return;
+    }
+
+    const latest = timeSeries[timeSeries.length - 1];
+    const prev = timeSeries.length >= 2 ? timeSeries[timeSeries.length - 2] : null;
+
+    let html = `<div class="space-y-2 text-slate-300">`;
+    html += `<p>최근 분석일: <strong class="text-emerald-400">${formatOptionalBizDateLabel(latest.date)}</strong> 기준</p>`;
+
+    if (prev) {
+        const riskDiff = latest.riskIndex - prev.riskIndex;
+        const bubbleDiff = latest.bubbleIndex - prev.bubbleIndex;
+        const anchorDiff = latest.fundamentalAnchorScore - prev.fundamentalAnchorScore;
+
+        const getDiffText = (diff) => {
+            if (diff > 0) return `<span class="text-rose-400">▲ ${diff.toFixed(1)}p 상승</span>`;
+            if (diff < 0) return `<span class="text-cyan-400">▼ ${Math.abs(diff).toFixed(1)}p 하락</span>`;
+            return `<span class="text-slate-400">변동 없음</span>`;
+        };
+
+        html += `<ul class="list-disc list-inside space-y-1 text-slate-400">`;
+        html += `<li>리스크 지수: <strong>${latest.riskIndex}</strong> (${getDiffText(riskDiff)})</li>`;
+        html += `<li>버블 지수: <strong>${latest.bubbleIndex ? latest.bubbleIndex.toFixed(1) : '-'}</strong> (${getDiffText(bubbleDiff)})</li>`;
+        html += `<li>펀더멘털 점수: <strong>${latest.fundamentalAnchorScore}</strong> (${getDiffText(anchorDiff)})</li>`;
+        html += `</ul>`;
+
+        html += `<div class="mt-3 border-t border-slate-700/60 pt-2 text-slate-400">`;
+        if (latest.riskIndex >= 70) {
+            html += `<p class="text-rose-300">⚠️ <strong>리스크 경고:</strong> 리스크 지수가 70p 이상인 과열 상태입니다. 신규 매수를 보수적으로 접근하고 리스크 관리가 필요합니다.</p>`;
+        } else if (latest.riskIndex <= 30) {
+            html += `<p class="text-emerald-300">🌿 <strong>기회 탐색:</strong> 리스크 지수가 30p 이하인 공포 구간입니다. 펀더멘털을 확인하며 분할 매수를 검토해볼 수 있습니다.</p>`;
+        } else {
+            html += `<p class="text-slate-300">⚖️ <strong>중립적 흐름:</strong> 리스크 지수가 균형 상태입니다. 개별 업종 확산과 금리 변동성을 주시하세요.</p>`;
+        }
+
+        if (bubbleDiff > 0 && latest.bubbleIndex > 50) {
+            html += `<p class="text-amber-300 mt-1">🔥 <strong>버블 압력 증가:</strong> 버블 지수가 지속적으로 상승하고 있습니다. 신용 잔고 및 공모주 광풍 신호를 주의 깊게 모니터링 하세요.</p>`;
+        }
+        html += `</div>`;
+    } else {
+        html += `<p class="text-slate-400">이전 시계열 분석 데이터가 누락되어 당일 분석 결과만 표시합니다.</p>`;
+    }
+    html += `</div>`;
+
+    summaryTextEl.innerHTML = html;
+}
+
+function renderTrendTable(timeSeries) {
+    const tableBody = document.getElementById("trend-table-body");
+    if (!tableBody) return;
+
+    if (!timeSeries.length) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-slate-500">데이터가 없습니다.</td></tr>`;
+        return;
+    }
+
+    const reversed = [...timeSeries].reverse();
+    tableBody.innerHTML = reversed.map(item => `
+        <tr class="border-b border-slate-800 hover:bg-slate-700/30 transition-colors">
+            <td class="py-2 px-2 font-mono">${formatOptionalBizDateLabel(item.date)}</td>
+            <td class="py-2 px-2 font-mono font-bold">${item.riskIndex ?? '-'}</td>
+            <td class="py-2 px-2 font-mono">${item.bubbleIndex ? item.bubbleIndex.toFixed(1) : '-'}</td>
+            <td class="py-2 px-2 font-mono">${item.fundamentalAnchorScore ?? '-'}</td>
+            <td class="py-2 px-2 font-mono">${item.disparity ? item.disparity.toFixed(1) + '%' : '-'}</td>
+        </tr>
+    `).join("");
 }
 
 initData();

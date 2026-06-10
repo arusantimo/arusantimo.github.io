@@ -255,6 +255,30 @@ function loadScriptOrThrow(path) {
     });
 }
 
+async function loadMarketManifest() {
+    try {
+        const manifest = await fetchJsonOrThrow("store/results/manifest.json");
+        if (manifest && manifest.latestFile) {
+            return manifest;
+        }
+    } catch (err) {
+        console.warn("manifest.json fetch 실패, manifest.js 로드를 시도합니다:", err);
+    }
+
+    try {
+        delete window.__MARKET_ANALYZE_MANIFEST__;
+        await loadScriptOrThrow("store/results/manifest.js");
+        const manifest = window.__MARKET_ANALYZE_MANIFEST__;
+        if (manifest && manifest.latestFile) {
+            return manifest;
+        }
+        throw new Error("manifest.js에서 window.__MARKET_ANALYZE_MANIFEST__ 객체를 찾을 수 없습니다.");
+    } catch (err) {
+        console.error("manifest 로드 최종 실패:", err);
+        throw err;
+    }
+}
+
 function createResultMetaPatch(patch = {}) {
     return {
         ...createDefaultMarketResultMeta(),
@@ -325,7 +349,7 @@ async function loadMarketArtifact(preferredDate = "latest") {
     delete window.__MARKET_ANALYZE_RESULT__;
 
     try {
-        const manifest = await fetchJsonOrThrow("store/results/manifest.json");
+        const manifest = await loadMarketManifest();
         if (!manifest?.latestFile) {
             throw new Error("manifest 최신 파일 정보 없음");
         }
