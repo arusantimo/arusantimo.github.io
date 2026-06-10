@@ -1227,6 +1227,10 @@ function updateAnalyzeButtonState() {
 }
 
 function syncScheduledAnalyzerTab(now = new Date(), { force = false } = {}) {
+  // 로컬스토리지에 저장된 활성 탭이 있다면 자동 시각 동기화를 우회합니다.
+  if (typeof readStoredActiveTab === 'function' && readStoredActiveTab()) {
+    return;
+  }
   const period = getDefaultAnalyzerTab(now);
   if (!force && lastScheduledAnalyzerPeriod === period) return;
   lastScheduledAnalyzerPeriod = period;
@@ -1272,6 +1276,9 @@ function updateCurrentTime() {
 }
 function setActiveTab(tab) {
   activeTab = tab;
+  if (typeof persistActiveTab === 'function') {
+    persistActiveTab(tab);
+  }
   updateTabUI();
   updateAnalyzeButtonState();
   updateCurrentTime();

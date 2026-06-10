@@ -10,32 +10,50 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-05</span>
+        <span class="meta-version">v2.1.2</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-08</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.0)</span>
+        <span>📋 최근 변경사항 (v2.1.2)</span>
       </div>
       <div class="changelog-body">
-                <ul>
-          <li class="cl-tip" data-tt-title="대화 및 런타임 성능 향상 (v2.1.0)"
-            data-tt-desc="컨텍스트 자동 압축 기능을 통해 불필요한 토큰 사용량을 대폭 절감하고, 장기 실행 태스크에서의 메모리 누수 방지 및 성능이 강화되었습니다."
-            data-tt-example="">컨텍스트 자동 압축 및 장기 실행 에이전트 성능 강화 (v2.1.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="task.md 동적 우선순위 재조정 (v2.1.0)"
-            data-tt-desc="작업 수행 중 발생하는 예외 상황이나 사용자의 실시간 피드백에 맞춰 task.md의 작업 우선순위를 에이전트가 런타임에 동적으로 재조정합니다."
-            data-tt-example=""><code>task.md</code> 런타임 동적 우선순위 재조정 (v2.1.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="MCP 서버 자동 탐지(Auto-Discovery) (v2.1.0)"
-            data-tt-desc="로컬 환경에 설치된 호환 가능한 주요 MCP 서버(예: Chrome DevTools, Github 등)를 에이전트가 자동으로 탐지하고 연동을 제안합니다."
-            data-tt-example="/mcp discover">MCP 서버 자동 탐지(Auto-Discovery) 및 제안 기능 (v2.1.0) <span class="badge-new">NEW</span></li>
+        <ul>
+          <li class="cl-tip" data-tt-title="경로 자동완성 및 슬래시 커맨드 제안 (v2.1.1)"
+            data-tt-desc="/open 및 /add-dir 명령어 사용 시 셸 스타일 경로 자동완성을 지원하며, 슬래시 커맨드 입력 시 Fuzzy 및 부분 일치 제안이 제공됩니다."
+            data-tt-example="">경로 자동완성(Path Autocomplete) 및 퍼지 검색 매칭 제안 (v2.1.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Optimistic Rendering 및 세션 목록 개선 (v2.1.1)"
+            data-tt-desc="사용자 입력 반응 지연을 해소하기 위한 Optimistic Rendering 도입 및 /resume 목록에서 에이전트 생성 서브세션을 제외하는 필터링이 적용되었습니다."
+            data-tt-example="">Optimistic Rendering 도입 및 세션 재개 필터링 적용 (v2.1.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="모델 서브커맨드 및 permissions 명령어 추가 (v2.1.2)"
+            data-tt-desc="기동 시 --model 옵션 추가, 사용 가능한 모델을 조회하는 agy models 서브커맨드, 그리고 보안 승인 규칙을 직접 제어하는 /permissions 명령어가 추가되었습니다."
+            data-tt-example="/permissions">보안 승인(/permissions) 관리 및 사용 가능 모델 조회 추가 (v2.1.2) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="상태줄 세로 누적 및 원격 MCP 구성 동기화 (v2.1.2)"
+            data-tt-desc="statusLine에 stack_with_default 설정을 추가해 기본/커스텀 상태줄을 세로로 누적 노출할 수 있고, mcp_config.json에서 url 지정을 통해 원격 MCP 구성을 동기화할 수 있습니다."
+            data-tt-example="">상태줄(statusLine) 세로 누적 및 원격 MCP 동기화 지원 (v2.1.2) <span class="badge-new">NEW</span></li>
         </ul>
 
 <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="대화 및 런타임 성능 향상 (v2.1.0)"
+                data-tt-desc="컨텍스트 자동 압축 기능을 통해 불필요한 토큰 사용량을 대폭 절감하고, 장기 실행 태스크에서의 메모리 누수 방지 및 성능이 강화되었습니다."
+                data-tt-example="">컨텍스트 자동 압축 및 장기 실행 에이전트 성능 강화 (v2.1.0)</li>
+              <li class="cl-tip" data-tt-title="task.md 동적 우선순위 재조정 (v2.1.0)"
+                data-tt-desc="작업 수행 중 발생하는 예외 상황이나 사용자의 실시간 피드백에 맞춰 task.md의 작업 우선순위를 에이전트가 런타임에 동적으로 재조정합니다."
+                data-tt-example=""><code>task.md</code> 런타임 동적 우선순위 재조정 (v2.1.0)</li>
+              <li class="cl-tip" data-tt-title="MCP 서버 자동 탐지(Auto-Discovery) (v2.1.0)"
+                data-tt-desc="로컬 환경에 설치된 호환 가능한 주요 MCP 서버(예: Chrome DevTools, Github 등)를 에이전트가 자동으로 탐지하고 연동을 제안합니다."
+                data-tt-example="/mcp discover">MCP 서버 자동 탐지(Auto-Discovery) 및 제안 기능 (v2.1.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.0.0</summary>
@@ -87,11 +105,11 @@ const antigravityContent = `
               <div class="group-label">설정 &amp; 관리</div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/mcp discover</code></div>
-                <div class="row-desc">로컬 MCP 자동 탐지 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">로컬 MCP 자동 탐지</div>
               </div>
-              <div class="row">
+              <div class="row cl-tip">
                 <div class="row-key"><code>/permissions</code></div>
-                <div class="row-desc">보안 승인 감도 및 실행 모드 제어</div>
+                <div class="row-desc">보안 승인 규칙 편집 및 실행 모드 제어 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/config</code></div>
@@ -215,6 +233,10 @@ const antigravityContent = `
                 <div class="row-key"><code>agy</code></div>
                 <div class="row-desc">대화형 에이전트 모드(TUI) 가동</div>
               </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>agy models</code></div>
+                <div class="row-desc">사용 가능한 모델 목록 조회 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>agy inspect</code></div>
                 <div class="row-desc">현재 프로젝트 구조 및 에이전트 스킬 목록 요약 출력</div>
@@ -235,6 +257,10 @@ const antigravityContent = `
               <div class="row">
                 <div class="row-key"><code>--dangerously-skip-permissions</code></div>
                 <div class="row-desc">모든 파일 수정 및 민감한 도구 실행 시 주어지는 사용자 승인 단계를 생략</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--model</code></div>
+                <div class="row-desc">기동 시 적용할 특정 AI 모델 강제 지정 <span class="badge-new">NEW</span></div>
               </div>
             </div>
           </div>

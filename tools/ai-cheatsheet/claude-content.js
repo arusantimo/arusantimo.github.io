@@ -10,38 +10,56 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.165</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-05</span>
+        <span class="meta-version">v2.1.169</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-08</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.165)</span>
+        <span>📋 최근 변경사항 (v2.1.169)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="버전 요구사항 설정 및 플러그인 리스트 (v2.1.163)"
-            data-tt-desc="requiredMinimumVersion / requiredMaximumVersion 설정이 추가되었으며, /plugin list 명령어(--enabled/--disabled)가 지원됩니다."
-            data-tt-example="/plugin list --enabled">버전 요구사항 설정 및 <code>/plugin list</code> (v2.1.163) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/btw 명령어 c로 복사 및 stdio MCP 개선 (v2.1.163)"
-            data-tt-desc="/btw 답변을 c 키로 마크다운 형식 복사할 수 있으며, stdio MCP에 CLAUDE_CODE_SESSION_ID가 전달됩니다."
-            data-tt-example=""><code>/btw</code> 마크다운 복사(c) 및 stdio MCP 세션 ID 지원 (v2.1.163) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="claude agents --json 및 WebFetch 권한 우선순위 (v2.1.162)"
-            data-tt-desc="claude agents --json에 대기 상태(waitingFor)가 표시되고, 명시적 WebFetch 규칙이 기본 허용 도메인보다 우선 적용됩니다."
-            data-tt-example="claude agents --json"><code>claude agents --json</code> 대기 상태 표시 및 WebFetch 우선순위 (v2.1.162) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="병렬 도구 호출 독립 실행 및 OTEL 라벨 (v2.1.161)"
-            data-tt-desc="병렬 도구 호출 중 하나가 실패해도 다른 호출이 취소되지 않고 독립적으로 결과를 반환하며, OTEL 측정에 라벨이 추가되었습니다."
-            data-tt-example="">병렬 도구 호출 독립 실행 보장 및 OTEL 라벨 (v2.1.161) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="시작 파일 작성 승인 확인 및 ultracode 트리거 (v2.1.160)"
-            data-tt-desc="셸 시작 파일(.zshenv 등)이나 빌드 도구 설정 작성 시 사용자 승인을 받습니다. 동적 워크플로 트리거 키워드가 workflow에서 ultracode로 변경되었습니다."
-            data-tt-example="">시작 파일 작성 승인 및 <code>ultracode</code> 트리거 키워드 변경 (v2.1.160) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="fallbackModel 멀티 폴백 설정 (v2.1.166)"
+            data-tt-desc="기본 모델 장애 시 대화형/비대화형 세션에서 순차적으로 시도하는 최대 3개의 fallbackModel 설정이 추가되었습니다."
+            data-tt-example="fallbackModel: [sonnet, haiku]">멀티 폴백 모델 설정 <code>fallbackModel</code> 지원 및 적용 (v2.1.166) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="도구 거부 규칙 와일드카드 지원 (v2.1.166)"
+            data-tt-desc="도구 차단 규칙(deny rules)의 도구 명칭 자리에 와일드카드 '*'를 명시하여 모든 도구 호출을 일괄 거부할 수 있습니다."
+            data-tt-example="&quot;*&quot;">도구 거부(deny) 규칙 내 와일드카드(<code>*</code>) 일괄 차단 지원 (v2.1.166) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude agents 세션 범위 확장 및 --all 플래그 (v2.1.169)"
+            data-tt-desc="claude agents --json에서 blocked/just-dispatched 세션을 포함하며, --all 플래그로 완료된 세션까지 출력이 가능합니다."
+            data-tt-example="claude agents --json --all"><code>claude agents --json</code> 세션 노출 범위 확장 및 <code>--all</code> 지원 (v2.1.169) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="macOS turn 지연 및 Windows cli 스캔 개선 (v2.1.169)"
+            data-tt-desc="macOS 사용자 로그인 시 턴 시작 부분의 30-50ms 지연 현상 및 Windows cli 스캔 중의 비정상적 지연(또는 대기) 현상이 해결되었습니다."
+            data-tt-example="">macOS 로그인 턴 지연 및 Windows CLI 기동 스캔 지연 개선 (v2.1.169) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.160~v2.1.163</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="버전 요구사항 설정 및 플러그인 리스트 (v2.1.163)"
+                data-tt-desc="requiredMinimumVersion / requiredMaximumVersion 설정이 추가되었으며, /plugin list 명령어(--enabled/--disabled)가 지원됩니다."
+                data-tt-example="/plugin list --enabled">버전 요구사항 설정 및 <code>/plugin list</code> (v2.1.163)</li>
+              <li class="cl-tip" data-tt-title="/btw 명령어 c로 복사 및 stdio MCP 개선 (v2.1.163)"
+                data-tt-desc="/btw 답변을 c 키로 마크다운 형식 복사할 수 있으며, stdio MCP에 CLAUDE_CODE_SESSION_ID가 전달됩니다."
+                data-tt-example=""><code>/btw</code> 마크다운 복사(c) 및 stdio MCP 세션 ID 지원 (v2.1.163)</li>
+              <li class="cl-tip" data-tt-title="claude agents --json 및 WebFetch 권한 우선순위 (v2.1.162)"
+                data-tt-desc="claude agents --json에 대기 상태(waitingFor)가 표시되고, 명시적 WebFetch 규칙이 기본 허용 도메인보다 우선 적용됩니다."
+                data-tt-example="claude agents --json"><code>claude agents --json</code> 대기 상태 표시 및 WebFetch 우선순위 (v2.1.162)</li>
+              <li class="cl-tip" data-tt-title="병렬 도구 호출 독립 실행 및 OTEL 라벨 (v2.1.161)"
+                data-tt-desc="병렬 도구 호출 중 하나가 실패해도 다른 호출이 취소되지 않고 독립적으로 결과를 반환하며, OTEL 측정에 라벨이 추가되었습니다."
+                data-tt-example="">병렬 도구 호출 독립 실행 보장 및 OTEL 라벨 (v2.1.161)</li>
+              <li class="cl-tip" data-tt-title="시작 파일 작성 승인 확인 및 ultracode 트리거 (v2.1.160)"
+                data-tt-desc="셸 시작 파일(.zshenv 등)이나 빌드 도구 설정 작성 시 사용자 승인을 받습니다. 동적 워크플로 트리거 키워드가 workflow에서 ultracode로 변경되었습니다."
+                data-tt-example="">시작 파일 작성 승인 및 <code>ultracode</code> 트리거 키워드 변경 (v2.1.160)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.159</summary>

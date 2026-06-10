@@ -948,7 +948,6 @@ test('replay period filter narrows modal content to the selected dates', () => {
   context.setJonggaReplayPeriod({ from: '2026-06-04', to: '2026-06-04' }, { persist: false, rerender: false });
   context.renderJonggaReplayModal('pullback');
 
-  assert.match(body.innerHTML, /현재 필터 2026-06-04 ~ 2026-06-04/);
   assert.match(body.innerHTML, /Gamma/);
   assert.match(body.innerHTML, /2026\.06\.04/);
   assert.doesNotMatch(body.innerHTML, /2026\.06\.03/);

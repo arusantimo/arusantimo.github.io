@@ -1,4 +1,14 @@
 window.CODEX_TIPS = {
+  "/app": {
+    "title": "/app — 데스크톱 앱으로 전환",
+    "desc": "현재 CLI 세션을 백그라운드로 남겨두고 동일한 작업 스레드를 Codex Desktop(데스크톱 앱)으로 전환하여 이어 진행합니다.",
+    "example": "/app"
+  },
+  "fallback_shortcuts": {
+    "title": "fallback_shortcuts — 대체 단축키 매핑",
+    "desc": "Alt 키 바인딩이 부족하거나 미지원되는 터미널 환경을 위하여 설정된 대체 단축키(fallback shortcuts) 매핑을 제공합니다.",
+    "example": ""
+  },
   "/archive": {
     "title": "/archive — 세션 보관",
     "desc": "현재 진행 중인 세션을 아카이브 처리하고 컨텍스트를 정리합니다.",

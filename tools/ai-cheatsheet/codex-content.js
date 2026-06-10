@@ -10,41 +10,56 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.137.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-04</span>
+        <span class="meta-version">v0.138.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-08</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.137.0)</span>
+        <span>📋 최근 변경사항 (v0.138.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="/archive 슬래시 커맨드 및 모델 도구 모드 (v0.137.0)"
-            data-tt-desc="/archive 슬래시 커맨드, 모델 도구 모드 선택기 추가 및 TUI f24 키 매핑과 취소된 프롬프트 복원 기능이 지원됩니다."
-            data-tt-example="/archive"><code>/archive</code> 슬래시 커맨드 및 모델 도구 모드 선택 (v0.137.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="클라우드 관리 설정 레이어 및 스킬 확장 스캐폴드 (v0.137.0)"
-            data-tt-desc="클라우드 관리 설정 레이어(cloud-managed config)가 지원되며, 스킬 확장을 위한 스캐폴드가 추가되었습니다. 병렬 독립 웹 검색도 가능합니다."
-            data-tt-example="">클라우드 관리 설정 레이어 및 스킬 확장 스캐폴드 (v0.137.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Remote-control 페어링 시작 및 플러그인 로직 개선 (v0.137.0)"
-            data-tt-desc="remote-control 페어링 기능이 추가되었고, 플러그인 검색 로직이 core-plugins로 이동했습니다."
-            data-tt-example="">Remote-control 페어링 시작 및 플러그인 탐색 개선 (v0.137.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Python SDK 베타 독립 릴리스 및 CodexConfig (v0.136.0)"
-            data-tt-desc="Python SDK 베타 버전이 런타임과 독립적으로 릴리스되며, AppServerConfig가 CodexConfig로 명칭이 변경되었습니다."
-            data-tt-example="">Python SDK 베타 독립 릴리스 및 <code>CodexConfig</code> 명칭 변경 (v0.136.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Amazon Bedrock GPT-5.5 지원 및 MCP 1.7.0 (v0.136.0)"
-            data-tt-desc="Bedrock 카탈로그 메타데이터가 갱신되어 GPT-5.5를 지원하며, MCP 의존성이 rmcp 1.7.0으로 업데이트되었습니다."
-            data-tt-example="">Bedrock GPT-5.5 카탈로그 지원 및 MCP 업데이트 (v0.136.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="원격 exec-server 등록 및 도구 스키마 개선 (v0.136.0)"
-            data-tt-desc="원격 exec-server 등록 시 API-key 인증을 허용하고, 내장 도구(MCP, shell, image 등)의 스키마 설명과 기본값이 명확해졌습니다."
-            data-tt-example="">원격 exec-server 등록 및 내장 도구 스키마 설명 개선 (v0.136.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/app 명령어 데스크톱 앱 전환 (v0.138.0)"
+            data-tt-desc="CLI 세션을 백그라운드로 남겨두고 동일 스레드 그대로 데스크톱 앱(macOS/Windows)으로 전환하여 작업을 이어갈 수 있습니다."
+            data-tt-example="/app"><code>/app</code> 명령어로 CLI 스레드를 데스크톱 앱으로 전환 지원 (v0.138.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Alt 키 대체 단축키 매핑 (v0.138.0)"
+            data-tt-desc="Alt 키 바인딩이 부족하거나 미지원되는 터미널 환경에서 추론 강도 조절 등을 수행하기 위해 대체 단축키(fallback shortcuts) 매핑을 제공합니다."
+            data-tt-example="">터미널 환경용 대체 단축키(fallback shortcuts) 매핑 지원 (v0.138.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="이미지 경로 명시 및 편집 정합성 개선 (v0.138.0)"
+            data-tt-desc="로컬 이미지 첨부 및 생성 시 생성된 파일 경로를 모델에 명시적으로 노출하여, 이후 변경 및 편집 시 정합성을 높였습니다."
+            data-tt-example="">로컬 이미지 파일 경로 명시 및 후속 편집 정합성 개선 (v0.138.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.136.0~v0.137.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="/archive 슬래시 커맨드 및 모델 도구 모드 (v0.137.0)"
+                data-tt-desc="/archive 슬래시 커맨드, 모델 도구 모드 선택기 추가 및 TUI f24 키 매핑과 취소된 프롬프트 복원 기능이 지원됩니다."
+                data-tt-example="/archive"><code>/archive</code> 슬래시 커맨드 및 모델 도구 모드 선택 (v0.137.0)</li>
+              <li class="cl-tip" data-tt-title="클라우드 관리 설정 레이어 및 스킬 확장 스캐폴드 (v0.137.0)"
+                data-tt-desc="클라우드 관리 설정 레이어(cloud-managed config)가 지원되며, 스킬 확장을 위한 스캐폴드가 추가되었습니다. 병렬 독립 웹 검색도 가능합니다."
+                data-tt-example="">클라우드 관리 설정 레이어 및 스킬 확장 스캐폴드 (v0.137.0)</li>
+              <li class="cl-tip" data-tt-title="Remote-control 페어링 시작 및 플러그인 로직 개선 (v0.137.0)"
+                data-tt-desc="remote-control 페어링 기능이 추가되었고, 플러그인 검색 로직이 core-plugins로 이동했습니다."
+                data-tt-example="">Remote-control 페어링 시작 및 플러그인 탐색 개선 (v0.137.0)</li>
+              <li class="cl-tip" data-tt-title="Python SDK 베타 독립 릴리스 및 CodexConfig (v0.136.0)"
+                data-tt-desc="Python SDK 베타 버전이 런타임과 독립적으로 릴리스되며, AppServerConfig가 CodexConfig로 명칭이 변경되었습니다."
+                data-tt-example="">Python SDK 베타 독립 릴리스 및 <code>CodexConfig</code> 명칭 변경 (v0.136.0)</li>
+              <li class="cl-tip" data-tt-title="Amazon Bedrock GPT-5.5 지원 및 MCP 1.7.0 (v0.136.0)"
+                data-tt-desc="Bedrock 카탈로그 메타데이터가 갱신되어 GPT-5.5를 지원하며, MCP 의존성이 rmcp 1.7.0으로 업데이트되었습니다."
+                data-tt-example="">Bedrock GPT-5.5 카탈로그 지원 및 MCP 업데이트 (v0.136.0)</li>
+              <li class="cl-tip" data-tt-title="원격 exec-server 등록 및 도구 스키마 개선 (v0.136.0)"
+                data-tt-desc="원격 exec-server 등록 시 API-key 인증을 허용하고, 내장 도구(MCP, shell, image 등)의 스키마 설명과 기본값이 명확해졌습니다."
+                data-tt-example="">원격 exec-server 등록 및 내장 도구 스키마 설명 개선 (v0.136.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.135.0</summary>
@@ -245,10 +260,14 @@ const codexContent = `
           <div class="group-label">세션 제어</div>
           <div class="row">
             <div class="row-key"><code>/archive</code></div>
-                <div class="row-desc">현재 세션을 보관 <span class="badge-new">NEW</span></div>
-              </div>
-              <div class="row cl-tip">
-                <div class="row-key"><code>/clear</code></div>
+            <div class="row-desc">현재 세션을 보관</div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/app</code></div>
+            <div class="row-desc">CLI 세션을 데스크탑 앱으로 전환 <span class="badge-new">NEW</span></div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/clear</code></div>
             <div class="row-desc">화면과 대화 초기화</div>
           </div>
           <div class="row">
@@ -782,6 +801,10 @@ const codexContent = `
           <div class="krow cl-tip" data-tt-title="Esc Esc — 되감기" data-tt-desc="상태 요약 또는 작업 되감기를 수행합니다.">
             <div class="kkey"><kbd>Esc</kbd><kbd>Esc</kbd></div>
             <div class="kdesc">되감기 / 요약</div>
+          </div>
+          <div class="krow cl-tip" data-tt-title="대체 단축키 매핑 (v0.138.0)" data-tt-desc="Alt 키 바인딩이 부족하거나 미지원되는 터미널 환경을 위해 설정한 대체 단축키(fallback shortcuts) 매핑을 지원합니다.">
+            <div class="kkey"><code>fallback_shortcuts</code></div>
+            <div class="kdesc">대체 단축키 매핑 지원 <span class="badge-new">NEW</span></div>
           </div>
         </div>
         <div class="group">

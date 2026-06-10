@@ -1,9 +1,23 @@
 window.CLAUDE_TIPS = {
+  "fallbackModel": {
+    "title": "fallbackModel — 멀티 폴백 모델 설정",
+    "desc": "기본 모델이 장애 상태이거나 사용 불가할 때 순차적으로 교체해 사용할 최대 3개의 폴백 모델을 설정합니다. 대화형 및 비대화형 세션 모두에 적용 가능합니다.",
+    "example": "\"fallbackModel\": [\"claude-3-5-sonnet-latest\", \"claude-3-5-haiku-latest\"]"
+  },
+  "claude agents --all": {
+    "title": "claude agents --all — 완료된 세션 포함 조회",
+    "desc": "백그라운드 세션 목록 조회 시 완료(completed)된 세션까지 모두 포함하여 JSON 형식으로 출력합니다.",
+    "example": "claude agents --json --all"
+  },
+  "tool_deny_wildcard": {
+    "title": "도구 일괄 거부 와일드카드 (*)",
+    "desc": "도구 거부 규칙(deny rules) 설정에서 도구명 자리에 '*'를 입력하여 모든 도구의 실행을 프롬프트 없이 차단할 수 있습니다.",
+    "example": "\"deniedTools\": [\"*\"]"
+  },
   "claude plugin list": {
     "title": "claude plugin list — 플러그인 목록",
     "desc": "설치된 플러그인 목록을 출력합니다. --enabled 또는 --disabled로 필터링할 수 있습니다.",
-    "example": "claude plugin list
-claude plugin list --enabled"
+    "example": "claude plugin list\nclaude plugin list --enabled"
   },
   "requiredMinimumVersion": {
     "title": "requiredMinimumVersion — 요구 버전",

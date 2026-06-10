@@ -249,7 +249,25 @@ function createStockCollections() {
   };
 }
 
-let activeTab = typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzerTab() : 'buy';
+const ANALYZER_ACTIVE_TAB_STORAGE_KEY = 'stockAnalyzeActiveTabV1';
+
+function readStoredActiveTab() {
+  try {
+    return localStorage.getItem(ANALYZER_ACTIVE_TAB_STORAGE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function persistActiveTab(tab) {
+  try {
+    if (tab === 'buy' || tab === 'sell') {
+      localStorage.setItem(ANALYZER_ACTIVE_TAB_STORAGE_KEY, tab);
+    }
+  } catch {}
+}
+
+let activeTab = readStoredActiveTab() || (typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzerTab() : 'buy');
 let lastScheduledAnalyzerPeriod = typeof getDefaultAnalyzerTab === 'function' ? getDefaultAnalyzerTab() : null;
 let activeBuySlot = 'slotA';
 let activeSellSlot = 'slotA';
@@ -615,13 +633,31 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
   const summary = document.getElementById('jongga-replay-view-summary');
   if (summary) {
     const cumulativeReturnPct = getJonggaReplayCumulativeReturnPct(activeMode);
-    const periodLabel = getJonggaReplayPeriodLabel();
     const replayDayCount = getJonggaReplayPeriodDayCount();
     summary.innerHTML = `
-      <span>기간 ${periodLabel}</span>
       <span>리플레이 총 ${replayDayCount}일</span>
       <span>누적 수익률 ${formatJonggaReplaySummaryPercent(cumulativeReturnPct)}</span>
     `;
+  }
+
+  // 메인 화면의 기간 설정 인풋 엘리먼트 동기화
+  const fromInput = document.getElementById('jongga-replay-period-from');
+  const toInput = document.getElementById('jongga-replay-period-to');
+  if (fromInput || toInput) {
+    const activePeriod = getJonggaReplayPeriod();
+    const bridge = getJonggaReplayBridgePayload();
+    const availablePeriod = getJonggaReplayAvailablePeriod(bridge);
+
+    if (fromInput) {
+      fromInput.value = activePeriod.from || '';
+      fromInput.min = availablePeriod.from || '';
+      fromInput.max = availablePeriod.to || '';
+    }
+    if (toInput) {
+      toInput.value = activePeriod.to || '';
+      toInput.min = availablePeriod.from || '';
+      toInput.max = availablePeriod.to || '';
+    }
   }
 }
 

@@ -1040,26 +1040,6 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
     <div class="replay-meta">자동 실행 상태: ${escapeHtml(String(attempt.status || 'missing'))} ${attempt.message ? `· ${escapeHtml(attempt.message)}` : ''}</div>
     <div class="replay-meta">기간: ${escapeHtml(periodLabel)} · 채널 ${escapeHtml(getJonggaReplayVariantLabel(latestRun.variant))} · 프로필 ${escapeHtml(latestRun.thresholdProfile || '-')} · 케이스 ${escapeHtml(getJonggaReplayViewMeta(activeCaseMode).label)}</div>
     ${renderReplayPolicyBanner(policy, getJonggaReplayVariantLabel(latestRun.variant))}
-    <div class="replay-overall-band">
-      <div class="replay-band-head">
-        <div>
-          <div class="replay-band-title">누적 replay 기간</div>
-          <div class="replay-band-meta">저장 범위 ${escapeHtml(periodLabel)} · 현재 필터 ${escapeHtml(currentPeriodLabel)}</div>
-        </div>
-        <div class="replay-band-side replay-period-controls">
-          <label class="replay-period-field">
-            <span>시작</span>
-            <input id="jongga-replay-period-from" type="date" value="${escapeHtml(activePeriod.from || '')}" min="${escapeHtml(availablePeriod.from || '')}" max="${escapeHtml(availablePeriod.to || '')}">
-          </label>
-          <label class="replay-period-field">
-            <span>종료</span>
-            <input id="jongga-replay-period-to" type="date" value="${escapeHtml(activePeriod.to || '')}" min="${escapeHtml(availablePeriod.from || '')}" max="${escapeHtml(availablePeriod.to || '')}">
-          </label>
-          <button id="btn-jongga-replay-period-reset" type="button" class="btn btn-secondary small">전체</button>
-        </div>
-      </div>
-      <div class="replay-band-meta" style="margin-top:8px;">필터를 바꾸면 아래 전략 요약, 종목별 수익, 일자별 요약이 누적 데이터에서 다시 계산됩니다.</div>
-    </div>
     <div class="section-title" style="margin-top:16px;">${escapeHtml(strategy ? `${getReplayStrategyLabel(strategy)} 타입 수익` : '전략별 성과')}</div>
     ${hasStrategyData
       ? renderReplayMetricPills(strategySummary, { includedCount: '타입 포함', tradeCount: '타입 체결', cumNetReturnPct: '타입 누적' })
@@ -1100,19 +1080,41 @@ function bindJonggaReplayControls() {
   document.getElementById('jongga-replay-overlay')?.addEventListener('click', event => {
     if (event.target === document.getElementById('jongga-replay-overlay')) closeJonggaReplayModal();
   });
-  document.getElementById('jongga-replay-body')?.addEventListener('input', event => {
+  
+  // 메인 화면에 있는 기간 설정 인풋의 input 및 change 이벤트 처리
+  const handlePeriodInput = event => {
     const target = event.target;
     if (!target || typeof target !== 'object') return;
     if (target.id !== 'jongga-replay-period-from' && target.id !== 'jongga-replay-period-to') return;
     if (typeof setJonggaReplayPeriod === 'function') {
-      setReplayDayPageIndex(0, { rerender: false });
+      if (typeof setReplayDayPageIndex === 'function') {
+        setReplayDayPageIndex(0, { rerender: false });
+      }
       const current = typeof getJonggaReplayPeriod === 'function' ? getJonggaReplayPeriod() : { from: '', to: '' };
       setJonggaReplayPeriod({
         from: target.id === 'jongga-replay-period-from' ? target.value : current.from,
         to: target.id === 'jongga-replay-period-to' ? target.value : current.to
       });
     }
+  };
+
+  document.addEventListener('input', handlePeriodInput);
+  document.addEventListener('change', handlePeriodInput);
+
+  // 메인 화면에 있는 기간 리셋 버튼 클릭 이벤트 처리
+  document.addEventListener('click', event => {
+    const target = event.target;
+    if (!target || typeof target !== 'object') return;
+    if (target.id === 'btn-jongga-replay-period-reset') {
+      if (typeof setJonggaReplayPeriod === 'function') {
+        if (typeof setReplayDayPageIndex === 'function') {
+          setReplayDayPageIndex(0, { rerender: false });
+        }
+        setJonggaReplayPeriod({ from: '', to: '' });
+      }
+    }
   });
+
   document.getElementById('jongga-replay-body')?.addEventListener('click', event => {
     const target = event.target;
     if (!target || typeof target !== 'object') return;
@@ -1127,11 +1129,6 @@ function bindJonggaReplayControls() {
     if (target.id === 'btn-jongga-replay-days-next') {
       moveReplayDayPage('newer');
       return;
-    }
-    if (target.id !== 'btn-jongga-replay-period-reset') return;
-    if (typeof setJonggaReplayPeriod === 'function') {
-      setReplayDayPageIndex(0, { rerender: false });
-      setJonggaReplayPeriod({ from: '', to: '' });
     }
   });
   renderReplayStrategySections();
