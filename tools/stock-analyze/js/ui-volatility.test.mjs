@@ -280,9 +280,13 @@ test('trade plan table renders stop timing under the stop condition', () => {
   assert.match(html, /최종 손절은 종가 확인 후/);
 });
 
-test('buy modal mixed exit section renders stop timing details', () => {
+test('trade plan table renders merged action guide in time order', () => {
   const context = loadUiContext();
-  const html = context.renderBuyModalMixedExitPolicySection({
+  const html = context.renderTradePlanTable({
+    tradePlanRows: [
+      { stage: '🌅 프리마켓', stageKey: 'premarket', condition: '+0.5% 도달', quantity: '40% 익절', targetYield: '+0.5%', targetPrice: '55,275원' },
+      { stage: '🛑 손절', stageKey: 'stop', condition: '유효 손절가 53,350원 하향 이탈', quantity: '전량', targetYield: '-3.0%', targetPrice: '53,350원' }
+    ],
     mixedExitPolicy: {
       active: true,
       label: '눌림목 × 7&A',
@@ -302,15 +306,38 @@ test('buy modal mixed exit section renders stop timing details', () => {
         label: '고변동성 방어'
       }
     }
-  });
+  }, { includeActionGuide: true });
 
-  assert.match(html, /혼합 전략/);
+  assert.match(html, /대응 순서/);
   assert.match(html, /지금/);
   assert.match(html, /장중/);
   assert.match(html, /1차 익절/);
+  assert.match(html, /2차 익절/);
   assert.match(html, /마감/);
   assert.match(html, /10:00 \/ 14:00 체크 후 50% 축소/);
   assert.match(html, /종가 -2% 이탈 시 전량 정리/);
+  assert.doesNotMatch(html, /혼합 전략:/);
+  assert.ok(html.indexOf('지금') < html.indexOf('장중'));
+  assert.ok(html.indexOf('장중') < html.indexOf('1차 익절'));
+  assert.ok(html.indexOf('1차 익절') < html.indexOf('2차 익절'));
+  assert.ok(html.indexOf('2차 익절') < html.indexOf('마감'));
+});
+
+test('trade plan table renders observe footer for inactive mixed policy', () => {
+  const context = loadUiContext();
+  const html = context.renderTradePlanTable({
+    tradePlanRows: [
+      { stage: '🌅 프리마켓', stageKey: 'premarket', condition: '+0.5% 도달', quantity: '40% 익절', targetYield: '+0.5%', targetPrice: '55,275원' }
+    ],
+    mixedExitPolicy: {
+      active: false,
+      label: '관찰 전용',
+      reason: '현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다.'
+    }
+  }, { includeActionGuide: true });
+
+  assert.doesNotMatch(html, /대응 순서/);
+  assert.match(html, /관찰 전용 · 현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다\./);
 });
 
 test('compact sell strategy plan keeps the stop-loss item visible', () => {

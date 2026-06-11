@@ -1917,43 +1917,49 @@ body.modal-scroll-locked {
   color: var(--text-secondary);
 }
 
-.buy-card-mixed-policy {
-  margin: -2px 0 12px;
-  padding: 8px 10px;
-  border: 1px solid rgba(59, 130, 246, 0.22);
+.trade-plan-action-guide {
+  margin: 0 0 10px;
+  padding: 7px 9px;
+  border: 1px solid rgba(59, 130, 246, 0.18);
   border-radius: 8px;
-  background: rgba(59, 130, 246, 0.08);
+  background: rgba(59, 130, 246, 0.06);
   color: var(--text-primary);
   font-size: 11px;
   line-height: 1.45;
 }
 
-.buy-card-mixed-policy-summary {
+.trade-plan-action-guide-title {
   font-weight: 700;
 }
 
-.buy-card-mixed-policy-line {
+.trade-plan-action-guide-summary {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.trade-plan-action-guide-line {
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
   gap: 6px;
   margin-top: 3px;
 }
 
-.buy-card-mixed-policy-line span {
+.trade-plan-action-guide-line span {
   color: var(--text-secondary);
   font-weight: 700;
 }
 
-.buy-card-mixed-policy-line strong {
+.trade-plan-action-guide-line strong {
   min-width: 0;
   color: inherit;
   font-weight: 600;
 }
 
-.buy-card-mixed-policy.observe {
-  border-color: rgba(148, 163, 184, 0.24);
-  background: rgba(148, 163, 184, 0.08);
-  color: var(--text-secondary);
+.trade-plan-observe-footer {
+  margin-top: 8px;
+  font-size: 10px;
+  color: var(--text-tertiary);
 }
 
 .buy-changed {

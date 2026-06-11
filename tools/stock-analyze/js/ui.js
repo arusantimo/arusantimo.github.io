@@ -1133,17 +1133,17 @@ function simplifyMixedExitClause(value) {
     .trim();
 }
 
-function renderMixedExitPolicyLineHtml(label, value) {
+function renderTradePlanActionGuideLineHtml(label, value) {
   const text = String(value || '').trim();
   if (!text) return '';
-  return `<div class="buy-card-mixed-policy-line"><span>${escapeHtml(label)}</span><strong>${escapeHtml(text)}</strong></div>`;
+  return `<div class="trade-plan-action-guide-line"><span>${escapeHtml(label)}</span><strong>${escapeHtml(text)}</strong></div>`;
 }
 
-function renderMixedExitPolicyDetailHtml(policy) {
+function renderTradePlanActionGuideDetailHtml(policy) {
   if (!policy || typeof policy !== 'object' || !policy.active) return '';
   const steps = [];
   const weight = Number(policy.positionWeightMultiplier);
-  steps.push(renderMixedExitPolicyLineHtml(
+  steps.push(renderTradePlanActionGuideLineHtml(
     '지금',
     Number.isFinite(weight)
       ? `${Math.round(weight * 100)}% 비중으로 진입/유지`
@@ -1160,45 +1160,44 @@ function renderMixedExitPolicyDetailHtml(policy) {
     intradayRiskParts.push(String(policy.volatilityOverlay.label || '고변동성 방어 적용'));
   }
   if (intradayRiskParts.length) {
-    steps.push(renderMixedExitPolicyLineHtml('장중', intradayRiskParts.join(' · ')));
+    steps.push(renderTradePlanActionGuideLineHtml('장중', intradayRiskParts.join(' · ')));
   }
 
   (Array.isArray(policy.takeProfitStages) ? policy.takeProfitStages : []).forEach((stage, index) => {
     const target = formatMixedExitPercent(stage?.targetPct);
     if (!target) return;
     const quantity = formatMixedExitQuantityLabel(stage?.quantityPct);
-    steps.push(renderMixedExitPolicyLineHtml(`${index + 1}차 익절`, `${target} 도달 시 ${quantity}`));
+    steps.push(renderTradePlanActionGuideLineHtml(`${index + 1}차 익절`, `${target} 도달 시 ${quantity}`));
   });
 
   const stopText = Number.isFinite(Number(policy.stopPct))
     ? `종가 ${formatMixedExitPercent(policy.stopPct)} 이탈 시 전량 정리`
     : simplifyMixedExitClause(policy.stopCondition);
   if (stopText) {
-    steps.push(renderMixedExitPolicyLineHtml('마감', stopText));
+    steps.push(renderTradePlanActionGuideLineHtml('마감', stopText));
   }
   return steps.filter(Boolean).join('');
 }
 
-function renderMixedExitPolicyHtml(entry) {
+function renderTradePlanActionGuideHtml(entry) {
   const summary = buildMixedExitPolicySummary(entry?.mixedExitPolicy);
   if (!summary) return '';
   const active = entry?.mixedExitPolicy?.active;
-  const detailHtml = renderMixedExitPolicyDetailHtml(entry?.mixedExitPolicy);
-  return `<div class="buy-card-mixed-policy ${active ? 'active' : 'observe'}">
-    <div class="buy-card-mixed-policy-summary">혼합 전략: ${escapeHtml(summary)}</div>
+  if (!active) return '';
+  const detailHtml = renderTradePlanActionGuideDetailHtml(entry?.mixedExitPolicy);
+  return `<div class="trade-plan-action-guide">
+    <div class="trade-plan-action-guide-title">대응 순서</div>
+    <div class="trade-plan-action-guide-summary">${escapeHtml(summary)}</div>
     ${detailHtml}
   </div>`;
 }
 
-function renderBuyModalMixedExitPolicySection(entry) {
-  const content = renderMixedExitPolicyHtml(entry);
-  if (!content) return '';
-  return `
-    <div class="buy-detail-block buy-detail-block-fixed">
-      <div class="modal-section-label">혼합 전략</div>
-      ${content}
-    </div>
-  `;
+function renderTradePlanObserveFooterHtml(entry) {
+  const policy = entry?.mixedExitPolicy;
+  if (!policy || typeof policy !== 'object' || policy.active) return '';
+  const label = String(policy.label || '관찰 전용').trim() || '관찰 전용';
+  const reason = String(policy.reason || '자동 진입 제외').trim() || '자동 진입 제외';
+  return `<div class="trade-plan-observe-footer">${escapeHtml(`${label} · ${reason}`)}</div>`;
 }
 
 function getMixedExitStopTimingText(source) {
@@ -2110,18 +2109,25 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
   `;
 }
 
-function renderTradePlanTable(entry) {
+function renderTradePlanTable(entry, { includeActionGuide = false } = {}) {
+  const actionGuideHtml = includeActionGuide ? renderTradePlanActionGuideHtml(entry) : '';
+  const observeFooterHtml = includeActionGuide ? renderTradePlanObserveFooterHtml(entry) : '';
   if (!(Array.isArray(entry.tradePlanRows) && entry.tradePlanRows.length) && !hasEntryTakeProfitProfiles(entry)) {
-    return '<div class="empty-state compact">매매 단계 정보가 없습니다.</div>';
+    return `
+      ${actionGuideHtml}
+      <div class="empty-state compact">매매 단계 정보가 없습니다.</div>
+      ${observeFooterHtml}
+    `;
   }
 
+  let tradePlanBodyHtml = '';
   if (hasEntryTakeProfitProfiles(entry)) {
     const recommendedProfile = getRecommendedTakeProfitProfileEntry(entry) || getOrderedTakeProfitProfiles(entry)[0] || null;
     const recommendedProfileLabel = String(recommendedProfile?.label || recommendedProfile?.profileKey || '').trim();
     const recommendedTitle = recommendedProfileLabel
       ? `추천 프로필 단계 · ${recommendedProfileLabel}`
       : '추천 프로필 단계';
-    return `
+    tradePlanBodyHtml = `
       ${renderTradePlanRecommendation(entry)}
       ${renderTradePlanProfileComparison(entry)}
       ${recommendedProfile ? renderTradePlanStageRowsTable(recommendedProfile, {
@@ -2129,12 +2135,18 @@ function renderTradePlanTable(entry) {
         recommendedTargetIndex: getTradePlanRecommendedTargetIndex(recommendedProfile)
       }) : ''}
     `;
+  } else {
+    tradePlanBodyHtml = `
+      ${renderTradePlanRecommendation(entry)}
+      ${renderTradePlanProfileComparison(entry)}
+      ${renderTradePlanStageRowsTable(entry)}
+    `;
   }
 
   return `
-    ${renderTradePlanRecommendation(entry)}
-    ${renderTradePlanProfileComparison(entry)}
-    ${renderTradePlanStageRowsTable(entry)}
+    ${actionGuideHtml}
+    ${tradePlanBodyHtml}
+    ${observeFooterHtml}
   `;
 }
 
@@ -2214,8 +2226,6 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       cardClass: 'triggered'
     });
     const buyDetailSummaryHtml = renderBuyDetailSummaryPanel(entry);
-    const buyModalMixedExitPolicyHtml = renderBuyModalMixedExitPolicySection(entry);
-
     document.getElementById('modal-body').innerHTML = `
       <div class="buy-modal-layout">
         <div class="buy-modal-fixed">
@@ -2251,11 +2261,9 @@ function openModal(codeOrEntryKey, mode = 'sell') {
               ${buyDetailSummaryHtml}
             </div>
 
-            ${buyModalMixedExitPolicyHtml}
-
             <div class="buy-trade-plan-block">
               <div class="modal-section-label">매매 단계</div>
-              ${renderTradePlanTable(entry)}
+              ${renderTradePlanTable(entry, { includeActionGuide: true })}
             </div>
           </div>
 
