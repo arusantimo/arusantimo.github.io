@@ -960,7 +960,7 @@ function renderSellStockCards() {
         <div class="scard" id="card-${stock.code}">
           <div class="scard-head">
             <div>
-              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
+              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code, stock.stockExchangeName || entry?.stockExchangeName)}</div>
               <div class="scard-code-wrap">
                 <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry || stock, marketCapRankMap)}</div>
               </div>
@@ -1005,7 +1005,7 @@ function renderSwingCards() {
       <div class="scard swing-card" id="card-${stock.code}">
         <div class="scard-head">
             <div>
-              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code)}</div>
+              <div class="scard-name">${buildStockNameLinksHtml(stock.name, stock.code, stock.stockExchangeName || getEntryByCode(stock.code)?.stockExchangeName)}</div>
               <div class="scard-code-wrap">
                 <div class="scard-code">${escapeHtml(stock.code)}${getTradingValueRankBadgeHtml(getEntryByCode(stock.code))}${renderMarketCapInlineHtml(getEntryByCode(stock.code), marketCapRankMap)}</div>
               </div>
@@ -1155,7 +1155,7 @@ function renderBuyStockCards() {
           <div class="buy-card-head">
             <div>
               <div class="buy-card-rank">${entry.rank}위 · ${escapeHtml(STRATEGY_META[entry.strategy].shortLabel)}</div>
-              <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code)}</div>
+              <div class="buy-card-name">${buildStockNameLinksHtml(entry.name, entry.code, entry.stockExchangeName)}</div>
               <div class="buy-card-code">${escapeHtml(entry.code)}${getTradingValueRankBadgeHtml(entry)}${renderMarketCapInlineHtml(entry, marketCapRankMap)}</div>
             </div>
             <div class="buy-card-scorebox">

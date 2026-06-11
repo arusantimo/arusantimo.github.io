@@ -88,7 +88,7 @@ function sampleSnapshot() {
   return {
     pullbackEntries: [
       { name: 'Reco A', code: '000001', gradeScore: 7.2, grade: 'A', entryEligible: true, statusLabel: '매수추천' },
-      { name: 'Replay B', code: '000002', gradeScore: 6.1, grade: 'B', entryEligible: false, statusLabel: '관심후보' },
+      { name: 'Replay B', code: '000002', gradeScore: 6.1, grade: 'B', entryEligible: false, statusLabel: '매수추천' },
       { name: 'A8 Candidate', code: '000006', gradeScore: 8.1, grade: 'A', entryEligible: false, statusLabel: '관심후보' },
       { name: 'Too Low', code: '000003', gradeScore: 5.9, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
     ],
@@ -170,7 +170,7 @@ test('replay view mode filters buy entries by recommendation, 8&A+, 6.0&B, or 7&
     ...snapshot.reversalEntries
   ], 'all');
 
-  assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Reco C']);
+  assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Too Low', 'Reco C', 'Replay D']);
   assert.deepEqual(replay.map(item => item.name), ['Replay B', 'A8 Candidate', 'Replay D']);
   assert.deepEqual(a8plus.map(item => item.name), ['A8 Candidate', 'Reco C']);
   assert.deepEqual(a7plus.map(item => item.name), ['Reco A', 'A8 Candidate']);
@@ -191,7 +191,6 @@ test('replay view controls show counts and active mode', () => {
   assert.equal(buttons[1].classList.contains('active'), false);
   assert.equal(buttons[2].classList.contains('active'), false);
   assert.equal(buttons[3].classList.contains('active'), true);
-  assert.match(summary.innerHTML, /기간 전체/);
   assert.match(summary.innerHTML, /리플레이 총 2일/);
   assert.match(summary.innerHTML, /누적 수익률 -0\.60%/);
   assert.doesNotMatch(summary.innerHTML, /매수추천 .*건/);

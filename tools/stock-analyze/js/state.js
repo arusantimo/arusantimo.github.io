@@ -27,10 +27,11 @@ function normalizeCodeKey(value) {
 const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'breakout', 'accumulation', 'momentum', 'reversal', 'swing']);
 const JONGGA_REPLAY_VIEW_STORAGE_KEY = 'stockAnalyzeJonggaReplayViewModeV1';
 const JONGGA_REPLAY_PERIOD_STORAGE_KEY = 'stockAnalyzeJonggaReplayPeriodV1';
+const JONGGA_BUY_STATUS_MARKERS = ['강력매수', '매수추천', '최우선 진입', '진입 가능', '관심후보'];
 const JONGGA_REPLAY_VIEW_MODES = {
   recommendation: {
     label: '매수추천',
-    description: '과거 daily 추천 목록 기준으로 표시합니다.'
+    description: '매수추천 라벨 또는 entryEligible 기준으로 표시합니다.'
   },
   a8plus: {
     label: '8 & A+',
@@ -351,6 +352,12 @@ function getJonggaReplayViewMeta(mode = getJonggaReplayViewMode()) {
   return JONGGA_REPLAY_VIEW_MODES[normalizedMode] || JONGGA_REPLAY_VIEW_MODES.recommendation;
 }
 
+function isJonggaRecommendationStatusLabel(entry = {}) {
+  const label = String(entry?.statusLabel || '').trim();
+  if (!label || label === '제외' || label.includes('매매금지')) return false;
+  return JONGGA_BUY_STATUS_MARKERS.some(marker => label.includes(marker));
+}
+
 function readStoredJonggaReplayViewMode() {
   try {
     return normalizeJonggaReplayViewMode(localStorage.getItem(JONGGA_REPLAY_VIEW_STORAGE_KEY) || 'recommendation');
@@ -525,10 +532,11 @@ function matchesJonggaReplayViewMode(entry = {}, mode = getJonggaReplayViewMode(
   }
 
   if (typeof inferEntryEligibilityFromEntry === 'function') {
-    return Boolean(inferEntryEligibilityFromEntry(entry).entryEligible);
+    const eligibility = inferEntryEligibilityFromEntry(entry);
+    return Boolean(eligibility.entryEligible) || Boolean(eligibility.entryWatch) || isJonggaRecommendationStatusLabel(entry);
   }
 
-  return Boolean(entry?.entryEligible);
+  return Boolean(entry?.entryEligible) || Boolean(entry?.entryWatch) || isJonggaRecommendationStatusLabel(entry);
 }
 
 function filterJonggaReplayViewEntries(entries = [], mode = getJonggaReplayViewMode()) {

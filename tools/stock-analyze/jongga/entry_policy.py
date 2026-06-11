@@ -16,10 +16,7 @@ MACRO_GATE_CODES = frozenset({"G5"})
 
 
 def _entry_min_grades(strategy: str) -> set[str]:
-    normalized = str(strategy or "").strip().lower()
-    if normalized == "pullback":
-        return {"S", "A", "B"}
-    return {"S", "A"}
+    return {"S", "A", "B"}
 
 
 def _gate_blockers(rows: list[dict[str, Any]]) -> list[str]:

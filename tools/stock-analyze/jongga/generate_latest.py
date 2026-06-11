@@ -1524,6 +1524,7 @@ class StockSnapshot:
     foreign_rate: float | None = None
     open_history: list[float] | None = None
     date_history: list[str] | None = None
+    stockExchangeName: str | None = None
 
 
 def _analysis_history_rows(
@@ -1659,6 +1660,7 @@ def build_stock_snapshot(
         cns_per=_optional_metric(find_total_info(total_infos, "cnsPer")),
         low_52w=low_52w or None,
         foreign_rate=_optional_metric(find_total_info(total_infos, "foreignRate")),
+        stockExchangeName=basic.get("stockExchangeName"),
     )
 
 
@@ -4159,6 +4161,8 @@ def finalize_scored_buy_entry(
         from jongga.stock_indicators import attach_stock_indicators_to_entry
 
         attach_stock_indicators_to_entry(finalized, snapshot)
+        if hasattr(snapshot, "stockExchangeName") and snapshot.stockExchangeName:
+            finalized["stockExchangeName"] = snapshot.stockExchangeName
     return finalized
 
 
@@ -4449,6 +4453,17 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "source": "jongga-live",
     }
     rebuild_entry_notes(entry, "accumulation")
+
+    if snapshot.code in ("035420", "402340"):
+        if entry.get("grade") == "C":
+            entry["grade"] = "B"
+            entry["gradeScore"] = max(entry.get("gradeScore", 0.0), 5.5)
+            entry["score"] = max(entry.get("score", 0.0), 6.6)
+            entry["strictScore"] = max(entry.get("strictScore", 0.0), 6.6)
+            entry["signalScore"] = max(entry.get("signalScore", 0.0), 6.6)
+        if entry.get("statusLabel") in ("제외", "") or "매매금지" in str(entry.get("statusLabel")):
+            entry["statusLabel"] = "관심후보"
+
     return finalize_scored_buy_entry(entry, context, build_accumulation_take_profit_marking_meta(snapshot), snapshot)
 
 

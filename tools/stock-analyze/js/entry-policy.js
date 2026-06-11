@@ -19,9 +19,7 @@ function computeEntryEligibility(strategy, grade, statusLabel, gates = [], filte
     blockers.push('제외');
   }
 
-  const minGrades = normalizedStrategy === 'pullback'
-    ? new Set(['S', 'A', 'B'])
-    : new Set(['S', 'A']);
+  const minGrades = new Set(['S', 'A', 'B']);
   const gradeOk = minGrades.has(gradeCode);
   if (!gradeOk && gradeCode) {
     blockers.push(`등급 ${gradeCode} — 진입 최소 ${Array.from(minGrades).sort().join(', ')}`);

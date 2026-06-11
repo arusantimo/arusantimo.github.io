@@ -341,7 +341,7 @@ function matchesReplayCaseItem(item = {}, caseKey = 'all') {
   const normalizedCase = String(caseKey || '').trim();
   if (normalizedCase === 'all') return true;
   if (normalizedCase === 'recommendation') {
-    return Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal);
+    return Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal) || String(item.statusLabel || '').includes('관심후보');
   }
   if (normalizedCase === 'a8plus') {
     if (Boolean(item.replayA8Plus)) return true;

@@ -371,12 +371,57 @@ function getTradingValueRankBadgeHtml(entry) {
   return `<span class="tv-rank-badge ${cls}">거래대금 ${rank}위</span>`;
 }
 
-function buildStockNameLinksHtml(name, code) {
+const JONGGA_STATIC_MARKET_MAP = {
+  // 코스피 (KOSPI)
+  '005930': 'KOSPI', '000660': 'KOSPI', '373220': 'KOSPI', '207940': 'KOSPI', '005380': 'KOSPI',
+  '005490': 'KOSPI', '000270': 'KOSPI', '035420': 'KOSPI', '006400': 'KOSPI', '051910': 'KOSPI',
+  '009150': 'KOSPI', '035720': 'KOSPI', '012330': 'KOSPI', '068270': 'KOSPI', '028260': 'KOSPI',
+  '402340': 'KOSPI',
+  '000810': 'KOSPI', '015760': 'KOSPI', '018260': 'KOSPI', '017670': 'KOSPI', '011200': 'KOSPI',
+  '009830': 'KOSPI', '032640': 'KOSPI', '010950': 'KOSPI', '003550': 'KOSPI', '036570': 'KOSPI',
+  '009540': 'KOSPI', '033780': 'KOSPI', '030200': 'KOSPI', '010140': 'KOSPI', '004020': 'KOSPI',
+  '323410': 'KOSPI', '377300': 'KOSPI', '259960': 'KOSPI', '452250': 'KOSPI', '302440': 'KOSPI',
+  '000100': 'KOSPI', '010130': 'KOSPI', '086790': 'KOSPI', '055550': 'KOSPI', '105560': 'KOSPI',
+  '316140': 'KOSPI', '003670': 'KOSPI', '007310': 'KOSPI', '001800': 'KOSPI', '000720': 'KOSPI',
+  '011070': 'KOSPI', '020150': 'KOSPI', '008770': 'KOSPI', '014680': 'KOSPI', '047050': 'KOSPI',
+  '001040': 'KOSPI', '079160': 'KOSPI', '097950': 'KOSPI', '005830': 'KOSPI', '000990': 'KOSPI',
+  '021240': 'KOSPI', '008560': 'KOSPI', '001450': 'KOSPI', '024110': 'KOSPI', '071050': 'KOSPI',
+  '008060': 'KOSPI', '006800': 'KOSPI', '016360': 'KOSPI', '039490': 'KOSPI', '006260': 'KOSPI',
+  // 코스닥 (KOSDAQ)
+  '247540': 'KOSDAQ', '086520': 'KOSDAQ', '068760': 'KOSDAQ', '095700': 'KOSDAQ', '036930': 'KOSDAQ',
+  '089030': 'KOSDAQ',
+  '093370': 'KOSDAQ', '214150': 'KOSDAQ', '192080': 'KOSDAQ', '035760': 'KOSDAQ', '025900': 'KOSDAQ',
+  '039030': 'KOSDAQ', '005290': 'KOSDAQ', '034230': 'KOSDAQ', '041510': 'KOSDAQ', '035900': 'KOSDAQ',
+  '253450': 'KOSDAQ', '293490': 'KOSDAQ', '112040': 'KOSDAQ', '263750': 'KOSDAQ', '058470': 'KOSDAQ',
+  '393890': 'KOSDAQ', '278280': 'KOSDAQ', '036830': 'KOSDAQ', '032500': 'KOSDAQ', '066970': 'KOSDAQ',
+  '214310': 'KOSDAQ', '096530': 'KOSDAQ', '240810': 'KOSDAQ', '084370': 'KOSDAQ', '060720': 'KOSDAQ',
+  '145020': 'KOSDAQ', '021220': 'KOSDAQ', '067630': 'KOSDAQ', '046890': 'KOSDAQ', '078600': 'KOSDAQ',
+  '038500': 'KOSDAQ', '053800': 'KOSDAQ', '036540': 'KOSDAQ', '054780': 'KOSDAQ', '063080': 'KOSDAQ',
+  '065350': 'KOSDAQ', '196170': 'KOSDAQ', '205470': 'KOSDAQ', '287410': 'KOSDAQ', '365550': 'KOSDAQ',
+  '237690': 'KOSDAQ', '140860': 'KOSDAQ', '383310': 'KOSDAQ', '319660': 'KOSDAQ', '340350': 'KOSDAQ',
+  '137400': 'KOSDAQ', '078350': 'KOSDAQ', '032620': 'KOSDAQ', '038070': 'KOSDAQ', '041190': 'KOSDAQ',
+  '060250': 'KOSDAQ', '054620': 'KOSDAQ', '023160': 'KOSDAQ', '000250': 'KOSDAQ'
+};
+
+function buildStockNameLinksHtml(name, code, stockExchangeName) {
   const safeCode = escapeHtml(code);
   const safeName = escapeHtml(name);
+  let marketLabel = '';
+  
+  const resolvedMarket = stockExchangeName || JONGGA_STATIC_MARKET_MAP[code];
+  
+  if (resolvedMarket) {
+    const market = String(resolvedMarket).toUpperCase();
+    if (market.includes('KOSPI') || market.includes('코스피')) {
+      marketLabel = `<span class="market-badge market-kospi">코스피</span>`;
+    } else if (market.includes('KOSDAQ') || market.includes('코스닥')) {
+      marketLabel = `<span class="market-badge market-kosdaq">코스닥</span>`;
+    }
+  }
   return `
     <span class="scard-name-links">
       <a class="scard-name-link" href="https://stock.naver.com/domestic/stock/${safeCode}/price" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${safeName}</a>
+      ${marketLabel}
       <a class="scard-name-link-toss" href="https://www.tossinvest.com/stocks/${safeCode}/order" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" title="토스 주문">T</a>
     </span>
   `.trim();
