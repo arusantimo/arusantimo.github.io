@@ -1917,49 +1917,31 @@ body.modal-scroll-locked {
   color: var(--text-secondary);
 }
 
-.trade-plan-action-guide {
-  margin: 0 0 10px;
-  padding: 7px 9px;
-  border: 1px solid rgba(59, 130, 246, 0.18);
-  border-radius: 8px;
-  background: rgba(59, 130, 246, 0.06);
-  color: var(--text-primary);
-  font-size: 11px;
-  line-height: 1.45;
-}
-
-.trade-plan-action-guide-title {
-  font-weight: 700;
-}
-
-.trade-plan-action-guide-summary {
-  margin-top: 2px;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.trade-plan-action-guide-line {
-  display: grid;
-  grid-template-columns: 56px minmax(0, 1fr);
-  gap: 6px;
-  margin-top: 3px;
-}
-
-.trade-plan-action-guide-line span {
-  color: var(--text-secondary);
-  font-weight: 700;
-}
-
-.trade-plan-action-guide-line strong {
-  min-width: 0;
-  color: inherit;
-  font-weight: 600;
-}
-
-.trade-plan-observe-footer {
-  margin-top: 8px;
+.trade-plan-merged-row td {
+  background: rgba(59, 130, 246, 0.05);
   font-size: 10px;
+  color: var(--text-primary);
+}
+
+.trade-plan-merged-row td:first-child {
+  color: var(--text-secondary);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.trade-plan-merged-row td[colspan] {
+  font-weight: 600;
+}
+
+.trade-plan-merged-row-summary td {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.trade-plan-observe-row td {
+  background: rgba(148, 163, 184, 0.06);
   color: var(--text-tertiary);
+  font-size: 10px;
+  text-align: left;
 }
 
 .buy-changed {

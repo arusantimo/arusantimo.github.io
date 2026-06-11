@@ -1133,22 +1133,45 @@ function simplifyMixedExitClause(value) {
     .trim();
 }
 
-function renderTradePlanActionGuideLineHtml(label, value) {
-  const text = String(value || '').trim();
-  if (!text) return '';
-  return `<div class="trade-plan-action-guide-line"><span>${escapeHtml(label)}</span><strong>${escapeHtml(text)}</strong></div>`;
+function getTradePlanActionGuideBasePrice(entry) {
+  const value = Number(entry?.entryPriceValue);
+  return Number.isFinite(value) && value > 0 ? value : null;
 }
 
-function renderTradePlanActionGuideDetailHtml(policy) {
-  if (!policy || typeof policy !== 'object' || !policy.active) return '';
+function formatTradePlanActionGuidePrice(basePrice, pct) {
+  const price = Number(basePrice);
+  const rate = Number(pct);
+  if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(rate)) return '-';
+  return formatWon(Math.round(price * (1 + (rate / 100))));
+}
+
+function formatTradePlanActionGuideYieldList(policy) {
+  const yields = (Array.isArray(policy?.takeProfitStages) ? policy.takeProfitStages : [])
+    .map(stage => formatMixedExitPercent(stage?.targetPct))
+    .filter(Boolean);
+  return yields.length ? yields.join(' / ') : '-';
+}
+
+function formatTradePlanActionGuidePriceList(entry, policy) {
+  const basePrice = getTradePlanActionGuideBasePrice(entry);
+  const prices = (Array.isArray(policy?.takeProfitStages) ? policy.takeProfitStages : [])
+    .map(stage => formatTradePlanActionGuidePrice(basePrice, stage?.targetPct))
+    .filter(price => price && price !== '-');
+  return prices.length ? prices.join(' / ') : '-';
+}
+
+function buildTradePlanActionGuideItems(policy) {
+  if (!policy || typeof policy !== 'object' || !policy.active) return [];
   const steps = [];
+  const basePrice = getTradePlanActionGuideBasePrice(policy.__entryRef);
   const weight = Number(policy.positionWeightMultiplier);
-  steps.push(renderTradePlanActionGuideLineHtml(
-    '지금',
-    Number.isFinite(weight)
-      ? `${Math.round(weight * 100)}% 비중으로 진입/유지`
-      : '진입/유지'
-  ));
+  steps.push({
+    label: '지금',
+    condition: simplifyMixedExitClause(policy.label || '진입/유지'),
+    quantity: Number.isFinite(weight) ? `${Math.round(weight * 100)}% 비중` : '-',
+    targetYield: formatTradePlanActionGuideYieldList(policy),
+    targetPrice: formatTradePlanActionGuidePriceList(policy.__entryRef, policy)
+  });
 
   const intradayRiskParts = [];
   const intradayTiming = normalizeMixedExitTimeLabel(policy?.intradayRiskRule?.timing);
@@ -1160,44 +1183,80 @@ function renderTradePlanActionGuideDetailHtml(policy) {
     intradayRiskParts.push(String(policy.volatilityOverlay.label || '고변동성 방어 적용'));
   }
   if (intradayRiskParts.length) {
-    steps.push(renderTradePlanActionGuideLineHtml('장중', intradayRiskParts.join(' · ')));
+    steps.push({
+      label: '장중',
+      condition: intradayRiskParts.join(' · '),
+      quantity: intradayAction || '-',
+      targetYield: formatMixedExitPercent(policy?.intradayRiskRule?.triggerPct) || '-',
+      targetPrice: formatTradePlanActionGuidePrice(basePrice, policy?.intradayRiskRule?.triggerPct)
+    });
   }
 
   (Array.isArray(policy.takeProfitStages) ? policy.takeProfitStages : []).forEach((stage, index) => {
     const target = formatMixedExitPercent(stage?.targetPct);
     if (!target) return;
     const quantity = formatMixedExitQuantityLabel(stage?.quantityPct);
-    steps.push(renderTradePlanActionGuideLineHtml(`${index + 1}차 익절`, `${target} 도달 시 ${quantity}`));
+    steps.push({
+      label: `${index + 1}차 익절`,
+      condition: `${target} 도달 시`,
+      quantity,
+      targetYield: target,
+      targetPrice: formatTradePlanActionGuidePrice(basePrice, stage?.targetPct)
+    });
   });
 
   const stopText = Number.isFinite(Number(policy.stopPct))
     ? `종가 ${formatMixedExitPercent(policy.stopPct)} 이탈 시 전량 정리`
     : simplifyMixedExitClause(policy.stopCondition);
   if (stopText) {
-    steps.push(renderTradePlanActionGuideLineHtml('마감', stopText));
+    steps.push({
+      label: '마감',
+      condition: stopText,
+      quantity: '전량 정리',
+      targetYield: formatMixedExitPercent(policy.stopPct) || '-',
+      targetPrice: formatTradePlanActionGuidePrice(basePrice, policy.stopPct)
+    });
   }
-  return steps.filter(Boolean).join('');
+  return steps.filter(step => step && step.label);
 }
 
-function renderTradePlanActionGuideHtml(entry) {
+function renderTradePlanActionGuideRowsHtml(entry) {
   const summary = buildMixedExitPolicySummary(entry?.mixedExitPolicy);
   if (!summary) return '';
   const active = entry?.mixedExitPolicy?.active;
   if (!active) return '';
-  const detailHtml = renderTradePlanActionGuideDetailHtml(entry?.mixedExitPolicy);
-  return `<div class="trade-plan-action-guide">
-    <div class="trade-plan-action-guide-title">대응 순서</div>
-    <div class="trade-plan-action-guide-summary">${escapeHtml(summary)}</div>
-    ${detailHtml}
-  </div>`;
+  const steps = buildTradePlanActionGuideItems({ ...entry?.mixedExitPolicy, __entryRef: entry });
+  const weight = Number(entry?.mixedExitPolicy?.positionWeightMultiplier);
+  return `
+    <tr class="trade-plan-merged-row trade-plan-merged-row-summary">
+      <td>대응 순서</td>
+      <td>${escapeHtml(summary)}</td>
+      <td>${escapeHtml(Number.isFinite(weight) ? `${Math.round(weight * 100)}% 비중` : '-')}</td>
+      <td>${escapeHtml(formatTradePlanActionGuideYieldList(entry?.mixedExitPolicy))}</td>
+      <td>${escapeHtml(formatTradePlanActionGuidePriceList(entry, entry?.mixedExitPolicy))}</td>
+    </tr>
+    ${steps.map(step => `
+      <tr class="trade-plan-merged-row">
+        <td>${escapeHtml(step.label)}</td>
+        <td>${escapeHtml(step.condition || '-')}</td>
+        <td>${escapeHtml(step.quantity || '-')}</td>
+        <td>${escapeHtml(step.targetYield || '-')}</td>
+        <td>${escapeHtml(step.targetPrice || '-')}</td>
+      </tr>
+    `).join('')}
+  `;
 }
 
-function renderTradePlanObserveFooterHtml(entry) {
+function renderTradePlanObserveFooterRowHtml(entry) {
   const policy = entry?.mixedExitPolicy;
   if (!policy || typeof policy !== 'object' || policy.active) return '';
   const label = String(policy.label || '관찰 전용').trim() || '관찰 전용';
   const reason = String(policy.reason || '자동 진입 제외').trim() || '자동 진입 제외';
-  return `<div class="trade-plan-observe-footer">${escapeHtml(`${label} · ${reason}`)}</div>`;
+  return `
+    <tr class="trade-plan-observe-row">
+      <td colspan="5">${escapeHtml(`${label} · ${reason}`)}</td>
+    </tr>
+  `;
 }
 
 function getMixedExitStopTimingText(source) {
@@ -2066,7 +2125,7 @@ function renderTradePlanProfileComparison(entry) {
   `;
 }
 
-function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIndex = -1 } = {}) {
+function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIndex = -1, prependBodyHtml = '', appendBodyHtml = '' } = {}) {
   const rows = Array.isArray(source?.tradePlanRows) ? source.tradePlanRows : [];
   if (!rows.length) return '';
 
@@ -2080,6 +2139,7 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
     <table class="guide-table compact-table">
       <thead><tr><th>단계</th><th>조건</th><th>수량</th><th>목표 수익률</th><th>목표가</th></tr></thead>
       <tbody>
+        ${prependBodyHtml}
         ${rows.map(row => {
           const isTargetRow = getTradePlanStageTagTone(row) !== 'stop';
           if (isTargetRow) targetIndex += 1;
@@ -2103,6 +2163,7 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
             : escapeHtml(row.condition);
           return `<tr${isRec ? ` style="${recRowStyle}"` : ''}>${stageCell}<td>${conditionCell}</td><td>${escapeHtml(row.quantity)}</td>${yieldCell}${priceCell}</tr>`;
         }).join('')}
+        ${appendBodyHtml}
       </tbody>
     </table>
     ${title ? `<div class="trade-plan-stage-caption">${escapeHtml(title)}</div>` : ''}
@@ -2110,13 +2171,11 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
 }
 
 function renderTradePlanTable(entry, { includeActionGuide = false } = {}) {
-  const actionGuideHtml = includeActionGuide ? renderTradePlanActionGuideHtml(entry) : '';
-  const observeFooterHtml = includeActionGuide ? renderTradePlanObserveFooterHtml(entry) : '';
+  const actionGuideRowsHtml = includeActionGuide ? renderTradePlanActionGuideRowsHtml(entry) : '';
+  const observeFooterRowHtml = includeActionGuide ? renderTradePlanObserveFooterRowHtml(entry) : '';
   if (!(Array.isArray(entry.tradePlanRows) && entry.tradePlanRows.length) && !hasEntryTakeProfitProfiles(entry)) {
     return `
-      ${actionGuideHtml}
       <div class="empty-state compact">매매 단계 정보가 없습니다.</div>
-      ${observeFooterHtml}
     `;
   }
 
@@ -2132,22 +2191,23 @@ function renderTradePlanTable(entry, { includeActionGuide = false } = {}) {
       ${renderTradePlanProfileComparison(entry)}
       ${recommendedProfile ? renderTradePlanStageRowsTable(recommendedProfile, {
         title: recommendedTitle,
-        recommendedTargetIndex: getTradePlanRecommendedTargetIndex(recommendedProfile)
+        recommendedTargetIndex: getTradePlanRecommendedTargetIndex(recommendedProfile),
+        prependBodyHtml: actionGuideRowsHtml,
+        appendBodyHtml: observeFooterRowHtml
       }) : ''}
     `;
   } else {
     tradePlanBodyHtml = `
       ${renderTradePlanRecommendation(entry)}
       ${renderTradePlanProfileComparison(entry)}
-      ${renderTradePlanStageRowsTable(entry)}
+      ${renderTradePlanStageRowsTable(entry, {
+        prependBodyHtml: actionGuideRowsHtml,
+        appendBodyHtml: observeFooterRowHtml
+      })}
     `;
   }
 
-  return `
-    ${actionGuideHtml}
-    ${tradePlanBodyHtml}
-    ${observeFooterHtml}
-  `;
+  return tradePlanBodyHtml;
 }
 
 function renderBuyDetailSummaryPanel(entry) {
