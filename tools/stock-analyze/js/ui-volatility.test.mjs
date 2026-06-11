@@ -308,20 +308,22 @@ test('trade plan table renders merged action guide in time order', () => {
     }
   }, { includeActionGuide: true });
 
-  assert.match(html, /<tr class="trade-plan-merged-row trade-plan-merged-row-summary">/);
-  assert.match(html, /<td>대응 순서<\/td>/);
-  assert.match(html, /<td>지금<\/td>/);
+  assert.match(html, /<tr class="trade-plan-section-row">/);
+  assert.match(html, /<td colspan="5">대응 순서<\/td>/);
+  assert.match(html, /<td colspan="5">기존 매매 단계<\/td>|<td colspan="5">추천 프로필 세부 단계<\/td>/);
+  assert.doesNotMatch(html, /<td>지금(?:<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천<\/span>)?<\/td>/);
   assert.match(html, /<td>장중<\/td>/);
-  assert.match(html, /<td>1차 익절<\/td>/);
+  assert.match(html, /<td>1차 익절<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천<\/span><\/td>/);
   assert.match(html, /<td>2차 익절<\/td>/);
   assert.match(html, /<td>마감<\/td>/);
   assert.match(html, /10:00 \/ 14:00 체크 후 50% 축소/);
   assert.match(html, /종가 -2% 이탈 시 전량 정리/);
   assert.doesNotMatch(html, /혼합 전략:/);
-  assert.ok(html.indexOf('<td>지금</td>') < html.indexOf('<td>장중</td>'));
-  assert.ok(html.indexOf('<td>장중</td>') < html.indexOf('<td>1차 익절</td>'));
-  assert.ok(html.indexOf('<td>1차 익절</td>') < html.indexOf('<td>2차 익절</td>'));
+  assert.ok(html.indexOf('<td>장중</td>') < html.indexOf('<td>1차 익절'));
+  assert.ok(html.indexOf('<td>1차 익절') < html.indexOf('<td>2차 익절</td>'));
   assert.ok(html.indexOf('<td>2차 익절</td>') < html.indexOf('<td>마감</td>'));
+  assert.ok(html.indexOf('대응 순서') < html.indexOf('<td>장중</td>'));
+  assert.ok(html.indexOf('<td>마감</td>') < html.indexOf('기존 매매 단계') || html.indexOf('<td>마감</td>') < html.indexOf('추천 프로필 세부 단계'));
 });
 
 test('trade plan table renders observe footer for inactive mixed policy', () => {

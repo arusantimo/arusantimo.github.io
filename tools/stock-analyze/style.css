@@ -1933,8 +1933,17 @@ body.modal-scroll-locked {
   font-weight: 600;
 }
 
-.trade-plan-merged-row-summary td {
+.trade-plan-section-row td {
   background: rgba(59, 130, 246, 0.08);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-align: left;
+}
+
+.trade-plan-section-row-muted td {
+  background: rgba(148, 163, 184, 0.08);
 }
 
 .trade-plan-observe-row td {
