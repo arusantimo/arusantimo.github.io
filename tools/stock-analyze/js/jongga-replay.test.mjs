@@ -859,6 +859,16 @@ test('strategy modal renders selected case summary, stock table, and day files',
   context.elements.set('jongga-replay-modal-title', title);
   context.elements.set('jongga-replay-modal-subtitle', subtitle);
   context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+  context.window.JONGGA_REPLAY_RUNS.latestRun.days[0].results[0].mixedExitPolicy = {
+    policyKey: 'pullback-a8plus-balanced',
+    label: '눌림목 × 8&A+',
+    active: true,
+    stopPct: -2,
+    takeProfitStages: [
+      { targetPct: 5, quantityPct: 50 },
+      { targetPct: 12, quantityPct: 50 }
+    ]
+  };
 
   context.renderJonggaReplayModal('pullback');
 
@@ -878,6 +888,9 @@ test('strategy modal renders selected case summary, stock table, and day files',
   assert.match(body.innerHTML, /매수\/매도 종목/);
   assert.match(body.innerHTML, /💚 장초반 익절/);
   assert.match(body.innerHTML, /익일 10시 이전 목표가 도달/);
+  assert.match(body.innerHTML, /눌림목 × 8&amp;A\+/);
+  assert.match(body.innerHTML, /\+5% 50% \/ \+12% 50%/);
+  assert.match(body.innerHTML, /종가 -2% 손절/);
   assert.match(body.innerHTML, /클릭해 체결 이력 보기/);
   assert.match(body.innerHTML, /순차 체결 이력/);
   assert.match(body.innerHTML, /replay-fill-badge buy/);

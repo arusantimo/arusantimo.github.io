@@ -1090,6 +1090,41 @@ function renderBuyMarketHoldBanner() {
   `;
 }
 
+function formatMixedExitPercent(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return '';
+  return `${number > 0 ? '+' : ''}${Number.isInteger(number) ? number.toFixed(0) : number.toFixed(1)}%`;
+}
+
+function buildMixedExitPolicySummary(policy) {
+  if (!policy || typeof policy !== 'object') return '';
+  const label = String(policy.label || (policy.active ? '혼합 전략' : '관찰 전용'));
+  if (!policy.active) {
+    return `${label} · ${String(policy.reason || '자동 진입 제외')}`;
+  }
+  const stages = Array.isArray(policy.takeProfitStages)
+    ? policy.takeProfitStages
+      .map(stage => {
+        const target = formatMixedExitPercent(stage?.targetPct);
+        const quantity = Number(stage?.quantityPct);
+        return target ? `${target} ${Number.isFinite(quantity) ? `${quantity.toFixed(0)}%` : ''}`.trim() : '';
+      })
+      .filter(Boolean)
+      .join(' / ')
+    : '';
+  const stop = Number.isFinite(Number(policy.stopPct))
+    ? `종가 ${formatMixedExitPercent(policy.stopPct)} 손절`
+    : '손절 미적용';
+  return `${label}${stages ? ` · ${stages}` : ''} · ${stop}`;
+}
+
+function renderMixedExitPolicyHtml(entry) {
+  const summary = buildMixedExitPolicySummary(entry?.mixedExitPolicy);
+  if (!summary) return '';
+  const active = entry?.mixedExitPolicy?.active;
+  return `<div class="buy-card-mixed-policy ${active ? 'active' : 'observe'}">혼합 전략: ${escapeHtml(summary)}</div>`;
+}
+
 function renderBuyStockCards() {
   const replayViewMode = typeof getJonggaReplayViewMode === 'function'
     ? getJonggaReplayViewMode()
@@ -1138,6 +1173,7 @@ function renderBuyStockCards() {
       const volatilityTopBadgesHtml = renderVolatilityTopBadges(entry);
       const pullbackInsightHtml = renderPullbackCardInsights(entry);
       const volatilityInsightHtml = renderVolatilityCardInsights(entry);
+      const mixedExitPolicyHtml = renderMixedExitPolicyHtml(entry);
       const statusReasonHtml = presentation.primaryStatusReasonShort
         ? `<div class="buy-card-status-reason">${escapeHtml(presentation.primaryStatusReasonShort)}</div>`
         : '';
@@ -1171,6 +1207,7 @@ function renderBuyStockCards() {
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
           ${statusReasonHtml}
           ${setupBadgeHtml}
+          ${mixedExitPolicyHtml}
           ${pullbackInsightHtml}
           ${volatilityInsightHtml}
           <div class="buy-card-tags">

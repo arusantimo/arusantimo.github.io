@@ -37,6 +37,7 @@ from jongga.macro_overlay import (
     reversal_status_label,
     trend_status_label,
 )
+from jongga.mixed_exit_policy import select_mixed_exit_policy
 from jongga.rule_evaluation import (
     evaluate_accumulation_c1,
     evaluate_accumulation_c2,
@@ -3930,6 +3931,11 @@ def compute_recommended_entry_band(entry_price: float, regime_label: str, gap_co
     }
 
 
+def attach_mixed_exit_policy(entry: dict[str, Any], strategy: str) -> dict[str, Any]:
+    entry["mixedExitPolicy"] = select_mixed_exit_policy(entry, strategy)
+    return entry
+
+
 def attach_marking(entry: dict[str, Any], context: dict[str, Any], marking_meta: dict[str, Any] | None = None) -> dict[str, Any]:
     """엔트리에 recommendedEntryBand·recommendedStage를 추가하고, tradePlanRows에
     recommended/historicalHitRate를 표기한다. 과거 적중 롤업이 있으면 EV(=적중률×목표)로,
@@ -3956,7 +3962,7 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any], marking_meta:
             entry["recommendedStage"] = dict(chosen_profile.get("recommendedStage") or {})
             stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if "손절" in str(row.get("stage") or "")), "0"))
             entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
-            return entry
+            return attach_mixed_exit_policy(entry, strategy)
     if strategy == "accumulation":
         profiles, recommended_profile = _build_accumulation_take_profit_profiles(entry, context, dims, marking_meta)
         chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
@@ -3967,7 +3973,7 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any], marking_meta:
             entry["recommendedStage"] = dict(chosen_profile.get("recommendedStage") or {})
             stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if _is_stop_trade_plan_row(row)), "0"))
             entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
-            return entry
+            return attach_mixed_exit_policy(entry, strategy)
     if strategy == "breakout":
         profiles, recommended_profile = _build_breakout_take_profit_profiles(entry, context, dims, marking_meta)
         chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
@@ -3979,7 +3985,7 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any], marking_meta:
             entry["breakoutLiveExitPolicy"] = build_breakout_live_exit_policy(chosen_profile)
             stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if _is_stop_trade_plan_row(row)), "0"))
             entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
-            return entry
+            return attach_mixed_exit_policy(entry, strategy)
     if strategy == "reversal":
         profiles, recommended_profile = _build_reversal_take_profit_profiles(entry, context, dims, marking_meta)
         chosen_profile = next((profile for profile in profiles if profile.get("recommended")), profiles[0] if profiles else None)
@@ -3991,10 +3997,10 @@ def attach_marking(entry: dict[str, Any], context: dict[str, Any], marking_meta:
             entry["reversalLiveExitPolicy"] = build_reversal_live_exit_policy()
             stop_rate = parse_float(next((row.get("targetYield") for row in entry["tradePlanRows"] if _is_stop_trade_plan_row(row)), "0"))
             entry["rr"] = rr_text(entry_price, stop_rate, blended_reward_from_plan(entry["tradePlanRows"]))
-            return entry
+            return attach_mixed_exit_policy(entry, strategy)
 
     entry["recommendedStage"] = _stage_recommendation_from_rows(strategy, rows, dims, rollup)
-    return entry
+    return attach_mixed_exit_policy(entry, strategy)
 
 
 def build_top_trading_value_gate(rank: int, code: str) -> dict[str, Any]:

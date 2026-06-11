@@ -1917,6 +1917,23 @@ body.modal-scroll-locked {
   color: var(--text-secondary);
 }
 
+.buy-card-mixed-policy {
+  margin: -2px 0 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(59, 130, 246, 0.22);
+  border-radius: 8px;
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--text-primary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.buy-card-mixed-policy.observe {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(148, 163, 184, 0.08);
+  color: var(--text-secondary);
+}
+
 .buy-changed {
   color: var(--text-refresh) !important;
 }

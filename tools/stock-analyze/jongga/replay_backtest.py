@@ -14,6 +14,11 @@ from jongga.outcome_tracker import compute_outcome, extract_context_dims, load_d
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, compact_date, iter_buy_entries, normalize_variant, read_js_assignment
 from jongga.replay_market_data import TICK_PROXY_SOURCE, build_replay_market_data
 from jongga.sim_broker import simulate_trade
+from jongga.mixed_exit_policy import (
+    mixed_exit_policy_key_for_cell,
+    matches_mixed_recommendation_case,
+    select_mixed_exit_policy,
+)
 
 REPLAY_RUNS_MARKER = "JONGGA_REPLAY_RUNS"
 REPLAY_INCLUDE_GRADE_SCORE_MIN = 6.0
@@ -137,6 +142,8 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "strictScore": float(entry.get("strictScore") or 0.0),
         "signalScore": float(entry.get("signalScore") or entry.get("score") or 0.0),
         "entryPrice": float(entry.get("entryPrice") or entry.get("currentPrice") or 0.0),
+        "statusLabel": str(entry.get("statusLabel") or ""),
+        "mixedExitPolicy": entry.get("mixedExitPolicy") or select_mixed_exit_policy(entry, strategy),
         "entryEligibleOriginal": bool(entry.get("entryEligible")),
         "historyRecommendation": bool(entry.get("historyRecommendation")),
         "replayIncluded": replay_included,
@@ -350,6 +357,42 @@ def build_take_profit_profile_stats(results: list[dict[str, Any]]) -> dict[str, 
     }
 
 
+def build_strategy_recommendation_matrix(results: list[dict[str, Any]]) -> dict[str, Any]:
+    matrix: dict[str, Any] = {}
+    cases = (
+        REPLAY_CASE_RECOMMENDATION,
+        REPLAY_CASE_A8PLUS,
+        REPLAY_CASE_A7PLUS,
+        REPLAY_CASE_REPLAY,
+    )
+    strategies = sorted(
+        {str(item.get("strategy") or "") for item in results if str(item.get("strategy") or "")},
+        key=strategy_sort_key,
+    )
+    for strategy in strategies:
+        strategy_results = [item for item in results if item.get("strategy") == strategy]
+        for case_key in cases:
+            case_results = [
+                item
+                for item in strategy_results
+                if matches_mixed_recommendation_case(item, case_key)
+            ]
+            returns = _metric_returns(case_results)
+            wins = [ret for ret in returns if ret > 0]
+            matrix[f"{strategy}|{case_key}"] = {
+                "strategy": strategy,
+                "recommendationCase": case_key,
+                "sampleCount": len(case_results),
+                "tradeCount": len(case_results),
+                "winRate": round(len(wins) / len(returns), 4) if returns else None,
+                "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
+                "cumNetReturnPct": cumulative_return_pct(returns),
+                "maxDrawdownPct": max_drawdown_pct(returns) if returns else None,
+                "recommendedExitPolicyKey": mixed_exit_policy_key_for_cell(strategy, case_key),
+            }
+    return matrix
+
+
 def build_summary_payload(
     *,
     candidates: list[dict[str, Any]],
@@ -360,12 +403,14 @@ def build_summary_payload(
     by_strategy = build_strategy_stats(candidates=candidates, results=results, orders=orders)
     by_stock = build_stock_stats(results)
     by_take_profit_profile = build_take_profit_profile_stats(results)
+    strategy_recommendation_matrix = build_strategy_recommendation_matrix(results)
     return {
         **overall,
         "overall": overall,
         "byStrategy": by_strategy,
         "byStock": by_stock,
         "strategyStats": by_strategy,
+        "strategyRecommendationMatrix": strategy_recommendation_matrix,
         **by_take_profit_profile,
     }
 
@@ -388,6 +433,7 @@ def summarize_trade_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "tradeStatus": item.get("tradeStatus"),
             "closedReason": item.get("closedReason"),
             "netReturnPct": item.get("netReturnPct"),
+            "mixedExitPolicy": item.get("mixedExitPolicy"),
         })
     return rows
 
@@ -839,8 +885,10 @@ def run_replay(
                     "entryEligible": candidate["entryEligible"],
                     "entryEligibleOriginal": candidate["entryEligibleOriginal"],
                     "setupQuality": candidate["setupQuality"],
+                    "statusLabel": candidate.get("statusLabel") or "",
                     "takeProfitProfileKey": candidate["takeProfitProfileKey"],
                     "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
+                    "mixedExitPolicy": candidate.get("mixedExitPolicy") or {},
                     "payloadSourceMode": payload_source_mode,
                     "inputArchiveVersion": input_archive_version,
                     "rebuildable": payload_rebuildable,

@@ -137,6 +137,21 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
             sampleCount: 12,
             ev: 1.37
           },
+          mixedExitPolicy: {
+            version: 'mixed-exit-v1-balanced',
+            policyKey: 'reversal-a7plus-balanced',
+            label: '반등 × 7&A',
+            active: true,
+            priority: 2,
+            stopPct: -2,
+            stopExecution: 'close',
+            takeProfitStages: [
+              { targetPct: 2, quantityPct: 50 },
+              { targetPct: 10, quantityPct: 50 }
+            ],
+            positionWeightHint: 'normal',
+            reason: '반등 주력 후보'
+          },
           pullbackTakeProfitProfiles: [{
             profileKey: 'conservative',
             label: '보수형',
@@ -274,6 +289,9 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(breakout.marketCapUniverseCount, 2000);
   assert.equal(breakout.recommendedTakeProfitProfile.profileKey, 'balanced');
   assert.equal(breakout.recommendedTakeProfitProfile.sampleCount, 12);
+  assert.equal(breakout.mixedExitPolicy.policyKey, 'reversal-a7plus-balanced');
+  assert.equal(breakout.mixedExitPolicy.stopPct, -2);
+  assert.equal(breakout.mixedExitPolicy.takeProfitStages[1].targetPct, 10);
   assert.equal(breakout.pullbackTakeProfitProfiles.length, 1);
   assert.equal(breakout.pullbackTakeProfitProfiles[0].nearestResistanceType, 'ma5');
   assert.equal(breakout.pullbackTakeProfitProfiles[0].tradePlanRows[0].targetPrice, '70,500원');

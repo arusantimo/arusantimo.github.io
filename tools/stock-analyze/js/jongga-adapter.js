@@ -124,6 +124,27 @@ function normalizeJonggaTakeProfitProfiles(value) {
     .filter(Boolean);
 }
 
+function normalizeJonggaMixedExitPolicy(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    version: String(value.version || ''),
+    policyKey: String(value.policyKey || ''),
+    label: String(value.label || ''),
+    active: Boolean(value.active),
+    priority: value.priority === null || value.priority === undefined ? null : Number(value.priority),
+    strategyCase: String(value.strategyCase || ''),
+    recommendationCase: String(value.recommendationCase || ''),
+    stopPct: value.stopPct === null || value.stopPct === undefined ? null : Number(value.stopPct),
+    stopExecution: String(value.stopExecution || 'close'),
+    takeProfitStages: asJonggaArray(value.takeProfitStages).map(stage => ({
+      targetPct: Number(stage.targetPct || 0),
+      quantityPct: Number(stage.quantityPct || 0)
+    })),
+    positionWeightHint: String(value.positionWeightHint || ''),
+    reason: String(value.reason || '')
+  };
+}
+
 function normalizeJonggaPullbackContext(value) {
   if (!value || typeof value !== 'object') return null;
   const support = value.support && typeof value.support === 'object' ? value.support : {};
@@ -541,6 +562,7 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     statusReasonShort: String(effectiveRawEntry.statusReasonShort || ''),
     notes: asJonggaArray(effectiveRawEntry.notes).map(note => String(note)),
     tradePlanRows: normalizeJonggaTradePlanRows(effectiveRawEntry.tradePlanRows || effectiveRawEntry.tradePlan),
+    mixedExitPolicy: normalizeJonggaMixedExitPolicy(effectiveRawEntry.mixedExitPolicy),
     recommendedEntryBand: normalizeJonggaRecommendedBand(effectiveRawEntry.recommendedEntryBand),
     recommendedStage: normalizeJonggaRecommendedStage(effectiveRawEntry.recommendedStage),
     pullbackTakeProfitProfiles: normalizeJonggaTakeProfitProfiles(effectiveRawEntry.pullbackTakeProfitProfiles),

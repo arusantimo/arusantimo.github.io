@@ -95,6 +95,34 @@ function formatReplayQuantityPct(value) {
   return `${num.toFixed(num % 1 === 0 ? 0 : 1)}%`;
 }
 
+function formatReplayMixedExitPercent(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '';
+  return `${num > 0 ? '+' : ''}${num.toFixed(num % 1 === 0 ? 0 : 1)}%`;
+}
+
+function buildReplayMixedExitPolicySummary(policy = null) {
+  if (!policy || typeof policy !== 'object') return '';
+  const label = String(policy.label || (policy.active ? '혼합 전략' : '관찰 전용')).trim();
+  if (!policy.active) {
+    return `${label || '관찰 전용'} · ${String(policy.reason || '자동 진입 제외')}`;
+  }
+  const stages = Array.isArray(policy.takeProfitStages)
+    ? policy.takeProfitStages
+      .map(stage => {
+        const target = formatReplayMixedExitPercent(stage?.targetPct);
+        const quantity = Number(stage?.quantityPct);
+        return target ? `${target} ${Number.isFinite(quantity) ? `${quantity.toFixed(0)}%` : ''}`.trim() : '';
+      })
+      .filter(Boolean)
+      .join(' / ')
+    : '';
+  const stop = Number.isFinite(Number(policy.stopPct))
+    ? `종가 ${formatReplayMixedExitPercent(policy.stopPct)} 손절`
+    : '손절 미적용';
+  return `${label || '혼합 전략'}${stages ? ` · ${stages}` : ''} · ${stop}`;
+}
+
 function getReplayFillSourceEntryKey(fill = {}) {
   const explicit = String(fill?.sourceEntryKey || '').trim();
   if (explicit) return explicit;
@@ -452,6 +480,7 @@ function summarizeReplayTradeRows(results = [], fills = []) {
     tradeStatus: item?.tradeStatus,
     closedReason: item?.closedReason,
     netReturnPct: item?.netReturnPct,
+    mixedExitPolicy: item?.mixedExitPolicy || null,
     fills: fillsByEntryKey.get(String(item?.sourceEntryKey || '')) || []
   }));
 }
@@ -919,6 +948,7 @@ function renderReplayTradeTable(rows = []) {
             const rowId = buildReplayTradeRowId(item);
             const detailId = buildReplayTradeDetailRowId(item);
             const hasDetail = Array.isArray(item?.fills) && item.fills.length > 0;
+            const mixedPolicySummary = buildReplayMixedExitPolicySummary(item?.mixedExitPolicy);
             return `
             <tr
               id="${escapeHtml(rowId)}"
@@ -943,6 +973,7 @@ function renderReplayTradeTable(rows = []) {
               <td>
                 ${escapeHtml(item.tradeStatus || '-')}
                 <div class="replay-cell-sub">${escapeHtml(getReplayClosedReasonLabel(item.closedReason))}</div>
+                ${mixedPolicySummary ? `<div class="replay-cell-sub">${escapeHtml(mixedPolicySummary)}</div>` : ''}
               </td>
             </tr>
             ${hasDetail ? `
