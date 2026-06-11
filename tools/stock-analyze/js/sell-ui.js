@@ -362,8 +362,26 @@ function describeSellStrategyStage(stage, row, detail) {
     if (detail?.gapProfile?.swingMode === 'conditional') return `잔여 물량만 조건부 스윙 검토${rowSummary ? ` · ${rowSummary}` : ''}`;
     return `잔여 물량만 스윙 전환 검토${rowSummary ? ` · ${rowSummary}` : ''}`;
   }
-  if (stage === 'stopLoss') return `손절선 이탈 시 전량 매도${rowSummary ? ` · ${rowSummary}` : ''}`;
+  if (stage === 'stopLoss') {
+    const stopTiming = String(detail?.mixedExitPolicy?.stopTiming || detail?.stock?.mixedExitPolicy?.stopTiming || '').trim();
+    return `${stopTiming ? `손절 시점 ${stopTiming} · ` : ''}손절선 이탈 시 전량 매도${rowSummary ? ` · ${rowSummary}` : ''}`;
+  }
   return rowSummary || rowCondition || '세부 전략 확인';
+}
+
+function getCompactSellPlanItems(items) {
+  if (!Array.isArray(items) || !items.length) return [];
+  const stopLossIndex = items.findIndex(item => String(item?.title || '').includes('손절'));
+  if (stopLossIndex < 0 || items.length <= 3) {
+    return items.slice(0, 3);
+  }
+
+  const stopLossItem = items[stopLossIndex];
+  const nonStopItems = items.filter(item => item !== stopLossItem);
+  if (stopLossIndex === 0) {
+    return [stopLossItem, ...nonStopItems.slice(0, 2)];
+  }
+  return [...nonStopItems.slice(0, 2), stopLossItem];
 }
 
 function buildSyntheticSellStrategyItem(detail) {
@@ -534,8 +552,7 @@ function buildSellStrategyPlan(detail) {
 
 function renderSellStrategyPlan(detail, compact = false) {
   const plan = buildSellStrategyPlan(detail);
-  const limit = compact ? 3 : plan.items.length;
-  const visibleItems = plan.items.slice(0, limit);
+  const visibleItems = compact ? getCompactSellPlanItems(plan.items) : plan.items;
   const summaryLine = plan.headlineDetail
     ? `${escapeHtml(plan.headline)}: ${escapeHtml(plan.headlineDetail)}`
     : escapeHtml(plan.headline);

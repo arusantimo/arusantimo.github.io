@@ -177,6 +177,19 @@ test('replay view mode filters buy entries by recommendation, 8&A+, 6.0&B, or 7&
   assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Too Low', 'Reco C', 'Replay D']);
 });
 
+test('replay view mode defaults to all when no stored selection exists', () => {
+  const { context, buttons, elements } = loadStateContext();
+  const summary = createElementStub();
+  elements.set('jongga-replay-view-summary', summary);
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+
+  assert.equal(context.getJonggaReplayViewMode(), 'all');
+  context.updateJonggaReplayViewControls(sampleSnapshot());
+
+  assert.equal(buttons[4].classList.contains('active'), true);
+  assert.match(summary.innerHTML, /리플레이 총 2일/);
+});
+
 test('replay view controls show counts and active mode', () => {
   const { context, elements, buttons } = loadStateContext();
   const summary = createElementStub();

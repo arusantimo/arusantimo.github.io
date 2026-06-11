@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-11T11:18:18+00:00",
+    "generatedAt": "2026-06-11T13:39:01+00:00",
     "status": "partial",
     "buyCount": 10,
     "topRecommendations": [
@@ -24,7 +24,7 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 10.0,
         "grade": "A",
         "gradeScore": 7.5,
-        "statusLabel": "진입 가능(거시경고·축소)",
+        "statusLabel": "매수추천",
         "entryEligible": true,
         "currentPrice": 55000
       },
@@ -39,7 +39,7 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 10.0,
         "grade": "A",
         "gradeScore": 7.1,
-        "statusLabel": "진입 가능(거시경고·축소)",
+        "statusLabel": "매수추천",
         "entryEligible": true,
         "currentPrice": 226000
       },
@@ -54,7 +54,7 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 12.0,
         "grade": "A",
         "gradeScore": 7.2,
-        "statusLabel": "진입 가능(거시경고·축소)",
+        "statusLabel": "매수추천",
         "entryEligible": true,
         "currentPrice": 365000
       },
@@ -121,21 +121,6 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성생명",
-        "code": "032830",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "진입 가능(거시경고·축소)",
-        "entryEligible": true,
-        "currentPrice": 365000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
         "name": "NAVER",
         "code": "035420",
         "score": 7.8,
@@ -162,6 +147,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 347000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성생명",
+        "code": "032830",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(갭다운 주의 · 신규 진입 보류)",
+        "entryEligible": false,
+        "currentPrice": 365000
       }
     ]
   },

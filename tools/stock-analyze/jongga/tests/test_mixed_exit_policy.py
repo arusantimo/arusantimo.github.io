@@ -47,6 +47,42 @@ class MixedExitPolicyTests(unittest.TestCase):
                 {"targetPct": 12.0, "quantityPct": 20.0},
             ],
         )
+        self.assertEqual(policy["stopCondition"], "종가 기준 -2% 이탈")
+        self.assertEqual(policy["stopTiming"], "종가 확인 후 전량 정리")
+
+    def test_pullback_a7plus_uses_volatility_overlay_when_range_is_large(self):
+        policy = select_mixed_exit_policy(
+            {
+                "strategy": "pullback",
+                "gradeScore": 7.0,
+                "grade": "A",
+                "statusLabel": "관심후보",
+                "entryEligible": False,
+                "volatilityContext": {
+                    "blendedState": "volatile",
+                    "marketState": "volatile",
+                    "stockState": "volatile",
+                    "metrics": {"todayRangePct": 12.5, "atrPct10": 11.2, "returnStd20": 7.1, "vkospi": 87.3},
+                },
+            }
+        )
+
+        self.assertTrue(policy["active"])
+        self.assertEqual(policy["policyKey"], "pullback-a7plus-balanced")
+        self.assertEqual(policy["positionWeightHint"], "half")
+        self.assertEqual(policy["positionWeightMultiplier"], 0.5)
+        self.assertTrue(policy["volatilityOverlay"]["active"])
+        self.assertTrue(policy["intradayRiskRule"]["active"])
+        self.assertEqual(policy["intradayRiskRule"]["triggerPct"], -5.0)
+        self.assertEqual(
+            policy["takeProfitStages"],
+            [
+                {"targetPct": 3.0, "quantityPct": 50.0},
+                {"targetPct": 8.0, "quantityPct": 50.0},
+            ],
+        )
+        self.assertIn("장중 -5% 이상", policy["stopCondition"])
+        self.assertIn("최종 손절은 종가", policy["stopTiming"])
 
     def test_accumulation_and_breakout_are_observe_only(self):
         base_entry = {

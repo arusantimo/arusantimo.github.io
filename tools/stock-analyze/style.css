@@ -1924,8 +1924,30 @@ body.modal-scroll-locked {
   border-radius: 8px;
   background: rgba(59, 130, 246, 0.08);
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.45;
+}
+
+.buy-card-mixed-policy-summary {
+  font-weight: 700;
+}
+
+.buy-card-mixed-policy-line {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.buy-card-mixed-policy-line span {
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.buy-card-mixed-policy-line strong {
+  min-width: 0;
+  color: inherit;
+  font-weight: 600;
 }
 
 .buy-card-mixed-policy.observe {
@@ -3864,6 +3886,19 @@ body.modal-scroll-locked {
   margin-top: 5px;
   font-size: 11px;
   color: var(--text-tertiary);
+}
+
+.plan-stop-timing {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.trade-plan-stage-caption {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: right;
 }
 
 .scard-plan-empty {

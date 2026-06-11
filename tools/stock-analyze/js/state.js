@@ -25,7 +25,7 @@ function normalizeCodeKey(value) {
 }
 
 const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'breakout', 'accumulation', 'momentum', 'reversal', 'swing']);
-const JONGGA_REPLAY_VIEW_STORAGE_KEY = 'stockAnalyzeJonggaReplayViewModeV1';
+const JONGGA_REPLAY_VIEW_STORAGE_KEY = 'stockAnalyzeJonggaReplayViewModeV2';
 const JONGGA_REPLAY_PERIOD_STORAGE_KEY = 'stockAnalyzeJonggaReplayPeriodV1';
 const JONGGA_BUY_STATUS_MARKERS = ['강력매수', '매수추천', '최우선 진입', '진입 가능', '관심후보'];
 const JONGGA_REPLAY_VIEW_MODES = {
@@ -340,16 +340,17 @@ function getActiveSellSnapshot() {
 
 function normalizeJonggaReplayViewMode(value) {
   const normalized = String(value || '').trim();
+  if (normalized === 'recommendation') return 'recommendation';
   if (normalized === 'a8plus' || normalized === 'a8' || normalized === 'gradea8plus') return 'a8plus';
   if (normalized === 'replay') return 'replay';
   if (normalized === 'a7plus' || normalized === 'a7' || normalized === 'gradea7plus') return 'a7plus';
   if (normalized === 'all') return 'all';
-  return 'recommendation';
+  return 'all';
 }
 
 function getJonggaReplayViewMeta(mode = getJonggaReplayViewMode()) {
   const normalizedMode = normalizeJonggaReplayViewMode(mode);
-  return JONGGA_REPLAY_VIEW_MODES[normalizedMode] || JONGGA_REPLAY_VIEW_MODES.recommendation;
+  return JONGGA_REPLAY_VIEW_MODES[normalizedMode] || JONGGA_REPLAY_VIEW_MODES.all;
 }
 
 function isJonggaRecommendationStatusLabel(entry = {}) {
@@ -360,9 +361,9 @@ function isJonggaRecommendationStatusLabel(entry = {}) {
 
 function readStoredJonggaReplayViewMode() {
   try {
-    return normalizeJonggaReplayViewMode(localStorage.getItem(JONGGA_REPLAY_VIEW_STORAGE_KEY) || 'recommendation');
+    return normalizeJonggaReplayViewMode(localStorage.getItem(JONGGA_REPLAY_VIEW_STORAGE_KEY) || 'all');
   } catch {
-    return 'recommendation';
+    return 'all';
   }
 }
 

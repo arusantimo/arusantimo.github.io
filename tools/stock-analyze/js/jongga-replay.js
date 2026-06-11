@@ -117,10 +117,20 @@ function buildReplayMixedExitPolicySummary(policy = null) {
       .filter(Boolean)
       .join(' / ')
     : '';
-  const stop = Number.isFinite(Number(policy.stopPct))
-    ? `종가 ${formatReplayMixedExitPercent(policy.stopPct)} 손절`
-    : '손절 미적용';
-  return `${label || '혼합 전략'}${stages ? ` · ${stages}` : ''} · ${stop}`;
+  const stopCondition = String(policy.stopCondition || (
+    Number.isFinite(Number(policy.stopPct)) ? `종가 기준 ${formatReplayMixedExitPercent(policy.stopPct)} 이탈` : ''
+  ));
+  const stopTiming = String(policy.stopTiming || (
+    Number.isFinite(Number(policy.stopPct)) ? '종가 확인 후 전량 정리' : ''
+  ));
+  const weight = Number(policy.positionWeightMultiplier);
+  const weightText = policy?.volatilityOverlay?.active && Number.isFinite(weight)
+    ? ` · 비중 ${Math.round(weight * 100)}%`
+    : '';
+  const intradayRisk = policy?.intradayRiskRule?.active
+    ? ` · 장중 방어: ${String(policy.intradayRiskRule.action || '부분 축소')} ${String(policy.intradayRiskRule.timing || '장중 확인')}`
+    : '';
+  return `${label || '혼합 전략'}${stages ? ` · ${stages}` : ''}${weightText} · 손절 조건: ${stopCondition} · 손절 시점: ${stopTiming}${intradayRisk}`;
 }
 
 function getReplayFillSourceEntryKey(fill = {}) {

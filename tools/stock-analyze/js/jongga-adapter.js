@@ -126,6 +126,36 @@ function normalizeJonggaTakeProfitProfiles(value) {
 
 function normalizeJonggaMixedExitPolicy(value) {
   if (!value || typeof value !== 'object') return null;
+  const intradayRiskRule = value.intradayRiskRule && typeof value.intradayRiskRule === 'object'
+    ? {
+      active: Boolean(value.intradayRiskRule.active),
+      triggerPct: value.intradayRiskRule.triggerPct === null || value.intradayRiskRule.triggerPct === undefined ? null : Number(value.intradayRiskRule.triggerPct),
+      action: String(value.intradayRiskRule.action || ''),
+      timing: String(value.intradayRiskRule.timing || ''),
+      recoveryRule: String(value.intradayRiskRule.recoveryRule || ''),
+      finalStopRule: String(value.intradayRiskRule.finalStopRule || '')
+    }
+    : { active: false };
+  const volatilityOverlay = value.volatilityOverlay && typeof value.volatilityOverlay === 'object'
+    ? {
+      active: Boolean(value.volatilityOverlay.active),
+      mode: String(value.volatilityOverlay.mode || ''),
+      label: String(value.volatilityOverlay.label || ''),
+      reason: String(value.volatilityOverlay.reason || ''),
+      positionWeightMultiplier: value.volatilityOverlay.positionWeightMultiplier === null || value.volatilityOverlay.positionWeightMultiplier === undefined ? null : Number(value.volatilityOverlay.positionWeightMultiplier),
+      triggerMetrics: value.volatilityOverlay.triggerMetrics && typeof value.volatilityOverlay.triggerMetrics === 'object'
+        ? { ...value.volatilityOverlay.triggerMetrics }
+        : {},
+      originalTakeProfitStages: asJonggaArray(value.volatilityOverlay.originalTakeProfitStages).map(stage => ({
+        targetPct: Number(stage.targetPct || 0),
+        quantityPct: Number(stage.quantityPct || 0)
+      })),
+      adjustedTakeProfitStages: asJonggaArray(value.volatilityOverlay.adjustedTakeProfitStages).map(stage => ({
+        targetPct: Number(stage.targetPct || 0),
+        quantityPct: Number(stage.quantityPct || 0)
+      }))
+    }
+    : { active: false };
   return {
     version: String(value.version || ''),
     policyKey: String(value.policyKey || ''),
@@ -136,11 +166,16 @@ function normalizeJonggaMixedExitPolicy(value) {
     recommendationCase: String(value.recommendationCase || ''),
     stopPct: value.stopPct === null || value.stopPct === undefined ? null : Number(value.stopPct),
     stopExecution: String(value.stopExecution || 'close'),
+    stopCondition: String(value.stopCondition || ''),
+    stopTiming: String(value.stopTiming || ''),
     takeProfitStages: asJonggaArray(value.takeProfitStages).map(stage => ({
       targetPct: Number(stage.targetPct || 0),
       quantityPct: Number(stage.quantityPct || 0)
     })),
     positionWeightHint: String(value.positionWeightHint || ''),
+    positionWeightMultiplier: value.positionWeightMultiplier === null || value.positionWeightMultiplier === undefined ? null : Number(value.positionWeightMultiplier),
+    intradayRiskRule,
+    volatilityOverlay,
     reason: String(value.reason || '')
   };
 }

@@ -744,7 +744,8 @@ function describeSellStrategyStage(stage, row, detail) {
     return `잔여 물량만 스윙 전환 검토${rowSummary ? ` · ${rowSummary}` : ''}`;
   }
   if (stage === 'stopLoss') {
-    return `손절선 이탈 시 전량 매도${rowSummary ? ` · ${rowSummary}` : ''}`;
+    const stopTiming = getMixedExitStopTimingText(detail);
+    return `${stopTiming ? `손절 시점 ${stopTiming} · ` : ''}손절선 이탈 시 전량 매도${rowSummary ? ` · ${rowSummary}` : ''}`;
   }
   return rowSummary || rowCondition || '세부 전략 확인';
 }
@@ -904,8 +905,7 @@ function buildSellStrategyPlan(detail) {
 
 function renderSellStrategyPlan(detail, compact = false) {
   const plan = buildSellStrategyPlan(detail);
-  const limit = compact ? 3 : plan.items.length;
-  const visibleItems = plan.items.slice(0, limit);
+  const visibleItems = compact ? getCompactSellPlanItems(plan.items) : plan.items;
 
   return `
     <div class="${compact ? 'scard-plan scard-plan-current' : 'sell-strategy-panel'}">
@@ -1102,27 +1102,123 @@ function buildMixedExitPolicySummary(policy) {
   if (!policy.active) {
     return `${label} · ${String(policy.reason || '자동 진입 제외')}`;
   }
-  const stages = Array.isArray(policy.takeProfitStages)
-    ? policy.takeProfitStages
-      .map(stage => {
-        const target = formatMixedExitPercent(stage?.targetPct);
-        const quantity = Number(stage?.quantityPct);
-        return target ? `${target} ${Number.isFinite(quantity) ? `${quantity.toFixed(0)}%` : ''}`.trim() : '';
-      })
-      .filter(Boolean)
-      .join(' / ')
+  const weight = Number(policy.positionWeightMultiplier);
+  const weightText = policy?.volatilityOverlay?.active && Number.isFinite(weight)
+    ? ` · 비중 ${Math.round(weight * 100)}%`
     : '';
-  const stop = Number.isFinite(Number(policy.stopPct))
-    ? `종가 ${formatMixedExitPercent(policy.stopPct)} 손절`
-    : '손절 미적용';
-  return `${label}${stages ? ` · ${stages}` : ''} · ${stop}`;
+  return `${label}${weightText}`;
+}
+
+function formatMixedExitQuantityLabel(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return '매도';
+  if (number >= 100) return '전량 정리';
+  return `${number.toFixed(0)}% 매도`;
+}
+
+function normalizeMixedExitTimeLabel(value) {
+  return String(value || '')
+    .trim()
+    .replace(/\s*또는\s*/gu, ' / ')
+    .replace(/\s*확인\s*$/u, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function simplifyMixedExitClause(value) {
+  return String(value || '')
+    .trim()
+    .split(/[;,]/u)[0]
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function renderMixedExitPolicyLineHtml(label, value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+  return `<div class="buy-card-mixed-policy-line"><span>${escapeHtml(label)}</span><strong>${escapeHtml(text)}</strong></div>`;
+}
+
+function renderMixedExitPolicyDetailHtml(policy) {
+  if (!policy || typeof policy !== 'object' || !policy.active) return '';
+  const steps = [];
+  const weight = Number(policy.positionWeightMultiplier);
+  steps.push(renderMixedExitPolicyLineHtml(
+    '지금',
+    Number.isFinite(weight)
+      ? `${Math.round(weight * 100)}% 비중으로 진입/유지`
+      : '진입/유지'
+  ));
+
+  const intradayRiskParts = [];
+  const intradayTiming = normalizeMixedExitTimeLabel(policy?.intradayRiskRule?.timing);
+  const intradayAction = String(policy?.intradayRiskRule?.action || '').trim();
+  if (policy?.intradayRiskRule?.active) {
+    intradayRiskParts.push(`${intradayTiming || '장중'} 체크 후 ${intradayAction || '부분 축소'}`);
+  }
+  if (policy?.volatilityOverlay?.active) {
+    intradayRiskParts.push(String(policy.volatilityOverlay.label || '고변동성 방어 적용'));
+  }
+  if (intradayRiskParts.length) {
+    steps.push(renderMixedExitPolicyLineHtml('장중', intradayRiskParts.join(' · ')));
+  }
+
+  (Array.isArray(policy.takeProfitStages) ? policy.takeProfitStages : []).forEach((stage, index) => {
+    const target = formatMixedExitPercent(stage?.targetPct);
+    if (!target) return;
+    const quantity = formatMixedExitQuantityLabel(stage?.quantityPct);
+    steps.push(renderMixedExitPolicyLineHtml(`${index + 1}차 익절`, `${target} 도달 시 ${quantity}`));
+  });
+
+  const stopText = Number.isFinite(Number(policy.stopPct))
+    ? `종가 ${formatMixedExitPercent(policy.stopPct)} 이탈 시 전량 정리`
+    : simplifyMixedExitClause(policy.stopCondition);
+  if (stopText) {
+    steps.push(renderMixedExitPolicyLineHtml('마감', stopText));
+  }
+  return steps.filter(Boolean).join('');
 }
 
 function renderMixedExitPolicyHtml(entry) {
   const summary = buildMixedExitPolicySummary(entry?.mixedExitPolicy);
   if (!summary) return '';
   const active = entry?.mixedExitPolicy?.active;
-  return `<div class="buy-card-mixed-policy ${active ? 'active' : 'observe'}">혼합 전략: ${escapeHtml(summary)}</div>`;
+  const detailHtml = renderMixedExitPolicyDetailHtml(entry?.mixedExitPolicy);
+  return `<div class="buy-card-mixed-policy ${active ? 'active' : 'observe'}">
+    <div class="buy-card-mixed-policy-summary">혼합 전략: ${escapeHtml(summary)}</div>
+    ${detailHtml}
+  </div>`;
+}
+
+function renderBuyModalMixedExitPolicySection(entry) {
+  const content = renderMixedExitPolicyHtml(entry);
+  if (!content) return '';
+  return `
+    <div class="buy-detail-block buy-detail-block-fixed">
+      <div class="modal-section-label">혼합 전략</div>
+      ${content}
+    </div>
+  `;
+}
+
+function getMixedExitStopTimingText(source) {
+  const policy = source?.mixedExitPolicy || source?.stock?.mixedExitPolicy || null;
+  return String(policy?.stopTiming || '').trim();
+}
+
+function getCompactSellPlanItems(items) {
+  if (!Array.isArray(items) || !items.length) return [];
+  const stopLossIndex = items.findIndex(item => String(item?.title || '').includes('손절'));
+  if (stopLossIndex < 0 || items.length <= 3) {
+    return items.slice(0, 3);
+  }
+
+  const stopLossItem = items[stopLossIndex];
+  const nonStopItems = items.filter(item => item !== stopLossItem);
+  if (stopLossIndex === 0) {
+    return [stopLossItem, ...nonStopItems.slice(0, 2)];
+  }
+  return [...nonStopItems.slice(0, 2), stopLossItem];
 }
 
 function renderBuyStockCards() {
@@ -1173,7 +1269,6 @@ function renderBuyStockCards() {
       const volatilityTopBadgesHtml = renderVolatilityTopBadges(entry);
       const pullbackInsightHtml = renderPullbackCardInsights(entry);
       const volatilityInsightHtml = renderVolatilityCardInsights(entry);
-      const mixedExitPolicyHtml = renderMixedExitPolicyHtml(entry);
       const statusReasonHtml = presentation.primaryStatusReasonShort
         ? `<div class="buy-card-status-reason">${escapeHtml(presentation.primaryStatusReasonShort)}</div>`
         : '';
@@ -1207,7 +1302,6 @@ function renderBuyStockCards() {
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
           ${statusReasonHtml}
           ${setupBadgeHtml}
-          ${mixedExitPolicyHtml}
           ${pullbackInsightHtml}
           ${volatilityInsightHtml}
           <div class="buy-card-tags">
@@ -1984,7 +2078,6 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
   let targetIndex = -1;
 
   return `
-    ${title ? `<div class="modal-section-label">${escapeHtml(title)}</div>` : ''}
     <table class="guide-table compact-table">
       <thead><tr><th>단계</th><th>조건</th><th>수량</th><th>목표 수익률</th><th>목표가</th></tr></thead>
       <tbody>
@@ -1995,6 +2088,8 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
           const hitRate = (row.historicalHitRate === null || row.historicalHitRate === undefined)
             ? ''
             : ` <span style="color:var(--text-muted)">· 적중 ${Math.round(row.historicalHitRate * 100)}%</span>`;
+          const isStopRow = String(row?.stageKey || '').trim() === 'stop' || getTradePlanStageTagTone(row) === 'stop';
+          const stopTiming = isStopRow ? getMixedExitStopTimingText(source) : '';
           const stageCell = isRec
             ? `<td style="${recCellStyle}">${escapeHtml(row.stage)}${recBadge}</td>`
             : `<td>${escapeHtml(row.stage)}</td>`;
@@ -2004,10 +2099,14 @@ function renderTradePlanStageRowsTable(source, { title = '', recommendedTargetIn
           const priceCell = isRec
             ? `<td style="${recYieldStyle}">${escapeHtml(row.targetPrice)}</td>`
             : `<td>${escapeHtml(row.targetPrice)}</td>`;
-          return `<tr${isRec ? ` style="${recRowStyle}"` : ''}>${stageCell}<td>${escapeHtml(row.condition)}</td><td>${escapeHtml(row.quantity)}</td>${yieldCell}${priceCell}</tr>`;
+          const conditionCell = isStopRow && stopTiming
+            ? `${escapeHtml(row.condition)}<div class="plan-stop-timing">손절 시점: ${escapeHtml(stopTiming)}</div>`
+            : escapeHtml(row.condition);
+          return `<tr${isRec ? ` style="${recRowStyle}"` : ''}>${stageCell}<td>${conditionCell}</td><td>${escapeHtml(row.quantity)}</td>${yieldCell}${priceCell}</tr>`;
         }).join('')}
       </tbody>
     </table>
+    ${title ? `<div class="trade-plan-stage-caption">${escapeHtml(title)}</div>` : ''}
   `;
 }
 
@@ -2115,6 +2214,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
       cardClass: 'triggered'
     });
     const buyDetailSummaryHtml = renderBuyDetailSummaryPanel(entry);
+    const buyModalMixedExitPolicyHtml = renderBuyModalMixedExitPolicySection(entry);
 
     document.getElementById('modal-body').innerHTML = `
       <div class="buy-modal-layout">
@@ -2150,6 +2250,8 @@ function openModal(codeOrEntryKey, mode = 'sell') {
               <div class="modal-section-label">요약</div>
               ${buyDetailSummaryHtml}
             </div>
+
+            ${buyModalMixedExitPolicyHtml}
 
             <div class="buy-trade-plan-block">
               <div class="modal-section-label">매매 단계</div>

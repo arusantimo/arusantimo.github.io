@@ -145,11 +145,32 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
             priority: 2,
             stopPct: -2,
             stopExecution: 'close',
+            stopCondition: '종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소',
+            stopTiming: '장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후',
             takeProfitStages: [
               { targetPct: 2, quantityPct: 50 },
               { targetPct: 10, quantityPct: 50 }
             ],
             positionWeightHint: 'normal',
+            positionWeightMultiplier: 0.5,
+            intradayRiskRule: {
+              active: true,
+              triggerPct: -5,
+              action: '50% 축소',
+              timing: '10:00 또는 14:00 확인',
+              recoveryRule: '진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소',
+              finalStopRule: '종가 기준 -2% 이탈 시 남은 물량 전량 정리'
+            },
+            volatilityOverlay: {
+              active: true,
+              mode: 'high-volatility',
+              label: '고변동성 방어',
+              reason: '시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.',
+              positionWeightMultiplier: 0.5,
+              triggerMetrics: { todayRangePct: 12.5, atrPct10: 11.2 },
+              originalTakeProfitStages: [{ targetPct: 2, quantityPct: 50 }],
+              adjustedTakeProfitStages: [{ targetPct: 2, quantityPct: 60 }]
+            },
             reason: '반등 주력 후보'
           },
           pullbackTakeProfitProfiles: [{
@@ -291,6 +312,10 @@ test('jongga_result.v1 JSON은 slot snapshot으로 주입된다', () => {
   assert.equal(breakout.recommendedTakeProfitProfile.sampleCount, 12);
   assert.equal(breakout.mixedExitPolicy.policyKey, 'reversal-a7plus-balanced');
   assert.equal(breakout.mixedExitPolicy.stopPct, -2);
+  assert.equal(breakout.mixedExitPolicy.stopCondition, '종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소');
+  assert.equal(breakout.mixedExitPolicy.stopTiming, '장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후');
+  assert.equal(breakout.mixedExitPolicy.intradayRiskRule.action, '50% 축소');
+  assert.equal(breakout.mixedExitPolicy.volatilityOverlay.label, '고변동성 방어');
   assert.equal(breakout.mixedExitPolicy.takeProfitStages[1].targetPct, 10);
   assert.equal(breakout.pullbackTakeProfitProfiles.length, 1);
   assert.equal(breakout.pullbackTakeProfitProfiles[0].nearestResistanceType, 'ma5');

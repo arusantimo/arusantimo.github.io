@@ -1,7 +1,7 @@
 [
   {
     "orderId": "20260529|stable|pullback|017670-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -21,7 +21,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|017670-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -41,7 +41,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|017670-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -61,7 +61,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|017670-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -81,7 +81,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|017670-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -101,7 +101,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|017670-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -121,7 +121,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|017670-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -141,7 +141,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -161,7 +161,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -181,7 +181,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -201,7 +201,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -221,7 +221,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -241,7 +241,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -261,7 +261,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|036930-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -281,7 +281,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -301,7 +301,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -321,7 +321,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -341,7 +341,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -361,7 +361,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -381,7 +381,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -401,7 +401,7 @@
   },
   {
     "orderId": "20260529|stable|pullback|402340-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "pullback",
@@ -421,7 +421,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -441,7 +441,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -461,7 +461,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -481,7 +481,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -501,7 +501,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -521,7 +521,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-swing",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -541,7 +541,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -561,7 +561,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|000810-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -581,7 +581,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -601,7 +601,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -621,7 +621,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -641,7 +641,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -661,7 +661,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -681,7 +681,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-swing",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -701,7 +701,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -721,7 +721,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|010170-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -741,7 +741,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -761,7 +761,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -781,7 +781,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -801,7 +801,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -821,7 +821,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -841,7 +841,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-swing",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -861,7 +861,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -881,7 +881,7 @@
   },
   {
     "orderId": "20260529|stable|accumulation|011070-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "accumulation",
@@ -901,7 +901,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -921,7 +921,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -941,7 +941,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -961,7 +961,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-intraday1",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -981,7 +981,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-intraday2",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -1001,7 +1001,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-swing",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -1021,7 +1021,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -1041,7 +1041,7 @@
   },
   {
     "orderId": "20260529|stable|breakout|011070-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "breakout",
@@ -1061,7 +1061,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|066570-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1081,7 +1081,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|066570-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1101,7 +1101,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|066570-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1121,7 +1121,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|066570-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1141,7 +1141,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|066570-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1161,7 +1161,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|011070-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1181,7 +1181,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|011070-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1201,7 +1201,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|011070-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1221,7 +1221,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|011070-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1241,7 +1241,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|011070-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1261,7 +1261,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|028260-entry",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1281,7 +1281,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|028260-premarket",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1301,7 +1301,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|028260-openPhase",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1321,7 +1321,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|028260-stop",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",
@@ -1341,7 +1341,7 @@
   },
   {
     "orderId": "20260529|stable|reversal|028260-finalCutoff",
-    "runId": "replay-20260608-221058-2fbb5306",
+    "runId": "replay-20260611-223940-be501eb2",
     "date": "2026-05-29",
     "variant": "stable",
     "strategy": "reversal",

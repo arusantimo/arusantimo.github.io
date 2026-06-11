@@ -890,7 +890,8 @@ test('strategy modal renders selected case summary, stock table, and day files',
   assert.match(body.innerHTML, /익일 10시 이전 목표가 도달/);
   assert.match(body.innerHTML, /눌림목 × 8&amp;A\+/);
   assert.match(body.innerHTML, /\+5% 50% \/ \+12% 50%/);
-  assert.match(body.innerHTML, /종가 -2% 손절/);
+  assert.match(body.innerHTML, /손절 조건: 종가 기준 -2% 이탈/);
+  assert.match(body.innerHTML, /손절 시점: 종가 확인 후 전량 정리/);
   assert.match(body.innerHTML, /클릭해 체결 이력 보기/);
   assert.match(body.innerHTML, /순차 체결 이력/);
   assert.match(body.innerHTML, /replay-fill-badge buy/);

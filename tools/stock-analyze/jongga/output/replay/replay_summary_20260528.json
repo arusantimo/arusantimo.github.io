@@ -1,5 +1,5 @@
 {
-  "runId": "replay-20260608-221058-2fbb5306",
+  "runId": "replay-20260611-223940-be501eb2",
   "date": "2026-05-28",
   "variant": "stable",
   "thresholdProfile": "current",
@@ -327,6 +327,184 @@
       "unfilledRate": 0.25
     }
   },
+  "strategyRecommendationMatrix": {
+    "pullback|recommendation": {
+      "strategy": "pullback",
+      "recommendationCase": "recommendation",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "pullback-recommendation-balanced"
+    },
+    "pullback|a8plus": {
+      "strategy": "pullback",
+      "recommendationCase": "a8plus",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "pullback-a8plus-balanced"
+    },
+    "pullback|a7plus": {
+      "strategy": "pullback",
+      "recommendationCase": "a7plus",
+      "sampleCount": 3,
+      "tradeCount": 3,
+      "winRate": 1.0,
+      "avgNetReturnPct": 2.6104,
+      "cumNetReturnPct": 8.0327,
+      "maxDrawdownPct": 0.0,
+      "recommendedExitPolicyKey": "pullback-a7plus-balanced"
+    },
+    "pullback|replay": {
+      "strategy": "pullback",
+      "recommendationCase": "replay",
+      "sampleCount": 3,
+      "tradeCount": 3,
+      "winRate": 1.0,
+      "avgNetReturnPct": 2.6104,
+      "cumNetReturnPct": 8.0327,
+      "maxDrawdownPct": 0.0,
+      "recommendedExitPolicyKey": "pullback-replay-balanced"
+    },
+    "accumulation|recommendation": {
+      "strategy": "accumulation",
+      "recommendationCase": "recommendation",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-accumulation"
+    },
+    "accumulation|a8plus": {
+      "strategy": "accumulation",
+      "recommendationCase": "a8plus",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-accumulation"
+    },
+    "accumulation|a7plus": {
+      "strategy": "accumulation",
+      "recommendationCase": "a7plus",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-accumulation"
+    },
+    "accumulation|replay": {
+      "strategy": "accumulation",
+      "recommendationCase": "replay",
+      "sampleCount": 2,
+      "tradeCount": 2,
+      "winRate": 1.0,
+      "avgNetReturnPct": 3.4055,
+      "cumNetReturnPct": 6.8223,
+      "maxDrawdownPct": 0.0,
+      "recommendedExitPolicyKey": "observe-accumulation"
+    },
+    "breakout|recommendation": {
+      "strategy": "breakout",
+      "recommendationCase": "recommendation",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-breakout"
+    },
+    "breakout|a8plus": {
+      "strategy": "breakout",
+      "recommendationCase": "a8plus",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-breakout"
+    },
+    "breakout|a7plus": {
+      "strategy": "breakout",
+      "recommendationCase": "a7plus",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-breakout"
+    },
+    "breakout|replay": {
+      "strategy": "breakout",
+      "recommendationCase": "replay",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-breakout"
+    },
+    "reversal|recommendation": {
+      "strategy": "reversal",
+      "recommendationCase": "recommendation",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "observe-unmatched"
+    },
+    "reversal|a8plus": {
+      "strategy": "reversal",
+      "recommendationCase": "a8plus",
+      "sampleCount": 0,
+      "tradeCount": 0,
+      "winRate": null,
+      "avgNetReturnPct": null,
+      "cumNetReturnPct": null,
+      "maxDrawdownPct": null,
+      "recommendedExitPolicyKey": "reversal-a8plus-balanced"
+    },
+    "reversal|a7plus": {
+      "strategy": "reversal",
+      "recommendationCase": "a7plus",
+      "sampleCount": 3,
+      "tradeCount": 3,
+      "winRate": 1.0,
+      "avgNetReturnPct": 3.1718,
+      "cumNetReturnPct": 9.819,
+      "maxDrawdownPct": 0.0,
+      "recommendedExitPolicyKey": "reversal-a7plus-balanced"
+    },
+    "reversal|replay": {
+      "strategy": "reversal",
+      "recommendationCase": "replay",
+      "sampleCount": 3,
+      "tradeCount": 3,
+      "winRate": 1.0,
+      "avgNetReturnPct": 3.1718,
+      "cumNetReturnPct": 9.819,
+      "maxDrawdownPct": 0.0,
+      "recommendedExitPolicyKey": "reversal-replay-balanced"
+    }
+  },
   "byTakeProfitProfile": {
     "pullback|conservative": {
       "tradeCount": 3,
@@ -402,6 +580,30 @@
       "strictScore": 7.5,
       "signalScore": 7.5,
       "entryPrice": 205000.0,
+      "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, G4)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -438,6 +640,30 @@
       "strictScore": 7.5,
       "signalScore": 7.5,
       "entryPrice": 225500.0,
+      "statusLabel": "매매금지(핵심 Gate 미충족: G7, G8)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -471,6 +697,30 @@
       "strictScore": 7.5,
       "signalScore": 7.5,
       "entryPrice": 1237000.0,
+      "statusLabel": "매매금지(핵심 Gate 미충족: G0, G7, G8)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -505,6 +755,30 @@
       "strictScore": 7.9,
       "signalScore": 7.9,
       "entryPrice": 560000.0,
+      "statusLabel": "매매금지(갭다운 경고 · 신규 진입 금지)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -516,8 +790,7 @@
       "entryEligible": false,
       "entryWatch": false,
       "entryBlockers": [
-        "매매금지(갭다운 경고 · 신규 진입 금지)",
-        "등급 B — 진입 최소 A, S"
+        "매매금지(갭다운 경고 · 신규 진입 금지)"
       ],
       "setupQuality": "setup_weak",
       "payloadSourceMode": "live",
@@ -537,6 +810,30 @@
       "strictScore": 7.1,
       "signalScore": 7.1,
       "entryPrice": 664000.0,
+      "statusLabel": "매매금지(갭다운 경고 · 신규 진입 금지)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -548,8 +845,7 @@
       "entryEligible": false,
       "entryWatch": false,
       "entryBlockers": [
-        "매매금지(갭다운 경고 · 신규 진입 금지)",
-        "등급 B — 진입 최소 A, S"
+        "매매금지(갭다운 경고 · 신규 진입 금지)"
       ],
       "setupQuality": "setup_weak",
       "payloadSourceMode": "live",
@@ -569,6 +865,30 @@
       "strictScore": 6.4,
       "signalScore": 6.4,
       "entryPrice": 205000.0,
+      "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": false,
@@ -583,7 +903,7 @@
         "핵심 Gate 미충족: G1",
         "핵심 Gate 미충족: G4",
         "매매금지(핵심 Gate 미충족: G1, G4)",
-        "등급 C — 진입 최소 A, S"
+        "등급 C — 진입 최소 A, B, S"
       ],
       "setupQuality": "setup_weak",
       "payloadSourceMode": "live",
@@ -603,6 +923,30 @@
       "strictScore": 5.1,
       "signalScore": 5.8,
       "entryPrice": 248500.0,
+      "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-breakout",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": false,
@@ -616,7 +960,7 @@
       "entryBlockers": [
         "핵심 Gate 미충족: G2",
         "매매금지(핵심 Gate 미충족: G2)",
-        "등급 C — 진입 최소 A, S"
+        "등급 C — 진입 최소 A, B, S"
       ],
       "setupQuality": "setup_weak",
       "payloadSourceMode": "live",
@@ -636,6 +980,30 @@
       "strictScore": 7.8,
       "signalScore": 7.8,
       "entryPrice": 1134000.0,
+      "statusLabel": "매매금지",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -668,6 +1036,30 @@
       "strictScore": 7.0,
       "signalScore": 7.0,
       "entryPrice": 205000.0,
+      "statusLabel": "매매금지",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -703,6 +1095,30 @@
       "strictScore": 7.0,
       "signalScore": 7.0,
       "entryPrice": 399500.0,
+      "statusLabel": "매매금지",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "entryEligibleOriginal": false,
       "historyRecommendation": false,
       "replayIncluded": true,
@@ -741,7 +1157,30 @@
       "exitLastFillPrice": 217300.0,
       "tradeStatus": "closed",
       "closedReason": "intraday2_touch",
-      "netReturnPct": 3.005
+      "netReturnPct": 3.005,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "pullback",
@@ -757,7 +1196,30 @@
       "exitLastFillPrice": 239030.0,
       "tradeStatus": "closed",
       "closedReason": "intraday2_touch",
-      "netReturnPct": 3.005
+      "netReturnPct": 3.005,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "pullback",
@@ -773,7 +1235,30 @@
       "exitLastFillPrice": 1256000.0,
       "tradeStatus": "closed",
       "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 1.8213
+      "netReturnPct": 1.8213,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "accumulation",
@@ -789,7 +1274,30 @@
       "exitLastFillPrice": 604000.0,
       "tradeStatus": "closed",
       "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 6.6402
+      "netReturnPct": 6.6402,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "accumulation",
@@ -805,7 +1313,30 @@
       "exitLastFillPrice": 657000.0,
       "tradeStatus": "closed",
       "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 0.1708
+      "netReturnPct": 0.1708,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "accumulation",
@@ -821,7 +1352,30 @@
       "exitLastFillPrice": 227550.0,
       "tradeStatus": "closed",
       "closedReason": "swing_touch",
-      "netReturnPct": 5.0305
+      "netReturnPct": 5.0305,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "breakout",
@@ -837,7 +1391,30 @@
       "exitLastFillPrice": 283290.0,
       "tradeStatus": "closed",
       "closedReason": "swing_touch",
-      "netReturnPct": 7.4552
+      "netReturnPct": 7.4552,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-breakout",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "reversal",
@@ -853,7 +1430,30 @@
       "exitLastFillPrice": 1190700.0,
       "tradeStatus": "closed",
       "closedReason": "openPhase_touch",
-      "netReturnPct": 3.5783
+      "netReturnPct": 3.5783,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "reversal",
@@ -869,7 +1469,30 @@
       "exitLastFillPrice": 413000.0,
       "tradeStatus": "closed",
       "closedReason": "openPhase_touch",
-      "netReturnPct": 2.8512
+      "netReturnPct": 2.8512,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     },
     {
       "strategy": "reversal",
@@ -885,12 +1508,35 @@
       "exitLastFillPrice": 213000.0,
       "tradeStatus": "closed",
       "closedReason": "openPhase_touch",
-      "netReturnPct": 3.0859
+      "netReturnPct": 3.0859,
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      }
     }
   ],
   "results": [
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "pullback",
@@ -934,14 +1580,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, G4)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "pullback",
@@ -985,14 +1655,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(핵심 Gate 미충족: G7, G8)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "pullback",
@@ -1036,14 +1730,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(핵심 Gate 미충족: G0, G7, G8)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-pullback",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "accumulation",
@@ -1087,14 +1805,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(갭다운 경고 · 신규 진입 금지)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "accumulation",
@@ -1138,14 +1880,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(갭다운 경고 · 신규 진입 금지)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "accumulation",
@@ -1189,14 +1955,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-accumulation",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "breakout",
@@ -1240,14 +2030,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "저항 우선형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-breakout",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "reversal",
@@ -1291,14 +2105,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "보수형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "reversal",
@@ -1342,14 +2180,38 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "보수형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true
     },
     {
-      "runId": "replay-20260608-221058-2fbb5306",
+      "runId": "replay-20260611-223940-be501eb2",
       "date": "2026-05-28",
       "variant": "stable",
       "strategy": "reversal",
@@ -1393,8 +2255,32 @@
       "entryEligible": false,
       "entryEligibleOriginal": false,
       "setupQuality": "setup_weak",
+      "statusLabel": "매매금지",
       "takeProfitProfileKey": "conservative",
       "takeProfitProfileLabel": "보수형",
+      "mixedExitPolicy": {
+        "version": "mixed-exit-v1-balanced",
+        "policyKey": "observe-reversal",
+        "label": "관찰 전용",
+        "active": false,
+        "priority": null,
+        "strategyCase": "",
+        "recommendationCase": "",
+        "stopPct": null,
+        "stopExecution": "close",
+        "stopCondition": "",
+        "stopTiming": "자동 진입 제외",
+        "takeProfitStages": [],
+        "positionWeightHint": "observe",
+        "positionWeightMultiplier": 0.0,
+        "intradayRiskRule": {
+          "active": false
+        },
+        "volatilityOverlay": {
+          "active": false
+        },
+        "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+      },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true

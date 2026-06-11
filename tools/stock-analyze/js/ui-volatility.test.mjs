@@ -257,6 +257,95 @@ test('trade plan table keeps profile comparison and also shows recommended profi
   assert.match(html, /📈 장중 1차/);
   assert.match(html, /📊 스윙 전환/);
   assert.match(html, /🛑 손절/);
+  assert.match(html, /trade-plan-stage-caption/);
+});
+
+test('trade plan table renders stop timing under the stop condition', () => {
+  const context = loadUiContext();
+  const html = context.renderTradePlanTable({
+    mixedExitPolicy: {
+      active: true,
+      stopTiming: '장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후'
+    },
+    tradePlanRows: [
+      { stage: '🌅 프리마켓', stageKey: 'premarket', condition: '+0.5% 도달', quantity: '40% 익절', targetYield: '+0.5%', targetPrice: '55,275원' },
+      { stage: '🔔 장초반', stageKey: 'openPhase', condition: '+1.5% 도달', quantity: '35% 익절', targetYield: '+1.5%', targetPrice: '55,825원' },
+      { stage: '📈 장중 1차', stageKey: 'intraday1', condition: '+3.5% 도달', quantity: '25% 익절', targetYield: '+3.5%', targetPrice: '56,925원' },
+      { stage: '🛑 손절', stageKey: 'stop', condition: '유효 손절가 53,350원 하향 이탈', quantity: '전량', targetYield: '-3.0%', targetPrice: '53,350원' }
+    ]
+  });
+
+  assert.match(html, /손절 시점/);
+  assert.match(html, /10:00\/14:00 확인 후 부분 축소/);
+  assert.match(html, /최종 손절은 종가 확인 후/);
+});
+
+test('buy modal mixed exit section renders stop timing details', () => {
+  const context = loadUiContext();
+  const html = context.renderBuyModalMixedExitPolicySection({
+    mixedExitPolicy: {
+      active: true,
+      label: '눌림목 × 7&A',
+      takeProfitStages: [
+        { targetPct: 3, quantityPct: 50 },
+        { targetPct: 8, quantityPct: 50 }
+      ],
+      stopCondition: '종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소',
+      stopTiming: '장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후',
+      intradayRiskRule: {
+        active: true,
+        action: '50% 축소',
+        timing: '10:00 또는 14:00 확인'
+      },
+      volatilityOverlay: {
+        active: true,
+        label: '고변동성 방어'
+      }
+    }
+  });
+
+  assert.match(html, /혼합 전략/);
+  assert.match(html, /지금/);
+  assert.match(html, /장중/);
+  assert.match(html, /1차 익절/);
+  assert.match(html, /마감/);
+  assert.match(html, /10:00 \/ 14:00 체크 후 50% 축소/);
+  assert.match(html, /종가 -2% 이탈 시 전량 정리/);
+});
+
+test('compact sell strategy plan keeps the stop-loss item visible', () => {
+  const context = loadUiContext();
+  const entry = {
+    entryKey: 'slotA:pullback:035420',
+    tradePlanRows: [
+      { stage: '🌅 프리마켓', stageKey: 'premarket', condition: '+0.5% 도달', quantity: '40% 익절', targetYield: '+0.5%', targetPrice: '55,275원' },
+      { stage: '🔔 장초반', stageKey: 'openPhase', condition: '+1.5% 도달', quantity: '35% 익절', targetYield: '+1.5%', targetPrice: '55,825원' },
+      { stage: '📈 장중 1차', stageKey: 'intraday1', condition: '+3.5% 도달', quantity: '25% 익절', targetYield: '+3.5%', targetPrice: '56,925원' },
+      { stage: '🛑 손절', stageKey: 'stop', condition: '유효 손절가 53,350원 하향 이탈', quantity: '전량', targetYield: '-3.0%', targetPrice: '53,350원' }
+    ]
+  };
+  context.getEntryByCode = () => entry;
+  context.parseTradePlanTargets = source => {
+    const rows = Array.isArray(source?.tradePlanRows) ? source.tradePlanRows : [];
+    const byKey = key => rows.find(row => row.stageKey === key) || null;
+    return {
+      premarket: { row: byKey('premarket') },
+      openPhase: { row: byKey('openPhase') },
+      intraday1: { row: byKey('intraday1') },
+      intraday2: { row: byKey('intraday2') },
+      swing: { row: byKey('swing') },
+      stopLoss: { row: byKey('stop') }
+    };
+  };
+  const html = context.renderSellStrategyPlan({
+    stock: { entryKey: entry.entryKey, code: '035420', slotId: 'slotA' },
+    actionStage: 'hold',
+    gapProfile: {}
+  }, true);
+
+  assert.match(html, /현재 유효 전략/);
+  assert.match(html, /손절 라인 점검/);
+  assert.match(html, /손절선 이탈 시 전량 매도/);
 });
 
 test('buy cards render staged exit tags including swing stage', () => {
@@ -349,6 +438,7 @@ test('buy cards render staged exit tags including swing stage', () => {
   context.renderBuyStockCards();
 
   const html = containers.get('buy-list-pullback').innerHTML;
+  assert.doesNotMatch(html, /혼합 전략/);
   assert.match(html, /plan-prices/);
   assert.match(html, /🌅 30% 익절 261,887원/);
   assert.match(html, /📈1 25% 익절 270,830원/);
