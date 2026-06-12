@@ -10,32 +10,50 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.138.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-08</span>
+        <span class="meta-version">v0.139.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-11</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.138.0)</span>
+        <span>📋 최근 변경사항 (v0.139.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="/app 명령어 데스크톱 앱 전환 (v0.138.0)"
-            data-tt-desc="CLI 세션을 백그라운드로 남겨두고 동일 스레드 그대로 데스크톱 앱(macOS/Windows)으로 전환하여 작업을 이어갈 수 있습니다."
-            data-tt-example="/app"><code>/app</code> 명령어로 CLI 스레드를 데스크톱 앱으로 전환 지원 (v0.138.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Alt 키 대체 단축키 매핑 (v0.138.0)"
-            data-tt-desc="Alt 키 바인딩이 부족하거나 미지원되는 터미널 환경에서 추론 강도 조절 등을 수행하기 위해 대체 단축키(fallback shortcuts) 매핑을 제공합니다."
-            data-tt-example="">터미널 환경용 대체 단축키(fallback shortcuts) 매핑 지원 (v0.138.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="이미지 경로 명시 및 편집 정합성 개선 (v0.138.0)"
-            data-tt-desc="로컬 이미지 첨부 및 생성 시 생성된 파일 경로를 모델에 명시적으로 노출하여, 이후 변경 및 편집 시 정합성을 높였습니다."
-            data-tt-example="">로컬 이미지 파일 경로 명시 및 후속 편집 정합성 개선 (v0.138.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="독립 웹 검색 직접 호출 지원 (v0.139.0)"
+            data-tt-desc="Code 모드에서 중첩 JS 도구 호출 및 독립 웹 검색 직접 실행을 지원하며, 획득한 평문 검색 결과를 인라인으로 처리합니다."
+            data-tt-example="">독립 웹 검색(Web Search) 직접 실행 및 평문 결과 획득 지원 (v0.139.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex doctor 환경 변수 수집 개선 (v0.139.0)"
+            data-tt-desc="codex doctor 실행 시 진단을 위해 에디터 및 페이저 환경 변수 상세 정보를 마스킹 처리하여 안전하게 수집합니다."
+            data-tt-example="codex doctor"><code>codex doctor</code> 환경 변수 진단 마스킹 및 수집 개선 (v0.139.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="resume 및 fork 명령어 버그 수정 (v0.139.0)"
+            data-tt-desc="codex resume 및 codex fork 실행 시 전달된 trailing arguments를 초기 프롬프트로 정확히 매핑하여 해석하도록 개선되었습니다."
+            data-tt-example="codex resume 'auth-bug'"><code>codex resume</code> / <code>fork</code> 후행 인수 초기 프롬프트 파싱 버그 수정 (v0.139.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="V8 툴체인 및 디버그 기호 아카이브 분리 (v0.139.0)"
+            data-tt-desc="임베디드 V8 툴체인을 rusty_v8 149.2.0으로 업데이트하고, 디버깅을 위해 기호(symbol) 아카이브를 분리하여 출시합니다."
+            data-tt-example="">임베디드 <code>rusty_v8 149.2.0</code> 툴체인 업데이트 및 심볼 분리 배포 (v0.139.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.138.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="/app 명령어 데스크톱 앱 전환 (v0.138.0)"
+                data-tt-desc="CLI 세션을 백그라운드로 남겨두고 동일 스레드 그대로 데스크톱 앱(macOS/Windows)으로 전환하여 작업을 이어갈 수 있습니다."
+                data-tt-example="/app"><code>/app</code> 명령어로 CLI 스레드를 데스크톱 앱으로 전환 지원 (v0.138.0)</li>
+              <li class="cl-tip" data-tt-title="Alt 키 대체 단축키 매핑 (v0.138.0)"
+                data-tt-desc="Alt 키 바인딩이 부족하거나 미지원되는 터미널 환경에서 추론 강도 조절 등을 수행하기 위해 대체 단축키(fallback shortcuts) 매핑을 제공합니다."
+                data-tt-example="">터미널 환경용 대체 단축키(fallback shortcuts) 매핑 지원 (v0.138.0)</li>
+              <li class="cl-tip" data-tt-title="이미지 경로 명시 및 편집 정합성 개선 (v0.138.0)"
+                data-tt-desc="로컬 이미지 첨부 및 생성 시 생성된 파일 경로를 모델에 명시적으로 노출하여, 이후 변경 및 편집 시 정합성을 높였습니다."
+                data-tt-example="">로컬 이미지 파일 경로 명시 및 후속 편집 정합성 개선 (v0.138.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.136.0~v0.137.0</summary>
@@ -264,7 +282,7 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/app</code></div>
-            <div class="row-desc">CLI 세션을 데스크탑 앱으로 전환 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">CLI 세션을 데스크탑 앱으로 전환</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/clear</code></div>
@@ -804,7 +822,7 @@ const codexContent = `
           </div>
           <div class="krow cl-tip" data-tt-title="대체 단축키 매핑 (v0.138.0)" data-tt-desc="Alt 키 바인딩이 부족하거나 미지원되는 터미널 환경을 위해 설정한 대체 단축키(fallback shortcuts) 매핑을 지원합니다.">
             <div class="kkey"><code>fallback_shortcuts</code></div>
-            <div class="kdesc">대체 단축키 매핑 지원 <span class="badge-new">NEW</span></div>
+            <div class="kdesc">대체 단축키 매핑 지원</div>
           </div>
         </div>
         <div class="group">

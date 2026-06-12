@@ -1,4 +1,24 @@
 window.CLAUDE_TIPS = {
+  "disableBundledSkills": {
+    "title": "disableBundledSkills — 번들 스킬/워크플로 비활성화",
+    "desc": "Claude Code의 기본 스킬, 워크플로 및 빌트인 슬래시 커맨드를 숨겨 시스템의 리소스 소모를 방지하고 커스텀 기능만 유지할 수 있도록 설정합니다.",
+    "example": "\"disableBundledSkills\": true"
+  },
+  "CLAUDE_CODE_SAFE_MODE": {
+    "title": "CLAUDE_CODE_SAFE_MODE — 세이프 모드 기동",
+    "desc": "이 환경변수를 1로 설정하고 실행하면 모든 커스터마이징(플러그인, 스킬, 훅, MCP 서버 등)을 비활성화한 깨끗한 상태로 세션을 시작합니다.",
+    "example": "export CLAUDE_CODE_SAFE_MODE=1"
+  },
+  "/cd <dir>": {
+    "title": "/cd — 세션 작업 디렉터리 변경",
+    "desc": "세션을 중단하거나 프롬프트 캐시를 깨지 않고, 진행 중인 상태 그대로 현재 세션의 작업 디렉터리를 새로운 경로로 변경합니다.",
+    "example": "/cd ../another-project"
+  },
+  "--safe-mode": {
+    "title": "--safe-mode — 세이프 모드 플래그",
+    "desc": "모든 세션 커스터마이징(플러그인, 스킬, 훅, MCP 서버 등)을 비활성화하여 시작 시 발생할 수 있는 충돌이나 시작 지연을 트러블슈팅할 때 유용합니다.",
+    "example": "claude --safe-mode"
+  },
   "fallbackModel": {
     "title": "fallbackModel — 멀티 폴백 모델 설정",
     "desc": "기본 모델이 장애 상태이거나 사용 불가할 때 순차적으로 교체해 사용할 최대 3개의 폴백 모델을 설정합니다. 대화형 및 비대화형 세션 모두에 적용 가능합니다.",
@@ -22,7 +42,7 @@ window.CLAUDE_TIPS = {
   "requiredMinimumVersion": {
     "title": "requiredMinimumVersion — 요구 버전",
     "desc": "클라이언트 실행을 위한 최소/최대 버전을 설정합니다.",
-    "example": ""requiredMinimumVersion": "2.1.163""
+    "example": "\"requiredMinimumVersion\": \"2.1.163\""
   },
   "/code-review": {
     "title": "/code-review — 코드 리뷰 스킬",

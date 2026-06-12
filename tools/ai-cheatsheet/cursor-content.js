@@ -11,31 +11,49 @@ const cursorContent = `
       </div>
       <div class="meta">
         <span class="meta-version">v3.7</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-05</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-10</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.7)</span>
+        <span>📋 최근 변경사항 (v3.7+)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Canvas Improvements (v3.7)"
-            data-tt-desc="캔버스에 Design Mode가 도입되어 UI 요소를 직접 선택해 주석을 달 수 있으며, Context Usage Report로 토큰 사용량을 시각적으로 분석할 수 있습니다."
-            data-tt-example="Canvas > Design Mode">Canvas 기능 강화 — Design Mode 및 Context Usage Report (v3.7) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor Enterprise Organizations (v3.7)"
-            data-tt-desc="엔터프라이즈 고객을 위한 다중 팀 관리, 보안, 예산 및 거버넌스 제어를 통합한 중앙 집중식 조직 허브가 제공됩니다."
-            data-tt-example="Settings > Organization">Cursor Enterprise 조직 허브 도입 — 보안 및 다중 팀 관리 (v3.7) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Teams Pricing & Controls (v3.7)"
-            data-tt-desc="에이전트를 많이 사용하는 유저를 위한 신규 Premium seat가 도입되었으며, 사용 비용 예측 및 가시성이 향상되었습니다."
-            data-tt-example="">Teams 플랜 개선 — 신규 Premium Seat 및 비용 가시성 향상 (v3.7) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Bugbot 성능 개선 및 /review 커맨드 추가 (2026-06-10)"
+            data-tt-desc="Bugbot이 Composer 2.5를 탑재하여 속도 ~3.5배 향상, 비용 ~22% 절감, 탐지율 10% 증가가 적용되었으며, push 전 코드/보안 검토를 위한 /review 슬래시 커맨드가 도입되었습니다."
+            data-tt-example="/review">Bugbot 성능 혁신 및 사전 PR/코드 검토를 위한 <code>/review</code> 명령어 추가 (2026-06-10) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Design Mode 다중 선택 및 음성 입력 (v3.7)"
+            data-tt-desc="브라우저 Design Mode에서 여러 요소를 다중 선택(Multi-select)하여 비교/조정 피드백을 전달할 수 있고, 실행 도중 음성 입력 큐잉이 가능합니다."
+            data-tt-example="">Design Mode 다중 선택(Multi-select) 및 음성(Voice) 입력 큐잉 지원 (v3.7) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor SDK 대규모 기능 개선 (2026-06-04)"
+            data-tt-desc="@cursor/sdk 릴리스에서 SQLite 외에 JSONL/PG 커스텀 스토어, customTools 전달, local auto-review 샌드박스 정책 설정 등이 지원됩니다."
+            data-tt-example="npm install @cursor/sdk"><code>@cursor/sdk</code> 업데이트 — 커스텀 스토어, customTools 및 auto-review 지원 (2026-06-04) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Canvas 토큰 사용량 탐색기 및 디버그 버튼 (2026-06-04)"
+            data-tt-desc="컨버스의 토큰 할당(System, Tool, Rules, Skills) 분석 보고서를 인터랙티브 캔버스로 열어 디버깅할 수 있습니다."
+            data-tt-example="">Canvas 토큰 사용량 시각화 보고서 및 Debug with Agent 지원 (2026-06-04) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.7 (초기 버전)</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Canvas Improvements (v3.7)"
+                data-tt-desc="캔버스에 Design Mode가 도입되어 UI 요소를 직접 선택해 주석을 달 수 있으며, Context Usage Report로 토큰 사용량을 시각적으로 분석할 수 있습니다."
+                data-tt-example="Canvas > Design Mode">Canvas 기능 강화 — Design Mode 및 Context Usage Report (v3.7)</li>
+              <li class="cl-tip" data-tt-title="Cursor Enterprise Organizations (v3.7)"
+                data-tt-desc="엔터프라이즈 고객을 위한 다중 팀 관리, 보안, 예산 및 거버넌스 제어를 통합한 중앙 집중식 조직 허브가 제공됩니다."
+                data-tt-example="Settings > Organization">Cursor Enterprise 조직 허브 도입 — 보안 및 다중 팀 관리 (v3.7)</li>
+              <li class="cl-tip" data-tt-title="Teams Pricing & Controls (v3.7)"
+                data-tt-desc="에이전트를 많이 사용하는 유저를 위한 신규 Premium seat가 도입되었으며, 사용 비용 예측 및 가시성이 향상되었습니다."
+                data-tt-example="">Teams 플랜 개선 — 신규 Premium Seat 및 비용 가시성 향상 (v3.7)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.6</summary>
@@ -150,8 +168,12 @@ const cursorContent = `
             <div class="group">
               <div class="group-label">Composer 주요 제어</div>
               <div class="row">
+                <div class="row-key"><code>/review</code></div>
+                <div class="row-desc">코드 및 보안 사전 검토 (/review-bugbot, /review-security) <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row">
                 <div class="row-key">Canvas Design Mode</div>
-                <div class="row-desc">UI 선택 및 컨텍스트 리포트 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">UI 선택 및 컨텍스트 리포트</div>
               </div>
               <div class="row">
                 <div class="row-key">다중 파일 편집</div>

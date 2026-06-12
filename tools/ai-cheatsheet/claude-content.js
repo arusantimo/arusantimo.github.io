@@ -10,35 +10,59 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.169</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-08</span>
+        <span class="meta-version">v2.1.173</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-11</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.169)</span>
+        <span>📋 최근 변경사항 (v2.1.173)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="fallbackModel 멀티 폴백 설정 (v2.1.166)"
-            data-tt-desc="기본 모델 장애 시 대화형/비대화형 세션에서 순차적으로 시도하는 최대 3개의 fallbackModel 설정이 추가되었습니다."
-            data-tt-example="fallbackModel: [sonnet, haiku]">멀티 폴백 모델 설정 <code>fallbackModel</code> 지원 및 적용 (v2.1.166) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="도구 거부 규칙 와일드카드 지원 (v2.1.166)"
-            data-tt-desc="도구 차단 규칙(deny rules)의 도구 명칭 자리에 와일드카드 '*'를 명시하여 모든 도구 호출을 일괄 거부할 수 있습니다."
-            data-tt-example="&quot;*&quot;">도구 거부(deny) 규칙 내 와일드카드(<code>*</code>) 일괄 차단 지원 (v2.1.166) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="claude agents 세션 범위 확장 및 --all 플래그 (v2.1.169)"
-            data-tt-desc="claude agents --json에서 blocked/just-dispatched 세션을 포함하며, --all 플래그로 완료된 세션까지 출력이 가능합니다."
-            data-tt-example="claude agents --json --all"><code>claude agents --json</code> 세션 노출 범위 확장 및 <code>--all</code> 지원 (v2.1.169) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="macOS turn 지연 및 Windows cli 스캔 개선 (v2.1.169)"
-            data-tt-desc="macOS 사용자 로그인 시 턴 시작 부분의 30-50ms 지연 현상 및 Windows cli 스캔 중의 비정상적 지연(또는 대기) 현상이 해결되었습니다."
-            data-tt-example="">macOS 로그인 턴 지연 및 Windows CLI 기동 스캔 지연 개선 (v2.1.169) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Claude Fable 5 모델 출시 (v2.1.170)"
+            data-tt-desc="뛰어난 성능과 안전성을 갖춘 신규 Mythos-class 모델인 Claude Fable 5가 공식 출시되었습니다."
+            data-tt-example="">안전성과 성능이 대폭 강화된 신규 모델 <code>Claude Fable 5</code> 지원 (v2.1.170) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="중첩 서브에이전트 스폰 지원 (v2.1.172)"
+            data-tt-desc="서브에이전트 세션 내에서 하위 서브에이전트를 최대 5단계 깊이까지 재귀적으로 스폰하여 실행할 수 있습니다."
+            data-tt-example="">서브에이전트의 자체 서브에이전트 생성(최대 5레벨 깊이) 지원 (v2.1.172) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Amazon Bedrock 리전 파싱 개선 (v2.1.172)"
+            data-tt-desc="AWS_REGION 환경변수가 미설정된 경우 Bedrock이 ~/.aws 설정 파일에서 리전 정보를 순서대로 읽어옵니다."
+            data-tt-example="">Amazon Bedrock의 <code>~/.aws</code> 리전 정보 탐지 및 <code>/status</code> 노출 지원 (v2.1.172) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/plugin 마켓플레이스 검색창 추가 (v2.1.172)"
+            data-tt-desc="/plugin 명령어 실행 후 마켓플레이스의 플러그인을 탐색할 때 원하는 플러그인을 빠르게 찾을 수 있도록 검색 필터 바가 지원됩니다."
+            data-tt-example=""><code>/plugin</code> 마켓플레이스 탐색 내 플러그인 검색 바 추가 (v2.1.172) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Fable 5 모델 1M context suffix 정규화 (v2.1.173)"
+            data-tt-desc="Fable 5가 기본적으로 1M 컨텍스트를 지원하여 모델명 뒤에 붙는 [1m] suffix를 자동으로 제거 및 정문화합니다."
+            data-tt-example="">Fable 5 모델명 <code>[1m]</code> suffix 자동 normalize 패치 (v2.1.173) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Windows 샌드박스 의존성 시작 경고 수정 (v2.1.173)"
+            data-tt-desc="설정에서 샌드박스를 활성화했을 때 Windows 환경에서 부정확하게 표시되던 sandbox dependencies missing 시작 경고를 해결했습니다."
+            data-tt-example="">Windows 환경의 spurious sandbox 시작 경고 버그 수정 (v2.1.173) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.166~v2.1.169</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="fallbackModel 멀티 폴백 설정 (v2.1.166)"
+                data-tt-desc="기본 모델 장애 시 대화형/비대화형 세션에서 순차적으로 시도하는 최대 3개의 fallbackModel 설정이 추가되었습니다."
+                data-tt-example="fallbackModel: [sonnet, haiku]">멀티 폴백 모델 설정 <code>fallbackModel</code> 지원 및 적용 (v2.1.166)</li>
+              <li class="cl-tip" data-tt-title="도구 거부 규칙 와일드카드 지원 (v2.1.166)"
+                data-tt-desc="도구 차단 규칙(deny rules)의 도구 명칭 자리에 와일드카드 '*'를 명시하여 모든 도구 호출을 일괄 거부할 수 있습니다."
+                data-tt-example="&quot;*&quot;">도구 거부(deny) 규칙 내 와일드카드(<code>*</code>) 일괄 차단 지원 (v2.1.166)</li>
+              <li class="cl-tip" data-tt-title="claude agents 세션 범위 확장 및 --all 플래그 (v2.1.169)"
+                data-tt-desc="claude agents --json에서 blocked/just-dispatched 세션을 포함하며, --all 플래그로 완료된 세션까지 출력이 가능합니다."
+                data-tt-example="claude agents --json --all"><code>claude agents --json</code> 세션 노출 범위 확장 및 <code>--all</code> 지원 (v2.1.169)</li>
+              <li class="cl-tip" data-tt-title="macOS turn 지연 및 Windows cli 스캔 개선 (v2.1.169)"
+                data-tt-desc="macOS 사용자 로그인 시 턴 시작 부분의 30-50ms 지연 현상 및 Windows cli 스캔 중의 비정상적 지연(또는 대기) 현상이 해결되었습니다."
+                data-tt-example="">macOS 로그인 턴 지연 및 Windows CLI 기동 스캔 지연 개선 (v2.1.169)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.160~v2.1.163</summary>
@@ -429,6 +453,10 @@ const claudeContent = `
           <div>
             <div class="group">
               <div class="group-label">세션 (Session)</div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>/cd &lt;dir&gt;</code></div>
+                <div class="row-desc">세션 작업 디렉터리 이동 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/clear</code></div>
                 <div class="row-desc">대화 내용 초기화</div>
@@ -828,7 +856,7 @@ const claudeContent = `
               <div class="group-label">핵심 명령</div>
               <div class="row cl-tip">
                 <div class="row-key"><code>claude plugin list</code></div>
-                <div class="row-desc">설치된 플러그인 확인 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">설치된 플러그인 확인</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>claude</code></div>
@@ -921,6 +949,10 @@ const claudeContent = `
           <div>
             <div class="group">
               <div class="group-label">주요 플래그</div>
+              <div class="row">
+                <div class="row-key"><code>--safe-mode</code></div>
+                <div class="row-desc">세이프 모드로 세션 시작 (customizations 비활성) <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>--model</code></div>
                 <div class="row-desc">모델 지정</div>
@@ -1465,8 +1497,12 @@ const claudeContent = `
             <div class="group">
               <div class="group-label">핵심 설정 항목</div>
               <div class="row cl-tip">
+                <div class="row-key"><code>disableBundledSkills</code></div>
+                <div class="row-desc">번들 스킬 및 워크플로 비활성화 <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row cl-tip">
                 <div class="row-key"><code>requiredMinimumVersion</code></div>
-                <div class="row-desc">최소 허용 버전 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">최소 허용 버전</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>modelOverrides</code></div>
@@ -1513,6 +1549,10 @@ const claudeContent = `
           <div>
             <div class="group">
               <div class="group-label">핵심 환경 변수</div>
+              <div class="row">
+                <div class="row-key"><code>CLAUDE_CODE_SAFE_MODE</code></div>
+                <div class="row-desc">세이프 모드로 세션 시작 (customizations 무시) <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>ANTHROPIC_API_KEY</code></div>
                 <div class="row-desc">API 키</div>

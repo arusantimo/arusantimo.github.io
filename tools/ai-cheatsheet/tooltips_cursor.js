@@ -1,4 +1,9 @@
 window.CURSOR_TIPS = {
+  "/review": {
+    "title": "/review — 코드 및 보안 사전 검토",
+    "desc": "코드를 push하기 전 버그나 보안 위험 요소를 사전에 분석합니다. /review-bugbot 및 /review-security 명령어로 각각 독립적인 검토를 실행할 수도 있습니다.",
+    "example": "/review\n/review-bugbot\n/review-security"
+  },
   "Ctrl + L": {
     "title": "AI Chat 사이드바 토글",
     "desc": "에디터 화면 우측의 AI 채팅 창을 열거나 숨깁니다. 코딩 도중 질문이나 참조 자료를 찾을 때 활용합니다.",

@@ -10,30 +10,36 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.2</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-08</span>
+        <span class="meta-version">v2.1.3</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-12</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.2)</span>
+        <span>📋 최근 변경사항 (v2.1.3)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="경로 자동완성 및 슬래시 커맨드 제안 (v2.1.1)"
-            data-tt-desc="/open 및 /add-dir 명령어 사용 시 셸 스타일 경로 자동완성을 지원하며, 슬래시 커맨드 입력 시 Fuzzy 및 부분 일치 제안이 제공됩니다."
-            data-tt-example="">경로 자동완성(Path Autocomplete) 및 퍼지 검색 매칭 제안 (v2.1.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Optimistic Rendering 및 세션 목록 개선 (v2.1.1)"
-            data-tt-desc="사용자 입력 반응 지연을 해소하기 위한 Optimistic Rendering 도입 및 /resume 목록에서 에이전트 생성 서브세션을 제외하는 필터링이 적용되었습니다."
-            data-tt-example="">Optimistic Rendering 도입 및 세션 재개 필터링 적용 (v2.1.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="모델 서브커맨드 및 permissions 명령어 추가 (v2.1.2)"
-            data-tt-desc="기동 시 --model 옵션 추가, 사용 가능한 모델을 조회하는 agy models 서브커맨드, 그리고 보안 승인 규칙을 직접 제어하는 /permissions 명령어가 추가되었습니다."
-            data-tt-example="/permissions">보안 승인(/permissions) 관리 및 사용 가능 모델 조회 추가 (v2.1.2) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="상태줄 세로 누적 및 원격 MCP 구성 동기화 (v2.1.2)"
-            data-tt-desc="statusLine에 stack_with_default 설정을 추가해 기본/커스텀 상태줄을 세로로 누적 노출할 수 있고, mcp_config.json에서 url 지정을 통해 원격 MCP 구성을 동기화할 수 있습니다."
-            data-tt-example="">상태줄(statusLine) 세로 누적 및 원격 MCP 동기화 지원 (v2.1.2) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Gemini 모델 도구 호출 한도 상향 (v2.1.3)"
+            data-tt-desc="Gemini 모델의 1턴당 최대 도구 호출 횟수 제한이 512회로 대폭 확장되어 복잡하고 자율적인 다단계 작업 처리가 가능합니다."
+            data-tt-example="">Gemini 모델 1턴당 최대 도구 호출 수 512회 확장 지원 (v2.1.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="MCP 서버 실행 타임아웃 구성 (v2.1.3)"
+            data-tt-desc="MCP 서버 시작 시 타임아웃 제한 시간을 임의로 구성하거나 -1을 설정해 타임아웃을 완전 차단할 수 있습니다."
+            data-tt-example="">MCP 서버 기동 대기 타임아웃 설정 지원 (비활성: <code>-1</code>) (v2.1.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="아티팩트 뷰어 행 번호 매핑 개선 (v2.1.3)"
+            data-tt-desc="줄바꿈 처리된 텍스트 및 축소된 Mermaid 다이어그램을 포함하여 뷰어의 행 번호와 실제 소스 라인 번호가 정확히 일치하도록 매핑을 개선했습니다."
+            data-tt-example="">아티팩트 뷰어 행 번호 및 줄바꿈/Mermaid 라인 매핑 정교화 (v2.1.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="GitHub subpath 플러그인 설치 (v2.1.3)"
+            data-tt-desc="GitHub 리포지토리의 subpath 디렉터리 경로를 명시하여 브랜치 단위로 커스텀 플러그인을 직접 다운로드 및 설치할 수 있습니다."
+            data-tt-example="">GitHub subpath를 통한 플러그인 직접 다운로드 설치 지원 (v2.1.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Linux Wayland 클립보드 네이티브 지원 (v2.1.3)"
+            data-tt-desc="Linux 데스크톱 환경의 wl-paste를 네이티브 수준으로 우선 연동하며, 파일 매니저로부터 복사된 파일을 이미지 데이터보다 우선 취급합니다."
+            data-tt-example="">Linux Wayland 클립보드(<code>wl-paste</code>) 지원 및 파일 복사 우선순위 개선 (v2.1.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="settings.json 미확인 필드 유실 패치 (v2.1.3)"
+            data-tt-desc="설정 파일을 로드하거나 병합 후 저장할 때 알 수 없는 임의의 settings 필드가 영구적으로 삭제되는 현상을 수정했습니다."
+            data-tt-example="">설정(settings.json) 병합 저장 시 미인지 필드 온전 보존 패치 (v2.1.3) <span class="badge-new">NEW</span></li>
         </ul>
 
 <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
@@ -109,7 +115,7 @@ const antigravityContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/permissions</code></div>
-                <div class="row-desc">보안 승인 규칙 편집 및 실행 모드 제어 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">보안 승인 규칙 편집 및 실행 모드 제어</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>/config</code></div>
@@ -235,7 +241,7 @@ const antigravityContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>agy models</code></div>
-                <div class="row-desc">사용 가능한 모델 목록 조회 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">사용 가능한 모델 목록 조회</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>agy inspect</code></div>
@@ -260,7 +266,7 @@ const antigravityContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>--model</code></div>
-                <div class="row-desc">기동 시 적용할 특정 AI 모델 강제 지정 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">기동 시 적용할 특정 AI 모델 강제 지정</div>
               </div>
             </div>
           </div>
