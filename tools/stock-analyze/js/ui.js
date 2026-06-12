@@ -1133,6 +1133,8 @@ function simplifyMixedExitClause(value) {
     .trim();
 }
 
+const TRADE_PLAN_REC_BADGE_HTML = '<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천</span>';
+
 function getTradePlanActionGuideBasePrice(entry) {
   const value = Number(entry?.entryPriceValue);
   return Number.isFinite(value) && value > 0 ? value : null;
@@ -1145,31 +1147,15 @@ function formatTradePlanActionGuidePrice(basePrice, pct) {
   return formatWon(Math.round(price * (1 + (rate / 100))));
 }
 
-function formatTradePlanActionGuideYieldList(policy) {
-  const yields = (Array.isArray(policy?.takeProfitStages) ? policy.takeProfitStages : [])
-    .map(stage => formatMixedExitPercent(stage?.targetPct))
-    .filter(Boolean);
-  return yields.length ? yields.join(' / ') : '-';
-}
-
-function formatTradePlanActionGuidePriceList(entry, policy) {
-  const basePrice = getTradePlanActionGuideBasePrice(entry);
-  const prices = (Array.isArray(policy?.takeProfitStages) ? policy.takeProfitStages : [])
-    .map(stage => formatTradePlanActionGuidePrice(basePrice, stage?.targetPct))
-    .filter(price => price && price !== '-');
-  return prices.length ? prices.join(' / ') : '-';
-}
-
-function buildTradePlanActionGuideItems(policy) {
+function buildTradePlanActionGuideItems(policy, entry) {
   if (!policy || typeof policy !== 'object' || !policy.active) return [];
   const steps = [];
-  const basePrice = getTradePlanActionGuideBasePrice(policy.__entryRef);
+  const basePrice = getTradePlanActionGuideBasePrice(entry);
   const takeProfitStages = Array.isArray(policy.takeProfitStages) ? policy.takeProfitStages : [];
   const intradayRiskParts = [];
-  const intradayTiming = normalizeMixedExitTimeLabel(policy?.intradayRiskRule?.timing);
   const intradayAction = String(policy?.intradayRiskRule?.action || '').trim();
   if (policy?.intradayRiskRule?.active) {
-    intradayRiskParts.push(`${intradayTiming || '장중'} 체크 후 ${intradayAction || '부분 축소'}`);
+    intradayRiskParts.push(`${normalizeMixedExitTimeLabel(policy?.intradayRiskRule?.timing) || '장중'} 체크 후 ${intradayAction || '부분 축소'}`);
   }
   if (policy?.volatilityOverlay?.active) {
     intradayRiskParts.push(String(policy.volatilityOverlay.label || '고변동성 방어 적용'));
@@ -1218,15 +1204,14 @@ function renderTradePlanActionGuideRowsHtml(entry) {
   if (!summary) return '';
   const active = entry?.mixedExitPolicy?.active;
   if (!active) return '';
-  const steps = buildTradePlanActionGuideItems({ ...entry?.mixedExitPolicy, __entryRef: entry });
-  const recBadge = '<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천</span>';
+  const steps = buildTradePlanActionGuideItems(entry?.mixedExitPolicy, entry);
   return `
     <tr class="trade-plan-section-row">
       <td colspan="5">대응 순서</td>
     </tr>
     ${steps.map(step => `
       <tr class="trade-plan-merged-row">
-        <td>${escapeHtml(step.label)}${step.recommended ? recBadge : ''}</td>
+        <td>${escapeHtml(step.label)}${step.recommended ? TRADE_PLAN_REC_BADGE_HTML : ''}</td>
         <td>${escapeHtml(step.condition || '-')}</td>
         <td>${escapeHtml(step.quantity || '-')}</td>
         <td>${escapeHtml(step.targetYield || '-')}</td>
@@ -2137,7 +2122,7 @@ function renderTradePlanStageRowsTable(source, {
   const recRowStyle = 'background:rgba(16,185,129,0.16);box-shadow:inset 3px 0 0 var(--text-success)';
   const recCellStyle = 'font-weight:700';
   const recYieldStyle = 'color:var(--text-success);font-weight:700';
-  const recBadge = '<span class="plan-tag target" style="margin-left:6px;">👉 지금 추천</span>';
+  const recBadge = TRADE_PLAN_REC_BADGE_HTML;
   let targetIndex = -1;
 
   return `

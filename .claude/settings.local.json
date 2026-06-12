@@ -18,7 +18,14 @@
       "Bash(/opt/homebrew/bin/python3 -c \"import openpyxl; print\\('openpyxl', openpyxl.__version__\\)\")",
       "Bash(/opt/homebrew/bin/python3 build_model.py)",
       "WebFetch(domain:stockanalysis.com)",
-      "Bash(/opt/homebrew/bin/python3 add_valuation_tabs.py)"
+      "Bash(/opt/homebrew/bin/python3 add_valuation_tabs.py)",
+      "Bash(rg -rn \"targetPrice\\\\s*[:=]\" tools/stock-analyze/js/*.js)",
+      "Bash(rg -n \"function formatWon\" tools/stock-analyze/js/*.js)",
+      "Bash(rg -n \"Math.round\\\\\\(.*entryPriceValue|entryPriceValue \\\\* |\\\\* \\\\\\(1 \\\\+|targetPct\" tools/stock-analyze/js/*.js)",
+      "Bash(rg -n \"function formatMixedExitPercent|function getTradePlanDisplayValue|function formatReplayMixedExitPercent\" tools/stock-analyze/js/*.js)",
+      "Bash(node --test js/ui-volatility.test.mjs)",
+      "Bash(node --test js/*.test.mjs)",
+      "Bash(git stash *)"
     ]
   }
 }
