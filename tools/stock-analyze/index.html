@@ -72,9 +72,7 @@
         <div class="sell-universe-actions">
           <div class="page-switcher" id="jongga-replay-view-switch">
             <button type="button" class="page-switch-btn active" data-jongga-replay-view="recommendation">매수추천</button>
-            <button type="button" class="page-switch-btn" data-jongga-replay-view="a8plus">8 &amp; A+</button>
             <button type="button" class="page-switch-btn" data-jongga-replay-view="a7plus">7 &amp; A</button>
-            <button type="button" class="page-switch-btn" data-jongga-replay-view="replay">6.0 &amp; B</button>
             <button type="button" class="page-switch-btn" data-jongga-replay-view="all">전체</button>
           </div>
           <div class="replay-band-side replay-period-controls" id="jongga-main-period-controls" style="margin-left: 8px; display: inline-flex; align-items: center; gap: 6px;">
@@ -107,6 +105,7 @@
       <div class="section-title section-title-collapsible strategy-replay-section">
         <div class="section-title-main">
           <span>📊 눌림목 종가베팅</span>
+          <span class="section-accent-note">전체도 추천</span>
           <button class="icon-btn strategy-info-btn" data-strategy="pullback" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
           <span id="jongga-replay-badge-pullback" class="quality-status unknown">미확인</span>
         </div>
@@ -120,6 +119,7 @@
       <div class="section-title section-title-collapsible strategy-replay-section">
         <div class="section-title-main">
           <span>🔥 수급 매집형 종가베팅</span>
+          <span class="section-accent-note">7&amp;A도 추천</span>
           <span class="section-help">조용한 거래량·20MA 횡보·양매수 흐름 중심 (돌파 구간과 분리)</span>
           <button class="icon-btn strategy-info-btn" data-strategy="accumulation" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
           <span id="jongga-replay-badge-accumulation" class="quality-status unknown">미확인</span>
@@ -133,21 +133,8 @@
 
       <div class="section-title section-title-collapsible strategy-replay-section">
         <div class="section-title-main">
-          <span>🚀 주도주 돌파형 종가베팅</span>
-          <span class="section-help">strictScore 우선 정렬 · 신호 점수는 전략 내부 모니터링용입니다.</span>
-          <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
-          <span id="jongga-replay-badge-breakout" class="quality-status unknown">미확인</span>
-        </div>
-        <div class="section-title-actions">
-          <div id="jongga-replay-summary-breakout" class="strategy-replay-inline"></div>
-          <button id="btn-open-jongga-replay-breakout" type="button" class="btn btn-secondary small">리플레이</button>
-        </div>
-      </div>
-      <div id="buy-list-breakout" class="buy-grid"></div>
-
-      <div class="section-title section-title-collapsible strategy-replay-section">
-        <div class="section-title-main">
           <span>🔻 주도주 급락 반등 후보</span>
+          <span class="section-accent-note">7&amp;A도 추천</span>
           <span class="section-help">역추세 전용 채점표입니다. 수급 매집형 점수와 크기를 비교하지 마세요.</span>
           <button class="icon-btn strategy-info-btn" data-strategy="reversal" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
           <span id="jongga-replay-badge-reversal" class="quality-status unknown">미확인</span>
@@ -158,6 +145,33 @@
         </div>
       </div>
       <div id="buy-list-reversal" class="buy-grid"></div>
+
+      <div id="buy-breakout-hidden-panel" class="section-title section-title-collapsible strategy-replay-section">
+        <div class="section-title-main">
+          <span>🚀 주도주 돌파형 종가베팅</span>
+          <span class="section-help">현재 화면에서 숨김 상태입니다.</span>
+        </div>
+        <div class="section-title-actions">
+          <button id="btn-show-buy-breakout" type="button" class="btn btn-secondary small" aria-expanded="false">보기</button>
+        </div>
+      </div>
+
+      <div id="buy-breakout-panel">
+        <div class="section-title section-title-collapsible strategy-replay-section">
+          <div class="section-title-main">
+            <span>🚀 주도주 돌파형 종가베팅</span>
+            <span class="section-help">strictScore 우선 정렬 · 신호 점수는 전략 내부 모니터링용입니다.</span>
+            <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+            <span id="jongga-replay-badge-breakout" class="quality-status unknown">미확인</span>
+          </div>
+          <div class="section-title-actions">
+            <div id="jongga-replay-summary-breakout" class="strategy-replay-inline"></div>
+            <button id="btn-hide-buy-breakout" type="button" class="btn btn-secondary small" aria-expanded="true">숨기기</button>
+            <button id="btn-open-jongga-replay-breakout" type="button" class="btn btn-secondary small">리플레이</button>
+          </div>
+        </div>
+        <div id="buy-list-breakout" class="buy-grid"></div>
+      </div>
     </section>
 
     <section class="tab-panel" data-tab-panel="sell">
@@ -217,20 +231,6 @@
       </div>
 
       <div class="section-title split-title">
-        <div>🚀 주도주 돌파형 <span class="section-help">9:08 이전 시초가 점검 · 이후 매도/손절 분석</span>
-          <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
-        </div>
-        <div class="inline-inputs">
-          <input type="text" id="breakout-name" placeholder="종목명">
-          <input type="text" id="breakout-code" placeholder="코드(6자리)" maxlength="6">
-          <button id="btn-add-breakout" class="btn btn-secondary small">➕ 추가</button>
-        </div>
-      </div>
-      <div id="list-breakout" class="stock-grid">
-        <div class="empty-state">종목 데이터가 없습니다.</div>
-      </div>
-
-      <div class="section-title split-title">
         <div>🔻 주도주 급락 반등<span class="section-help">9:08 이전/이후 모두 분석</span>
           <button class="icon-btn strategy-info-btn" data-strategy="reversal" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
         </div>
@@ -241,6 +241,20 @@
         </div>
       </div>
       <div id="list-reversal" class="stock-grid">
+        <div class="empty-state">종목 데이터가 없습니다.</div>
+      </div>
+
+      <div class="section-title split-title">
+        <div>🚀 주도주 돌파형 <span class="section-help">9:08 이전 시초가 점검 · 이후 매도/손절 분석</span>
+          <button class="icon-btn strategy-info-btn" data-strategy="breakout" title="전략 설명 보기" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; margin-left:4px;">❓</button>
+        </div>
+        <div class="inline-inputs">
+          <input type="text" id="breakout-name" placeholder="종목명">
+          <input type="text" id="breakout-code" placeholder="코드(6자리)" maxlength="6">
+          <button id="btn-add-breakout" class="btn btn-secondary small">➕ 추가</button>
+        </div>
+      </div>
+      <div id="list-breakout" class="stock-grid">
         <div class="empty-state">종목 데이터가 없습니다.</div>
       </div>
     </section>

@@ -4,25 +4,25 @@ from jongga.mixed_exit_policy import select_mixed_exit_policy
 
 
 class MixedExitPolicyTests(unittest.TestCase):
-    def test_reversal_a8plus_uses_split_large_rebound_policy(self):
+    def test_reversal_a7plus_accepts_s_grade_candidates(self):
         policy = select_mixed_exit_policy(
             {
                 "strategy": "reversal",
                 "gradeScore": 8.0,
-                "grade": "A",
+                "grade": "S",
                 "statusLabel": "관심후보",
                 "entryEligible": False,
             }
         )
 
         self.assertTrue(policy["active"])
-        self.assertEqual(policy["policyKey"], "reversal-a8plus-balanced")
+        self.assertEqual(policy["policyKey"], "reversal-a7plus-balanced")
         self.assertEqual(policy["stopPct"], -2.0)
         self.assertEqual(
             policy["takeProfitStages"],
             [
-                {"targetPct": 8.0, "quantityPct": 40.0},
-                {"targetPct": 15.0, "quantityPct": 60.0},
+                {"targetPct": 2.0, "quantityPct": 50.0},
+                {"targetPct": 10.0, "quantityPct": 50.0},
             ],
         )
 

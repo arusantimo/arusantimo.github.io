@@ -15,6 +15,15 @@ ACCUMULATION_VOLUME_SOFT_CAP = 1.5
 ACCUMULATION_LAST_HOUR_STRENGTH_MIN = 100.0
 ACCUMULATION_LATE_STRENGTH_DELTA_MIN = 0.0
 ACCUMULATION_LAST_30M_BUY_SELL_RATIO_MIN = 1.1
+PULLBACK_VOLUME_TRAP_HARD_RATIO = 0.80
+PULLBACK_VOLUME_CONTRACTION_STRONG_RATIO = 0.35
+PULLBACK_VOLUME_CONTRACTION_PARTIAL_RATIO = 0.60
+PULLBACK_LAST_HOUR_STRENGTH_GOOD = 100.0
+PULLBACK_LAST_HOUR_STRENGTH_PARTIAL = 95.0
+PULLBACK_LAST_HOUR_STRENGTH_WARN = 90.0
+PULLBACK_LAST_30M_STRENGTH_MIN = 90.0
+PULLBACK_LAST_30M_BUY_SELL_HARD_MIN = 0.9
+PULLBACK_LAST_30M_BUY_SELL_GOOD_MIN = 1.0
 REVERSAL_MIN_MARKET_CAP_TRILLION = 5.0
 REVERSAL_MIN_RETURN_21D = 15.0
 REVERSAL_DRAWDOWN_MIN = -25.0
@@ -63,6 +72,10 @@ def gate_dict(code: str, result: EvalResult, *, warn_if_not_met: bool = False) -
 
 def rule_dict(code: str, result: EvalResult) -> dict[str, Any]:
     return {"code": code, "note": result.note, "evalStatus": result.eval_status}
+
+
+def warning_gate_dict(code: str, note: str, *, eval_status: EvalStatus = "not_met") -> dict[str, Any]:
+    return {"code": code, "status": "⚠️", "note": note, "evalStatus": eval_status}
 
 
 def split_rule_lists(score_map: dict[str, EvalResult]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -248,6 +261,29 @@ def evaluate_pullback_s2(snapshot: Any) -> EvalResult:
     return eval_not_met(f"{note} · 당일 순매수 없음")
 
 
+def evaluate_pullback_s3(snapshot: Any) -> EvalResult:
+    toss = snapshot.toss or {}
+    avg_strength = float(toss.get("avgStrength") or 0)
+    last_hour = float(toss.get("lastHourAvgStrength") or 0)
+    last_30_ratio = float(toss.get("last30BuySellRatio") or 0)
+    last_30_strength = float(toss.get("last30AvgStrength") or 0)
+    if last_hour <= 0:
+        return eval_data_missing("마지막 1시간 평균 체결강도 데이터 부족")
+    note = (
+        f"당일 평균 {avg_strength:.1f}% / 마지막 1시간 {last_hour:.1f}% / "
+        f"마지막 30분 비율 {last_30_ratio:.2f}:1 / 마지막 30분 평균 {last_30_strength:.1f}%"
+    )
+    last_30_supports = (
+        last_30_ratio >= PULLBACK_LAST_30M_BUY_SELL_GOOD_MIN
+        or (avg_strength > 0 and last_30_strength >= avg_strength)
+    )
+    if last_hour >= PULLBACK_LAST_HOUR_STRENGTH_GOOD and last_30_supports:
+        return eval_met(f"{note} · 장후반 흡수 확인")
+    if last_hour >= PULLBACK_LAST_HOUR_STRENGTH_PARTIAL:
+        return eval_met(f"{note} · 장후반 체결강도 유지", score=0.5)
+    return eval_not_met(f"{note} · 장후반 흡수 약함")
+
+
 def evaluate_pullback_p1(snapshot: Any) -> EvalResult:
     mas = [("5MA", snapshot.ma5), ("10MA", snapshot.ma10), ("20MA", snapshot.ma20)]
     available = [(label, value) for label, value in mas if value is not None]
@@ -273,6 +309,18 @@ def evaluate_pullback_p2(snapshot: Any) -> EvalResult:
     if above:
         return eval_met(note)
     return eval_not_met(note)
+
+
+def evaluate_pullback_p3(snapshot: Any, anchor: dict[str, Any] | None) -> EvalResult:
+    body_mid = float((anchor or {}).get("bodyMid") or 0)
+    if body_mid <= 0:
+        return eval_data_missing("앵커 중심값 데이터 부족")
+    note = f"앵커 중심값 {body_mid:,.0f} / 저가 {snapshot.low_price:,.0f} / 종가 {snapshot.current_price:,.0f}"
+    if snapshot.current_price >= body_mid and snapshot.low_price < body_mid:
+        return eval_met(f"{note} · 장중 이탈 후 종가 회복", score=0.5)
+    if snapshot.current_price >= body_mid:
+        return eval_met(f"{note} · 종가 회복")
+    return eval_not_met(f"{note} · 종가 미회복")
 
 
 def evaluate_pullback_c1(snapshot: Any, lower_wick_ratio) -> EvalResult:
@@ -308,6 +356,115 @@ def evaluate_pullback_c3(snapshot: Any, context: dict[str, Any]) -> EvalResult:
     if industry_change_pct > kospi_change_pct:
         return eval_met(f"{comparison_note} outperform")
     return eval_not_met(f"{comparison_note} underperform")
+
+
+def evaluate_pullback_c4(snapshot: Any, anchor: dict[str, Any] | None) -> EvalResult:
+    anchor_volume = float((anchor or {}).get("volume") or 0)
+    if anchor_volume <= 0:
+        return eval_data_missing("앵커 거래량 데이터 부족")
+    ratio = snapshot.volume / anchor_volume
+    note = f"당일 거래량 / 앵커 거래량 {ratio * 100:.0f}%"
+    if ratio <= PULLBACK_VOLUME_CONTRACTION_STRONG_RATIO:
+        return eval_met(f"{note} · 거래량 급감")
+    if ratio <= PULLBACK_VOLUME_CONTRACTION_PARTIAL_RATIO:
+        return eval_met(f"{note} · 거래량 축소", score=0.5)
+    return eval_not_met(f"{note} · 거래량 수축 약함")
+
+
+def evaluate_pullback_c5(snapshot: Any) -> EvalResult:
+    news_flow = snapshot.news_flow or {}
+    status = str(news_flow.get("status") or "")
+    if not news_flow or status == "data_missing":
+        return eval_data_missing(str(news_flow.get("summary") or "최근 뉴스 데이터 부족"))
+    fresh_positive = int(news_flow.get("freshPositiveCount") or 0)
+    positive_count = int(news_flow.get("positiveCount") or 0)
+    note = str(news_flow.get("summary") or "최근 뉴스 흐름")
+    if fresh_positive > 0:
+        return eval_met(f"{note} · 최근 3거래일 재료 유지")
+    if positive_count > 0:
+        return eval_met(f"{note} · 최근 5거래일 재료 확인", score=0.5)
+    return eval_not_met(f"{note} · 최근 재료 신선도 약함")
+
+
+def evaluate_pullback_g10(snapshot: Any, anchor: dict[str, Any] | None) -> EvalResult:
+    anchor_volume = float((anchor or {}).get("volume") or 0)
+    if anchor_volume <= 0:
+        return eval_data_missing("앵커 거래량 데이터 부족")
+    ratio = snapshot.volume / anchor_volume
+    note = (
+        f"당일 거래량 / 앵커 거래량 {ratio * 100:.0f}% · "
+        f"시가 {snapshot.open_price:,.0f} / 종가 {snapshot.current_price:,.0f} / 전일 종가 {snapshot.prev_close:,.0f}"
+    )
+    bearish_close = snapshot.current_price < snapshot.open_price or snapshot.current_price < snapshot.prev_close
+    if bearish_close and ratio >= PULLBACK_VOLUME_TRAP_HARD_RATIO:
+        return eval_not_met(f"{note} · 고거래량 눌림 함정")
+    return eval_met(f"{note} · 거래량 함정 아님")
+
+
+def build_pullback_g11_gate(snapshot: Any, anchor: dict[str, Any] | None, support_price: float | None) -> dict[str, Any]:
+    body_mid = float((anchor or {}).get("bodyMid") or 0)
+    if body_mid <= 0:
+        return warning_gate_dict("G11", "앵커 중심값 데이터 부족", eval_status="data_missing")
+    if support_price is None or support_price <= 0:
+        return warning_gate_dict("G11", f"앵커 중심값 {body_mid:,.0f} · 복합 지지 primaryLine 데이터 부족", eval_status="data_missing")
+
+    below_anchor = snapshot.current_price < body_mid
+    below_support = snapshot.current_price < support_price
+    note = f"종가 {snapshot.current_price:,.0f} / 앵커 중심값 {body_mid:,.0f} / 복합 지지 {support_price:,.0f}"
+    if below_anchor and below_support:
+        return {"code": "G11", "status": "⛔", "note": f"{note} · 앵커·지지 모두 이탈", "evalStatus": "not_met"}
+    if below_anchor or below_support:
+        return warning_gate_dict("G11", f"{note} · 앵커 또는 지지 한 축 이탈")
+    return {"code": "G11", "status": "✅", "note": f"{note} · 앵커·지지 방어", "evalStatus": "met"}
+
+
+def build_pullback_g12_gate(snapshot: Any) -> dict[str, Any]:
+    toss = snapshot.toss or {}
+    avg_strength = float(toss.get("avgStrength") or 0)
+    last_hour = float(toss.get("lastHourAvgStrength") or 0)
+    last_30_ratio = float(toss.get("last30BuySellRatio") or 0)
+    last_30_strength = float(toss.get("last30AvgStrength") or 0)
+    if last_30_strength > 0 or last_30_ratio > 0:
+        note = (
+            f"마지막 30분 비율 {last_30_ratio:.2f}:1 / 마지막 30분 평균 {last_30_strength:.1f}% / "
+            f"마지막 1시간 {last_hour:.1f}%"
+        )
+        if (
+            (last_30_strength > 0 and last_30_strength < PULLBACK_LAST_30M_STRENGTH_MIN)
+            or (last_30_ratio > 0 and last_30_ratio < PULLBACK_LAST_30M_BUY_SELL_HARD_MIN)
+        ):
+            return {"code": "G12", "status": "⛔", "note": f"{note} · 장 막판 투매 경고", "evalStatus": "not_met"}
+        return {"code": "G12", "status": "✅", "note": f"{note} · 장 막판 매수세 유지", "evalStatus": "met"}
+    if last_hour > 0 and avg_strength > 0:
+        note = f"당일 평균 {avg_strength:.1f}% / 마지막 1시간 {last_hour:.1f}% · 마지막 30분 프록시 없음"
+        if last_hour < PULLBACK_LAST_HOUR_STRENGTH_WARN and last_hour + 5 <= avg_strength:
+            return warning_gate_dict("G12", f"{note} · 장후반 약화 경고")
+        return warning_gate_dict("G12", note, eval_status="data_missing")
+    return warning_gate_dict("G12", "장 막판 체결강도 데이터 부족", eval_status="data_missing")
+
+
+def evaluate_pullback_g13(snapshot: Any) -> EvalResult:
+    event_filter = snapshot.event_filter or {}
+    if event_filter.get("blocked"):
+        return eval_not_met(str(event_filter.get("note") or "기업 이벤트 필터 차단"))
+
+    news_flow = snapshot.news_flow or {}
+    if int(news_flow.get("freshNegativeCount") or 0) > 0:
+        return eval_not_met(str(news_flow.get("summary") or "최근 악재 뉴스 감지"))
+
+    has_event_filter = (
+        bool(event_filter.get("note"))
+        or event_filter.get("earningsDays") is not None
+        or event_filter.get("corporateActionDays") is not None
+    )
+    status = str(news_flow.get("status") or "")
+    if not news_flow or status == "data_missing":
+        return eval_data_missing(str(news_flow.get("summary") or "최근 뉴스 데이터 부족"))
+    if not has_event_filter:
+        return eval_data_missing(f"{news_flow.get('summary') or '최근 뉴스 흐름'} · KIND 이벤트 필터 미반영")
+
+    event_note = str(event_filter.get("note") or "KIND 이벤트 필터 통과")
+    return eval_met(f"{event_note} / {news_flow.get('summary') or '최근 뉴스 악재 없음'}")
 
 
 # --- Breakout (주도주 돌파형) ---
@@ -594,6 +751,189 @@ def evaluate_accumulation_s4(snapshot: Any) -> EvalResult:
     if delta > ACCUMULATION_LATE_STRENGTH_DELTA_MIN:
         return eval_met(f"{note} · 장후반 매수세 강화")
     return eval_not_met(f"{note} · 장후반 강화 미확인")
+
+
+def _accumulation_trend_number(value: Any) -> float:
+    text = str(value or "").replace(",", "").strip()
+    if not text:
+        return 0.0
+    try:
+        return float(text)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _accumulation_trend_series(snapshot: Any) -> list[dict[str, Any]]:
+    history = list(getattr(snapshot, "deal_trend_history", []) or [])
+    rows: list[dict[str, Any]] = []
+    for row in history[:5]:
+        rows.append({
+            "date": str(row.get("date") or row.get("bizdate") or ""),
+            "foreignNet": _accumulation_trend_number(row.get("foreignNet", row.get("foreignerPureBuyQuant"))),
+            "institutionNet": _accumulation_trend_number(row.get("institutionNet", row.get("organPureBuyQuant"))),
+        })
+    return rows
+
+
+def _accumulation_actor_metrics(rows: list[dict[str, Any]], key: str) -> dict[str, Any]:
+    values_desc = [float(row.get(key) or 0.0) for row in rows]
+    values = list(reversed(values_desc))
+    positive_days = sum(1 for value in values if value > 0)
+    improvement_count = sum(1 for previous, current in zip(values, values[1:]) if current > previous)
+    return {
+        "todayNet": values_desc[0] if values_desc else 0.0,
+        "cumulativeNet": sum(values),
+        "positiveDays": positive_days,
+        "improvementCount": improvement_count,
+        "series": [{"date": str(row.get("date") or ""), "net": float(row.get(key) or 0.0)} for row in rows],
+    }
+
+
+def build_accumulation_s5_detail(snapshot: Any) -> dict[str, Any]:
+    rows = _accumulation_trend_series(snapshot)
+    lookback = len(rows)
+    empty_series = {"foreign": [], "institution": [], "sponsor": []}
+    if lookback < 3:
+        return {
+            "lookbackDays": lookback,
+            "sponsor": "none",
+            "cumulativeNet": 0.0,
+            "positiveDays": 0,
+            "improvementCount": 0,
+            "series": empty_series,
+            "status": "data_missing",
+            "score": 0.0,
+            "summary": "최근 수급 추세 데이터 부족",
+            "note": f"최근 수급 추세 데이터 부족 ({lookback}일)",
+        }
+
+    threshold = 2 if lookback >= 5 else 1
+    minimum_positive_days = (lookback + 1) // 2
+    foreign = _accumulation_actor_metrics(rows, "foreignNet")
+    institution = _accumulation_actor_metrics(rows, "institutionNet")
+    both_positive_days = sum(
+        1
+        for row in rows
+        if float(row.get("foreignNet") or 0.0) > 0 and float(row.get("institutionNet") or 0.0) > 0
+    )
+    both_series = [
+        {
+            "date": str(row.get("date") or ""),
+            "net": float(row.get("foreignNet") or 0.0) + float(row.get("institutionNet") or 0.0),
+        }
+        for row in rows
+    ]
+    combined_metrics = _accumulation_actor_metrics(
+        [
+            {"date": row.get("date"), "combinedNet": float(row.get("foreignNet") or 0.0) + float(row.get("institutionNet") or 0.0)}
+            for row in rows
+        ],
+        "combinedNet",
+    )
+
+    def actor_status(metrics: dict[str, Any]) -> str:
+        base_ok = (
+            metrics["todayNet"] > 0
+            and metrics["cumulativeNet"] > 0
+            and metrics["positiveDays"] >= minimum_positive_days
+        )
+        if not base_ok:
+            return "not_met"
+        if metrics["improvementCount"] >= threshold:
+            return "met"
+        return "partial"
+
+    foreign_status = actor_status(foreign)
+    institution_status = actor_status(institution)
+
+    def rank_key(metrics: dict[str, Any]) -> tuple[float, int, float]:
+        return (metrics["cumulativeNet"], metrics["positiveDays"], metrics["todayNet"])
+
+    sponsor = "none"
+    sponsor_metrics = None
+    sponsor_label = "수급"
+    if foreign_status == "met" and institution_status == "met":
+        sponsor = "both"
+        sponsor_metrics = {
+            "cumulativeNet": combined_metrics["cumulativeNet"],
+            "positiveDays": both_positive_days,
+            "improvementCount": combined_metrics["improvementCount"],
+            "series": both_series,
+        }
+        sponsor_label = "기관+외국인"
+    else:
+        candidates: list[tuple[str, dict[str, Any], str]] = []
+        if foreign_status in {"met", "partial"}:
+            candidates.append(("foreign", foreign, "외국인"))
+        if institution_status in {"met", "partial"}:
+            candidates.append(("institution", institution, "기관"))
+        if candidates:
+            sponsor, sponsor_metrics, sponsor_label = max(candidates, key=lambda item: rank_key(item[1]))
+
+    if sponsor_metrics is None:
+        return {
+            "lookbackDays": lookback,
+            "sponsor": "none",
+            "cumulativeNet": 0.0,
+            "positiveDays": 0,
+            "improvementCount": 0,
+            "series": {
+                "foreign": foreign["series"],
+                "institution": institution["series"],
+                "sponsor": [],
+            },
+            "status": "not_met",
+            "score": 0.0,
+            "summary": "최근 매집 추세 약함",
+            "note": f"최근 {lookback}일 매집 추세 약함",
+        }
+
+    status = "met"
+    score = 1.0
+    if sponsor == "both":
+        summary = f"{sponsor_label} 최근 {lookback}일 동반 매집 추세"
+        note = (
+            f"{summary} · 합산 누적 {sponsor_metrics['cumulativeNet']:+,.0f}주 · "
+            f"동반 양수 {sponsor_metrics['positiveDays']}/{lookback}일 · 증가 {sponsor_metrics['improvementCount']}회"
+        )
+    else:
+        actor_status_value = foreign_status if sponsor == "foreign" else institution_status
+        if actor_status_value == "partial":
+            status = "partial"
+            score = 0.5
+            summary = f"{sponsor_label} 최근 {lookback}일 매집 유지"
+        else:
+            summary = f"{sponsor_label} 최근 {lookback}일 매집 추세 강화"
+        note = (
+            f"{sponsor_label} 최근 {lookback}일 누적 {sponsor_metrics['cumulativeNet']:+,.0f}주 · "
+            f"양수 {sponsor_metrics['positiveDays']}/{lookback}일 · 증가 {sponsor_metrics['improvementCount']}회"
+        )
+
+    return {
+        "lookbackDays": lookback,
+        "sponsor": sponsor,
+        "cumulativeNet": float(sponsor_metrics["cumulativeNet"]),
+        "positiveDays": int(sponsor_metrics["positiveDays"]),
+        "improvementCount": int(sponsor_metrics["improvementCount"]),
+        "series": {
+            "foreign": foreign["series"],
+            "institution": institution["series"],
+            "sponsor": sponsor_metrics["series"],
+        },
+        "status": status,
+        "score": score,
+        "summary": summary,
+        "note": note,
+    }
+
+
+def evaluate_accumulation_s5(snapshot: Any) -> EvalResult:
+    detail = build_accumulation_s5_detail(snapshot)
+    if detail["status"] == "data_missing":
+        return eval_data_missing(detail["note"])
+    if detail["status"] == "not_met":
+        return eval_not_met(detail["note"])
+    return eval_met(detail["note"], score=float(detail.get("score") or 1.0))
 
 
 def evaluate_accumulation_p1(snapshot: Any) -> EvalResult:

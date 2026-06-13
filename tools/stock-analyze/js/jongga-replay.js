@@ -375,24 +375,28 @@ function filterReplayDaysByPeriod(days = [], period = typeof getJonggaReplayPeri
   return (Array.isArray(days) ? days : []).filter(day => isReplayDateInPeriod(day?.date, period));
 }
 
+function isReplayCasePullbackGateOk(item = {}) {
+  if (typeof isJonggaReplayPullbackGateOk === 'function') {
+    return isJonggaReplayPullbackGateOk(item, {
+      entryEligible: Boolean(item?.entryEligibleOriginal ?? item?.entryEligible),
+      entryWatch: false
+    });
+  }
+  return item?.pullbackReplayGateOk !== false;
+}
+
 function matchesReplayCaseItem(item = {}, caseKey = 'all') {
   const normalizedCase = String(caseKey || '').trim();
+  const pullbackGateOk = isReplayCasePullbackGateOk(item);
   if (normalizedCase === 'all') return true;
   if (normalizedCase === 'recommendation') {
-    return Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal) || String(item.statusLabel || '').includes('관심후보');
+    return pullbackGateOk && (Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal));
   }
-  if (normalizedCase === 'a8plus') {
-    if (Boolean(item.replayA8Plus)) return true;
-    const gradeScore = Number(item.gradeScore);
-    const gradeCode = String(item.replayGrade || item.grade || '').trim().charAt(0).toUpperCase();
-    return Number.isFinite(gradeScore) && gradeScore >= 8.0 && ['A', 'S'].includes(gradeCode);
-  }
-  if (normalizedCase === 'replay') return Boolean(item.replayIncluded);
   if (normalizedCase === 'a7plus') {
     if (Boolean(item.replayA7Plus)) return true;
     const gradeScore = Number(item.gradeScore);
     const gradeCode = String(item.replayGrade || item.grade || '').trim().charAt(0).toUpperCase();
-    return Number.isFinite(gradeScore) && gradeScore >= 7.0 && gradeCode === 'A';
+    return pullbackGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
   }
   return false;
 }
@@ -463,6 +467,35 @@ function buildReplaySummaryMetrics(candidates = [], results = [], orders = []) {
     ambiguousCount: (Array.isArray(results) ? results : []).reduce((sum, item) => sum + Number(item?.ambiguousCount || 0), 0),
     unfilledRate: sellOrders.length ? Number((pendingOrders.length / sellOrders.length).toFixed(4)) : null
   };
+}
+
+function filterReplayCaseOrders(orders = [], results = [], caseKey = 'all') {
+  const list = Array.isArray(orders) ? orders : [];
+  if (caseKey === 'all') return list;
+  const entryKeys = new Set(
+    (Array.isArray(results) ? results : [])
+      .map(item => String(item?.sourceEntryKey || ''))
+      .filter(Boolean)
+  );
+  return list.filter(item => entryKeys.has(String(item?.sourceEntryKey || '')));
+}
+
+function buildReplayCaseComparisons(candidates = [], results = [], orders = []) {
+  const caseSpecs = [
+    ['all', '전체 후보'],
+    ['a7plus', '7&A'],
+    ['recommendation', '추천 전용']
+  ];
+  return Object.fromEntries(caseSpecs.map(([caseKey, label]) => {
+    const caseCandidates = caseKey === 'all' ? candidates : filterReplayCaseItems(candidates, caseKey);
+    const caseResults = caseKey === 'all' ? results : filterReplayCaseItems(results, caseKey);
+    const caseOrders = filterReplayCaseOrders(orders, caseResults, caseKey);
+    return [caseKey, {
+      caseKey,
+      label,
+      ...buildReplaySummaryMetrics(caseCandidates, caseResults, caseOrders)
+    }];
+  }));
 }
 
 function summarizeReplayTradeRows(results = [], fills = []) {
@@ -588,8 +621,17 @@ function buildJonggaReplayPeriodSummary(bridge = getJonggaReplayBridge(), strate
   const selectedCandidates = [];
   const selectedResults = [];
   const selectedOrders = [];
+  const comparisonCandidates = [];
+  const comparisonResults = [];
+  const comparisonOrders = [];
 
   filteredDays.forEach(day => {
+    const scopedCandidates = (day?.candidates || []).filter(item => !strategy || item?.strategy === strategy);
+    const scopedResults = (day?.results || []).filter(item => !strategy || item?.strategy === strategy);
+    const scopedOrders = (day?.orders || []).filter(item => !strategy || item?.strategy === strategy);
+    comparisonCandidates.push(...scopedCandidates);
+    comparisonResults.push(...scopedResults);
+    comparisonOrders.push(...scopedOrders);
     const dayView = buildReplayDayView(day, { strategy, caseKey });
     if (!dayView.results.length && !dayView.candidates.length && !dayView.orders.length) {
       return;
@@ -602,6 +644,7 @@ function buildJonggaReplayPeriodSummary(bridge = getJonggaReplayBridge(), strate
 
   return {
     summary: buildReplaySummaryMetrics(selectedCandidates, selectedResults, selectedOrders),
+    comparisonByCase: buildReplayCaseComparisons(comparisonCandidates, comparisonResults, comparisonOrders),
     stocks: buildReplayStockStats(selectedResults),
     days: selectedDays,
     period: normalizeReplayPeriod(period),
@@ -684,13 +727,13 @@ function getReplayStrategyView(strategy, bridge = getJonggaReplayBridge(), mode 
   if (explicit && typeof explicit === 'object' && !Array.isArray(explicit)) {
     const normalizedMode = normalizeJonggaReplayViewMode(mode);
     if (normalizedMode === 'all') {
-      return { ...explicit, selectedCase: normalizedMode };
+      return { ...explicit, selectedCase: normalizedMode, comparisonByCase: explicit?.summary?.comparisonByCase || explicit?.comparisonByCase || null };
     }
     const caseView = explicit.caseViews?.[normalizedMode];
     if (caseView && typeof caseView === 'object' && !Array.isArray(caseView)) {
-      return { ...caseView, selectedCase: normalizedMode };
+      return { ...caseView, selectedCase: normalizedMode, comparisonByCase: explicit?.summary?.comparisonByCase || explicit?.comparisonByCase || null };
     }
-    return { ...explicit, selectedCase: normalizedMode };
+    return { ...explicit, selectedCase: normalizedMode, comparisonByCase: explicit?.summary?.comparisonByCase || explicit?.comparisonByCase || null };
   }
 
   const byStrategy = latestRun.summary?.byStrategy || latestRun.summary?.strategyStats || {};
@@ -708,7 +751,7 @@ function getReplayStrategyView(strategy, bridge = getJonggaReplayBridge(), mode 
       })
       .filter(Boolean)
     : [];
-  return { summary, stocks, days, selectedCase: normalizeJonggaReplayViewMode(mode) };
+  return { summary, stocks, days, selectedCase: normalizeJonggaReplayViewMode(mode), comparisonByCase: summary?.comparisonByCase || null };
 }
 
 function isReplayStopLikeRule(value) {
@@ -808,6 +851,31 @@ function renderReplayMetricPills(summary = {}, labels = {}) {
           ${getReplayMetricMeta(key).help ? `<small class="replay-metric-help">${escapeHtml(getReplayMetricMeta(key).help)}</small>` : ''}
         </div>
       `).join('')}
+    </div>
+  `;
+}
+
+function renderReplayCaseComparisonCards(comparisonByCase = {}, selectedCase = 'all') {
+  const caseSpecs = [
+    ['all', '전체 후보'],
+    ['a7plus', '7&A'],
+    ['recommendation', '추천 전용']
+  ];
+  const hasAny = caseSpecs.some(([caseKey]) => comparisonByCase?.[caseKey]);
+  if (!hasAny) return '';
+  return `
+    <div class="quality-grid replay-summary-grid replay-case-comparison-grid">
+      ${caseSpecs.map(([caseKey, fallbackLabel]) => {
+        const summary = comparisonByCase?.[caseKey] || {};
+        const label = String(summary?.label || fallbackLabel);
+        return `
+          <div class="quality-card replay-case-comparison-card${selectedCase === caseKey ? ' active' : ''}">
+            <strong>${escapeHtml(label)}</strong>
+            <span>후보 ${escapeHtml(formatReplayNumber(summary?.candidateCount))} · 진입가능 ${escapeHtml(formatReplayNumber(summary?.eligibleCount))} · 포함 ${escapeHtml(formatReplayNumber(summary?.includedCount))}</span>
+            <small>체결 ${escapeHtml(formatReplayNumber(summary?.tradeCount))} · 승률 ${escapeHtml(formatReplayRate(summary?.winRate))} · 누적 ${renderColoredPercent(summary?.cumNetReturnPct)}</small>
+          </div>
+        `;
+      }).join('')}
     </div>
   `;
 }
@@ -1059,6 +1127,7 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
   const currentPeriodLabel = typeof getJonggaReplayPeriodLabel === 'function'
     ? getJonggaReplayPeriodLabel(activePeriod, bridge)
     : periodLabel;
+  const comparisonByCase = strategyView?.comparisonByCase || strategySummary?.comparisonByCase || null;
   const hasStrategyData = Boolean(
     strategyView &&
     strategySummary &&
@@ -1085,6 +1154,13 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
     ${hasStrategyData
       ? renderReplayMetricPills(strategySummary, { includedCount: '타입 포함', tradeCount: '타입 체결', cumNetReturnPct: '타입 누적' })
       : '<div class="replay-empty">해당 전략 요약이 없습니다.</div>'}
+    ${hasStrategyData && comparisonByCase
+      ? `
+        <div class="section-title" style="margin-top:16px;">집계 비교</div>
+        ${renderReplayCaseComparisonCards(comparisonByCase, strategyView?.selectedCase || activeCaseMode)}
+        <div class="replay-metric-note">상단 타입 수익은 현재 케이스 기준이며, 이 비교는 같은 기간의 전체 후보 / 7&A / 추천 전용을 나란히 보여줍니다.</div>
+      `
+      : ''}
     <div class="replay-metric-note">MDD는 최대 낙폭, degraded는 분봉/틱 데이터가 부족해 보강 데이터로 검증한 건수, ambiguous는 같은 봉에서 익절과 손절이 동시에 닿아 보수적으로 손절 처리한 건수입니다.</div>
     ${renderReplaySectionHead(
       '종목별 수익',

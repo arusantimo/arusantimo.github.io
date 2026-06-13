@@ -102,11 +102,11 @@ class ReplayBacktestTests(unittest.TestCase):
             "current",
         )
         self.assertFalse(candidate["entryEligible"])
-        self.assertTrue(candidate["replayIncluded"])
-        self.assertFalse(candidate["replayA8Plus"])
+        self.assertFalse(candidate["replayIncluded"])
         self.assertTrue(candidate["replayA7Plus"])
+        self.assertEqual(candidate["replayA7PlusRule"], "gradeScore>=7.0 AND replayGrade in {A,S}")
 
-        a8plus = replay_entry_view(
+        high_grade = replay_entry_view(
             {
                 "name": "S",
                 "code": "000009",
@@ -122,10 +122,9 @@ class ReplayBacktestTests(unittest.TestCase):
             "pullback",
             "current",
         )
-        self.assertTrue(a8plus["replayIncluded"])
-        self.assertTrue(a8plus["replayA8Plus"])
-        self.assertEqual(a8plus["replayA8PlusRule"], "gradeScore>=8.0 AND replayGrade in {A,S}")
-        self.assertTrue(a8plus["replayA7Plus"])
+        self.assertTrue(high_grade["replayIncluded"])
+        self.assertTrue(high_grade["replayA7Plus"])
+        self.assertEqual(high_grade["replayA7PlusRule"], "gradeScore>=7.0 AND replayGrade in {A,S}")
 
         min_cut = replay_entry_view(
             {
@@ -143,8 +142,8 @@ class ReplayBacktestTests(unittest.TestCase):
             "pullback",
             "current",
         )
-        self.assertTrue(min_cut["replayIncluded"])
-        self.assertEqual(min_cut["replayIncludeRule"], "gradeScore>=6.0 AND replayGrade>=B")
+        self.assertFalse(min_cut["replayIncluded"])
+        self.assertEqual(min_cut["replayIncludeRule"], "gradeScore>=8.0 AND replayGrade>=A")
 
         excluded = replay_entry_view(
             {
@@ -181,6 +180,28 @@ class ReplayBacktestTests(unittest.TestCase):
             "strict-doc",
         )
         self.assertFalse(grade_c["replayIncluded"])
+
+        blocked_pullback = replay_entry_view(
+            {
+                "name": "Trap",
+                "code": "000006",
+                "strategy": "pullback",
+                "grade": "A",
+                "gradeScore": 8.4,
+                "signalScore": 8.4,
+                "score": 8.4,
+                "entryEligible": False,
+                "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+                "gates": [{"code": "G12", "status": "⛔", "note": "late selloff"}],
+                "filters": [],
+                "setupQuality": "setup_weak",
+            },
+            "pullback",
+            "current",
+        )
+        self.assertFalse(blocked_pullback["pullbackReplayGateOk"])
+        self.assertFalse(blocked_pullback["replayIncluded"])
+        self.assertFalse(blocked_pullback["replayA7Plus"])
 
     def test_market_data_is_marked_degraded_when_falling_back_to_daily(self):
         rows = [
@@ -264,13 +285,19 @@ class ReplayBacktestTests(unittest.TestCase):
             bridge = read_js_assignment(replay_dir / "replay_runs.js", REPLAY_RUNS_MARKER)
             self.assertEqual(summary["candidateCount"], 2)
             self.assertEqual(summary["eligibleCount"], 1)
-            self.assertEqual(summary["includedCount"], 2)
+            self.assertEqual(summary["includedCount"], 0)
             self.assertEqual(summary["tradeCount"], 2)
             self.assertEqual(summary["degradedCount"], 2)
+            self.assertIn("comparisonByCase", summary)
+            self.assertEqual(summary["comparisonByCase"]["all"]["candidateCount"], 2)
+            self.assertEqual(summary["comparisonByCase"]["a7plus"]["tradeCount"], 2)
+            self.assertEqual(summary["comparisonByCase"]["recommendation"]["candidateCount"], 1)
+            self.assertEqual(summary["comparisonByCase"]["recommendation"]["tradeCount"], 1)
             self.assertEqual(run_record["summary"]["tradeCount"], 2)
             self.assertEqual(run_record["summary"]["candidateCount"], 2)
-            self.assertEqual(run_record["summary"]["includedCount"], 2)
+            self.assertEqual(run_record["summary"]["includedCount"], 0)
             self.assertIn("overall", run_record["summary"])
+            self.assertIn("comparisonByCase", run_record["summary"])
             self.assertIn("byStrategy", run_record["summary"])
             self.assertIn("byStock", run_record["summary"])
             self.assertIn("strategyRecommendationMatrix", run_record["summary"])
@@ -278,7 +305,9 @@ class ReplayBacktestTests(unittest.TestCase):
             self.assertEqual(pullback_a7_cell["recommendedExitPolicyKey"], "pullback-a7plus-balanced")
             self.assertEqual(pullback_a7_cell["sampleCount"], 1)
             self.assertEqual(pullback_a7_cell["tradeCount"], 1)
-            self.assertEqual(run_record["summary"]["byStrategy"]["accumulation"]["includedCount"], 1)
+            self.assertEqual(run_record["summary"]["byStrategy"]["accumulation"]["includedCount"], 0)
+            self.assertEqual(run_record["summary"]["byStrategy"]["pullback"]["comparisonByCase"]["all"]["candidateCount"], 1)
+            self.assertEqual(run_record["summary"]["byStrategy"]["pullback"]["comparisonByCase"]["recommendation"]["tradeCount"], 1)
             self.assertEqual(len(run_record["summary"]["byStock"]), 2)
             self.assertIn("lastEntryFillPrice", run_record["summary"]["byStock"][0])
             self.assertIn("lastExitAvgFillPrice", run_record["summary"]["byStock"][0])
@@ -311,19 +340,18 @@ class ReplayBacktestTests(unittest.TestCase):
                 run_record["strategyViews"]["pullback"]["caseViews"]["recommendation"]["days"][0]["candidates"][0]["historyRecommendationSourceMode"],
                 PAYLOAD_SOURCE_LIVE,
             )
-            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a8plus"]["summary"]["candidateCount"], 0)
             self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["summary"]["candidateCount"], 1)
             self.assertEqual(
                 [item["name"] for item in run_record["strategyViews"]["pullback"]["caseViews"]["a7plus"]["days"][0]["trades"]],
                 ["A"],
             )
-            self.assertEqual(run_record["strategyViews"]["pullback"]["caseViews"]["replay"]["summary"]["candidateCount"], 1)
-            self.assertEqual([day["date"] for day in run_record["strategyViews"]["pullback"]["caseViews"]["replay"]["days"]], ["2026-06-03"])
+            self.assertNotIn("replay", run_record["strategyViews"]["pullback"]["caseViews"])
+            self.assertNotIn("replay", run_record["strategyViews"]["accumulation"]["caseViews"])
             self.assertEqual(
-                [item["name"] for item in run_record["strategyViews"]["accumulation"]["caseViews"]["replay"]["days"][0]["trades"]],
+                [item["name"] for item in run_record["strategyViews"]["accumulation"]["caseViews"]["a7plus"]["days"][0]["trades"]],
                 ["B"],
             )
-            self.assertEqual(run_record["strategyViews"]["accumulation"]["caseViews"]["replay"]["summary"]["candidateCount"], 1)
+            self.assertEqual(run_record["strategyViews"]["accumulation"]["caseViews"]["a7plus"]["summary"]["candidateCount"], 1)
             self.assertTrue(
                 all(
                     (item.get("entryFilledAt") or "")[:10] != (item.get("exitFilledAt") or "")[:10]

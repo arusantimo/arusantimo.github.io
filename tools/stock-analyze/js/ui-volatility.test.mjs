@@ -42,6 +42,14 @@ function loadUiContext() {
 function createContainerStub() {
   return {
     innerHTML: '',
+    hidden: false,
+    dataset: {},
+    setAttribute(name, value) {
+      this[name] = value;
+    },
+    addEventListener(type, handler) {
+      this[`on${type}`] = handler;
+    },
     querySelectorAll() {
       return [];
     }
@@ -475,6 +483,301 @@ test('buy cards render staged exit tags including swing stage', () => {
   assert.match(html, /📈1 25% 익절 270,830원/);
   assert.match(html, /📊 5% 익절 281,050원/);
   assert.match(html, /🛑 전량 247,835원/);
+});
+
+test('accumulation buy cards render sponsor tag only for accumulation entries with confirmed sponsor', () => {
+  const context = loadUiContext();
+  vm.runInContext(fs.readFileSync(new URL('./sell-ui.js', import.meta.url), 'utf8'), context);
+  const containers = new Map([
+    ['buy-list-pullback', createContainerStub()],
+    ['buy-list-accumulation', createContainerStub()],
+    ['buy-list-breakout', createContainerStub()],
+    ['buy-list-reversal', createContainerStub()]
+  ]);
+
+  context.document = {
+    getElementById(id) {
+      return containers.get(id) || null;
+    },
+    querySelectorAll() {
+      return [];
+    }
+  };
+  context.getJonggaReplayViewMode = () => 'recommendation';
+  context.filterJonggaReplayViewEntries = entries => entries;
+  context.buildMarketCapRankMap = () => new Map();
+  context.summarizeGateStatus = () => ({ passed: 5, total: 6 });
+  context.getBuyPresentation = () => ({
+    verdictClass: 'candidate',
+    liveRefresh: false,
+    changed: {
+      score: false,
+      grade: false,
+      adjustment: false,
+      statusLabel: false
+    },
+    primaryGrade: 'A',
+    primarySummary: '신호 8.2 / 진입 8.2 · A',
+    primaryStatusLabel: '매수추천',
+    primaryStatusReasonShort: '',
+    strategyStatusLabel: '매수추천'
+  });
+  context.getBuyDisplayScore = () => '8.2';
+  context.buildBuyScoreDisplayHtml = () => ({ signalText: '8.2', strictLine: '', badgeHtml: '' });
+  context.renderVolatilityTopBadges = () => '';
+  context.renderPullbackCardInsights = () => '';
+  context.renderVolatilityCardInsights = () => '';
+  context.buildStockNameLinksHtml = name => name;
+  context.buildBuyTrackingButtonHtml = () => '';
+  context.getEntryByCode = entryKeyOrCode => {
+    const entries = [
+      ...(context.getSlotSnapshot('slotA')?.accumulationEntries || []),
+      ...(context.getSlotSnapshot('slotA')?.breakoutEntries || [])
+    ];
+    return entries.find(entry => entry.entryKey === entryKeyOrCode || entry.code === entryKeyOrCode) || null;
+  };
+  context.getTradingValueRankBadgeHtml = () => '';
+  context.renderMarketCapInlineHtml = () => '';
+  context.renderBuyPriceWithDailyChange = () => '<span>110,700원</span>';
+  context.openModal = () => {};
+  context.setNotionPageState('slotA', {
+    snapshot: {
+      pullbackEntries: [],
+      accumulationEntries: [{
+        entryKey: 'slotA:accumulation:035420',
+        strategy: 'accumulation',
+        rank: 1,
+        name: 'NAVER',
+        code: '035420',
+        rr: '1 : 1.3',
+        entryEligible: true,
+        matchedRules: ['S1', 'S5'],
+        unmatchedRules: [],
+        notes: [],
+        rationale: '최근 외국인 매집 추세가 강화됐습니다.',
+        accumulationTrend: { sponsor: 'foreign' },
+        accumulationStopPolicy: { sponsorMode: 'both' },
+        tradePlanRows: []
+      }],
+      breakoutEntries: [{
+        entryKey: 'slotA:breakout:005930',
+        strategy: 'breakout',
+        rank: 1,
+        name: '삼성전자',
+        code: '005930',
+        rr: '1 : 1.5',
+        entryEligible: true,
+        matchedRules: ['S1'],
+        unmatchedRules: [],
+        notes: [],
+        rationale: '돌파형 후보',
+        accumulationStopPolicy: { sponsorMode: 'both' },
+        tradePlanRows: []
+      }],
+      momentumEntries: [],
+      reversalEntries: [],
+      regimeTable: [],
+      regimeEvidence: [],
+      gapScore: { grade: '', rows: [] }
+    }
+  });
+  context.setActiveBuySlot('slotA');
+
+  context.renderBuyStockCards();
+
+  const accumulationHtml = containers.get('buy-list-accumulation').innerHTML;
+  const breakoutHtml = containers.get('buy-list-breakout').innerHTML;
+  assert.match(accumulationHtml, /매집 주체 외국인/);
+  assert.doesNotMatch(breakoutHtml, /매집 주체/);
+});
+
+test('accumulation buy cards hide sponsor tag when sponsor is none', () => {
+  const context = loadUiContext();
+  vm.runInContext(fs.readFileSync(new URL('./sell-ui.js', import.meta.url), 'utf8'), context);
+  const containers = new Map([
+    ['buy-list-pullback', createContainerStub()],
+    ['buy-list-accumulation', createContainerStub()],
+    ['buy-list-breakout', createContainerStub()],
+    ['buy-list-reversal', createContainerStub()]
+  ]);
+
+  context.document = {
+    getElementById(id) {
+      return containers.get(id) || null;
+    },
+    querySelectorAll() {
+      return [];
+    }
+  };
+  context.getJonggaReplayViewMode = () => 'recommendation';
+  context.filterJonggaReplayViewEntries = entries => entries;
+  context.buildMarketCapRankMap = () => new Map();
+  context.summarizeGateStatus = () => ({ passed: 5, total: 6 });
+  context.getBuyPresentation = () => ({
+    verdictClass: 'candidate',
+    liveRefresh: false,
+    changed: {
+      score: false,
+      grade: false,
+      adjustment: false,
+      statusLabel: false
+    },
+    primaryGrade: 'B',
+    primarySummary: '신호 6.0 / 진입 6.0 · B',
+    primaryStatusLabel: '관심후보',
+    primaryStatusReasonShort: '',
+    strategyStatusLabel: '관심후보'
+  });
+  context.getBuyDisplayScore = () => '6.0';
+  context.buildBuyScoreDisplayHtml = () => ({ signalText: '6.0', strictLine: '', badgeHtml: '' });
+  context.renderVolatilityTopBadges = () => '';
+  context.renderPullbackCardInsights = () => '';
+  context.renderVolatilityCardInsights = () => '';
+  context.buildStockNameLinksHtml = name => name;
+  context.buildBuyTrackingButtonHtml = () => '';
+  context.getEntryByCode = entryKeyOrCode => {
+    const entries = context.getSlotSnapshot('slotA')?.accumulationEntries || [];
+    return entries.find(entry => entry.entryKey === entryKeyOrCode || entry.code === entryKeyOrCode) || null;
+  };
+  context.getTradingValueRankBadgeHtml = () => '';
+  context.renderMarketCapInlineHtml = () => '';
+  context.renderBuyPriceWithDailyChange = () => '<span>110,700원</span>';
+  context.openModal = () => {};
+  context.setNotionPageState('slotA', {
+    snapshot: {
+      pullbackEntries: [],
+      accumulationEntries: [{
+        entryKey: 'slotA:accumulation:035420',
+        strategy: 'accumulation',
+        rank: 1,
+        name: 'NAVER',
+        code: '035420',
+        rr: '1 : 1.3',
+        entryEligible: true,
+        matchedRules: ['S1'],
+        unmatchedRules: ['S5'],
+        notes: [],
+        rationale: '주체 미확정',
+        accumulationTrend: { sponsor: 'none' },
+        accumulationStopPolicy: { sponsorMode: 'none' },
+        tradePlanRows: []
+      }],
+      breakoutEntries: [],
+      momentumEntries: [],
+      reversalEntries: [],
+      regimeTable: [],
+      regimeEvidence: [],
+      gapScore: { grade: '', rows: [] }
+    }
+  });
+  context.setActiveBuySlot('slotA');
+
+  context.renderBuyStockCards();
+
+  const accumulationHtml = containers.get('buy-list-accumulation').innerHTML;
+  assert.doesNotMatch(accumulationHtml, /매집 주체/);
+});
+
+test('buy breakout section stays hidden until explicitly shown and hidden state skips breakout render', () => {
+  const context = loadUiContext();
+  vm.runInContext(fs.readFileSync(new URL('./sell-ui.js', import.meta.url), 'utf8'), context);
+  const elements = new Map([
+    ['buy-list-pullback', createContainerStub()],
+    ['buy-list-accumulation', createContainerStub()],
+    ['buy-list-breakout', createContainerStub()],
+    ['buy-list-reversal', createContainerStub()],
+    ['buy-breakout-hidden-panel', createContainerStub()],
+    ['buy-breakout-panel', createContainerStub()],
+    ['btn-show-buy-breakout', createContainerStub()],
+    ['btn-hide-buy-breakout', createContainerStub()]
+  ]);
+
+  context.document = {
+    getElementById(id) {
+      return elements.get(id) || null;
+    },
+    querySelectorAll() {
+      return [];
+    }
+  };
+  context.getJonggaReplayViewMode = () => 'recommendation';
+  context.filterJonggaReplayViewEntries = entries => entries;
+  context.buildMarketCapRankMap = () => new Map();
+  context.summarizeGateStatus = () => ({ passed: 5, total: 6 });
+  context.getBuyPresentation = () => ({
+    verdictClass: 'candidate',
+    liveRefresh: false,
+    changed: {
+      score: false,
+      grade: false,
+      adjustment: false,
+      statusLabel: false
+    },
+    primaryGrade: 'A',
+    primarySummary: '신호 8.4 / 진입 8.4 · A',
+    primaryStatusLabel: '매수추천',
+    primaryStatusReasonShort: '',
+    strategyStatusLabel: '매수추천'
+  });
+  context.getBuyDisplayScore = () => '8.4';
+  context.buildBuyScoreDisplayHtml = () => ({ signalText: '8.4', strictLine: '', badgeHtml: '' });
+  context.renderVolatilityTopBadges = () => '';
+  context.renderPullbackCardInsights = () => '';
+  context.renderVolatilityCardInsights = () => '';
+  context.buildStockNameLinksHtml = name => name;
+  context.buildBuyTrackingButtonHtml = () => '';
+  context.bindBuyTrackingButtons = () => {};
+  context.getEntryByCode = entryKeyOrCode => {
+    const entries = [
+      ...(context.getSlotSnapshot('slotA')?.pullbackEntries || []),
+      ...(context.getSlotSnapshot('slotA')?.breakoutEntries || [])
+    ];
+    return entries.find(entry => entry.entryKey === entryKeyOrCode || entry.code === entryKeyOrCode) || null;
+  };
+  context.getTradingValueRankBadgeHtml = () => '';
+  context.renderMarketCapInlineHtml = () => '';
+  context.renderBuyPriceWithDailyChange = () => '<span>70,000원</span>';
+  context.openModal = () => {};
+  context.setJonggaBuyBreakoutVisible(false);
+  context.setNotionPageState('slotA', {
+    snapshot: {
+      pullbackEntries: [],
+      accumulationEntries: [],
+      breakoutEntries: [{
+        entryKey: 'slotA:breakout:005930',
+        strategy: 'breakout',
+        rank: 1,
+        name: '삼성전자',
+        code: '005930',
+        rr: '1 : 1.5',
+        entryEligible: true,
+        matchedRules: ['G1'],
+        unmatchedRules: [],
+        notes: [],
+        rationale: '돌파형 후보',
+        tradePlanRows: []
+      }],
+      momentumEntries: [],
+      reversalEntries: [],
+      regimeTable: [],
+      regimeEvidence: [],
+      gapScore: { grade: '', rows: [] }
+    }
+  });
+  context.setActiveBuySlot('slotA');
+
+  context.renderBuyStockCards();
+
+  assert.equal(elements.get('buy-breakout-hidden-panel').hidden, false);
+  assert.equal(elements.get('buy-breakout-panel').hidden, true);
+  assert.equal(elements.get('buy-list-breakout').innerHTML, '');
+
+  context.setJonggaBuyBreakoutVisible(true);
+  context.renderBuyStockCards();
+
+  assert.equal(elements.get('buy-breakout-hidden-panel').hidden, true);
+  assert.equal(elements.get('buy-breakout-panel').hidden, false);
+  assert.match(elements.get('buy-list-breakout').innerHTML, /삼성전자/);
 });
 
 test('G-E 가이드 문구가 전략별 축소 운용 정책과 일치한다', () => {

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import html
 import json
 import math
 import os
@@ -13,6 +14,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
+from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
 from jongga.entry_policy import attach_entry_eligibility
@@ -22,10 +24,10 @@ from jongga.scoring import (
     ACCUMULATION_STRICT_MAX,
     BREAKOUT_STRICT_MAX,
     BREAKOUT_WEIGHTS,
+    PULLBACK_SCORE_WEIGHTS,
+    PULLBACK_STRICT_MAX,
     REVERSAL_SCORE_WEIGHTS,
     REVERSAL_STRICT_MAX,
-    TREND_SCORE_WEIGHTS,
-    TREND_STRICT_MAX,
     apply_buy_scoring,
     rank_buy_entries,
 )
@@ -39,6 +41,7 @@ from jongga.macro_overlay import (
 )
 from jongga.mixed_exit_policy import select_mixed_exit_policy
 from jongga.rule_evaluation import (
+    build_accumulation_s5_detail,
     evaluate_accumulation_c1,
     evaluate_accumulation_c2,
     evaluate_accumulation_c3,
@@ -54,6 +57,7 @@ from jongga.rule_evaluation import (
     evaluate_accumulation_s2,
     evaluate_accumulation_s3,
     evaluate_accumulation_s4,
+    evaluate_accumulation_s5,
     evaluate_accumulation_c4,
     evaluate_breakout_c1,
     evaluate_breakout_c2,
@@ -73,8 +77,12 @@ from jongga.rule_evaluation import (
     evaluate_pullback_c1,
     evaluate_pullback_c2,
     evaluate_pullback_c3,
+    evaluate_pullback_c4,
+    evaluate_pullback_c5,
     evaluate_pullback_g0,
     evaluate_pullback_g1,
+    evaluate_pullback_g10,
+    evaluate_pullback_g13,
     evaluate_pullback_g2,
     evaluate_pullback_g3,
     evaluate_pullback_g4,
@@ -84,8 +92,10 @@ from jongga.rule_evaluation import (
     evaluate_pullback_g8_extension,
     evaluate_pullback_p1,
     evaluate_pullback_p2,
+    evaluate_pullback_p3,
     evaluate_pullback_s1,
     evaluate_pullback_s2,
+    evaluate_pullback_s3,
     evaluate_reversal_c1,
     evaluate_reversal_c2,
     evaluate_reversal_c3,
@@ -103,6 +113,8 @@ from jongga.rule_evaluation import (
     evaluate_reversal_s1,
     evaluate_reversal_s2,
     drawdown_from_high_20d,
+    build_pullback_g11_gate,
+    build_pullback_g12_gate,
     gate_dict,
     split_rule_lists,
 )
@@ -132,6 +144,7 @@ TOSS_STOCK_DETAIL_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v3/sto
 TOSS_QUOTES_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v3/stock-prices/A{code}/quotes?viewType=krx_all&investMode=krx"
 TOSS_TICKS_API_TEMPLATE = "https://wts-info-api.tossinvest.com/api/v2/stock-prices/A{code}/ticks?viewType=krx_all&count=120&investMode=krx"
 NAVER_ORDERBOOK_URL_TEMPLATE = "https://finance.naver.com/item/main.nhn?code={code}"
+NAVER_ITEM_NEWS_URL_TEMPLATE = "https://finance.naver.com/item/news_news.naver?code={code}&page={page}"
 KIND_DISCLOSURE_SEARCH_URL = "https://kind.krx.co.kr/disclosureSimpleSearch.do?method=disclosureSimpleSearchMain"
 ETF_NAME_PATTERN = re.compile(
     r"KODEX|TIGER|KOSEF|KBSTAR|ARIRANG|HANARO|ACE|SOL|TIMEFOLIO|PLUS|ETF|ETN|스팩|우B?$",
@@ -140,6 +153,14 @@ ETF_NAME_PATTERN = re.compile(
 STOCK_CODE_PATTERN = re.compile(r"^\d{6}$")
 KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업\(잠정\)실적|잠정실적|실적발표|결산실적", re.IGNORECASE)
 KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
+PULLBACK_NEWS_NEGATIVE_PATTERN = re.compile(
+    r"유상증자|전환사채|CB\b|BW\b|구주매출|보호예수\s*해제|최대주주\s*매도|적자|실적\s*부진|불성실공시|거래정지|조회공시",
+    re.IGNORECASE,
+)
+PULLBACK_NEWS_POSITIVE_PATTERN = re.compile(
+    r"수주|공급계약|계약\s*체결|MOU|업무협약|파트너십|제휴|협력|승인|허가|특허|출시|론칭|양산|증설|선정|채택|투자유치|흑자전환|실적\s*개선|호실적|자사주|배당\s*확대",
+    re.IGNORECASE,
+)
 TOP_TRADING_VALUE_LIMIT = 100
 NAVER_MARKET_VALUE_API_TEMPLATE = "https://m.stock.naver.com/api/stocks/marketValue/{market}?page={page}&pageSize={page_size}"
 CHROME_EXECUTABLE_CANDIDATES = [
@@ -966,6 +987,191 @@ def fetch_orderbook_with_http(code: str) -> dict[str, Any] | None:
         return None
 
 
+def _normalize_news_date_key(value: Any) -> str:
+    digits = re.sub(r"[^0-9]", "", str(value or ""))
+    return digits[:8] if len(digits) >= 8 else ""
+
+
+def build_pullback_news_flow_data_missing(snapshot: Any, summary: str) -> dict[str, Any]:
+    lookback_days = min(len(getattr(snapshot, "date_history", []) or []), 5)
+    return {
+        "lookbackDays": lookback_days,
+        "headlineCount": 0,
+        "positiveCount": 0,
+        "negativeCount": 0,
+        "latestPositiveDate": "",
+        "latestNegativeDate": "",
+        "status": "data_missing",
+        "summary": summary,
+        "headlines": [],
+        "freshPositiveCount": 0,
+        "freshNegativeCount": 0,
+    }
+
+
+def parse_naver_item_news_rows(html_text: str, code: str) -> list[dict[str, Any]]:
+    pattern = re.compile(
+        r'<td class="title">\s*<a href="(?P<href>[^"]+)"[^>]*>(?P<title>.*?)</a>.*?</td>\s*'
+        r'<td class="info">(?P<source>.*?)</td>\s*'
+        r'<td class="date">\s*(?P<date>\d{4}\.\d{2}\.\d{2}(?: \d{2}:\d{2})?)\s*</td>',
+        re.IGNORECASE | re.DOTALL,
+    )
+    rows: list[dict[str, Any]] = []
+    seen: set[tuple[str, str, str]] = set()
+    for match in pattern.finditer(html_text):
+        title = normalize_text(html.unescape(re.sub(r"<[^>]+>", "", match.group("title"))))
+        source = normalize_text(html.unescape(re.sub(r"<[^>]+>", "", match.group("source"))))
+        published_at = normalize_text(match.group("date"))
+        href = normalize_text(html.unescape(match.group("href")))
+        if not title or not published_at:
+            continue
+        url = urljoin("https://finance.naver.com", href)
+        dedupe_key = (title, published_at, url)
+        if dedupe_key in seen:
+            continue
+        seen.add(dedupe_key)
+        rows.append({
+            "title": title,
+            "source": source,
+            "publishedAt": published_at,
+            "dateKey": _normalize_news_date_key(published_at),
+            "url": url,
+            "code": code,
+        })
+    return rows
+
+
+def fetch_naver_item_news_rows(code: str, *, pages: int = 2) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for page in range(1, max(1, pages) + 1):
+        html_text = request_text(
+            NAVER_ITEM_NEWS_URL_TEMPLATE.format(code=code, page=page),
+            timeout=15.0,
+            encoding="euc-kr",
+        )
+        page_rows = parse_naver_item_news_rows(html_text, code)
+        if not page_rows:
+            break
+        rows.extend(page_rows)
+        if len(page_rows) < 10:
+            break
+    return rows
+
+
+def build_pullback_news_flow(snapshot: Any, rows: list[dict[str, Any]]) -> dict[str, Any]:
+    trade_dates = [str(value or "").replace("-", "")[:8] for value in list(getattr(snapshot, "date_history", []) or []) if str(value or "").strip()]
+    lookback_dates = trade_dates[:5]
+    fresh_dates = set(lookback_dates[:3])
+    lookback_set = set(lookback_dates)
+    if not lookback_dates:
+        return build_pullback_news_flow_data_missing(snapshot, "최근 거래일 기준 뉴스 비교 데이터 부족")
+
+    filtered_rows: list[dict[str, Any]] = []
+    positive_count = 0
+    negative_count = 0
+    fresh_positive_count = 0
+    fresh_negative_count = 0
+    latest_positive_date = ""
+    latest_negative_date = ""
+    for row in rows:
+        date_key = _normalize_news_date_key(row.get("dateKey") or row.get("publishedAt"))
+        if date_key not in lookback_set:
+            continue
+        title = normalize_text(row.get("title"))
+        sentiment = "neutral"
+        if PULLBACK_NEWS_NEGATIVE_PATTERN.search(title):
+            sentiment = "negative"
+            negative_count += 1
+            if not latest_negative_date:
+                latest_negative_date = date_key
+            if date_key in fresh_dates:
+                fresh_negative_count += 1
+        elif PULLBACK_NEWS_POSITIVE_PATTERN.search(title):
+            sentiment = "positive"
+            positive_count += 1
+            if not latest_positive_date:
+                latest_positive_date = date_key
+            if date_key in fresh_dates:
+                fresh_positive_count += 1
+        filtered_rows.append({
+            "date": str(row.get("publishedAt") or ""),
+            "title": title,
+            "source": normalize_text(row.get("source")),
+            "url": normalize_text(row.get("url")),
+            "sentiment": sentiment,
+        })
+
+    if not filtered_rows:
+        return {
+            "lookbackDays": len(lookback_dates),
+            "headlineCount": 0,
+            "positiveCount": 0,
+            "negativeCount": 0,
+            "latestPositiveDate": "",
+            "latestNegativeDate": "",
+            "status": "neutral",
+            "summary": "최근 5거래일 종목 뉴스 없음",
+            "headlines": [],
+            "freshPositiveCount": 0,
+            "freshNegativeCount": 0,
+        }
+
+    if fresh_negative_count > 0:
+        status = "negative"
+        status_suffix = "최근 3거래일 악재 감지"
+    elif fresh_positive_count > 0:
+        status = "positive"
+        status_suffix = "최근 3거래일 재료 유지"
+    elif positive_count > 0:
+        status = "stale_positive"
+        status_suffix = "최근 5거래일 재료 존재"
+    else:
+        status = "neutral"
+        status_suffix = "중립 뉴스 흐름"
+
+    return {
+        "lookbackDays": len(lookback_dates),
+        "headlineCount": len(filtered_rows),
+        "positiveCount": positive_count,
+        "negativeCount": negative_count,
+        "latestPositiveDate": latest_positive_date,
+        "latestNegativeDate": latest_negative_date,
+        "status": status,
+        "summary": f"최근 5거래일 뉴스 {len(filtered_rows)}건 · 긍정 {positive_count}건 · 악재 {negative_count}건 · {status_suffix}",
+        "headlines": filtered_rows[:3],
+        "freshPositiveCount": fresh_positive_count,
+        "freshNegativeCount": fresh_negative_count,
+    }
+
+
+def fetch_pullback_news_candidate_enrichments(candidates: list[Any]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    if not candidates:
+        return {}, []
+
+    def collect_one(snapshot: Any) -> tuple[str, dict[str, Any]]:
+        code = str(snapshot.code)
+        enrichment = {"toss": None, "orderbook": None, "eventFilter": None, "newsFlow": None, "errors": []}
+        try:
+            rows = fetch_naver_item_news_rows(code)
+            enrichment["newsFlow"] = build_pullback_news_flow(snapshot, rows)
+        except Exception as error:  # noqa: BLE001
+            enrichment["errors"].append(f"news {code}: {error}")
+            enrichment["newsFlow"] = build_pullback_news_flow_data_missing(snapshot, f"뉴스 수집 실패: {error}")
+        return code, enrichment
+
+    max_workers = min(4, len(candidates)) or 1
+    enrichments: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(collect_one, snapshot) for snapshot in candidates]
+        for future in concurrent.futures.as_completed(futures):
+            code, enrichment = future.result()
+            enrichments[code] = enrichment
+            if enrichment["errors"]:
+                errors.extend(enrichment["errors"])
+    return enrichments, errors
+
+
 def fetch_http_candidate_enrichments(candidates: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], list[str]]:
     if not candidates:
         return {}, []
@@ -1124,6 +1330,13 @@ def sync_entry_manual_input(entry: dict[str, Any]) -> None:
 def rebuild_entry_notes(entry: dict[str, Any], strategy: str) -> None:
     notes: list[str] = []
     event_filter = entry.get("eventFilter") or {}
+    if strategy == "pullback":
+        if not is_entry_field_satisfied(entry, "toss.avgStrength"):
+            notes.append("당일 평균 체결강도 미반영")
+        if not is_entry_field_satisfied(entry, "toss.lastHourAvgStrength"):
+            notes.append("마지막 1시간 체결강도 미반영")
+        if not (bool(event_filter.get("blocked")) or bool(normalize_text(event_filter.get("note"))) or event_filter.get("earningsDays") is not None or event_filter.get("corporateActionDays") is not None):
+            notes.append("기업 이벤트 필터는 미반영")
     if strategy in {"breakout", "momentum"}:
         if not is_entry_field_satisfied(entry, "toss.avgStrength"):
             notes.append("토스 체결강도 미반영")
@@ -1157,6 +1370,7 @@ def apply_browser_enrichment_to_entry(entry: dict[str, Any], strategy: str, enri
     toss = enrichment.get("toss")
     orderbook = enrichment.get("orderbook")
     event_filter = enrichment.get("eventFilter")
+    news_flow = enrichment.get("newsFlow")
     if isinstance(toss, dict):
         merged_toss = dict(entry.get("toss") or {})
         merged_toss.update(toss)
@@ -1165,6 +1379,13 @@ def apply_browser_enrichment_to_entry(entry: dict[str, Any], strategy: str, enri
         merged_orderbook = dict(entry.get("orderbook") or {})
         merged_orderbook.update(orderbook)
         entry["orderbook"] = merged_orderbook
+    if strategy == "pullback":
+        if isinstance(event_filter, dict):
+            entry["eventFilter"] = {**(entry.get("eventFilter") or {}), **event_filter}
+        if isinstance(news_flow, dict):
+            pullback_context = dict(entry.get("pullbackContext") or {})
+            pullback_context["newsFlow"] = news_flow
+            entry["pullbackContext"] = pullback_context
     if strategy == "reversal" and isinstance(event_filter, dict):
         entry["eventFilter"] = {**(entry.get("eventFilter") or {}), **event_filter}
         filters = entry.get("filters") if isinstance(entry.get("filters"), list) else []
@@ -1188,12 +1409,15 @@ def apply_browser_enrichment_to_snapshot(snapshot: "StockSnapshot", enrichment: 
     toss = enrichment.get("toss")
     orderbook = enrichment.get("orderbook")
     event_filter = enrichment.get("eventFilter")
+    news_flow = enrichment.get("newsFlow")
     if isinstance(toss, dict):
         snapshot.toss = {**(snapshot.toss or {}), **toss}
     if isinstance(orderbook, dict):
         snapshot.orderbook = {**(snapshot.orderbook or {}), **orderbook}
     if isinstance(event_filter, dict):
         snapshot.event_filter = {**(snapshot.event_filter or {}), **event_filter}
+    if isinstance(news_flow, dict):
+        snapshot.news_flow = {**(snapshot.news_flow or {}), **news_flow}
 
 
 def parse_cnbc_quote_html(html: str) -> dict[str, float]:
@@ -1514,6 +1738,8 @@ class StockSnapshot:
     industry_compare_count: int
     intraday_30m: dict[str, Any]
     event_filter: dict[str, Any] | None
+    deal_trend_history: list[dict[str, Any]] | None = None
+    news_flow: dict[str, Any] | None = None
     toss: dict[str, Any] | None = None
     orderbook: dict[str, Any] | None = None
     market_cap_rank: int | None = None
@@ -1546,6 +1772,34 @@ def _analysis_history_rows(
     return filtered_rows, analysis_row
 
 
+def _analysis_target_key(analysis_date: date | str | None) -> str | None:
+    if analysis_date is None:
+        return None
+    if isinstance(analysis_date, date):
+        return compact_date(analysis_date)
+    return str(analysis_date).replace("-", "")[:8]
+
+
+def _normalize_deal_trend_history(
+    deals: list[dict[str, Any]],
+    analysis_date: date | str | None,
+) -> list[dict[str, Any]]:
+    target_key = _analysis_target_key(analysis_date)
+    rows = deals or []
+    if target_key:
+        filtered = [row for row in rows if str(row.get("bizdate") or "").replace("-", "")[:8] <= target_key]
+        if filtered:
+            rows = filtered
+    history: list[dict[str, Any]] = []
+    for row in rows[:5]:
+        history.append({
+            "date": str(row.get("bizdate") or ""),
+            "foreignNet": parse_float(row.get("foreignerPureBuyQuant")),
+            "institutionNet": parse_float(row.get("organPureBuyQuant")),
+        })
+    return history
+
+
 def build_stock_snapshot(
     item: tuple[int, str, str],
     analysis_date: date | str | None = None,
@@ -1571,6 +1825,7 @@ def build_stock_snapshot(
     industry_compare_rows = integration.get("industryCompareInfo", []) or []
     today_deal = deals[0] if deals else {}
     previous_deal = deals[1] if len(deals) > 1 else {}
+    deal_trend_history = _normalize_deal_trend_history(deals, analysis_date)
     industry_change_values = [
         parse_float(row.get("fluctuationsRatio"))
         for row in industry_compare_rows
@@ -1582,7 +1837,9 @@ def build_stock_snapshot(
     high_52w = parse_float(find_total_info(total_infos, "highPriceOf52Weeks")) or max(history_high_window)
     low_52w = parse_float(find_total_info(total_infos, "lowPriceOf52Weeks")) or (min(low_history[:120]) if low_history else 0.0)
     historical_current = parse_float(analysis_row["closePrice"]) if analysis_row else 0.0
-    current_price = historical_current or parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
+    finalized_current = close_history[0] if analysis_date is not None and close_history else 0.0
+    # Historical/finalized runs should prefer the filtered session close over live/basic quotes.
+    current_price = finalized_current or historical_current or parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
     prev_close = parse_float(analysis_rows[1]["closePrice"]) if len(analysis_rows) > 1 else 0.0
     prev_close = prev_close or parse_float(find_total_info(total_infos, "lastClosePrice")) or (close_history[1] if len(close_history) > 1 else current_price)
     open_price = parse_float(analysis_row["openPrice"]) if analysis_row else 0.0
@@ -1652,6 +1909,8 @@ def build_stock_snapshot(
         industry_compare_count=len(industry_change_values),
         intraday_30m=intraday_30m,
         event_filter=event_filter,
+        deal_trend_history=deal_trend_history,
+        news_flow=None,
         toss=None,
         orderbook=None,
         market_cap_rank=(market_cap_rank_lookup or {}).get(code),
@@ -2311,6 +2570,23 @@ def _pullback_anchor_candidate(snapshot: StockSnapshot, *, lookback_days: int = 
     if not candidates:
         return None
     return sorted(candidates, key=lambda item: (-item["volumeRatio"], -item["volume"], -item["index"]))[0]
+
+
+def build_pullback_anchor_context(snapshot: StockSnapshot) -> dict[str, Any] | None:
+    anchor = _pullback_anchor_candidate(snapshot)
+    if anchor is None:
+        return None
+    return {
+        "date": str(anchor.get("date") or ""),
+        "open": _round_price(anchor.get("open")),
+        "close": _round_price(anchor.get("close")),
+        "high": _round_price(anchor.get("high")),
+        "low": _round_price(anchor.get("low")),
+        "bodyMid": _round_price(anchor.get("bodyMid")),
+        "volume": round(float(anchor.get("volume") or 0.0), 1),
+        "volumeRatio": round(float(anchor.get("volumeRatio") or 0.0), 2),
+        "daysAgo": int(anchor.get("index") or 0),
+    }
 
 
 def _is_pullback_stop_candidate_below_current(candidate_price: float | None, current_price: float | None) -> bool:
@@ -4012,6 +4288,48 @@ def build_manual_input_fields(strategy: str, snapshot: StockSnapshot) -> list[di
     toss_chart_url = f"https://www.tossinvest.com/stocks/A{snapshot.code}/chart"
     kind_disclosure_url = "https://kind.krx.co.kr/disclosure/disclosurecompany.do?method=searchDisclosureCompanyMain"
     auto_event_filter_ready = is_snapshot_field_satisfied(snapshot, "eventFilter")
+    if strategy == "pullback":
+        fields: list[dict[str, Any]] = []
+        if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
+            fields.append({
+                "fieldKey": "toss.avgStrength",
+                "label": "당일 평균 체결강도 (%)",
+                "sourceName": "토스증권 주문 화면",
+                "sourceUrl": toss_order_url,
+                "copyHint": "체결강도 평균 값을 그대로 복사해 붙여넣습니다.",
+                "instructions": [
+                    f"토스증권에서 {snapshot.name} ({snapshot.code}) 주문 화면을 엽니다.",
+                    "체결강도 영역의 당일 평균 값을 확인합니다.",
+                    "예: 98.4 처럼 숫자만 붙여넣습니다.",
+                ],
+            })
+        if not is_snapshot_field_satisfied(snapshot, "toss.lastHourAvgStrength"):
+            fields.append({
+                "fieldKey": "toss.lastHourAvgStrength",
+                "label": "마지막 1시간 평균 체결강도 (%)",
+                "sourceName": "토스증권 체결강도 분봉 화면",
+                "sourceUrl": toss_chart_url,
+                "copyHint": "마감 전 최근 1시간 평균 체결강도만 붙여넣습니다.",
+                "instructions": [
+                    f"토스증권에서 {snapshot.name} ({snapshot.code}) 차트 화면을 엽니다.",
+                    "종가 직전 최근 1시간 구간의 체결강도 평균을 확인합니다.",
+                    "예: 101.5 처럼 숫자만 붙여넣습니다.",
+                ],
+            })
+        if not auto_event_filter_ready:
+            fields.append({
+                "fieldKey": "eventFilter",
+                "label": "실적/기업행사 필터",
+                "sourceName": "KIND 공시",
+                "sourceUrl": kind_disclosure_url,
+                "copyHint": "실적 발표와 분할/합병/배당락까지 남은 일수만 입력하거나 차단을 체크합니다.",
+                "instructions": [
+                    f"KIND 공시에서 {snapshot.name} ({snapshot.code}) 종목 공시를 조회합니다.",
+                    "실적 발표 예정일, 분할/합병/배당락 일정을 확인합니다.",
+                    "남은 일수를 입력하거나 위험 이벤트가 임박했으면 차단을 체크합니다.",
+                ],
+            })
+        return fields
     if strategy in {"breakout", "momentum"}:
         fields: list[dict[str, Any]] = []
         if not is_snapshot_field_satisfied(snapshot, "toss.avgStrength"):
@@ -4210,20 +4528,46 @@ def build_reversal_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str
         ],
     }
 
+
+def build_pullback_trap_diagnostics(gates: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    gate_map = {str(gate.get("code") or ""): gate for gate in gates if isinstance(gate, dict)}
+    return {
+        "volumeTrap": {
+            "status": str((gate_map.get("G10") or {}).get("status") or ""),
+            "summary": str((gate_map.get("G10") or {}).get("note") or ""),
+        },
+        "supportDefense": {
+            "status": str((gate_map.get("G11") or {}).get("status") or ""),
+            "summary": str((gate_map.get("G11") or {}).get("note") or ""),
+        },
+        "intradayClose": {
+            "status": str((gate_map.get("G12") or {}).get("status") or ""),
+            "summary": str((gate_map.get("G12") or {}).get("note") or ""),
+        },
+    }
+
+
 def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> dict[str, Any]:
     manual_input = build_manual_input_meta("pullback", snapshot)
     daily_change_pct = stock_daily_change(snapshot)
     support_context = build_pullback_support_context(snapshot)
     volume_burst_context = build_pullback_volume_burst_context(snapshot)
+    anchor_context = build_pullback_anchor_context(snapshot)
+    support_price = parse_float(((support_context.get("support") or {}).get("primaryLine") or {}).get("price"))
+    news_flow = snapshot.news_flow if isinstance(snapshot.news_flow, dict) else build_pullback_news_flow_data_missing(snapshot, "최근 뉴스 데이터 미수집")
     volatility_context = build_entry_volatility_context(snapshot, context, "pullback")
     score_map = {
         "S1": evaluate_pullback_s1(snapshot),
         "S2": evaluate_pullback_s2(snapshot),
+        "S3": evaluate_pullback_s3(snapshot),
         "P1": evaluate_pullback_p1(snapshot),
         "P2": evaluate_pullback_p2(snapshot),
+        "P3": evaluate_pullback_p3(snapshot, anchor_context),
         "C1": evaluate_pullback_c1(snapshot, lower_wick_ratio),
         "C2": evaluate_pullback_c2(snapshot),
         "C3": evaluate_pullback_c3(snapshot, context),
+        "C4": evaluate_pullback_c4(snapshot, anchor_context),
+        "C5": evaluate_pullback_c5(snapshot),
     }
     gates = [
         gate_dict("G0", evaluate_pullback_g0(snapshot)),
@@ -4236,7 +4580,12 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict("G7", evaluate_pullback_g7_rsi_ceiling(snapshot)),
         gate_dict("G8", evaluate_pullback_g8_extension(snapshot)),
         build_pullback_support_gate(support_context),
+        gate_dict("G10", evaluate_pullback_g10(snapshot, anchor_context)),
+        build_pullback_g11_gate(snapshot, anchor_context, support_price),
+        build_pullback_g12_gate(snapshot),
+        gate_dict("G13", evaluate_pullback_g13(snapshot)),
     ]
+    trap_diagnostics = build_pullback_trap_diagnostics(gates)
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("pullback", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])
     fallback_stop_price = parse_float(trade_plan[-1]["targetPrice"]) if trade_plan else 0.0
@@ -4245,9 +4594,10 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     scoring = apply_buy_scoring(
         strategy="pullback",
         score_map=score_map,
-        weights=TREND_SCORE_WEIGHTS,
-        strict_max=TREND_STRICT_MAX,
+        weights=PULLBACK_SCORE_WEIGHTS,
+        strict_max=PULLBACK_STRICT_MAX,
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
+        snapshot=snapshot,
         volatility_context=volatility_context,
     )
     grade = scoring["grade"]
@@ -4271,10 +4621,15 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
             build_volatility_keypoint_suffix(volatility_context),
         ),
         "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
+        "toss": snapshot.toss or {},
+        "eventFilter": snapshot.event_filter or {},
         "pullbackContext": {
             "support": support_context["support"],
             "families": support_context["families"],
             "volumeBurst": volume_burst_context,
+            "anchor": anchor_context,
+            "trapDiagnostics": trap_diagnostics,
+            "newsFlow": news_flow,
         },
         "volatilityContext": volatility_context,
         "manualInput": manual_input,
@@ -4284,6 +4639,61 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "source": "jongga-live",
     }
     return finalize_scored_buy_entry(entry, context, build_pullback_take_profit_marking_meta(snapshot), snapshot)
+
+
+def rank_pullback_entries_with_enrichment(
+    snapshots: list[StockSnapshot],
+    context: dict[str, Any],
+    slot_limit: int,
+    *,
+    mode: str = VARIANT_STABLE,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    preliminary_entries = rank_buy_entries([build_pullback_entry(snapshot, context) for snapshot in snapshots])
+    if slot_limit <= 0 or not preliminary_entries:
+        return [], {
+            "preliminaryEntries": preliminary_entries,
+            "shortlistCodes": [],
+            "kindEnrichments": {},
+            "kindErrors": [],
+            "browserMeta": {"browserSource": "", "launchNotes": [], "launchAttempts": []},
+            "newsEnrichments": {},
+            "newsErrors": [],
+        }
+
+    shortlist_codes = [entry["code"] for entry in preliminary_entries[: max(slot_limit * 3, 9)]]
+    shortlisted_snapshots = [snapshot for snapshot in snapshots if snapshot.code in set(shortlist_codes)]
+
+    kind_enrichments: dict[str, dict[str, Any]] = {}
+    kind_errors: list[str] = []
+    browser_meta: dict[str, Any] = {"browserSource": "", "launchNotes": [], "launchAttempts": []}
+    kind_candidates = [
+        {"code": snapshot.code, "name": snapshot.name}
+        for snapshot in shortlisted_snapshots
+        if not snapshot.event_filter
+    ]
+    if kind_candidates:
+        kind_enrichments, kind_errors, browser_meta = fetch_kind_candidate_enrichments(kind_candidates, mode=mode)
+        for snapshot in shortlisted_snapshots:
+            enrichment = kind_enrichments.get(snapshot.code)
+            if enrichment:
+                apply_browser_enrichment_to_snapshot(snapshot, enrichment)
+
+    news_enrichments, news_errors = fetch_pullback_news_candidate_enrichments(shortlisted_snapshots)
+    for snapshot in shortlisted_snapshots:
+        enrichment = news_enrichments.get(snapshot.code)
+        if enrichment:
+            apply_browser_enrichment_to_snapshot(snapshot, enrichment)
+
+    final_entries = rank_buy_entries([build_pullback_entry(snapshot, context) for snapshot in shortlisted_snapshots])[:slot_limit]
+    return final_entries, {
+        "preliminaryEntries": preliminary_entries,
+        "shortlistCodes": shortlist_codes,
+        "kindEnrichments": kind_enrichments,
+        "kindErrors": kind_errors,
+        "browserMeta": browser_meta,
+        "newsEnrichments": news_enrichments,
+        "newsErrors": news_errors,
+    }
 
 
 def build_breakout_entry(
@@ -4387,6 +4797,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "S2": evaluate_accumulation_s2(snapshot),
         "S3": evaluate_accumulation_s3(snapshot),
         "S4": evaluate_accumulation_s4(snapshot),
+        "S5": evaluate_accumulation_s5(snapshot),
         "P1": evaluate_accumulation_p1(snapshot),
         "P2": evaluate_accumulation_p2(snapshot),
         "C1": evaluate_accumulation_c1(snapshot),
@@ -4394,6 +4805,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "C3": evaluate_accumulation_c3(snapshot, context),
         "C4": evaluate_accumulation_c4(snapshot),
     }
+    accumulation_trend = build_accumulation_s5_detail(snapshot)
     gates = [
         gate_dict("G0", evaluate_accumulation_g0(snapshot), warn_if_not_met=True),
         gate_dict("G1", evaluate_accumulation_g1(snapshot)),
@@ -4447,11 +4859,13 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         **build_market_cap_meta(snapshot),
         "keyPoint": join_keypoint_parts(
             f"수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 {snapshot.foreign_net:,.0f}주 / 기관 {snapshot.institution_net:,.0f}주{flow_summary}.",
+            accumulation_trend["summary"] if accumulation_trend["status"] in {"met", "partial"} else "",
             build_volatility_keypoint_suffix(volatility_context),
         ),
         "notes": [rule.note for rule in score_map.values() if rule.eval_status == "data_missing"],
         "toss": snapshot.toss or {},
         "volatilityContext": volatility_context,
+        "accumulationTrend": accumulation_trend,
         "manualInput": manual_input,
         "tradePlanRows": trade_plan,
         "accumulationStopPolicy": accumulation_stop_policy,
@@ -4836,9 +5250,12 @@ def collect_live_payload(
 
     scoring_started_at = perf_counter()
     slot_limits = context.get("strategySlotLimits") or slot_limits_for_regime(context.get("regimeLabel") or "")
-    pullback_entries = rank_buy_entries([build_pullback_entry(snapshot, context) for snapshot in snapshots])[
-        : slot_limits.get("pullback", 3)
-    ]
+    pullback_entries, pullback_enrichment_meta = rank_pullback_entries_with_enrichment(
+        snapshots,
+        context,
+        slot_limits.get("pullback", 3),
+        mode=resolved_mode,
+    )
     breakout_entries = rank_buy_entries(
         [
             build_breakout_entry(
@@ -4855,6 +5272,11 @@ def collect_live_payload(
         : slot_limits.get("accumulation", 3)
     ]
     reversal_entries = rank_buy_entries([build_reversal_entry(snapshot, context) for snapshot in snapshots])[:3]
+    browser_errors = list(pullback_enrichment_meta.get("kindErrors") or [])
+    browser_meta = dict(pullback_enrichment_meta.get("browserMeta") or {"browserSource": "", "launchNotes": [], "launchAttempts": []})
+    pullback_news_errors = list(pullback_enrichment_meta.get("newsErrors") or [])
+    pullback_kind_enrichments = pullback_enrichment_meta.get("kindEnrichments") or {}
+    pullback_news_enrichments = pullback_enrichment_meta.get("newsEnrichments") or {}
 
     log_step(
         "entry_scoring",
@@ -4874,7 +5296,10 @@ def collect_live_payload(
     ]
     if kind_candidates:
         started_at = perf_counter()
-        kind_enrichments, browser_errors, browser_meta = fetch_kind_candidate_enrichments(kind_candidates, mode=resolved_mode)
+        kind_enrichments, kind_browser_errors, kind_browser_meta = fetch_kind_candidate_enrichments(kind_candidates, mode=resolved_mode)
+        browser_errors.extend(kind_browser_errors)
+        if kind_browser_meta.get("browserSource"):
+            browser_meta = kind_browser_meta
         for snapshot in snapshots:
             enrichment = kind_enrichments.get(snapshot.code)
             if enrichment:
@@ -4883,17 +5308,30 @@ def collect_live_payload(
             enrichment = kind_enrichments.get(entry["code"])
             if enrichment:
                 apply_browser_enrichment_to_entry(entry, "reversal", enrichment, context)
-        launch_note = browser_meta.get("browserSource") or "browser unavailable"
+        launch_note = kind_browser_meta.get("browserSource") or browser_meta.get("browserSource") or "browser unavailable"
         log_step(
             "browser_enrichment",
             "카나리 KIND 브라우저 보강" if resolved_mode == VARIANT_CANARY else "KIND 브라우저 보강",
             started_at,
-            status="warning" if browser_meta.get("browserSource") == "unavailable" else "partial" if browser_errors else "ok",
+            status="warning" if launch_note == "unavailable" else "partial" if kind_browser_errors else "ok",
             detail=f"{launch_note} · KIND {sum(1 for item in kind_enrichments.values() if item.get('eventFilter'))}",
             count=len(kind_candidates),
         )
-        if browser_errors:
-            emit_cli_failures("카나리 KIND 브라우저 실패" if resolved_mode == VARIANT_CANARY else "KIND 브라우저 실패", browser_errors)
+        if kind_browser_errors:
+            emit_cli_failures("카나리 KIND 브라우저 실패" if resolved_mode == VARIANT_CANARY else "KIND 브라우저 실패", kind_browser_errors)
+
+    if pullback_news_enrichments:
+        started_at = perf_counter()
+        log_step(
+            "pullback_news_enrichment",
+            "눌림목 뉴스 보강",
+            started_at,
+            status="partial" if pullback_news_errors else "ok",
+            detail=f"shortlist {len(pullback_enrichment_meta.get('shortlistCodes') or [])} · 뉴스 {sum(1 for item in pullback_news_enrichments.values() if item.get('newsFlow'))}",
+            count=len(pullback_news_enrichments),
+        )
+        if pullback_news_errors:
+            emit_cli_failures("눌림목 뉴스 수집 실패", pullback_news_errors)
 
     all_entries = pullback_entries + breakout_entries + accumulation_entries + reversal_entries
     missing_public_metrics = sum(1 for entry in all_entries if entry.get("notes"))
@@ -4904,13 +5342,14 @@ def collect_live_payload(
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
     stale_keys = list(macro_freshness["staleKeys"])
-    data_quality_status = "partial" if errors or http_errors or browser_errors or missing_public_metrics or fallback_keys or stale_keys else "success"
+    data_quality_status = "partial" if errors or http_errors or browser_errors or pullback_news_errors or missing_public_metrics or fallback_keys or stale_keys else "success"
     intraday_ok = sum(1 for snapshot in snapshots if snapshot.intraday_30m.get("available"))
     event_schedule_ok = sum(1 for snapshot in snapshots if snapshot.event_filter)
     toss_strength_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("avgStrength") is not None)
     toss_ticks_proxy_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("intradayAbove100Ratio") is not None or (item.get("toss") or {}).get("lastHourAvgStrength") is not None)
     orderbook_ok = sum(1 for item in http_enrichments.values() if item.get("orderbook"))
-    kind_browser_ok = sum(1 for item in kind_enrichments.values() if item.get("eventFilter"))
+    kind_browser_ok = sum(1 for item in kind_enrichments.values() if item.get("eventFilter")) + sum(1 for item in pullback_kind_enrichments.values() if item.get("eventFilter"))
+    item_news_ok = sum(1 for item in pullback_news_enrichments.values() if item.get("newsFlow"))
 
     payload = {
         "schemaVersion": "jongga_result.v1",
@@ -4929,7 +5368,7 @@ def collect_live_payload(
                 "fallback": len(fallback_keys),
                 "slots": 1,
             },
-            "failedKeys": errors + http_errors + browser_errors,
+            "failedKeys": errors + http_errors + browser_errors + pullback_news_errors,
             "staleKeys": stale_keys,
             "manualKeys": manual_keys,
             "fallbackKeys": fallback_keys,
@@ -4943,6 +5382,7 @@ def collect_live_payload(
                 "toss_ticks_strength_proxy": {"ok": toss_ticks_proxy_ok},
                 "toss_quotes_orderbook": {"ok": orderbook_ok},
                 "kind_playwright_disclosure": {"ok": kind_browser_ok},
+                "naver_item_news": {"ok": item_news_ok},
                 "cnbc_quote": {"ok": 0 if live_metrics["vkospi"]["isFallback"] else 1},
             },
             "fallbackUsage": [
@@ -4960,9 +5400,9 @@ def collect_live_payload(
                 f"{variant_label(resolved_mode)} 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. "
                 "역추세 30분봉은 Yahoo 30분봉으로 계산합니다. "
                 + (
-                    "카나리는 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 Chrome 실행 파일을 우선 시도해 표시 종목만 브라우저 보강합니다."
+                    "카나리는 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 Chrome 실행 파일을 우선 시도해 표시 종목만 브라우저 보강합니다. 눌림목 shortlist는 네이버 종목뉴스를 추가 확인합니다."
                     if resolved_mode == VARIANT_CANARY
-                    else "현재 버전은 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 표시 종목만 Playwright로 보강합니다."
+                    else "현재 버전은 토스 공개 API로 체결강도·틱 프록시·호가를 병렬 수집하고, KIND 공시는 표시 종목만 Playwright로 보강합니다. 눌림목 shortlist는 네이버 종목뉴스를 추가 확인합니다."
                 )
             ),
             "channel": resolved_mode,

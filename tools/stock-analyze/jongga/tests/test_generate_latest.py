@@ -4,9 +4,10 @@ from dataclasses import replace
 from contextlib import redirect_stdout
 from datetime import date
 from types import SimpleNamespace
+from typing import Any
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
 from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_ROTATION_BUFFERED, REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
@@ -70,6 +71,111 @@ class GenerateLatestTest(unittest.TestCase):
             low_52w=190800.0,
             foreign_rate=34.6,
         )
+
+    def _pullback_context(self) -> dict[str, Any]:
+        return {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+            "kospiChangePct": -0.3,
+        }
+
+    def _pullback_support_context(self, primary_price: float) -> dict[str, Any]:
+        return {
+            "support": {
+                "summary": f"복합 지지 {primary_price:,.0f}원",
+                "primaryLine": {
+                    "label": "복합 지지",
+                    "price": primary_price,
+                    "familyCount": 2,
+                    "strengthPoints": 80,
+                },
+                "lines": [{"label": "복합 지지", "price": primary_price, "familyCount": 2, "strengthPoints": 80}],
+                "strengthScore": 80,
+                "warningLevel": "clear",
+                "warningReason": "복합 지지 strong",
+                "activeFamilyCount": 2,
+            },
+            "families": {
+                "horizontal": [],
+                "swingCluster": [],
+                "volumeShelf": [],
+                "eventAnchors": [],
+            },
+        }
+
+    def _pullback_news_flow(self, *, status: str = "positive", positive_count: int = 1, negative_count: int = 0, fresh_positive_count: int | None = None, fresh_negative_count: int | None = None, summary: str | None = None) -> dict[str, Any]:
+        return {
+            "lookbackDays": 5,
+            "headlineCount": max(positive_count + negative_count, 1),
+            "positiveCount": positive_count,
+            "negativeCount": negative_count,
+            "latestPositiveDate": "20260612" if positive_count else "",
+            "latestNegativeDate": "20260612" if negative_count else "",
+            "status": status,
+            "summary": summary or f"최근 5거래일 뉴스 {max(positive_count + negative_count, 1)}건 · 긍정 {positive_count}건 · 악재 {negative_count}건",
+            "headlines": [{
+                "date": "2026.06.12 15:30",
+                "title": "테스트 뉴스",
+                "source": "연합뉴스",
+                "url": "https://finance.naver.com/item/news_read.naver?article_id=1&office_id=001&code=005930",
+                "sentiment": "negative" if negative_count else "positive" if positive_count else "neutral",
+            }],
+            "freshPositiveCount": positive_count if fresh_positive_count is None else fresh_positive_count,
+            "freshNegativeCount": negative_count if fresh_negative_count is None else fresh_negative_count,
+        }
+
+    def _pullback_test_snapshot(self, **overrides: Any) -> StockSnapshot:
+        base = self._stock_indicator_snapshot()
+        snapshot = replace(
+            base,
+            rank=1,
+            code="005930",
+            name="삼성전자",
+            current_price=102000.0,
+            prev_close=103000.0,
+            open_price=103500.0,
+            high_price=104000.0,
+            low_price=100500.0,
+            volume=300000.0,
+            foreign_net=50000.0,
+            institution_net=10000.0,
+            foreign_previous=-1000.0,
+            institution_previous=0.0,
+            close_history=[102000.0, 110000.0, 98000.0, 97000.0, 96000.0, 95000.0] + [94000.0] * 19,
+            open_history=[103500.0, 100000.0, 97000.0, 96000.0, 95000.0, 94000.0] + [93000.0] * 19,
+            high_history=[104000.0, 112000.0, 99000.0, 98000.0, 97000.0, 96000.0] + [95000.0] * 19,
+            low_history=[100500.0, 99500.0, 96000.0, 95000.0, 94000.0, 93000.0] + [92000.0] * 19,
+            volume_history=[300000.0, 1000000.0, 300000.0, 300000.0, 300000.0, 300000.0] + [300000.0] * 19,
+            date_history=[f"202606{day:02d}" for day in range(12, 0, -1)] + [f"202605{day:02d}" for day in range(30, 18, -1)],
+            ma5=101000.0,
+            ma10=99500.0,
+            ma20=98500.0,
+            ma60=90000.0,
+            ma5_prev=100500.0,
+            ma20_prev=98000.0,
+            ma60_prev=89800.0,
+            weekly_rsi=62.0,
+            macd_hist=[0.2, 0.1, -0.05],
+            high_20d=112000.0,
+            low_5d=95000.0,
+            high_52w=120000.0,
+            return_5d=4.0,
+            return_20d=9.0,
+            return_21d=9.2,
+            volume_avg_5d=500000.0,
+            volume_avg_20d=350000.0,
+            industry_code="001",
+            industry_compare_change_pct=1.0,
+            industry_compare_count=8,
+            intraday_30m={"available": True},
+            event_filter={"blocked": False, "note": "이벤트 필터 통과", "earningsDays": 7, "corporateActionDays": 12},
+            news_flow=self._pullback_news_flow(),
+            toss={"avgStrength": 96.0, "lastHourAvgStrength": 102.0, "last30BuySellRatio": 1.05, "last30AvgStrength": 101.0},
+        )
+        return replace(snapshot, **overrides)
 
     def test_finalize_scored_buy_entry_attaches_stock_indicators_for_all_strategies(self):
         snapshot = self._stock_indicator_snapshot()
@@ -814,6 +920,49 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(snapshot.volume_avg_20d, (100000.0 + 90000.0) / 2)
         self.assertEqual(snapshot.industry_code, "")
         self.assertIsNone(snapshot.industry_compare_change_pct)
+
+    @mock.patch("jongga.generate_latest.build_auto_event_filter", return_value=None)
+    @mock.patch("jongga.generate_latest.fetch_reversal_intraday_signal", return_value={"available": False, "signal": False, "candles": []})
+    @mock.patch("jongga.generate_latest.fetch_naver_price_history")
+    @mock.patch("jongga.generate_latest.request_json")
+    def test_build_stock_snapshot_uses_latest_filtered_close_when_target_day_is_missing(self, request_json_mock, price_history_mock, _intraday_mock, _event_filter_mock):
+        request_json_mock.side_effect = [
+            {"closePrice": "3000", "stockPrice": "3000", "sosok": "KOSDAQ"},
+            {
+                "totalInfos": [
+                    {"code": "lastClosePrice", "value": "2900"},
+                    {"code": "openPrice", "value": "2950"},
+                    {"code": "highPrice", "value": "3050"},
+                    {"code": "lowPrice", "value": "2850"},
+                    {"code": "accumulatedTradingVolume", "value": "555555"},
+                    {"code": "accumulatedTradingValue", "value": "12,345,678,900"},
+                    {"code": "marketValue", "value": "1조 2,000억"},
+                ],
+                "dealTrendInfos": [],
+            },
+        ]
+        price_history_mock.return_value = [
+            {
+                "localTradedAt": "2026-06-07",
+                "closePrice": "2500",
+                "highPrice": "2600",
+                "lowPrice": "2450",
+                "openPrice": "2480",
+                "accumulatedTradingVolume": "90000",
+            },
+            {
+                "localTradedAt": "2026-06-05",
+                "closePrice": "2000",
+                "highPrice": "2100",
+                "lowPrice": "1950",
+                "openPrice": "1980",
+                "accumulatedTradingVolume": "80000",
+            },
+        ]
+
+        snapshot = build_stock_snapshot((1, "477850", "마키나락스"), date(2026, 6, 8))
+
+        self.assertEqual(snapshot.current_price, 2500.0)
 
     @mock.patch("jongga.generate_latest.build_auto_event_filter", return_value=None)
     @mock.patch("jongga.generate_latest.fetch_reversal_intraday_signal", return_value={"available": False, "signal": False, "candles": []})
@@ -1643,6 +1792,395 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertFalse(any("미반영" in note for note in entry["notes"]))
         self.assertEqual(entry["volatilityContext"]["strategyFit"], "unfavorable")
         self.assertTrue(any(row["code"] == "V1" for row in entry["scoreBreakdown"]))
+
+    def test_build_pullback_entry_blocks_high_volume_bearish_trap(self):
+        snapshot = self._pullback_test_snapshot(volume=850000.0, current_price=101500.0, open_price=103500.0, prev_close=103000.0)
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            entry = build_pullback_entry(snapshot, self._pullback_context())
+
+        g10 = next(row for row in entry["gates"] if row["code"] == "G10")
+        self.assertEqual(g10["evalStatus"], "not_met")
+        self.assertEqual(g10["status"], "⛔")
+
+    def test_build_pullback_entry_scores_anchor_volume_contraction_met_partial_and_not_met(self):
+        context = self._pullback_context()
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            met_entry = build_pullback_entry(self._pullback_test_snapshot(volume=300000.0), context)
+            partial_entry = build_pullback_entry(self._pullback_test_snapshot(volume=500000.0), context)
+            weak_entry = build_pullback_entry(self._pullback_test_snapshot(volume=700000.0), context)
+
+        met_c4 = next(row for row in met_entry["scoreBreakdown"] if row["code"] == "C4")
+        partial_c4 = next(row for row in partial_entry["scoreBreakdown"] if row["code"] == "C4")
+        weak_c4 = next(row for row in weak_entry["scoreBreakdown"] if row["code"] == "C4")
+        self.assertEqual(met_c4["strictPoints"], 1.0)
+        self.assertEqual(partial_c4["strictPoints"], 0.5)
+        self.assertEqual(weak_c4["strictPoints"], 0.0)
+
+    def test_build_pullback_entry_warns_when_anchor_or_support_only_one_axis_breaks(self):
+        snapshot = self._pullback_test_snapshot(current_price=104000.0, low_price=103000.0, open_price=106000.0, prev_close=106000.0)
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(103000.0)):
+            entry = build_pullback_entry(snapshot, self._pullback_context())
+
+        g11 = next(row for row in entry["gates"] if row["code"] == "G11")
+        p3 = next(row for row in entry["scoreBreakdown"] if row["code"] == "P3")
+        self.assertEqual(g11["status"], "⚠️")
+        self.assertEqual(p3["evalStatus"], "not_met")
+
+    def test_build_pullback_entry_blocks_when_anchor_and_support_both_break(self):
+        snapshot = self._pullback_test_snapshot(current_price=102000.0, low_price=101500.0, open_price=106000.0, prev_close=106000.0)
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(103500.0)):
+            entry = build_pullback_entry(snapshot, self._pullback_context())
+
+        g11 = next(row for row in entry["gates"] if row["code"] == "G11")
+        self.assertEqual(g11["evalStatus"], "not_met")
+        self.assertEqual(g11["status"], "⛔")
+
+    def test_build_pullback_entry_blocks_on_last30_intraday_dump(self):
+        snapshot = self._pullback_test_snapshot(toss={"avgStrength": 97.0, "lastHourAvgStrength": 92.0, "last30BuySellRatio": 0.82, "last30AvgStrength": 84.0})
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            entry = build_pullback_entry(snapshot, self._pullback_context())
+
+        g12 = next(row for row in entry["gates"] if row["code"] == "G12")
+        self.assertEqual(g12["evalStatus"], "not_met")
+        self.assertEqual(g12["status"], "⛔")
+
+    def test_build_pullback_entry_s3_uses_partial_when_only_last_hour_is_decent(self):
+        snapshot = self._pullback_test_snapshot(toss={"avgStrength": 94.0, "lastHourAvgStrength": 96.0})
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            entry = build_pullback_entry(snapshot, self._pullback_context())
+
+        s3 = next(row for row in entry["scoreBreakdown"] if row["code"] == "S3")
+        self.assertEqual(s3["strictPoints"], 0.5)
+
+    def test_build_pullback_entry_g13_blocks_event_filter_or_negative_news(self):
+        blocked_snapshot = self._pullback_test_snapshot(event_filter={"blocked": True, "note": "실적 D-1"})
+        negative_news_snapshot = self._pullback_test_snapshot(
+            news_flow=self._pullback_news_flow(status="negative", positive_count=0, negative_count=1, fresh_positive_count=0, fresh_negative_count=1)
+        )
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            blocked_entry = build_pullback_entry(blocked_snapshot, self._pullback_context())
+            negative_entry = build_pullback_entry(negative_news_snapshot, self._pullback_context())
+
+        blocked_g13 = next(row for row in blocked_entry["gates"] if row["code"] == "G13")
+        negative_g13 = next(row for row in negative_entry["gates"] if row["code"] == "G13")
+        self.assertEqual(blocked_g13["evalStatus"], "not_met")
+        self.assertEqual(negative_g13["evalStatus"], "not_met")
+
+    def test_build_pullback_entry_c5_distinguishes_fresh_and_stale_news(self):
+        fresh_snapshot = self._pullback_test_snapshot(news_flow=self._pullback_news_flow(status="positive", positive_count=1, fresh_positive_count=1))
+        stale_snapshot = self._pullback_test_snapshot(
+            news_flow=self._pullback_news_flow(status="stale_positive", positive_count=1, fresh_positive_count=0)
+        )
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            fresh_entry = build_pullback_entry(fresh_snapshot, self._pullback_context())
+            stale_entry = build_pullback_entry(stale_snapshot, self._pullback_context())
+
+        fresh_c5 = next(row for row in fresh_entry["scoreBreakdown"] if row["code"] == "C5")
+        stale_c5 = next(row for row in stale_entry["scoreBreakdown"] if row["code"] == "C5")
+        self.assertEqual(fresh_c5["strictPoints"], 0.5)
+        self.assertEqual(stale_c5["strictPoints"], 0.25)
+
+    @mock.patch("jongga.generate_latest.fetch_kind_candidate_enrichments", return_value=({}, [], {"browserSource": "", "launchNotes": [], "launchAttempts": []}))
+    def test_rank_pullback_entries_shortlists_only_and_reranks_after_news_enrichment(self, _kind_mock):
+        snapshots = [
+            self._pullback_test_snapshot(rank=index, code=f"{index:06d}", name=f"종목{index}", news_flow=None)
+            for index in range(1, 11)
+        ]
+
+        def build_news_enrichment(candidates):
+            enrichments = {}
+            for snapshot in candidates:
+                status = "positive" if snapshot.code == "000002" else "neutral"
+                enrichments[snapshot.code] = {
+                    "newsFlow": self._pullback_news_flow(
+                        status=status,
+                        positive_count=1 if status == "positive" else 0,
+                        negative_count=0,
+                        fresh_positive_count=1 if status == "positive" else 0,
+                        summary="최근 5거래일 뉴스 1건 · 긍정 1건 · 악재 0건" if status == "positive" else "최근 5거래일 종목 뉴스 없음",
+                    ),
+                    "errors": [],
+                }
+            return enrichments, []
+
+        with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
+            with mock.patch("jongga.generate_latest.fetch_pullback_news_candidate_enrichments", side_effect=build_news_enrichment) as news_mock:
+                entries, meta = rank_pullback_entries_with_enrichment(snapshots, self._pullback_context(), 1)
+
+        shortlisted_codes = {snapshot.code for snapshot in news_mock.call_args.args[0]}
+        self.assertEqual(len(shortlisted_codes), 9)
+        self.assertNotIn("000010", shortlisted_codes)
+        self.assertEqual(entries[0]["code"], "000002")
+        self.assertEqual(len(meta["shortlistCodes"]), 9)
+
+    def test_accumulation_adds_recent_foreign_sponsor_trend_bonus(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=85.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=1500.0,
+            institution_net=-200.0,
+            foreign_previous=1200.0,
+            institution_previous=-100.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[85.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=94600.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=94500.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=110000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            deal_trend_history=[
+                {"date": "20260611", "foreignNet": 1500.0, "institutionNet": -200.0},
+                {"date": "20260610", "foreignNet": 1200.0, "institutionNet": -100.0},
+                {"date": "20260609", "foreignNet": 900.0, "institutionNet": 0.0},
+                {"date": "20260608", "foreignNet": 600.0, "institutionNet": -50.0},
+                {"date": "20260605", "foreignNet": 300.0, "institutionNet": -150.0},
+            ],
+            toss={},
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+        matched_codes = {rule["code"] for rule in entry["matchedRules"]}
+        self.assertIn("S5", matched_codes)
+        self.assertEqual(entry["accumulationTrend"]["sponsor"], "foreign")
+        self.assertEqual(entry["accumulationTrend"]["status"], "met")
+        self.assertEqual(entry["accumulationTrend"]["lookbackDays"], 5)
+        self.assertIn("외국인 최근 5일 매집 추세 강화", entry["keyPoint"])
+
+    def test_accumulation_s5_partial_tracks_institution_without_full_bonus(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=85.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=-100.0,
+            institution_net=60.0,
+            foreign_previous=-50.0,
+            institution_previous=70.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[85.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=94600.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=94500.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=110000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            deal_trend_history=[
+                {"date": "20260611", "foreignNet": -100.0, "institutionNet": 60.0},
+                {"date": "20260610", "foreignNet": -50.0, "institutionNet": 70.0},
+                {"date": "20260609", "foreignNet": -40.0, "institutionNet": 80.0},
+                {"date": "20260608", "foreignNet": -30.0, "institutionNet": 90.0},
+                {"date": "20260605", "foreignNet": -20.0, "institutionNet": 100.0},
+            ],
+            toss={},
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+        s5_row = next(row for row in entry["scoreBreakdown"] if row["code"] == "S5")
+        matched_codes = {rule["code"] for rule in entry["matchedRules"]}
+        self.assertNotIn("S5", matched_codes)
+        self.assertEqual(entry["accumulationTrend"]["sponsor"], "institution")
+        self.assertEqual(entry["accumulationTrend"]["status"], "partial")
+        self.assertEqual(s5_row["strictPoints"], 0.5)
+        self.assertIn("기관 최근 5일 매집 유지", entry["keyPoint"])
+
+    def test_accumulation_s5_prefers_both_when_both_sponsors_strengthen(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=85.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=900.0,
+            institution_net=600.0,
+            foreign_previous=700.0,
+            institution_previous=450.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[85.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=94600.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=94500.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=110000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            deal_trend_history=[
+                {"date": "20260611", "foreignNet": 900.0, "institutionNet": 600.0},
+                {"date": "20260610", "foreignNet": 700.0, "institutionNet": 450.0},
+                {"date": "20260609", "foreignNet": 500.0, "institutionNet": 300.0},
+                {"date": "20260608", "foreignNet": 300.0, "institutionNet": 150.0},
+                {"date": "20260605", "foreignNet": 100.0, "institutionNet": 50.0},
+            ],
+            toss={},
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+        self.assertEqual(entry["accumulationTrend"]["sponsor"], "both")
+        self.assertEqual(entry["accumulationTrend"]["status"], "met")
+        self.assertIn("기관+외국인 최근 5일 동반 매집 추세", entry["keyPoint"])
+
+    def test_accumulation_s5_marks_data_missing_with_short_history(self):
+        snapshot = StockSnapshot(
+            rank=12,
+            code="005930",
+            name="테스트",
+            current_price=95000.0,
+            prev_close=94000.0,
+            open_price=94200.0,
+            high_price=95500.0,
+            low_price=93800.0,
+            volume=85.0,
+            trading_value_text="1,000억",
+            market_cap_trillion=12.0,
+            foreign_net=1500.0,
+            institution_net=500.0,
+            foreign_previous=200.0,
+            institution_previous=100.0,
+            close_history=[95000.0] * 21,
+            high_history=[95500.0] * 21,
+            low_history=[93800.0] * 21,
+            volume_history=[85.0] + [100.0] * 20,
+            ma5=94500.0,
+            ma10=94000.0,
+            ma20=94600.0,
+            ma60=90000.0,
+            ma5_prev=94400.0,
+            ma20_prev=94500.0,
+            ma60_prev=89900.0,
+            weekly_rsi=58.0,
+            macd_hist=[0.2, 0.1, 0.05],
+            high_20d=96000.0,
+            low_5d=93000.0,
+            high_52w=110000.0,
+            return_5d=4.0,
+            return_20d=8.0,
+            return_21d=8.0,
+            volume_avg_5d=100.0,
+            volume_avg_20d=100.0,
+            industry_code="307",
+            industry_compare_change_pct=0.8,
+            industry_compare_count=5,
+            intraday_30m={"available": True, "signal": True},
+            event_filter=None,
+            deal_trend_history=[
+                {"date": "20260611", "foreignNet": 1500.0, "institutionNet": 500.0},
+                {"date": "20260610", "foreignNet": 1200.0, "institutionNet": 400.0},
+            ],
+            toss={},
+            orderbook={},
+        )
+        context = {
+            "regimeLabel": "강세장 ✅",
+            "gapScore": {"code": "G-A"},
+            "vkospiValue": 18.0,
+            "kospiClose": 2600.0,
+            "kospiMa5": 2550.0,
+        }
+
+        entry = build_accumulation_entry(snapshot, context)
+        s5_row = next(row for row in entry["scoreBreakdown"] if row["code"] == "S5")
+        self.assertEqual(entry["accumulationTrend"]["status"], "data_missing")
+        self.assertEqual(entry["accumulationTrend"]["lookbackDays"], 2)
+        self.assertEqual(s5_row["evalStatus"], "data_missing")
 
     def test_breakout_candle_and_ma5_gates_are_warning_not_hard_block(self):
         snapshot = StockSnapshot(

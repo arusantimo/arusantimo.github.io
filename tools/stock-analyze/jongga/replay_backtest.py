@@ -21,13 +21,17 @@ from jongga.mixed_exit_policy import (
 )
 
 REPLAY_RUNS_MARKER = "JONGGA_REPLAY_RUNS"
-REPLAY_INCLUDE_GRADE_SCORE_MIN = 6.0
-REPLAY_INCLUDE_GRADE_MIN = "B"
+REPLAY_INCLUDE_GRADE_SCORE_MIN = 8.0
+REPLAY_INCLUDE_GRADE_MIN = "A"
 REPLAY_RULE_VERSION = "2026-06-11-mixed-volatility-v1"
 REPLAY_CASE_RECOMMENDATION = "recommendation"
-REPLAY_CASE_REPLAY = "replay"
-REPLAY_CASE_A8PLUS = "a8plus"
 REPLAY_CASE_A7PLUS = "a7plus"
+PULLBACK_STRICT_REPLAY_GATE_CODES = frozenset({"G10", "G11", "G12", "G13"})
+REPLAY_COMPARISON_CASE_LABELS = {
+    "all": "전체 후보",
+    REPLAY_CASE_A7PLUS: "7&A",
+    REPLAY_CASE_RECOMMENDATION: "추천 전용",
+}
 REPLAY_VALIDATION_POLICY = {
     "mode": "relaxed",
     "label": "완화 모드",
@@ -117,12 +121,29 @@ def _tick_proxy_source(entry: dict[str, Any]) -> str | None:
     return None
 
 
+def _blocked_gate_codes(rows: list[dict[str, Any]] | None) -> set[str]:
+    return {
+        str(row.get("code") or "").strip()
+        for row in rows or []
+        if str(row.get("status") or "") == "⛔"
+    }
+
+
+def _pullback_replay_gate_ok(entry: dict[str, Any], eligibility: dict[str, Any] | None = None) -> bool:
+    if str(entry.get("strategy") or "") != "pullback":
+        return True
+    blocked_codes = _blocked_gate_codes(entry.get("gates") or []) | _blocked_gate_codes(entry.get("filters") or [])
+    if blocked_codes & PULLBACK_STRICT_REPLAY_GATE_CODES:
+        return False
+    setup_quality = str((eligibility or {}).get("setupQuality") or "")
+    if setup_quality == "setup_weak" and str(entry.get("statusLabel") or "").strip().startswith("매매금지("):
+        return False
+    return True
+
+
 def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: str) -> dict[str, Any]:
     grade_score = float(entry.get("gradeScore") or 0.0)
     replay_grade = grade_from_threshold_profile(float(entry.get("gradeScore") or 0.0), strategy, threshold_profile)
-    replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A", "B"}
-    replay_a8plus = grade_score >= 8.0 and replay_grade in {"S", "A"}
-    replay_a7plus = grade_score >= 7.0 and replay_grade == "A"
     eligibility = compute_entry_eligibility(
         strategy,
         replay_grade,
@@ -130,6 +151,9 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         entry.get("gates") or [],
         entry.get("filters") or [],
     )
+    pullback_gate_ok = _pullback_replay_gate_ok({**entry, "strategy": strategy}, eligibility)
+    replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A"} and pullback_gate_ok
+    replay_a7plus = grade_score >= 7.0 and replay_grade in {"S", "A"} and pullback_gate_ok
     return {
         "strategy": strategy,
         "name": str(entry.get("name") or ""),
@@ -148,39 +172,49 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "historyRecommendation": bool(entry.get("historyRecommendation")),
         "replayIncluded": replay_included,
         "replayIncludeRule": f"gradeScore>={REPLAY_INCLUDE_GRADE_SCORE_MIN:.1f} AND replayGrade>={REPLAY_INCLUDE_GRADE_MIN}",
-        "replayA8Plus": replay_a8plus,
-        "replayA8PlusRule": "gradeScore>=8.0 AND replayGrade in {A,S}",
         "replayA7Plus": replay_a7plus,
-        "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade==A",
+        "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+        "pullbackReplayGateOk": pullback_gate_ok,
         **eligibility,
     }
 
 
 def matches_replay_case(item: dict[str, Any], case_key: str) -> bool:
     normalized = str(case_key or "").strip()
+    pullback_gate_ok = bool(item.get("pullbackReplayGateOk")) if "pullbackReplayGateOk" in item else _pullback_replay_gate_ok(item)
     if normalized == "all":
         return True
     if normalized == REPLAY_CASE_RECOMMENDATION:
-        return bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal"))
-    if normalized == REPLAY_CASE_REPLAY:
-        return bool(item.get("replayIncluded"))
-    if normalized == REPLAY_CASE_A8PLUS:
-        if bool(item.get("replayA8Plus")):
-            return True
-        grade_score = float(item.get("gradeScore") or 0.0)
-        replay_grade = str(item.get("replayGrade") or item.get("grade") or "").strip().upper()
-        return grade_score >= 8.0 and replay_grade in {"A", "S"}
+        return pullback_gate_ok and (bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal")))
     if normalized == REPLAY_CASE_A7PLUS:
         if bool(item.get("replayA7Plus")):
             return True
         grade_score = float(item.get("gradeScore") or 0.0)
         replay_grade = str(item.get("replayGrade") or item.get("grade") or "").strip().upper()
-        return grade_score >= 7.0 and replay_grade.startswith("A")
+        return pullback_gate_ok and grade_score >= 7.0 and replay_grade in {"A", "S"}
     return False
 
 
 def filter_replay_case_items(items: list[dict[str, Any]], case_key: str) -> list[dict[str, Any]]:
     return [item for item in items if matches_replay_case(item, case_key)]
+
+
+def filter_replay_case_orders(
+    orders: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+    case_key: str,
+) -> list[dict[str, Any]]:
+    if case_key == "all":
+        return list(orders)
+    result_entry_keys = {
+        str(item.get("sourceEntryKey") or "")
+        for item in results
+        if item.get("sourceEntryKey")
+    }
+    return [
+        item for item in orders
+        if str(item.get("sourceEntryKey") or "") in result_entry_keys
+    ]
 
 
 def max_drawdown_pct(returns_pct: list[float]) -> float:
@@ -257,6 +291,29 @@ def build_summary_metrics(
     }
 
 
+def build_case_comparison_summary(
+    *,
+    candidates: list[dict[str, Any]],
+    results: list[dict[str, Any]],
+    orders: list[dict[str, Any]],
+) -> dict[str, Any]:
+    comparisons: dict[str, Any] = {}
+    for case_key, label in REPLAY_COMPARISON_CASE_LABELS.items():
+        case_candidates = candidates if case_key == "all" else filter_replay_case_items(candidates, case_key)
+        case_results = results if case_key == "all" else filter_replay_case_items(results, case_key)
+        case_orders = filter_replay_case_orders(orders, case_results, case_key)
+        comparisons[case_key] = {
+            "caseKey": case_key,
+            "label": label,
+            **build_summary_metrics(
+                candidates=case_candidates,
+                results=case_results,
+                orders=case_orders,
+            ),
+        }
+    return comparisons
+
+
 def build_strategy_stats(
     *,
     candidates: list[dict[str, Any]],
@@ -270,6 +327,11 @@ def build_strategy_stats(
         strategy_candidates = [item for item in candidates if item["strategy"] == strategy]
         strategy_orders = [item for item in orders if item.get("strategy") == strategy and item.get("side") == "SELL"]
         strategy_stats[strategy] = build_summary_metrics(
+            candidates=strategy_candidates,
+            results=strategy_results,
+            orders=strategy_orders,
+        )
+        strategy_stats[strategy]["comparisonByCase"] = build_case_comparison_summary(
             candidates=strategy_candidates,
             results=strategy_results,
             orders=strategy_orders,
@@ -360,10 +422,8 @@ def build_take_profit_profile_stats(results: list[dict[str, Any]]) -> dict[str, 
 def build_strategy_recommendation_matrix(results: list[dict[str, Any]]) -> dict[str, Any]:
     matrix: dict[str, Any] = {}
     cases = (
-        REPLAY_CASE_RECOMMENDATION,
-        REPLAY_CASE_A8PLUS,
         REPLAY_CASE_A7PLUS,
-        REPLAY_CASE_REPLAY,
+        REPLAY_CASE_RECOMMENDATION,
     )
     strategies = sorted(
         {str(item.get("strategy") or "") for item in results if str(item.get("strategy") or "")},
@@ -404,9 +464,11 @@ def build_summary_payload(
     by_stock = build_stock_stats(results)
     by_take_profit_profile = build_take_profit_profile_stats(results)
     strategy_recommendation_matrix = build_strategy_recommendation_matrix(results)
+    comparison_by_case = build_case_comparison_summary(candidates=candidates, results=results, orders=orders)
     return {
         **overall,
         "overall": overall,
+        "comparisonByCase": comparison_by_case,
         "byStrategy": by_strategy,
         "byStock": by_stock,
         "strategyStats": by_strategy,
@@ -527,7 +589,7 @@ def build_strategy_views(
             })
 
         case_views: dict[str, Any] = {}
-        for case_key in (REPLAY_CASE_RECOMMENDATION, REPLAY_CASE_A8PLUS, REPLAY_CASE_A7PLUS, REPLAY_CASE_REPLAY):
+        for case_key in (REPLAY_CASE_RECOMMENDATION, REPLAY_CASE_A7PLUS):
             case_candidates = filter_replay_case_items(strategy_candidates, case_key)
             case_results = filter_replay_case_items(strategy_results, case_key)
             case_entry_keys = {

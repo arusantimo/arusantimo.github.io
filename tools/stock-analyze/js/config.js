@@ -116,16 +116,24 @@ const RULE_GUIDE = {
         { code: 'G6', condition: '당일 등락률 ≤ +12% (과열 추격 차단)', source: '네이버 증권 일봉 차트' },
         { code: 'G7', condition: '주봉 RSI(14) ≤ 80 (과매수 상한)', source: '네이버 증권 주봉 차트' },
         { code: 'G8', condition: '종가와 20MA/60MA 이격률 상한 유지 (20MA ≤ +25%, 60MA ≤ +60%)', source: '네이버 증권 일봉 차트' },
-        { code: 'G9', condition: '복합 지지선 강도 70점 이상 + 현재가 아래 유효 지지 family 2개 이상이면 ✅, 45~69점 또는 family 1개면 ⚠️, 핵심 지지 부재 시만 ⛔', source: '최근 60일 일봉 기반 복합 지지선 엔진' }
+        { code: 'G9', condition: '복합 지지선 강도 70점 이상 + 현재가 아래 유효 지지 family 2개 이상이면 ✅, 45~69점 또는 family 1개면 ⚠️, 핵심 지지 부재 시만 ⛔', source: '최근 60일 일봉 기반 복합 지지선 엔진' },
+        { code: 'G10', condition: '직전 고거래량 양봉 앵커 대비 거래량 80% 이상 + 음봉/약한 종가면 가짜 눌림 차단', source: '네이버 증권 일봉 차트' },
+        { code: 'G11', condition: '종가가 앵커 몸통 중심값과 복합 지지선을 함께 지키는지 확인, 한 축만 이탈이면 ⚠️', source: '앵커 캔들 + 복합 지지선 엔진' },
+        { code: 'G12', condition: '마지막 30분 틱 프록시에서 체결강도 < 90% 또는 매수/매도 < 0.9:1이면 장 막판 투매로 차단', source: '토스 체결 틱 프록시' },
+        { code: 'G13', condition: 'KIND 임박 이벤트 차단 + 최근 3거래일 네이버 뉴스 악재 헤드라인 차단', source: 'KIND 공시 + 네이버 종목뉴스' }
       ],
       scores: [
         { code: 'S1', condition: '당일 거래대금 순위 30위 이내', source: '네이버 증권' },
         { code: 'S2', condition: '당일 외국인 OR 기관 순매수 전환 확인', source: '네이버 증권' },
+        { code: 'S3', condition: '마지막 1시간 체결강도 ≥ 100% + 마지막 30분 프록시 개선 시 장후반 흡수 가점', source: '토스 체결강도 틱 프록시' },
         { code: 'P1', condition: '당일 저가가 5일/10일/20일선 중 하나에 근접 및 지지 (1% 이내 터치)', source: '네이버 증권' },
         { code: 'P2', condition: '당일 종가가 5일/10일/20일선 중 최소 1개 위', source: '네이버 증권' },
+        { code: 'P3', condition: '종가가 직전 고거래량 양봉 앵커의 몸통 중심값을 회복 및 유지', source: '네이버 증권 일봉 차트' },
         { code: 'C1', condition: '양봉 OR 아래꼬리:몸통 비율 ≥ 1:1', source: '네이버 증권' },
         { code: 'C2', condition: '당일 거래량이 5일 평균의 80% 이하 (거래량 감소)', source: '네이버 증권' },
         { code: 'C3', condition: '해당 섹터 지수가 코스피 대비 당일 outperform', source: '네이버 증권' },
+        { code: 'C4', condition: '당일 거래량이 앵커 봉 거래량의 35% 이하이면 강한 수축, 60% 이하는 약한 수축', source: '네이버 증권' },
+        { code: 'C5', condition: '최근 3~5거래일 네이버 뉴스에서 재료/테마 신선도 확인', source: '네이버 종목뉴스' },
         { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 눌림목 적합도를 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
       ]
     },
@@ -165,6 +173,7 @@ const RULE_GUIDE = {
         { code: 'S2', condition: '2일 수급 개선 (연속 순매수 또는 당일 양매수+전일 유지)', source: '네이버 증권' },
         { code: 'S3', condition: '마지막 1시간 평균 체결강도 ≥ 100%', source: '토스 체결강도 틱 프록시' },
         { code: 'S4', condition: '마지막 1시간 평균 체결강도 > 당일 평균 체결강도', source: '토스 체결강도 틱 프록시' },
+        { code: 'S5', condition: '최근 5거래일 매집 추세 (외국인/기관 중 누적·양수 일수·증가 흐름 우위 주체)', source: '네이버 증권' },
         { code: 'P1', condition: '종가가 20MA 98~102% (횡보·눌림)', source: '네이버 증권' },
         { code: 'P2', condition: '5MA > 20MA', source: '네이버 증권' },
         { code: 'C1', condition: '당일 거래량 ≤ 5일 평균 90%', source: '네이버 증권' },

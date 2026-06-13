@@ -240,6 +240,12 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
   const replayViewMode = typeof getJonggaReplayViewMode === 'function'
     ? getJonggaReplayViewMode()
     : 'recommendation';
+  const breakoutVisible = typeof isJonggaBuyBreakoutVisible === 'function'
+    ? isJonggaBuyBreakoutVisible()
+    : false;
+  const breakoutEntries = breakoutVisible
+    ? (notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || [])
+    : [];
   const filterEntries = entries => (
     typeof filterJonggaReplayViewEntries === 'function'
       ? filterJonggaReplayViewEntries(entries, replayViewMode)
@@ -255,7 +261,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
   const marketCapRankMap = buildMarketCapRankMap([
     ...(filterEntries(notionSnapshot.pullbackEntries || [])),
     ...(filterEntries(notionSnapshot.accumulationEntries || [])),
-    ...(filterEntries(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || [])),
+    ...(filterEntries(breakoutEntries)),
     ...(filterEntries(notionSnapshot.reversalEntries || []))
   ]);
 
@@ -302,6 +308,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
           ${statusReasonHtml}
           <div class="buy-card-tags">
+            ${typeof renderBuyAccumulationSponsorTag === 'function' ? renderBuyAccumulationSponsorTag(entry) : ''}
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
             <span class="buy-tag">충족 ${entry.matchedRules.length}</span>
@@ -324,8 +331,16 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
   const snapshot = getActiveBuySnapshot();
   renderGroup(snapshot.pullbackEntries, 'buy-list-pullback');
   renderGroup(snapshot.accumulationEntries || [], 'buy-list-accumulation');
-  renderGroup(snapshot.breakoutEntries || snapshot.momentumEntries, 'buy-list-breakout');
+  if (breakoutVisible) {
+    renderGroup(breakoutEntries, 'buy-list-breakout');
+  } else {
+    const breakoutContainer = document.getElementById('buy-list-breakout');
+    if (breakoutContainer) breakoutContainer.innerHTML = '';
+  }
   renderGroup(snapshot.reversalEntries, 'buy-list-reversal');
+  if (typeof updateBuyBreakoutVisibilityUI === 'function') {
+    updateBuyBreakoutVisibilityUI();
+  }
 };
 
 function getSellStrategyStageMeta(stage) {

@@ -34,11 +34,27 @@ TREND_SCORE_WEIGHTS: dict[str, float] = {
 }
 TREND_STRICT_MAX = 10.0
 
+PULLBACK_SCORE_WEIGHTS: dict[str, float] = {
+    "S1": 2.0,
+    "S2": 2.0,
+    "S3": 1.0,
+    "P1": 1.5,
+    "P2": 1.5,
+    "P3": 1.0,
+    "C1": 1.0,
+    "C2": 1.0,
+    "C3": 1.0,
+    "C4": 1.0,
+    "C5": 0.5,
+}
+PULLBACK_STRICT_MAX = 13.5
+
 ACCUMULATION_SCORE_WEIGHTS = {
     "S1": 2.0,
     "S2": 2.0,
     "S3": 1.0,
     "S4": 0.5,
+    "S5": 1.0,
     "P1": 1.5,
     "P2": 1.5,
     "C1": 1.0,
@@ -46,10 +62,10 @@ ACCUMULATION_SCORE_WEIGHTS = {
     "C3": 1.0,
     "C4": 0.5,
 }
-ACCUMULATION_STRICT_MAX = 12.0
+ACCUMULATION_STRICT_MAX = 13.0
 
-REVERSAL_SCORE_WEIGHTS = TREND_SCORE_WEIGHTS
-REVERSAL_STRICT_MAX = TREND_STRICT_MAX
+REVERSAL_SCORE_WEIGHTS = dict(TREND_SCORE_WEIGHTS)
+REVERSAL_STRICT_MAX = 10.0
 
 SignalFactorFn = Callable[[str, EvalResult, Optional[Any]], float]
 

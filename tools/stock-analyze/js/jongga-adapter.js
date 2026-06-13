@@ -124,6 +124,17 @@ function normalizeJonggaTakeProfitProfiles(value) {
     .filter(Boolean);
 }
 
+function normalizeJonggaEventFilter(value) {
+  if (!value || typeof value !== 'object') return null;
+  return {
+    blocked: Boolean(value.blocked),
+    earningsDays: toJonggaNumber(value.earningsDays, null),
+    corporateActionDays: toJonggaNumber(value.corporateActionDays, null),
+    note: String(value.note || ''),
+    source: String(value.source || '')
+  };
+}
+
 function normalizeJonggaMixedExitPolicy(value) {
   if (!value || typeof value !== 'object') return null;
   const intradayRiskRule = value.intradayRiskRule && typeof value.intradayRiskRule === 'object'
@@ -185,6 +196,9 @@ function normalizeJonggaPullbackContext(value) {
   const support = value.support && typeof value.support === 'object' ? value.support : {};
   const families = value.families && typeof value.families === 'object' ? value.families : {};
   const volumeBurst = value.volumeBurst && typeof value.volumeBurst === 'object' ? value.volumeBurst : {};
+  const anchor = value.anchor && typeof value.anchor === 'object' ? value.anchor : {};
+  const trapDiagnostics = value.trapDiagnostics && typeof value.trapDiagnostics === 'object' ? value.trapDiagnostics : {};
+  const newsFlow = value.newsFlow && typeof value.newsFlow === 'object' ? value.newsFlow : {};
   const normalizeSupportFamilyLine = line => ({
     family: String(line.family || ''),
     familyLabel: String(line.familyLabel || ''),
@@ -243,6 +257,48 @@ function normalizeJonggaPullbackContext(value) {
       burstCount: Number(volumeBurst.burstCount || 0),
       maxRatioPct: toJonggaNumber(volumeBurst.maxRatioPct, null),
       latestBurstDaysAgo: toJonggaNumber(volumeBurst.latestBurstDaysAgo, null)
+    },
+    anchor: {
+      date: String(anchor.date || ''),
+      open: toJonggaNumber(anchor.open, null),
+      close: toJonggaNumber(anchor.close, null),
+      high: toJonggaNumber(anchor.high, null),
+      low: toJonggaNumber(anchor.low, null),
+      bodyMid: toJonggaNumber(anchor.bodyMid, null),
+      volume: toJonggaNumber(anchor.volume, null),
+      volumeRatio: toJonggaNumber(anchor.volumeRatio, null),
+      daysAgo: toJonggaNumber(anchor.daysAgo, null)
+    },
+    trapDiagnostics: {
+      volumeTrap: {
+        status: String(trapDiagnostics?.volumeTrap?.status || ''),
+        summary: String(trapDiagnostics?.volumeTrap?.summary || '')
+      },
+      supportDefense: {
+        status: String(trapDiagnostics?.supportDefense?.status || ''),
+        summary: String(trapDiagnostics?.supportDefense?.summary || '')
+      },
+      intradayClose: {
+        status: String(trapDiagnostics?.intradayClose?.status || ''),
+        summary: String(trapDiagnostics?.intradayClose?.summary || '')
+      }
+    },
+    newsFlow: {
+      lookbackDays: Number(newsFlow.lookbackDays || 0),
+      headlineCount: Number(newsFlow.headlineCount || 0),
+      positiveCount: Number(newsFlow.positiveCount || 0),
+      negativeCount: Number(newsFlow.negativeCount || 0),
+      latestPositiveDate: String(newsFlow.latestPositiveDate || ''),
+      latestNegativeDate: String(newsFlow.latestNegativeDate || ''),
+      status: String(newsFlow.status || ''),
+      summary: String(newsFlow.summary || ''),
+      headlines: asJonggaArray(newsFlow.headlines).map(item => ({
+        date: String(item?.date || ''),
+        title: String(item?.title || ''),
+        source: String(item?.source || ''),
+        url: String(item?.url || ''),
+        sentiment: String(item?.sentiment || '')
+      }))
     }
   };
 }
@@ -316,6 +372,32 @@ function normalizeJonggaAccumulationStopPolicy(value) {
     hardStopRuleSummary: String(value.hardStopRuleSummary || ''),
     marketShockHoldRuleSummary: String(value.marketShockHoldRuleSummary || ''),
     reasonSummary: String(value.reasonSummary || '')
+  };
+}
+
+function normalizeJonggaAccumulationTrendSeries(value) {
+  return asJonggaArray(value).map(row => ({
+    date: String(row?.date || ''),
+    net: toJonggaNumber(row?.net, 0)
+  }));
+}
+
+function normalizeJonggaAccumulationTrend(value) {
+  if (!value || typeof value !== 'object') return null;
+  const rawSeries = value.series && typeof value.series === 'object' ? value.series : {};
+  return {
+    lookbackDays: Number(value.lookbackDays || 0),
+    sponsor: String(value.sponsor || ''),
+    cumulativeNet: toJonggaNumber(value.cumulativeNet, 0),
+    positiveDays: Number(value.positiveDays || 0),
+    improvementCount: Number(value.improvementCount || 0),
+    status: String(value.status || ''),
+    summary: String(value.summary || ''),
+    series: {
+      foreign: normalizeJonggaAccumulationTrendSeries(rawSeries.foreign),
+      institution: normalizeJonggaAccumulationTrendSeries(rawSeries.institution),
+      sponsor: normalizeJonggaAccumulationTrendSeries(rawSeries.sponsor)
+    }
   };
 }
 
@@ -607,11 +689,13 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     recommendedTakeProfitProfile: normalizeJonggaRecommendedTakeProfitProfile(effectiveRawEntry.recommendedTakeProfitProfile),
     pullbackContext: normalizeJonggaPullbackContext(effectiveRawEntry.pullbackContext),
     pullbackStopPolicy: normalizeJonggaPullbackStopPolicy(effectiveRawEntry.pullbackStopPolicy),
+    accumulationTrend: normalizeJonggaAccumulationTrend(effectiveRawEntry.accumulationTrend),
     accumulationStopPolicy: normalizeJonggaAccumulationStopPolicy(effectiveRawEntry.accumulationStopPolicy),
     breakoutStopPolicy: normalizeJonggaBreakoutStopPolicy(breakoutStopPolicyRaw),
     breakoutLiveExitPolicy: normalizeJonggaBreakoutLiveExitPolicy(effectiveRawEntry.breakoutLiveExitPolicy),
     reversalStopPolicy: normalizeJonggaReversalStopPolicy(effectiveRawEntry.reversalStopPolicy),
     reversalLiveExitPolicy: normalizeJonggaReversalLiveExitPolicy(effectiveRawEntry.reversalLiveExitPolicy),
+    eventFilter: normalizeJonggaEventFilter(effectiveRawEntry.eventFilter),
     toss: normalizeJonggaToss(effectiveRawEntry.toss),
     orderbook: normalizeJonggaOrderbook(effectiveRawEntry.orderbook),
     volatilityContext: normalizeJonggaVolatilityContext(effectiveRawEntry.volatilityContext),

@@ -1263,10 +1263,69 @@ function getCompactSellPlanItems(items) {
   return [...nonStopItems.slice(0, 2), stopLossItem];
 }
 
+function getBuyAccumulationSponsorLabel(mode) {
+  if (mode === 'foreign') return '외국인';
+  if (mode === 'institution') return '기관';
+  if (mode === 'both') return '기관+외국인';
+  return '';
+}
+
+function renderBuyAccumulationSponsorTag(entry) {
+  if (entry?.strategy !== 'accumulation') return '';
+  const trendMode = String(entry?.accumulationTrend?.sponsor || '').trim();
+  const stopMode = String(entry?.accumulationStopPolicy?.sponsorMode || '').trim();
+  const label = getBuyAccumulationSponsorLabel(trendMode && trendMode !== 'none' ? trendMode : stopMode);
+  if (!label) return '';
+  return `<span class="buy-tag accumulation-sponsor">매집 주체 ${escapeHtml(label)}</span>`;
+}
+
+function updateBuyBreakoutVisibilityUI() {
+  const breakoutVisible = typeof isJonggaBuyBreakoutVisible === 'function'
+    ? isJonggaBuyBreakoutVisible()
+    : false;
+  const hiddenPanel = document.getElementById('buy-breakout-hidden-panel');
+  const breakoutPanel = document.getElementById('buy-breakout-panel');
+  const showButton = document.getElementById('btn-show-buy-breakout');
+  const hideButton = document.getElementById('btn-hide-buy-breakout');
+
+  if (hiddenPanel) hiddenPanel.hidden = breakoutVisible;
+  if (breakoutPanel) breakoutPanel.hidden = !breakoutVisible;
+  if (showButton) {
+    showButton.setAttribute('aria-expanded', breakoutVisible ? 'true' : 'false');
+    if (!showButton.dataset.bound) {
+      showButton.dataset.bound = 'true';
+      showButton.addEventListener('click', () => {
+        if (typeof setJonggaBuyBreakoutVisible === 'function') {
+          setJonggaBuyBreakoutVisible(true);
+        }
+        renderAll();
+      });
+    }
+  }
+  if (hideButton) {
+    hideButton.setAttribute('aria-expanded', breakoutVisible ? 'true' : 'false');
+    if (!hideButton.dataset.bound) {
+      hideButton.dataset.bound = 'true';
+      hideButton.addEventListener('click', () => {
+        if (typeof setJonggaBuyBreakoutVisible === 'function') {
+          setJonggaBuyBreakoutVisible(false);
+        }
+        renderAll();
+      });
+    }
+  }
+}
+
 function renderBuyStockCards() {
   const replayViewMode = typeof getJonggaReplayViewMode === 'function'
     ? getJonggaReplayViewMode()
     : 'recommendation';
+  const breakoutVisible = typeof isJonggaBuyBreakoutVisible === 'function'
+    ? isJonggaBuyBreakoutVisible()
+    : false;
+  const breakoutEntries = breakoutVisible
+    ? (notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || [])
+    : [];
   const filterEntries = entries => (
     typeof filterJonggaReplayViewEntries === 'function'
       ? filterJonggaReplayViewEntries(entries, replayViewMode)
@@ -1282,7 +1341,7 @@ function renderBuyStockCards() {
   const marketCapRankMap = buildMarketCapRankMap([
     ...(filterEntries(notionSnapshot.pullbackEntries || [])),
     ...(filterEntries(notionSnapshot.accumulationEntries || [])),
-    ...(filterEntries(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries || [])),
+    ...(filterEntries(breakoutEntries)),
     ...(filterEntries(notionSnapshot.reversalEntries || []))
   ]);
 
@@ -1347,6 +1406,7 @@ function renderBuyStockCards() {
           ${pullbackInsightHtml}
           ${volatilityInsightHtml}
           <div class="buy-card-tags">
+            ${renderBuyAccumulationSponsorTag(entry)}
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>
             <span class="buy-tag">충족 ${entry.matchedRules.length}</span>
@@ -1370,8 +1430,14 @@ function renderBuyStockCards() {
 
   renderGroup(notionSnapshot.pullbackEntries, 'buy-list-pullback');
   renderGroup(notionSnapshot.accumulationEntries || [], 'buy-list-accumulation');
-  renderGroup(notionSnapshot.breakoutEntries || notionSnapshot.momentumEntries, 'buy-list-breakout');
+  if (breakoutVisible) {
+    renderGroup(breakoutEntries, 'buy-list-breakout');
+  } else {
+    const breakoutContainer = document.getElementById('buy-list-breakout');
+    if (breakoutContainer) breakoutContainer.innerHTML = '';
+  }
   renderGroup(notionSnapshot.reversalEntries, 'buy-list-reversal');
+  updateBuyBreakoutVisibilityUI();
 }
 
 function renderAll() {
@@ -2630,6 +2696,7 @@ const STRATEGY_INFO_CONTENT = {
         <li>단기 고점 대비 -7% ~ -15% 수준으로 적당히 조정받았는지 평가합니다.</li>
         <li>당일 외국인이나 기관이 다시 사기 시작했는지(수급 전환) 확인합니다.</li>
         <li>당일 캔들이 양봉이거나 아래꼬리가 길게 달렸는지, 거래량은 적당히 진정되었는지(5일 평균의 100~180%)를 점수화하여 등급(S~A)을 매긴 후 상위 종목을 선정합니다.</li>
+        <li>거래량이 안 줄거나, 장막판 매수세가 꺾이거나, 앵커/지지선을 종가로 이탈하면 가짜 눌림으로 봅니다.</li>
       </ul>
     `
   },
@@ -2664,6 +2731,7 @@ const STRATEGY_INFO_CONTENT = {
         <li>52주 고가 &lt; 92%, 거래량 &lt; 20일 평균 120%</li>
         <li>60MA 위, 과거 거래량 급증 이력, VKOSPI(눌림목 G5)</li>
         <li>20MA 98~102% 박스, 5MA&gt;20MA, 당일 등락 -3%~+5%</li>
+        <li>최근 5거래일 외국인/기관 중 실제로 누가 순매수를 쌓는지 함께 확인합니다.</li>
       </ul>
     `
   },

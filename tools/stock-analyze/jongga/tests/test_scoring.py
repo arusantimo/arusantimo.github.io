@@ -7,6 +7,10 @@ from jongga.scoring import (
     ACCUMULATION_SCORE_WEIGHTS,
     BREAKOUT_STRICT_MAX,
     BREAKOUT_WEIGHTS,
+    PULLBACK_SCORE_WEIGHTS,
+    PULLBACK_STRICT_MAX,
+    REVERSAL_SCORE_WEIGHTS,
+    REVERSAL_STRICT_MAX,
     apply_buy_scoring,
     grade_score_from_strict,
     rank_buy_entries,
@@ -68,6 +72,16 @@ class ScoringTests(unittest.TestCase):
         self.assertEqual(breakdown["S3"]["maxPoints"], 1.0)
         self.assertEqual(breakdown["S4"]["maxPoints"], 0.5)
         self.assertEqual(breakdown["C4"]["maxPoints"], 0.5)
+        self.assertEqual(ACCUMULATION_SCORE_WEIGHTS["S5"], 1.0)
+        self.assertEqual(ACCUMULATION_STRICT_MAX, 13.0)
+
+    def test_pullback_and_reversal_weights_are_split(self):
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["S3"], 1.0)
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["P3"], 1.0)
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["C5"], 0.5)
+        self.assertEqual(PULLBACK_STRICT_MAX, 13.5)
+        self.assertNotIn("S3", REVERSAL_SCORE_WEIGHTS)
+        self.assertEqual(REVERSAL_STRICT_MAX, 10.0)
 
     def test_volatility_bonus_adjusts_scores_and_breakdown(self):
         score_map = {code: eval_not_met("x") for code in BREAKOUT_WEIGHTS}

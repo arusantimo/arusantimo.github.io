@@ -36,15 +36,11 @@ function loadStateContext() {
   const buttons = [
     createElementStub(),
     createElementStub(),
-    createElementStub(),
-    createElementStub(),
     createElementStub()
   ];
   buttons[0].dataset.jonggaReplayView = 'recommendation';
-  buttons[1].dataset.jonggaReplayView = 'a8plus';
-  buttons[2].dataset.jonggaReplayView = 'a7plus';
-  buttons[3].dataset.jonggaReplayView = 'replay';
-  buttons[4].dataset.jonggaReplayView = 'all';
+  buttons[1].dataset.jonggaReplayView = 'a7plus';
+  buttons[2].dataset.jonggaReplayView = 'all';
 
   const context = {
     console,
@@ -87,17 +83,17 @@ function loadStateContext() {
 function sampleSnapshot() {
   return {
     pullbackEntries: [
-      { name: 'Reco A', code: '000001', gradeScore: 7.2, grade: 'A', entryEligible: true, statusLabel: '매수추천' },
-      { name: 'Replay B', code: '000002', gradeScore: 6.1, grade: 'B', entryEligible: false, statusLabel: '매수추천' },
-      { name: 'A8 Candidate', code: '000006', gradeScore: 8.1, grade: 'A', entryEligible: false, statusLabel: '관심후보' },
-      { name: 'Too Low', code: '000003', gradeScore: 5.9, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
+      { name: 'Reco A', strategy: 'pullback', code: '000001', gradeScore: 7.2, grade: 'A', entryEligible: true, statusLabel: '매수추천' },
+      { name: 'Replay B', strategy: 'pullback', code: '000002', gradeScore: 6.1, grade: 'B', entryEligible: false, statusLabel: '매수추천' },
+      { name: 'A8 Candidate', strategy: 'pullback', code: '000006', gradeScore: 8.1, grade: 'A', entryEligible: false, statusLabel: '관심후보' },
+      { name: 'Too Low', strategy: 'pullback', code: '000003', gradeScore: 5.9, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
     ],
     accumulationEntries: [
-      { name: 'Reco C', code: '000004', gradeScore: 8.0, grade: 'S', entryEligible: true, statusLabel: '강력매수' }
+      { name: 'Reco C', strategy: 'accumulation', code: '000004', gradeScore: 8.0, grade: 'S', entryEligible: true, statusLabel: '강력매수' }
     ],
     breakoutEntries: [],
     reversalEntries: [
-      { name: 'Replay D', code: '000005', gradeScore: 6.0, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
+      { name: 'Replay D', strategy: 'reversal', code: '000005', gradeScore: 6.0, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
     ]
   };
 }
@@ -106,10 +102,28 @@ function sampleReplayBridge() {
   return {
     latestRun: {
       analysisDates: ['2026-06-02', '2026-06-03'],
-      days: [{ date: '2026-06-02' }, { date: '2026-06-03' }],
+      days: [
+        {
+          date: '2026-06-02',
+          results: [
+            { strategy: 'pullback', code: '000006', gradeScore: 8.1, replayGrade: 'A', netReturnPct: 9.87 }
+          ]
+        },
+        {
+          date: '2026-06-03',
+          results: [
+            { strategy: 'pullback', code: '000001', gradeScore: 7.2, replayGrade: 'A', netReturnPct: 1.2 }
+          ]
+        }
+      ],
       summary: {
         overall: {
           cumNetReturnPct: 0.59
+        },
+        comparisonByCase: {
+          all: { cumNetReturnPct: 0.59 },
+          a7plus: { cumNetReturnPct: 11.19 },
+          recommendation: { cumNetReturnPct: 1.2 }
         }
       },
       strategyViews: {
@@ -124,11 +138,11 @@ function sampleReplayBridge() {
                 }
               ]
             },
-            replay: {
+            a7plus: {
               days: [
                 {
                   trades: [
-                    { netReturnPct: -0.6 }
+                    { netReturnPct: 1.2 }
                   ]
                 }
               ]
@@ -140,7 +154,7 @@ function sampleReplayBridge() {
   };
 }
 
-test('replay view mode filters buy entries by recommendation, 8&A+, 6.0&B, or 7&A', () => {
+test('replay view mode filters buy entries by recommendation or 7&A', () => {
   const { context } = loadStateContext();
   const snapshot = sampleSnapshot();
 
@@ -149,31 +163,19 @@ test('replay view mode filters buy entries by recommendation, 8&A+, 6.0&B, or 7&
     ...snapshot.accumulationEntries,
     ...snapshot.reversalEntries
   ], 'recommendation');
-  const replay = context.filterJonggaReplayViewEntries([
-    ...snapshot.pullbackEntries,
-    ...snapshot.accumulationEntries,
-    ...snapshot.reversalEntries
-  ], 'replay');
   const a7plus = context.filterJonggaReplayViewEntries([
     ...snapshot.pullbackEntries,
     ...snapshot.accumulationEntries,
     ...snapshot.reversalEntries
   ], 'a7plus');
-  const a8plus = context.filterJonggaReplayViewEntries([
-    ...snapshot.pullbackEntries,
-    ...snapshot.accumulationEntries,
-    ...snapshot.reversalEntries
-  ], 'a8plus');
   const all = context.filterJonggaReplayViewEntries([
     ...snapshot.pullbackEntries,
     ...snapshot.accumulationEntries,
     ...snapshot.reversalEntries
   ], 'all');
 
-  assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Too Low', 'Reco C', 'Replay D']);
-  assert.deepEqual(replay.map(item => item.name), ['Replay B', 'A8 Candidate', 'Replay D']);
-  assert.deepEqual(a8plus.map(item => item.name), ['A8 Candidate', 'Reco C']);
-  assert.deepEqual(a7plus.map(item => item.name), ['Reco A', 'A8 Candidate']);
+  assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Replay B', 'Reco C']);
+  assert.deepEqual(a7plus.map(item => item.name), ['Reco A', 'A8 Candidate', 'Reco C']);
   assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Too Low', 'Reco C', 'Replay D']);
 });
 
@@ -186,7 +188,7 @@ test('replay view mode defaults to all when no stored selection exists', () => {
   assert.equal(context.getJonggaReplayViewMode(), 'all');
   context.updateJonggaReplayViewControls(sampleSnapshot());
 
-  assert.equal(buttons[4].classList.contains('active'), true);
+  assert.equal(buttons[2].classList.contains('active'), true);
   assert.match(summary.innerHTML, /리플레이 총 2일/);
 });
 
@@ -197,20 +199,39 @@ test('replay view controls show counts and active mode', () => {
   const snapshot = sampleSnapshot();
   context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
 
-  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
+  context.setJonggaReplayViewMode('a7plus', { persist: false, rerender: false });
   context.updateJonggaReplayViewControls(snapshot);
 
   assert.equal(buttons[0].classList.contains('active'), false);
-  assert.equal(buttons[1].classList.contains('active'), false);
+  assert.equal(buttons[1].classList.contains('active'), true);
   assert.equal(buttons[2].classList.contains('active'), false);
-  assert.equal(buttons[3].classList.contains('active'), true);
   assert.match(summary.innerHTML, /리플레이 총 2일/);
-  assert.match(summary.innerHTML, /누적 수익률 -0\.60%/);
+  assert.match(summary.innerHTML, /누적 수익률 \+11\.19%/);
   assert.doesNotMatch(summary.innerHTML, /매수추천 .*건/);
-  assert.doesNotMatch(summary.innerHTML, /8 & A\+ .*건/);
   assert.doesNotMatch(summary.innerHTML, /7 & A .*건/);
-  assert.doesNotMatch(summary.innerHTML, /6\.0 & B .*건/);
   assert.doesNotMatch(summary.innerHTML, /전체 .*건/);
+});
+
+test('replay view summary shows dash when visible mode entries have no replay history', () => {
+  const { context, elements } = loadStateContext();
+  const summary = createElementStub();
+  elements.set('jongga-replay-view-summary', summary);
+  const snapshot = {
+    pullbackEntries: [
+      { name: 'Fresh A7', strategy: 'pullback', code: '099999', gradeScore: 7.3, grade: 'A', entryEligible: false, statusLabel: '관심후보' }
+    ],
+    accumulationEntries: [],
+    breakoutEntries: [],
+    reversalEntries: []
+  };
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+  context.window.JONGGA_REPLAY_RUNS.latestRun.summary.comparisonByCase.a7plus.cumNetReturnPct = undefined;
+  context.window.JONGGA_REPLAY_RUNS.latestRun.strategyViews.pullback.caseViews.a7plus.days = [];
+
+  context.setJonggaReplayViewMode('a7plus', { persist: false, rerender: false });
+  context.updateJonggaReplayViewControls(snapshot);
+
+  assert.match(summary.innerHTML, /누적 수익률 —/);
 });
 
 test('setJonggaReplayViewMode rerenders strategy replay sections on tab switch', () => {
@@ -224,8 +245,34 @@ test('setJonggaReplayViewMode rerenders strategy replay sections on tab switch',
     modalRenderCount += 1;
   };
 
-  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
+  context.setJonggaReplayViewMode('a7plus', { persist: false, rerender: false });
 
   assert.equal(replaySectionRenderCount, 1);
   assert.equal(modalRenderCount, 1);
+});
+
+test('replay total excludes breakout returns while breakout panel is hidden', () => {
+  const { context } = loadStateContext();
+  context.setJonggaBuyBreakoutVisible(false);
+  context.getReplayStrategyView = strategy => ({
+    days: strategy === 'pullback'
+      ? [{ trades: [{ netReturnPct: 5 }] }]
+      : strategy === 'breakout'
+        ? [{ trades: [{ netReturnPct: -10 }] }]
+        : []
+  });
+  context.window.JONGGA_REPLAY_RUNS = {
+    latestRun: {
+      summary: {
+        comparisonByCase: {
+          all: { cumNetReturnPct: -5.5 }
+        }
+      }
+    }
+  };
+
+  assert.ok(Math.abs(context.getJonggaReplayCumulativeReturnPct('all', sampleSnapshot()) - 5) < 1e-9);
+
+  context.setJonggaBuyBreakoutVisible(true);
+  assert.equal(context.getJonggaReplayCumulativeReturnPct('all', sampleSnapshot()), -5.5);
 });

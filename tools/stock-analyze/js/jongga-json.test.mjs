@@ -345,7 +345,13 @@ test('pullbackContext 확장 필드를 정규화한다', () => {
           score: 7.4,
           grade: 'A',
           statusLabel: '매수추천',
-          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9']),
+          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9', 'G10', 'G11', 'G12', 'G13']),
+          eventFilter: {
+            blocked: false,
+            earningsDays: 7,
+            corporateActionDays: 12,
+            note: '이벤트 필터 통과'
+          },
           pullbackContext: {
             support: {
               summary: '주지지 99,000원 · 강도 80점',
@@ -390,6 +396,39 @@ test('pullbackContext 확장 필드를 정규화한다', () => {
               burstCount: 1,
               maxRatioPct: 240,
               latestBurstDaysAgo: 3
+            },
+            anchor: {
+              date: '20260611',
+              open: 100000,
+              close: 110000,
+              high: 112000,
+              low: 99500,
+              bodyMid: 105000,
+              volume: 1000000,
+              volumeRatio: 3.2,
+              daysAgo: 1
+            },
+            trapDiagnostics: {
+              volumeTrap: { status: '✅', summary: '거래량 함정 아님' },
+              supportDefense: { status: '⚠️', summary: '앵커 또는 지지 한 축 이탈' },
+              intradayClose: { status: '✅', summary: '장 막판 매수세 유지' }
+            },
+            newsFlow: {
+              lookbackDays: 5,
+              headlineCount: 2,
+              positiveCount: 1,
+              negativeCount: 0,
+              latestPositiveDate: '20260612',
+              latestNegativeDate: '',
+              status: 'positive',
+              summary: '최근 5거래일 뉴스 2건 · 긍정 1건 · 악재 0건 · 최근 3거래일 재료 유지',
+              headlines: [{
+                date: '2026.06.12 15:30',
+                title: '신규 공급계약 체결',
+                source: '연합뉴스',
+                url: 'https://finance.naver.com/item/news_read.naver?article_id=1&office_id=001&code=005930',
+                sentiment: 'positive'
+              }]
             }
           }
         }]
@@ -404,6 +443,10 @@ test('pullbackContext 확장 필드를 정규화한다', () => {
   assert.equal(entry.pullbackContext.support.warningLevel, 'clear');
   assert.equal(entry.pullbackContext.families.horizontal[0].price, 99000);
   assert.equal(entry.pullbackContext.volumeBurst.burstCount, 1);
+  assert.equal(entry.pullbackContext.anchor.bodyMid, 105000);
+  assert.equal(entry.pullbackContext.trapDiagnostics.supportDefense.status, '⚠️');
+  assert.equal(entry.pullbackContext.newsFlow.headlineCount, 2);
+  assert.equal(entry.eventFilter.earningsDays, 7);
 });
 
 test('accumulationStopPolicy를 정규화해 accumulation entry에 연결한다', () => {
@@ -439,6 +482,20 @@ test('accumulationStopPolicy를 정규화해 accumulation entry에 연결한다'
             hardStopRuleSummary: '매집 시작 봉 시가 손절',
             marketShockHoldRuleSummary: '지수 급락 시 보류',
             reasonSummary: '전일 매집봉 시가를 하드 스톱으로 사용합니다.'
+          },
+          accumulationTrend: {
+            lookbackDays: 5,
+            sponsor: 'both',
+            cumulativeNet: 120000,
+            positiveDays: 3,
+            improvementCount: 2,
+            status: 'met',
+            summary: '기관+외국인 최근 5일 동반 매집 추세',
+            series: {
+              foreign: [{ date: '20260611', net: 70000 }],
+              institution: [{ date: '20260611', net: 50000 }],
+              sponsor: [{ date: '20260611', net: 120000 }]
+            }
           }
         }]
       }
@@ -451,6 +508,9 @@ test('accumulationStopPolicy를 정규화해 accumulation entry에 연결한다'
   assert.equal(entry.accumulationStopPolicy.sponsorMode, 'both');
   assert.equal(entry.accumulationStopPolicy.effectiveHardStopPrice, 9700);
   assert.equal(entry.accumulationStopPolicy.reasonSummary, '전일 매집봉 시가를 하드 스톱으로 사용합니다.');
+  assert.equal(entry.accumulationTrend.sponsor, 'both');
+  assert.equal(entry.accumulationTrend.lookbackDays, 5);
+  assert.equal(entry.accumulationTrend.series.sponsor[0].net, 120000);
 });
 
 test('volatilityContext 확장 필드를 정규화하고 구버전 payload는 null로 폴백한다', () => {
@@ -530,7 +590,7 @@ test('statusReason 필드를 갭다운 경고와 Gate 차단 근거로 정규화
             score: 6.8,
             grade: 'B',
             statusLabel: '매매금지(갭다운 경고)',
-            gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9'])
+            gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9', 'G10', 'G11', 'G12', 'G13'])
           },
           {
             rank: 2,
@@ -546,7 +606,11 @@ test('statusReason 필드를 갭다운 경고와 Gate 차단 근거로 정규화
               G3: { status: 'passed' },
               G4: { status: 'passed' },
               G5: { status: 'warning' },
-              G9: { status: 'passed' }
+              G9: { status: 'passed' },
+              G10: { status: 'passed' },
+              G11: { status: 'passed' },
+              G12: { status: 'passed' },
+              G13: { status: 'passed' }
             }
           }
         ]
@@ -578,7 +642,7 @@ test('fresh G-E 완화 상태 라벨은 safety block 없이 유지된다', () =>
           score: 8.4,
           grade: 'A',
           statusLabel: '진입 가능(거시경고·축소)',
-          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9'])
+          gates: validGateMap(['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9', 'G10', 'G11', 'G12', 'G13'])
         }]
       }
     }]

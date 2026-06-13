@@ -62,22 +62,16 @@ function loadReplayContext() {
       return activeMode;
     },
     getJonggaReplayViewMeta(mode = activeMode) {
-      if (mode === 'a8plus') {
-        return { label: '8 & A+', description: 'gradeScore 8.0 이상, A 또는 S 등급 항목의 거래를 표시합니다.' };
-      }
-      if (mode === 'replay') {
-        return { label: '6.0 & B', description: 'entryEligible가 아닌 gradeScore 6.0 이상, B 이상만 표시합니다.' };
-      }
       if (mode === 'a7plus') {
-        return { label: '7 & A', description: 'gradeScore 7.0 이상, A 등급만 표시합니다.' };
+        return { label: '7 & A', description: 'gradeScore 7.0 이상이면서 A 또는 S 등급인 거래를 표시합니다.' };
       }
       return { label: '매수추천', description: 'entryEligible 기준으로 표시합니다.' };
     },
     normalizeJonggaReplayViewMode(value) {
       const normalized = String(value || '').trim();
-      if (normalized === 'a8plus') return 'a8plus';
-      if (normalized === 'replay') return 'replay';
+      if (normalized === 'a8plus') return 'a7plus';
       if (normalized === 'a7plus') return 'a7plus';
+      if (normalized === 'all') return 'all';
       return 'recommendation';
     },
     setReplayMode(mode) {
@@ -429,70 +423,6 @@ function sampleReplayBridge() {
                 }
               ]
             },
-            a8plus: {
-              summary: {
-                candidateCount: 1,
-                eligibleCount: 1,
-                includedCount: 1,
-                tradeCount: 1,
-                winRate: 1,
-                avgNetReturnPct: 1.2,
-                cumNetReturnPct: 1.2,
-                maxDrawdownPct: 0.4,
-                degradedCount: 1,
-                ambiguousCount: 0,
-                unfilledRate: 0
-              },
-              stocks: [
-                {
-                  strategy: 'pullback',
-                  code: '000001',
-                  name: 'Alpha',
-                  tradeCount: 1,
-                  winRate: 1,
-                  avgNetReturnPct: 1.2,
-                  cumNetReturnPct: 1.2,
-                  lastReplayDate: '2026-06-03',
-                  lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
-                  lastEntryFillPrice: 10050.2,
-                  lastExitFilledAt: '2026-06-04T09:00:00+09:00',
-                  lastExitAvgFillPrice: 10200.6,
-                  lastExitFillPrice: 10200.6
-                }
-              ],
-              days: [
-                {
-                  date: '2026-06-03',
-                  summaryFile: 'replay_summary_20260603.json',
-                  ordersFile: 'sim_orders_20260603.json',
-                  fillsFile: 'sim_fills_20260603.json',
-                  includedCount: 1,
-                  tradeCount: 1,
-                  winRate: 1,
-                  avgNetReturnPct: 1.2,
-                  cumNetReturnPct: 1.2,
-                  maxDrawdownPct: 0.4,
-                  degradedCount: 1,
-                  ambiguousCount: 0,
-                  trades: [
-                    {
-              strategy: 'pullback',
-              code: '000001',
-              name: 'Alpha',
-              replayGrade: 'A',
-              entryFilledAt: '2026-06-03T15:30:00+09:00',
-                      entryFillPrice: 10050.2,
-                      exitFilledAt: '2026-06-04T09:00:00+09:00',
-                      exitAvgFillPrice: 10200.6,
-                      exitLastFillPrice: 10200.6,
-                      tradeStatus: 'closed',
-                      closedReason: 'primary_target_touch',
-                      netReturnPct: 1.2
-                    }
-                  ]
-                }
-              ]
-            },
             a7plus: {
               summary: {
                 candidateCount: 1,
@@ -551,69 +481,6 @@ function sampleReplayBridge() {
                       tradeStatus: 'closed',
                       closedReason: 'primary_target_touch',
                       netReturnPct: 1.2
-                    }
-                  ]
-                }
-              ]
-            },
-            replay: {
-              summary: {
-                candidateCount: 3,
-                eligibleCount: 0,
-                includedCount: 1,
-                tradeCount: 1,
-                winRate: 0,
-                avgNetReturnPct: -0.6,
-                cumNetReturnPct: -0.6,
-                maxDrawdownPct: 0.8,
-                degradedCount: 0,
-                ambiguousCount: 0,
-                unfilledRate: 0
-              },
-              stocks: [
-                {
-                  strategy: 'pullback',
-                  code: '000002',
-                  name: 'Beta',
-                  tradeCount: 1,
-                  winRate: 0,
-                  avgNetReturnPct: -0.6,
-                  cumNetReturnPct: -0.6,
-                  lastReplayDate: '2026-06-03',
-                  lastEntryFilledAt: '2026-06-03T15:30:00+09:00',
-                  lastEntryFillPrice: 20000.0,
-                  lastExitFilledAt: '2026-06-04T09:00:00+09:00',
-                  lastExitAvgFillPrice: 19880.0,
-                  lastExitFillPrice: 19880.0
-                }
-              ],
-              days: [
-                {
-                  date: '2026-06-03',
-                  summaryFile: 'replay_summary_20260603.json',
-                  ordersFile: 'sim_orders_20260603.json',
-                  fillsFile: 'sim_fills_20260603.json',
-                  includedCount: 1,
-                  tradeCount: 1,
-                  winRate: 0,
-                  avgNetReturnPct: -0.6,
-                  cumNetReturnPct: -0.6,
-                  maxDrawdownPct: 0.8,
-                  degradedCount: 0,
-                  ambiguousCount: 0,
-                  trades: [
-                    {
-                      strategy: 'pullback',
-                      code: '000002',
-                      name: 'Beta',
-                      entryFilledAt: '2026-06-03T15:30:00+09:00',
-                      entryFillPrice: 20000.0,
-                      exitFilledAt: '2026-06-04T09:00:00+09:00',
-                      exitAvgFillPrice: 19880.0,
-                      exitLastFillPrice: 19880.0,
-                      tradeStatus: 'closed',
-                      closedReason: 'stop_touch',
-                      netReturnPct: -0.6
                     }
                   ]
                 }
@@ -758,12 +625,12 @@ function sampleReplayBridgeWithSecondDay() {
   bridge.latestRun.strategyViews.pullback.summary.includedCount += 1;
   bridge.latestRun.strategyViews.pullback.summary.tradeCount += 1;
   bridge.latestRun.strategyViews.pullback.summary.degradedCount += 0;
-  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.candidateCount += 1;
-  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.eligibleCount += 1;
-  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.includedCount += 1;
-  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.tradeCount += 1;
-  bridge.latestRun.strategyViews.pullback.caseViews.replay.summary.degradedCount += 0;
-  bridge.latestRun.strategyViews.pullback.caseViews.replay.days.push({
+  bridge.latestRun.strategyViews.pullback.caseViews.a7plus.summary.candidateCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.a7plus.summary.eligibleCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.a7plus.summary.includedCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.a7plus.summary.tradeCount += 1;
+  bridge.latestRun.strategyViews.pullback.caseViews.a7plus.summary.degradedCount += 0;
+  bridge.latestRun.strategyViews.pullback.caseViews.a7plus.days.push({
     date: '2026-06-04',
     summaryFile: 'replay_summary_20260604.json',
     ordersFile: 'sim_orders_20260604.json',
@@ -831,7 +698,7 @@ function buildReplayDayFixture(date, index) {
 
 test('strategy section renders selected case summary and button state', () => {
   const context = loadReplayContext();
-  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
+  context.setJonggaReplayViewMode('a7plus', { persist: false, rerender: false });
   const badge = createElementStub();
   const summary = createElementStub();
   const button = createElementStub();
@@ -846,7 +713,7 @@ test('strategy section renders selected case summary and button state', () => {
   assert.match(summary.innerHTML, /\+1\.20%/);
   assert.match(summary.innerHTML, /체결/);
   assert.equal(button.disabled, false);
-  assert.match(button.title, /6\.0 & B/);
+  assert.match(button.title, /7 & A/);
 });
 
 test('strategy modal renders selected case summary, stock table, and day files', () => {
@@ -860,13 +727,13 @@ test('strategy modal renders selected case summary, stock table, and day files',
   context.elements.set('jongga-replay-modal-subtitle', subtitle);
   context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
   context.window.JONGGA_REPLAY_RUNS.latestRun.days[0].results[0].mixedExitPolicy = {
-    policyKey: 'pullback-a8plus-balanced',
-    label: '눌림목 × 8&A+',
+    policyKey: 'pullback-a7plus-balanced',
+    label: '눌림목 × 7&A',
     active: true,
     stopPct: -2,
     takeProfitStages: [
-      { targetPct: 5, quantityPct: 50 },
-      { targetPct: 12, quantityPct: 50 }
+      { targetPct: 5, quantityPct: 80 },
+      { targetPct: 12, quantityPct: 20 }
     ]
   };
 
@@ -875,6 +742,11 @@ test('strategy modal renders selected case summary, stock table, and day files',
   assert.match(title.textContent, /눌림목/);
   assert.match(title.textContent, /매수추천/);
   assert.match(body.innerHTML, /타입 수익/);
+  assert.match(body.innerHTML, /집계 비교/);
+  assert.match(body.innerHTML, /전체 후보/);
+  assert.match(body.innerHTML, /7&amp;A/);
+  assert.match(body.innerHTML, /추천 전용/);
+  assert.match(body.innerHTML, /전체 후보 \/ 7(?:\s|&nbsp;|&amp;)?&(?:\s|&nbsp;|amp;)?A \/ 추천 전용/);
   assert.match(body.innerHTML, /종목별 수익/);
   assert.match(body.innerHTML, /Alpha/);
   assert.match(body.innerHTML, /href="https:\/\/stock\.naver\.com\/domestic\/stock\/000001\/price"/);
@@ -888,8 +760,8 @@ test('strategy modal renders selected case summary, stock table, and day files',
   assert.match(body.innerHTML, /매수\/매도 종목/);
   assert.match(body.innerHTML, /💚 장초반 익절/);
   assert.match(body.innerHTML, /익일 10시 이전 목표가 도달/);
-  assert.match(body.innerHTML, /눌림목 × 8&amp;A\+/);
-  assert.match(body.innerHTML, /\+5% 50% \/ \+12% 50%/);
+  assert.match(body.innerHTML, /눌림목 × 7&amp;A/);
+  assert.match(body.innerHTML, /\+5% 80% \/ \+12% 20%/);
   assert.match(body.innerHTML, /손절 조건: 종가 기준 -2% 이탈/);
   assert.match(body.innerHTML, /손절 시점: 종가 확인 후 전량 정리/);
   assert.match(body.innerHTML, /클릭해 체결 이력 보기/);
@@ -950,7 +822,7 @@ test('day list sorts newest first and paginates by five days', () => {
 
 test('replay period filter narrows modal content to the selected dates', () => {
   const context = loadReplayContext();
-  context.setJonggaReplayViewMode('replay', { persist: false, rerender: false });
+  context.setJonggaReplayViewMode('all', { persist: false, rerender: false });
   const body = createElementStub();
   const title = createElementStub();
   const subtitle = createElementStub();

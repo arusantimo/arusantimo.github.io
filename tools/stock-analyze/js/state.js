@@ -27,27 +27,20 @@ function normalizeCodeKey(value) {
 const ENTRY_STRATEGY_KEYS = new Set(['pullback', 'breakout', 'accumulation', 'momentum', 'reversal', 'swing']);
 const JONGGA_REPLAY_VIEW_STORAGE_KEY = 'stockAnalyzeJonggaReplayViewModeV2';
 const JONGGA_REPLAY_PERIOD_STORAGE_KEY = 'stockAnalyzeJonggaReplayPeriodV1';
-const JONGGA_BUY_STATUS_MARKERS = ['강력매수', '매수추천', '최우선 진입', '진입 가능', '관심후보'];
+const JONGGA_BUY_STATUS_MARKERS = ['강력매수', '매수추천', '최우선 진입', '진입 가능'];
+const JONGGA_REPLAY_STRICT_PULLBACK_GATE_CODES = new Set(['G10', 'G11', 'G12', 'G13']);
 const JONGGA_REPLAY_VIEW_MODES = {
   recommendation: {
     label: '매수추천',
     description: '매수추천 라벨 또는 entryEligible 기준으로 표시합니다.'
   },
-  a8plus: {
-    label: '8 & A+',
-    description: 'gradeScore 8.0 이상, A 또는 S 등급 항목의 거래를 표시합니다.'
-  },
   a7plus: {
     label: '7 & A',
-    description: 'gradeScore 7.0 이상, A 등급 항목의 거래를 표시합니다.'
-  },
-  replay: {
-    label: '6.0 & B',
-    description: 'gradeScore 6.0 이상, B 이상 항목의 거래를 표시합니다.'
+    description: 'gradeScore 7.0 이상이면서 A 또는 S 등급인 거래를 표시합니다.'
   },
   all: {
     label: '전체',
-    description: '매수추천, 8 & A+, 7 & A, 6.0 & B 거래를 모두 포함해 표시합니다.'
+    description: '매수추천, 7 & A 거래를 모두 포함해 표시합니다.'
   }
 };
 
@@ -274,6 +267,7 @@ let activeBuySlot = 'slotA';
 let activeSellSlot = 'slotA';
 let activeJonggaReplayViewMode = readStoredJonggaReplayViewMode();
 let activeJonggaReplayPeriod = readStoredJonggaReplayPeriod();
+let activeBuyBreakoutVisible = false;
 let stocks = createStockCollections();
 let notionPages = createDefaultNotionPages();
 let notionSnapshot = getNotionPageState(activeBuySlot).snapshot;
@@ -338,11 +332,27 @@ function getActiveSellSnapshot() {
   return getSlotSnapshot(activeSellSlot);
 }
 
+function isJonggaBuyBreakoutVisible() {
+  return Boolean(activeBuyBreakoutVisible);
+}
+
+function setJonggaBuyBreakoutVisible(visible) {
+  activeBuyBreakoutVisible = Boolean(visible);
+  return activeBuyBreakoutVisible;
+}
+
+function getJonggaReplayAggregateStrategyKeys(snapshot = getActiveBuySnapshot()) {
+  const strategies = ['pullback', 'accumulation', 'reversal'];
+  if (isJonggaBuyBreakoutVisible()) {
+    strategies.splice(2, 0, 'breakout');
+  }
+  return strategies;
+}
+
 function normalizeJonggaReplayViewMode(value) {
   const normalized = String(value || '').trim();
   if (normalized === 'recommendation') return 'recommendation';
-  if (normalized === 'a8plus' || normalized === 'a8' || normalized === 'gradea8plus') return 'a8plus';
-  if (normalized === 'replay') return 'replay';
+  if (normalized === 'a8plus' || normalized === 'gradea8plus') return 'a7plus';
   if (normalized === 'a7plus' || normalized === 'a7' || normalized === 'gradea7plus') return 'a7plus';
   if (normalized === 'all') return 'all';
   return 'all';
@@ -357,6 +367,45 @@ function isJonggaRecommendationStatusLabel(entry = {}) {
   const label = String(entry?.statusLabel || '').trim();
   if (!label || label === '제외' || label.includes('매매금지')) return false;
   return JONGGA_BUY_STATUS_MARKERS.some(marker => label.includes(marker));
+}
+
+function getJonggaReplayEntryGradeCode(entry = {}) {
+  return String(entry?.replayGrade || entry?.grade || '').trim().charAt(0).toUpperCase();
+}
+
+function getJonggaReplayBlockedGateCodes(entry = {}) {
+  return new Set(
+    [...(entry?.filters || []), ...(entry?.gates || [])]
+      .filter(row => row?.status === '⛔')
+      .map(row => String(row?.code || '').trim())
+      .filter(Boolean)
+  );
+}
+
+function isJonggaReplayPullbackGateOk(entry = {}, eligibility = null) {
+  const strategy = normalizeEntryStrategyKey(entry?.strategy || entry?.type);
+  if (strategy !== 'pullback') return true;
+  if (entry?.pullbackReplayGateOk === true || entry?.pullbackReplayGateOk === false) {
+    return Boolean(entry.pullbackReplayGateOk);
+  }
+  const blockedCodes = getJonggaReplayBlockedGateCodes(entry);
+  for (const code of JONGGA_REPLAY_STRICT_PULLBACK_GATE_CODES) {
+    if (blockedCodes.has(code)) return false;
+  }
+  const resolvedEligibility = eligibility || (
+    typeof inferEntryEligibilityFromEntry === 'function'
+      ? inferEntryEligibilityFromEntry(entry)
+      : { entryEligible: Boolean(entry?.entryEligible), entryWatch: Boolean(entry?.entryWatch) }
+  );
+  const setupQuality = String(entry?.setupQuality || '').trim();
+  const statusLabel = String(entry?.statusLabel || '').trim();
+  if (setupQuality === 'setup_weak' && statusLabel.startsWith('매매금지(')) {
+    return false;
+  }
+  if (!resolvedEligibility?.entryEligible && statusLabel.startsWith('매매금지(')) {
+    return false;
+  }
+  return true;
 }
 
 function readStoredJonggaReplayViewMode() {
@@ -516,33 +565,40 @@ function getJonggaReplayEntryGradeScore(entry = {}) {
 function matchesJonggaReplayViewMode(entry = {}, mode = getJonggaReplayViewMode()) {
   const normalizedMode = normalizeJonggaReplayViewMode(mode);
   if (normalizedMode === 'all') return true;
-  if (normalizedMode === 'a8plus') {
-    const gradeScore = getJonggaReplayEntryGradeScore(entry);
-    const gradeCode = String(entry.grade || '').trim().charAt(0).toUpperCase();
-    return Number.isFinite(gradeScore) && gradeScore >= 8.0 && ['A', 'S'].includes(gradeCode);
-  }
-  if (normalizedMode === 'replay') {
-    const gradeScore = getJonggaReplayEntryGradeScore(entry);
-    const gradeCode = String(entry.grade || '').trim().charAt(0).toUpperCase();
-    return !Boolean(entry?.entryEligible) && Number.isFinite(gradeScore) && gradeScore >= 6.0 && ['S', 'A', 'B'].includes(gradeCode);
-  }
+  const eligibility = typeof inferEntryEligibilityFromEntry === 'function'
+    ? inferEntryEligibilityFromEntry(entry)
+    : { entryEligible: Boolean(entry?.entryEligible), entryWatch: Boolean(entry?.entryWatch) };
+  const pullbackGateOk = isJonggaReplayPullbackGateOk(entry, eligibility);
   if (normalizedMode === 'a7plus') {
     const gradeScore = getJonggaReplayEntryGradeScore(entry);
-    const gradeCode = String(entry.grade || '').trim().charAt(0).toUpperCase();
-    return Number.isFinite(gradeScore) && gradeScore >= 7.0 && gradeCode === 'A';
+    const gradeCode = getJonggaReplayEntryGradeCode(entry);
+    return pullbackGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
   }
-
-  if (typeof inferEntryEligibilityFromEntry === 'function') {
-    const eligibility = inferEntryEligibilityFromEntry(entry);
-    return Boolean(eligibility.entryEligible) || Boolean(eligibility.entryWatch) || isJonggaRecommendationStatusLabel(entry);
-  }
-
-  return Boolean(entry?.entryEligible) || Boolean(entry?.entryWatch) || isJonggaRecommendationStatusLabel(entry);
+  return pullbackGateOk && (Boolean(entry?.historyRecommendation) || Boolean(eligibility.entryEligible) || isJonggaRecommendationStatusLabel(entry));
 }
 
 function filterJonggaReplayViewEntries(entries = [], mode = getJonggaReplayViewMode()) {
   const list = Array.isArray(entries) ? entries : [];
   return list.filter(entry => matchesJonggaReplayViewMode(entry, mode));
+}
+
+function getJonggaReplayVisibleEntryKeys(snapshot = getActiveBuySnapshot(), mode = getJonggaReplayViewMode()) {
+  const groups = getJonggaReplayViewGroups(snapshot);
+  const allEntries = [
+    ...groups.pullback,
+    ...groups.accumulation,
+    ...groups.breakout,
+    ...groups.reversal
+  ];
+  return new Set(
+    filterJonggaReplayViewEntries(allEntries, mode)
+      .map(entry => {
+        const strategy = normalizeEntryStrategyKey(entry?.strategy || entry?.type);
+        const code = normalizeCodeKey(entry?.code);
+        return strategy && code ? `${strategy}|${code}` : '';
+      })
+      .filter(Boolean)
+  );
 }
 
 function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
@@ -554,8 +610,6 @@ function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
     ...groups.reversal
   ];
   const recommendationCount = filterJonggaReplayViewEntries(allEntries, 'recommendation').length;
-  const a8plusCount = filterJonggaReplayViewEntries(allEntries, 'a8plus').length;
-  const replayCount = filterJonggaReplayViewEntries(allEntries, 'replay').length;
   const a7plusCount = filterJonggaReplayViewEntries(allEntries, 'a7plus').length;
   const allCount = allEntries.length;
   const activeMode = getJonggaReplayViewMode();
@@ -563,8 +617,6 @@ function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
   const activeMeta = getJonggaReplayViewMeta(activeMode);
   return {
     recommendationCount,
-    a8plusCount,
-    replayCount,
     a7plusCount,
     allCount,
     activeCount,
@@ -574,6 +626,7 @@ function getJonggaReplayViewCounts(snapshot = getActiveBuySnapshot()) {
 }
 
 function formatJonggaReplaySummaryPercent(value) {
+  if (value === null || value === undefined || value === '') return '—';
   const num = Number(value);
   if (!Number.isFinite(num)) return '—';
   return `${num > 0 ? '+' : ''}${num.toFixed(2)}%`;
@@ -585,34 +638,55 @@ function getJonggaReplayBridgePayload() {
   return payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : null;
 }
 
-function getJonggaReplayCumulativeReturnPct(mode = getJonggaReplayViewMode()) {
+function getJonggaReplayCumulativeReturnPct(mode = getJonggaReplayViewMode(), snapshot = getActiveBuySnapshot()) {
   const bridge = getJonggaReplayBridgePayload();
   const latestRun = bridge?.latestRun;
   if (!latestRun || typeof latestRun !== 'object') return null;
 
   const normalizedMode = normalizeJonggaReplayViewMode(mode);
-  const period = getJonggaReplayPeriod();
-  if (typeof buildJonggaReplayPeriodSummary === 'function' && hasJonggaReplayPeriodFilter(period)) {
-    try {
-      const summaryView = buildJonggaReplayPeriodSummary(bridge, null, normalizedMode, period);
-      const cumulativeReturn = Number(summaryView?.summary?.cumNetReturnPct);
-      if (Number.isFinite(cumulativeReturn)) return cumulativeReturn;
-    } catch {}
-  }
-  if (normalizedMode === 'all') {
+  const aggregateStrategies = getJonggaReplayAggregateStrategyKeys(snapshot);
+  if (normalizedMode === 'all' && aggregateStrategies.length === 4) {
+    const overallCaseReturn = Number(latestRun.summary?.comparisonByCase?.all?.cumNetReturnPct);
+    if (Number.isFinite(overallCaseReturn)) return overallCaseReturn;
     const overall = latestRun.summary?.overall || latestRun.summary || {};
     const overallReturn = Number(overall?.cumNetReturnPct);
     return Number.isFinite(overallReturn) ? overallReturn : null;
   }
 
+  if (typeof getReplayStrategyView === 'function') {
+    const returns = [];
+    aggregateStrategies.forEach(strategy => {
+      const strategyView = getReplayStrategyView(strategy, bridge, normalizedMode);
+      (Array.isArray(strategyView?.days) ? strategyView.days : []).forEach(day => {
+        (Array.isArray(day?.trades) ? day.trades : []).forEach(item => {
+          const value = Number(item?.netReturnPct);
+          if (Number.isFinite(value)) returns.push(value);
+        });
+      });
+    });
+    if (!returns.length) return null;
+    let equity = 1;
+    returns.forEach(value => {
+      equity *= 1 + (value / 100);
+    });
+    return (equity - 1) * 100;
+  }
+
+  const caseSummaryReturn = Number(latestRun.summary?.comparisonByCase?.[normalizedMode]?.cumNetReturnPct);
+  if (Number.isFinite(caseSummaryReturn)) return caseSummaryReturn;
+
   const strategyViews = latestRun.strategyViews;
   if (!strategyViews || typeof strategyViews !== 'object') return null;
 
   const returns = [];
-  Object.values(strategyViews).forEach(view => {
-    const days = Array.isArray(view?.caseViews?.[normalizedMode]?.days)
-      ? view.caseViews[normalizedMode].days
-      : [];
+  aggregateStrategies.forEach(strategy => {
+    const view = strategyViews?.[strategy];
+    if (!view || typeof view !== 'object') return;
+    const days = normalizedMode === 'all'
+      ? (Array.isArray(view?.days) ? view.days : [])
+      : (Array.isArray(view?.caseViews?.[normalizedMode]?.days)
+        ? view.caseViews[normalizedMode].days
+        : []);
     days.forEach(day => {
       const trades = Array.isArray(day?.trades) ? day.trades : [];
       trades.forEach(item => {
@@ -641,7 +715,7 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
 
   const summary = document.getElementById('jongga-replay-view-summary');
   if (summary) {
-    const cumulativeReturnPct = getJonggaReplayCumulativeReturnPct(activeMode);
+    const cumulativeReturnPct = getJonggaReplayCumulativeReturnPct(activeMode, snapshot);
     const replayDayCount = getJonggaReplayPeriodDayCount();
     summary.innerHTML = `
       <span>리플레이 총 ${replayDayCount}일</span>

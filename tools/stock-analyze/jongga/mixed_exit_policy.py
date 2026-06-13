@@ -6,8 +6,9 @@ MIXED_EXIT_POLICY_VERSION = "mixed-exit-v1-balanced"
 VOLATILE_RANGE_PCT_MIN = 10.0
 VOLATILE_ATR_PCT_MIN = 10.0
 
-BUY_STATUS_MARKERS = ("강력매수", "매수추천", "최우선 진입", "진입 가능", "관심후보")
+BUY_STATUS_MARKERS = ("강력매수", "매수추천", "최우선 진입", "진입 가능")
 BLOCKED_STATUS_MARKERS = ("매매금지", "자동매수 금지", "신규 진입 금지", "시장 Gate 차단")
+PULLBACK_STRICT_GATE_CODES = frozenset({"G10", "G11", "G12", "G13"})
 
 
 def normalize_mixed_strategy(strategy: Any) -> str:
@@ -45,21 +46,42 @@ def is_recommendation_status_label(status_label: Any) -> bool:
     return any(marker in label for marker in BUY_STATUS_MARKERS)
 
 
+def _blocked_gate_codes(entry: dict[str, Any]) -> set[str]:
+    rows = [*(entry.get("filters") or []), *(entry.get("gates") or [])]
+    return {
+        str(row.get("code") or "").strip()
+        for row in rows
+        if str(row.get("status") or "") == "⛔"
+    }
+
+
+def _pullback_recommendation_gate_ok(entry: dict[str, Any]) -> bool:
+    if normalize_mixed_strategy(entry.get("strategy")) != "pullback":
+        return True
+    if _blocked_gate_codes(entry) & PULLBACK_STRICT_GATE_CODES:
+        return False
+    setup_quality = str(entry.get("setupQuality") or "")
+    status_label = str(entry.get("statusLabel") or "").strip()
+    if setup_quality == "setup_weak" and status_label.startswith("매매금지("):
+        return False
+    return True
+
+
 def mixed_recommendation_cases(entry: dict[str, Any]) -> list[str]:
     score = _grade_score(entry)
     grade = _grade_code(entry.get("replayGrade") or entry.get("grade"))
+    pullback_gate_ok = _pullback_recommendation_gate_ok(entry)
     cases: list[str] = []
-    if score >= 8.0 and grade in {"A", "S"}:
-        cases.append("a8plus")
-    if score >= 7.0 and grade == "A":
+    if pullback_gate_ok and score >= 7.0 and grade in {"A", "S"}:
         cases.append("a7plus")
-    if score >= 6.0 and grade in {"A", "B", "S"}:
-        cases.append("replay")
     if (
+        pullback_gate_ok
+        and (
         bool(entry.get("historyRecommendation"))
         or bool(entry.get("entryEligibleOriginal"))
         or bool(entry.get("entryEligible"))
         or is_recommendation_status_label(entry.get("statusLabel"))
+        )
     ):
         cases.append("recommendation")
     return cases
@@ -73,22 +95,9 @@ def matches_mixed_recommendation_case(entry: dict[str, Any], case_key: str) -> b
 
 
 POLICY_DEFINITIONS: dict[str, dict[str, Any]] = {
-    "reversal-a8plus-balanced": {
-        "label": "반등 × 8&A+",
-        "priority": 1,
-        "strategyCase": "reversal",
-        "recommendationCase": "a8plus",
-        "stopPct": -2.0,
-        "takeProfitStages": [
-            {"targetPct": 8.0, "quantityPct": 40.0},
-            {"targetPct": 15.0, "quantityPct": 60.0},
-        ],
-        "positionWeightHint": "normal",
-        "reason": "고등급 반등 후보는 조기 일부익절 후 큰 반등 목표를 열어둡니다.",
-    },
     "reversal-a7plus-balanced": {
         "label": "반등 × 7&A",
-        "priority": 2,
+        "priority": 1,
         "strategyCase": "reversal",
         "recommendationCase": "a7plus",
         "stopPct": -2.0,
@@ -99,22 +108,9 @@ POLICY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "positionWeightHint": "normal",
         "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다.",
     },
-    "pullback-a8plus-balanced": {
-        "label": "눌림목 × 8&A+",
-        "priority": 3,
-        "strategyCase": "pullback",
-        "recommendationCase": "a8plus",
-        "stopPct": -2.0,
-        "takeProfitStages": [
-            {"targetPct": 5.0, "quantityPct": 50.0},
-            {"targetPct": 12.0, "quantityPct": 50.0},
-        ],
-        "positionWeightHint": "normal",
-        "reason": "고등급 눌림목은 기본 5% 익절 뒤 12% 보조 목표를 허용합니다.",
-    },
     "pullback-a7plus-balanced": {
         "label": "눌림목 × 7&A",
-        "priority": 3,
+        "priority": 2,
         "strategyCase": "pullback",
         "recommendationCase": "a7plus",
         "stopPct": -2.0,
@@ -125,29 +121,9 @@ POLICY_DEFINITIONS: dict[str, dict[str, Any]] = {
         "positionWeightHint": "normal",
         "reason": "눌림목 주력 후보는 5% 익절을 기본으로 하고 일부만 12% 목표를 둡니다.",
     },
-    "pullback-replay-balanced": {
-        "label": "눌림목 × 전체(6&B+)",
-        "priority": 4,
-        "strategyCase": "pullback",
-        "recommendationCase": "replay",
-        "stopPct": -2.0,
-        "takeProfitStages": [{"targetPct": 5.0, "quantityPct": 100.0}],
-        "positionWeightHint": "small",
-        "reason": "6&B+ 눌림목은 보조 후보로만 보고 5% 익절을 우선합니다.",
-    },
-    "reversal-replay-balanced": {
-        "label": "반등 × 전체(6&B+)",
-        "priority": 4,
-        "strategyCase": "reversal",
-        "recommendationCase": "replay",
-        "stopPct": -2.0,
-        "takeProfitStages": [{"targetPct": 15.0, "quantityPct": 100.0}],
-        "positionWeightHint": "small",
-        "reason": "6&B+ 반등은 보조 후보로만 보고 큰 반등 목표를 열어둡니다.",
-    },
     "pullback-recommendation-balanced": {
         "label": "눌림목 × 매수추천",
-        "priority": 5,
+        "priority": 4,
         "strategyCase": "pullback",
         "recommendationCase": "recommendation",
         "stopPct": -2.0,
@@ -158,26 +134,14 @@ POLICY_DEFINITIONS: dict[str, dict[str, Any]] = {
 }
 
 POLICY_PRIORITY = (
-    ("reversal", "a8plus", "reversal-a8plus-balanced"),
     ("reversal", "a7plus", "reversal-a7plus-balanced"),
-    ("pullback", "a8plus", "pullback-a8plus-balanced"),
     ("pullback", "a7plus", "pullback-a7plus-balanced"),
-    ("pullback", "replay", "pullback-replay-balanced"),
-    ("reversal", "replay", "reversal-replay-balanced"),
     ("pullback", "recommendation", "pullback-recommendation-balanced"),
 )
 
 
 VOLATILE_TAKE_PROFIT_STAGES_BY_POLICY: dict[str, list[dict[str, float]]] = {
-    "pullback-a8plus-balanced": [
-        {"targetPct": 3.0, "quantityPct": 50.0},
-        {"targetPct": 8.0, "quantityPct": 50.0},
-    ],
     "pullback-a7plus-balanced": [
-        {"targetPct": 3.0, "quantityPct": 50.0},
-        {"targetPct": 8.0, "quantityPct": 50.0},
-    ],
-    "pullback-replay-balanced": [
         {"targetPct": 3.0, "quantityPct": 50.0},
         {"targetPct": 8.0, "quantityPct": 50.0},
     ],
@@ -185,17 +149,9 @@ VOLATILE_TAKE_PROFIT_STAGES_BY_POLICY: dict[str, list[dict[str, float]]] = {
         {"targetPct": 3.0, "quantityPct": 50.0},
         {"targetPct": 8.0, "quantityPct": 50.0},
     ],
-    "reversal-a8plus-balanced": [
-        {"targetPct": 5.0, "quantityPct": 50.0},
-        {"targetPct": 12.0, "quantityPct": 50.0},
-    ],
     "reversal-a7plus-balanced": [
         {"targetPct": 2.0, "quantityPct": 60.0},
         {"targetPct": 8.0, "quantityPct": 40.0},
-    ],
-    "reversal-replay-balanced": [
-        {"targetPct": 5.0, "quantityPct": 50.0},
-        {"targetPct": 10.0, "quantityPct": 50.0},
     ],
 }
 
