@@ -36,6 +36,7 @@ echo "    $(date '+%Y-%m-%d %H:%M:%S')"
 echo "  ============================================================"
 echo ""
 echo "  [SH] 추천 생성 + 자동 replay 검증 + 화면 브리지 갱신"
+echo "  [SH] 예: --session 1500  또는  --session 1730"
 echo ""
 
 if [[ ${#ARGS[@]} -gt 0 ]]; then

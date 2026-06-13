@@ -4,11 +4,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from jongga.output_contract import (
+    ANALYSIS_SESSION_1500,
     INPUT_ARCHIVE_VERSION,
     PAYLOAD_SOURCE_LIVE,
     VARIANT_CANARY,
     VARIANT_STABLE,
     build_input_archive_path,
+    build_session_archive_path,
     extract_top_recommendations,
     is_canary_channel_enabled,
     previous_trading_day,
@@ -104,6 +106,12 @@ class OutputContractTests(unittest.TestCase):
             self.assertIn("payloadSourceMode", history_text)
             self.assertIn("rebuildable", history_text)
             self.assertIn("jongga/output/archive/202606/inputs_20260608.json", history_text.replace("\\\\", "/"))
+
+    def test_build_session_archive_path_uses_date_session_and_variant(self):
+        stable_path = build_session_archive_path("jongga/output", date(2026, 6, 8), session=ANALYSIS_SESSION_1500, variant=VARIANT_STABLE)
+        canary_path = build_session_archive_path("jongga/output", date(2026, 6, 8), session=ANALYSIS_SESSION_1500, variant=VARIANT_CANARY)
+        self.assertEqual(stable_path.as_posix(), "jongga/output/archive/202606/session_20260608_1500.json")
+        self.assertEqual(canary_path.as_posix(), "jongga/output/archive/202606/session_20260608_1500_canary.json")
 
     def test_write_daily_outputs_rejects_weekend_analysis_date(self):
         with TemporaryDirectory() as tmp:

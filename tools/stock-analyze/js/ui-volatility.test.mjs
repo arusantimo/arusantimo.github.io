@@ -678,6 +678,115 @@ test('accumulation buy cards hide sponsor tag when sponsor is none', () => {
   assert.doesNotMatch(accumulationHtml, /매집 주체/);
 });
 
+test('buy cards render analysis session tag before strategy tags when session metadata exists', () => {
+  const context = loadUiContext();
+  vm.runInContext(fs.readFileSync(new URL('./sell-ui.js', import.meta.url), 'utf8'), context);
+  const containers = new Map([
+    ['buy-list-pullback', createContainerStub()],
+    ['buy-list-accumulation', createContainerStub()],
+    ['buy-list-breakout', createContainerStub()],
+    ['buy-list-reversal', createContainerStub()]
+  ]);
+
+  context.document = {
+    getElementById(id) {
+      return containers.get(id) || null;
+    },
+    querySelectorAll() {
+      return [];
+    }
+  };
+  context.getJonggaReplayViewMode = () => 'recommendation';
+  context.filterJonggaReplayViewEntries = entries => entries;
+  context.buildMarketCapRankMap = () => new Map();
+  context.summarizeGateStatus = () => ({ passed: 5, total: 6 });
+  context.getBuyPresentation = entry => ({
+    verdictClass: 'candidate',
+    liveRefresh: false,
+    changed: {
+      score: false,
+      grade: false,
+      adjustment: false,
+      statusLabel: false
+    },
+    primaryGrade: entry.strategy === 'pullback' ? 'A' : 'S',
+    primarySummary: '신호 8.4 / 진입 8.4 · A',
+    primaryStatusLabel: '매수추천',
+    primaryStatusReasonShort: '',
+    strategyStatusLabel: '매수추천'
+  });
+  context.getBuyDisplayScore = () => '8.4';
+  context.buildBuyScoreDisplayHtml = () => ({ signalText: '8.4', strictLine: '', badgeHtml: '' });
+  context.renderVolatilityTopBadges = () => '';
+  context.renderPullbackCardInsights = () => '';
+  context.renderVolatilityCardInsights = () => '';
+  context.buildStockNameLinksHtml = name => name;
+  context.buildBuyTrackingButtonHtml = () => '';
+  context.bindBuyTrackingButtons = () => {};
+  context.getEntryByCode = entryKeyOrCode => {
+    const entries = [
+      ...(context.getSlotSnapshot('slotA')?.pullbackEntries || []),
+      ...(context.getSlotSnapshot('slotA')?.accumulationEntries || [])
+    ];
+    return entries.find(entry => entry.entryKey === entryKeyOrCode || entry.code === entryKeyOrCode) || null;
+  };
+  context.getTradingValueRankBadgeHtml = () => '';
+  context.renderMarketCapInlineHtml = () => '';
+  context.renderBuyPriceWithDailyChange = () => '<span>110,700원</span>';
+  context.openModal = () => {};
+  context.setNotionPageState('slotA', {
+    snapshot: {
+      pullbackEntries: [{
+        entryKey: 'slotA:pullback:111111',
+        strategy: 'pullback',
+        rank: 1,
+        name: '세션이월',
+        code: '111111',
+        rr: '1 : 1.3',
+        entryEligible: true,
+        matchedRules: ['G1'],
+        unmatchedRules: [],
+        notes: [],
+        rationale: '3시 유지 카드',
+        analysisSession: '1500',
+        analysisSessionLabel: '3시 분석',
+        tradePlanRows: []
+      }],
+      accumulationEntries: [{
+        entryKey: 'slotA:accumulation:222222',
+        strategy: 'accumulation',
+        rank: 1,
+        name: '세션최신',
+        code: '222222',
+        rr: '1 : 1.4',
+        entryEligible: true,
+        matchedRules: ['S1', 'S5'],
+        unmatchedRules: [],
+        notes: [],
+        rationale: '1730 신규 카드',
+        analysisSession: '1730',
+        analysisSessionLabel: '5시반 분석',
+        accumulationTrend: { sponsor: 'foreign' },
+        tradePlanRows: []
+      }],
+      breakoutEntries: [],
+      momentumEntries: [],
+      reversalEntries: [],
+      regimeTable: [],
+      regimeEvidence: [],
+      gapScore: { grade: '', rows: [] }
+    }
+  });
+  context.setActiveBuySlot('slotA');
+
+  context.renderBuyStockCards();
+
+  const pullbackHtml = containers.get('buy-list-pullback').innerHTML;
+  const accumulationHtml = containers.get('buy-list-accumulation').innerHTML;
+  assert.match(pullbackHtml, /buy-card-tags">\s*<span class="buy-tag analysis-session">3시 분석<\/span>\s*<span class="buy-tag strategy">/);
+  assert.match(accumulationHtml, /buy-card-tags">\s*<span class="buy-tag analysis-session">5시반 분석<\/span>\s*<span class="buy-tag accumulation-sponsor">매집 주체 외국인<\/span>/);
+});
+
 test('buy breakout section stays hidden until explicitly shown and hidden state skips breakout render', () => {
   const context = loadUiContext();
   vm.runInContext(fs.readFileSync(new URL('./sell-ui.js', import.meta.url), 'utf8'), context);

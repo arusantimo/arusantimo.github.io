@@ -308,6 +308,7 @@ renderBuyStockCards = function renderBuyStockCardsOverride() {
           <div class="buy-card-status ${presentation.changed.statusLabel ? 'buy-changed' : ''}">${escapeHtml(presentation.primaryStatusLabel)}</div>
           ${statusReasonHtml}
           <div class="buy-card-tags">
+            ${typeof renderBuyAnalysisSessionTag === 'function' ? renderBuyAnalysisSessionTag(entry) : ''}
             ${typeof renderBuyAccumulationSponsorTag === 'function' ? renderBuyAccumulationSponsorTag(entry) : ''}
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>

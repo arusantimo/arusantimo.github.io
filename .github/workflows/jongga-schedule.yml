@@ -1,19 +1,20 @@
-# 종가베팅 jongga 데이터 — 평일 KST 14:50 / 15:00 / 15:10 자동 생성 후 Pages 배포용 커밋
+# 종가베팅 jongga 데이터 — 평일 KST 15:00 / 17:30 자동 생성 후 Pages 배포용 커밋
 name: jongga-schedule
 
 on:
+  schedule:
+    - cron: "0 6 * * 1-5"
+    - cron: "30 8 * * 1-5"
   workflow_dispatch:
     inputs:
-      run_slot:
-        description: "실행 슬롯 (비우면 manual)"
-        required: false
-        default: manual
+      session:
+        description: "실행 세션"
+        required: true
+        default: "1500"
         type: choice
         options:
-          - manual
-          - pre_close
-          - at_close
-          - post_close
+          - "1500"
+          - "1730"
 
 concurrency:
   group: jongga-schedule-${{ github.ref }}
@@ -27,28 +28,43 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - name: Resolve run label (KST)
+      - name: Resolve analysis session (KST)
         id: meta
         env:
           SCHEDULE: ${{ github.event.schedule }}
-          INPUT_SLOT: ${{ github.event.inputs.run_slot }}
+          INPUT_SESSION: ${{ github.event.inputs.session }}
         run: |
           set -euo pipefail
-          label="수동 실행"
+          session=""
+          label=""
           case "${SCHEDULE}" in
-            "50 5 * * 1-5") label="14:50 KST (장마감 10분 전)" ;;
-            "0 6 * * 1-5")  label="15:00 KST (동시호가 직전)" ;;
-            "10 6 * * 1-5") label="15:10 KST (마감·동시호가 반영)" ;;
+            "0 6 * * 1-5")
+              session="1500"
+              label="15:00 KST (3시 분석)"
+              ;;
+            "30 8 * * 1-5")
+              session="1730"
+              label="17:30 KST (5시반 분석)"
+              ;;
           esac
-          if [ "${INPUT_SLOT}" != "" ] && [ "${INPUT_SLOT}" != "manual" ]; then
-            case "${INPUT_SLOT}" in
-              pre_close)  label="14:50 KST (장마감 10분 전) [manual]" ;;
-              at_close)   label="15:00 KST (동시호가 직전) [manual]" ;;
-              post_close) label="15:10 KST (마감·동시호가 반영) [manual]" ;;
+          if [ "${INPUT_SESSION}" != "" ]; then
+            session="${INPUT_SESSION}"
+            case "${INPUT_SESSION}" in
+              "1500") label="15:00 KST (3시 분석) [manual]" ;;
+              "1730") label="17:30 KST (5시반 분석) [manual]" ;;
+              *)
+                echo "Unsupported session: ${INPUT_SESSION}" >&2
+                exit 1
+                ;;
             esac
           fi
+          if [ "${session}" = "" ]; then
+            echo "Unable to resolve jongga session from schedule or input" >&2
+            exit 1
+          fi
+          echo "session=${session}" >> "${GITHUB_OUTPUT}"
           echo "label=${label}" >> "${GITHUB_OUTPUT}"
-          echo "Run slot: ${label}"
+          echo "Resolved session: ${session} (${label})"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -93,7 +109,7 @@ jobs:
           PYTHONUTF8: "1"
           PYTHONIOENCODING: utf-8
           FORCE_COLOR: "1"
-        run: python run_jongga_pipeline.py
+        run: python run_jongga_pipeline.py --session "${{ steps.meta.outputs.session }}"
 
       - name: Commit and push jongga outputs
         env:

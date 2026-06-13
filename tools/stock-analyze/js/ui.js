@@ -1270,6 +1270,21 @@ function getBuyAccumulationSponsorLabel(mode) {
   return '';
 }
 
+function getBuyAnalysisSessionLabel(entry) {
+  const explicitLabel = String(entry?.analysisSessionLabel || '').trim();
+  if (explicitLabel) return explicitLabel;
+  const session = String(entry?.analysisSession || '').trim();
+  if (session === '1500') return '3시 분석';
+  if (session === '1730') return '5시반 분석';
+  return '';
+}
+
+function renderBuyAnalysisSessionTag(entry) {
+  const label = getBuyAnalysisSessionLabel(entry);
+  if (!label) return '';
+  return `<span class="buy-tag analysis-session">${escapeHtml(label)}</span>`;
+}
+
 function renderBuyAccumulationSponsorTag(entry) {
   if (entry?.strategy !== 'accumulation') return '';
   const trendMode = String(entry?.accumulationTrend?.sponsor || '').trim();
@@ -1406,6 +1421,7 @@ function renderBuyStockCards() {
           ${pullbackInsightHtml}
           ${volatilityInsightHtml}
           <div class="buy-card-tags">
+            ${renderBuyAnalysisSessionTag(entry)}
             ${renderBuyAccumulationSponsorTag(entry)}
             <span class="buy-tag strategy">전략 판정 ${escapeHtml(presentation.strategyStatusLabel)}</span>
             <span class="buy-tag">Gate ${gateSummary.passed}/${gateSummary.total}</span>

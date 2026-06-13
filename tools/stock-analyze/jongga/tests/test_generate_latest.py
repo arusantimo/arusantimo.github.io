@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from typing import Any
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, annotate_payload_with_analysis_session, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, merge_same_day_session_payloads, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
 from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_ROTATION_BUFFERED, REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
@@ -1600,6 +1600,95 @@ class GenerateLatestTest(unittest.TestCase):
                 },
             }],
         }
+
+    def _session_payload(
+        self,
+        session: str,
+        *,
+        pullback: list[str] | None = None,
+        accumulation: list[str] | None = None,
+        breakout: list[str] | None = None,
+        reversal: list[str] | None = None,
+    ) -> dict[str, Any]:
+        def build_entries(strategy: str, codes: list[str] | None) -> list[dict[str, Any]]:
+            return [
+                {
+                    "name": f"{strategy}-{code}",
+                    "code": code,
+                    "score": 8.0,
+                    "signalScore": 8.0,
+                    "strictScore": 8.0,
+                    "grade": "A",
+                    "statusLabel": "매수추천",
+                    "strategy": strategy,
+                }
+                for code in (codes or [])
+            ]
+
+        payload = payload_with_analysis_date(
+            {
+                "schemaVersion": "jongga_result.v1",
+                "generatedAt": "2026-05-22T15:00:00+09:00",
+                "dataQuality": {"status": "partial"},
+                "slots": [{
+                    "slotId": "slotA",
+                    "entries": {
+                        "pullback": build_entries("pullback", pullback),
+                        "accumulation": build_entries("accumulation", accumulation),
+                        "breakout": build_entries("breakout", breakout),
+                        "reversal": build_entries("reversal", reversal),
+                        "swing": [],
+                    },
+                }],
+            },
+            date(2026, 5, 22),
+            variant=VARIANT_STABLE,
+        )
+        return annotate_payload_with_analysis_session(payload, session=session)
+
+    def test_annotate_payload_with_analysis_session_adds_root_and_entry_metadata(self):
+        payload = annotate_payload_with_analysis_session(
+            payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE),
+            session="1500",
+        )
+
+        self.assertEqual(payload["analysisSession"], "1500")
+        self.assertEqual(payload["analysisSessionLabel"], "3시 분석")
+        self.assertEqual(payload["sessionSources"], ["1500"])
+        self.assertEqual(payload["slots"][0]["entries"]["pullback"][0]["analysisSession"], "1500")
+        self.assertEqual(payload["slots"][0]["entries"]["pullback"][0]["analysisSessionLabel"], "3시 분석")
+        self.assertEqual(payload["slots"][0]["entries"]["breakout"][0]["analysisSession"], "1500")
+
+    def test_merge_same_day_session_payloads_keeps_1730_cards_and_appends_1500_unique_same_strategy(self):
+        payload_1500 = self._session_payload(
+            "1500",
+            pullback=["000111", "000888"],
+            accumulation=["000222"],
+            breakout=["000444"],
+            reversal=["000333"],
+        )
+        payload_1730 = self._session_payload(
+            "1730",
+            pullback=["000111", "000555", "000556"],
+            accumulation=["000666", "000333"],
+            breakout=["000777"],
+            reversal=[],
+        )
+
+        merged = merge_same_day_session_payloads(payload_1500, payload_1730)
+        entries = merged["slots"][0]["entries"]
+
+        self.assertEqual(merged["analysisSession"], "1730")
+        self.assertEqual(merged["analysisSessionLabel"], "5시반 분석")
+        self.assertEqual(merged["sessionSources"], ["1500", "1730"])
+        self.assertEqual([item["code"] for item in entries["pullback"]], ["000111", "000555", "000556", "000888"])
+        self.assertEqual([item["rank"] for item in entries["pullback"]], [1, 2, 3, 4])
+        self.assertEqual(entries["pullback"][0]["analysisSessionLabel"], "5시반 분석")
+        self.assertEqual(entries["pullback"][-1]["analysisSessionLabel"], "3시 분석")
+        self.assertEqual([item["code"] for item in entries["accumulation"]], ["000666", "000333", "000222"])
+        self.assertEqual([item["code"] for item in entries["reversal"]], ["000333"])
+        self.assertEqual(entries["reversal"][0]["analysisSessionLabel"], "3시 분석")
+        self.assertEqual([item["code"] for item in entries["breakout"]], ["000777"])
 
 
     def test_breakout_and_accumulation_g2_are_mutually_exclusive(self):

@@ -107,11 +107,11 @@ def run_outcome_backfill(*, analysis_date: str | None, variant: str, lookback_da
     return 0
 
 
-def run_generate(*, analysis_date: str | None, variant: str, top_limit: int) -> int:
-    from jongga.output_contract import is_canary_channel_enabled
+def run_generate(*, analysis_date: str | None, variant: str, top_limit: int, session: str) -> int:
+    from jongga.output_contract import analysis_session_label, is_canary_channel_enabled
 
     channel_label = "stable · canary" if is_canary_channel_enabled() else "stable"
-    emit("STEP", f"3/5 라이브 수집 + 종가베팅 추천 생성 ({channel_label})")
+    emit("STEP", f"3/5 라이브 수집 + 종가베팅 추천 생성 ({channel_label}, {analysis_session_label(session)})")
     cmd = [
         sys.executable,
         "-m",
@@ -126,6 +126,8 @@ def run_generate(*, analysis_date: str | None, variant: str, top_limit: int) -> 
         "jongga/output/jongga_data.js",
         "--variant",
         variant,
+        "--session",
+        session,
         "--top-limit",
         str(top_limit),
     ]
@@ -464,6 +466,11 @@ def build_parser() -> argparse.ArgumentParser:
         default="all",
         help="출력 채널 (기본: all — 카나리 비활성 시 stable만 생성)",
     )
+    parser.add_argument(
+        "--session",
+        choices=["1500", "1730"],
+        help="분석 세션 (추천 생성 시 필수, replay-only/tests-only 제외)",
+    )
     parser.add_argument("--top-limit", type=int, default=40, help="거래대금 TOP universe (최대 40)")
     parser.add_argument("--with-tests", action="store_true", help="생성 전 jongga 단위 테스트 실행")
     parser.add_argument(
@@ -507,7 +514,7 @@ def main() -> int:
     if os.getenv("OPEN_BET_FORCE_COLOR") or os.getenv("FORCE_COLOR"):
         os.environ.setdefault("FORCE_COLOR", "1")
 
-    from jongga.output_contract import VARIANT_CANARY, is_canary_channel_enabled, resolve_generation_variants
+    from jongga.output_contract import VARIANT_CANARY, is_canary_channel_enabled, normalize_analysis_session, resolve_generation_variants
 
     args = build_parser().parse_args()
     print()
@@ -528,6 +535,14 @@ def main() -> int:
         emit("FAIL", "요청한 variant에 대해 생성할 채널이 없습니다.")
         print_summary(exit_code=2, quality_status="")
         return 2
+    session = ""
+    if args.session:
+        try:
+            session = normalize_analysis_session(args.session)
+        except ValueError as exc:
+            emit("FAIL", str(exc))
+            print_summary(exit_code=2, quality_status="")
+            return 2
     try:
         resolved_analysis_date = resolve_pipeline_analysis_date(args.date)
     except ValueError as exc:
@@ -565,6 +580,11 @@ def main() -> int:
         print_summary(exit_code=validate_code, quality_status=quality_status, summary_label="리플레이 재검증 완료")
         return validate_code
 
+    if not session:
+        emit("FAIL", "--session 1500 또는 --session 1730 이 필요합니다.")
+        print_summary(exit_code=2, quality_status="")
+        return 2
+
     if not args.skip_outcomes:
         run_outcome_backfill(analysis_date=analysis_date_arg, variant=args.variant)
     else:
@@ -574,6 +594,7 @@ def main() -> int:
         analysis_date=analysis_date_arg,
         variant=args.variant,
         top_limit=args.top_limit,
+        session=session,
     )
     if gen_code != 0:
         print_summary(exit_code=gen_code, quality_status="")

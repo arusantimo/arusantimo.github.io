@@ -641,6 +641,8 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     scoreUnavailable: Boolean(effectiveRawEntry.scoreUnavailable) || score === null,
     scoreLabel: effectiveRawEntry.scoreLabel || (score === null ? '미산출' : ''),
     statusLabel: String(pickJonggaValue(effectiveRawEntry, ['statusLabel', 'decision', 'verdict'])),
+    analysisSession: String(effectiveRawEntry.analysisSession || ''),
+    analysisSessionLabel: String(effectiveRawEntry.analysisSessionLabel || ''),
     strategy,
     type: strategy,
     gates,

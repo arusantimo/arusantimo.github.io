@@ -8,6 +8,7 @@ import math
 import os
 import re
 import sys
+from copy import deepcopy
 from time import perf_counter
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
@@ -119,19 +120,25 @@ from jongga.rule_evaluation import (
     split_rule_lists,
 )
 from jongga.output_contract import (
+    ANALYSIS_SESSION_1500,
+    ANALYSIS_SESSION_1730,
     INPUT_ARCHIVE_VERSION,
     KST,
     PAYLOAD_SOURCE_LIVE,
     VARIANT_CANARY,
     VARIANT_STABLE,
+    analysis_session_label,
     compact_date,
+    normalize_analysis_session,
     normalize_variant,
     payload_with_analysis_date,
     read_js_assignment,
+    read_session_archive,
     resolve_analysis_date,
     resolve_generation_variants,
     variant_label,
     write_daily_outputs,
+    write_session_archive,
 )
 from jongga.support_levels import build_pullback_support_gate, build_pullback_support_payload_from_snapshot
 from jongga.volatility_context import build_volatility_context, build_volatility_keypoint_suffix
@@ -162,6 +169,7 @@ PULLBACK_NEWS_POSITIVE_PATTERN = re.compile(
     re.IGNORECASE,
 )
 TOP_TRADING_VALUE_LIMIT = 100
+SESSION_MERGE_STRATEGIES = ("pullback", "accumulation", "reversal")
 NAVER_MARKET_VALUE_API_TEMPLATE = "https://m.stock.naver.com/api/stocks/marketValue/{market}?page={page}&pageSize={page_size}"
 CHROME_EXECUTABLE_CANDIDATES = [
     lambda: os.getenv("MARKET_ANALYZE_PLAYWRIGHT_EXECUTABLE_PATH", ""),
@@ -5031,6 +5039,90 @@ def build_input_archive_payload(
     }
 
 
+def annotate_payload_with_analysis_session(
+    payload: dict[str, Any],
+    *,
+    session: str,
+    session_sources: list[str] | None = None,
+) -> dict[str, Any]:
+    resolved_session = normalize_analysis_session(session)
+    label = analysis_session_label(resolved_session)
+    next_payload = deepcopy(payload)
+    normalized_sources: list[str] = []
+    for item in session_sources or [resolved_session]:
+        normalized = normalize_analysis_session(item)
+        if normalized not in normalized_sources:
+            normalized_sources.append(normalized)
+    next_payload["analysisSession"] = resolved_session
+    next_payload["analysisSessionLabel"] = label
+    next_payload["sessionSources"] = normalized_sources
+    for slot in next_payload.get("slots") or []:
+        if not isinstance(slot, dict):
+            continue
+        entries = slot.get("entries")
+        if not isinstance(entries, dict):
+            continue
+        for strategy in ("pullback", "accumulation", "breakout", "reversal"):
+            bucket = entries.get(strategy)
+            if not isinstance(bucket, list):
+                continue
+            annotated_bucket: list[dict[str, Any]] = []
+            for entry in bucket:
+                if not isinstance(entry, dict):
+                    continue
+                next_entry = deepcopy(entry)
+                next_entry["analysisSession"] = resolved_session
+                next_entry["analysisSessionLabel"] = label
+                annotated_bucket.append(next_entry)
+            entries[strategy] = annotated_bucket
+    return next_payload
+
+
+def _slot_merge_key(slot: dict[str, Any], index: int) -> str:
+    return str(slot.get("slotId") or index)
+
+
+def _entry_code(entry: dict[str, Any]) -> str:
+    return str(entry.get("code") or "").strip()
+
+
+def merge_same_day_session_payloads(
+    payload_1500: dict[str, Any],
+    payload_1730: dict[str, Any],
+) -> dict[str, Any]:
+    merged = deepcopy(payload_1730)
+    prior_slots: dict[str, dict[str, Any]] = {}
+    for index, slot in enumerate(payload_1500.get("slots") or []):
+        if isinstance(slot, dict):
+            prior_slots[_slot_merge_key(slot, index)] = slot
+
+    for index, slot in enumerate(merged.get("slots") or []):
+        if not isinstance(slot, dict):
+            continue
+        prior_slot = prior_slots.get(_slot_merge_key(slot, index))
+        if not isinstance(prior_slot, dict):
+            continue
+        entries = slot.get("entries")
+        prior_entries = prior_slot.get("entries")
+        if not isinstance(entries, dict) or not isinstance(prior_entries, dict):
+            continue
+        for strategy in SESSION_MERGE_STRATEGIES:
+            current_bucket = [deepcopy(entry) for entry in entries.get(strategy) or [] if isinstance(entry, dict)]
+            carry_bucket = [deepcopy(entry) for entry in prior_entries.get(strategy) or [] if isinstance(entry, dict)]
+            current_codes = {_entry_code(entry) for entry in current_bucket if _entry_code(entry)}
+            for entry in carry_bucket:
+                code = _entry_code(entry)
+                if code and code in current_codes:
+                    continue
+                current_bucket.append(entry)
+            entries[strategy] = assign_ranks(current_bucket)
+
+    merged["analysisSession"] = ANALYSIS_SESSION_1730
+    merged["analysisSessionLabel"] = analysis_session_label(ANALYSIS_SESSION_1730)
+    merged["sessionSources"] = [ANALYSIS_SESSION_1500, ANALYSIS_SESSION_1730]
+    return merged
+
+
 def collect_live_payload(
     top_limit: int = TOP_TRADING_VALUE_LIMIT,
     *,
@@ -5474,6 +5566,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="all",
         help="Output channel to generate. Defaults to stable only while canary is disabled",
     )
+    parser.add_argument(
+        "--session",
+        choices=[ANALYSIS_SESSION_1500, ANALYSIS_SESSION_1730],
+        required=True,
+        help="Analysis session (1500 or 1730)",
+    )
     parser.add_argument("--out-dir", default="jongga/output", help="Daily output directory")
     parser.add_argument("--history-js", default="jongga/output/jongga_history.js", help="History manifest JS path")
     parser.add_argument("--out", help="Legacy latest.json output path")
@@ -5485,6 +5583,7 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     prepare_console_output()
     args = build_parser().parse_args()
+    session = normalize_analysis_session(args.session)
     try:
         analysis_date = resolve_analysis_date(args.date)
     except ValueError as exc:
@@ -5508,8 +5607,32 @@ def main() -> int:
             analysis_date=analysis_date,
         )
         payload = payload_with_analysis_date(collected_payload, analysis_date, variant=variant)
+        session_payload = annotate_payload_with_analysis_session(payload, session=session)
+        session_archive_path = write_session_archive(
+            session_payload,
+            args.out_dir,
+            analysis_date,
+            variant=variant,
+            session=session,
+        )
+        emit_cli_log("FILE", f"SESSION JSON {session_archive_path}", tone="muted")
+        final_payload = session_payload
+        if session == ANALYSIS_SESSION_1730:
+            payload_1500 = read_session_archive(
+                args.out_dir,
+                analysis_date,
+                session=ANALYSIS_SESSION_1500,
+                variant=variant,
+            )
+            if payload_1500:
+                final_payload = merge_same_day_session_payloads(payload_1500, session_payload)
+                emit_cli_log(
+                    "OK",
+                    f"{variant_label(variant)} · 1730 세션 머지 완료 ({compact_date(analysis_date)} 기준)",
+                    tone="green",
+                )
         json_path, js_path, history_path = write_daily_outputs(
-            payload,
+            final_payload,
             args.out_dir,
             args.history_js,
             variant=variant,
@@ -5517,10 +5640,11 @@ def main() -> int:
         )
         generated_runs.append({
             "variant": variant,
-            "payload": payload,
+            "payload": final_payload,
             "jsonPath": json_path,
             "jsPath": js_path,
             "historyPath": history_path,
+            "sessionArchivePath": session_archive_path,
         })
 
     if args.out or args.bridge_js:

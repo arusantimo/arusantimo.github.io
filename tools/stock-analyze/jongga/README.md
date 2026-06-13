@@ -22,9 +22,9 @@
 
 ```bat
 cd tools\stock-analyze
-generate-jongga-data.bat
-generate-jongga-data.bat --with-tests
-generate-jongga-data.bat --no-pause --date 2026-05-26
+generate-jongga-data.bat --session 1500
+generate-jongga-data.bat --session 1730 --with-tests
+generate-jongga-data.bat --session 1730 --no-pause --date 2026-05-26
 
 replay-jongga-data.bat
 replay-jongga-data.bat --no-pause
@@ -33,7 +33,8 @@ replay-jongga-data.bat --no-pause
 ```bash
 cd tools/stock-analyze
 chmod +x generate-jongga-data.sh
-./generate-jongga-data.sh --with-tests
+./generate-jongga-data.sh --session 1500 --with-tests
+./generate-jongga-data.sh --session 1730 --date 2026-05-26
 
 chmod +x replay-jongga-data.sh
 ./replay-jongga-data.sh
@@ -45,6 +46,7 @@ chmod +x replay-jongga-data.sh
 - `latest_YYYYMMDD_canary.json` · `jongga_data_YYYYMMDD_canary.js` (canary)
 - `jongga/output/latest.json` · `jongga_data.js` (레거시 브리지)
 - `jongga/output/jongga_history.js`
+- `jongga/output/archive/YYYYMM/session_YYYYMMDD_1500*.json` · `session_YYYYMMDD_1730*.json` (세션 원본)
 
 ## GitHub Actions (평일 자동 스케줄)
 
@@ -52,14 +54,15 @@ chmod +x replay-jongga-data.sh
 
 | KST | UTC cron | 용도 |
 |-----|----------|------|
-| 14:50 | `50 5 * * 1-5` | 장마감 10분 전 1차 스냅샷 |
-| 15:00 | `0 6 * * 1-5` | 동시호가 직전 2차 |
-| 15:10 | `10 6 * * 1-5` | 마감·동시호가 반영 3차 |
+| 15:00 | `0 6 * * 1-5` | `--session 1500` 3시 분석 raw 생성 |
+| 17:30 | `30 8 * * 1-5` | `--session 1730` 5시반 분석 raw 생성 후 같은 날짜 `1500` 세션과 머지 |
 
 - 성공 시 `jongga/output/` 변경분을 커밋·푸시 → GitHub Pages에 반영됩니다.
-- **스케줄은 수 분 지연될 수 있습니다.** 15:00 정각 판단은 Actions만 믿지 말고, Pages에서 **「일괄 분석」** 또는 로컬 BAT를 병행하세요.
+- **스케줄은 수 분 지연될 수 있습니다.** 15:00 / 17:30 정각 판단은 Actions만 믿지 말고, Pages에서 **「일괄 분석」** 또는 로컬 BAT를 병행하세요.
 - 공휴일(휴장)에도 월~금 cron은 동작합니다. 휴장일 스킵은 추후 거래일 캘린더로 확장 가능합니다.
-- 수동 실행: 저장소 **Actions** → **jongga-schedule** → **Run workflow** (`pre_close` / `at_close` / `post_close`).
+- 수동 실행: 저장소 **Actions** → **jongga-schedule** → **Run workflow** (`1500` / `1730`).
+- `1500`은 해당 시점 raw 추천을 바로 공개 최신 파일로 반영합니다.
+- `1730`은 해당 시점 raw 추천을 만든 뒤, 같은 날짜 `1500` 세션 원본이 있으면 `5시반 결과 + 3시 고유 종목`으로 머지한 최신 파일을 공개합니다.
 
 ## 실행 예시 (개별 명령)
 
@@ -71,7 +74,8 @@ python -m unittest discover -s tools/stock-analyze/jongga/tests -p "test_*.py"
 
 ```powershell
 Set-Location "tools/stock-analyze"
-python -m jongga.generate_latest --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js" --out "jongga\output\latest.json" --bridge-js "jongga\output\jongga_data.js"
+python -m jongga.generate_latest --session 1500 --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js" --out "jongga\output\latest.json" --bridge-js "jongga\output\jongga_data.js"
+python -m jongga.generate_latest --session 1730 --out-dir "jongga\output" --history-js "jongga\output\jongga_history.js" --out "jongga\output\latest.json" --bridge-js "jongga\output\jongga_data.js"
 ```
 
 - 공개 소스: 네이버 모바일 API, 네이버 차트, Yahoo chart API, CNBC quote page

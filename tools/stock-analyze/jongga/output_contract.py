@@ -15,6 +15,12 @@ except ZoneInfoNotFoundError:
 STRATEGY_ORDER = ("pullback", "accumulation", "breakout", "reversal", "swing")
 VARIANT_STABLE = "stable"
 VARIANT_CANARY = "canary"
+ANALYSIS_SESSION_1500 = "1500"
+ANALYSIS_SESSION_1730 = "1730"
+ANALYSIS_SESSION_LABELS = {
+    ANALYSIS_SESSION_1500: "3시 분석",
+    ANALYSIS_SESSION_1730: "5시반 분석",
+}
 INPUT_ARCHIVE_VERSION = "jongga_inputs.v1"
 PAYLOAD_SOURCE_LIVE = "live"
 PAYLOAD_SOURCE_ARCHIVE_REBUILD = "archive_rebuild"
@@ -84,6 +90,17 @@ def variant_label(value: str | None = None) -> str:
     return VARIANT_LABELS[normalize_variant(value)]
 
 
+def normalize_analysis_session(value: str | None) -> str:
+    text = str(value or "").strip()
+    if text not in ANALYSIS_SESSION_LABELS:
+        raise ValueError("analysis session must be 1500 or 1730")
+    return text
+
+
+def analysis_session_label(value: str | None) -> str:
+    return ANALYSIS_SESSION_LABELS[normalize_analysis_session(value)]
+
+
 def variant_suffix(value: str | None = None) -> str:
     variant = normalize_variant(value)
     return "" if variant == VARIANT_STABLE else f"_{variant}"
@@ -108,6 +125,21 @@ def build_input_archive_path(out_dir: str | Path, analysis_date: date, *, varian
     compact = compact_date(analysis_date)
     suffix = variant_suffix(variant)
     return directory / f"inputs_{compact}{suffix}.json"
+
+
+def build_session_archive_path(
+    out_dir: str | Path,
+    analysis_date: date,
+    *,
+    session: str,
+    variant: str = VARIANT_STABLE,
+) -> Path:
+    month_folder = analysis_date.strftime("%Y%m")
+    directory = Path(out_dir) / "archive" / month_folder
+    compact = compact_date(analysis_date)
+    suffix = variant_suffix(variant)
+    resolved_session = normalize_analysis_session(session)
+    return directory / f"session_{compact}_{resolved_session}{suffix}.json"
 
 
 def payload_with_analysis_date(payload: dict[str, Any], analysis_date: date, *, variant: str = VARIANT_STABLE) -> dict[str, Any]:
@@ -193,6 +225,37 @@ def write_input_archive(
     archive_path.parent.mkdir(parents=True, exist_ok=True)
     archive_path.write_text(json.dumps(archive_payload, ensure_ascii=False, indent=2), encoding="utf-8")
     return archive_path
+
+
+def write_session_archive(
+    payload: dict[str, Any],
+    out_dir: str | Path,
+    analysis_date: date,
+    *,
+    session: str,
+    variant: str = VARIANT_STABLE,
+) -> Path:
+    archive_path = build_session_archive_path(out_dir, analysis_date, session=session, variant=variant)
+    archive_path.parent.mkdir(parents=True, exist_ok=True)
+    archive_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    return archive_path
+
+
+def read_session_archive(
+    out_dir: str | Path,
+    analysis_date: date,
+    *,
+    session: str,
+    variant: str = VARIANT_STABLE,
+) -> dict[str, Any] | None:
+    archive_path = build_session_archive_path(out_dir, analysis_date, session=session, variant=variant)
+    if not archive_path.exists():
+        return None
+    try:
+        parsed = json.loads(archive_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return parsed if isinstance(parsed, dict) else None
 
 
 def build_history_entry(
