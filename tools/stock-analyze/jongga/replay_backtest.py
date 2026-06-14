@@ -13,6 +13,7 @@ from jongga.grade_policy import REVERSAL_GRADE_MIN, TREND_GRADE_MIN
 from jongga.outcome_tracker import compute_outcome, extract_context_dims, load_daily_payload
 from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, compact_date, iter_buy_entries, normalize_variant, read_js_assignment
 from jongga.replay_market_data import TICK_PROXY_SOURCE, build_replay_market_data
+from jongga.strategy_quality import evaluate_quality_from_indicators
 from jongga.sim_broker import simulate_trade
 from jongga.mixed_exit_policy import (
     mixed_exit_policy_key_for_cell,
@@ -141,6 +142,20 @@ def _pullback_replay_gate_ok(entry: dict[str, Any], eligibility: dict[str, Any] 
     return True
 
 
+def _quality_gate_ok(entry: dict[str, Any], strategy: str) -> bool:
+    """저장된 stockIndicators.snapshot으로 품질 게이트(Q1)를 재평가.
+
+    라이브 엔진이 Q1 게이트를 추가하기 전 생성된 과거 JSON에도 동일 기준을
+    소급 적용하므로, 리플레이가 곧 Q1 적용 후 백테스트가 된다. 데이터가 없으면
+    (data_missing) 보수적으로 통과시켜 기존 동작을 깨지 않는다.
+    """
+    indicators = (entry.get("stockIndicators") or {}).get("snapshot") or {}
+    verdict = evaluate_quality_from_indicators(strategy, indicators)
+    if verdict is None:
+        return True
+    return verdict.passed
+
+
 def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: str) -> dict[str, Any]:
     grade_score = float(entry.get("gradeScore") or 0.0)
     replay_grade = grade_from_threshold_profile(float(entry.get("gradeScore") or 0.0), strategy, threshold_profile)
@@ -152,8 +167,9 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         entry.get("filters") or [],
     )
     pullback_gate_ok = _pullback_replay_gate_ok({**entry, "strategy": strategy}, eligibility)
-    replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A"} and pullback_gate_ok
-    replay_a7plus = grade_score >= 7.0 and replay_grade in {"S", "A"} and pullback_gate_ok
+    quality_gate_ok = _quality_gate_ok(entry, strategy)
+    replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A"} and pullback_gate_ok and quality_gate_ok
+    replay_a7plus = grade_score >= 7.0 and replay_grade in {"S", "A"} and pullback_gate_ok and quality_gate_ok
     return {
         "strategy": strategy,
         "name": str(entry.get("name") or ""),
@@ -175,6 +191,7 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "replayA7Plus": replay_a7plus,
         "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
         "pullbackReplayGateOk": pullback_gate_ok,
+        "qualityGateOk": quality_gate_ok,
         **eligibility,
     }
 
@@ -182,16 +199,21 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
 def matches_replay_case(item: dict[str, Any], case_key: str) -> bool:
     normalized = str(case_key or "").strip()
     pullback_gate_ok = bool(item.get("pullbackReplayGateOk")) if "pullbackReplayGateOk" in item else _pullback_replay_gate_ok(item)
+    quality_gate_ok = (
+        bool(item.get("qualityGateOk"))
+        if "qualityGateOk" in item
+        else _quality_gate_ok(item, str(item.get("strategy") or ""))
+    )
     if normalized == "all":
         return True
     if normalized == REPLAY_CASE_RECOMMENDATION:
-        return pullback_gate_ok and (bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal")))
+        return pullback_gate_ok and quality_gate_ok and (bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal")))
     if normalized == REPLAY_CASE_A7PLUS:
         if bool(item.get("replayA7Plus")):
             return True
         grade_score = float(item.get("gradeScore") or 0.0)
         replay_grade = str(item.get("replayGrade") or item.get("grade") or "").strip().upper()
-        return pullback_gate_ok and grade_score >= 7.0 and replay_grade in {"A", "S"}
+        return pullback_gate_ok and quality_gate_ok and grade_score >= 7.0 and replay_grade in {"A", "S"}
     return False
 
 

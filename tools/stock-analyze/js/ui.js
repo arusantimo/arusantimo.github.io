@@ -1857,12 +1857,17 @@ function renderStrategyRuleCard(rule, entry, kind, matched) {
   const titleSuffix = kind === 'score'
     ? (matched ? '일치' : '불일치')
     : (rule.status === '✅' ? '통과' : rule.status === '⚠️' ? '경계' : '제외');
+  const diagnosticOnly = isDiagnosticOnlyScoreCode(entry.strategy, kind, rule.code);
+  const diagnosticBadge = diagnosticOnly
+    ? '<div class="modal-ind-eval-badge eval-diagnostic">진단 전용 (등급 미반영)</div>'
+    : '';
   return `
     <div class="modal-ind-card ${statusClass} ${evalClass}">
       <div class="modal-ind-icon">${icon}</div>
       <div class="modal-ind-content">
         <div class="modal-ind-title">${escapeHtml(rule.code)} ${titleSuffix}</div>
         <div class="modal-ind-eval-badge eval-${presentation.evalStatus}">${escapeHtml(presentation.typeLabel)}</div>
+        ${diagnosticBadge}
         <div class="modal-ind-criterion">${escapeHtml(guide.condition)}</div>
         <div class="modal-ind-result">→ ${escapeHtml(presentation.resultText)}</div>
         ${guide.source ? `<div class="modal-ind-value">출처: ${escapeHtml(guide.source)}</div>` : ''}
@@ -2434,8 +2439,11 @@ function openModal(codeOrEntryKey, mode = 'sell') {
 
           ${renderModalCollapsibleSection(
             'buy-section-scoring-rules',
-            '채점 조건 (S·P·C) 일치 / 불일치',
-            `<div class="modal-ind-list">${renderRuleMatchList(entry)}</div>`
+            '채점 조건 (S·P·C·D) 일치 / 불일치',
+            `${(() => {
+              const note = typeof getStrategyScoreNote === 'function' ? getStrategyScoreNote(entry.strategy) : '';
+              return note ? `<div class="modal-score-note">${escapeHtml(note)}</div>` : '';
+            })()}<div class="modal-ind-list">${renderRuleMatchList(entry)}</div>`
           )}
         </div>
       </div>

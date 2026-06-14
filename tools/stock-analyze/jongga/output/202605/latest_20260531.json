@@ -322,19 +322,11 @@
             "strictScore": 7.5,
             "signalScore": 7.5,
             "score": 7.5,
-            "scoreMax": 10.0,
-            "effectiveScoreMax": 10.0,
-            "gradeScore": 7.5,
-            "grade": "A",
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 11.0,
+            "gradeScore": 6.8,
+            "grade": "B",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 24위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -342,14 +334,6 @@
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 -851,638주 / 기관 124,201주 · 당일 순매수"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 96,900 · 이평선 터치: 5MA, 10MA, 20MA"
               },
               {
                 "code": "P2",
@@ -368,20 +352,28 @@
                 "note": "양봉 (시가 99,300 ≤ 종가 100,600)"
               },
               {
-                "code": "C2",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 160% (필요 ≤ 80%)"
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -28.3% (≥12% 만점·8~12% 부분) · 충족"
               },
               {
-                "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "not_met",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
                 "evalStatus": "met",
-                "note": "동종업종 평균 -2.64% / KOSPI -8.29% outperform"
+                "note": "거래량 178% (≥100% 만점·80~100% 부분) · 충족"
               },
               {
                 "code": "V1",
@@ -451,6 +443,12 @@
                 "evalStatus": "met"
               },
               {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -28.3% (≥12%) · 거래량 178% (≥80%) · 수급추세 +0 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "evalStatus": "met"
+              },
+              {
                 "code": "G9",
                 "status": "✅",
                 "note": "복합 지지 강도 90점 · 현재가 아래 유효 family 3개",
@@ -487,12 +485,27 @@
                 "code": "C3",
                 "note": "동종업종 평균 -2.64% / KOSPI -8.29% outperform",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -28.3% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 178% (≥100% 만점·80~100% 부분) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
               {
                 "code": "C2",
                 "note": "당일 거래량 / 5일 평균 160% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족",
                 "evalStatus": "not_met"
               }
             ],
@@ -1286,22 +1299,14 @@
             "rank": 2,
             "name": "주성엔지니어링",
             "code": "036930",
-            "strictScore": 7.5,
-            "signalScore": 7.5,
-            "score": 7.5,
-            "scoreMax": 10.0,
-            "effectiveScoreMax": 10.0,
-            "gradeScore": 7.5,
-            "grade": "A",
+            "strictScore": 6.0,
+            "signalScore": 6.0,
+            "score": 6.0,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 11.0,
+            "gradeScore": 5.5,
+            "grade": "B",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 30위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -1309,14 +1314,6 @@
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 5,844주 / 기관 -61,709주 · 당일 순매수"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 200,000 · 이평선 터치: 5MA"
               },
               {
                 "code": "P2",
@@ -1335,20 +1332,28 @@
                 "note": "음봉 · 아래꼬리:몸통 0.00 (필요 ≥ 1.0)"
               },
               {
-                "code": "C2",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
                 "evalStatus": "met",
-                "note": "당일 거래량 / 5일 평균 65% (필요 ≤ 80%)"
+                "note": "52주 고가 대비 -21.6% (≥12% 만점·8~12% 부분) · 충족"
               },
               {
-                "code": "C3",
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "not_met",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족"
+              },
+              {
+                "code": "D3",
                 "strictPoints": 1.0,
                 "signalPoints": 1.0,
-                "maxPoints": 1.0,
+                "maxPoints": 2.0,
                 "evalStatus": "met",
-                "note": "동종업종 평균 -8.23% / KOSPI -8.29% outperform"
+                "note": "거래량 94% (≥100% 만점·80~100% 부분) · 부분 충족"
               },
               {
                 "code": "V1",
@@ -1418,6 +1423,12 @@
                 "evalStatus": "not_met"
               },
               {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -21.6% (≥12%) · 거래량 94% (≥80%) · 수급추세 +0 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "evalStatus": "met"
+              },
+              {
                 "code": "G9",
                 "status": "⚠️",
                 "note": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
@@ -1454,6 +1465,11 @@
                 "code": "C3",
                 "note": "동종업종 평균 -8.23% / KOSPI -8.29% outperform",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -21.6% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
@@ -1461,6 +1477,16 @@
                 "code": "C1",
                 "note": "음봉 · 아래꼬리:몸통 0.00 (필요 ≥ 1.0)",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 94% (≥100% 만점·80~100% 부분) · 부분 충족",
+                "evalStatus": "met"
               }
             ],
             "currentPrice": 200000,
@@ -2446,22 +2472,14 @@
             "rank": 3,
             "name": "SK스퀘어",
             "code": "402340",
-            "strictScore": 6.8,
-            "signalScore": 6.8,
-            "score": 6.8,
-            "scoreMax": 10.0,
-            "effectiveScoreMax": 10.0,
-            "gradeScore": 6.8,
-            "grade": "B",
+            "strictScore": 5.8,
+            "signalScore": 5.8,
+            "score": 5.8,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 11.0,
+            "gradeScore": 5.3,
+            "grade": "C",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 12위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -2469,14 +2487,6 @@
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 7,021주 / 기관 -24,451주 · 당일 순매수"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 1,217,000 · 이평선 터치: 5MA"
               },
               {
                 "code": "P2",
@@ -2495,20 +2505,28 @@
                 "note": "음봉 · 아래꼬리:몸통 0.59 (필요 ≥ 1.0)"
               },
               {
-                "code": "C2",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 145% (필요 ≤ 80%)"
+                "code": "D1",
+                "strictPoints": 1.25,
+                "signalPoints": 1.25,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -11.4% (≥12% 만점·8~12% 부분) · 부분 충족"
               },
               {
-                "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "not_met",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
                 "evalStatus": "met",
-                "note": "동종업종 평균 -2.59% / KOSPI -8.29% outperform"
+                "note": "거래량 135% (≥100% 만점·80~100% 부분) · 충족"
               },
               {
                 "code": "V1",
@@ -2520,7 +2538,7 @@
               }
             ],
             "scoreScope": "pullback",
-            "statusLabel": "매매금지(핵심 Gate 미충족: G0, G7, G8)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G0, G7, G8, Q1)",
             "strategy": "pullback",
             "gates": [
               {
@@ -2578,6 +2596,12 @@
                 "evalStatus": "not_met"
               },
               {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "52주 고가 대비 -11.4% (≥12%) · 거래량 135% (≥80%) · 수급추세 +0 (≥0) · 얕은 조정(고가권 추격)",
+                "evalStatus": "not_met"
+              },
+              {
                 "code": "G9",
                 "status": "⚠️",
                 "note": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
@@ -2609,6 +2633,11 @@
                 "code": "C3",
                 "note": "동종업종 평균 -2.59% / KOSPI -8.29% outperform",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 135% (≥100% 만점·80~100% 부분) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
@@ -2620,6 +2649,16 @@
               {
                 "code": "C2",
                 "note": "당일 거래량 / 5일 평균 145% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -11.4% (≥12% 만점·8~12% 부분) · 부분 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족",
                 "evalStatus": "not_met"
               }
             ],
@@ -3562,11 +3601,13 @@
               "핵심 Gate 미충족: G0",
               "핵심 Gate 미충족: G7",
               "핵심 Gate 미충족: G8",
-              "매매금지(핵심 Gate 미충족: G0, G7, G8)"
+              "핵심 Gate 미충족: Q1",
+              "매매금지(핵심 Gate 미충족: G0, G7, G8, Q1)",
+              "등급 C — 진입 최소 A, B, S"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G0 미충족: 최근 20일 최대 거래량 급증 167% (필요 ≥ 200%) · 외 2건",
-            "statusReason": "G0 미충족: 최근 20일 최대 거래량 급증 167% (필요 ≥ 200%) / G7 미충족: 주봉 RSI 87.3 (필요 ≤ 80) · 과매수 과열 / G8 미충족: 이격 20MA +11.3% (필요 ≤ +25%) · 60MA +61.1% (필요 ≤ +60%) · 과이격(지지선 눌림 아님)",
+            "statusReasonShort": "G0 미충족: 최근 20일 최대 거래량 급증 167% (필요 ≥ 200%) · 외 3건",
+            "statusReason": "G0 미충족: 최근 20일 최대 거래량 급증 167% (필요 ≥ 200%) / G7 미충족: 주봉 RSI 87.3 (필요 ≤ 80) · 과매수 과열 / G8 미충족: 이격 20MA +11.3% (필요 ≤ +25%) · 60MA +61.1% (필요 ≤ +60%) · 과이격(지지선 눌림 아님) / 외 1건",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 1233000.0,
@@ -4361,6 +4402,12 @@
                 "evalStatus": "met"
               },
               {
+                "code": "Q1",
+                "status": "✅",
+                "note": "외인 보유율 58.3% (≥25%) · 20일 수익률 +17.8% (≥0%) · 매집 주체 존재+가격 지탱",
+                "evalStatus": "met"
+              },
+              {
                 "code": "G5",
                 "status": "⚠️",
                 "note": "KOSPI 7,484 / 5MA 8,375 (-10.6%) · VKOSPI 76.6 · KOSPI 단기 추세 이탈",
@@ -4813,8 +4860,7 @@
             "entryEligible": false,
             "entryWatch": false,
             "entryBlockers": [
-              "매매금지(갭다운 경고 · 신규 진입 금지)",
-              "등급 B — 진입 최소 A, S"
+              "매매금지(갭다운 경고 · 신규 진입 금지)"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "갭 스코어 G-E -10.0점: NQ -3.77%, SOX -4.74%",
@@ -4944,7 +4990,7 @@
               }
             ],
             "scoreScope": "accumulation",
-            "statusLabel": "매매금지(갭다운 경고 · 신규 진입 금지)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
             "strategy": "accumulation",
             "gates": [
               {
@@ -4976,6 +5022,12 @@
                 "status": "✅",
                 "note": "당일 거래량 / 20일 평균 49% (필요 < 150%)",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "외인 보유율 1.9% (≥25%) · 20일 수익률 +50.4% (≥0%) · 외인 매집 주체 약함",
+                "evalStatus": "not_met"
               },
               {
                 "code": "G5",
@@ -5441,12 +5493,12 @@
             "entryEligible": false,
             "entryWatch": false,
             "entryBlockers": [
-              "매매금지(갭다운 경고 · 신규 진입 금지)",
-              "등급 B — 진입 최소 A, S"
+              "핵심 Gate 미충족: Q1",
+              "매매금지(핵심 Gate 미충족: Q1)"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "갭 스코어 G-E -10.0점: NQ -3.77%, SOX -4.74%",
-            "statusReason": "갭 스코어 G-E (-10.0점)로 신규 진입 금지입니다. NQ -3.77%, SOX -4.74%, 미 10년물 +7.3bp, 원달러 +14.69원 악화가 동시에 확인됐습니다.",
+            "statusReasonShort": "Q1 미충족: 외인 보유율 1.9% (≥25%) · 20일 수익률 +50.4% (≥0%) · 외인 매집 주체 약함",
+            "statusReason": "Q1 미충족: 외인 보유율 1.9% (≥25%) · 20일 수익률 +50.4% (≥0%) · 외인 매집 주체 약함",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 22700.0,
@@ -5572,7 +5624,7 @@
               }
             ],
             "scoreScope": "accumulation",
-            "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
             "strategy": "accumulation",
             "gates": [
               {
@@ -5603,6 +5655,12 @@
                 "code": "G4",
                 "status": "⛔",
                 "note": "당일 거래량 / 20일 평균 349% (필요 < 150%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "외인 보유율 23.1% (≥25%) · 20일 수익률 +152.7% (≥0%) · 외인 매집 주체 약함",
                 "evalStatus": "not_met"
               },
               {
@@ -6059,12 +6117,13 @@
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: G4",
-              "매매금지(핵심 Gate 미충족: G4)",
-              "등급 C — 진입 최소 A, S"
+              "핵심 Gate 미충족: Q1",
+              "매매금지(핵심 Gate 미충족: G4, Q1)",
+              "등급 C — 진입 최소 A, B, S"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G4 미충족: 당일 거래량 / 20일 평균 349% (필요 < 150%)",
-            "statusReason": "G4 미충족: 당일 거래량 / 20일 평균 349% (필요 < 150%)",
+            "statusReasonShort": "G4 미충족: 당일 거래량 / 20일 평균 349% (필요 < 150%) · 외 1건",
+            "statusReason": "G4 미충족: 당일 거래량 / 20일 평균 349% (필요 < 150%) / Q1 미충족: 외인 보유율 23.1% (≥25%) · 20일 수익률 +152.7% (≥0%) · 외인 매집 주체 약함",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 1458000.0,
@@ -6226,6 +6285,12 @@
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "20MA 이격 +49.4% (≤+22%) · RSI14 75 (≤72) · 20MA 과이격(반등 소진), RSI 과매수",
+                "evalStatus": "not_met"
               }
             ],
             "matchedRules": [
@@ -6597,11 +6662,12 @@
             "entryBlockers": [
               "핵심 Gate 미충족: F4",
               "핵심 Gate 미충족: G2",
+              "핵심 Gate 미충족: Q1",
               "매매금지"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "F4 미충족: 최근 손절 이력 2건 (최근: 2026-05-26) · 재진입 차단 · 외 1건",
-            "statusReason": "F4 미충족: 최근 손절 이력 2건 (최근: 2026-05-26) · 재진입 차단 / G2 미충족: 20일 고점 대비 +0.0% (필요 -5%~-25%)",
+            "statusReasonShort": "F4 미충족: 최근 손절 이력 2건 (최근: 2026-05-26) · 재진입 차단 · 외 2건",
+            "statusReason": "F4 미충족: 최근 손절 이력 2건 (최근: 2026-05-26) · 재진입 차단 / G2 미충족: 20일 고점 대비 +0.0% (필요 -5%~-25%) / Q1 미충족: 20MA 이격 +49.4% (≤+22%) · RSI14 75 (≤72) · 20MA 과이격(반등 소진), RSI 과매수",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 293000.0,
@@ -6761,6 +6827,12 @@
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "20MA 이격 +82.2% (≤+22%) · RSI14 91 (≤72) · 20MA 과이격(반등 소진), RSI 과매수",
+                "evalStatus": "not_met"
               }
             ],
             "matchedRules": [
@@ -7132,11 +7204,12 @@
             "entryBlockers": [
               "핵심 Gate 미충족: G2",
               "핵심 Gate 미충족: G4",
+              "핵심 Gate 미충족: Q1",
               "매매금지"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G2 미충족: 20일 고점 대비 -1.1% (필요 -5%~-25%) · 외 1건",
-            "statusReason": "G2 미충족: 20일 고점 대비 -1.1% (필요 -5%~-25%) / G4 미충족: 최근 5거래일 최저 -2.2% (필요 -3% 이하 급락 1회 이상)",
+            "statusReasonShort": "G2 미충족: 20일 고점 대비 -1.1% (필요 -5%~-25%) · 외 2건",
+            "statusReason": "G2 미충족: 20일 고점 대비 -1.1% (필요 -5%~-25%) / G4 미충족: 최근 5거래일 최저 -2.2% (필요 -3% 이하 급락 1회 이상) / Q1 미충족: 20MA 이격 +82.2% (≤+22%) · RSI14 91 (≤72) · 20MA 과이격(반등 소진), RSI 과매수",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 1458000.0,
@@ -7295,6 +7368,12 @@
                 "code": "G5-a",
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "20MA 이격 +9.1% (≤+22%) · RSI14 63 (≤72) · 과이격·과매수 반등 아님",
                 "evalStatus": "met"
               }
             ],
@@ -7654,12 +7733,13 @@
             "entryEligible": false,
             "entryWatch": false,
             "entryBlockers": [
+              "핵심 Gate 미충족: F3",
               "핵심 Gate 미충족: G4",
               "매매금지"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G4 미충족: 최근 5거래일 최저 -2.7% (필요 -3% 이하 급락 1회 이상)",
-            "statusReason": "G4 미충족: 최근 5거래일 최저 -2.7% (필요 -3% 이하 급락 1회 이상)",
+            "statusReasonShort": "F3 미충족: KIND 최근공시 2026-06-02 기업설명회(IR) 개최(안내공시) · 외 1건",
+            "statusReason": "F3 미충족: KIND 최근공시 2026-06-02 기업설명회(IR) 개최(안내공시) / G4 미충족: 최근 5거래일 최저 -2.7% (필요 -3% 이하 급락 1회 이상)",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 432500.0,

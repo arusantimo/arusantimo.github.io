@@ -120,7 +120,8 @@ const RULE_GUIDE = {
         { code: 'G10', condition: '직전 고거래량 양봉 앵커 대비 거래량 80% 이상 + 음봉/약한 종가면 가짜 눌림 차단', source: '네이버 증권 일봉 차트' },
         { code: 'G11', condition: '종가가 앵커 몸통 중심값과 복합 지지선을 함께 지키는지 확인, 한 축만 이탈이면 ⚠️', source: '앵커 캔들 + 복합 지지선 엔진' },
         { code: 'G12', condition: '마지막 30분 틱 프록시에서 체결강도 < 90% 또는 매수/매도 < 0.9:1이면 장 막판 투매로 차단', source: '토스 체결 틱 프록시' },
-        { code: 'G13', condition: 'KIND 임박 이벤트 차단 + 최근 3거래일 네이버 뉴스 악재 헤드라인 차단', source: 'KIND 공시 + 네이버 종목뉴스' }
+        { code: 'G13', condition: 'KIND 임박 이벤트 차단 + 최근 3거래일 네이버 뉴스 악재 헤드라인 차단', source: 'KIND 공시 + 네이버 종목뉴스' },
+        { code: 'Q1', condition: '품질 필터: 52주 고가 대비 ≥12% 눌림 + 당일 거래량 ≥ 20일 평균 80% + 수급추세 비음수 (얕은 추격·반등 거래량 부족·수급 이탈 차단)', source: '백테스트 검증 (낙폭·거래량·수급)' }
       ],
       scores: [
         { code: 'S1', condition: '당일 거래대금 순위 30위 이내', source: '네이버 증권' },
@@ -134,8 +135,12 @@ const RULE_GUIDE = {
         { code: 'C3', condition: '해당 섹터 지수가 코스피 대비 당일 outperform', source: '네이버 증권' },
         { code: 'C4', condition: '당일 거래량이 앵커 봉 거래량의 35% 이하이면 강한 수축, 60% 이하는 약한 수축', source: '네이버 증권' },
         { code: 'C5', condition: '최근 3~5거래일 네이버 뉴스에서 재료/테마 신선도 확인', source: '네이버 종목뉴스' },
+        { code: 'D1', condition: '[재채점] 눌림 깊이 — 52주 고가 대비 낙폭 ≥12% 만점·8~12% 부분 (얕은 조정 감점)', source: '백테스트 재채점 (등급 corr +0.51)' },
+        { code: 'D2', condition: '[재채점] 수급 추세 — 외인·기관 2일 순매수 강도 ≥+2 만점·+1 부분', source: '백테스트 재채점' },
+        { code: 'D3', condition: '[재채점] 반등 거래량 — 당일/20일 평균 ≥100% 만점·80~100% 부분 (반등 관심 확인)', source: '백테스트 재채점' },
         { code: 'V1', condition: '시장·종목 혼합 변동성 기준으로 눌림목 적합도를 보조 가감점', source: '시장 레짐 + 최근 20일 일봉 변동성' }
-      ]
+      ],
+      scoreNote: '2026-06 재채점: 등급은 D1·D2·D3 + S2·P2·C1·C5만 반영. S1·S3·P1·P3·C2·C3·C4는 수익과 무/역상관이라 등급 제외(진단 표시만 유지).'
     },
     breakout: {
       gates: [
@@ -166,7 +171,8 @@ const RULE_GUIDE = {
         { code: 'G2', condition: '52주 고가 대비 < 92% (돌파 구간 제외)', source: '네이버 증권' },
         { code: 'G3', condition: '거래대금 TOP100', source: '네이버 증권' },
         { code: 'G4', condition: '당일 거래량 < 20일 평균 120%', source: '네이버 증권' },
-        { code: 'G5', condition: 'KOSPI 5일선 + VKOSPI (눌림목 G5와 동일)', source: '네이버 증권' }
+        { code: 'G5', condition: 'KOSPI 5일선 + VKOSPI (눌림목 G5와 동일)', source: '네이버 증권' },
+        { code: 'Q1', condition: '품질 필터: 외인 보유율 ≥25% + 20일 수익률 ≥0% (매집 주체 부재·낙하 칼날 차단)', source: '백테스트 검증 (외인지분·상대강도)' }
       ],
       scores: [
         { code: 'S1', condition: '외국인 AND 기관 당일 양매수', source: '네이버 증권' },
@@ -201,7 +207,8 @@ const RULE_GUIDE = {
         { code: 'G2', condition: '직전 단기 고점(20거래일 최고종가) 대비 -7% ~ -20% 하락 구간', source: '네이버 일봉' },
         { code: 'G3', condition: '종가 > 60MA (장기 추세 베이스 유지)', source: '네이버 일봉' },
         { code: 'G4', condition: '직전 5거래일 내 일봉 -4% 이상 급락 1회 이상 발생', source: '네이버 일봉' },
-        { code: 'G5', condition: '안정화 캔들 패턴 (G5-a 양봉 / G5-b 긴아래꼬리 / G5-c 도지)', source: '네이버 일봉' }
+        { code: 'G5', condition: '안정화 캔들 패턴 (G5-a 양봉 / G5-b 긴아래꼬리 / G5-c 도지)', source: '네이버 일봉' },
+        { code: 'Q1', condition: '품질 필터: 20MA 이격 ≤ +22% + 일봉 RSI(14) ≤ 72 (과이격·과매수로 소진된 반등 차단)', source: '백테스트 검증 (이격·RSI)' }
       ],
       scores: [
         { code: 'S1', condition: '외국인 OR 기관 당일 순매수 전환 (전일 대비 부호 반전)', source: '네이버 증권' },

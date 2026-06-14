@@ -1,5 +1,5 @@
-window.JONGGA_CANARY_DAILY_DATA = window.JONGGA_CANARY_DAILY_DATA || {};
-window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
+window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
+window.JONGGA_DAILY_DATA["2026-06-08"] = {
   "schemaVersion": "jongga_result.v1",
   "generatedAt": "2026-06-08T08:12:10+00:00",
   "variant": "canary",
@@ -306,22 +306,14 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "rank": 1,
             "name": "NAVER",
             "code": "035420",
-            "strictScore": 7.5,
-            "signalScore": 7.5,
-            "score": 7.5,
-            "scoreMax": 10.0,
-            "effectiveScoreMax": 10.0,
-            "gradeScore": 7.5,
-            "grade": "A",
+            "strictScore": 4.1,
+            "signalScore": 4.1,
+            "score": 4.1,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 4.5,
+            "gradeScore": 9.1,
+            "grade": "S",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 5위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -329,14 +321,6 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 -147,900주 / 기관 135,906주 · 당일 순매수"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 238,500 · 이평선 터치: 5MA, 10MA"
               },
               {
                 "code": "P2",
@@ -355,20 +339,28 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "note": "양봉 (시가 239,500 ≤ 종가 279,000)"
               },
               {
-                "code": "C2",
+                "code": "D1",
                 "strictPoints": 0.0,
                 "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 134% (필요 ≤ 80%)"
+                "maxPoints": 2.5,
+                "evalStatus": "data_missing",
+                "note": "52주 고가 낙폭 (≥12% 만점·8~12% 부분) · 데이터 부족"
               },
               {
-                "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "동종업종 평균 -6.60% / KOSPI -8.29% outperform"
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "data_missing",
+                "note": "수급추세 (≥+2 만점·+1 부분) · 데이터 부족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "data_missing",
+                "note": "거래량 (≥100% 만점·80~100% 부분) · 데이터 부족"
               },
               {
                 "code": "V1",
@@ -438,6 +430,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "evalStatus": "not_met"
               },
               {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "눌림목 품질 피처 부족 (낙폭·거래량·수급)",
+                "evalStatus": "data_missing"
+              },
+              {
                 "code": "G9",
                 "status": "✅",
                 "note": "복합 지지 강도 85점 · 현재가 아래 유효 family 4개",
@@ -481,6 +479,21 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "code": "C2",
                 "note": "당일 거래량 / 5일 평균 134% (필요 ≤ 80%)",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 낙폭 (≥12% 만점·8~12% 부분) · 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 (≥+2 만점·+1 부분) · 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 (≥100% 만점·80~100% 부분) · 데이터 부족",
+                "evalStatus": "data_missing"
               }
             ],
             "currentPrice": 279000,
@@ -1260,22 +1273,14 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "rank": 2,
             "name": "삼성전기",
             "code": "009150",
-            "strictScore": 7.5,
-            "signalScore": 7.5,
-            "score": 7.5,
-            "scoreMax": 10.0,
-            "effectiveScoreMax": 10.0,
-            "gradeScore": 7.5,
-            "grade": "A",
+            "strictScore": 4.1,
+            "signalScore": 4.1,
+            "score": 4.1,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 4.5,
+            "gradeScore": 9.1,
+            "grade": "S",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 6위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -1283,14 +1288,6 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 -57,044주 / 기관 99,296주 · 당일 순매수"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 1,552,000 · 이평선 터치: 5MA, 10MA"
               },
               {
                 "code": "P2",
@@ -1309,20 +1306,28 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "note": "양봉 (시가 1,556,000 ≤ 종가 1,664,000)"
               },
               {
-                "code": "C2",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 거래량 / 5일 평균 66% (필요 ≤ 80%)"
-              },
-              {
-                "code": "C3",
+                "code": "D1",
                 "strictPoints": 0.0,
                 "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "동종업종 평균 -9.10% / KOSPI -8.29% underperform"
+                "maxPoints": 2.5,
+                "evalStatus": "data_missing",
+                "note": "52주 고가 낙폭 (≥12% 만점·8~12% 부분) · 데이터 부족"
+              },
+              {
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "data_missing",
+                "note": "수급추세 (≥+2 만점·+1 부분) · 데이터 부족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "data_missing",
+                "note": "거래량 (≥100% 만점·80~100% 부분) · 데이터 부족"
               },
               {
                 "code": "V1",
@@ -1392,6 +1397,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "evalStatus": "not_met"
               },
               {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "눌림목 품질 피처 부족 (낙폭·거래량·수급)",
+                "evalStatus": "data_missing"
+              },
+              {
                 "code": "G9",
                 "status": "⚠️",
                 "note": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
@@ -1435,6 +1446,21 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "code": "C3",
                 "note": "동종업종 평균 -9.10% / KOSPI -8.29% underperform",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 낙폭 (≥12% 만점·8~12% 부분) · 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 (≥+2 만점·+1 부분) · 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 (≥100% 만점·80~100% 부분) · 데이터 부족",
+                "evalStatus": "data_missing"
               }
             ],
             "currentPrice": 1664000,
@@ -3698,6 +3724,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "evalStatus": "met"
               },
               {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "매집 품질 피처 부족 (외인지분·상대강도)",
+                "evalStatus": "data_missing"
+              },
+              {
                 "code": "G5",
                 "status": "⚠️",
                 "note": "KOSPI 7,484 / 5MA 8,375 (-10.6%) · VKOSPI 76.6 · KOSPI 단기 추세 이탈",
@@ -4111,7 +4143,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "entryWatch": false,
             "entryBlockers": [
               "매매금지(갭다운 경고 · 신규 진입 금지)",
-              "등급 C — 진입 최소 A, S"
+              "등급 C — 진입 최소 A, B, S"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "갭 스코어 G-E -11.5점: NQ -4.59%, 원달러 +20.05원",
@@ -4251,6 +4283,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "status": "✅",
                 "note": "당일 거래량 / 20일 평균 89% (필요 < 150%)",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "매집 품질 피처 부족 (외인지분·상대강도)",
+                "evalStatus": "data_missing"
               },
               {
                 "code": "G5",
@@ -4666,7 +4704,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "entryWatch": false,
             "entryBlockers": [
               "매매금지(갭다운 경고 · 신규 진입 금지)",
-              "등급 C — 진입 최소 A, S"
+              "등급 C — 진입 최소 A, B, S"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "갭 스코어 G-E -11.5점: NQ -4.59%, 원달러 +20.05원",
@@ -4806,6 +4844,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "status": "✅",
                 "note": "당일 거래량 / 20일 평균 52% (필요 < 150%)",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "매집 품질 피처 부족 (외인지분·상대강도)",
+                "evalStatus": "data_missing"
               },
               {
                 "code": "G5",
@@ -5221,7 +5265,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "entryWatch": false,
             "entryBlockers": [
               "매매금지(갭다운 경고 · 신규 진입 금지)",
-              "등급 C — 진입 최소 A, S"
+              "등급 C — 진입 최소 A, B, S"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "갭 스코어 G-E -11.5점: NQ -4.59%, 원달러 +20.05원",
@@ -5365,6 +5409,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "반등 품질 피처 부족 (20MA 이격·RSI)",
+                "evalStatus": "data_missing"
               }
             ],
             "matchedRules": [
@@ -5735,8 +5785,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: F4",
-              "매매금지",
-              "등급 B — 진입 최소 A, S"
+              "매매금지"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "F4 미충족: 최근 손절 이력 6건 (최근: 2026-05-29) · 재진입 차단",
@@ -5878,6 +5927,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "반등 품질 피처 부족 (20MA 이격·RSI)",
+                "evalStatus": "data_missing"
               }
             ],
             "matchedRules": [
@@ -6405,6 +6460,12 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⚠️",
+                "note": "반등 품질 피처 부족 (20MA 이격·RSI)",
+                "evalStatus": "data_missing"
               }
             ],
             "matchedRules": [
@@ -6775,8 +6836,7 @@ window.JONGGA_CANARY_DAILY_DATA["2026-06-08"] = {
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: G2",
-              "매매금지",
-              "등급 B — 진입 최소 A, S"
+              "매매금지"
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "G2 미충족: 20일 고점 대비 -38.8% (필요 -5%~-25%)",

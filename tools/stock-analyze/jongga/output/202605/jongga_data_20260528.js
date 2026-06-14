@@ -320,22 +320,14 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "rank": 1,
             "name": "삼성전자",
             "code": "005930",
-            "strictScore": 9.4,
-            "signalScore": 9.4,
-            "score": 9.4,
-            "scoreMax": 13.5,
-            "effectiveScoreMax": 13.5,
-            "gradeScore": 7.0,
+            "strictScore": 8.2,
+            "signalScore": 8.2,
+            "score": 8.2,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 11.5,
+            "gradeScore": 7.1,
             "grade": "A",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 2위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -343,22 +335,6 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 2,880,306주 / 기관 3,295,009주 · 당일 순매수"
-              },
-              {
-                "code": "S3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 평균 111.0% / 마지막 1시간 225.0% / 마지막 30분 비율 0.05:1 / 마지막 30분 평균 221.1% · 장후반 흡수 확인"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 287,500 · 이평선 터치: 5MA, 10MA"
               },
               {
                 "code": "P2",
@@ -369,14 +345,6 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "note": "종가 299,500 · 5MA·10MA·20MA 중 10MA, 20MA 위"
               },
               {
-                "code": "P3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "앵커 중심값 260,000 / 저가 287,500 / 종가 299,500 · 종가 회복"
-              },
-              {
                 "code": "C1",
                 "strictPoints": 1.0,
                 "signalPoints": 1.0,
@@ -385,36 +353,36 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "note": "아래꼬리:몸통 2.18 (필요 ≥ 1.0)"
               },
               {
-                "code": "C2",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 102% (필요 ≤ 80%)"
-              },
-              {
-                "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "동종업종 평균 +11.25% / KOSPI +4.63% outperform"
-              },
-              {
-                "code": "C4",
-                "strictPoints": 0.5,
-                "signalPoints": 0.5,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 거래량 / 앵커 거래량 57% · 거래량 축소"
-              },
-              {
                 "code": "C5",
                 "strictPoints": 0.0,
                 "signalPoints": 0.0,
                 "maxPoints": 0.5,
                 "evalStatus": "not_met",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함"
+              },
+              {
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -20.6% (≥12% 만점·8~12% 부분) · 충족"
+              },
+              {
+                "code": "D2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "수급추세 +2 (≥+2 만점·+1 부분) · 충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "거래량 94% (≥100% 만점·80~100% 부분) · 부분 충족"
               },
               {
                 "code": "V1",
@@ -481,6 +449,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "G8",
                 "status": "✅",
                 "note": "이격 20MA +9.9% (필요 ≤ +25%) · 60MA +34.9% (필요 ≤ +60%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -20.6% (≥12%) · 거래량 94% (≥80%) · 수급추세 +2 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
                 "evalStatus": "met"
               },
               {
@@ -554,6 +528,16 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "C3",
                 "note": "동종업종 평균 +11.25% / KOSPI +4.63% outperform",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -20.6% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +2 (≥+2 만점·+1 부분) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
@@ -571,6 +555,11 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "C5",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 94% (≥100% 만점·80~100% 부분) · 부분 충족",
+                "evalStatus": "met"
               }
             ],
             "currentPrice": 299500,
@@ -1572,22 +1561,14 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "rank": 2,
             "name": "LG전자",
             "code": "066570",
-            "strictScore": 9.0,
-            "signalScore": 9.0,
-            "score": 9.0,
-            "scoreMax": 13.5,
-            "effectiveScoreMax": 13.5,
-            "gradeScore": 6.7,
+            "strictScore": 6.8,
+            "signalScore": 6.8,
+            "score": 6.8,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 11.5,
+            "gradeScore": 5.9,
             "grade": "B",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 21위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -1595,22 +1576,6 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 -126,962주 / 기관 145,349주 · 당일 순매수"
-              },
-              {
-                "code": "S3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 평균 88.0% / 마지막 1시간 159.3% / 마지막 30분 비율 0.05:1 / 마지막 30분 평균 161.5% · 장후반 흡수 확인"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 215,000 · 이평선 터치: 5MA, 10MA"
               },
               {
                 "code": "P2",
@@ -1621,14 +1586,6 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "note": "종가 225,500 · 5MA·10MA·20MA 중 10MA, 20MA 위"
               },
               {
-                "code": "P3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "앵커 중심값 173,150 / 저가 215,000 / 종가 225,500 · 종가 회복"
-              },
-              {
                 "code": "C1",
                 "strictPoints": 1.0,
                 "signalPoints": 1.0,
@@ -1637,36 +1594,36 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "note": "아래꼬리:몸통 1.17 (필요 ≥ 1.0)"
               },
               {
-                "code": "C2",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 81% (필요 ≤ 80%)"
-              },
-              {
-                "code": "C3",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "동종업종 평균 +0.96% / KOSPI +4.63% underperform"
-              },
-              {
-                "code": "C4",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 거래량 / 앵커 거래량 29% · 거래량 급감"
-              },
-              {
                 "code": "C5",
                 "strictPoints": 0.0,
                 "signalPoints": 0.0,
                 "maxPoints": 0.5,
                 "evalStatus": "not_met",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함"
+              },
+              {
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -51.8% (≥12% 만점·8~12% 부분) · 충족"
+              },
+              {
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "not_met",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "거래량 82% (≥100% 만점·80~100% 부분) · 부분 충족"
               },
               {
                 "code": "V1",
@@ -1734,6 +1691,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "status": "⛔",
                 "note": "이격 20MA +19.6% (필요 ≤ +25%) · 60MA +60.1% (필요 ≤ +60%) · 과이격(지지선 눌림 아님)",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -51.8% (≥12%) · 거래량 82% (≥80%) · 수급추세 +0 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "evalStatus": "met"
               },
               {
                 "code": "G9",
@@ -1806,6 +1769,11 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "C4",
                 "note": "당일 거래량 / 앵커 거래량 29% · 거래량 급감",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -51.8% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
@@ -1823,6 +1791,16 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "C5",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 82% (≥100% 만점·80~100% 부분) · 부분 충족",
+                "evalStatus": "met"
               }
             ],
             "currentPrice": 225500,
@@ -2902,22 +2880,14 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "rank": 3,
             "name": "SK스퀘어",
             "code": "402340",
-            "strictScore": 8.2,
-            "signalScore": 8.2,
-            "score": 8.2,
-            "scoreMax": 13.5,
-            "effectiveScoreMax": 13.5,
-            "gradeScore": 6.1,
+            "strictScore": 6.8,
+            "signalScore": 6.8,
+            "score": 6.8,
+            "scoreMax": 11.5,
+            "effectiveScoreMax": 11.5,
+            "gradeScore": 5.9,
             "grade": "B",
             "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 거래대금 순위 6위 (TOP 30 이내 시 충족)"
-              },
               {
                 "code": "S2",
                 "strictPoints": 2.0,
@@ -2925,22 +2895,6 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "외인 -513,309주 / 기관 716,022주 · 당일 순매수"
-              },
-              {
-                "code": "S3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 평균 112.0% / 마지막 1시간 253.2% / 마지막 30분 비율 14.00:1 / 마지막 30분 평균 300.0% · 장후반 흡수 확인"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "저가 1,173,000 · 이평선 터치: 5MA"
               },
               {
                 "code": "P2",
@@ -2951,14 +2905,6 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "note": "종가 1,237,000 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위"
               },
               {
-                "code": "P3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "앵커 중심값 950,000 / 저가 1,173,000 / 종가 1,237,000 · 종가 회복"
-              },
-              {
                 "code": "C1",
                 "strictPoints": 1.0,
                 "signalPoints": 1.0,
@@ -2967,36 +2913,36 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "note": "아래꼬리:몸통 2.37 (필요 ≥ 1.0)"
               },
               {
-                "code": "C2",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 95% (필요 ≤ 80%)"
-              },
-              {
-                "code": "C3",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "동종업종 평균 +3.93% / KOSPI +4.63% underperform"
-              },
-              {
-                "code": "C4",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 앵커 거래량 61% · 거래량 수축 약함"
-              },
-              {
                 "code": "C5",
                 "strictPoints": 0.0,
                 "signalPoints": 0.0,
                 "maxPoints": 0.5,
                 "evalStatus": "not_met",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함"
+              },
+              {
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -13.0% (≥12% 만점·8~12% 부분) · 충족"
+              },
+              {
+                "code": "D2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "not_met",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "거래량 91% (≥100% 만점·80~100% 부분) · 부분 충족"
               },
               {
                 "code": "V1",
@@ -3066,6 +3012,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "evalStatus": "not_met"
               },
               {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -13.0% (≥12%) · 거래량 91% (≥80%) · 수급추세 +0 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "evalStatus": "met"
+              },
+              {
                 "code": "G9",
                 "status": "⚠️",
                 "note": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
@@ -3131,6 +3083,11 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "C1",
                 "note": "아래꼬리:몸통 2.37 (필요 ≥ 1.0)",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -13.0% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
@@ -3153,6 +3110,16 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "C5",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 91% (≥100% 만점·80~100% 부분) · 부분 충족",
+                "evalStatus": "met"
               }
             ],
             "currentPrice": 1237000,
@@ -4945,7 +4912,7 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
               }
             ],
             "scoreScope": "accumulation",
-            "statusLabel": "매매금지(핵심 Gate 미충족: G1, G5)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
             "strategy": "accumulation",
             "gates": [
               {
@@ -4977,6 +4944,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "status": "✅",
                 "note": "당일 거래량 / 20일 평균 88% (필요 < 150%)",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "외인 보유율 6.9% (≥25%) · 20일 수익률 +1.0% (≥0%) · 외인 매집 주체 약함",
+                "evalStatus": "not_met"
               },
               {
                 "code": "G5",
@@ -5539,12 +5512,13 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: G1",
+              "핵심 Gate 미충족: Q1",
               "시장 Gate 차단: G5 — 신규 진입 보류",
-              "매매금지(핵심 Gate 미충족: G1, G5)"
+              "매매금지(핵심 Gate 미충족: G1, Q1, G5)"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G1 미충족: 종가 41,950 / 60MA 44,810 · 외 1건",
-            "statusReason": "G1 미충족: 종가 41,950 / 60MA 44,810 / G5 미충족: KOSPI 8,124 / 5MA 7,840 (+3.6%) · VKOSPI 89.9 · VKOSPI 과열",
+            "statusReasonShort": "G1 미충족: 종가 41,950 / 60MA 44,810 · 외 2건",
+            "statusReason": "G1 미충족: 종가 41,950 / 60MA 44,810 / Q1 미충족: 외인 보유율 6.9% (≥25%) · 20일 수익률 +1.0% (≥0%) · 외인 매집 주체 약함 / G5 미충족: KOSPI 8,124 / 5MA 7,840 (+3.6%) · VKOSPI 89.9 · VKOSPI 과열",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 41950.0,
@@ -5679,7 +5653,7 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
               }
             ],
             "scoreScope": "accumulation",
-            "statusLabel": "관심후보",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, Q1, G5)",
             "strategy": "accumulation",
             "gates": [
               {
@@ -5710,6 +5684,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "G4",
                 "status": "⛔",
                 "note": "당일 거래량 / 20일 평균 211% (필요 < 150%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "외인 보유율 34.4% (≥25%) · 20일 수익률 -4.7% (≥0%) · 20일 약세(낙하 칼날)",
                 "evalStatus": "not_met"
               },
               {
@@ -6274,11 +6254,13 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "entryBlockers": [
               "핵심 Gate 미충족: G1",
               "핵심 Gate 미충족: G4",
-              "시장 Gate 차단: G5 — 신규 진입 보류"
+              "핵심 Gate 미충족: Q1",
+              "시장 Gate 차단: G5 — 신규 진입 보류",
+              "매매금지(핵심 Gate 미충족: G1, G4, Q1, G5)"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G1 미충족: 종가 205,000 / 60MA 210,473 · 외 2건",
-            "statusReason": "G1 미충족: 종가 205,000 / 60MA 210,473 / G4 미충족: 당일 거래량 / 20일 평균 211% (필요 < 150%) / G5 미충족: KOSPI 8,124 / 5MA 7,840 (+3.6%) · VKOSPI 89.9 · VKOSPI 과열",
+            "statusReasonShort": "G1 미충족: 종가 205,000 / 60MA 210,473 · 외 3건",
+            "statusReason": "G1 미충족: 종가 205,000 / 60MA 210,473 / G4 미충족: 당일 거래량 / 20일 평균 211% (필요 < 150%) / Q1 미충족: 외인 보유율 34.4% (≥25%) · 20일 수익률 -4.7% (≥0%) · 20일 약세(낙하 칼날) / 외 1건",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 205000.0,
@@ -6413,7 +6395,7 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
               }
             ],
             "scoreScope": "accumulation",
-            "statusLabel": "매매금지(핵심 Gate 미충족: G1, G5)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
             "strategy": "accumulation",
             "gates": [
               {
@@ -6445,6 +6427,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "status": "✅",
                 "note": "당일 거래량 / 20일 평균 68% (필요 < 150%)",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "외인 보유율 0.6% (≥25%) · 20일 수익률 -15.2% (≥0%) · 외인 매집 주체 약함, 20일 약세(낙하 칼날)",
+                "evalStatus": "not_met"
               },
               {
                 "code": "G5",
@@ -7007,12 +6995,13 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: G1",
+              "핵심 Gate 미충족: Q1",
               "시장 Gate 차단: G5 — 신규 진입 보류",
-              "매매금지(핵심 Gate 미충족: G1, G5)"
+              "매매금지(핵심 Gate 미충족: G1, Q1, G5)"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G1 미충족: 종가 14,670 / 60MA 15,977 · 외 1건",
-            "statusReason": "G1 미충족: 종가 14,670 / 60MA 15,977 / G5 미충족: KOSPI 8,124 / 5MA 7,840 (+3.6%) · VKOSPI 89.9 · VKOSPI 과열",
+            "statusReasonShort": "G1 미충족: 종가 14,670 / 60MA 15,977 · 외 2건",
+            "statusReason": "G1 미충족: 종가 14,670 / 60MA 15,977 / Q1 미충족: 외인 보유율 0.6% (≥25%) · 20일 수익률 -15.2% (≥0%) · 외인 매집 주체 약함, 20일 약세(낙하 칼날) / G5 미충족: KOSPI 8,124 / 5MA 7,840 (+3.6%) · VKOSPI 89.9 · VKOSPI 과열",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 14670.0,
@@ -7175,6 +7164,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
                 "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "⛔",
+                "note": "20MA 이격 +50.0% (≤+22%) · RSI14 87 (≤72) · 20MA 과이격(반등 소진), RSI 과매수",
+                "evalStatus": "not_met"
               }
             ],
             "matchedRules": [
@@ -7545,11 +7540,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: G4",
+              "핵심 Gate 미충족: Q1",
               "매매금지"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G4 미충족: 최근 5거래일 최저 -2.2% (필요 -3% 이하 급락 1회 이상)",
-            "statusReason": "G4 미충족: 최근 5거래일 최저 -2.2% (필요 -3% 이하 급락 1회 이상)",
+            "statusReasonShort": "G4 미충족: 최근 5거래일 최저 -2.2% (필요 -3% 이하 급락 1회 이상) · 외 1건",
+            "statusReason": "G4 미충족: 최근 5거래일 최저 -2.2% (필요 -3% 이하 급락 1회 이상) / Q1 미충족: 20MA 이격 +50.0% (≤+22%) · RSI14 87 (≤72) · 20MA 과이격(반등 소진), RSI 과매수",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 1134000.0,
@@ -7708,6 +7704,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "code": "G5-a",
                 "status": "✅",
                 "note": "양봉 안정화 캔들",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "20MA 이격 -0.5% (≤+22%) · RSI14 49 (≤72) · 과이격·과매수 반등 아님",
                 "evalStatus": "met"
               }
             ],
@@ -8067,14 +8069,15 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "entryEligible": false,
             "entryWatch": false,
             "entryBlockers": [
+              "핵심 Gate 미충족: F3",
               "핵심 Gate 미충족: G1",
               "핵심 Gate 미충족: G3",
               "핵심 Gate 미충족: G4",
               "매매금지"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G1 미충족: 1개월 수익률 -4.2% (필요 ≥ +15%) · 외 2건",
-            "statusReason": "G1 미충족: 1개월 수익률 -4.2% (필요 ≥ +15%) / G3 미충족: 종가 205,000 / 60MA 210,473 / G4 미충족: 최근 5거래일 최저 -1.5% (필요 -3% 이하 급락 1회 이상)",
+            "statusReasonShort": "F3 미충족: KIND 최근공시 2026-06-01 기업설명회(IR) 개최(안내공시) · 외 3건",
+            "statusReason": "F3 미충족: KIND 최근공시 2026-06-01 기업설명회(IR) 개최(안내공시) / G1 미충족: 1개월 수익률 -4.2% (필요 ≥ +15%) / G3 미충족: 종가 205,000 / 60MA 210,473 / 외 1건",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 205000.0,
@@ -8234,6 +8237,12 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
                 "status": "⛔",
                 "note": "양봉·긴아래꼬리·도지 패턴 없음",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "20MA 이격 +2.4% (≤+22%) · RSI14 56 (≤72) · 과이격·과매수 반등 아님",
+                "evalStatus": "met"
               }
             ],
             "matchedRules": [
@@ -8592,13 +8601,14 @@ window.JONGGA_DAILY_DATA["2026-05-28"] = {
             "entryEligible": false,
             "entryWatch": false,
             "entryBlockers": [
+              "핵심 Gate 미충족: F3",
               "핵심 Gate 미충족: G4",
               "시장 Gate 차단: G5 — 신규 진입 보류",
               "매매금지"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G4 미충족: 최근 5거래일 최저 -2.7% (필요 -3% 이하 급락 1회 이상) · 외 1건",
-            "statusReason": "G4 미충족: 최근 5거래일 최저 -2.7% (필요 -3% 이하 급락 1회 이상) / G5 미충족: 양봉·긴아래꼬리·도지 패턴 없음",
+            "statusReasonShort": "F3 미충족: KIND 최근공시 2026-06-02 기업설명회(IR) 개최(안내공시) · 외 2건",
+            "statusReason": "F3 미충족: KIND 최근공시 2026-06-02 기업설명회(IR) 개최(안내공시) / G4 미충족: 최근 5거래일 최저 -2.7% (필요 -3% 이하 급락 1회 이상) / G5 미충족: 양봉·긴아래꼬리·도지 패턴 없음",
             "stockIndicators": {
               "snapshot": {
                 "currentPrice": 399500.0,

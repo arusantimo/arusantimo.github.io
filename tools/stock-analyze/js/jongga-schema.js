@@ -97,6 +97,20 @@ function inferRuleEvalStatus(rule = {}, matched = false) {
   return 'not_met';
 }
 
+// 2026-06 눌림목 재채점: 등급(gradeScore)에 반영되는 score 코드만 나열. 나머지는 score_map에는
+// 남아 matchedRules/unmatchedRules로 표시되지만 진단(diagnostic) 용도일 뿐 등급에는 반영되지 않음.
+const PULLBACK_GRADE_SCORE_CODES = ['S2', 'P2', 'C1', 'C5', 'D1', 'D2', 'D3'];
+
+function isDiagnosticOnlyScoreCode(strategy, kind, code) {
+  if (strategy !== 'pullback' || kind !== 'score') return false;
+  return !PULLBACK_GRADE_SCORE_CODES.includes(code);
+}
+
+function getStrategyScoreNote(strategy) {
+  const strategyGuide = RULE_GUIDE?.strategies?.[strategy] || {};
+  return String(strategyGuide.scoreNote || '').trim();
+}
+
 function getStrategyRuleGuide(strategy, kind, code) {
   const strategyGuide = RULE_GUIDE?.strategies?.[strategy] || {};
   const list = kind === 'filter'

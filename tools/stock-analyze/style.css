@@ -3536,6 +3536,23 @@ body.modal-scroll-locked {
   border: 1px solid rgba(245, 158, 11, 0.28);
 }
 
+.modal-ind-eval-badge.eval-diagnostic {
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-color);
+}
+
+.modal-score-note {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+
 .modal-ind-card.eval-unavailable {
   background: rgba(245, 158, 11, 0.06);
   border-color: rgba(245, 158, 11, 0.22);

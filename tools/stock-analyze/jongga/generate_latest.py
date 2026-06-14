@@ -91,6 +91,12 @@ from jongga.rule_evaluation import (
     evaluate_pullback_g6_daily_change,
     evaluate_pullback_g7_rsi_ceiling,
     evaluate_pullback_g8_extension,
+    evaluate_pullback_quality_gate,
+    evaluate_accumulation_quality_gate,
+    evaluate_reversal_quality_gate,
+    evaluate_pullback_d1_depth,
+    evaluate_pullback_d2_supply,
+    evaluate_pullback_d3_rebound_volume,
     evaluate_pullback_p1,
     evaluate_pullback_p2,
     evaluate_pullback_p3,
@@ -4498,6 +4504,17 @@ def finalize_scored_buy_entry(
     return finalized
 
 
+def _strategy_quality_indicators(snapshot: StockSnapshot, strategy: str) -> dict[str, Any]:
+    """품질 게이트(Q1)용 지표 스냅샷 — 저장되는 stockIndicators와 동일 계산.
+
+    리플레이는 저장된 stockIndicators.snapshot으로 같은 게이트를 재평가하므로
+    라이브·리플레이가 동일한 값을 본다.
+    """
+    from jongga.stock_indicators import build_stock_indicator_snapshot
+
+    return build_stock_indicator_snapshot(snapshot, strategy)
+
+
 def build_pullback_take_profit_marking_meta(snapshot: StockSnapshot) -> dict[str, Any]:
     return {
         "ma5Price": _round_price(snapshot.ma5),
@@ -4564,6 +4581,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     support_price = parse_float(((support_context.get("support") or {}).get("primaryLine") or {}).get("price"))
     news_flow = snapshot.news_flow if isinstance(snapshot.news_flow, dict) else build_pullback_news_flow_data_missing(snapshot, "최근 뉴스 데이터 미수집")
     volatility_context = build_entry_volatility_context(snapshot, context, "pullback")
+    quality_indicators = _strategy_quality_indicators(snapshot, "pullback")
     score_map = {
         "S1": evaluate_pullback_s1(snapshot),
         "S2": evaluate_pullback_s2(snapshot),
@@ -4576,6 +4594,10 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "C3": evaluate_pullback_c3(snapshot, context),
         "C4": evaluate_pullback_c4(snapshot, anchor_context),
         "C5": evaluate_pullback_c5(snapshot),
+        # 2026-06 재채점 항목 (등급 산출에 사용, 위 P1·C2·C3·C4 등은 진단 표시용으로만 잔존)
+        "D1": evaluate_pullback_d1_depth(quality_indicators),
+        "D2": evaluate_pullback_d2_supply(quality_indicators),
+        "D3": evaluate_pullback_d3_rebound_volume(quality_indicators),
     }
     gates = [
         gate_dict("G0", evaluate_pullback_g0(snapshot)),
@@ -4587,6 +4609,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict("G6", evaluate_pullback_g6_daily_change(snapshot, daily_change_pct)),
         gate_dict("G7", evaluate_pullback_g7_rsi_ceiling(snapshot)),
         gate_dict("G8", evaluate_pullback_g8_extension(snapshot)),
+        gate_dict("Q1", evaluate_pullback_quality_gate(quality_indicators)),
         build_pullback_support_gate(support_context),
         gate_dict("G10", evaluate_pullback_g10(snapshot, anchor_context)),
         build_pullback_g11_gate(snapshot, anchor_context, support_price),
@@ -4797,6 +4820,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
     manual_input = build_manual_input_meta("accumulation", snapshot)
     toss = snapshot.toss or {}
     volatility_context = build_entry_volatility_context(snapshot, context, "accumulation")
+    quality_indicators = _strategy_quality_indicators(snapshot, "accumulation")
     late_strength = parse_float(toss.get("lastHourAvgStrength"))
     avg_strength = parse_float(toss.get("avgStrength"))
     last30_ratio = parse_float(toss.get("last30BuySellRatio"))
@@ -4820,6 +4844,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         gate_dict("G2", evaluate_accumulation_g2(snapshot), warn_if_not_met=True),
         gate_dict("G3", evaluate_accumulation_g3(snapshot)),
         gate_dict("G4", evaluate_accumulation_g4_volume(snapshot)),
+        gate_dict("Q1", evaluate_accumulation_quality_gate(quality_indicators)),
         evaluate_accumulation_g5(context),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
@@ -4900,6 +4925,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
     auto_event_filter = snapshot.event_filter
     intraday_signal = snapshot.intraday_30m
     volatility_context = build_entry_volatility_context(snapshot, context, "reversal")
+    quality_indicators = _strategy_quality_indicators(snapshot, "reversal")
     drawdown_20d = drawdown_from_high_20d(snapshot) or 0.0
     bullish = snapshot.current_price > snapshot.open_price
     doji = candle_range(snapshot) > 0 and abs(snapshot.current_price - snapshot.open_price) <= candle_range(snapshot) * 0.3
@@ -4930,6 +4956,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         gate_dict("G3", evaluate_reversal_g3(snapshot)),
         gate_dict("G4", evaluate_reversal_g4(snapshot)),
         gate_dict(g5_code, g5_result),
+        gate_dict("Q1", evaluate_reversal_quality_gate(quality_indicators)),
     ]
     matched_rules, unmatched_rules = split_rule_lists(score_map)
     trade_plan = build_trade_plan("reversal", snapshot.current_price, context["regimeLabel"], context["gapScore"]["code"])

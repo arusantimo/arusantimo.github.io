@@ -76,10 +76,15 @@ class ScoringTests(unittest.TestCase):
         self.assertEqual(ACCUMULATION_STRICT_MAX, 13.0)
 
     def test_pullback_and_reversal_weights_are_split(self):
-        self.assertEqual(PULLBACK_SCORE_WEIGHTS["S3"], 1.0)
-        self.assertEqual(PULLBACK_SCORE_WEIGHTS["P3"], 1.0)
+        # 2026-06 재채점: 등급은 깊이(D1)·수급(D2)·반등 거래량(D3) + S2·P2·C1·C5만 반영.
+        # 무/역상관 항목(S1·S3·P1·P3·C2·C3·C4)은 등급 산출에서 제외(진단 표시는 잔존).
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["D1"], 2.5)
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["D2"], 2.0)
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["D3"], 2.0)
         self.assertEqual(PULLBACK_SCORE_WEIGHTS["C5"], 0.5)
-        self.assertEqual(PULLBACK_STRICT_MAX, 13.5)
+        for excluded in ("S1", "S3", "P1", "P3", "C2", "C3", "C4"):
+            self.assertNotIn(excluded, PULLBACK_SCORE_WEIGHTS)
+        self.assertEqual(PULLBACK_STRICT_MAX, 11.5)
         self.assertNotIn("S3", REVERSAL_SCORE_WEIGHTS)
         self.assertEqual(REVERSAL_STRICT_MAX, 10.0)
 

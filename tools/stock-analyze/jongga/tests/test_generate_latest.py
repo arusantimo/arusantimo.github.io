@@ -1898,12 +1898,26 @@ class GenerateLatestTest(unittest.TestCase):
             partial_entry = build_pullback_entry(self._pullback_test_snapshot(volume=500000.0), context)
             weak_entry = build_pullback_entry(self._pullback_test_snapshot(volume=700000.0), context)
 
-        met_c4 = next(row for row in met_entry["scoreBreakdown"] if row["code"] == "C4")
-        partial_c4 = next(row for row in partial_entry["scoreBreakdown"] if row["code"] == "C4")
-        weak_c4 = next(row for row in weak_entry["scoreBreakdown"] if row["code"] == "C4")
-        self.assertEqual(met_c4["strictPoints"], 1.0)
-        self.assertEqual(partial_c4["strictPoints"], 0.5)
-        self.assertEqual(weak_c4["strictPoints"], 0.0)
+        # C4는 2026-06 재채점에서 등급 산출 제외(진단 전용) → scoreBreakdown 대신 규칙 목록으로 확인.
+        # 만점(score 1.0)=matchedRules, 부분(0.5)=unmatchedRules+evalStatus met, 미충족=unmatchedRules+not_met.
+        def find_rule(entry, code):
+            for row in entry.get("matchedRules", []):
+                if row["code"] == code:
+                    return row, True
+            for row in entry.get("unmatchedRules", []):
+                if row["code"] == code:
+                    return row, False
+            raise AssertionError(f"rule {code} not found")
+
+        met_c4, met_in_matched = find_rule(met_entry, "C4")
+        partial_c4, partial_in_matched = find_rule(partial_entry, "C4")
+        weak_c4, weak_in_matched = find_rule(weak_entry, "C4")
+        self.assertTrue(met_in_matched)
+        self.assertEqual(met_c4["evalStatus"], "met")
+        self.assertFalse(partial_in_matched)
+        self.assertEqual(partial_c4["evalStatus"], "met")
+        self.assertFalse(weak_in_matched)
+        self.assertEqual(weak_c4["evalStatus"], "not_met")
 
     def test_build_pullback_entry_warns_when_anchor_or_support_only_one_axis_breaks(self):
         snapshot = self._pullback_test_snapshot(current_price=104000.0, low_price=103000.0, open_price=106000.0, prev_close=106000.0)
@@ -1911,7 +1925,8 @@ class GenerateLatestTest(unittest.TestCase):
             entry = build_pullback_entry(snapshot, self._pullback_context())
 
         g11 = next(row for row in entry["gates"] if row["code"] == "G11")
-        p3 = next(row for row in entry["scoreBreakdown"] if row["code"] == "P3")
+        # P3는 재채점에서 등급 제외(진단 전용) → unmatchedRules로 확인.
+        p3 = next(row for row in entry["unmatchedRules"] if row["code"] == "P3")
         self.assertEqual(g11["status"], "⚠️")
         self.assertEqual(p3["evalStatus"], "not_met")
 
@@ -1938,8 +1953,9 @@ class GenerateLatestTest(unittest.TestCase):
         with mock.patch("jongga.generate_latest.build_pullback_support_context", return_value=self._pullback_support_context(100000.0)):
             entry = build_pullback_entry(snapshot, self._pullback_context())
 
-        s3 = next(row for row in entry["scoreBreakdown"] if row["code"] == "S3")
-        self.assertEqual(s3["strictPoints"], 0.5)
+        # S3는 재채점에서 등급 제외(진단 전용). 부분 충족(score 0.5)은 unmatchedRules+evalStatus met.
+        s3 = next(row for row in entry["unmatchedRules"] if row["code"] == "S3")
+        self.assertEqual(s3["evalStatus"], "met")
 
     def test_build_pullback_entry_g13_blocks_event_filter_or_negative_news(self):
         blocked_snapshot = self._pullback_test_snapshot(event_filter={"blocked": True, "note": "실적 D-1"})

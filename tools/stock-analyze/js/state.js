@@ -408,6 +408,49 @@ function isJonggaReplayPullbackGateOk(entry = {}, eligibility = null) {
   return true;
 }
 
+// 전략 품질 게이트(Q1) — jongga/strategy_quality.py와 임계값·로직 동기화.
+// 저장된 stockIndicators.snapshot으로 평가하며, 피처가 없으면 보수적으로 통과시킨다.
+const JONGGA_QUALITY_GATE_THRESHOLDS = {
+  pullback: { minDropFrom52w: 12.0, minVolumeRatio20d: 80.0, minSupplyTrend: 0.0 },
+  accumulation: { minForeignRate: 25.0, minRs20: 0.0 },
+  reversal: { maxMa20Gap: 22.0, maxRsi14: 72.0 }
+};
+
+function isJonggaReplayQualityGateOk(entry = {}) {
+  if (entry?.qualityGateOk === true || entry?.qualityGateOk === false) {
+    return Boolean(entry.qualityGateOk);
+  }
+  const strategy = normalizeEntryStrategyKey(entry?.strategy || entry?.type);
+  const ind = (entry?.stockIndicators || {}).snapshot || {};
+  const num = (value) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+  if (strategy === 'pullback') {
+    const drop = num(ind.dropFrom52wHighPct);
+    const vol = num(ind.volumeRatio20d);
+    const supply = num(ind.supplyTrendScore);
+    if (drop === null || vol === null || supply === null) return true;
+    const t = JONGGA_QUALITY_GATE_THRESHOLDS.pullback;
+    return drop >= t.minDropFrom52w && vol >= t.minVolumeRatio20d && supply >= t.minSupplyTrend;
+  }
+  if (strategy === 'accumulation') {
+    const foreign = num(ind.foreignRate);
+    const rs20 = num(ind.rs20Pct);
+    if (foreign === null || rs20 === null) return true;
+    const t = JONGGA_QUALITY_GATE_THRESHOLDS.accumulation;
+    return foreign >= t.minForeignRate && rs20 >= t.minRs20;
+  }
+  if (strategy === 'reversal') {
+    const gap = num(ind.ma20GapPct);
+    const rsi = num(ind.rsi14);
+    if (gap === null || rsi === null) return true;
+    const t = JONGGA_QUALITY_GATE_THRESHOLDS.reversal;
+    return gap <= t.maxMa20Gap && rsi <= t.maxRsi14;
+  }
+  return true;
+}
+
 function readStoredJonggaReplayViewMode() {
   try {
     return normalizeJonggaReplayViewMode(localStorage.getItem(JONGGA_REPLAY_VIEW_STORAGE_KEY) || 'all');
@@ -569,12 +612,13 @@ function matchesJonggaReplayViewMode(entry = {}, mode = getJonggaReplayViewMode(
     ? inferEntryEligibilityFromEntry(entry)
     : { entryEligible: Boolean(entry?.entryEligible), entryWatch: Boolean(entry?.entryWatch) };
   const pullbackGateOk = isJonggaReplayPullbackGateOk(entry, eligibility);
+  const qualityGateOk = isJonggaReplayQualityGateOk(entry);
   if (normalizedMode === 'a7plus') {
     const gradeScore = getJonggaReplayEntryGradeScore(entry);
     const gradeCode = getJonggaReplayEntryGradeCode(entry);
-    return pullbackGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
+    return pullbackGateOk && qualityGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
   }
-  return pullbackGateOk && (Boolean(entry?.historyRecommendation) || Boolean(eligibility.entryEligible) || isJonggaRecommendationStatusLabel(entry));
+  return pullbackGateOk && qualityGateOk && (Boolean(entry?.historyRecommendation) || Boolean(eligibility.entryEligible) || isJonggaRecommendationStatusLabel(entry));
 }
 
 function filterJonggaReplayViewEntries(entries = [], mode = getJonggaReplayViewMode()) {

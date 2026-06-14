@@ -385,18 +385,29 @@ function isReplayCasePullbackGateOk(item = {}) {
   return item?.pullbackReplayGateOk !== false;
 }
 
+function isReplayCaseQualityGateOk(item = {}) {
+  if (item?.qualityGateOk === true || item?.qualityGateOk === false) {
+    return Boolean(item.qualityGateOk);
+  }
+  if (typeof isJonggaReplayQualityGateOk === 'function') {
+    return isJonggaReplayQualityGateOk(item);
+  }
+  return true;
+}
+
 function matchesReplayCaseItem(item = {}, caseKey = 'all') {
   const normalizedCase = String(caseKey || '').trim();
   const pullbackGateOk = isReplayCasePullbackGateOk(item);
+  const qualityGateOk = isReplayCaseQualityGateOk(item);
   if (normalizedCase === 'all') return true;
   if (normalizedCase === 'recommendation') {
-    return pullbackGateOk && (Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal));
+    return pullbackGateOk && qualityGateOk && (Boolean(item.historyRecommendation) || Boolean(item.entryEligibleOriginal));
   }
   if (normalizedCase === 'a7plus') {
     if (Boolean(item.replayA7Plus)) return true;
     const gradeScore = Number(item.gradeScore);
     const gradeCode = String(item.replayGrade || item.grade || '').trim().charAt(0).toUpperCase();
-    return pullbackGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
+    return pullbackGateOk && qualityGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
   }
   return false;
 }

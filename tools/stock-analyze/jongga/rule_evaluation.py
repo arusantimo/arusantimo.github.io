@@ -6,6 +6,11 @@ from dataclasses import dataclass
 from typing import Any, Literal
 
 from jongga.macro_overlay import build_pullback_g5_gate
+from jongga.strategy_quality import (
+    evaluate_accumulation_quality as _quality_accumulation,
+    evaluate_pullback_quality as _quality_pullback,
+    evaluate_reversal_quality as _quality_reversal,
+)
 
 EvalStatus = Literal["met", "not_met", "data_missing", "manual_required"]
 
@@ -56,6 +61,45 @@ def eval_data_missing(note: str) -> EvalResult:
 
 def eval_manual_required(note: str) -> EvalResult:
     return EvalResult(0.0, note, "manual_required")
+
+
+# --- 전략 품질 게이트 (Q1) — 백테스트 검증 필터를 EvalResult로 래핑 ---
+# 임계값·판정 로직은 jongga.strategy_quality 단일 소스. 여기선 indicators dict를
+# 받아 EvalResult로 변환만 한다. 라이브 엔진(generate_latest)과 리플레이가
+# 동일한 strategy_quality 로직을 공유한다.
+
+
+def _quality_to_eval(verdict: Any) -> EvalResult:
+    if verdict.status == "met":
+        return eval_met(verdict.note)
+    if verdict.status == "data_missing":
+        return eval_data_missing(verdict.note)
+    return eval_not_met(verdict.note)
+
+
+def evaluate_pullback_quality_gate(indicators: dict[str, Any] | None) -> EvalResult:
+    snap = indicators or {}
+    return _quality_to_eval(_quality_pullback(
+        drop_from_52w_high_pct=snap.get("dropFrom52wHighPct"),
+        volume_ratio_20d_pct=snap.get("volumeRatio20d"),
+        supply_trend_score=snap.get("supplyTrendScore"),
+    ))
+
+
+def evaluate_accumulation_quality_gate(indicators: dict[str, Any] | None) -> EvalResult:
+    snap = indicators or {}
+    return _quality_to_eval(_quality_accumulation(
+        foreign_rate_pct=snap.get("foreignRate"),
+        rs20_pct=snap.get("rs20Pct"),
+    ))
+
+
+def evaluate_reversal_quality_gate(indicators: dict[str, Any] | None) -> EvalResult:
+    snap = indicators or {}
+    return _quality_to_eval(_quality_reversal(
+        ma20_gap_pct=snap.get("ma20GapPct"),
+        rsi14=snap.get("rsi14"),
+    ))
 
 
 def gate_dict(code: str, result: EvalResult, *, warn_if_not_met: bool = False) -> dict[str, Any]:
@@ -244,6 +288,45 @@ def evaluate_pullback_g8_extension(snapshot: Any) -> EvalResult:
 
 
 # --- Pullback scores ---
+
+
+# D1·D2·D3 — 백테스트 재채점 항목 (2026-06).
+# 기존 채점(P1 MA터치·C2/C4 거래량수축·C3 섹터추격)은 수익과 역상관(-0.42)이라
+# 등급이 높을수록 과열·추격을 뽑았다. 대신 '진짜 눌림(깊이)·수급·반등 거래량'을
+# 가점해 등급-수익 상관을 +0.51로 전환한다. indicators dict로 평가해 Q1·라이브·
+# 리플레이가 동일 값을 본다.
+def _graduated_eval(value: float | None, full: float, partial: float, note: str) -> EvalResult:
+    if value is None:
+        return eval_data_missing(f"{note} · 데이터 부족")
+    if value >= full:
+        return eval_met(f"{note} · 충족", score=1.0)
+    if value >= partial:
+        return eval_met(f"{note} · 부분 충족", score=0.5)
+    return eval_not_met(f"{note} · 미충족")
+
+
+def evaluate_pullback_d1_depth(indicators: dict[str, Any] | None) -> EvalResult:
+    """눌림 깊이 — 52주 고가 대비 낙폭이 클수록 가점 (≥12% 만점, 8~12% 부분)."""
+    drop = (indicators or {}).get("dropFrom52wHighPct")
+    drop = float(drop) if isinstance(drop, (int, float)) else None
+    note = f"52주 고가 대비 -{drop:.1f}%" if drop is not None else "52주 고가 낙폭"
+    return _graduated_eval(drop, 12.0, 8.0, f"{note} (≥12% 만점·8~12% 부분)")
+
+
+def evaluate_pullback_d2_supply(indicators: dict[str, Any] | None) -> EvalResult:
+    """수급 추세 — 외인·기관 2일 순매수 강도 (≥+2 만점, +1 부분)."""
+    supply = (indicators or {}).get("supplyTrendScore")
+    supply = float(supply) if isinstance(supply, (int, float)) else None
+    note = f"수급추세 {supply:+.0f}" if supply is not None else "수급추세"
+    return _graduated_eval(supply, 2.0, 1.0, f"{note} (≥+2 만점·+1 부분)")
+
+
+def evaluate_pullback_d3_rebound_volume(indicators: dict[str, Any] | None) -> EvalResult:
+    """반등 거래량 — 당일 거래량/20일 평균 (≥100% 만점, 80~100% 부분)."""
+    vol = (indicators or {}).get("volumeRatio20d")
+    vol = float(vol) if isinstance(vol, (int, float)) else None
+    note = f"거래량 {vol:.0f}%" if vol is not None else "거래량"
+    return _graduated_eval(vol, 100.0, 80.0, f"{note} (≥100% 만점·80~100% 부분)")
 
 
 def evaluate_pullback_s1(snapshot: Any) -> EvalResult:
