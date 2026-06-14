@@ -1,6 +1,18 @@
 let jonggaLastPayload = null;
 let jonggaLastValidation = null;
 let jonggaLastLoadMeta = null;
+const JONGGA_DEPRECATED_CREDIT_PROVIDER_PATTERNS = [/^infostock_credit_/i, /^krx_credit_/i];
+const JONGGA_DEPRECATED_CREDIT_KEY_PATTERNS = [/credit_balance/i, /credit/i, /신용/];
+
+function isDeprecatedCreditProvider(provider) {
+  const text = String(provider || '').trim();
+  return JONGGA_DEPRECATED_CREDIT_PROVIDER_PATTERNS.some(pattern => pattern.test(text));
+}
+
+function isDeprecatedCreditText(value) {
+  const text = String(value || '').trim();
+  return JONGGA_DEPRECATED_CREDIT_KEY_PATTERNS.some(pattern => pattern.test(text));
+}
 
 function getJonggaPayloadVariant(payload = jonggaLastPayload, meta = jonggaLastLoadMeta) {
   return String(payload?.variant || meta?.variant || payload?.dataQuality?.channel || 'stable');
@@ -20,12 +32,17 @@ function getJonggaQuality(payload = {}) {
 
 function getJonggaProviderHealth(payload = {}) {
   const source = payload && typeof payload === 'object' ? payload : {};
-  return source.providerHealth || source.dataQuality?.providerHealth || {};
+  const entries = Object.entries(source.providerHealth || source.dataQuality?.providerHealth || {});
+  return Object.fromEntries(entries.filter(([provider]) => !isDeprecatedCreditProvider(provider)));
 }
 
 function getJonggaFallbackUsage(payload = {}) {
   const source = payload && typeof payload === 'object' ? payload : {};
-  return source.fallbackUsage || source.dataQuality?.fallbackUsage || [];
+  const rows = source.fallbackUsage || source.dataQuality?.fallbackUsage || [];
+  return asJonggaArray(rows).filter(row => (
+    !isDeprecatedCreditProvider(row?.provider)
+    && !isDeprecatedCreditText(row?.key || row?.metric)
+  ));
 }
 
 function getJonggaCollectionLog(payload = {}) {
@@ -37,7 +54,11 @@ function getJonggaCollectionLog(payload = {}) {
 function getJonggaFailedKeys(payload = {}) {
   const source = payload && typeof payload === 'object' ? payload : {};
   const rows = source.failedKeys || source.dataQuality?.failedKeys || [];
-  return Array.isArray(rows) ? rows.map(item => String(item || '').trim()).filter(Boolean) : [];
+  return Array.isArray(rows)
+    ? rows
+      .map(item => String(item || '').trim())
+      .filter(item => item && !isDeprecatedCreditText(item))
+    : [];
 }
 
 function getJonggaQualityBadgeMeta(payload = jonggaLastPayload) {

@@ -329,6 +329,48 @@ def evaluate_pullback_d3_rebound_volume(indicators: dict[str, Any] | None) -> Ev
     return _graduated_eval(vol, 100.0, 80.0, f"{note} (≥100% 만점·80~100% 부분)")
 
 
+def evaluate_pullback_d4_short_covering(indicators: dict[str, Any] | None) -> EvalResult:
+    """대차잔고(공매도) 추이 — 최근 10거래일 잔고 감소율 (숏커버링 징후, ≥10% 만점·5~10% 부분).
+
+    대형주(시가총액 상위 100위 이내)만 수집되며, 그 외 종목은 데이터 부족으로
+    등급에는 영향 없이 진단으로만 표시된다.
+    """
+    change = (indicators or {}).get("shortBalanceChangePct")
+    change = float(change) if isinstance(change, (int, float)) else None
+    if change is None:
+        return eval_data_missing("대차잔고 추이 데이터 부족 (대형주만 수집)")
+    decrease = -change
+    note = f"대차잔고 {change:+.1f}% (최근 10거래일)"
+    return _graduated_eval(decrease, 10.0, 5.0, f"{note} (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후)")
+
+
+# --- 대차잔고 — 매집/주도주 보강 (2026-06) ---
+#
+# D4와 동일한 시가총액 상위 100위 이내 대형주 한정·10거래일 변화율 데이터를
+# 재사용한다. 전략별로 신호 방향이 반대다:
+#   - 매집(L1): 대차잔고 감소 = 과열 없는 클린 매집 가점
+#   - 돌파/주도주(L1): 대차잔고 증가 = 숏스퀴즈 동력 가점
+def evaluate_accumulation_l1_short_balance_decrease(indicators: dict[str, Any] | None) -> EvalResult:
+    """대차잔고 추이 — 최근 10거래일 잔고 감소율 (클린 매집 징후, ≥10% 만점·5~10% 부분)."""
+    change = (indicators or {}).get("shortBalanceChangePct")
+    change = float(change) if isinstance(change, (int, float)) else None
+    if change is None:
+        return eval_data_missing("대차잔고 추이 데이터 부족 (대형주만 수집)")
+    decrease = -change
+    note = f"대차잔고 {change:+.1f}% (최근 10거래일)"
+    return _graduated_eval(decrease, 10.0, 5.0, f"{note} (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후)")
+
+
+def evaluate_breakout_l1_short_balance_increase(indicators: dict[str, Any] | None) -> EvalResult:
+    """대차잔고 추이 — 최근 10거래일 잔고 증가율 (숏스퀴즈 동력, ≥10% 만점·5~10% 부분)."""
+    change = (indicators or {}).get("shortBalanceChangePct")
+    change = float(change) if isinstance(change, (int, float)) else None
+    if change is None:
+        return eval_data_missing("대차잔고 추이 데이터 부족 (대형주만 수집)")
+    note = f"대차잔고 {change:+.1f}% (최근 10거래일)"
+    return _graduated_eval(change, 10.0, 5.0, f"{note} (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력)")
+
+
 def evaluate_pullback_s1(snapshot: Any) -> EvalResult:
     rank = int(getattr(snapshot, "rank", 0) or 0)
     note = f"당일 거래대금 순위 {rank}위 (TOP 30 이내 시 충족)"

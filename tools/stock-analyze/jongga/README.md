@@ -61,9 +61,13 @@ chmod +x replay-jongga-data.sh
 - **스케줄은 수 분 지연될 수 있습니다.** 15:00 / 17:30 정각 판단은 Actions만 믿지 말고, Pages에서 **「일괄 분석」** 또는 로컬 BAT를 병행하세요.
 - 공휴일(휴장)에도 월~금 cron은 동작합니다. 휴장일 스킵은 추후 거래일 캘린더로 확장 가능합니다.
 - 수동 실행: 저장소 **Actions** → **jongga-schedule** → **Run workflow** (`1500` / `1730`).
+- GitHub Actions에서 KRX 로그인 기반 대차잔고 수집을 쓰려면 저장소 **Settings → Secrets and variables → Actions** 에 `KRX_ID`, `KRX_PW` secret을 등록하세요. workflow는 이 값을 환경변수로 주입해 사용합니다.
+- workflow는 Playwright 브라우저 캐시(`~/.cache/ms-playwright`)를 사용합니다. cache miss일 때만 `python -m playwright install chromium --with-deps` 로 Chromium을 설치하고, cache hit일 때는 `python -m playwright install-deps chromium` 만 실행한 뒤 실제 Chromium launch 검증과 `MARKET_ANALYZE_PLAYWRIGHT_EXECUTABLE_PATH` 주입을 수행합니다. 이 검증이 실패하면 산출물 커밋 전에 workflow가 중단됩니다.
 - `1500`은 해당 시점 raw 추천을 바로 공개 최신 파일로 반영합니다.
 - `1730`은 해당 시점 raw 추천을 만든 뒤, 같은 날짜 `1500` 세션 원본이 있으면 `5시반 결과 + 3시 고유 종목`으로 머지한 최신 파일을 공개합니다.
 - `1730` 세션은 종목별 `currentPrice`(스냅샷 종가)를 정규장 종가 대신 `finance.naver.com/sise/sise_quant_overtime.naver`(시간외 단일가/NXT 대체거래소 체결가) 게시판 가격으로 대체합니다 (`fetch_overtime_price_map`). 게시판에 종목이 없으면 정규장 종가를 그대로 사용합니다. 게이트·점수·등급(D1/D2/D3, Q1 등)도 이 가격을 기준으로 재계산됩니다.
+- 눌림목(pullback) `D4`는 시가총액 상위 100위 이내 대형주만 대상으로 최근 10거래일 대차잔고(공매도 잔고) 변화율을 수집해 가점합니다 (`fetch_short_balance_trend_map`). 수집 우선순위는 `pykrx`(KRX 로그인 자격증명 있을 때) → KRX 공개 short loader → 공매도 종합포털이며, 셋 다 실패하거나 대형주가 아닌 종목은 데이터 부족으로 D4가 등급에 영향을 주지 않고 진단으로만 표시됩니다.
+- 수급 매집(accumulation)·돌파/주도주(breakout·momentum) 전략은 같은 대차잔고 추이 `L1`만 반영합니다. `L1` 역시 D4와 동일한 `fetch_short_balance_trend_map`을 사용하며 시가총액 100위 이내 대형주만 수집됩니다. 반등(reversal) 전략과 신용잔고 기반 점수/게이트(`D5`/`L2`/`G14`)는 현재 추천·백테스트 경로에서 제거됐습니다.
 
 ## 실행 예시 (개별 명령)
 

@@ -119,6 +119,15 @@ def _parse_qty(text: Any) -> int:
     return int(match.group(1)) if match else 0
 
 
+def resolve_outcome_entry_price(entry: dict[str, Any]) -> float:
+    explicit_entry_price = float(entry.get("entryPrice") or 0.0)
+    if explicit_entry_price > 0:
+        return explicit_entry_price
+    if entry.get("analysisSession") or entry.get("analysisSessionLabel"):
+        return 0.0
+    return float(entry.get("currentPrice") or 0.0)
+
+
 # --- 다음 거래일 OHLC 조회 ---
 
 
@@ -423,7 +432,7 @@ def backfill(
             trade_plan_rows = entry.get("tradePlanRows") or []
             if not trade_plan_rows:
                 continue
-            entry_price = float(entry.get("entryPrice") or entry.get("currentPrice") or 0)
+            entry_price = resolve_outcome_entry_price(entry)
             if entry_price <= 0:
                 continue
 

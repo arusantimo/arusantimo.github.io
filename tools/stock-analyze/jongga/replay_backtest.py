@@ -11,7 +11,18 @@ from typing import Any
 from jongga.entry_policy import compute_entry_eligibility
 from jongga.grade_policy import REVERSAL_GRADE_MIN, TREND_GRADE_MIN
 from jongga.outcome_tracker import compute_outcome, extract_context_dims, load_daily_payload
-from jongga.output_contract import VARIANT_CANARY, VARIANT_STABLE, compact_date, iter_buy_entries, normalize_variant, read_js_assignment
+from jongga.output_contract import (
+    POINT_IN_TIME_STATUS_HISTORICAL_REGEN,
+    POINT_IN_TIME_STATUS_LEGACY_UNKNOWN,
+    VARIANT_CANARY,
+    VARIANT_STABLE,
+    compact_date,
+    infer_payload_point_in_time_status,
+    iter_buy_entries,
+    normalize_variant,
+    point_in_time_flag_from_status,
+    read_js_assignment,
+)
 from jongga.replay_market_data import TICK_PROXY_SOURCE, build_replay_market_data
 from jongga.strategy_quality import evaluate_quality_from_indicators
 from jongga.sim_broker import simulate_trade
@@ -156,9 +167,20 @@ def _quality_gate_ok(entry: dict[str, Any], strategy: str) -> bool:
     return verdict.passed
 
 
+def _resolve_replay_entry_price(entry: dict[str, Any]) -> float:
+    explicit_entry_price = float(entry.get("entryPrice") or 0.0)
+    if explicit_entry_price > 0:
+        return explicit_entry_price
+    if entry.get("analysisSession") or entry.get("analysisSessionLabel"):
+        return 0.0
+    return float(entry.get("currentPrice") or 0.0)
+
+
 def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: str) -> dict[str, Any]:
     grade_score = float(entry.get("gradeScore") or 0.0)
     replay_grade = grade_from_threshold_profile(float(entry.get("gradeScore") or 0.0), strategy, threshold_profile)
+    entry_price = _resolve_replay_entry_price(entry)
+    entry_price_available = entry_price > 0
     eligibility = compute_entry_eligibility(
         strategy,
         replay_grade,
@@ -181,7 +203,8 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
         "gradeScore": grade_score,
         "strictScore": float(entry.get("strictScore") or 0.0),
         "signalScore": float(entry.get("signalScore") or entry.get("score") or 0.0),
-        "entryPrice": float(entry.get("entryPrice") or entry.get("currentPrice") or 0.0),
+        "entryPrice": entry_price,
+        "entryPriceAvailable": entry_price_available,
         "statusLabel": str(entry.get("statusLabel") or ""),
         "mixedExitPolicy": entry.get("mixedExitPolicy") or select_mixed_exit_policy(entry, strategy),
         "entryEligibleOriginal": bool(entry.get("entryEligible")),
@@ -475,11 +498,43 @@ def build_strategy_recommendation_matrix(results: list[dict[str, Any]]) -> dict[
     return matrix
 
 
+def build_point_in_time_summary(run_days: list[dict[str, Any]]) -> dict[str, Any]:
+    counts = {
+        "confirmed": 0,
+        "historical_regen": 0,
+        "legacy_unknown": 0,
+    }
+    historical_regen_excluded_days = 0
+    legacy_unknown_included_days = 0
+    warnings: list[str] = []
+    for day in run_days:
+        status = str(day.get("pointInTimeStatus") or "").strip().lower()
+        if status in counts:
+            counts[status] += 1
+        if str(day.get("skippedReason") or "") == "historical_regen_excluded":
+            historical_regen_excluded_days += 1
+        if status == POINT_IN_TIME_STATUS_LEGACY_UNKNOWN and (
+            int(day.get("candidateCount") or 0) > 0 or int(day.get("tradeCount") or 0) > 0
+        ):
+            legacy_unknown_included_days += 1
+    if historical_regen_excluded_days:
+        warnings.append(f"historical_regen {historical_regen_excluded_days}일 제외")
+    if legacy_unknown_included_days:
+        warnings.append(f"legacy_unknown {legacy_unknown_included_days}일 포함")
+    return {
+        "pointInTimeStatusCounts": counts,
+        "historicalRegenExcludedDays": historical_regen_excluded_days,
+        "legacyUnknownIncludedDays": legacy_unknown_included_days,
+        "pointInTimeWarnings": warnings,
+    }
+
+
 def build_summary_payload(
     *,
     candidates: list[dict[str, Any]],
     results: list[dict[str, Any]],
     orders: list[dict[str, Any]],
+    run_days: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     overall = build_summary_metrics(candidates=candidates, results=results, orders=orders)
     by_strategy = build_strategy_stats(candidates=candidates, results=results, orders=orders)
@@ -487,7 +542,7 @@ def build_summary_payload(
     by_take_profit_profile = build_take_profit_profile_stats(results)
     strategy_recommendation_matrix = build_strategy_recommendation_matrix(results)
     comparison_by_case = build_case_comparison_summary(candidates=candidates, results=results, orders=orders)
-    return {
+    payload = {
         **overall,
         "overall": overall,
         "comparisonByCase": comparison_by_case,
@@ -497,6 +552,9 @@ def build_summary_payload(
         "strategyRecommendationMatrix": strategy_recommendation_matrix,
         **by_take_profit_profile,
     }
+    if run_days is not None:
+        payload.update(build_point_in_time_summary(run_days))
+    return payload
 
 
 def summarize_trade_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -548,6 +606,12 @@ def build_daily_summary(
         "results": results,
         "fills": fills,
     }
+
+
+def fetch_naver_price_history(code: str, count: int = 40) -> list[dict[str, Any]]:
+    from jongga.generate_latest import fetch_naver_price_history as fetch_history
+
+    return fetch_history(code, count=count)
 
 
 def build_strategy_views(
@@ -602,6 +666,9 @@ def build_strategy_views(
                 "summaryFile": day.get("summaryFile"),
                 "ordersFile": day.get("ordersFile"),
                 "fillsFile": day.get("fillsFile"),
+                "pointInTime": day.get("pointInTime"),
+                "pointInTimeStatus": day.get("pointInTimeStatus"),
+                "skippedReason": day.get("skippedReason") or "",
                 "trades": [item for item in (day.get("trades") or []) if item.get("strategy") == strategy],
                 "candidates": day_candidates,
                 "results": day_results,
@@ -639,6 +706,9 @@ def build_strategy_views(
                     "summaryFile": day.get("summaryFile"),
                     "ordersFile": day.get("ordersFile"),
                     "fillsFile": day.get("fillsFile"),
+                    "pointInTime": day.get("pointInTime"),
+                    "pointInTimeStatus": day.get("pointInTimeStatus"),
+                    "skippedReason": day.get("skippedReason") or "",
                     "trades": summarize_trade_rows(day_case_results),
                     "candidates": day_case_candidates,
                     "results": day_case_results,
@@ -703,7 +773,7 @@ def build_cumulative_run_record(runs: list[dict[str, Any]]) -> dict[str, Any] | 
     candidates = [item for day in cumulative_days for item in (day.get("candidates") or [])]
     results = [item for day in cumulative_days for item in (day.get("results") or [])]
     orders = [item for day in cumulative_days for item in (day.get("orders") or [])]
-    summary = build_summary_payload(candidates=candidates, results=results, orders=orders)
+    summary = build_summary_payload(candidates=candidates, results=results, orders=orders, run_days=cumulative_days)
     latest_run = ordered_runs[-1]
     analysis_dates = sorted({str(day.get("date") or "") for day in cumulative_days if str(day.get("date") or "")})
     from_date = analysis_dates[0] if analysis_dates else str(latest_run.get("from") or "")
@@ -886,100 +956,114 @@ def run_replay(
         daily_fills: list[dict[str, Any]] = []
         daily_results: list[dict[str, Any]] = []
         daily_candidates: list[dict[str, Any]] = []
+        day_point_in_time_status = POINT_IN_TIME_STATUS_LEGACY_UNKNOWN
+        day_point_in_time = False
+        day_skipped_reason = ""
 
         if payload is not None:
+            day_point_in_time_status = infer_payload_point_in_time_status(payload)
+            day_point_in_time = point_in_time_flag_from_status(day_point_in_time_status)
             dims = extract_context_dims(payload)
             payload_source_mode = str(payload.get("payloadSourceMode") or "legacy").strip() or "legacy"
             input_archive_version = str(payload.get("inputArchiveVersion") or "").strip()
             payload_rebuildable = bool(payload.get("rebuildable"))
-            for strategy, entry in iter_buy_entries(payload):
-                candidate = replay_entry_view(entry, strategy, threshold_profile)
-                candidate["payloadSourceMode"] = payload_source_mode
-                candidate["inputArchiveVersion"] = input_archive_version
-                candidate["rebuildable"] = payload_rebuildable
-                candidate["historyRecommendationSourceMode"] = payload_source_mode if candidate.get("entryEligibleOriginal") else ""
-                daily_candidates.append(candidate)
-                code = candidate["code"]
-                if not code:
-                    continue
-                candidate_key = f"{date_str}|{variant}|{strategy}|{code}"
-                if candidate_key in recommendation_key_set:
-                    candidate["historyRecommendation"] = True
-                    candidate["historyRecommendationSourceMode"] = payload_source_mode
-                if code not in history_cache:
-                    history_cache[code] = entry.get("_historyRows") or []
-                    if not history_cache[code]:
-                        from jongga.generate_latest import fetch_naver_price_history
-                        history_cache[code] = fetch_naver_price_history(code, count=40)
-                market_data = build_replay_market_data(
-                    code=code,
-                    entry_date=date_str,
-                    entry_price=candidate["entryPrice"],
-                    history_rows=history_cache[code],
-                    bar_unit=bar,
-                    tick_proxy_source=_tick_proxy_source(entry),
-                )
-                if market_data["status"] != "resolved":
-                    continue
-                source_entry_key = f"{compact}|{variant}|{strategy}|{code}"
-                simulation = simulate_trade(
-                    run_id=run_id,
-                    date=date_str,
-                    variant=variant,
-                    strategy=strategy,
-                    code=code,
-                    name=candidate["name"],
-                    source_entry_key=source_entry_key,
-                    trade_plan_rows=entry.get("tradePlanRows") or [],
-                    market_data=market_data,
-                    reversal_live_exit_policy=entry.get("reversalLiveExitPolicy") if strategy == "reversal" else None,
-                    entry_mode="close",
-                    auto_flatten=True,
-                )
-                proxy = compute_outcome(
-                    {
-                        "date": date_str,
-                        "variant": variant,
-                        "strategy": strategy,
-                        "code": code,
-                        "name": candidate["name"],
+            if day_point_in_time_status == POINT_IN_TIME_STATUS_HISTORICAL_REGEN:
+                day_skipped_reason = "historical_regen_excluded"
+            else:
+                for strategy, entry in iter_buy_entries(payload):
+                    candidate = replay_entry_view(entry, strategy, threshold_profile)
+                    candidate["payloadSourceMode"] = payload_source_mode
+                    candidate["inputArchiveVersion"] = input_archive_version
+                    candidate["rebuildable"] = payload_rebuildable
+                    candidate["historyRecommendationSourceMode"] = payload_source_mode if candidate.get("entryEligibleOriginal") else ""
+                    candidate["pointInTime"] = day_point_in_time
+                    candidate["pointInTimeStatus"] = day_point_in_time_status
+                    daily_candidates.append(candidate)
+                    code = candidate["code"]
+                    if not code:
+                        continue
+                    candidate_key = f"{date_str}|{variant}|{strategy}|{code}"
+                    if candidate_key in recommendation_key_set:
+                        candidate["historyRecommendation"] = True
+                        candidate["historyRecommendationSourceMode"] = payload_source_mode
+                    if candidate["entryPrice"] <= 0:
+                        candidate["replaySkippedReason"] = "entry_price_unavailable"
+                        continue
+                    if code not in history_cache:
+                        history_cache[code] = entry.get("_historyRows") or []
+                        if not history_cache[code]:
+                            history_cache[code] = fetch_naver_price_history(code, count=40)
+                    market_data = build_replay_market_data(
+                        code=code,
+                        entry_date=date_str,
+                        entry_price=candidate["entryPrice"],
+                        history_rows=history_cache[code],
+                        bar_unit=bar,
+                        tick_proxy_source=_tick_proxy_source(entry),
+                    )
+                    if market_data["status"] != "resolved":
+                        continue
+                    source_entry_key = f"{compact}|{variant}|{strategy}|{code}"
+                    simulation = simulate_trade(
+                        run_id=run_id,
+                        date=date_str,
+                        variant=variant,
+                        strategy=strategy,
+                        code=code,
+                        name=candidate["name"],
+                        source_entry_key=source_entry_key,
+                        trade_plan_rows=entry.get("tradePlanRows") or [],
+                        market_data=market_data,
+                        reversal_live_exit_policy=entry.get("reversalLiveExitPolicy") if strategy == "reversal" else None,
+                        entry_mode="close",
+                        auto_flatten=True,
+                    )
+                    proxy = compute_outcome(
+                        {
+                            "date": date_str,
+                            "variant": variant,
+                            "strategy": strategy,
+                            "code": code,
+                            "name": candidate["name"],
+                            "takeProfitProfileKey": candidate["takeProfitProfileKey"],
+                            "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
+                            **dims,
+                        },
+                        entry.get("tradePlanRows") or [],
+                        candidate["entryPrice"],
+                        str(market_data.get("nextTradingDate") or ""),
+                        market_data.get("nextDayOHLC") or {},
+                    )
+                    result = {
+                        **simulation["result"],
+                        **dims,
+                        "dataQualityStatus": str((market_data.get("dataQuality") or {}).get("status") or ""),
+                        "dataQuality": market_data.get("dataQuality") or {},
+                        "nextTradingDate": market_data.get("nextTradingDate"),
+                        "proxyOutcomeStatus": proxy.get("outcomeStatus"),
+                        "proxyRealizedReturnPct": round(float(proxy.get("realizedReturnProxy") or 0.0) * 100.0, 4),
+                        "replayGrade": candidate["replayGrade"],
+                        "gradeScore": candidate["gradeScore"],
+                        "replayIncluded": candidate["replayIncluded"],
+                        "replayIncludeRule": candidate["replayIncludeRule"],
+                        "historyRecommendation": candidate["historyRecommendation"],
+                        "historyRecommendationSourceMode": candidate.get("historyRecommendationSourceMode") or "",
+                        "entryEligible": candidate["entryEligible"],
+                        "entryEligibleOriginal": candidate["entryEligibleOriginal"],
+                        "setupQuality": candidate["setupQuality"],
+                        "statusLabel": candidate.get("statusLabel") or "",
                         "takeProfitProfileKey": candidate["takeProfitProfileKey"],
                         "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
-                        **dims,
-                    },
-                    entry.get("tradePlanRows") or [],
-                    candidate["entryPrice"],
-                    str(market_data.get("nextTradingDate") or ""),
-                    market_data.get("nextDayOHLC") or {},
-                )
-                result = {
-                    **simulation["result"],
-                    **dims,
-                    "dataQualityStatus": str((market_data.get("dataQuality") or {}).get("status") or ""),
-                    "dataQuality": market_data.get("dataQuality") or {},
-                    "nextTradingDate": market_data.get("nextTradingDate"),
-                    "proxyOutcomeStatus": proxy.get("outcomeStatus"),
-                    "proxyRealizedReturnPct": round(float(proxy.get("realizedReturnProxy") or 0.0) * 100.0, 4),
-                    "replayGrade": candidate["replayGrade"],
-                    "gradeScore": candidate["gradeScore"],
-                    "replayIncluded": candidate["replayIncluded"],
-                    "replayIncludeRule": candidate["replayIncludeRule"],
-                    "historyRecommendation": candidate["historyRecommendation"],
-                    "historyRecommendationSourceMode": candidate.get("historyRecommendationSourceMode") or "",
-                    "entryEligible": candidate["entryEligible"],
-                    "entryEligibleOriginal": candidate["entryEligibleOriginal"],
-                    "setupQuality": candidate["setupQuality"],
-                    "statusLabel": candidate.get("statusLabel") or "",
-                    "takeProfitProfileKey": candidate["takeProfitProfileKey"],
-                    "takeProfitProfileLabel": candidate["takeProfitProfileLabel"],
-                    "mixedExitPolicy": candidate.get("mixedExitPolicy") or {},
-                    "payloadSourceMode": payload_source_mode,
-                    "inputArchiveVersion": input_archive_version,
-                    "rebuildable": payload_rebuildable,
-                }
-                daily_orders.extend(simulation["orders"])
-                daily_fills.extend(simulation["fills"])
-                daily_results.append(result)
+                        "mixedExitPolicy": candidate.get("mixedExitPolicy") or {},
+                        "payloadSourceMode": payload_source_mode,
+                        "inputArchiveVersion": input_archive_version,
+                        "rebuildable": payload_rebuildable,
+                        "pointInTime": day_point_in_time,
+                        "pointInTimeStatus": day_point_in_time_status,
+                    }
+                    daily_orders.extend(simulation["orders"])
+                    daily_fills.extend(simulation["fills"])
+                    daily_results.append(result)
 
         daily_summary = build_daily_summary(
             run_id=run_id,
@@ -1009,6 +1093,9 @@ def run_replay(
             "degradedCount": daily_summary["degradedCount"],
             "ambiguousCount": daily_summary["ambiguousCount"],
             "byStrategy": daily_summary["byStrategy"],
+            "pointInTime": day_point_in_time,
+            "pointInTimeStatus": day_point_in_time_status,
+            "skippedReason": day_skipped_reason,
             "candidates": daily_candidates,
             "trades": daily_summary["trades"],
             "results": daily_results,
@@ -1021,7 +1108,7 @@ def run_replay(
     existing_runs = existing_raw if isinstance(existing_raw, list) else (existing_raw.get("runHistory") if isinstance(existing_raw, dict) else [])
     if not isinstance(existing_runs, list):
         existing_runs = []
-    summary = build_summary_payload(candidates=all_candidates, results=all_results, orders=all_orders)
+    summary = build_summary_payload(candidates=all_candidates, results=all_results, orders=all_orders, run_days=run_days)
     run_record = {
         "runId": run_id,
         "generatedAt": generated_at,

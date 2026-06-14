@@ -14,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 JONGGA_OUTPUT = ROOT / "jongga" / "output"
+JONGGA_RESCORED_OUTPUT = ROOT / "jongga" / "output_rescored"
 JONGGA_TESTS = ROOT / "jongga" / "tests"
 DEFAULT_REPLAY_VARIANT = "stable"
 DEFAULT_REPLAY_THRESHOLD_PROFILE = "current"
@@ -142,6 +143,88 @@ def run_generate(*, analysis_date: str | None, variant: str, top_limit: int, ses
     return 0
 
 
+def _read_json_dict(path: Path) -> dict[str, object] | None:
+    if not path.exists():
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def _write_legacy_payload_bridge(payload: dict[str, object], *, out_path: Path, bridge_js_path: Path) -> None:
+    rendered = json.dumps(payload, ensure_ascii=False, indent=2)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    bridge_js_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(rendered, encoding="utf-8")
+    bridge_js_path.write_text(f"window.JONGGA_DATA = {rendered};\n", encoding="utf-8")
+
+
+def _display_path(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def publish_rescored_stable_output(*, analysis_date: str | None, top_limit: int) -> tuple[int, dict[str, object]]:
+    from jongga.output_contract import VARIANT_STABLE, build_daily_output_paths, build_input_archive_path, write_daily_outputs
+    from jongga.rescore_credit_balance import rescore_payload
+
+    emit("STEP", "4/6 stable 대차 재채점 반영")
+    resolved_analysis_date = resolve_pipeline_analysis_date(analysis_date)
+    source_json_path, _ = build_daily_output_paths(JONGGA_OUTPUT, resolved_analysis_date, variant=VARIANT_STABLE)
+    if not source_json_path.exists():
+        emit("FAIL", f"stable 산출물 없음: {_display_path(source_json_path)}")
+        return 1, {}
+
+    payload = _read_json_dict(source_json_path)
+    if payload is None:
+        emit("FAIL", f"stable 산출물 JSON 파싱 실패: {_display_path(source_json_path)}")
+        return 1, {}
+
+    archive_payload = _read_json_dict(
+        build_input_archive_path(JONGGA_OUTPUT, resolved_analysis_date, variant=VARIANT_STABLE),
+    )
+    rescored_payload = rescore_payload(payload)
+    write_daily_outputs(
+        rescored_payload,
+        JONGGA_RESCORED_OUTPUT,
+        JONGGA_RESCORED_OUTPUT / "jongga_history.js",
+        variant=VARIANT_STABLE,
+        input_archive=archive_payload,
+        top_limit=top_limit,
+    )
+    active_json_path, _, _ = write_daily_outputs(
+        rescored_payload,
+        JONGGA_OUTPUT,
+        JONGGA_OUTPUT / "jongga_history.js",
+        variant=VARIANT_STABLE,
+        input_archive=archive_payload,
+        top_limit=top_limit,
+    )
+    _write_legacy_payload_bridge(
+        rescored_payload,
+        out_path=JONGGA_OUTPUT / "latest.json",
+        bridge_js_path=JONGGA_OUTPUT / "jongga_data.js",
+    )
+
+    rescore_meta = rescored_payload.get("rescoreMeta") if isinstance(rescored_payload.get("rescoreMeta"), dict) else {}
+    changed_entries = len(rescore_meta.get("changedEntries") or [])
+    short_balance_codes = len(rescore_meta.get("shortBalanceCodes") or [])
+    emit(
+        "OK",
+        f"stable 재채점 반영 완료 · 변경 {changed_entries}건 · 대차 적용 {short_balance_codes}종목",
+    )
+    emit("FILE", _display_path(active_json_path))
+    emit("FILE", "jongga/output/latest.json (rescored stable)")
+    return 0, {
+        "changedEntries": changed_entries,
+        "shortBalanceCodes": short_balance_codes,
+    }
+
+
 def _compact_date(analysis_date: str | None) -> str:
     if analysis_date:
         return analysis_date.replace("-", "")
@@ -212,11 +295,17 @@ def select_replay_dates_from_history(
     required_followup_days: int = DEFAULT_REPLAY_REQUIRED_FOLLOWUP_DAYS,
     include_cutoff_date: bool = False,
 ) -> list[date]:
-    from jongga.output_contract import normalize_variant, read_history_index
+    from jongga.output_contract import (
+        POINT_IN_TIME_STATUS_CONFIRMED,
+        normalize_variant,
+        read_history_index,
+    )
 
     resolved_variant = normalize_variant(variant)
     stable_dates: list[date] = []
+    replay_candidate_dates: list[date] = []
     seen: set[date] = set()
+    candidate_seen: set[date] = set()
     for entry in read_history_index(history_js):
         if normalize_variant(str(entry.get("variant") or "")) != resolved_variant:
             continue
@@ -225,22 +314,47 @@ def select_replay_dates_from_history(
         except ValueError:
             continue
         if entry_date in seen:
+            raw_point_in_time_status = str(entry.get("pointInTimeStatus") or "").strip().lower()
+            if entry_date in candidate_seen:
+                continue
+            if raw_point_in_time_status == POINT_IN_TIME_STATUS_CONFIRMED or (
+                not raw_point_in_time_status and entry.get("pointInTime") is not False
+            ):
+                candidate_seen.add(entry_date)
+                replay_candidate_dates.append(entry_date)
             continue
         seen.add(entry_date)
         stable_dates.append(entry_date)
+        raw_point_in_time_status = str(entry.get("pointInTimeStatus") or "").strip().lower()
+        if raw_point_in_time_status == POINT_IN_TIME_STATUS_CONFIRMED or (
+            not raw_point_in_time_status and entry.get("pointInTime") is not False
+        ):
+            candidate_seen.add(entry_date)
+            replay_candidate_dates.append(entry_date)
 
     if include_cutoff_date:
         stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date <= cutoff_date})
     else:
         stable_dates = sorted({entry_date for entry_date in stable_dates if entry_date < cutoff_date})
     stable_dates = [entry_date for entry_date in stable_dates if not _is_weekend_day(entry_date)]
+    if include_cutoff_date:
+        replay_candidate_dates = sorted({entry_date for entry_date in replay_candidate_dates if entry_date <= cutoff_date})
+    else:
+        replay_candidate_dates = sorted({entry_date for entry_date in replay_candidate_dates if entry_date < cutoff_date})
+    replay_candidate_dates = [entry_date for entry_date in replay_candidate_dates if not _is_weekend_day(entry_date)]
     if since_date:
-        stable_dates = [entry_date for entry_date in stable_dates if entry_date > since_date]
-    if not stable_dates:
+        replay_candidate_dates = [entry_date for entry_date in replay_candidate_dates if entry_date > since_date]
+    if not replay_candidate_dates:
         return []
-    if len(stable_dates) <= required_followup_days:
-        return []
-    return stable_dates[:-required_followup_days]
+    later_day_count = {
+        entry_date: sum(1 for later in stable_dates if later > entry_date)
+        for entry_date in replay_candidate_dates
+    }
+    return [
+        entry_date
+        for entry_date in replay_candidate_dates
+        if later_day_count.get(entry_date, 0) >= required_followup_days
+    ]
 
 
 def build_replay_recommendation_keys_from_history(*, history_js: str | Path, variant: str, analysis_dates: list[date]) -> set[str]:
@@ -288,7 +402,7 @@ def run_replay_backtest(
     out_dir: str | Path,
     variant: str = DEFAULT_REPLAY_VARIANT,
     threshold_profile: str = DEFAULT_REPLAY_THRESHOLD_PROFILE,
-    step_label: str = "4/5",
+    step_label: str = "5/6",
 ) -> tuple[int, dict[str, object]]:
     from jongga.replay_backtest import run_replay, write_replay_bridge
     from jongga.replay_backtest import replay_runs_paths, read_replay_runs
@@ -381,7 +495,7 @@ def run_replay_backtest(
     }
 
 
-def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str = "5/5") -> tuple[int, dict[str, object]]:
+def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str = "6/6") -> tuple[int, dict[str, object]]:
     emit("STEP", f"{step_label} 산출물 검증")
     compact = _compact_date(analysis_date)
     month_folder = compact[:6]
@@ -411,6 +525,7 @@ def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str
     stable_path = JONGGA_OUTPUT / month_folder / f"latest_{compact}.json"
     payload = json.loads(stable_path.read_text(encoding="utf-8"))
     quality = payload.get("dataQuality") if isinstance(payload.get("dataQuality"), dict) else {}
+    rescore_meta = payload.get("rescoreMeta") if isinstance(payload.get("rescoreMeta"), dict) else {}
     status = str(quality.get("status") or "unknown")
     slot = (payload.get("slots") or [{}])[0]
     entries = slot.get("entries") if isinstance(slot, dict) else {}
@@ -424,6 +539,14 @@ def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str
         "OK",
         f"stable 품질={status} · 눌림목 {counts['pullback']} · 매집 {counts['accumulation']} · 돌파 {counts['breakout']} · 급락반등 {counts['reversal']}",
     )
+    if rescore_meta:
+        emit(
+            "OK",
+            f"rescored stable 메타 · 변경 {len(rescore_meta.get('changedEntries') or [])}건 · "
+            f"대차 적용 {len(rescore_meta.get('shortBalanceCodes') or [])}종목",
+        )
+    else:
+        emit("WARN", "stable payload에 rescoreMeta가 없습니다. 구형 산출물일 수 있습니다.")
     outcomes_path = JONGGA_OUTPUT / "jongga_outcomes.js"
     if outcomes_path.exists():
         emit("FILE", "jongga/output/jongga_outcomes.js (적중 추적)")
@@ -437,7 +560,7 @@ def validate_outputs(*, analysis_date: str | None, variant: str, step_label: str
     emit("UI", "tools/stock-analyze/index.html")
     if status != "complete":
         emit("WARN", "dataQuality가 complete가 아닙니다. 로그의 FAIL/WARN 항목을 확인하세요.")
-    return 0, {"status": status, "counts": counts}
+    return 0, {"status": status, "counts": counts, "hasRescoreMeta": bool(rescore_meta)}
 
 
 def print_summary(*, exit_code: int, quality_status: str, summary_label: str = "종가베팅 추천 데이터 생성 완료") -> None:
@@ -514,7 +637,13 @@ def main() -> int:
     if os.getenv("OPEN_BET_FORCE_COLOR") or os.getenv("FORCE_COLOR"):
         os.environ.setdefault("FORCE_COLOR", "1")
 
-    from jongga.output_contract import VARIANT_CANARY, is_canary_channel_enabled, normalize_analysis_session, resolve_generation_variants
+    from jongga.output_contract import (
+        VARIANT_CANARY,
+        VARIANT_STABLE,
+        is_canary_channel_enabled,
+        normalize_analysis_session,
+        resolve_generation_variants,
+    )
 
     args = build_parser().parse_args()
     print()
@@ -600,6 +729,17 @@ def main() -> int:
         print_summary(exit_code=gen_code, quality_status="")
         return gen_code
 
+    if VARIANT_STABLE in resolve_generation_variants(args.variant):
+        rescore_code, _ = publish_rescored_stable_output(
+            analysis_date=analysis_date_arg,
+            top_limit=args.top_limit,
+        )
+        if rescore_code != 0:
+            print_summary(exit_code=rescore_code, quality_status="")
+            return rescore_code
+    else:
+        emit("STEP", "4/6 stable 대차 재채점 반영 — 생략(stable 미생성)")
+
     if not args.skip_replay:
         run_replay_backtest(
             analysis_date=analysis_date_arg,
@@ -607,9 +747,10 @@ def main() -> int:
             out_dir=JONGGA_OUTPUT,
             variant=args.replay_variant,
             threshold_profile=args.replay_threshold_profile,
+            step_label="5/6",
         )
     else:
-        emit("STEP", "4/5 리플레이 검증 — 생략(--skip-replay)")
+        emit("STEP", "5/6 리플레이 검증 — 생략(--skip-replay)")
         from jongga.replay_backtest import write_replay_bridge
 
         write_replay_bridge(
@@ -623,7 +764,7 @@ def main() -> int:
             },
         )
 
-    validate_code, meta = validate_outputs(analysis_date=analysis_date_arg, variant=args.variant)
+    validate_code, meta = validate_outputs(analysis_date=analysis_date_arg, variant=args.variant, step_label="6/6")
     quality_status = str(meta.get("status") or "")
     print_summary(exit_code=validate_code, quality_status=quality_status)
     return validate_code

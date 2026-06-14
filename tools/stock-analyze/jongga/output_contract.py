@@ -21,10 +21,14 @@ ANALYSIS_SESSION_LABELS = {
     ANALYSIS_SESSION_1500: "3시 분석",
     ANALYSIS_SESSION_1730: "5시반 분석",
 }
+POINT_IN_TIME_HISTORY_START_DATE = date(2026, 6, 8)
 INPUT_ARCHIVE_VERSION = "jongga_inputs.v1"
 PAYLOAD_SOURCE_LIVE = "live"
 PAYLOAD_SOURCE_ARCHIVE_REBUILD = "archive_rebuild"
 PAYLOAD_SOURCE_BEST_EFFORT_LEGACY = "best_effort_legacy"
+POINT_IN_TIME_STATUS_CONFIRMED = "confirmed"
+POINT_IN_TIME_STATUS_HISTORICAL_REGEN = "historical_regen"
+POINT_IN_TIME_STATUS_LEGACY_UNKNOWN = "legacy_unknown"
 CANARY_CHANNEL_ENABLED = False
 VARIANT_LABELS = {
     VARIANT_STABLE: "현재 버전",
@@ -142,10 +146,116 @@ def build_session_archive_path(
     return directory / f"session_{compact}_{resolved_session}{suffix}.json"
 
 
-def payload_with_analysis_date(payload: dict[str, Any], analysis_date: date, *, variant: str = VARIANT_STABLE) -> dict[str, Any]:
+def point_in_time_status(
+    analysis_date: date,
+    *,
+    today: date | None = None,
+    explicit_date_used: bool = False,
+) -> str:
+    """실행 캘린더 날짜 + --date 명시 여부 기준 point-in-time 상태."""
+    if explicit_date_used:
+        return POINT_IN_TIME_STATUS_HISTORICAL_REGEN
+    base_day = today or datetime.now(KST).date()
+    if is_weekend_day(base_day):
+        return POINT_IN_TIME_STATUS_HISTORICAL_REGEN
+    return (
+        POINT_IN_TIME_STATUS_CONFIRMED
+        if analysis_date == base_day
+        else POINT_IN_TIME_STATUS_HISTORICAL_REGEN
+    )
+
+
+def point_in_time_flag_from_status(status: str | None) -> bool:
+    return str(status or "").strip().lower() == POINT_IN_TIME_STATUS_CONFIRMED
+
+
+def infer_generated_point_in_time_status(payload: dict[str, Any] | None) -> str | None:
+    source = payload or {}
+    raw_analysis_date = str(source.get("analysisDate") or "").strip()
+    raw_generated_at = str(source.get("generatedAt") or "").strip()
+    if not raw_analysis_date or not raw_generated_at:
+        return None
+    try:
+        analysis_date = date.fromisoformat(raw_analysis_date)
+    except ValueError:
+        return None
+    try:
+        generated_at = datetime.fromisoformat(raw_generated_at)
+    except ValueError:
+        return None
+    if generated_at.tzinfo is None:
+        generated_at = generated_at.replace(tzinfo=KST)
+    generated_date = generated_at.astimezone(KST).date()
+    if is_weekend_day(generated_date):
+        return POINT_IN_TIME_STATUS_HISTORICAL_REGEN
+    return (
+        POINT_IN_TIME_STATUS_CONFIRMED
+        if analysis_date == generated_date
+        else POINT_IN_TIME_STATUS_HISTORICAL_REGEN
+    )
+
+
+def infer_payload_point_in_time_status(payload: dict[str, Any] | None) -> str:
+    source = payload or {}
+    raw_status = str(source.get("pointInTimeStatus") or "").strip().lower()
+    generated_status = infer_generated_point_in_time_status(source)
+    if raw_status in {
+        POINT_IN_TIME_STATUS_CONFIRMED,
+        POINT_IN_TIME_STATUS_HISTORICAL_REGEN,
+    }:
+        return raw_status
+    if raw_status == POINT_IN_TIME_STATUS_LEGACY_UNKNOWN:
+        return generated_status or POINT_IN_TIME_STATUS_LEGACY_UNKNOWN
+    point_in_time = source.get("pointInTime")
+    if isinstance(point_in_time, bool):
+        return (
+            POINT_IN_TIME_STATUS_CONFIRMED
+            if point_in_time
+            else POINT_IN_TIME_STATUS_HISTORICAL_REGEN
+        )
+    if generated_status:
+        return generated_status
+    return POINT_IN_TIME_STATUS_LEGACY_UNKNOWN
+
+
+def apply_inferred_point_in_time_metadata(payload: dict[str, Any]) -> dict[str, Any]:
+    status = infer_payload_point_in_time_status(payload)
+    payload["pointInTimeStatus"] = status
+    payload["pointInTime"] = point_in_time_flag_from_status(status)
+    return payload
+
+
+def is_point_in_time_run(
+    analysis_date: date,
+    *,
+    today: date | None = None,
+    explicit_date_used: bool = False,
+) -> bool:
+    return point_in_time_status(
+        analysis_date,
+        today=today,
+        explicit_date_used=explicit_date_used,
+    ) == POINT_IN_TIME_STATUS_CONFIRMED
+
+
+def payload_with_analysis_date(
+    payload: dict[str, Any],
+    analysis_date: date,
+    *,
+    variant: str = VARIANT_STABLE,
+    today: date | None = None,
+    explicit_date_used: bool = False,
+) -> dict[str, Any]:
     next_payload = deepcopy(payload)
     next_payload["analysisDate"] = analysis_date.isoformat()
     next_payload["variant"] = normalize_variant(variant)
+    status = point_in_time_status(
+        analysis_date,
+        today=today,
+        explicit_date_used=explicit_date_used,
+    )
+    next_payload["pointInTime"] = point_in_time_flag_from_status(status)
+    next_payload["pointInTimeStatus"] = status
     return next_payload
 
 
@@ -272,6 +382,7 @@ def build_history_entry(
     payload_source_mode = str(payload.get("payloadSourceMode") or PAYLOAD_SOURCE_LIVE)
     input_archive_version = str(payload.get("inputArchiveVersion") or "")
     rebuildable = bool(payload.get("rebuildable")) or input_archive_path is not None
+    point_in_time_status = infer_payload_point_in_time_status(payload)
     return {
         "date": str(payload.get("analysisDate") or ""),
         "variant": resolved_variant,
@@ -283,6 +394,8 @@ def build_history_entry(
         "payloadSourceMode": payload_source_mode,
         "rebuildable": rebuildable,
         "generatedAt": payload.get("generatedAt") or "",
+        "pointInTime": point_in_time_flag_from_status(point_in_time_status),
+        "pointInTimeStatus": point_in_time_status,
         "status": quality.get("status") or "unknown",
         "buyCount": count_buy_entries(payload),
         "topRecommendations": extract_top_recommendations(payload, per_strategy=max(1, min(3, top_limit // 3))),
@@ -292,11 +405,24 @@ def build_history_entry(
 def update_history_index(existing: list[dict[str, Any]], entry: dict[str, Any]) -> list[dict[str, Any]]:
     target_date = entry.get("date")
     target_variant = normalize_variant(str(entry.get("variant") or ""))
+    if _history_entry_is_before_active_window(entry):
+        return sorted(
+            [
+                item for item in existing
+                if not _history_entry_is_weekend(item) and not _history_entry_is_before_active_window(item)
+            ],
+            key=lambda item: (
+                str(item.get("date") or ""),
+                1 if normalize_variant(str(item.get("variant") or "")) == VARIANT_STABLE else 0,
+            ),
+            reverse=True,
+        )
     merged = [
         item for item in existing
         if (
             (item.get("date") != target_date or normalize_variant(str(item.get("variant") or "")) != target_variant)
             and not _history_entry_is_weekend(item)
+            and not _history_entry_is_before_active_window(item)
         )
     ]
     merged.append(entry)
@@ -317,6 +443,13 @@ def _history_entry_is_weekend(entry: dict[str, Any]) -> bool:
         return False
 
 
+def _history_entry_is_before_active_window(entry: dict[str, Any]) -> bool:
+    try:
+        return date.fromisoformat(str(entry.get("date") or "")) < POINT_IN_TIME_HISTORY_START_DATE
+    except ValueError:
+        return False
+
+
 def write_daily_outputs(
     payload: dict[str, Any],
     out_dir: str | Path,
@@ -326,6 +459,7 @@ def write_daily_outputs(
     input_archive: dict[str, Any] | None = None,
     top_limit: int = 10,
 ) -> tuple[Path, Path, Path]:
+    apply_inferred_point_in_time_metadata(payload)
     raw_date = payload.get("analysisDate")
     analysis_date = resolve_analysis_date(str(raw_date) if raw_date else None)
     resolved_variant = normalize_variant(variant or str(payload.get("variant") or ""))

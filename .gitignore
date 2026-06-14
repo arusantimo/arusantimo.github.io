@@ -5,3 +5,4 @@ tools/market-analyze/store/analysis_settings.local.json
 tools/market-analyze/node_modules/
 tools/market-analyze/.npm-cache/
 .agents/*
+.env

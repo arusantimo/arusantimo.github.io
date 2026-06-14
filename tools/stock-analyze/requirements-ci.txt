@@ -1,2 +1,3 @@
 # GitHub Actions / CI — jongga 파이프라인 (generate_latest Playwright 보강)
 playwright>=1.49.0,<2
+pykrx>=1.0.51

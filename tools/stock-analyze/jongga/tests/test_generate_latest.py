@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from typing import Any
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, annotate_payload_with_analysis_session, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, merge_same_day_session_payloads, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, annotate_payload_with_analysis_session, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, collect_overtime_price_context, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, merge_same_day_session_payloads, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
 from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_ROTATION_BUFFERED, REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
@@ -241,6 +241,34 @@ class GenerateLatestTest(unittest.TestCase):
     def test_parse_market_cap_trillion(self):
         self.assertAlmostEqual(parse_market_cap_trillion("1,613조 5,729억"), 1613.5729)
         self.assertAlmostEqual(parse_market_cap_trillion("29조 9,000억"), 29.9)
+
+    def test_collect_overtime_price_context_skips_historical_regen(self):
+        with mock.patch("jongga.generate_latest.fetch_overtime_price_map") as fetch_overtime_price_map:
+            price_map, meta = collect_overtime_price_context(session="1730", point_in_time_run=False)
+
+        self.assertEqual(price_map, {})
+        self.assertEqual(meta["status"], "skipped")
+        self.assertFalse(meta["fallback"])
+        self.assertIn("historical regen", meta["detail"])
+        fetch_overtime_price_map.assert_not_called()
+
+    def test_collect_overtime_price_context_marks_live_fallback_when_empty(self):
+        with mock.patch("jongga.generate_latest.fetch_overtime_price_map", return_value={}):
+            price_map, meta = collect_overtime_price_context(session="1730", point_in_time_run=True)
+
+        self.assertEqual(price_map, {})
+        self.assertEqual(meta["status"], "fallback")
+        self.assertTrue(meta["fallback"])
+        self.assertEqual(meta["fallbackUsage"][0]["key"], "overtime_price")
+
+    def test_collect_overtime_price_context_does_not_run_for_1500_session(self):
+        with mock.patch("jongga.generate_latest.fetch_overtime_price_map") as fetch_overtime_price_map:
+            price_map, meta = collect_overtime_price_context(session="1500", point_in_time_run=True)
+
+        self.assertEqual(price_map, {})
+        self.assertEqual(meta["status"], "skipped")
+        self.assertFalse(meta["enabled"])
+        fetch_overtime_price_map.assert_not_called()
 
     def test_build_gap_score_matches_grade_thresholds(self):
         payload = build_gap_score({
@@ -790,6 +818,8 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(entry["date"], "2026-05-22")
         self.assertEqual(entry["variant"], "stable")
         self.assertEqual(entry["variantLabel"], "현재 버전")
+        self.assertEqual(entry["pointInTime"], False)
+        self.assertEqual(entry["pointInTimeStatus"], "historical_regen")
         self.assertEqual(entry["status"], "partial")
         self.assertEqual(entry["buyCount"], 2)
         self.assertEqual(len(entry["topRecommendations"]), 2)
@@ -800,35 +830,35 @@ class GenerateLatestTest(unittest.TestCase):
 
     def test_history_update_replaces_same_date(self):
         entries = update_history_index(
-            [{"date": "2026-05-21", "buyCount": 1}, {"date": "2026-05-22", "buyCount": 2}],
-            {"date": "2026-05-22", "buyCount": 3},
+            [{"date": "2026-06-09", "buyCount": 1}, {"date": "2026-06-10", "buyCount": 2}],
+            {"date": "2026-06-10", "buyCount": 3},
         )
-        self.assertEqual([entry["date"] for entry in entries], ["2026-05-22", "2026-05-21"])
+        self.assertEqual([entry["date"] for entry in entries], ["2026-06-10", "2026-06-09"])
         self.assertEqual(entries[0]["buyCount"], 3)
 
     def test_history_update_keeps_stable_and_canary_same_date(self):
         entries = update_history_index(
-            [{"date": "2026-05-22", "variant": "stable", "buyCount": 2}],
-            {"date": "2026-05-22", "variant": "canary", "buyCount": 4},
+            [{"date": "2026-06-10", "variant": "stable", "buyCount": 2}],
+            {"date": "2026-06-10", "variant": "canary", "buyCount": 4},
         )
-        self.assertEqual([(entry["date"], entry["variant"]) for entry in entries], [("2026-05-22", "stable"), ("2026-05-22", "canary")])
+        self.assertEqual([(entry["date"], entry["variant"]) for entry in entries], [("2026-06-10", "stable"), ("2026-06-10", "canary")])
 
     def test_write_daily_outputs_writes_manifest_without_duplicates(self):
-        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
+        payload = payload_with_analysis_date(self._sample_payload(), date(2026, 6, 10), variant=VARIANT_STABLE)
         with TemporaryDirectory() as tmp:
             history_path = f"{tmp}/jongga_history.js"
             write_daily_outputs(payload, tmp, history_path, variant=VARIANT_STABLE)
             write_daily_outputs(payload, tmp, history_path, variant=VARIANT_STABLE)
             with open(history_path, encoding="utf-8") as handle:
                 history_js = handle.read()
-            self.assertEqual(history_js.count('"date": "2026-05-22"'), 1)
+            self.assertEqual(history_js.count('"date": "2026-06-10"'), 1)
             self.assertEqual(history_js.count('"variant": "stable"'), 1)
-            with open(f"{tmp}/202605/jongga_data_20260522.js", encoding="utf-8") as handle:
-                self.assertIn('window.JONGGA_DAILY_DATA["2026-05-22"]', handle.read())
+            with open(f"{tmp}/202606/jongga_data_20260610.js", encoding="utf-8") as handle:
+                self.assertIn('window.JONGGA_DAILY_DATA["2026-06-10"]', handle.read())
 
     def test_write_daily_outputs_keeps_stable_and_canary_variants(self):
-        stable_payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_STABLE)
-        canary_payload = payload_with_analysis_date(self._sample_payload(), date(2026, 5, 22), variant=VARIANT_CANARY)
+        stable_payload = payload_with_analysis_date(self._sample_payload(), date(2026, 6, 10), variant=VARIANT_STABLE)
+        canary_payload = payload_with_analysis_date(self._sample_payload(), date(2026, 6, 10), variant=VARIANT_CANARY)
         with TemporaryDirectory() as tmp:
             history_path = f"{tmp}/jongga_history.js"
             write_daily_outputs(stable_payload, tmp, history_path, variant=VARIANT_STABLE)
@@ -837,8 +867,8 @@ class GenerateLatestTest(unittest.TestCase):
                 history_js = handle.read()
             self.assertIn('"variant": "stable"', history_js)
             self.assertIn('"variant": "canary"', history_js)
-            with open(f"{tmp}/202605/jongga_data_20260522_canary.js", encoding="utf-8") as handle:
-                self.assertIn('window.JONGGA_CANARY_DAILY_DATA["2026-05-22"]', handle.read())
+            with open(f"{tmp}/202606/jongga_data_20260610_canary.js", encoding="utf-8") as handle:
+                self.assertIn('window.JONGGA_CANARY_DAILY_DATA["2026-06-10"]', handle.read())
 
     def test_emit_cli_failures_prints_explicit_items(self):
         buffer = io.StringIO()
@@ -1296,7 +1326,7 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(c3_rule["evalStatus"], "met")
         self.assertIn("114.0%", s2_rule["note"])
         self.assertIn("1.5", c3_rule["note"])
-        self.assertEqual(entry["scoreMax"], 11.5)
+        self.assertEqual(entry["scoreMax"], 12.5)
         self.assertIn("strictScore", entry)
         self.assertIn("signalScore", entry)
         self.assertIn("scoreBreakdown", entry)
@@ -2670,6 +2700,63 @@ class MarkingTest(unittest.TestCase):
         self.assertLess(band["low"], band["anchor"])
         self.assertLessEqual(band["anchor"], band["high"] + 1)
         self.assertLess(band["low"], band["high"])
+
+
+class ShortBalanceTrendTest(unittest.TestCase):
+    def test_short_balance_series_from_rows_parses_and_sorts(self):
+        from jongga.balance_sources import _short_balance_series_from_rows
+
+        rows = [
+            {"TRD_DD": "2026/06/12", "BAL_QTY": "1,200,000"},
+            {"TRD_DD": "2026/06/10", "BAL_QTY": "1,500,000"},
+            {"TRD_DD": "2026/06/11", "BAL_QTY": "1,350,000"},
+            {"TRD_DD": "2026/06/09", "BAL_QTY": "0"},  # 잔고 0은 무시
+        ]
+        series = _short_balance_series_from_rows(rows)
+        self.assertEqual(
+            series,
+            [("20260610", 1500000.0), ("20260611", 1350000.0), ("20260612", 1200000.0)],
+        )
+
+    def test_compute_short_balance_change_pct_uses_lookback_window(self):
+        from jongga.balance_sources import _compute_short_balance_change_pct
+
+        series = [(f"2026060{i}", 1000.0 + i * 100) for i in range(1, 9)]  # 1100..1800
+        # lookback 5 거래일 -> 마지막 6개(1300..1800) 비교
+        change = _compute_short_balance_change_pct(series, 5)
+        self.assertAlmostEqual(change, (1800.0 - 1300.0) / 1300.0 * 100, places=4)
+
+    def test_compute_short_balance_change_pct_requires_two_points(self):
+        from jongga.balance_sources import _compute_short_balance_change_pct
+
+        self.assertIsNone(_compute_short_balance_change_pct([], 10))
+        self.assertIsNone(_compute_short_balance_change_pct([("20260612", 1000.0)], 10))
+
+    def test_fetch_short_balance_trend_map_skips_invalid_codes_without_network(self):
+        from jongga.balance_sources import fetch_short_balance_trend_map
+
+        # 빈 목록/형식이 잘못된 코드는 네트워크 호출 없이 즉시 빈 딕셔너리를 반환한다.
+        self.assertEqual(fetch_short_balance_trend_map([]), {})
+        self.assertEqual(fetch_short_balance_trend_map(["abc", "12345"]), {})
+
+
+class CodeIsinMapTest(unittest.TestCase):
+    """KRX 종목코드 -> ISIN 파생/조회."""
+
+    def test_derives_krx_isin_without_network_lookup(self):
+        from jongga.balance_sources import _fetch_code_isin_map
+
+        with mock.patch("jongga.balance_sources._krx_post_json") as mocked:
+            isin_map = _fetch_code_isin_map({"005930", "000660"})
+
+        self.assertEqual(isin_map, {"005930": "KR7005930003", "000660": "KR7000660001"})
+        mocked.assert_not_called()
+
+    def test_returns_empty_for_invalid_codes(self):
+        from jongga.balance_sources import _fetch_code_isin_map
+
+        isin_map = _fetch_code_isin_map({"abc", "12345"})
+        self.assertEqual(isin_map, {})
 
 
 if __name__ == "__main__":

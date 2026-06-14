@@ -124,6 +124,47 @@ class PullbackRescoreTest(unittest.TestCase):
         self.assertEqual(evaluate_pullback_d3_rebound_volume({"volumeRatio20d": 90.0}).score, 0.5)
         self.assertEqual(evaluate_pullback_d3_rebound_volume({"volumeRatio20d": 50.0}).score, 0.0)
 
+    def test_d4_short_covering_graduated(self):
+        from jongga.rule_evaluation import evaluate_pullback_d4_short_covering
+        # 대차잔고 12% 감소 -> 숏커버링 강한 징후 (만점)
+        self.assertEqual(evaluate_pullback_d4_short_covering({"shortBalanceChangePct": -12.0}).score, 1.0)
+        # 대차잔고 7% 감소 -> 부분 충족
+        self.assertEqual(evaluate_pullback_d4_short_covering({"shortBalanceChangePct": -7.0}).score, 0.5)
+        # 대차잔고 증가 -> 미충족
+        self.assertEqual(evaluate_pullback_d4_short_covering({"shortBalanceChangePct": 5.0}).score, 0.0)
+        # 대형주가 아니거나 수집 실패 -> 데이터 부족 (등급에 영향 없음)
+        self.assertEqual(evaluate_pullback_d4_short_covering({}).eval_status, "data_missing")
+
+
+class BalanceTrendCrossStrategyTest(unittest.TestCase):
+    """2026-06: 매집·돌파/주도주 전략의 대차잔고(L1) 추이 채점."""
+
+    def test_accumulation_l1_decrease_graduated(self):
+        from jongga.rule_evaluation import (
+            evaluate_accumulation_l1_short_balance_decrease,
+        )
+        # 대차잔고 12% 감소 -> 클린 매집 강한 징후 (만점)
+        self.assertEqual(evaluate_accumulation_l1_short_balance_decrease({"shortBalanceChangePct": -12.0}).score, 1.0)
+        # 7% 감소 -> 부분 충족
+        self.assertEqual(evaluate_accumulation_l1_short_balance_decrease({"shortBalanceChangePct": -7.0}).score, 0.5)
+        # 증가 -> 미충족
+        self.assertEqual(evaluate_accumulation_l1_short_balance_decrease({"shortBalanceChangePct": 5.0}).score, 0.0)
+        # 데이터 부족
+        self.assertEqual(evaluate_accumulation_l1_short_balance_decrease({}).eval_status, "data_missing")
+
+    def test_breakout_l1_increase_graduated(self):
+        from jongga.rule_evaluation import (
+            evaluate_breakout_l1_short_balance_increase,
+        )
+        # 대차잔고 12% 증가 -> 숏스퀴즈 강한 징후 (만점)
+        self.assertEqual(evaluate_breakout_l1_short_balance_increase({"shortBalanceChangePct": 12.0}).score, 1.0)
+        # 7% 증가 -> 부분 충족
+        self.assertEqual(evaluate_breakout_l1_short_balance_increase({"shortBalanceChangePct": 7.0}).score, 0.5)
+        # 감소 -> 미충족
+        self.assertEqual(evaluate_breakout_l1_short_balance_increase({"shortBalanceChangePct": -5.0}).score, 0.0)
+        # 데이터 부족
+        self.assertEqual(evaluate_breakout_l1_short_balance_increase({}).eval_status, "data_missing")
+
 
 class DispatchTest(unittest.TestCase):
     def test_dispatch_by_strategy(self):

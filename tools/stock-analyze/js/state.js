@@ -682,6 +682,11 @@ function getJonggaReplayBridgePayload() {
   return payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : null;
 }
 
+function getJonggaReplayPointInTimeWarnings(bridge = getJonggaReplayBridgePayload()) {
+  const warnings = bridge?.latestRun?.summary?.pointInTimeWarnings;
+  return Array.isArray(warnings) ? warnings.filter(Boolean).map(item => String(item)) : [];
+}
+
 function getJonggaReplayCumulativeReturnPct(mode = getJonggaReplayViewMode(), snapshot = getActiveBuySnapshot()) {
   const bridge = getJonggaReplayBridgePayload();
   const latestRun = bridge?.latestRun;
@@ -761,9 +766,11 @@ function updateJonggaReplayViewControls(snapshot = getActiveBuySnapshot()) {
   if (summary) {
     const cumulativeReturnPct = getJonggaReplayCumulativeReturnPct(activeMode, snapshot);
     const replayDayCount = getJonggaReplayPeriodDayCount();
+    const pointInTimeWarnings = getJonggaReplayPointInTimeWarnings();
     summary.innerHTML = `
       <span>리플레이 총 ${replayDayCount}일</span>
       <span>누적 수익률 ${formatJonggaReplaySummaryPercent(cumulativeReturnPct)}</span>
+      ${pointInTimeWarnings.length ? `<span class="warning-text">${escapeHtml(pointInTimeWarnings.join(' · '))}</span>` : ''}
     `;
   }
 

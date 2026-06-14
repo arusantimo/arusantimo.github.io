@@ -94,6 +94,7 @@ def build_stock_indicator_snapshot(
         "cnsPer": _finite(snapshot.cns_per),
         "foreignRate": _finite(snapshot.foreign_rate),
         "supplyTrendScore": float(_supply_trend_score(snapshot)),
+        "shortBalanceChangePct": _finite(snapshot.short_balance_change_pct),
     }
 
     return {

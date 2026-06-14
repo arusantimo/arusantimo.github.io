@@ -1,5 +1,5 @@
 {
-  "runId": "replay-20260614-020916-db62f2af",
+  "runId": "replay-20260614-225433-ae359061",
   "date": "2026-06-08",
   "variant": "stable",
   "thresholdProfile": "current",
@@ -321,9 +321,9 @@
       "strategy": "pullback",
       "code": "009150",
       "name": "삼성전기",
-      "grade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "grade": "C",
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "tradeCount": 1,
       "winRate": 1.0,
       "avgNetReturnPct": 3.005,
@@ -340,9 +340,9 @@
       "strategy": "pullback",
       "code": "066570",
       "name": "LG전자",
-      "grade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "grade": "C",
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "tradeCount": 1,
       "winRate": 0.0,
       "avgNetReturnPct": -1.3185,
@@ -361,7 +361,7 @@
       "name": "현대차",
       "grade": "C",
       "replayGrade": "C",
-      "gradeScore": 4.3,
+      "gradeScore": 3.8,
       "tradeCount": 1,
       "winRate": 0.0,
       "avgNetReturnPct": -6.082,
@@ -399,7 +399,7 @@
       "name": "삼성전자",
       "grade": "B",
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.7,
       "tradeCount": 1,
       "winRate": 1.0,
       "avgNetReturnPct": 3.3477,
@@ -418,7 +418,7 @@
       "name": "LG에너지솔루션",
       "grade": "B",
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.1,
       "tradeCount": 1,
       "winRate": 0.0,
       "avgNetReturnPct": -0.0787,
@@ -456,7 +456,7 @@
       "name": "NAVER",
       "grade": "C",
       "replayGrade": "C",
-      "gradeScore": 3.4,
+      "gradeScore": 3.8,
       "tradeCount": 1,
       "winRate": 0.0,
       "avgNetReturnPct": -5.6247,
@@ -942,12 +942,13 @@
       "code": "066570",
       "takeProfitProfileKey": "balanced",
       "takeProfitProfileLabel": "1차 저항 반영형",
-      "originalGrade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "originalGrade": "C",
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "strictScore": 6.8,
       "signalScore": 6.8,
       "entryPrice": 268000.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(핵심 Gate 미충족: G5, G7, G8, G12)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -987,13 +988,16 @@
         "핵심 Gate 미충족: G7",
         "핵심 Gate 미충족: G8",
         "핵심 Gate 미충족: G12",
-        "매매금지(핵심 Gate 미충족: G5, G7, G8, G12)"
+        "매매금지(핵심 Gate 미충족: G5, G7, G8, G12)",
+        "등급 C — 진입 최소 A, B, S"
       ],
       "setupQuality": "setup_weak",
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "pullback",
@@ -1001,12 +1005,13 @@
       "code": "009150",
       "takeProfitProfileKey": "balanced",
       "takeProfitProfileLabel": "1차 저항 반영형",
-      "originalGrade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "originalGrade": "C",
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "strictScore": 6.8,
       "signalScore": 6.8,
       "entryPrice": 1664000.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(핵심 Gate 미충족: G0, G5, G7, G8, Q1)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1047,13 +1052,16 @@
         "핵심 Gate 미충족: G7",
         "핵심 Gate 미충족: G8",
         "핵심 Gate 미충족: Q1",
-        "매매금지(핵심 Gate 미충족: G0, G5, G7, G8, Q1)"
+        "매매금지(핵심 Gate 미충족: G0, G5, G7, G8, Q1)",
+        "등급 C — 진입 최소 A, B, S"
       ],
       "setupQuality": "setup_weak",
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "pullback",
@@ -1063,10 +1071,11 @@
       "takeProfitProfileLabel": "저항 우선형",
       "originalGrade": "C",
       "replayGrade": "C",
-      "gradeScore": 4.3,
+      "gradeScore": 3.8,
       "strictScore": 4.9,
       "signalScore": 4.9,
       "entryPrice": 639000.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(핵심 Gate 미충족: G0, G5, Q1, G12)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1113,7 +1122,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "accumulation",
@@ -1123,10 +1134,11 @@
       "takeProfitProfileLabel": "저항 우선형",
       "originalGrade": "B",
       "replayGrade": "B",
-      "gradeScore": 6.6,
-      "strictScore": 7.9,
-      "signalScore": 7.9,
+      "gradeScore": 6.7,
+      "strictScore": 8.7,
+      "signalScore": 8.7,
       "entryPrice": 295500.0,
+      "entryPriceAvailable": true,
       "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1168,7 +1180,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "accumulation",
@@ -1178,10 +1192,11 @@
       "takeProfitProfileLabel": "저항 우선형",
       "originalGrade": "B",
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.1,
       "strictScore": 7.9,
       "signalScore": 7.9,
       "entryPrice": 388500.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1226,7 +1241,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "accumulation",
@@ -1240,6 +1257,7 @@
       "strictScore": 7.5,
       "signalScore": 7.5,
       "entryPrice": 41700.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1284,7 +1302,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "breakout",
@@ -1294,10 +1314,11 @@
       "takeProfitProfileLabel": "저항 우선형",
       "originalGrade": "C",
       "replayGrade": "C",
-      "gradeScore": 3.4,
-      "strictScore": 3.9,
-      "signalScore": 4.6,
+      "gradeScore": 3.8,
+      "strictScore": 4.7,
+      "signalScore": 4.7,
       "entryPrice": 279000.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(갭다운 경고 · 신규 진입 금지)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1340,7 +1361,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "breakout",
@@ -1354,6 +1377,7 @@
       "strictScore": 3.6,
       "signalScore": 3.6,
       "entryPrice": 14170.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1397,7 +1421,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "reversal",
@@ -1411,6 +1437,7 @@
       "strictScore": 6.1,
       "signalScore": 6.1,
       "entryPrice": 106600.0,
+      "entryPriceAvailable": true,
       "statusLabel": "진입 가능(거시경고·축소)",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1483,7 +1510,7 @@
         "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
       },
       "entryEligibleOriginal": true,
-      "historyRecommendation": false,
+      "historyRecommendation": true,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "replayA7Plus": true,
@@ -1497,7 +1524,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": "live"
+      "historyRecommendationSourceMode": "live",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "reversal",
@@ -1511,6 +1540,7 @@
       "strictScore": 7.8,
       "signalScore": 7.8,
       "entryPrice": 1095000.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1553,7 +1583,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
       "strategy": "reversal",
@@ -1567,6 +1599,7 @@
       "strictScore": 6.5,
       "signalScore": 6.5,
       "entryPrice": 268000.0,
+      "entryPriceAvailable": true,
       "statusLabel": "매매금지",
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
@@ -1610,7 +1643,9 @@
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
-      "historyRecommendationSourceMode": ""
+      "historyRecommendationSourceMode": "",
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     }
   ],
   "trades": [
@@ -1620,7 +1655,7 @@
       "name": "현대차",
       "grade": "C",
       "replayGrade": "C",
-      "gradeScore": 4.3,
+      "gradeScore": 3.8,
       "entryFilledAt": "2026-06-08T15:30:00+09:00",
       "entryFillPrice": 639639.0,
       "exitFilledAt": "2026-06-10T15:00:00+09:00",
@@ -1657,9 +1692,9 @@
       "strategy": "pullback",
       "code": "009150",
       "name": "삼성전기",
-      "grade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "grade": "C",
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "entryFilledAt": "2026-06-08T15:30:00+09:00",
       "entryFillPrice": 1665664.0,
       "exitFilledAt": "2026-06-09T10:00:00+09:00",
@@ -1696,9 +1731,9 @@
       "strategy": "pullback",
       "code": "066570",
       "name": "LG전자",
-      "grade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "grade": "C",
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "entryFilledAt": "2026-06-08T15:30:00+09:00",
       "entryFillPrice": 268268.0,
       "exitFilledAt": "2026-06-09T15:00:00+09:00",
@@ -1737,7 +1772,7 @@
       "name": "삼성전자",
       "grade": "B",
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.7,
       "entryFilledAt": "2026-06-08T15:30:00+09:00",
       "entryFillPrice": 295795.5,
       "exitFilledAt": "2026-06-10T15:00:00+09:00",
@@ -1815,7 +1850,7 @@
       "name": "LG에너지솔루션",
       "grade": "B",
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.1,
       "entryFilledAt": "2026-06-08T15:30:00+09:00",
       "entryFillPrice": 388888.5,
       "exitFilledAt": "2026-06-10T15:00:00+09:00",
@@ -1893,7 +1928,7 @@
       "name": "NAVER",
       "grade": "C",
       "replayGrade": "C",
-      "gradeScore": 3.4,
+      "gradeScore": 3.8,
       "entryFilledAt": "2026-06-08T15:30:00+09:00",
       "entryFillPrice": 279279.0,
       "exitFilledAt": "2026-06-09T15:00:00+09:00",
@@ -2093,7 +2128,7 @@
   ],
   "results": [
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "pullback",
@@ -2128,8 +2163,8 @@
       "nextTradingDate": "20260609",
       "proxyOutcomeStatus": "stop_first_ambiguous",
       "proxyRealizedReturnPct": -1.012,
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "historyRecommendation": false,
@@ -2165,10 +2200,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "pullback",
@@ -2203,8 +2240,8 @@
       "nextTradingDate": "20260609",
       "proxyOutcomeStatus": "resolved",
       "proxyRealizedReturnPct": 3.325,
-      "replayGrade": "B",
-      "gradeScore": 5.9,
+      "replayGrade": "C",
+      "gradeScore": 5.2,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "historyRecommendation": false,
@@ -2240,10 +2277,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "pullback",
@@ -2279,7 +2318,7 @@
       "proxyOutcomeStatus": "resolved",
       "proxyRealizedReturnPct": -2.5,
       "replayGrade": "C",
-      "gradeScore": 4.3,
+      "gradeScore": 3.8,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "historyRecommendation": false,
@@ -2315,10 +2354,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "accumulation",
@@ -2354,7 +2395,7 @@
       "proxyOutcomeStatus": "resolved",
       "proxyRealizedReturnPct": 4.66,
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.7,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "historyRecommendation": false,
@@ -2390,10 +2431,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "accumulation",
@@ -2429,7 +2472,7 @@
       "proxyOutcomeStatus": "stop_first_ambiguous",
       "proxyRealizedReturnPct": 1.936,
       "replayGrade": "B",
-      "gradeScore": 6.6,
+      "gradeScore": 6.1,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "historyRecommendation": false,
@@ -2465,10 +2508,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "accumulation",
@@ -2540,10 +2585,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "breakout",
@@ -2579,7 +2626,7 @@
       "proxyOutcomeStatus": "stop_first_ambiguous",
       "proxyRealizedReturnPct": -5.339,
       "replayGrade": "C",
-      "gradeScore": 3.4,
+      "gradeScore": 3.8,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
       "historyRecommendation": false,
@@ -2615,10 +2662,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "breakout",
@@ -2690,10 +2739,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "reversal",
@@ -2732,7 +2783,7 @@
       "gradeScore": 7.6,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-      "historyRecommendation": false,
+      "historyRecommendation": true,
       "historyRecommendationSourceMode": "live",
       "entryEligible": true,
       "entryEligibleOriginal": true,
@@ -2812,10 +2863,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "reversal",
@@ -2887,10 +2940,12 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-020916-db62f2af",
+      "runId": "replay-20260614-225433-ae359061",
       "date": "2026-06-08",
       "variant": "stable",
       "strategy": "reversal",
@@ -2962,7 +3017,9 @@
       },
       "payloadSourceMode": "live",
       "inputArchiveVersion": "jongga_inputs.v1",
-      "rebuildable": true
+      "rebuildable": true,
+      "pointInTime": true,
+      "pointInTimeStatus": "confirmed"
     }
   ],
   "fills": [

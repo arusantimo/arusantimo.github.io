@@ -15,6 +15,8 @@ class ReplayBacktestTests(unittest.TestCase):
         return {
             "analysisDate": "2026-06-03",
             "variant": "stable",
+            "pointInTime": True,
+            "pointInTimeStatus": "confirmed",
             "payloadSourceMode": PAYLOAD_SOURCE_LIVE,
             "inputArchiveVersion": INPUT_ARCHIVE_VERSION,
             "rebuildable": True,
@@ -203,6 +205,54 @@ class ReplayBacktestTests(unittest.TestCase):
         self.assertFalse(blocked_pullback["replayIncluded"])
         self.assertFalse(blocked_pullback["replayA7Plus"])
 
+    def test_replay_entry_view_does_not_fallback_to_current_price_for_session_entries(self):
+        candidate = replay_entry_view(
+            {
+                "name": "Carry",
+                "code": "000777",
+                "grade": "A",
+                "gradeScore": 8.2,
+                "signalScore": 8.2,
+                "score": 8.2,
+                "currentPrice": 12345.0,
+                "analysisSession": "1500",
+                "statusLabel": "매수추천",
+                "entryEligible": True,
+                "gates": [{"code": "G1", "status": "✅", "note": "ok"}],
+                "filters": [],
+            },
+            "pullback",
+            "current",
+        )
+
+        self.assertEqual(candidate["entryPrice"], 0.0)
+        self.assertFalse(candidate["entryPriceAvailable"])
+
+    def test_run_replay_skips_session_entries_without_explicit_entry_price(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            payload = self._payload()
+            carry_entry = payload["slots"][0]["entries"]["pullback"][0]
+            carry_entry.pop("entryPrice", None)
+            carry_entry["currentPrice"] = 12345.0
+            carry_entry["analysisSession"] = "1500"
+            carry_entry["analysisSessionLabel"] = "3시 분석"
+            self._write_payload(out_dir, payload)
+
+            with mock.patch("jongga.replay_backtest.fetch_naver_price_history", return_value=[]):
+                run = run_replay(
+                    date_from=date(2026, 6, 3),
+                    date_to=date(2026, 6, 3),
+                    variant=VARIANT_STABLE,
+                    bar="1m",
+                    threshold_profile="current",
+                    out_dir=out_dir,
+                )
+
+        self.assertEqual(run["summary"]["tradeCount"], 0)
+        self.assertEqual(run["summary"]["candidateCount"], 2)
+        self.assertEqual(run["days"][0]["candidates"][0]["replaySkippedReason"], "entry_price_unavailable")
+
     def test_market_data_is_marked_degraded_when_falling_back_to_daily(self):
         rows = [
             {"localTradedAt": "20260604", "openPrice": "10050", "highPrice": "10500", "lowPrice": "9800", "closePrice": "10200", "accumulatedTradingVolume": "1000"},
@@ -239,6 +289,60 @@ class ReplayBacktestTests(unittest.TestCase):
             normalize_analysis_dates([date(2026, 6, 1), date(2026, 6, 6), date(2026, 6, 7), date(2026, 6, 2)]),
             [date(2026, 6, 1), date(2026, 6, 2)],
         )
+
+    def test_run_replay_excludes_historical_regen_payloads(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            payload = self._payload()
+            payload["pointInTime"] = False
+            payload["pointInTimeStatus"] = "historical_regen"
+            self._write_payload(out_dir, payload)
+
+            with mock.patch("jongga.replay_backtest.fetch_naver_price_history", return_value=[]):
+                run = run_replay(
+                    date_from=date(2026, 6, 3),
+                    date_to=date(2026, 6, 3),
+                    variant=VARIANT_STABLE,
+                    bar="1m",
+                    threshold_profile="current",
+                    out_dir=out_dir,
+                )
+
+            self.assertEqual(run["summary"]["tradeCount"], 0)
+            self.assertEqual(run["summary"]["historicalRegenExcludedDays"], 1)
+            self.assertEqual(run["days"][0]["skippedReason"], "historical_regen_excluded")
+            self.assertEqual(run["days"][0]["pointInTimeStatus"], "historical_regen")
+
+    def test_run_replay_keeps_legacy_unknown_and_surfaces_warning(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            payload = self._payload()
+            payload.pop("pointInTime", None)
+            payload.pop("pointInTimeStatus", None)
+            self._write_payload(out_dir, payload)
+            rows_by_code = {
+                "000001": [
+                    {"localTradedAt": "20260604", "openPrice": "10050", "highPrice": "10450", "lowPrice": "9900", "closePrice": "10350", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260603", "openPrice": "9950", "highPrice": "10050", "lowPrice": "9800", "closePrice": "10000", "accumulatedTradingVolume": "1000"},
+                ],
+                "000002": [
+                    {"localTradedAt": "20260604", "openPrice": "20000", "highPrice": "20100", "lowPrice": "19800", "closePrice": "19950", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260603", "openPrice": "19900", "highPrice": "20100", "lowPrice": "19800", "closePrice": "20000", "accumulatedTradingVolume": "1000"},
+                ],
+            }
+
+            with mock.patch("jongga.replay_backtest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]):
+                run = run_replay(
+                    date_from=date(2026, 6, 3),
+                    date_to=date(2026, 6, 3),
+                    variant=VARIANT_STABLE,
+                    bar="1m",
+                    threshold_profile="current",
+                    out_dir=out_dir,
+                )
+
+            self.assertEqual(run["days"][0]["pointInTimeStatus"], "legacy_unknown")
+            self.assertIn("legacy_unknown 1일 포함", run["summary"]["pointInTimeWarnings"])
 
     def test_run_replay_writes_expected_artifacts(self):
         with TemporaryDirectory() as tmp:

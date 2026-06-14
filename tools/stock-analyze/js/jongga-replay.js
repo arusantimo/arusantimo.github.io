@@ -204,6 +204,11 @@ function getReplayValidationPolicy(bridge = getJonggaReplayBridge()) {
   return policy && typeof policy === 'object' && !Array.isArray(policy) ? policy : null;
 }
 
+function getReplayPointInTimeWarnings(bridge = getJonggaReplayBridge()) {
+  const warnings = bridge?.latestRun?.summary?.pointInTimeWarnings;
+  return Array.isArray(warnings) ? warnings.filter(Boolean).map(item => String(item)) : [];
+}
+
 function getReplayClosedReasonLabel(value) {
   const labels = {
     close_slippage: '종가 매수 체결',
@@ -1139,6 +1144,7 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
     ? getJonggaReplayPeriodLabel(activePeriod, bridge)
     : periodLabel;
   const comparisonByCase = strategyView?.comparisonByCase || strategySummary?.comparisonByCase || null;
+  const pointInTimeWarnings = getReplayPointInTimeWarnings(bridge);
   const hasStrategyData = Boolean(
     strategyView &&
     strategySummary &&
@@ -1160,6 +1166,7 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
   body.innerHTML = `
     <div class="replay-meta">자동 실행 상태: ${escapeHtml(String(attempt.status || 'missing'))} ${attempt.message ? `· ${escapeHtml(attempt.message)}` : ''}</div>
     <div class="replay-meta">기간: ${escapeHtml(periodLabel)} · 채널 ${escapeHtml(getJonggaReplayVariantLabel(latestRun.variant))} · 프로필 ${escapeHtml(latestRun.thresholdProfile || '-')} · 케이스 ${escapeHtml(getJonggaReplayViewMeta(activeCaseMode).label)}</div>
+    ${pointInTimeWarnings.length ? `<div class="replay-meta warning-text">시점 메타: ${escapeHtml(pointInTimeWarnings.join(' · '))}</div>` : ''}
     ${renderReplayPolicyBanner(policy, getJonggaReplayVariantLabel(latestRun.variant))}
     <div class="section-title" style="margin-top:16px;">${escapeHtml(strategy ? `${getReplayStrategyLabel(strategy)} 타입 수익` : '전략별 성과')}</div>
     ${hasStrategyData

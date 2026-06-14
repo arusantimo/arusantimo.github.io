@@ -1,10 +1,8 @@
-# 종가베팅 jongga 데이터 — 평일 KST 15:00 / 17:30 자동 생성 후 Pages 배포용 커밋
+# 종가베팅 jongga 데이터 — 외부 스케줄러가 평일 KST 15:00 / 17:30에 workflow_dispatch로 호출,
+# 데이터 생성 후 Pages 배포용 커밋
 name: jongga-schedule
 
 on:
-  schedule:
-    - cron: "0 6 * * 1-5"
-    - cron: "30 8 * * 1-5"
   workflow_dispatch:
     inputs:
       session:
@@ -27,44 +25,30 @@ jobs:
   generate-jongga:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: utf-8
+      FORCE_COLOR: "1"
+      KRX_ID: ${{ secrets.KRX_ID }}
+      KRX_PW: ${{ secrets.KRX_PW }}
     steps:
       - name: Resolve analysis session (KST)
         id: meta
         env:
-          SCHEDULE: ${{ github.event.schedule }}
           INPUT_SESSION: ${{ github.event.inputs.session }}
         run: |
           set -euo pipefail
-          session=""
-          label=""
-          case "${SCHEDULE}" in
-            "0 6 * * 1-5")
-              session="1500"
-              label="15:00 KST (3시 분석)"
-              ;;
-            "30 8 * * 1-5")
-              session="1730"
-              label="17:30 KST (5시반 분석)"
+          case "${INPUT_SESSION}" in
+            "1500") label="15:00 KST (3시 분석)" ;;
+            "1730") label="17:30 KST (5시반 분석)" ;;
+            *)
+              echo "Unsupported session: ${INPUT_SESSION}" >&2
+              exit 1
               ;;
           esac
-          if [ "${INPUT_SESSION}" != "" ]; then
-            session="${INPUT_SESSION}"
-            case "${INPUT_SESSION}" in
-              "1500") label="15:00 KST (3시 분석) [manual]" ;;
-              "1730") label="17:30 KST (5시반 분석) [manual]" ;;
-              *)
-                echo "Unsupported session: ${INPUT_SESSION}" >&2
-                exit 1
-                ;;
-            esac
-          fi
-          if [ "${session}" = "" ]; then
-            echo "Unable to resolve jongga session from schedule or input" >&2
-            exit 1
-          fi
-          echo "session=${session}" >> "${GITHUB_OUTPUT}"
+          echo "session=${INPUT_SESSION}" >> "${GITHUB_OUTPUT}"
           echo "label=${label}" >> "${GITHUB_OUTPUT}"
-          echo "Resolved session: ${session} (${label})"
+          echo "Resolved session: ${INPUT_SESSION} (${label})"
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -103,12 +87,27 @@ jobs:
         working-directory: tools/stock-analyze
         run: python -m playwright install-deps chromium
 
+      - name: Verify Playwright runtime
+        working-directory: tools/stock-analyze
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from playwright.sync_api import sync_playwright
+
+          github_env = os.environ["GITHUB_ENV"]
+          with sync_playwright() as p:
+              executable_path = p.chromium.executable_path
+              print(f"Resolved Playwright Chromium: {executable_path}")
+              with open(github_env, "a", encoding="utf-8") as handle:
+                  handle.write(f"MARKET_ANALYZE_PLAYWRIGHT_EXECUTABLE_PATH={executable_path}\n")
+              browser = p.chromium.launch(headless=True)
+              print(f"Playwright Chromium version: {browser.version}")
+              browser.close()
+          PY
+
       - name: Run jongga pipeline
         working-directory: tools/stock-analyze
-        env:
-          PYTHONUTF8: "1"
-          PYTHONIOENCODING: utf-8
-          FORCE_COLOR: "1"
         run: python run_jongga_pipeline.py --session "${{ steps.meta.outputs.session }}"
 
       - name: Commit and push jongga outputs

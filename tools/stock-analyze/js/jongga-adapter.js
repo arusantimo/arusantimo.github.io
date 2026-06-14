@@ -25,11 +25,21 @@ function normalizeJonggaRule(rule = {}) {
   };
 }
 
+const JONGGA_DEPRECATED_CREDIT_RULE_CODES = new Set(['D5', 'G14', 'L2']);
+
+function isDeprecatedCreditRuleCode(code) {
+  return JONGGA_DEPRECATED_CREDIT_RULE_CODES.has(String(code || '').trim().toUpperCase());
+}
+
 function normalizeJonggaRuleList(value, codes = null) {
-  const list = normalizeJonggaRuleArray(value).map(normalizeJonggaRule).filter(rule => rule.code);
+  const list = normalizeJonggaRuleArray(value)
+    .map(normalizeJonggaRule)
+    .filter(rule => rule.code && !isDeprecatedCreditRuleCode(rule.code));
   if (!codes) return list;
   const map = new Map(list.map(rule => [rule.code, rule]));
-  return codes.map(code => map.get(code) || { code, status: '미상', note: '근거 누락' });
+  return codes
+    .filter(code => !isDeprecatedCreditRuleCode(code))
+    .map(code => map.get(code) || { code, status: '미상', note: '근거 누락' });
 }
 
 function normalizeJonggaRuleCodes(value, matched = false) {
@@ -41,7 +51,7 @@ function normalizeJonggaRuleCodes(value, matched = false) {
         || inferRuleEvalStatus({ ...rule, note }, matched);
       return { code, note, evalStatus };
     })
-    .filter(rule => rule.code);
+    .filter(rule => rule.code && !isDeprecatedCreditRuleCode(rule.code));
 }
 
 function normalizeJonggaTradePlanRows(value) {
@@ -627,7 +637,9 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
     signalScore,
     scoreMax,
     gradeScore,
-    scoreBreakdown: Array.isArray(effectiveRawEntry.scoreBreakdown) ? effectiveRawEntry.scoreBreakdown : [],
+    scoreBreakdown: Array.isArray(effectiveRawEntry.scoreBreakdown)
+      ? effectiveRawEntry.scoreBreakdown.filter(row => !isDeprecatedCreditRuleCode(row?.code))
+      : [],
     scoreScope: String(effectiveRawEntry.scoreScope || strategy),
     ...(typeof effectiveRawEntry.entryEligible === 'boolean'
       ? {

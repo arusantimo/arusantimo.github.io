@@ -1,18 +1,27 @@
+import json
 import unittest
 from datetime import date
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from jongga.output_contract import (
+    POINT_IN_TIME_HISTORY_START_DATE,
     ANALYSIS_SESSION_1500,
     INPUT_ARCHIVE_VERSION,
     PAYLOAD_SOURCE_LIVE,
+    POINT_IN_TIME_STATUS_CONFIRMED,
+    POINT_IN_TIME_STATUS_HISTORICAL_REGEN,
+    POINT_IN_TIME_STATUS_LEGACY_UNKNOWN,
     VARIANT_CANARY,
     VARIANT_STABLE,
     build_input_archive_path,
     build_session_archive_path,
     extract_top_recommendations,
+    infer_payload_point_in_time_status,
     is_canary_channel_enabled,
+    is_point_in_time_run,
+    point_in_time_status,
+    payload_with_analysis_date,
     previous_trading_day,
     resolve_analysis_date,
     resolve_generation_variants,
@@ -68,6 +77,50 @@ class OutputContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "주말 날짜"):
             resolve_analysis_date("2026-06-07")
 
+    def test_is_point_in_time_run_true_for_natural_analysis_date(self):
+        # 2026-06-08(월)에 --date 없이 실행하면 자연 분석일은 2026-06-08
+        self.assertTrue(is_point_in_time_run(date(2026, 6, 8), today=date(2026, 6, 8)))
+
+    def test_is_point_in_time_run_false_for_weekend_no_date_execution(self):
+        self.assertFalse(is_point_in_time_run(date(2026, 6, 5), today=date(2026, 6, 7)))
+
+    def test_is_point_in_time_run_false_for_past_date_regen(self):
+        # 2026-06-14에 5/22 데이터를 재생성하면 vintage 오염 위험
+        self.assertFalse(is_point_in_time_run(date(2026, 5, 22), today=date(2026, 6, 14)))
+
+    def test_explicit_date_marks_historical_regen_even_on_same_day(self):
+        self.assertEqual(
+            point_in_time_status(date(2026, 6, 8), today=date(2026, 6, 8), explicit_date_used=True),
+            POINT_IN_TIME_STATUS_HISTORICAL_REGEN,
+        )
+
+    def test_payload_with_analysis_date_stamps_point_in_time_fields(self):
+        payload = payload_with_analysis_date({}, date(2026, 5, 22), variant=VARIANT_STABLE, today=date(2026, 5, 22))
+        self.assertIn("pointInTime", payload)
+        self.assertIsInstance(payload["pointInTime"], bool)
+        self.assertEqual(payload["pointInTimeStatus"], POINT_IN_TIME_STATUS_CONFIRMED)
+
+    def test_infer_payload_point_in_time_status_marks_missing_meta_as_legacy_unknown(self):
+        self.assertEqual(infer_payload_point_in_time_status({}), POINT_IN_TIME_STATUS_LEGACY_UNKNOWN)
+
+    def test_infer_payload_point_in_time_status_upgrades_legacy_unknown_when_generated_same_day(self):
+        payload = {
+            "analysisDate": "2026-06-09",
+            "generatedAt": "2026-06-09T15:40:00+09:00",
+            "pointInTime": False,
+            "pointInTimeStatus": POINT_IN_TIME_STATUS_LEGACY_UNKNOWN,
+        }
+        self.assertEqual(infer_payload_point_in_time_status(payload), POINT_IN_TIME_STATUS_CONFIRMED)
+
+    def test_infer_payload_point_in_time_status_upgrades_legacy_unknown_when_generated_later(self):
+        payload = {
+            "analysisDate": "2026-06-05",
+            "generatedAt": "2026-06-08T22:00:00+09:00",
+            "pointInTime": False,
+            "pointInTimeStatus": POINT_IN_TIME_STATUS_LEGACY_UNKNOWN,
+        }
+        self.assertEqual(infer_payload_point_in_time_status(payload), POINT_IN_TIME_STATUS_HISTORICAL_REGEN)
+
     def test_write_daily_outputs_writes_input_archive_and_history_metadata(self):
         with TemporaryDirectory() as tmp:
             out_dir = Path(tmp) / "jongga" / "output"
@@ -106,6 +159,9 @@ class OutputContractTests(unittest.TestCase):
             self.assertIn("payloadSourceMode", history_text)
             self.assertIn("rebuildable", history_text)
             self.assertIn("jongga/output/archive/202606/inputs_20260608.json", history_text.replace("\\\\", "/"))
+            written_payload = json.loads(json_path.read_text(encoding="utf-8"))
+            self.assertEqual(written_payload["pointInTimeStatus"], POINT_IN_TIME_STATUS_CONFIRMED)
+            self.assertTrue(written_payload["pointInTime"])
 
     def test_build_session_archive_path_uses_date_session_and_variant(self):
         stable_path = build_session_archive_path("jongga/output", date(2026, 6, 8), session=ANALYSIS_SESSION_1500, variant=VARIANT_STABLE)
@@ -133,14 +189,28 @@ class OutputContractTests(unittest.TestCase):
             [
                 {"date": "2026-06-07", "variant": VARIANT_STABLE},
                 {"date": "2026-06-06", "variant": VARIANT_STABLE},
-                {"date": "2026-06-05", "variant": VARIANT_STABLE},
+                {"date": "2026-06-08", "variant": VARIANT_STABLE},
             ],
-            {"date": "2026-06-08", "variant": VARIANT_STABLE},
+            {"date": "2026-06-09", "variant": VARIANT_STABLE},
         )
 
         self.assertEqual(
             [row["date"] for row in rows],
-            ["2026-06-08", "2026-06-05"],
+            ["2026-06-09", "2026-06-08"],
+        )
+
+    def test_update_history_index_drops_entries_before_active_window(self):
+        rows = update_history_index(
+            [
+                {"date": "2026-06-09", "variant": VARIANT_STABLE},
+                {"date": "2026-06-05", "variant": VARIANT_STABLE},
+            ],
+            {"date": POINT_IN_TIME_HISTORY_START_DATE.isoformat(), "variant": VARIANT_STABLE},
+        )
+
+        self.assertEqual(
+            [row["date"] for row in rows],
+            ["2026-06-09", POINT_IN_TIME_HISTORY_START_DATE.isoformat()],
         )
 
 

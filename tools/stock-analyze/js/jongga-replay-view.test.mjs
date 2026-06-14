@@ -234,6 +234,18 @@ test('replay view summary shows dash when visible mode entries have no replay hi
   assert.match(summary.innerHTML, /누적 수익률 —/);
 });
 
+test('replay view summary appends point-in-time warnings when present', () => {
+  const { context, elements } = loadStateContext();
+  const summary = createElementStub();
+  elements.set('jongga-replay-view-summary', summary);
+  context.window.JONGGA_REPLAY_RUNS = sampleReplayBridge();
+  context.window.JONGGA_REPLAY_RUNS.latestRun.summary.pointInTimeWarnings = ['legacy_unknown 1일 포함'];
+
+  context.updateJonggaReplayViewControls(sampleSnapshot());
+
+  assert.match(summary.innerHTML, /legacy_unknown 1일 포함/);
+});
+
 test('setJonggaReplayViewMode rerenders strategy replay sections on tab switch', () => {
   const { context } = loadStateContext();
   let replaySectionRenderCount = 0;

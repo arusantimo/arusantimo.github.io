@@ -16,8 +16,9 @@ BREAKOUT_WEIGHTS: dict[str, float] = {
     "C1": 1.0,
     "C2": 1.0,
     "C3": 1.0,
+    "L1": 1.0,  # 대차잔고 증가 추이 — 숏스퀴즈 동력 (대형주만 수집, 그 외 데이터 부족)
 }
-BREAKOUT_STRICT_MAX = 11.5
+BREAKOUT_STRICT_MAX = 12.5
 
 # Legacy names
 MOMENTUM_WEIGHTS = BREAKOUT_WEIGHTS
@@ -46,8 +47,9 @@ PULLBACK_SCORE_WEIGHTS: dict[str, float] = {
     "D1": 2.5,   # 눌림 깊이 (52주 고가 대비 낙폭)
     "D2": 2.0,   # 수급 추세 (2일 순매수 강도)
     "D3": 2.0,   # 반등 거래량 (당일/20일 평균)
+    "D4": 1.5,   # 대차잔고(공매도) 감소 추이 — 숏커버링 징후 (대형주만 수집, 그 외 데이터 부족)
 }
-PULLBACK_STRICT_MAX = 11.5
+PULLBACK_STRICT_MAX = 13.0
 
 ACCUMULATION_SCORE_WEIGHTS = {
     "S1": 2.0,
@@ -61,8 +63,9 @@ ACCUMULATION_SCORE_WEIGHTS = {
     "C2": 1.0,
     "C3": 1.0,
     "C4": 0.5,
+    "L1": 1.0,  # 대차잔고 감소 추이 — 클린 매집 징후 (대형주만 수집, 그 외 데이터 부족)
 }
-ACCUMULATION_STRICT_MAX = 13.0
+ACCUMULATION_STRICT_MAX = 14.0
 
 REVERSAL_SCORE_WEIGHTS = dict(TREND_SCORE_WEIGHTS)
 REVERSAL_STRICT_MAX = 10.0
@@ -74,12 +77,25 @@ def _clamp_score(value: float, minimum: float, maximum: float) -> float:
     return max(minimum, min(maximum, value))
 
 
+def _snapshot_value(snapshot: Any | None, key: str, default: Any = None) -> Any:
+    if snapshot is None:
+        return default
+    if isinstance(snapshot, dict):
+        return snapshot.get(key, default)
+    return getattr(snapshot, key, default)
+
+
+def _snapshot_mapping(snapshot: Any | None, key: str) -> dict[str, Any]:
+    value = _snapshot_value(snapshot, key, {})
+    return value if isinstance(value, dict) else {}
+
+
 def _breakout_s2_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
     if result.score >= 1.0:
         return 1.0
     if snapshot is None:
         return 0.0
-    toss = snapshot.toss or {}
+    toss = _snapshot_mapping(snapshot, "toss")
     avg_strength = float(toss.get("avgStrength") or 0)
     intraday_ratio = float(toss.get("intradayAbove100Ratio") or 0)
     if avg_strength >= 110.0 or intraday_ratio >= 70.0:
@@ -92,7 +108,7 @@ def _breakout_c3_signal_factor(_code: str, result: EvalResult, snapshot: Any | N
         return 1.0
     if snapshot is None:
         return 0.0
-    orderbook = snapshot.orderbook or {}
+    orderbook = _snapshot_mapping(snapshot, "orderbook")
     bid_ask_ratio = float(orderbook.get("bidAskRatio") or 0)
     if bid_ask_ratio >= 1.2:
         return 1.0
@@ -104,10 +120,14 @@ def _breakout_c3_signal_factor(_code: str, result: EvalResult, snapshot: Any | N
 def _breakout_p1_signal_factor(_code: str, result: EvalResult, snapshot: Any | None) -> float:
     if result.score >= 1.0:
         return 1.0
-    if snapshot is None or not snapshot.high_20d:
+    high_20d = _snapshot_value(snapshot, "high_20d")
+    if high_20d is None and isinstance(snapshot, dict):
+        high_20d = snapshot.get("high20d")
+    price = _snapshot_value(snapshot, "current_price")
+    if price is None and isinstance(snapshot, dict):
+        price = snapshot.get("currentPrice")
+    if snapshot is None or not high_20d or not price:
         return 0.0
-    price = snapshot.current_price
-    high_20d = snapshot.high_20d
     if price > high_20d:
         extension = (price / high_20d - 1) * 100
         if extension <= 5.0:

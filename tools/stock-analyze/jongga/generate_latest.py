@@ -12,14 +12,23 @@ from copy import deepcopy
 from html.parser import HTMLParser
 from time import perf_counter
 from dataclasses import asdict, dataclass
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError, URLError
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 from urllib.request import Request, urlopen
 
 from jongga.entry_policy import attach_entry_eligibility
+from jongga.balance_sources import (
+    LARGE_CAP_MARKET_CAP_RANK_LIMIT,
+    SHORT_BALANCE_TREND_LOOKBACK_TRADING_DAYS,
+    _compute_short_balance_change_pct,
+    _fetch_code_isin_map,
+    _short_balance_series_from_rows,
+    collect_short_balance_trend,
+    fetch_short_balance_trend_map,
+)
 from jongga.grade_policy import grade_from_score
 from jongga.scoring import (
     ACCUMULATION_SCORE_WEIGHTS,
@@ -98,6 +107,9 @@ from jongga.rule_evaluation import (
     evaluate_pullback_d1_depth,
     evaluate_pullback_d2_supply,
     evaluate_pullback_d3_rebound_volume,
+    evaluate_pullback_d4_short_covering,
+    evaluate_accumulation_l1_short_balance_decrease,
+    evaluate_breakout_l1_short_balance_increase,
     evaluate_pullback_p1,
     evaluate_pullback_p2,
     evaluate_pullback_p3,
@@ -132,10 +144,13 @@ from jongga.output_contract import (
     INPUT_ARCHIVE_VERSION,
     KST,
     PAYLOAD_SOURCE_LIVE,
+    POINT_IN_TIME_STATUS_CONFIRMED,
     VARIANT_CANARY,
     VARIANT_STABLE,
     analysis_session_label,
     compact_date,
+    infer_payload_point_in_time_status,
+    is_point_in_time_run,
     normalize_analysis_session,
     normalize_variant,
     payload_with_analysis_date,
@@ -1649,6 +1664,61 @@ def fetch_overtime_price_map(*, max_pages: int = OVERTIME_BOARD_MAX_PAGES) -> di
     return price_map
 
 
+def collect_overtime_price_context(*, session: str, point_in_time_run: bool) -> tuple[dict[str, float], dict[str, Any]]:
+    resolved_session = normalize_analysis_session(session)
+    if resolved_session != ANALYSIS_SESSION_1730:
+        return {}, {
+            "enabled": False,
+            "status": "skipped",
+            "detail": "",
+            "count": 0,
+            "fallback": False,
+            "providerHealth": {},
+            "fallbackUsage": [],
+        }
+    if not point_in_time_run:
+        return {}, {
+            "enabled": False,
+            "status": "skipped",
+            "detail": "historical regen keeps regular close to avoid vintage contamination",
+            "count": 0,
+            "fallback": False,
+            "providerHealth": {"naver_overtime_board": {"skipped": 1}},
+            "fallbackUsage": [],
+        }
+
+    price_map = fetch_overtime_price_map()
+    fallback = not bool(price_map)
+    return price_map, {
+        "enabled": True,
+        "status": "ok" if price_map else "fallback",
+        "detail": "정규장 종가로 대체" if fallback else "",
+        "count": len(price_map),
+        "fallback": fallback,
+        "providerHealth": (
+            {"naver_overtime_board": {"ok": len(price_map)}}
+            if price_map
+            else {"naver_overtime_board": {"fallback": 1}}
+        ),
+        "fallbackUsage": (
+            [{
+                "key": "overtime_price",
+                "provider": "naver_overtime_board",
+                "layer": "session_close",
+                "fallbackLevel": 1,
+                "confidence": 0.4,
+                "stale": False,
+            }]
+            if fallback
+            else []
+        ),
+    }
+
+
+# --- 잔고 계열(source layer) ---
+# 대차/신용 잔고는 balance_sources.py의 전용 provider 체인으로 수집한다.
+
+
 def _is_market_cap_rank_candidate(row: dict[str, Any]) -> bool:
     code = str(row.get("itemCode") or row.get("code") or "").strip()
     name = str(row.get("stockName") or row.get("name") or "").strip()
@@ -1857,6 +1927,7 @@ class StockSnapshot:
     open_history: list[float] | None = None
     date_history: list[str] | None = None
     stockExchangeName: str | None = None
+    short_balance_change_pct: float | None = None
 
 
 def _analysis_history_rows(
@@ -1911,6 +1982,7 @@ def build_stock_snapshot(
     market_cap_rank_lookup: dict[str, int] | None = None,
     market_cap_universe_count: int | None = None,
     overtime_price_map: dict[str, float] | None = None,
+    short_balance_trend_map: dict[str, float] | None = None,
 ) -> StockSnapshot:
     rank, code, name = item
     basic = request_json(f"https://m.stock.naver.com/api/stock/{code}/basic", timeout=20.0)
@@ -2031,6 +2103,7 @@ def build_stock_snapshot(
         low_52w=low_52w or None,
         foreign_rate=_optional_metric(find_total_info(total_infos, "foreignRate")),
         stockExchangeName=basic.get("stockExchangeName"),
+        short_balance_change_pct=(short_balance_trend_map or {}).get(code),
     )
 
 
@@ -4694,6 +4767,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         "D1": evaluate_pullback_d1_depth(quality_indicators),
         "D2": evaluate_pullback_d2_supply(quality_indicators),
         "D3": evaluate_pullback_d3_rebound_volume(quality_indicators),
+        "D4": evaluate_pullback_d4_short_covering(quality_indicators),
     }
     gates = [
         gate_dict("G0", evaluate_pullback_g0(snapshot)),
@@ -4833,6 +4907,7 @@ def build_breakout_entry(
     daily_change_pct = stock_daily_change(snapshot)
     manual_input = build_manual_input_meta("breakout", snapshot)
     volatility_context = build_entry_volatility_context(snapshot, context, "breakout")
+    quality_indicators = _strategy_quality_indicators(snapshot, "breakout")
     score_map = {
         "RS": evaluate_breakout_rs(rs_top10),
         "S1": evaluate_breakout_s1(snapshot),
@@ -4842,6 +4917,7 @@ def build_breakout_entry(
         "C1": evaluate_breakout_c1(snapshot),
         "C2": evaluate_breakout_c2(snapshot, candle_range, upper_wick_ratio),
         "C3": evaluate_breakout_c3(snapshot),
+        "L1": evaluate_breakout_l1_short_balance_increase(quality_indicators),
     }
     gates = [
         gate_dict("G1", evaluate_breakout_g1(snapshot, kospi_return_5d, kospi_return_20d)),
@@ -4932,6 +5008,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         "C2": evaluate_accumulation_c2(snapshot, daily_change_pct),
         "C3": evaluate_accumulation_c3(snapshot, context),
         "C4": evaluate_accumulation_c4(snapshot),
+        "L1": evaluate_accumulation_l1_short_balance_decrease(quality_indicators),
     }
     accumulation_trend = build_accumulation_s5_detail(snapshot)
     gates = [
@@ -5252,6 +5329,7 @@ def collect_live_payload(
     mode: str = VARIANT_STABLE,
     analysis_date: str | date | None = None,
     session: str = ANALYSIS_SESSION_1500,
+    point_in_time_run: bool = True,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     resolved_mode = normalize_variant(mode)
     collection_log: list[dict[str, Any]] = []
@@ -5281,6 +5359,32 @@ def collect_live_payload(
             f"{variant_label(resolved_mode)} · {label} · {duration_ms:.1f}ms{count_suffix}{detail_suffix}",
             tone=step_tone(status.lower()),
         )
+
+    def merge_provider_health_rows(base: dict[str, dict[str, int]], extra: dict[str, dict[str, int]]) -> dict[str, dict[str, int]]:
+        merged = {provider: dict(statuses) for provider, statuses in base.items()}
+        for provider, statuses in extra.items():
+            row = merged.setdefault(provider, {})
+            for status, count in statuses.items():
+                row[status] = row.get(status, 0) + int(count)
+        return merged
+
+    def summarize_balance_collection(
+        collected: dict[str, Any],
+        attempted_count: int,
+        *,
+        missing_note: str,
+        result_status: str,
+        fallback_usage: list[dict[str, Any]],
+    ) -> tuple[str, str]:
+        if collected:
+            used_fallback = sum(int(row.get("count") or 0) for row in fallback_usage)
+            if used_fallback:
+                fallback_providers = ", ".join(sorted({str(row.get("provider") or "") for row in fallback_usage if row.get("provider")}))
+                return "partial", f"후보 {attempted_count}종목 중 {len(collected)}건 수집 · fallback {used_fallback}건 ({fallback_providers})"
+            return "ok", f"후보 {attempted_count}종목 중 {len(collected)}건 수집"
+        if result_status == "failed":
+            return "warning", f"후보 {attempted_count}종목 조회 실패 · {missing_note}"
+        return "warning", f"후보 {attempted_count}종목 데이터 부족 · {missing_note}"
 
     started_at = perf_counter()
     vkospi_quote = fetch_vkospi_quote()
@@ -5391,17 +5495,53 @@ def collect_live_payload(
     log_step("top_trading", "거래대금 상위 종목 수집", started_at, count=len(top_trading))
 
     overtime_price_map: dict[str, float] = {}
+    overtime_meta: dict[str, Any] = {
+        "enabled": False,
+        "status": "skipped",
+        "detail": "",
+        "count": 0,
+        "fallback": False,
+        "providerHealth": {},
+        "fallbackUsage": [],
+    }
     if normalize_analysis_session(session) == ANALYSIS_SESSION_1730:
         started_at = perf_counter()
-        overtime_price_map = fetch_overtime_price_map()
+        overtime_price_map, overtime_meta = collect_overtime_price_context(
+            session=session,
+            point_in_time_run=point_in_time_run,
+        )
         log_step(
             "overtime_price",
             "시간외 단일가 종가 보강",
             started_at,
-            status="ok" if overtime_price_map else "fallback",
-            detail="정규장 종가로 대체" if not overtime_price_map else "",
-            count=len(overtime_price_map),
+            status=str(overtime_meta.get("status") or "skipped"),
+            detail=str(overtime_meta.get("detail") or ""),
+            count=int(overtime_meta.get("count") or 0),
         )
+
+    started_at = perf_counter()
+    large_cap_codes = [
+        code
+        for _, code, _ in top_trading
+        if (market_cap_rank_lookup.get(code) or 0) and market_cap_rank_lookup[code] <= LARGE_CAP_MARKET_CAP_RANK_LIMIT
+    ]
+    short_balance_result = collect_short_balance_trend(large_cap_codes, as_of=resolved_analysis_date)
+    short_balance_trend_map = short_balance_result.values
+    short_balance_status, short_balance_detail = summarize_balance_collection(
+        short_balance_trend_map,
+        len(large_cap_codes),
+        missing_note="D4/L1 진단 제외",
+        result_status=short_balance_result.status,
+        fallback_usage=short_balance_result.fallback_usage,
+    )
+    log_step(
+        "short_balance_trend",
+        "대차잔고(공매도) 추이 보강 (대형주)",
+        started_at,
+        status=short_balance_status,
+        detail=short_balance_detail,
+        count=len(short_balance_trend_map),
+    )
 
     snapshots: list[StockSnapshot] = []
     errors: list[str] = []
@@ -5415,6 +5555,7 @@ def collect_live_payload(
                 market_cap_rank_lookup,
                 market_cap_universe_count,
                 overtime_price_map,
+                short_balance_trend_map,
             ): item
             for item in top_trading
         }
@@ -5571,8 +5712,17 @@ def collect_live_payload(
         manual_keys.append("toss_metrics")
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
+    if short_balance_result.manual_required:
+        manual_keys.append("short_balance_trend")
+    if overtime_meta.get("fallback"):
+        fallback_keys.append("overtime_price")
+    if short_balance_result.fallback_usage:
+        fallback_keys.append("short_balance_trend")
+    manual_keys = list(dict.fromkeys(manual_keys))
+    fallback_keys = list(dict.fromkeys(fallback_keys))
     stale_keys = list(macro_freshness["staleKeys"])
-    data_quality_status = "partial" if errors or http_errors or browser_errors or pullback_news_errors or missing_public_metrics or fallback_keys or stale_keys else "success"
+    balance_failures = list(short_balance_result.failure_messages)
+    data_quality_status = "partial" if errors or http_errors or browser_errors or pullback_news_errors or balance_failures or missing_public_metrics or fallback_keys or stale_keys else "success"
     intraday_ok = sum(1 for snapshot in snapshots if snapshot.intraday_30m.get("available"))
     event_schedule_ok = sum(1 for snapshot in snapshots if snapshot.event_filter)
     toss_strength_ok = sum(1 for item in http_enrichments.values() if (item.get("toss") or {}).get("avgStrength") is not None)
@@ -5580,6 +5730,35 @@ def collect_live_payload(
     orderbook_ok = sum(1 for item in http_enrichments.values() if item.get("orderbook"))
     kind_browser_ok = sum(1 for item in kind_enrichments.values() if item.get("eventFilter")) + sum(1 for item in pullback_kind_enrichments.values() if item.get("eventFilter"))
     item_news_ok = sum(1 for item in pullback_news_enrichments.values() if item.get("newsFlow"))
+    provider_health = merge_provider_health_rows(
+        {
+            "naver_mobile": {"ok": len(snapshots)},
+            "naver_chart": {"ok": len(snapshots)},
+            "naver_integration_schedule": {"ok": event_schedule_ok},
+            "yahoo_chart": {"ok": 5 + (1 if live_metrics["vkospi"]["isFallback"] else 0), "stale": len(stale_keys)},
+            "yahoo_intraday_30m": {"ok": intraday_ok},
+            "toss_http_strength": {"ok": toss_strength_ok},
+            "toss_ticks_strength_proxy": {"ok": toss_ticks_proxy_ok},
+            "toss_quotes_orderbook": {"ok": orderbook_ok},
+            "kind_playwright_disclosure": {"ok": kind_browser_ok},
+            "naver_item_news": {"ok": item_news_ok},
+            "cnbc_quote": {"ok": 0 if live_metrics["vkospi"]["isFallback"] else 1},
+        },
+        overtime_meta.get("providerHealth") or {},
+        short_balance_result.provider_health,
+    )
+    fallback_usage = [
+        {
+            "key": "vkospi",
+            "provider": "yahoo_chart",
+            "layer": "proxy",
+            "fallbackLevel": 2,
+            "confidence": 0.55,
+            "stale": False,
+        }
+    ] if live_metrics["vkospi"]["isFallback"] else []
+    fallback_usage.extend(overtime_meta.get("fallbackUsage") or [])
+    fallback_usage.extend(short_balance_result.fallback_usage)
 
     payload = {
         "schemaVersion": "jongga_result.v1",
@@ -5592,39 +5771,18 @@ def collect_live_payload(
             "status": data_quality_status,
             "counts": {
                 "total": len(snapshots),
-                "failed": len(errors),
+                "failed": len(errors) + len(balance_failures),
                 "stale": len(stale_keys),
-                "manual": missing_public_metrics,
+                "manual": missing_public_metrics + len(manual_keys),
                 "fallback": len(fallback_keys),
                 "slots": 1,
             },
-            "failedKeys": errors + http_errors + browser_errors + pullback_news_errors,
+            "failedKeys": errors + http_errors + browser_errors + pullback_news_errors + balance_failures,
             "staleKeys": stale_keys,
             "manualKeys": manual_keys,
             "fallbackKeys": fallback_keys,
-            "providerHealth": {
-                "naver_mobile": {"ok": len(snapshots)},
-                "naver_chart": {"ok": len(snapshots)},
-                "naver_integration_schedule": {"ok": event_schedule_ok},
-                "yahoo_chart": {"ok": 5 + (1 if live_metrics["vkospi"]["isFallback"] else 0), "stale": len(stale_keys)},
-                "yahoo_intraday_30m": {"ok": intraday_ok},
-                "toss_http_strength": {"ok": toss_strength_ok},
-                "toss_ticks_strength_proxy": {"ok": toss_ticks_proxy_ok},
-                "toss_quotes_orderbook": {"ok": orderbook_ok},
-                "kind_playwright_disclosure": {"ok": kind_browser_ok},
-                "naver_item_news": {"ok": item_news_ok},
-                "cnbc_quote": {"ok": 0 if live_metrics["vkospi"]["isFallback"] else 1},
-            },
-            "fallbackUsage": [
-                {
-                    "key": "vkospi",
-                    "provider": "yahoo_chart",
-                    "layer": "proxy",
-                    "fallbackLevel": 2,
-                    "confidence": 0.55,
-                    "stale": False,
-                }
-            ] if fallback_keys else [],
+            "providerHealth": provider_health,
+            "fallbackUsage": fallback_usage,
             "collectionLog": collection_log,
             "note": (
                 f"{variant_label(resolved_mode)} 채널입니다. CNBC VKOSPI 실측을 우선 사용하고, 실패 시 Yahoo VIX 프록시로 대체합니다. "
@@ -5715,6 +5873,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out", help="Legacy latest.json output path")
     parser.add_argument("--bridge-js", help="Legacy window.JONGGA_DATA bridge JS output path")
     parser.add_argument("--top-limit", type=int, default=TOP_TRADING_VALUE_LIMIT, help="Universe size from Naver top trading-value list. Hard-capped at 100")
+    parser.add_argument(
+        "--allow-historical-regen",
+        action="store_true",
+        help="과거 일자(--date) 재생성을 허용합니다. vintage 오염 위험이 있으므로 백테스트 재채점은 jongga.rescore_credit_balance를 권장합니다.",
+    )
     return parser
 
 
@@ -5726,6 +5889,18 @@ def main() -> int:
         analysis_date = resolve_analysis_date(args.date)
     except ValueError as exc:
         emit_cli_log("FAIL", str(exc), tone="red")
+        return 2
+    explicit_date_used = bool(args.date)
+    point_in_time_run = is_point_in_time_run(analysis_date, explicit_date_used=explicit_date_used)
+    if not point_in_time_run and not args.allow_historical_regen:
+        emit_cli_log(
+            "FAIL",
+            f"과거 일자({analysis_date.isoformat()}) 재생성은 매크로·유니버스가 "
+            "실행 시점 데이터로 stamp되어 vintage 오염을 유발합니다. "
+            "백테스트 재채점은 jongga.rescore_credit_balance를 사용하세요. "
+            "강행하려면 --allow-historical-regen 을 지정하세요.",
+            tone="red",
+        )
         return 2
     variants = resolve_generation_variants(args.variant)
     if not variants:
@@ -5744,8 +5919,14 @@ def main() -> int:
             mode=variant,
             analysis_date=analysis_date,
             session=session,
+            point_in_time_run=point_in_time_run,
         )
-        payload = payload_with_analysis_date(collected_payload, analysis_date, variant=variant)
+        payload = payload_with_analysis_date(
+            collected_payload,
+            analysis_date,
+            variant=variant,
+            explicit_date_used=explicit_date_used,
+        )
         session_payload = annotate_payload_with_analysis_session(payload, session=session)
         session_archive_path = write_session_archive(
             session_payload,

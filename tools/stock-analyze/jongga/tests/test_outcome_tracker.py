@@ -89,6 +89,21 @@ class ComputeOutcomeTest(unittest.TestCase):
         self.assertEqual(rec["outcomeStatus"], "stop_first_ambiguous")
 
 
+class EntryPriceResolutionTest(unittest.TestCase):
+    def test_session_entry_without_explicit_entry_price_does_not_fallback_to_current_price(self):
+        entry = {
+            "analysisSession": "1500",
+            "currentPrice": 12345.0,
+        }
+        self.assertEqual(ot.resolve_outcome_entry_price(entry), 0.0)
+
+    def test_legacy_entry_can_still_fallback_to_current_price(self):
+        entry = {
+            "currentPrice": 12345.0,
+        }
+        self.assertEqual(ot.resolve_outcome_entry_price(entry), 12345.0)
+
+
 class RollupTest(unittest.TestCase):
     def test_two_granularities_and_ambiguous_excluded(self):
         index = [

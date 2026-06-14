@@ -335,10 +335,10 @@
             "strictScore": 9.0,
             "signalScore": 9.0,
             "score": 9.0,
-            "scoreMax": 11.5,
-            "effectiveScoreMax": 11.5,
-            "gradeScore": 7.8,
-            "grade": "A",
+            "scoreMax": 13.0,
+            "effectiveScoreMax": 13.0,
+            "gradeScore": 6.9,
+            "grade": "B",
             "scoreBreakdown": [
               {
                 "code": "S2",
@@ -395,6 +395,14 @@
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "거래량 145% (≥100% 만점·80~100% 부분) · 충족"
+              },
+              {
+                "code": "D4",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.5,
+                "evalStatus": "not_met",
+                "note": "대차잔고 +222.4% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 미충족"
               },
               {
                 "code": "V1",
@@ -502,33 +510,13 @@
             ],
             "matchedRules": [
               {
-                "code": "S1",
-                "note": "당일 거래대금 순위 10위 (TOP 30 이내 시 충족)",
-                "evalStatus": "met"
-              },
-              {
                 "code": "S2",
                 "note": "외인 654,497주 / 기관 750,508주 · 당일 순매수",
                 "evalStatus": "met"
               },
               {
-                "code": "S3",
-                "note": "당일 평균 125.0% / 마지막 1시간 210.7% / 마지막 30분 비율 1.60:1 / 마지막 30분 평균 204.4% · 장후반 흡수 확인",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P1",
-                "note": "저가 231,000 · 이평선 터치: 5MA, 10MA",
-                "evalStatus": "met"
-              },
-              {
                 "code": "P2",
                 "note": "종가 247,000 · 5MA·10MA·20MA 중 5MA, 20MA 위",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P3",
-                "note": "앵커 중심값 222,750 / 저가 231,000 / 종가 247,000 · 종가 회복",
                 "evalStatus": "met"
               },
               {
@@ -554,23 +542,13 @@
             ],
             "unmatchedRules": [
               {
-                "code": "C2",
-                "note": "당일 거래량 / 5일 평균 100% (필요 ≤ 80%)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "C3",
-                "note": "동종업종 평균 +4.24% / KOSPI +4.63% underperform",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "C4",
-                "note": "당일 거래량 / 앵커 거래량 69% · 거래량 수축 약함",
-                "evalStatus": "not_met"
-              },
-              {
                 "code": "C5",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D4",
+                "note": "대차잔고 +222.4% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 미충족",
                 "evalStatus": "not_met"
               }
             ],
@@ -1512,7 +1490,8 @@
                 "pbr": 1.25,
                 "cnsPer": 19.95,
                 "foreignRate": 34.4,
-                "supplyTrendScore": 2.0
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": 222.41399201251397
               },
               "evaluatedAt": "2026-06-13T20:10:02+09:00",
               "source": "jongga_analysis"
@@ -1523,11 +1502,11 @@
             "rank": 2,
             "name": "리노공업",
             "code": "058470",
-            "strictScore": 9.0,
-            "signalScore": 9.0,
-            "score": 9.0,
-            "scoreMax": 11.5,
-            "effectiveScoreMax": 11.5,
+            "strictScore": 10.1,
+            "signalScore": 10.1,
+            "score": 10.1,
+            "scoreMax": 13.0,
+            "effectiveScoreMax": 13.0,
             "gradeScore": 7.8,
             "grade": "A",
             "scoreBreakdown": [
@@ -1586,6 +1565,14 @@
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "거래량 449% (≥100% 만점·80~100% 부분) · 충족"
+              },
+              {
+                "code": "D4",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "대차잔고 -14.6% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 충족"
               },
               {
                 "code": "V1",
@@ -1693,23 +1680,8 @@
             ],
             "matchedRules": [
               {
-                "code": "S1",
-                "note": "당일 거래대금 순위 30위 (TOP 30 이내 시 충족)",
-                "evalStatus": "met"
-              },
-              {
                 "code": "S2",
                 "note": "외인 6,326,201주 / 기관 805,273주 · 당일 순매수",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S3",
-                "note": "당일 평균 92.0% / 마지막 1시간 215.5% / 마지막 30분 비율 12.00:1 / 마지막 30분 평균 300.0% · 장후반 흡수 확인",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P1",
-                "note": "저가 99,100 · 이평선 터치: 20MA",
                 "evalStatus": "met"
               },
               {
@@ -1720,11 +1692,6 @@
               {
                 "code": "C1",
                 "note": "양봉 (시가 101,300 ≤ 종가 104,500)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C3",
-                "note": "동종업종 평균 +11.77% / KOSPI +4.63% outperform",
                 "evalStatus": "met"
               },
               {
@@ -1741,24 +1708,14 @@
                 "code": "D3",
                 "note": "거래량 449% (≥100% 만점·80~100% 부분) · 충족",
                 "evalStatus": "met"
+              },
+              {
+                "code": "D4",
+                "note": "대차잔고 -14.6% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 충족",
+                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
-              {
-                "code": "P3",
-                "note": "앵커 중심값 데이터 부족",
-                "evalStatus": "data_missing"
-              },
-              {
-                "code": "C2",
-                "note": "당일 거래량 / 5일 평균 390% (필요 ≤ 80%)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "C4",
-                "note": "앵커 거래량 데이터 부족",
-                "evalStatus": "data_missing"
-              },
               {
                 "code": "C5",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
@@ -2683,7 +2640,8 @@
                 "pbr": 11.16,
                 "cnsPer": 42.65,
                 "foreignRate": 23.17,
-                "supplyTrendScore": 2.0
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": -14.567760926601395
               },
               "evaluatedAt": "2026-06-13T20:10:02+09:00",
               "source": "jongga_analysis"
@@ -2697,9 +2655,9 @@
             "strictScore": 7.5,
             "signalScore": 7.5,
             "score": 7.5,
-            "scoreMax": 11.5,
-            "effectiveScoreMax": 11.5,
-            "gradeScore": 6.5,
+            "scoreMax": 13.0,
+            "effectiveScoreMax": 13.0,
+            "gradeScore": 5.8,
             "grade": "B",
             "scoreBreakdown": [
               {
@@ -2757,6 +2715,14 @@
                 "maxPoints": 2.0,
                 "evalStatus": "met",
                 "note": "거래량 466% (≥100% 만점·80~100% 부분) · 충족"
+              },
+              {
+                "code": "D4",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.5,
+                "evalStatus": "not_met",
+                "note": "대차잔고 +11.5% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 미충족"
               },
               {
                 "code": "V1",
@@ -2864,23 +2830,8 @@
             ],
             "matchedRules": [
               {
-                "code": "S1",
-                "note": "당일 거래대금 순위 7위 (TOP 30 이내 시 충족)",
-                "evalStatus": "met"
-              },
-              {
                 "code": "S2",
                 "note": "외인 -4,033주 / 기관 1,567,960주 · 당일 순매수",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S3",
-                "note": "당일 평균 136.0% / 마지막 1시간 278.6% / 마지막 30분 비율 35.00:1 / 마지막 30분 평균 300.0% · 장후반 흡수 확인",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P1",
-                "note": "저가 298,000 · 이평선 터치: 20MA",
                 "evalStatus": "met"
               },
               {
@@ -2891,11 +2842,6 @@
               {
                 "code": "C1",
                 "note": "양봉 (시가 306,000 ≤ 종가 361,000)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C3",
-                "note": "동종업종 평균 +8.55% / KOSPI +4.63% outperform",
                 "evalStatus": "met"
               },
               {
@@ -2911,21 +2857,6 @@
             ],
             "unmatchedRules": [
               {
-                "code": "P3",
-                "note": "앵커 중심값 333,500 / 저가 298,000 / 종가 361,000 · 장중 이탈 후 종가 회복",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C2",
-                "note": "당일 거래량 / 5일 평균 582% (필요 ≤ 80%)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "C4",
-                "note": "당일 거래량 / 앵커 거래량 100% · 거래량 수축 약함",
-                "evalStatus": "not_met"
-              },
-              {
                 "code": "C5",
                 "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
                 "evalStatus": "not_met"
@@ -2933,6 +2864,11 @@
               {
                 "code": "D2",
                 "note": "수급추세 +0 (≥+2 만점·+1 부분) · 미충족",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D4",
+                "note": "대차잔고 +11.5% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 미충족",
                 "evalStatus": "not_met"
               }
             ],
@@ -3950,7 +3886,8 @@
                 "pbr": 53.85,
                 "cnsPer": 0.0,
                 "foreignRate": 6.51,
-                "supplyTrendScore": 0.0
+                "supplyTrendScore": 0.0,
+                "shortBalanceChangePct": 11.48977485064455
               },
               "evaluatedAt": "2026-06-13T20:10:02+09:00",
               "source": "jongga_analysis"
@@ -3966,7 +3903,7 @@
             "strictScore": 5.4,
             "signalScore": 5.4,
             "score": 5.4,
-            "scoreMax": 11.5,
+            "scoreMax": 12.5,
             "effectiveScoreMax": 8.5,
             "gradeScore": 6.4,
             "grade": "B",
@@ -4034,6 +3971,14 @@
                 "maxPoints": 1.0,
                 "evalStatus": "manual_required",
                 "note": "호가잔량 비율 미입력 (토스 호가창 수동 입력)"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "data_missing",
+                "note": "대차잔고 추이 데이터 부족 (대형주만 수집)"
               },
               {
                 "code": "V1",
@@ -4133,6 +4078,11 @@
                 "code": "C3",
                 "note": "호가잔량 비율 미입력 (토스 호가창 수동 입력)",
                 "evalStatus": "manual_required"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 추이 데이터 부족 (대형주만 수집)",
+                "evalStatus": "data_missing"
               }
             ],
             "currentPrice": 71500,
@@ -4619,11 +4569,11 @@
             "name": "이오테크닉스",
             "code": "039030",
             "strictScore": 4.6,
-            "signalScore": 5.4,
-            "score": 5.4,
-            "scoreMax": 11.5,
-            "effectiveScoreMax": 9.5,
-            "gradeScore": 4.8,
+            "signalScore": 4.6,
+            "score": 4.6,
+            "scoreMax": 12.5,
+            "effectiveScoreMax": 10.5,
+            "gradeScore": 4.4,
             "grade": "C",
             "scoreBreakdown": [
               {
@@ -4645,7 +4595,7 @@
               {
                 "code": "S2",
                 "strictPoints": 0.0,
-                "signalPoints": 1.0,
+                "signalPoints": 0.0,
                 "maxPoints": 2.0,
                 "evalStatus": "manual_required",
                 "note": "당일 평균 체결강도 126.0% · 100% 유지 비율 미입력"
@@ -4689,6 +4639,14 @@
                 "maxPoints": 1.0,
                 "evalStatus": "met",
                 "note": "매수/매도 호가잔량 4.65 (필요 ≥ 1.2) · 매수 잔량 우위"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "대차잔고 -4.5% (최근 10거래일) (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력) · 미충족"
               },
               {
                 "code": "V1",
@@ -4788,6 +4746,11 @@
                 "code": "S2",
                 "note": "당일 평균 체결강도 126.0% · 100% 유지 비율 미입력",
                 "evalStatus": "manual_required"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 -4.5% (최근 10거래일) (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력) · 미충족",
+                "evalStatus": "not_met"
               }
             ],
             "currentPrice": 612000,
@@ -5260,7 +5223,8 @@
                 "pbr": 10.67,
                 "cnsPer": 63.66,
                 "foreignRate": 25.19,
-                "supplyTrendScore": 0.0
+                "supplyTrendScore": 0.0,
+                "shortBalanceChangePct": -4.527566349709847
               },
               "evaluatedAt": "2026-06-13T20:10:02+09:00",
               "source": "jongga_analysis"
@@ -5272,9 +5236,9 @@
             "name": "후성",
             "code": "093370",
             "strictScore": 3.9,
-            "signalScore": 4.4,
-            "score": 4.4,
-            "scoreMax": 11.5,
+            "signalScore": 3.9,
+            "score": 3.9,
+            "scoreMax": 12.5,
             "effectiveScoreMax": 11.5,
             "gradeScore": 3.4,
             "grade": "C",
@@ -5306,7 +5270,7 @@
               {
                 "code": "P1",
                 "strictPoints": 0.0,
-                "signalPoints": 0.75,
+                "signalPoints": 0.0,
                 "maxPoints": 1.5,
                 "evalStatus": "not_met",
                 "note": "20일 고점 대비 94.8% (미돌파 시 필요 ≥ 95%)"
@@ -5342,6 +5306,14 @@
                 "maxPoints": 1.0,
                 "evalStatus": "met",
                 "note": "매수/매도 호가잔량 4.72 (필요 ≥ 1.2) · 매수 잔량 우위"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "data_missing",
+                "note": "대차잔고 추이 데이터 부족 (대형주만 수집)"
               },
               {
                 "code": "V1",
@@ -5441,6 +5413,11 @@
                 "code": "C2",
                 "note": "몸통 69% / 윗꼬리·몸통 0.43 · 강마감 약충족",
                 "evalStatus": "met"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 추이 데이터 부족 (대형주만 수집)",
+                "evalStatus": "data_missing"
               }
             ],
             "currentPrice": 19010,
@@ -5926,12 +5903,12 @@
             "rank": 1,
             "name": "리노공업",
             "code": "058470",
-            "strictScore": 7.5,
-            "signalScore": 7.5,
-            "score": 7.5,
-            "scoreMax": 13.0,
-            "effectiveScoreMax": 13.0,
-            "gradeScore": 5.8,
+            "strictScore": 8.2,
+            "signalScore": 8.2,
+            "score": 8.2,
+            "scoreMax": 14.0,
+            "effectiveScoreMax": 14.0,
+            "gradeScore": 5.9,
             "grade": "B",
             "scoreBreakdown": [
               {
@@ -6021,6 +5998,14 @@
                 "maxPoints": 0.5,
                 "evalStatus": "met",
                 "note": "마지막 30분 틱프록시 매수/매도 12.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "대차잔고 -14.6% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 충족"
               },
               {
                 "code": "V1",
@@ -6117,6 +6102,11 @@
               {
                 "code": "C4",
                 "note": "마지막 30분 틱프록시 매수/매도 12.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위",
+                "evalStatus": "met"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 -14.6% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 충족",
                 "evalStatus": "met"
               }
             ],
@@ -6657,7 +6647,8 @@
                 "pbr": 11.16,
                 "cnsPer": 42.65,
                 "foreignRate": 23.17,
-                "supplyTrendScore": 2.0
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": -14.567760926601395
               },
               "evaluatedAt": "2026-06-13T20:10:02+09:00",
               "source": "jongga_analysis"
@@ -6671,7 +6662,7 @@
             "strictScore": 7.5,
             "signalScore": 7.5,
             "score": 7.5,
-            "scoreMax": 13.0,
+            "scoreMax": 14.0,
             "effectiveScoreMax": 13.0,
             "gradeScore": 5.8,
             "grade": "B",
@@ -6763,6 +6754,14 @@
                 "maxPoints": 0.5,
                 "evalStatus": "not_met",
                 "note": "마지막 30분 틱프록시 매수/매도 0.11:1 · 평균 체결강도 150.0% (필요 ≥ 1.1:1)"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "data_missing",
+                "note": "대차잔고 추이 데이터 부족 (대형주만 수집)"
               },
               {
                 "code": "V1",
@@ -6877,6 +6876,11 @@
                 "code": "C4",
                 "note": "마지막 30분 틱프록시 매수/매도 0.11:1 · 평균 체결강도 150.0% (필요 ≥ 1.1:1)",
                 "evalStatus": "not_met"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 추이 데이터 부족 (대형주만 수집)",
+                "evalStatus": "data_missing"
               }
             ],
             "currentPrice": 28300,
@@ -7412,10 +7416,10 @@
             "strictScore": 7.5,
             "signalScore": 7.5,
             "score": 7.5,
-            "scoreMax": 13.0,
-            "effectiveScoreMax": 13.0,
-            "gradeScore": 5.8,
-            "grade": "B",
+            "scoreMax": 14.0,
+            "effectiveScoreMax": 14.0,
+            "gradeScore": 5.4,
+            "grade": "C",
             "scoreBreakdown": [
               {
                 "code": "S1",
@@ -7504,6 +7508,14 @@
                 "maxPoints": 0.5,
                 "evalStatus": "met",
                 "note": "마지막 30분 틱프록시 매수/매도 13.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "대차잔고 +17.5% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 미충족"
               },
               {
                 "code": "V1",
@@ -7617,6 +7629,11 @@
               {
                 "code": "C3",
                 "note": "동종업종 평균 +0.39% / KOSPI +4.63% underperform",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 +17.5% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 미충족",
                 "evalStatus": "not_met"
               }
             ],
@@ -8138,7 +8155,8 @@
                 "pbr": 3.08,
                 "cnsPer": 18.32,
                 "foreignRate": 5.56,
-                "supplyTrendScore": 2.0
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": 17.52479592005696
               },
               "evaluatedAt": "2026-06-13T20:10:02+09:00",
               "source": "jongga_analysis"
@@ -9897,5 +9915,292 @@
       }
     }
   ],
-  "analysisDate": "2026-06-12"
+  "analysisDate": "2026-06-12",
+  "pointInTime": false,
+  "pointInTimeStatus": "historical_regen",
+  "rescoreMeta": {
+    "rescoredRules": {
+      "pullback": [
+        "D4"
+      ],
+      "accumulation": [
+        "L1"
+      ],
+      "breakout": [
+        "L1"
+      ]
+    },
+    "shortBalanceCodes": [
+      "035420",
+      "039030",
+      "042700",
+      "058470",
+      "064400"
+    ],
+    "changedEntries": [
+      {
+        "strategy": "pullback",
+        "code": "035420",
+        "name": "NAVER",
+        "changedFields": [
+          "scoreMax",
+          "effectiveScoreMax",
+          "gradeScore",
+          "grade"
+        ],
+        "before": {
+          "strictScore": 9.0,
+          "signalScore": 9.0,
+          "score": 9.0,
+          "scoreMax": 11.5,
+          "effectiveScoreMax": 11.5,
+          "gradeScore": 7.8,
+          "grade": "A"
+        },
+        "after": {
+          "strictScore": 9.0,
+          "signalScore": 9.0,
+          "score": 9.0,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 6.9,
+          "grade": "B"
+        }
+      },
+      {
+        "strategy": "pullback",
+        "code": "058470",
+        "name": "리노공업",
+        "changedFields": [
+          "strictScore",
+          "signalScore",
+          "score",
+          "scoreMax",
+          "effectiveScoreMax"
+        ],
+        "before": {
+          "strictScore": 9.0,
+          "signalScore": 9.0,
+          "score": 9.0,
+          "scoreMax": 11.5,
+          "effectiveScoreMax": 11.5,
+          "gradeScore": 7.8,
+          "grade": "A"
+        },
+        "after": {
+          "strictScore": 10.1,
+          "signalScore": 10.1,
+          "score": 10.1,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 7.8,
+          "grade": "A"
+        }
+      },
+      {
+        "strategy": "pullback",
+        "code": "042700",
+        "name": "한미반도체",
+        "changedFields": [
+          "scoreMax",
+          "effectiveScoreMax",
+          "gradeScore"
+        ],
+        "before": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 11.5,
+          "effectiveScoreMax": 11.5,
+          "gradeScore": 6.5,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 5.8,
+          "grade": "B"
+        }
+      },
+      {
+        "strategy": "accumulation",
+        "code": "058470",
+        "name": "리노공업",
+        "changedFields": [
+          "strictScore",
+          "signalScore",
+          "score",
+          "scoreMax",
+          "effectiveScoreMax",
+          "gradeScore"
+        ],
+        "before": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 5.8,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 8.2,
+          "signalScore": 8.2,
+          "score": 8.2,
+          "scoreMax": 14.0,
+          "effectiveScoreMax": 14.0,
+          "gradeScore": 5.9,
+          "grade": "B"
+        }
+      },
+      {
+        "strategy": "accumulation",
+        "code": "085620",
+        "name": "미래에셋생명",
+        "changedFields": [
+          "scoreMax"
+        ],
+        "before": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 5.8,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 14.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 5.8,
+          "grade": "B"
+        }
+      },
+      {
+        "strategy": "accumulation",
+        "code": "064400",
+        "name": "LG씨엔에스",
+        "changedFields": [
+          "scoreMax",
+          "effectiveScoreMax",
+          "gradeScore",
+          "grade"
+        ],
+        "before": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 5.8,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 7.5,
+          "signalScore": 7.5,
+          "score": 7.5,
+          "scoreMax": 14.0,
+          "effectiveScoreMax": 14.0,
+          "gradeScore": 5.4,
+          "grade": "C"
+        }
+      },
+      {
+        "strategy": "breakout",
+        "code": "403870",
+        "name": "HPSP",
+        "changedFields": [
+          "scoreMax"
+        ],
+        "before": {
+          "strictScore": 5.4,
+          "signalScore": 5.4,
+          "score": 5.4,
+          "scoreMax": 11.5,
+          "effectiveScoreMax": 8.5,
+          "gradeScore": 6.4,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 5.4,
+          "signalScore": 5.4,
+          "score": 5.4,
+          "scoreMax": 12.5,
+          "effectiveScoreMax": 8.5,
+          "gradeScore": 6.4,
+          "grade": "B"
+        }
+      },
+      {
+        "strategy": "breakout",
+        "code": "039030",
+        "name": "이오테크닉스",
+        "changedFields": [
+          "signalScore",
+          "score",
+          "scoreMax",
+          "effectiveScoreMax",
+          "gradeScore"
+        ],
+        "before": {
+          "strictScore": 4.6,
+          "signalScore": 5.4,
+          "score": 5.4,
+          "scoreMax": 11.5,
+          "effectiveScoreMax": 9.5,
+          "gradeScore": 4.8,
+          "grade": "C"
+        },
+        "after": {
+          "strictScore": 4.6,
+          "signalScore": 4.6,
+          "score": 4.6,
+          "scoreMax": 12.5,
+          "effectiveScoreMax": 10.5,
+          "gradeScore": 4.4,
+          "grade": "C"
+        }
+      },
+      {
+        "strategy": "breakout",
+        "code": "093370",
+        "name": "후성",
+        "changedFields": [
+          "signalScore",
+          "score",
+          "scoreMax"
+        ],
+        "before": {
+          "strictScore": 3.9,
+          "signalScore": 4.4,
+          "score": 4.4,
+          "scoreMax": 11.5,
+          "effectiveScoreMax": 11.5,
+          "gradeScore": 3.4,
+          "grade": "C"
+        },
+        "after": {
+          "strictScore": 3.9,
+          "signalScore": 3.9,
+          "score": 3.9,
+          "scoreMax": 12.5,
+          "effectiveScoreMax": 11.5,
+          "gradeScore": 3.4,
+          "grade": "C"
+        }
+      }
+    ],
+    "providerHealth": {
+      "krx_pykrx_short_balance": {
+        "ok": 5
+      }
+    },
+    "sourcePointInTimeStatus": "historical_regen"
+  }
 }

@@ -13,6 +13,67 @@ def _render_history(entries):
 
 
 class RunJonggaPipelineReplayTests(unittest.TestCase):
+    def test_publish_rescored_stable_output_updates_active_and_rescored_paths(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            output_dir = root / "jongga" / "output"
+            rescored_dir = root / "jongga" / "output_rescored"
+            month_dir = output_dir / "202606"
+            archive_dir = output_dir / "archive" / "202606"
+            month_dir.mkdir(parents=True, exist_ok=True)
+            archive_dir.mkdir(parents=True, exist_ok=True)
+
+            payload = {
+                "analysisDate": "2026-06-12",
+                "variant": "stable",
+                "dataQuality": {"status": "complete"},
+                "slots": [],
+            }
+            (month_dir / "latest_20260612.json").write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            (output_dir / "jongga_history.js").write_text(_render_history([]), encoding="utf-8")
+            (archive_dir / "inputs_20260612.json").write_text(
+                json.dumps({"inputs": True}, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+
+            rescored_payload = {
+                **payload,
+                "pointInTimeStatus": "confirmed",
+                "rescoreMeta": {
+                    "changedEntries": [{"code": "000001"}],
+                    "shortBalanceCodes": ["000001", "000002"],
+                },
+            }
+
+            with mock.patch.object(pipeline, "JONGGA_OUTPUT", output_dir), \
+                 mock.patch.object(pipeline, "JONGGA_RESCORED_OUTPUT", rescored_dir), \
+                 mock.patch("jongga.rescore_credit_balance.rescore_payload", return_value=rescored_payload):
+                code, meta = pipeline.publish_rescored_stable_output(
+                    analysis_date="2026-06-12",
+                    top_limit=40,
+                )
+
+            self.assertEqual(code, 0)
+            self.assertEqual(meta["changedEntries"], 1)
+            self.assertEqual(meta["shortBalanceCodes"], 2)
+
+            active_daily = json.loads((output_dir / "202606" / "latest_20260612.json").read_text(encoding="utf-8"))
+            rescored_daily = json.loads((rescored_dir / "202606" / "latest_20260612.json").read_text(encoding="utf-8"))
+            legacy_latest = json.loads((output_dir / "latest.json").read_text(encoding="utf-8"))
+            history = json.loads(
+                (output_dir / "jongga_history.js").read_text(encoding="utf-8").split("=", 1)[1].rstrip(";\n"),
+            )
+
+            self.assertEqual(active_daily["rescoreMeta"]["shortBalanceCodes"], ["000001", "000002"])
+            self.assertEqual(rescored_daily["rescoreMeta"]["changedEntries"][0]["code"], "000001")
+            self.assertEqual(legacy_latest["analysisDate"], "2026-06-12")
+            self.assertEqual(history[0]["pointInTimeStatus"], "confirmed")
+            self.assertTrue((output_dir / "jongga_data.js").exists())
+            self.assertTrue((rescored_dir / "jongga_history.js").exists())
+
     def test_select_replay_dates_from_history_uses_recent_days_and_skips_latest_day(self):
         with TemporaryDirectory() as tmp:
             history_path = Path(tmp) / "jongga_history.js"
@@ -79,6 +140,29 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
             )
 
             self.assertEqual(replay_dates, [date(2026, 6, 5), date(2026, 6, 8)])
+
+    def test_select_replay_dates_from_history_skips_non_confirmed_rows(self):
+        with TemporaryDirectory() as tmp:
+            history_path = Path(tmp) / "jongga_history.js"
+            history_path.write_text(
+                _render_history([
+                    {"date": "2026-06-12", "variant": "stable", "pointInTimeStatus": "historical_regen"},
+                    {"date": "2026-06-11", "variant": "stable", "pointInTimeStatus": "confirmed"},
+                    {"date": "2026-06-10", "variant": "stable", "pointInTimeStatus": "confirmed"},
+                    {"date": "2026-06-09", "variant": "stable", "pointInTimeStatus": "confirmed"},
+                    {"date": "2026-06-08", "variant": "stable", "pointInTimeStatus": "confirmed"},
+                ]),
+                encoding="utf-8",
+            )
+
+            replay_dates = pipeline.select_replay_dates_from_history(
+                history_js=history_path,
+                cutoff_date=date(2026, 6, 12),
+                variant="stable",
+                include_cutoff_date=True,
+            )
+
+            self.assertEqual(replay_dates, [date(2026, 6, 8), date(2026, 6, 9), date(2026, 6, 10), date(2026, 6, 11)])
 
     def test_build_replay_recommendation_keys_uses_entry_eligible_rows(self):
         with TemporaryDirectory() as tmp:
@@ -353,6 +437,7 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
         with mock.patch.object(pipeline, "run_preflight") as run_preflight, \
              mock.patch.object(pipeline, "run_outcome_backfill") as run_outcome_backfill, \
              mock.patch.object(pipeline, "run_generate") as run_generate, \
+             mock.patch.object(pipeline, "publish_rescored_stable_output") as publish_rescored_stable_output, \
              mock.patch.object(pipeline, "run_replay_backtest", return_value=(0, {"status": "complete"})) as run_replay_backtest, \
              mock.patch.object(pipeline, "validate_outputs", return_value=(0, {"status": "complete"})) as validate_outputs, \
              mock.patch.object(pipeline, "print_summary") as print_summary, \
@@ -363,6 +448,31 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
         run_preflight.assert_called_once()
         run_outcome_backfill.assert_not_called()
         run_generate.assert_not_called()
+        publish_rescored_stable_output.assert_not_called()
+        run_replay_backtest.assert_called_once()
+        validate_outputs.assert_called_once()
+        print_summary.assert_called_once()
+
+    def test_main_publishes_rescored_stable_output_before_replay(self):
+        with mock.patch.object(pipeline, "run_preflight") as run_preflight, \
+             mock.patch.object(pipeline, "resolve_pipeline_analysis_date", return_value=date(2026, 6, 12)), \
+             mock.patch.object(pipeline, "run_generate", return_value=0) as run_generate, \
+             mock.patch.object(pipeline, "run_outcome_backfill") as run_outcome_backfill, \
+             mock.patch.object(pipeline, "publish_rescored_stable_output", return_value=(0, {"changedEntries": 2})) as publish_rescored_stable_output, \
+             mock.patch.object(pipeline, "run_replay_backtest", return_value=(0, {"status": "complete"})) as run_replay_backtest, \
+             mock.patch.object(pipeline, "validate_outputs", return_value=(0, {"status": "complete"})) as validate_outputs, \
+             mock.patch.object(pipeline, "print_summary") as print_summary, \
+             mock.patch.object(pipeline.sys, "argv", ["run_jongga_pipeline.py", "--session", "1730"]):
+            exit_code = pipeline.main()
+
+        self.assertEqual(exit_code, 0)
+        run_preflight.assert_called_once()
+        run_outcome_backfill.assert_called_once()
+        run_generate.assert_called_once()
+        publish_rescored_stable_output.assert_called_once_with(
+            analysis_date="2026-06-12",
+            top_limit=40,
+        )
         run_replay_backtest.assert_called_once()
         validate_outputs.assert_called_once()
         print_summary.assert_called_once()

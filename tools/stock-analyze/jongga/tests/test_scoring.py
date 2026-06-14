@@ -73,7 +73,19 @@ class ScoringTests(unittest.TestCase):
         self.assertEqual(breakdown["S4"]["maxPoints"], 0.5)
         self.assertEqual(breakdown["C4"]["maxPoints"], 0.5)
         self.assertEqual(ACCUMULATION_SCORE_WEIGHTS["S5"], 1.0)
-        self.assertEqual(ACCUMULATION_STRICT_MAX, 13.0)
+        self.assertEqual(ACCUMULATION_STRICT_MAX, 14.0)
+
+    def test_balance_trend_weights_keep_short_balance_only_for_accumulation_breakout(self):
+        # 2026-06: 신용잔고 계열은 제거하고, 대차잔고(L1)만 매집/돌파 보강 점수로 유지한다.
+        self.assertEqual(ACCUMULATION_SCORE_WEIGHTS["L1"], 1.0)
+        self.assertNotIn("L2", ACCUMULATION_SCORE_WEIGHTS)
+        self.assertEqual(ACCUMULATION_STRICT_MAX, 14.0)
+        self.assertEqual(BREAKOUT_WEIGHTS["L1"], 1.0)
+        self.assertNotIn("L2", BREAKOUT_WEIGHTS)
+        self.assertEqual(BREAKOUT_STRICT_MAX, 12.5)
+        self.assertNotIn("L1", REVERSAL_SCORE_WEIGHTS)
+        self.assertNotIn("L2", REVERSAL_SCORE_WEIGHTS)
+        self.assertEqual(REVERSAL_STRICT_MAX, 10.0)
 
     def test_pullback_and_reversal_weights_are_split(self):
         # 2026-06 재채점: 등급은 깊이(D1)·수급(D2)·반등 거래량(D3) + S2·P2·C1·C5만 반영.
@@ -81,10 +93,12 @@ class ScoringTests(unittest.TestCase):
         self.assertEqual(PULLBACK_SCORE_WEIGHTS["D1"], 2.5)
         self.assertEqual(PULLBACK_SCORE_WEIGHTS["D2"], 2.0)
         self.assertEqual(PULLBACK_SCORE_WEIGHTS["D3"], 2.0)
+        self.assertEqual(PULLBACK_SCORE_WEIGHTS["D4"], 1.5)
+        self.assertNotIn("D5", PULLBACK_SCORE_WEIGHTS)
         self.assertEqual(PULLBACK_SCORE_WEIGHTS["C5"], 0.5)
         for excluded in ("S1", "S3", "P1", "P3", "C2", "C3", "C4"):
             self.assertNotIn(excluded, PULLBACK_SCORE_WEIGHTS)
-        self.assertEqual(PULLBACK_STRICT_MAX, 11.5)
+        self.assertEqual(PULLBACK_STRICT_MAX, 13.0)
         self.assertNotIn("S3", REVERSAL_SCORE_WEIGHTS)
         self.assertEqual(REVERSAL_STRICT_MAX, 10.0)
 

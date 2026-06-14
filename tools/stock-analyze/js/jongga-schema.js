@@ -1,5 +1,6 @@
 const JONGGA_SCHEMA_VERSION = 'jongga_result.v1';
 const JONGGA_BUY_STRATEGIES = ['pullback', 'accumulation', 'breakout', 'reversal'];
+const JONGGA_POINT_IN_TIME_STATUSES = new Set(['confirmed', 'historical_regen', 'legacy_unknown']);
 const JONGGA_REQUIRED_RULES = {
   pullback: ['G0', 'G1', 'G2', 'G3', 'G4', 'G5', 'G9', 'G10', 'G11', 'G12', 'G13'],
   breakout: ['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7'],
@@ -99,7 +100,7 @@ function inferRuleEvalStatus(rule = {}, matched = false) {
 
 // 2026-06 눌림목 재채점: 등급(gradeScore)에 반영되는 score 코드만 나열. 나머지는 score_map에는
 // 남아 matchedRules/unmatchedRules로 표시되지만 진단(diagnostic) 용도일 뿐 등급에는 반영되지 않음.
-const PULLBACK_GRADE_SCORE_CODES = ['S2', 'P2', 'C1', 'C5', 'D1', 'D2', 'D3'];
+const PULLBACK_GRADE_SCORE_CODES = ['S2', 'P2', 'C1', 'C5', 'D1', 'D2', 'D3', 'D4'];
 
 function isDiagnosticOnlyScoreCode(strategy, kind, code) {
   if (strategy !== 'pullback' || kind !== 'score') return false;
@@ -244,6 +245,9 @@ function validateJonggaResult(payload) {
   }
   if (payload.schemaVersion !== JONGGA_SCHEMA_VERSION) {
     errors.push(`schemaVersion은 ${JONGGA_SCHEMA_VERSION}이어야 합니다.`);
+  }
+  if (payload.pointInTimeStatus !== undefined && !JONGGA_POINT_IN_TIME_STATUSES.has(String(payload.pointInTimeStatus))) {
+    warnings.push(`pointInTimeStatus 값이 예상 범위를 벗어났습니다: ${String(payload.pointInTimeStatus)}`);
   }
 
   const slots = getJonggaSlots(payload);
