@@ -261,6 +261,22 @@ def available_strict_max(
     return available if available > 0 else sum(weights.values())
 
 
+# 강세장 + VKOSPI strong + 갭다운 경고(G-D/G-E) 조합은 익일 보유 종가베팅이
+# 오버나이트 갭다운에 최대로 노출되는 구간이다. 백테스트에서 이 조합에 최악 손실
+# (역추세 갭다운)이 집중돼, 해당 케이스의 점수·랭크를 대폭 깎아 추천에서 배제한다.
+OVERNIGHT_GAP_RISK_PENALTY = 2.5
+
+
+def overnight_gap_risk_penalty(regime_bucket: str, vkospi_tier: str, gap_code: str) -> float:
+    if (
+        str(regime_bucket) == "bull"
+        and str(vkospi_tier) == "strong"
+        and str(gap_code) in {"G-D", "G-E"}
+    ):
+        return OVERNIGHT_GAP_RISK_PENALTY
+    return 0.0
+
+
 def apply_buy_scoring(
     *,
     strategy: str,
@@ -270,6 +286,9 @@ def apply_buy_scoring(
     vkospi_multiplier: float,
     snapshot: Any | None = None,
     volatility_context: dict[str, Any] | None = None,
+    regime_bucket: str = "",
+    vkospi_tier: str = "",
+    gap_code: str = "",
 ) -> dict[str, Any]:
     normalized = "breakout" if strategy == "momentum" else strategy
     signal_factors = BREAKOUT_SIGNAL_FACTORS if normalized == "breakout" else None
@@ -282,6 +301,11 @@ def apply_buy_scoring(
     # 이를 통해 토스 데이터 미수집 시에도 셋업이 완벽하면 S 등급에 도달 가능.
     eff_max = available_strict_max(score_map, weights)
     grade_score = round(_clamp_score(grade_score_from_strict(strict_score, eff_max), 0.0, 10.0), 1)
+    overnight_penalty = overnight_gap_risk_penalty(regime_bucket, vkospi_tier, gap_code)
+    if overnight_penalty > 0:
+        grade_score = round(max(0.0, grade_score - overnight_penalty), 1)
+        strict_score = round(max(0.0, strict_score - overnight_penalty), 1)
+        signal_score = round(max(0.0, signal_score - overnight_penalty), 1)
     grade = grade_from_score(grade_score, strategy)
     return {
         "strictScore": strict_score,
@@ -291,6 +315,7 @@ def apply_buy_scoring(
         "effectiveScoreMax": round(eff_max, 2),  # 실효 분모 (등급 산출에 사용)
         "gradeScore": grade_score,
         "grade": grade,
+        "overnightGapPenalty": overnight_penalty,
         "scoreBreakdown": append_volatility_breakdown_row(
             build_score_breakdown(
                 score_map,

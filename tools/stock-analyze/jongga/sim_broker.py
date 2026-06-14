@@ -306,6 +306,7 @@ def simulate_exit_plan(
     reversal_time_stop_cutoff = str((reversal_live_exit_policy or {}).get("timeStopCutoff") or "09:15")
     reversal_time_stop_min_bounce = float((reversal_live_exit_policy or {}).get("timeStopMinBouncePct") or 1.0)
     reversal_breakeven_activation = float((reversal_live_exit_policy or {}).get("breakevenActivationPct") or 3.0)
+    session_close_seen = False
 
     for bar in bars:
         if remaining <= 0:
@@ -416,10 +417,48 @@ def simulate_exit_plan(
             closed_reason = "breakeven_fail"
             break
 
+        is_session_close = _is_session_close_bar(bar)
+        first_session_close = is_session_close and not session_close_seen
+        if is_session_close:
+            session_close_seen = True
+
+        # 당일 종가 손절: 눌림목은 첫 관리일(D1) 종가에 손실이면 둘째 오버나이트로 넘기지 않고
+        # 전량 정리한다. 둘째 날 종가까지 끌려가며 손실이 복리로 커지는 것을 차단한다.
+        pullback_day1_loss_cut = bool(
+            strategy == "pullback"
+            and remaining > 0
+            and first_session_close
+            and close_price > 0
+            and entry_fill_price > 0
+            and close_price < entry_fill_price
+        )
+        if pullback_day1_loss_cut:
+            market_order = stop_order or final_order or orders[0]
+            market_order["finalStatus"] = "filled"
+            fills.append(
+                _fill_from_bar(
+                    market_order,
+                    bar,
+                    qty=remaining,
+                    fill_rule="same_day_close_stop",
+                    fill_price=close_price,
+                )
+            )
+            for order in pending_targets.values():
+                if order.get("finalStatus") == "open":
+                    order["finalStatus"] = "cancelled"
+            if final_order and final_order is not market_order and final_order.get("finalStatus") == "open":
+                final_order["finalStatus"] = "cancelled"
+            if stop_order and stop_order is not market_order and stop_order.get("finalStatus") == "open":
+                stop_order["finalStatus"] = "cancelled"
+            remaining = 0.0
+            closed_reason = "same_day_close_stop"
+            break
+
         stop_hit = bool(
             stop_order
             and stop_order.get("finalStatus") == "open"
-            and _is_session_close_bar(bar)
+            and is_session_close
             and close_price > 0
             and close_price <= float(stop_order.get("requestedPrice") or 0.0)
         )

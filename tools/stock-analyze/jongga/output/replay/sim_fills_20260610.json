@@ -144,7 +144,7 @@
     "barHigh": 228500.0,
     "barLow": 218500.0,
     "barClose": 224000.0,
-    "fillRule": "stop_close"
+    "fillRule": "same_day_close_stop"
   },
   {
     "orderId": "20260610|stable|pullback|011070-entry",
@@ -177,16 +177,16 @@
     "stageKey": "stop",
     "reason": "🛑 손절",
     "fillStatus": "filled",
-    "filledAt": "2026-06-12T15:00:00+09:00",
-    "fillPrice": 1036000.0,
+    "filledAt": "2026-06-11T15:00:00+09:00",
+    "fillPrice": 1072000.0,
     "filledQuantityPct": 100.0,
     "slippagePct": 0.0,
-    "barTimestamp": "2026-06-12T15:00:00+09:00",
-    "barOpen": 1163000.0,
-    "barHigh": 1192000.0,
-    "barLow": 1013000.0,
-    "barClose": 1036000.0,
-    "fillRule": "stop_close"
+    "barTimestamp": "2026-06-11T15:00:00+09:00",
+    "barOpen": 1023000.0,
+    "barHigh": 1098000.0,
+    "barLow": 1009000.0,
+    "barClose": 1072000.0,
+    "fillRule": "same_day_close_stop"
   },
   {
     "orderId": "20260610|stable|accumulation|064400-entry",

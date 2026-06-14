@@ -27,7 +27,23 @@
       "Bash(node --test js/*.test.mjs)",
       "Bash(git stash *)",
       "Bash(python -c ' *)",
-      "Bash(python -m pytest tests/test_replay_backtest.py -q)"
+      "Bash(python -m pytest tests/test_replay_backtest.py -q)",
+      "Bash(sed -n '1,60p' \"invest-daily\\\\afternon-bet-routine-claude.md\")",
+      "Bash(sed -n '1,50p' \"jongga_betting_plan.md\")",
+      "Bash(awk '/## 7\\\\. 매도 단계 체계/,/## 8\\\\./' \"invest-daily\\\\afternon-bet-routine-claude.md\")",
+      "Bash(python -m pytest tests/test_sim_broker.py -q)",
+      "Bash(python -m pytest jongga/tests/ -q)",
+      "Bash(rm -rf /tmp/replaytest)",
+      "Bash(mkdir -p /tmp/replaytest)",
+      "Bash(cp -r jongga/output/202606 /tmp/replaytest/)",
+      "Bash(python -m jongga.replay_backtest --from 2026-06-08 --to 2026-06-11 --variant stable --threshold-profile current --out-dir /tmp/replaytest)",
+      "Bash(ls -la /tmp/replaytest/replay/ 2>&1 | head; echo \"---\"; ls /tmp/replaytest/ 2>&1 | head)",
+      "Bash(rm -rf jongga/_replaytest)",
+      "Bash(mkdir -p jongga/_replaytest)",
+      "Bash(cp -r jongga/output/202606 jongga/_replaytest/)",
+      "Bash(python -m jongga.replay_backtest --from 2026-06-08 --to 2026-06-11 --variant stable --threshold-profile current --out-dir jongga/_replaytest)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(PYTHONUTF8=1 python -c ' *)"
     ]
   }
 }

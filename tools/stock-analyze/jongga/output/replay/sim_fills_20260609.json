@@ -144,7 +144,7 @@
     "barHigh": 314500.0,
     "barLow": 295250.0,
     "barClose": 302500.0,
-    "fillRule": "stop_close"
+    "fillRule": "same_day_close_stop"
   },
   {
     "orderId": "20260609|stable|pullback|000660-entry",
@@ -186,7 +186,7 @@
     "barHigh": 2180000.0,
     "barLow": 1992000.0,
     "barClose": 2048000.0,
-    "fillRule": "stop_close"
+    "fillRule": "same_day_close_stop"
   },
   {
     "orderId": "20260609|stable|accumulation|108490-entry",

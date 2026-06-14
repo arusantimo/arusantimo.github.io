@@ -1,5 +1,5 @@
 {
-  "runId": "replay-20260614-225433-ae359061",
+  "runId": "replay-20260615-012030-89880194",
   "date": "2026-06-11",
   "variant": "stable",
   "thresholdProfile": "current",
@@ -46,7 +46,7 @@
     "a7plus": {
       "caseKey": "a7plus",
       "label": "7&A",
-      "candidateCount": 4,
+      "candidateCount": 5,
       "eligibleCount": 0,
       "includedCount": 0,
       "tradeCount": 5,
@@ -106,7 +106,7 @@
         "a7plus": {
           "caseKey": "a7plus",
           "label": "7&A",
-          "candidateCount": 0,
+          "candidateCount": 1,
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 1,
@@ -559,7 +559,7 @@
         "a7plus": {
           "caseKey": "a7plus",
           "label": "7&A",
-          "candidateCount": 0,
+          "candidateCount": 1,
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 1,
@@ -977,7 +977,7 @@
       "historyRecommendation": false,
       "replayIncluded": false,
       "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-      "replayA7Plus": false,
+      "replayA7Plus": true,
       "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
       "pullbackReplayGateOk": false,
       "qualityGateOk": true,
@@ -2039,7 +2039,7 @@
   ],
   "results": [
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "pullback",
@@ -2116,7 +2116,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "pullback",
@@ -2193,7 +2193,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "pullback",
@@ -2270,7 +2270,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "accumulation",
@@ -2347,7 +2347,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "accumulation",
@@ -2424,7 +2424,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "accumulation",
@@ -2501,7 +2501,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "breakout",
@@ -2578,7 +2578,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "breakout",
@@ -2655,7 +2655,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "reversal",
@@ -2732,7 +2732,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "reversal",
@@ -2809,7 +2809,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260614-225433-ae359061",
+      "runId": "replay-20260615-012030-89880194",
       "date": "2026-06-11",
       "variant": "stable",
       "strategy": "reversal",

@@ -10,6 +10,7 @@ from typing import Any
 
 from jongga.entry_policy import compute_entry_eligibility
 from jongga.grade_policy import REVERSAL_GRADE_MIN, TREND_GRADE_MIN
+from jongga.scoring import overnight_gap_risk_penalty
 from jongga.outcome_tracker import compute_outcome, extract_context_dims, load_daily_payload
 from jongga.output_contract import (
     POINT_IN_TIME_STATUS_HISTORICAL_REGEN,
@@ -176,9 +177,23 @@ def _resolve_replay_entry_price(entry: dict[str, Any]) -> float:
     return float(entry.get("currentPrice") or 0.0)
 
 
-def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: str) -> dict[str, Any]:
+def replay_entry_view(
+    entry: dict[str, Any],
+    strategy: str,
+    threshold_profile: str,
+    dims: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     grade_score = float(entry.get("gradeScore") or 0.0)
-    replay_grade = grade_from_threshold_profile(float(entry.get("gradeScore") or 0.0), strategy, threshold_profile)
+    # 오버나이트 갭다운 페널티: 라이브에서 점수에 이미 반영됐으면(overnightGapPenalty>0)
+    # 중복 적용하지 않고, 페널티 이전 구버전 페이로드에는 dims 기준으로 소급 적용한다.
+    if dims and float(entry.get("overnightGapPenalty") or 0.0) <= 0.0:
+        penalty = overnight_gap_risk_penalty(
+            str(dims.get("regimeBucket") or ""),
+            str(dims.get("vkospiTier") or ""),
+            str(dims.get("gapGrade") or ""),
+        )
+        grade_score = round(max(0.0, grade_score - penalty), 1)
+    replay_grade = grade_from_threshold_profile(grade_score, strategy, threshold_profile)
     entry_price = _resolve_replay_entry_price(entry)
     entry_price_available = entry_price > 0
     eligibility = compute_entry_eligibility(
@@ -971,7 +986,7 @@ def run_replay(
                 day_skipped_reason = "historical_regen_excluded"
             else:
                 for strategy, entry in iter_buy_entries(payload):
-                    candidate = replay_entry_view(entry, strategy, threshold_profile)
+                    candidate = replay_entry_view(entry, strategy, threshold_profile, dims=dims)
                     candidate["payloadSourceMode"] = payload_source_mode
                     candidate["inputArchiveVersion"] = input_archive_version
                     candidate["rebuildable"] = payload_rebuildable

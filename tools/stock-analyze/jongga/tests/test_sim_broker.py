@@ -157,13 +157,13 @@ class SimBrokerTests(unittest.TestCase):
     def test_partial_target_fill_then_same_day_close_can_stop_remaining(self):
         result = self._simulate(self._market_data(day1_high=10300.0, day1_low=9600.0, day1_close=9600.0))
         self.assertEqual(result["result"]["tradeStatus"], "closed")
-        self.assertEqual(result["result"]["closedReason"], "stop_close")
+        self.assertEqual(result["result"]["closedReason"], "same_day_close_stop")
         self.assertEqual(result["result"]["ambiguousCount"], 0)
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
         sell_fills = [fill for fill in result["fills"] if fill["orderId"].endswith(("premarket", "stop"))]
         self.assertEqual(len(sell_fills), 2)
         self.assertTrue(any(fill["fillRule"] == "premarket_touch" for fill in result["fills"]))
-        self.assertTrue(any(fill["fillRule"] == "stop_close" for fill in result["fills"]))
+        self.assertTrue(any(fill["fillRule"] == "same_day_close_stop" for fill in result["fills"]))
 
     def test_multiple_targets_fill_in_price_order_on_same_bar(self):
         result = self._simulate(self._market_data(day1_high=10700.0, day1_low=9900.0, day1_close=10650.0))
@@ -203,9 +203,28 @@ class SimBrokerTests(unittest.TestCase):
     def test_close_below_stop_uses_close_price_for_stop_exit(self):
         result = self._simulate(self._market_data(day1_high=10100.0, day1_low=9600.0, day1_close=9600.0, day2_high=10100.0, day2_low=9500.0))
         self.assertEqual(result["result"]["tradeStatus"], "closed")
-        self.assertEqual(result["result"]["closedReason"], "stop_close")
+        self.assertEqual(result["result"]["closedReason"], "same_day_close_stop")
         self.assertEqual(result["result"]["exitFilledAt"], "2026-06-04T15:00:00+09:00")
         self.assertEqual(result["result"]["exitLastFillPrice"], 9600.0)
+        self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
+
+    def test_pullback_same_day_close_stop_cuts_loss_before_second_overnight(self):
+        # D1 종가가 진입가 아래(소폭 손실, -3% 손절선은 미이탈)이면 D2로 넘기지 않고 D1 종가에 정리한다.
+        result = self._simulate(
+            self._market_data(
+                day1_high=10100.0,
+                day1_low=9750.0,
+                day1_close=9900.0,   # -1.0% 손실, 손절선 9700 미이탈
+                day2_open=9700.0,
+                day2_high=9750.0,
+                day2_low=9000.0,
+                day2_close=9100.0,   # 익일 폭락(현재 로직이면 여기서 더 큰 손실)
+            )
+        )
+        self.assertEqual(result["result"]["tradeStatus"], "closed")
+        self.assertEqual(result["result"]["closedReason"], "same_day_close_stop")
+        self.assertEqual(result["result"]["exitFilledAt"], "2026-06-04T15:00:00+09:00")
+        self.assertEqual(result["result"]["exitLastFillPrice"], 9900.0)
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
 
     def test_final_cutoff_sells_remaining_position_on_third_day(self):

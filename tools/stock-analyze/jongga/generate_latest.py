@@ -4689,6 +4689,15 @@ def build_manual_input_meta(strategy: str, snapshot: StockSnapshot) -> dict[str,
 
 
 
+def overnight_gap_penalty_kwargs(context: dict[str, Any]) -> dict[str, str]:
+    """오버나이트 갭다운 페널티 판정에 필요한 시장 맥락(레짐·VKOSPI tier·갭등급)."""
+    return {
+        "regime_bucket": regime_bucket(str(context.get("regimeLabel") or "")),
+        "vkospi_tier": str(context.get("kospiBullTier") or ""),
+        "gap_code": str((context.get("gapScore") or {}).get("code") or ""),
+    }
+
+
 def finalize_scored_buy_entry(
     entry: dict[str, Any],
     context: dict[str, Any] | None = None,
@@ -4834,6 +4843,7 @@ def build_pullback_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
         snapshot=snapshot,
         volatility_context=volatility_context,
+        **overnight_gap_penalty_kwargs(context),
     )
     grade = scoring["grade"]
     entry = {
@@ -4976,6 +4986,7 @@ def build_breakout_entry(
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
         snapshot=snapshot,
         volatility_context=volatility_context,
+        **overnight_gap_penalty_kwargs(context),
     )
     grade = scoring["grade"]
     entry = {
@@ -5072,6 +5083,7 @@ def build_accumulation_entry(snapshot: StockSnapshot, context: dict[str, Any]) -
         vkospi_multiplier=trend_vkospi_multiplier(context["vkospiValue"]),
         snapshot=snapshot,
         volatility_context=volatility_context,
+        **overnight_gap_penalty_kwargs(context),
     )
     grade = scoring["grade"]
     flow_bits: list[str] = []
@@ -5177,6 +5189,7 @@ def build_reversal_entry(snapshot: StockSnapshot, context: dict[str, Any]) -> di
         strict_max=REVERSAL_STRICT_MAX,
         vkospi_multiplier=reversal_vkospi_multiplier(context["vkospiValue"]),
         volatility_context=volatility_context,
+        **overnight_gap_penalty_kwargs(context),
     )
     grade = scoring["grade"]
     entry = {
