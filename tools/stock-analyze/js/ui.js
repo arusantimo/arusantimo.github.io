@@ -2460,7 +2460,7 @@ function openModal(codeOrEntryKey, mode = 'sell') {
         : stock.type === 'accumulation'
           ? '🔥 수급 매집형 종가베팅'
           : stock.type === 'reversal'
-            ? '🔻 주도주 급락 반등 종가베팅'
+            ? '🔻 낙주 매매 종가베팅'
             : '🚀 주도주 돌파형 종가베팅';
     document.getElementById('modal-type').textContent = typeLabel;
 
@@ -2663,7 +2663,7 @@ const STRATEGY_CAUTION_NOTES = {
     ]
   },
   reversal: {
-    headline: '급락 반등은 수익이 빨리 날 수 있지만, 바닥 확인 전에 잡으면 낙하하는 칼을 받는 매매가 됩니다.',
+    headline: '낙주 매매는 수익이 빨리 날 수 있지만, 바닥 확인 전에 잡으면 낙하하는 칼을 받는 매매가 됩니다.',
     items: [
       '악재가 끝나지 않은 종목은 첫 반등 뒤 재차 저점을 깨는 경우가 많아, 평균단가를 낮추는 대응이 특히 위험합니다.',
       '역추세 매매는 본전 심리가 붙기 쉬워 손절이 늦어지므로, 보유 기간과 최대 손실을 더 짧고 명확하게 관리해야 합니다.',
@@ -2760,10 +2760,10 @@ const STRATEGY_INFO_CONTENT = {
     `
   },
   reversal: {
-    title: '타입 3: 주도주 급락 반등 매매 (전략 ③ - 역추세 트랙)',
+    title: '타입 3: 낙주 매매 종가베팅 (전략 ③ - 역추세 트랙)',
     subtitle: '"초대형 우량주가 갑자기 폭락했을 때, 첫 반등의 꼬리를 잡는다"',
     body: `
-      <p><strong>개념:</strong> 시장을 주도하던 대형·준대형 리더주(시총 8조 원 이상)가 단기 악재 등으로 패닉 셀링(급락)을 겪은 후, 매도가 멈추고 강한 매수세가 처음 유입되는 순간 진입하는 역추세(낙주) 매매입니다. (안정성을 위해 별도 트랙으로 격리 운용하며, 최대 3일만 보유하고 무조건 청산합니다.)</p>
+      <p><strong>개념:</strong> 시장을 주도하던 대형·준대형 리더주(시총 8조 원 이상)가 단기 악재 등으로 패닉 셀링(급락)을 겪은 후, 매도가 멈추고 강한 매수세가 처음 유입되는 순간 진입하는 낙주 매매입니다. (안정성을 위해 별도 트랙으로 격리 운용하며, 최대 3일만 보유하고 무조건 청산합니다.)</p>
       ${renderStrategyCautionPanel('reversal', { sectionLabel: '⚠️ 꼭 주의할 점', title: '반등이 보여도 바닥이 확인된 것은 아닙니다.' })}
       <div style="margin-top: 12px; font-weight: bold; color: var(--text-primary);">선정 조건 (Gate):</div>
       <ul style="padding-left: 20px; margin-top: 8px;">

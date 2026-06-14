@@ -34,6 +34,8 @@ VARIANT_LABELS = {
     VARIANT_STABLE: "현재 버전",
     VARIANT_CANARY: "카나리",
 }
+MANUAL_OVERRIDES_DIR = Path(__file__).resolve().parent / "manual_overrides"
+POINT_IN_TIME_OVERRIDE_PATH = MANUAL_OVERRIDES_DIR / "point_in_time_overrides.json"
 
 
 def is_canary_channel_enabled() -> bool:
@@ -94,6 +96,44 @@ def variant_label(value: str | None = None) -> str:
     return VARIANT_LABELS[normalize_variant(value)]
 
 
+def _read_point_in_time_override_entries(path: str | Path | None = None) -> list[dict[str, Any]]:
+    target = Path(path) if path else POINT_IN_TIME_OVERRIDE_PATH
+    if not target.exists():
+        return []
+    try:
+        payload = json.loads(target.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    if isinstance(payload, list):
+        entries = payload
+    elif isinstance(payload, dict):
+        entries = payload.get("entries")
+    else:
+        entries = None
+    return [entry for entry in entries if isinstance(entry, dict)] if isinstance(entries, list) else []
+
+
+def resolve_point_in_time_override_status(
+    analysis_date: date,
+    *,
+    variant: str | None = None,
+    overrides_path: str | Path | None = None,
+) -> str | None:
+    target_date = analysis_date.isoformat()
+    target_variant = normalize_variant(variant)
+    for entry in _read_point_in_time_override_entries(overrides_path):
+        if str(entry.get("date") or "").strip() != target_date:
+            continue
+        if normalize_variant(str(entry.get("variant") or "")) != target_variant:
+            continue
+        status = str(entry.get("status") or "").strip().lower()
+        if status in {POINT_IN_TIME_STATUS_CONFIRMED, POINT_IN_TIME_STATUS_HISTORICAL_REGEN}:
+            return status
+        if entry.get("confirmed") is True:
+            return POINT_IN_TIME_STATUS_CONFIRMED
+    return None
+
+
 def normalize_analysis_session(value: str | None) -> str:
     text = str(value or "").strip()
     if text not in ANALYSIS_SESSION_LABELS:
@@ -151,8 +191,17 @@ def point_in_time_status(
     *,
     today: date | None = None,
     explicit_date_used: bool = False,
+    variant: str | None = None,
+    overrides_path: str | Path | None = None,
 ) -> str:
     """실행 캘린더 날짜 + --date 명시 여부 기준 point-in-time 상태."""
+    override_status = resolve_point_in_time_override_status(
+        analysis_date,
+        variant=variant,
+        overrides_path=overrides_path,
+    )
+    if override_status:
+        return override_status
     if explicit_date_used:
         return POINT_IN_TIME_STATUS_HISTORICAL_REGEN
     base_day = today or datetime.now(KST).date()
@@ -230,11 +279,15 @@ def is_point_in_time_run(
     *,
     today: date | None = None,
     explicit_date_used: bool = False,
+    variant: str | None = None,
+    overrides_path: str | Path | None = None,
 ) -> bool:
     return point_in_time_status(
         analysis_date,
         today=today,
         explicit_date_used=explicit_date_used,
+        variant=variant,
+        overrides_path=overrides_path,
     ) == POINT_IN_TIME_STATUS_CONFIRMED
 
 
@@ -245,6 +298,7 @@ def payload_with_analysis_date(
     variant: str = VARIANT_STABLE,
     today: date | None = None,
     explicit_date_used: bool = False,
+    overrides_path: str | Path | None = None,
 ) -> dict[str, Any]:
     next_payload = deepcopy(payload)
     next_payload["analysisDate"] = analysis_date.isoformat()
@@ -253,6 +307,8 @@ def payload_with_analysis_date(
         analysis_date,
         today=today,
         explicit_date_used=explicit_date_used,
+        variant=variant,
+        overrides_path=overrides_path,
     )
     next_payload["pointInTime"] = point_in_time_flag_from_status(status)
     next_payload["pointInTimeStatus"] = status

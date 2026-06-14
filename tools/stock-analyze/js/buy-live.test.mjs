@@ -90,7 +90,7 @@ test('하향 보정은 최대 -1.0점으로 제한된다', () => {
   assert.equal(payload.finalScore, 7.5);
 });
 
-test('급락 반등 전략은 최종 점수 7.0에서 A로 승격된다', () => {
+test('낙주 매매 전략은 최종 점수 7.0에서 A로 승격된다', () => {
   const { buildBuyLiveRefreshPayload } = loadBuyLiveContext();
   const entry = { score: 6.9, grade: 'B', strategy: 'reversal' };
   const payload = buildBuyLiveRefreshPayload(entry, {

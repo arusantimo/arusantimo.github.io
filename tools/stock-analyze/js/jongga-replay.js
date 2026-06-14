@@ -2,7 +2,7 @@ const JONGGA_REPLAY_STRATEGIES = [
   { key: 'pullback', label: '눌림목' },
   { key: 'accumulation', label: '수급 매집' },
   { key: 'breakout', label: '주도주 돌파' },
-  { key: 'reversal', label: '급락 반등' }
+  { key: 'reversal', label: '낙주 매매' }
 ];
 const JONGGA_REPLAY_STRATEGY_ORDER = ['pullback', 'accumulation', 'breakout', 'reversal'];
 const REPLAY_DAY_PAGE_SIZE = 5;

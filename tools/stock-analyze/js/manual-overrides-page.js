@@ -3,7 +3,7 @@ const STRATEGY_LABELS = {
   breakout: '주도주 돌파형',
   accumulation: '수급 매집형',
   momentum: '주도주 돌파형',
-  reversal: '급락 반등',
+  reversal: '낙주 매매',
   manual: '직접 입력'
 };
 

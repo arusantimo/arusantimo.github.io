@@ -6,7 +6,7 @@ STRATEGY_DISPLAY_NAMES: dict[str, str] = {
     "breakout": "주도주돌파형",
     "accumulation": "수급매집형",
     "pullback": "눌림목",
-    "reversal": "급락반등",
+    "reversal": "낙주 매매",
     "none": "없음",
     "momentum": "주도주돌파형",
 }

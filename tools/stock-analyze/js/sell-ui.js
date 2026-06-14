@@ -920,7 +920,7 @@ openModal = function openModalOverride(codeOrEntryKey, mode = 'sell') {
         ? '🔥 수급 매집형 종가베팅'
         : (detail.stock.type === 'breakout' || detail.stock.type === 'momentum')
           ? '🚀 주도주 돌파형 종가베팅'
-          : '🔻 주도주 급락 반등';
+          : '🔻 낙주 매매';
   document.getElementById('modal-body').innerHTML = buildSellModalBody(detail);
   document.getElementById('modal-overlay').classList.add('open');
   syncBodyScrollLock();

@@ -1,0 +1,10 @@
+{
+  "entries": [
+    {
+      "date": "2026-06-12",
+      "variant": "stable",
+      "status": "confirmed",
+      "reason": "2026-06-12 stable payload는 재현 가능한 point-in-time 예외로 유지"
+    }
+  ]
+}

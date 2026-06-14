@@ -81,6 +81,10 @@ function parseRuleCodes(segment) {
     });
 }
 
+function isReversalHeading(heading) {
+  return heading.includes('낙주 매매') || heading.includes('급락 반등') || heading.includes('전략 ③');
+}
+
 function parseEntryMetaLine(entry, line) {
   if (line.startsWith('Gate:')) {
     entry.gates = parseGateTokens(line);
@@ -235,7 +239,7 @@ function buildSourceTextFromNotion(data) {
       lines.push(`## ${heading}`);
       return;
     }
-    if (heading.includes('급락 반등') || heading.includes('전략 ③')) {
+    if (isReversalHeading(heading)) {
       lines.push(`## ${heading}`);
       return;
     }
@@ -288,7 +292,7 @@ function parseNotionSnapshotFromText(sourceText) {
           currentSection = 'pullback';
         } else if (heading.includes('수급') && heading.includes('종가베팅')) {
           currentSection = 'momentum';
-        } else if (heading.includes('급락 반등') || heading.includes('전략 ③')) {
+        } else if (isReversalHeading(heading)) {
           currentSection = 'reversal';
         } else {
           currentSection = 'other';

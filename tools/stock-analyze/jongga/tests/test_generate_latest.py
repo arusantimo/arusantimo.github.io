@@ -7,7 +7,7 @@ from types import SimpleNamespace
 from typing import Any
 from unittest import mock
 
-from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, annotate_payload_with_analysis_session, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, collect_overtime_price_context, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, merge_same_day_session_payloads, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
+from jongga.generate_latest import StockSnapshot, analyze_reversal_intraday_signal, annotate_macro_metric_freshness, annotate_payload_with_analysis_session, build_accumulation_entry, build_auto_event_filter, build_breakout_entry, build_gap_score, build_kind_event_filter_from_rows, build_market_context, build_momentum_entry, build_pullback_entry, build_reversal_entry, build_stock_snapshot, build_top_trading_value_gate, collect_overtime_price_context, decide_regime, emit_cli_failures, fetch_browser_candidate_enrichments, finalize_scored_buy_entry, has_actionable_public_metric_gap, merge_same_day_session_payloads, parse_cnbc_quote_html, parse_kind_disclosure_rows, parse_market_cap_trillion, parse_naver_orderbook_ratio_html, parse_toss_quotes_payload, parse_toss_stock_price_detail_payload, parse_toss_ticks_strength_payload, prepare_console_output, rank_pullback_entries_with_enrichment, safe_console_text, select_top_trading_value_codes
 from jongga.rule_evaluation import evaluate_accumulation_g2, evaluate_breakout_g2
 from jongga.grade_policy import grade_from_score
 from jongga.macro_overlay import REGIME_ROTATION_BUFFERED, REGIME_STRONG_BULL, apply_regime_fields_to_context, load_market_analyze_snapshot, trend_status_label, reversal_status_label
@@ -176,6 +176,10 @@ class GenerateLatestTest(unittest.TestCase):
             toss={"avgStrength": 96.0, "lastHourAvgStrength": 102.0, "last30BuySellRatio": 1.05, "last30AvgStrength": 101.0},
         )
         return replace(snapshot, **overrides)
+
+    def test_has_actionable_public_metric_gap_ignores_anchor_diagnostics(self):
+        self.assertFalse(has_actionable_public_metric_gap({"notes": ["앵커 중심값 데이터 부족", "앵커 거래량 데이터 부족"]}))
+        self.assertTrue(has_actionable_public_metric_gap({"notes": ["동종업종 비교 데이터 부족"]}))
 
     def test_finalize_scored_buy_entry_attaches_stock_indicators_for_all_strategies(self):
         snapshot = self._stock_indicator_snapshot()
@@ -507,6 +511,17 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertEqual(parsed["bidTotal"], 698319)
         self.assertEqual(parsed["askTotal"], 629695)
 
+    def test_parse_naver_orderbook_ratio_html_handles_no_ask_volume(self):
+        parsed = parse_naver_orderbook_ratio_html(
+            '<tr class="total"><td class="f_down">&nbsp;</td><td>잔량합계</td><td class="f_up">972,607</td></tr>',
+            "403870",
+        )
+        self.assertIsNotNone(parsed)
+        self.assertEqual(parsed["bidAskRatio"], 999.0)
+        self.assertEqual(parsed["bidTotal"], 972607)
+        self.assertEqual(parsed["askTotal"], 0)
+        self.assertIn("매도 잔량 없음", parsed["note"])
+
     def test_parse_kind_disclosure_rows_strips_company_name(self):
         rows = parse_kind_disclosure_rows([
             '2026-05-15 16:14 삼성전자 분기보고서(일반법인)(2026.03)',
@@ -522,6 +537,22 @@ class GenerateLatestTest(unittest.TestCase):
         self.assertIsNotNone(event_filter)
         self.assertTrue(event_filter["blocked"])
         self.assertIn("배당 결정", event_filter["note"])
+
+    def test_build_kind_event_filter_blocks_recent_short_sale_overheat_notice(self):
+        event_filter = build_kind_event_filter_from_rows([
+            {"date": "2026-06-12", "time": "20:01", "title": "공매도 과열종목 지정(공매도 거래 금지 적용)"},
+        ], today=date(2026, 6, 12))
+        self.assertIsNotNone(event_filter)
+        self.assertTrue(event_filter["blocked"])
+        self.assertIn("공매도 과열종목 지정", event_filter["note"])
+
+    def test_build_kind_event_filter_marks_clear_when_recent_rows_have_no_risk_event(self):
+        event_filter = build_kind_event_filter_from_rows([
+            {"date": "2026-06-12", "time": "20:01", "title": "주식선물 2단계 가격제한폭 확대요건 도달(상승)"},
+        ], today=date(2026, 6, 12))
+        self.assertIsNotNone(event_filter)
+        self.assertFalse(event_filter["blocked"])
+        self.assertIn("위험 공시 없음", event_filter["note"])
 
     def test_select_top_trading_value_codes_keeps_raw_top100_only(self):
         rows = [

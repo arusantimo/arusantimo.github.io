@@ -94,11 +94,60 @@ class OutputContractTests(unittest.TestCase):
             POINT_IN_TIME_STATUS_HISTORICAL_REGEN,
         )
 
+    def test_point_in_time_override_marks_explicit_date_confirmed(self):
+        with TemporaryDirectory() as tmp:
+            overrides_path = Path(tmp) / "point_in_time_overrides.json"
+            overrides_path.write_text(json.dumps({
+                "entries": [
+                    {"date": "2026-06-12", "variant": VARIANT_STABLE, "status": POINT_IN_TIME_STATUS_CONFIRMED},
+                ]
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+
+            self.assertEqual(
+                point_in_time_status(
+                    date(2026, 6, 12),
+                    today=date(2026, 6, 14),
+                    explicit_date_used=True,
+                    variant=VARIANT_STABLE,
+                    overrides_path=overrides_path,
+                ),
+                POINT_IN_TIME_STATUS_CONFIRMED,
+            )
+            self.assertTrue(
+                is_point_in_time_run(
+                    date(2026, 6, 12),
+                    today=date(2026, 6, 14),
+                    explicit_date_used=True,
+                    variant=VARIANT_STABLE,
+                    overrides_path=overrides_path,
+                )
+            )
+
     def test_payload_with_analysis_date_stamps_point_in_time_fields(self):
         payload = payload_with_analysis_date({}, date(2026, 5, 22), variant=VARIANT_STABLE, today=date(2026, 5, 22))
         self.assertIn("pointInTime", payload)
         self.assertIsInstance(payload["pointInTime"], bool)
         self.assertEqual(payload["pointInTimeStatus"], POINT_IN_TIME_STATUS_CONFIRMED)
+
+    def test_payload_with_analysis_date_applies_override_status(self):
+        with TemporaryDirectory() as tmp:
+            overrides_path = Path(tmp) / "point_in_time_overrides.json"
+            overrides_path.write_text(json.dumps({
+                "entries": [
+                    {"date": "2026-06-12", "variant": VARIANT_STABLE, "status": POINT_IN_TIME_STATUS_CONFIRMED},
+                ]
+            }, ensure_ascii=False, indent=2), encoding="utf-8")
+
+            payload = payload_with_analysis_date(
+                {},
+                date(2026, 6, 12),
+                variant=VARIANT_STABLE,
+                today=date(2026, 6, 14),
+                explicit_date_used=True,
+                overrides_path=overrides_path,
+            )
+            self.assertTrue(payload["pointInTime"])
+            self.assertEqual(payload["pointInTimeStatus"], POINT_IN_TIME_STATUS_CONFIRMED)
 
     def test_infer_payload_point_in_time_status_marks_missing_meta_as_legacy_unknown(self):
         self.assertEqual(infer_payload_point_in_time_status({}), POINT_IN_TIME_STATUS_LEGACY_UNKNOWN)

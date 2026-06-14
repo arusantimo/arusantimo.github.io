@@ -158,9 +158,9 @@ const STRATEGY_META = {
     noun: '수급 매집형'
   },
   reversal: {
-    label: '🔻 주도주 급락 반등',
-    shortLabel: '급락 반등',
-    noun: '급락 반등 매매'
+    label: '🔻 낙주 매매 종가베팅',
+    shortLabel: '낙주 매매',
+    noun: '낙주 매매'
   },
   swing: {
     label: '🔄 스윙 보유',
@@ -180,7 +180,7 @@ const REGIME_LABEL_GUIDE = {
   '스윙 전환': '현 레짐에서 종베→스윙 전환 허용 정도입니다. 적극/조건부/제한/금지 4단계로 구분됩니다.',
   '스윙 전환 활성도': '현 레짐에서 종베→스윙 전환을 얼마나 허용하는지 보여주는 항목입니다. 적극/조건부/제한/금지로 해석합니다.',
   '시가베팅': '현 레짐에서 시가베팅 활성 여부입니다. 강세장·순환매장에서만 활성화됩니다.',
-  '역추세 트랙': '전략 ③ 주도주 급락 반등 매매의 활성 여부입니다. 약세장에서는 비활성, 강세장·박스권 중심으로 제한적으로 사용합니다.',
+  '역추세 트랙': '전략 ③ 낙주 매매의 활성 여부입니다. 약세장에서는 비활성, 강세장·박스권 중심으로 제한적으로 사용합니다.',
   '갭 스코어': '미국 시장과 환율을 반영해 익일 갭 방향을 점수화한 항목입니다. 낮을수록 다음 날 갭다운 위험이 크다고 봅니다.',
   '갭 조정': '갭 스코어에 따라 당일 진입 비중과 익일 매도 전략을 어떻게 조정하는지 요약한 항목입니다.',
   '등락주': '당일 상승 종목 수, 하락 종목 수, 상한가 수를 요약한 내부 체력 지표입니다. 지수와 별개로 시장 폭을 판단할 때 사용합니다.',
@@ -1300,7 +1300,7 @@ function buildSourceTextFromNotion(data) {
       lines.push(`## ${heading}`);
       return;
     }
-    if (heading.includes('급락 반등') || heading.includes('전략 ③')) {
+    if (heading.includes('낙주 매매') || heading.includes('급락 반등') || heading.includes('전략 ③')) {
       lines.push(`## ${heading}`);
       return;
     }
@@ -1353,7 +1353,7 @@ function parseNotionSnapshotFromText(sourceText) {
           currentSection = 'pullback';
         } else if (heading.includes('수급') && heading.includes('종가베팅')) {
           currentSection = 'momentum';
-        } else if (heading.includes('급락 반등') || heading.includes('전략 ③')) {
+        } else if (heading.includes('낙주 매매') || heading.includes('급락 반등') || heading.includes('전략 ③')) {
           currentSection = 'reversal';
         } else {
           currentSection = 'other';

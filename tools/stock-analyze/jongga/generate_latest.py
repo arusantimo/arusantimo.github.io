@@ -181,7 +181,7 @@ ETF_NAME_PATTERN = re.compile(
 )
 STOCK_CODE_PATTERN = re.compile(r"^\d{6}$")
 KIND_EARNINGS_EVENT_PATTERN = re.compile(r"기업설명회\(IR\)\s*개최|영업\(잠정\)실적|잠정실적|실적발표|결산실적", re.IGNORECASE)
-KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수", re.IGNORECASE)
+KIND_CORP_ACTION_PATTERN = re.compile(r"주주총회소집결의|배당\s*결정|분할결정|합병결정|유상증자결정|무상증자결정|감자결정|권리락|주식교환|주식이전|공개매수|공매도\s*과열종목\s*지정", re.IGNORECASE)
 PULLBACK_NEWS_NEGATIVE_PATTERN = re.compile(
     r"유상증자|전환사채|CB\b|BW\b|구주매출|보호예수\s*해제|최대주주\s*매도|적자|실적\s*부진|불성실공시|거래정지|조회공시",
     re.IGNORECASE,
@@ -751,7 +751,7 @@ def parse_toss_ticks_strength_payload(payload: Any) -> dict[str, Any] | None:
 
 def parse_naver_orderbook_ratio_html(html: str, code: str) -> dict[str, Any] | None:
     match = re.search(
-        r'<tr class="total">.*?<td[^>]*>\s*([\d,]+)\s*</td>\s*<td>잔량합계</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>',
+        r'<tr class="total">.*?<td[^>]*>\s*([\d,]*)\s*(?:&nbsp;)?\s*</td>\s*<td>잔량합계</td>\s*<td[^>]*>\s*([\d,]+)\s*</td>',
         html,
         re.IGNORECASE | re.DOTALL,
     )
@@ -759,8 +759,17 @@ def parse_naver_orderbook_ratio_html(html: str, code: str) -> dict[str, Any] | N
         return None
     ask_total = parse_float(match.group(1))
     bid_total = parse_float(match.group(2))
-    if not ask_total or not bid_total:
+    if bid_total <= 0:
         return None
+    if ask_total <= 0:
+        return {
+            "bidAskRatio": 999.0,
+            "bidTotal": int(bid_total),
+            "askTotal": 0,
+            "note": f"Naver 호가잔량합계 매수 {int(bid_total):,} / 매도 0 (매도 잔량 없음)",
+            "source": "naver_orderbook_browser",
+            "sourceUrl": NAVER_ORDERBOOK_URL_TEMPLATE.format(code=code),
+        }
     ratio = bid_total / ask_total if ask_total else 0.0
     return {
         "bidAskRatio": round(ratio, 4),
@@ -795,6 +804,7 @@ def parse_kind_disclosure_rows(rows: list[str], company_name: str) -> list[dict[
 
 def build_kind_event_filter_from_rows(rows: list[dict[str, str]], today: date | None = None) -> dict[str, Any] | None:
     base_date = today or datetime.now().date()
+    latest_row: dict[str, str] | None = None
     for row in rows:
         try:
             disclosed_at = datetime.strptime(row["date"], "%Y-%m-%d").date()
@@ -804,6 +814,8 @@ def build_kind_event_filter_from_rows(rows: list[dict[str, str]], today: date | 
         title = row["title"]
         if age_days < 0:
             continue
+        if latest_row is None:
+            latest_row = row
         if KIND_EARNINGS_EVENT_PATTERN.search(title) and age_days <= 14:
             return {
                 "blocked": True,
@@ -820,7 +832,15 @@ def build_kind_event_filter_from_rows(rows: list[dict[str, str]], today: date | 
                 "note": f"KIND 최근공시 {row['date']} {title}",
                 "source": "kind_playwright_recent_disclosure",
             }
-    return None
+    if latest_row is None:
+        return None
+    return {
+        "blocked": False,
+        "earningsDays": None,
+        "corporateActionDays": None,
+        "note": f"KIND 최근공시 {latest_row['date']}까지 위험 공시 없음",
+        "source": "kind_playwright_recent_disclosure",
+    }
 
 
 def iter_browser_executable_candidates() -> list[str]:
@@ -1342,6 +1362,20 @@ def is_snapshot_field_satisfied(snapshot: "StockSnapshot", field_key: str) -> bo
 
 def normalize_text(value: Any) -> str:
     return str(value or "").strip()
+
+
+NON_ACTIONABLE_PUBLIC_METRIC_NOTES = {
+    "앵커 중심값 데이터 부족",
+    "앵커 거래량 데이터 부족",
+}
+
+
+def has_actionable_public_metric_gap(entry: dict[str, Any]) -> bool:
+    for note in entry.get("notes", []) or []:
+        normalized = normalize_text(note)
+        if normalized and normalized not in NON_ACTIONABLE_PUBLIC_METRIC_NOTES:
+            return True
+    return False
 
 
 def sync_entry_manual_input(entry: dict[str, Any]) -> None:
@@ -5360,12 +5394,13 @@ def collect_live_payload(
             tone=step_tone(status.lower()),
         )
 
-    def merge_provider_health_rows(base: dict[str, dict[str, int]], extra: dict[str, dict[str, int]]) -> dict[str, dict[str, int]]:
+    def merge_provider_health_rows(base: dict[str, dict[str, int]], *extras: dict[str, dict[str, int]]) -> dict[str, dict[str, int]]:
         merged = {provider: dict(statuses) for provider, statuses in base.items()}
-        for provider, statuses in extra.items():
-            row = merged.setdefault(provider, {})
-            for status, count in statuses.items():
-                row[status] = row.get(status, 0) + int(count)
+        for extra in extras:
+            for provider, statuses in extra.items():
+                row = merged.setdefault(provider, {})
+                for status, count in statuses.items():
+                    row[status] = row.get(status, 0) + int(count)
         return merged
 
     def summarize_balance_collection(
@@ -5705,10 +5740,13 @@ def collect_live_payload(
             emit_cli_failures("눌림목 뉴스 수집 실패", pullback_news_errors)
 
     all_entries = pullback_entries + breakout_entries + accumulation_entries + reversal_entries
-    missing_public_metrics = sum(1 for entry in all_entries if entry.get("notes"))
+    missing_public_metrics = sum(1 for entry in all_entries if has_actionable_public_metric_gap(entry))
     fallback_keys = ["vkospi"] if live_metrics["vkospi"]["isFallback"] else []
     manual_keys: list[str] = []
-    if any(entry.get("manualInput", {}).get("fields") for entry in all_entries):
+    if any(
+        any(str(field.get("fieldKey") or "").startswith(("toss.", "orderbook.")) for field in entry.get("manualInput", {}).get("fields", []))
+        for entry in all_entries
+    ):
         manual_keys.append("toss_metrics")
     if any(any(field.get("fieldKey") == "eventFilter" for field in entry.get("manualInput", {}).get("fields", [])) for entry in all_entries):
         manual_keys.append("event_filters")
@@ -5891,7 +5929,11 @@ def main() -> int:
         emit_cli_log("FAIL", str(exc), tone="red")
         return 2
     explicit_date_used = bool(args.date)
-    point_in_time_run = is_point_in_time_run(analysis_date, explicit_date_used=explicit_date_used)
+    point_in_time_run = is_point_in_time_run(
+        analysis_date,
+        explicit_date_used=explicit_date_used,
+        variant=normalize_variant(args.variant),
+    )
     if not point_in_time_run and not args.allow_historical_regen:
         emit_cli_log(
             "FAIL",
