@@ -9,6 +9,7 @@ import os
 import re
 import sys
 from copy import deepcopy
+from html.parser import HTMLParser
 from time import perf_counter
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
@@ -1558,6 +1559,96 @@ def fetch_naver_market_value_universe() -> list[dict[str, Any]]:
     return rows
 
 
+OVERTIME_BOARD_URL_TEMPLATE = "https://finance.naver.com/sise/sise_quant_overtime.naver?page={page}"
+OVERTIME_BOARD_MAX_PAGES = 5
+
+
+class _OvertimeBoardParser(HTMLParser):
+    """시간외 단일가 게시판(sise_quant_overtime.naver) 테이블을 종목코드 포함 셀 텍스트로 파싱한다."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.tables: list[list[list[str]]] = []
+        self._current_table: list[list[str]] | None = None
+        self._current_row: list[str] | None = None
+        self._cell_parts: list[str] = []
+        self._in_cell = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "table":
+            self._current_table = []
+        elif tag == "tr" and self._current_table is not None:
+            self._current_row = []
+        elif tag in ("td", "th") and self._current_row is not None:
+            self._in_cell = True
+            self._cell_parts = []
+        elif tag == "a" and self._in_cell:
+            href = dict(attrs).get("href") or ""
+            code_match = re.search(r"code=(\d{6})", href)
+            if code_match:
+                self._cell_parts.append(f" {code_match.group(1)} ")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("td", "th") and self._in_cell and self._current_row is not None:
+            text = re.sub(r"\s+", " ", "".join(self._cell_parts)).strip()
+            self._current_row.append(text)
+            self._in_cell = False
+            self._cell_parts = []
+        elif tag == "tr" and self._current_row is not None and self._current_table is not None:
+            if any(cell.strip() for cell in self._current_row):
+                self._current_table.append(self._current_row)
+            self._current_row = None
+        elif tag == "table" and self._current_table is not None:
+            if self._current_table:
+                self.tables.append(self._current_table)
+            self._current_table = None
+
+    def handle_data(self, data: str) -> None:
+        if self._in_cell:
+            self._cell_parts.append(data)
+
+
+def _parse_overtime_board_html(html_text: str) -> dict[str, float]:
+    parser = _OvertimeBoardParser()
+    parser.feed(html_text)
+    price_map: dict[str, float] = {}
+    for table in parser.tables:
+        for row in table:
+            if len(row) < 3:
+                continue
+            joined = " ".join(row)
+            code_match = re.search(r"\b(\d{6})\b", joined)
+            if not code_match:
+                continue
+            price = parse_float(row[2])
+            if price <= 0:
+                continue
+            price_map[code_match.group(1)] = price
+    return price_map
+
+
+def fetch_overtime_price_map(*, max_pages: int = OVERTIME_BOARD_MAX_PAGES) -> dict[str, float]:
+    """KRX 시간외 단일가(대체거래소 포함 호가) 게시판에서 종목별 시간외 체결가를 수집한다.
+
+    17:30(5시반) 분석 세션에서 정규장 종가 대신 사용한다. 페이지를 순회하다 새 종목이
+    더 이상 나오지 않거나 페이지 조회에 실패하면 중단한다.
+    """
+    price_map: dict[str, float] = {}
+    for page in range(1, max_pages + 1):
+        try:
+            html_text = request_text(OVERTIME_BOARD_URL_TEMPLATE.format(page=page), timeout=15.0, encoding="euc-kr")
+        except (URLError, OSError, TimeoutError):
+            break
+        page_map = _parse_overtime_board_html(html_text)
+        if not page_map:
+            break
+        before = len(price_map)
+        price_map.update(page_map)
+        if len(price_map) == before:
+            break
+    return price_map
+
+
 def _is_market_cap_rank_candidate(row: dict[str, Any]) -> bool:
     code = str(row.get("itemCode") or row.get("code") or "").strip()
     name = str(row.get("stockName") or row.get("name") or "").strip()
@@ -1819,6 +1910,7 @@ def build_stock_snapshot(
     analysis_date: date | str | None = None,
     market_cap_rank_lookup: dict[str, int] | None = None,
     market_cap_universe_count: int | None = None,
+    overtime_price_map: dict[str, float] | None = None,
 ) -> StockSnapshot:
     rank, code, name = item
     basic = request_json(f"https://m.stock.naver.com/api/stock/{code}/basic", timeout=20.0)
@@ -1854,6 +1946,10 @@ def build_stock_snapshot(
     finalized_current = close_history[0] if analysis_date is not None and close_history else 0.0
     # Historical/finalized runs should prefer the filtered session close over live/basic quotes.
     current_price = finalized_current or historical_current or parse_float(basic.get("closePrice") or basic.get("stockPrice")) or close_history[0]
+    # 17:30(5시) 분석 세션: 정규장 종가 대신 NXT/시간외 단일가 게시판 체결가를 종가로 사용한다.
+    overtime_price = (overtime_price_map or {}).get(code)
+    if overtime_price and overtime_price > 0:
+        current_price = overtime_price
     prev_close = parse_float(analysis_rows[1]["closePrice"]) if len(analysis_rows) > 1 else 0.0
     prev_close = prev_close or parse_float(find_total_info(total_infos, "lastClosePrice")) or (close_history[1] if len(close_history) > 1 else current_price)
     open_price = parse_float(analysis_row["openPrice"]) if analysis_row else 0.0
@@ -5155,6 +5251,7 @@ def collect_live_payload(
     *,
     mode: str = VARIANT_STABLE,
     analysis_date: str | date | None = None,
+    session: str = ANALYSIS_SESSION_1500,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     resolved_mode = normalize_variant(mode)
     collection_log: list[dict[str, Any]] = []
@@ -5293,6 +5390,19 @@ def collect_live_payload(
     top_trading = fetch_top_trading_codes(top_limit, market_value_rows)
     log_step("top_trading", "거래대금 상위 종목 수집", started_at, count=len(top_trading))
 
+    overtime_price_map: dict[str, float] = {}
+    if normalize_analysis_session(session) == ANALYSIS_SESSION_1730:
+        started_at = perf_counter()
+        overtime_price_map = fetch_overtime_price_map()
+        log_step(
+            "overtime_price",
+            "시간외 단일가 종가 보강",
+            started_at,
+            status="ok" if overtime_price_map else "fallback",
+            detail="정규장 종가로 대체" if not overtime_price_map else "",
+            count=len(overtime_price_map),
+        )
+
     snapshots: list[StockSnapshot] = []
     errors: list[str] = []
     started_at = perf_counter()
@@ -5304,6 +5414,7 @@ def collect_live_payload(
                 resolved_analysis_date,
                 market_cap_rank_lookup,
                 market_cap_universe_count,
+                overtime_price_map,
             ): item
             for item in top_trading
         }
@@ -5632,6 +5743,7 @@ def main() -> int:
             top_limit=args.top_limit,
             mode=variant,
             analysis_date=analysis_date,
+            session=session,
         )
         payload = payload_with_analysis_date(collected_payload, analysis_date, variant=variant)
         session_payload = annotate_payload_with_analysis_session(payload, session=session)

@@ -63,6 +63,7 @@ chmod +x replay-jongga-data.sh
 - 수동 실행: 저장소 **Actions** → **jongga-schedule** → **Run workflow** (`1500` / `1730`).
 - `1500`은 해당 시점 raw 추천을 바로 공개 최신 파일로 반영합니다.
 - `1730`은 해당 시점 raw 추천을 만든 뒤, 같은 날짜 `1500` 세션 원본이 있으면 `5시반 결과 + 3시 고유 종목`으로 머지한 최신 파일을 공개합니다.
+- `1730` 세션은 종목별 `currentPrice`(스냅샷 종가)를 정규장 종가 대신 `finance.naver.com/sise/sise_quant_overtime.naver`(시간외 단일가/NXT 대체거래소 체결가) 게시판 가격으로 대체합니다 (`fetch_overtime_price_map`). 게시판에 종목이 없으면 정규장 종가를 그대로 사용합니다. 게이트·점수·등급(D1/D2/D3, Q1 등)도 이 가격을 기준으로 재계산됩니다.
 
 ## 실행 예시 (개별 명령)
 
