@@ -226,7 +226,7 @@ test('history modal filters by active variant and renders variant badge', () => 
     generatedAt: '2026-05-22T01:00:00Z',
     status: 'partial',
     buyCount: 1,
-    topRecommendations: [{ strategy: 'momentum', name: '삼성전자', code: '005930', score: 8.4, grade: 'A', statusLabel: '매수추천' }]
+    topRecommendations: [{ strategy: 'accumulation', name: '삼성전자', code: '005930', score: 8.4, grade: 'A', statusLabel: '매수추천' }]
   }, {
     date: todayKey,
     variant: 'canary',
@@ -242,6 +242,43 @@ test('history modal filters by active variant and renders variant badge', () => 
   assert.doesNotMatch(body.innerHTML, /SK하이닉스/);
   assert.match(body.innerHTML, /history-variant-badge stable/);
   assert.equal(context.applied, undefined);
+});
+
+test('history modal hides breakout recommendations until expanded and omits long status labels in cards', () => {
+  const context = loadDailyContext();
+  const body = createElementStub();
+  context.elements.set('jongga-history-body', body);
+  context.setActiveJonggaVariant('stable', { reload: false });
+  context.window.JONGGA_HISTORY_INDEX = [{
+    date: '2026-06-12',
+    variant: 'stable',
+    generatedAt: '2026-06-12T08:30:00Z',
+    status: 'complete',
+    buyCount: 2,
+    topRecommendations: [
+      { strategy: 'momentum', name: '삼성전자', code: '005930', score: 8.4, grade: 'A', entryPriceText: '81,000원 (당일 종가 기준)', currentPrice: 82000, statusLabel: '매매금지(핵심 Gate 미충족: Q1, G5)' },
+      { strategy: 'pullback', name: '리노공업', code: '058470', score: 7.8, grade: 'A', entryPrice: 432000, currentPrice: 435500, statusLabel: '매매금지(핵심 Gate 미충족: G13)' }
+    ]
+  }];
+
+  context.renderJonggaHistoryModal();
+  assert.ok(body.innerHTML.indexOf('🔻 낙주매매') < body.innerHTML.indexOf('🚀 주도주 돌파'));
+  assert.match(body.innerHTML, /주도주 돌파/);
+  assert.match(body.innerHTML, /기본 숨김 전략입니다\. 보기 버튼을 눌러 펼치세요\./);
+  assert.match(body.innerHTML, />보기</);
+  assert.doesNotMatch(body.innerHTML, /삼성전자/);
+  assert.doesNotMatch(body.innerHTML, /005930/);
+  assert.doesNotMatch(body.innerHTML, /매매금지\(핵심 Gate 미충족: Q1, G5\)/);
+  assert.doesNotMatch(body.innerHTML, /매매금지\(핵심 Gate 미충족: G13\)/);
+  assert.doesNotMatch(body.innerHTML, /history-strategy-collapsed/);
+
+  context.setJonggaHistoryStrategyExpanded({ date: '2026-06-12', variant: 'stable' }, 'breakout', true);
+  assert.match(body.innerHTML, /삼성전자/);
+  assert.match(body.innerHTML, /진입가 82,000원/);
+  assert.doesNotMatch(body.innerHTML, /현재가 82,000원/);
+  assert.doesNotMatch(body.innerHTML, /005930/);
+  assert.doesNotMatch(body.innerHTML, /기본 숨김 전략입니다\. 보기 버튼을 눌러 펼치세요\./);
+  assert.match(body.innerHTML, />숨기기</);
 });
 
 test('history modal groups entries by week and shows one week per page with top navigation', () => {

@@ -25,7 +25,9 @@
       "Bash(rg -n \"function formatMixedExitPercent|function getTradePlanDisplayValue|function formatReplayMixedExitPercent\" tools/stock-analyze/js/*.js)",
       "Bash(node --test js/ui-volatility.test.mjs)",
       "Bash(node --test js/*.test.mjs)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(python -c ' *)",
+      "Bash(python -m pytest tests/test_replay_backtest.py -q)"
     ]
   }
 }

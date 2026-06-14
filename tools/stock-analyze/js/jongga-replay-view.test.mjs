@@ -86,6 +86,7 @@ function sampleSnapshot() {
       { name: 'Reco A', strategy: 'pullback', code: '000001', gradeScore: 7.2, grade: 'A', entryEligible: true, statusLabel: '매수추천' },
       { name: 'Replay B', strategy: 'pullback', code: '000002', gradeScore: 6.1, grade: 'B', entryEligible: false, statusLabel: '매수추천' },
       { name: 'A8 Candidate', strategy: 'pullback', code: '000006', gradeScore: 8.1, grade: 'A', entryEligible: false, statusLabel: '관심후보' },
+      { name: 'Blocked A7', strategy: 'pullback', code: '000007', gradeScore: 7.4, grade: 'A', entryEligible: false, statusLabel: '매매금지(핵심 Gate 미충족: G13)', setupQuality: 'setup_weak', gates: [{ code: 'G13', status: '⛔' }] },
       { name: 'Too Low', strategy: 'pullback', code: '000003', gradeScore: 5.9, grade: 'B', entryEligible: false, statusLabel: '관심후보' }
     ],
     accumulationEntries: [
@@ -175,8 +176,8 @@ test('replay view mode filters buy entries by recommendation or 7&A', () => {
   ], 'all');
 
   assert.deepEqual(recommendation.map(item => item.name), ['Reco A', 'Replay B', 'Reco C']);
-  assert.deepEqual(a7plus.map(item => item.name), ['Reco A', 'A8 Candidate', 'Reco C']);
-  assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Too Low', 'Reco C', 'Replay D']);
+  assert.deepEqual(a7plus.map(item => item.name), ['Reco A', 'A8 Candidate', 'Blocked A7', 'Reco C']);
+  assert.deepEqual(all.map(item => item.name), ['Reco A', 'Replay B', 'A8 Candidate', 'Blocked A7', 'Too Low', 'Reco C', 'Replay D']);
 });
 
 test('replay view mode defaults to all when no stored selection exists', () => {

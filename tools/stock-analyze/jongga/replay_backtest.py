@@ -191,7 +191,7 @@ def replay_entry_view(entry: dict[str, Any], strategy: str, threshold_profile: s
     pullback_gate_ok = _pullback_replay_gate_ok({**entry, "strategy": strategy}, eligibility)
     quality_gate_ok = _quality_gate_ok(entry, strategy)
     replay_included = grade_score >= REPLAY_INCLUDE_GRADE_SCORE_MIN and replay_grade in {"S", "A"} and pullback_gate_ok and quality_gate_ok
-    replay_a7plus = grade_score >= 7.0 and replay_grade in {"S", "A"} and pullback_gate_ok and quality_gate_ok
+    replay_a7plus = grade_score >= 7.0 and replay_grade in {"S", "A"}
     return {
         "strategy": strategy,
         "name": str(entry.get("name") or ""),
@@ -232,11 +232,11 @@ def matches_replay_case(item: dict[str, Any], case_key: str) -> bool:
     if normalized == REPLAY_CASE_RECOMMENDATION:
         return pullback_gate_ok and quality_gate_ok and (bool(item.get("historyRecommendation")) or bool(item.get("entryEligibleOriginal")))
     if normalized == REPLAY_CASE_A7PLUS:
-        if bool(item.get("replayA7Plus")):
-            return True
+        if "replayA7Plus" in item:
+            return bool(item.get("replayA7Plus"))
         grade_score = float(item.get("gradeScore") or 0.0)
         replay_grade = str(item.get("replayGrade") or item.get("grade") or "").strip().upper()
-        return pullback_gate_ok and quality_gate_ok and grade_score >= 7.0 and replay_grade in {"A", "S"}
+        return grade_score >= 7.0 and replay_grade in {"A", "S"}
     return False
 
 

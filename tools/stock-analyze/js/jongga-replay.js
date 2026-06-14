@@ -412,7 +412,7 @@ function matchesReplayCaseItem(item = {}, caseKey = 'all') {
     if (Boolean(item.replayA7Plus)) return true;
     const gradeScore = Number(item.gradeScore);
     const gradeCode = String(item.replayGrade || item.grade || '').trim().charAt(0).toUpperCase();
-    return pullbackGateOk && qualityGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
+    return Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
   }
   return false;
 }

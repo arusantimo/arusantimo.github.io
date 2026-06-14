@@ -203,7 +203,7 @@ class ReplayBacktestTests(unittest.TestCase):
         )
         self.assertFalse(blocked_pullback["pullbackReplayGateOk"])
         self.assertFalse(blocked_pullback["replayIncluded"])
-        self.assertFalse(blocked_pullback["replayA7Plus"])
+        self.assertTrue(blocked_pullback["replayA7Plus"])
 
     def test_replay_entry_view_does_not_fallback_to_current_price_for_session_entries(self):
         candidate = replay_entry_view(

@@ -696,6 +696,35 @@ function buildReplayDayFixture(date, index) {
   };
 }
 
+test('7&A 케이스는 매매금지 종목도 A/S와 7점 이상이면 포함한다', () => {
+  const context = loadReplayContext();
+  const items = [
+    {
+      name: 'Blocked A7',
+      strategy: 'pullback',
+      gradeScore: 7.4,
+      replayGrade: 'A',
+      entryEligibleOriginal: false,
+      statusLabel: '매매금지(핵심 Gate 미충족: G13)',
+      setupQuality: 'setup_weak',
+      gates: [{ code: 'G13', status: '⛔' }]
+    },
+    {
+      name: 'Low B',
+      strategy: 'pullback',
+      gradeScore: 6.9,
+      replayGrade: 'B',
+      entryEligibleOriginal: false,
+      statusLabel: '매매금지(핵심 Gate 미충족: G13)',
+      setupQuality: 'setup_weak',
+      gates: [{ code: 'G13', status: '⛔' }]
+    }
+  ];
+
+  assert.deepEqual(context.filterReplayCaseItems(items, 'recommendation').map(item => item.name), []);
+  assert.deepEqual(context.filterReplayCaseItems(items, 'a7plus').map(item => item.name), ['Blocked A7']);
+});
+
 test('strategy section renders selected case summary and button state', () => {
   const context = loadReplayContext();
   context.setJonggaReplayViewMode('a7plus', { persist: false, rerender: false });

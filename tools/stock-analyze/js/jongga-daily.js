@@ -15,6 +15,7 @@ const JONGGA_DAILY_NAMESPACES = {
 let jonggaDailyControlsBound = false;
 let activeJonggaHistoryPage = 1;
 const JONGGA_HISTORY_WEEKS_PER_PAGE = 1;
+const activeJonggaHistoryExpandedStrategies = new Set();
 let activeJonggaVariant = readStoredJonggaVariant();
 const jonggaDailyScriptPromises = {};
 const jonggaDailyLoadPromises = {};
@@ -673,6 +674,35 @@ function renderJonggaHistoryModal() {
   `;
 }
 
+function normalizeJonggaHistoryStrategyKey(strategy) {
+  const text = String(strategy || '').trim().toLowerCase();
+  if (text === 'momentum') return 'breakout';
+  return text || 'unknown';
+}
+
+function buildJonggaHistoryStrategyToggleKey(entry, strategy) {
+  return [
+    normalizeJonggaVariant(entry?.variant || 'stable'),
+    String(entry?.date || '').trim(),
+    normalizeJonggaHistoryStrategyKey(strategy)
+  ].join('::');
+}
+
+function isJonggaHistoryStrategyCollapsedByDefault(strategy) {
+  return normalizeJonggaHistoryStrategyKey(strategy) === 'breakout';
+}
+
+function isJonggaHistoryStrategyExpanded(entry, strategy) {
+  return activeJonggaHistoryExpandedStrategies.has(buildJonggaHistoryStrategyToggleKey(entry, strategy));
+}
+
+function setJonggaHistoryStrategyExpanded(entry, strategy, expanded, { rerender = true } = {}) {
+  const key = buildJonggaHistoryStrategyToggleKey(entry, strategy);
+  if (expanded) activeJonggaHistoryExpandedStrategies.add(key);
+  else activeJonggaHistoryExpandedStrategies.delete(key);
+  if (rerender) renderJonggaHistoryModal();
+}
+
 function renderJonggaHistoryItem(entry) {
   const recommendations = Array.isArray(entry.topRecommendations) ? entry.topRecommendations : [];
   const variant = normalizeJonggaVariant(entry.variant || 'stable');
@@ -695,13 +725,13 @@ function renderJonggaHistoryItem(entry) {
     breakout: '🚀 주도주 돌파',
     accumulation: '🔥 수급 매집',
     momentum: '🚀 주도주 돌파',
-    reversal: '🔻 급락반등',
+    reversal: '🔻 낙주매매',
     swing: '🔄 스윙'
   };
   
   let recHtml = '';
   if (recommendations.length) {
-    const order = ['pullback', 'accumulation', 'breakout', 'momentum', 'reversal', 'swing'];
+    const order = ['pullback', 'accumulation', 'reversal', 'breakout', 'momentum', 'swing'];
     const presentStrategies = order.filter(s => strategyGroups[s] && strategyGroups[s].length);
     Object.keys(strategyGroups).forEach(s => {
       if (!order.includes(s)) presentStrategies.push(s);
@@ -709,14 +739,36 @@ function renderJonggaHistoryItem(entry) {
     
     recHtml = `
       <div class="history-recommendations-grouped">
-        ${presentStrategies.map(strat => `
-          <div class="history-strategy-group" style="margin-top: 8px;">
-            <div class="history-strategy-title" style="font-weight: bold; font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">${escapeHtml(STRATEGY_LABELS[strat] || strat)}</div>
-            <div class="history-strategy-items" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-              ${strategyGroups[strat].map(renderJonggaHistoryRecommendation).join('')}
+        ${presentStrategies.map(strat => {
+          const normalizedStrategy = normalizeJonggaHistoryStrategyKey(strat);
+          const title = STRATEGY_LABELS[strat] || strat;
+          const hiddenByDefault = isJonggaHistoryStrategyCollapsedByDefault(strat);
+          const expanded = !isJonggaHistoryStrategyCollapsedByDefault(strat) || isJonggaHistoryStrategyExpanded(entry, strat);
+          const actionLabel = expanded ? '숨기기' : '보기';
+          const actionButton = hiddenByDefault
+            ? `<button type="button" class="btn btn-secondary small" data-history-toggle-strategy="${escapeHtml(normalizedStrategy)}" data-history-date="${escapeHtml(entry.date || '')}" data-history-variant="${escapeHtml(variant)}" data-history-expanded="${expanded ? 'true' : 'false'}">${actionLabel}</button>`
+            : '';
+          const helperText = hiddenByDefault && !expanded
+            ? '<span style="font-weight: normal; font-size: 11px; color: var(--text-tertiary);">기본 숨김 전략입니다. 보기 버튼을 눌러 펼치세요.</span>'
+            : '';
+          return `
+            <div class="history-strategy-group" style="margin-top: 8px;">
+              <div class="history-strategy-head" style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom: 4px;">
+                <div class="history-strategy-title" style="display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-weight: bold; font-size: 13px; color: var(--text-muted);">
+                  <span>${escapeHtml(title)}</span>
+                  ${helperText}
+                </div>
+                ${actionButton}
+              </div>
+              ${expanded
+                ? `<div class="history-strategy-items" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                    ${strategyGroups[strat].map(renderJonggaHistoryRecommendation).join('')}
+                  </div>`
+                : ''
+              }
             </div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
   } else {
@@ -745,13 +797,13 @@ function renderJonggaHistoryItem(entry) {
 
 function renderJonggaHistoryRecommendation(item) {
   const score = Number.isFinite(Number(item.signalScore ?? item.score)) ? Number(item.signalScore ?? item.score).toFixed(1) : '-';
-  const priceText = item.currentPrice ? `${Number(item.currentPrice).toLocaleString()}원` : '-';
+  const entryPriceText = item.currentPrice ? `${Number(item.currentPrice).toLocaleString()}원` : '-';
   const strategyText = ({
     pullback: '눌림목',
     breakout: '돌파',
     accumulation: '매집',
     momentum: '돌파',
-    reversal: '반등',
+    reversal: '낙주매매',
     swing: '스윙'
   })[item.strategy] || item.strategy || '-';
   const entryBadge = item.entryEligible === true
@@ -759,16 +811,12 @@ function renderJonggaHistoryRecommendation(item) {
     : (item.entryEligible === false ? '<span class="buy-entry-badge entry-blocked">진입불가</span>' : '');
   
   return `
-    <div class="history-rec-card" style="display: flex; flex-direction: column; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background-color: rgba(255, 255, 255, 0.03); box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      <div style="font-weight: bold; font-size: 13px; margin-bottom: 2px;">${escapeHtml(item.name || '종목명 없음')}</div>
-      <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 4px;">${escapeHtml(item.code || '-')}</div>
-      <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+    <div class="history-rec-card" style="display: flex; flex-direction: column; padding: 6px; border: 1px solid var(--border-color); border-radius: 6px; background-color: rgba(255, 255, 255, 0.03); box-shadow: 0 1px 3px rgba(0,0,0,0.1); gap: 2px;">
+      <div style="font-weight: bold; font-size: 12px; line-height: 1.25;">${escapeHtml(item.name || '종목명 없음')}</div>
+      <div style="font-size: 10px; color: var(--text-muted);">진입가 ${escapeHtml(entryPriceText)}</div>
+      <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
         <span style="font-weight: bold; color: var(--accent-primary, #00d9ff);">${score}점 ${entryBadge}</span>
         <span style="font-size: 10px; padding: 2px 4px; background: rgba(255,255,255,0.05); border-radius: 3px; border: 1px solid var(--border-color);">${escapeHtml(strategyText)} · ${escapeHtml(item.grade || '-')}</span>
-      </div>
-      <div style="font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: var(--text-secondary);">${priceText}</span>
-        <span style="font-size: 10px; padding: 2px 4px; background: rgba(255,255,255,0.05); border-radius: 3px; border: 1px solid var(--border-color); color: var(--text-muted);">${escapeHtml(item.statusLabel || '-')}</span>
       </div>
     </div>
   `;
@@ -802,6 +850,15 @@ function bindJonggaDailyControls() {
         loadJonggaDailyData(date, variant);
         closeJonggaHistoryModal();
       }
+      return;
+    }
+    const strategyBtn = event.target.closest('[data-history-toggle-strategy]');
+    if (strategyBtn) {
+      setJonggaHistoryStrategyExpanded(
+        { date: strategyBtn.dataset.historyDate, variant: strategyBtn.dataset.historyVariant },
+        strategyBtn.dataset.historyToggleStrategy,
+        strategyBtn.dataset.historyExpanded !== 'true'
+      );
       return;
     }
     const pageBtn = event.target.closest('[data-history-page]');

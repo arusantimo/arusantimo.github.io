@@ -616,7 +616,7 @@ function matchesJonggaReplayViewMode(entry = {}, mode = getJonggaReplayViewMode(
   if (normalizedMode === 'a7plus') {
     const gradeScore = getJonggaReplayEntryGradeScore(entry);
     const gradeCode = getJonggaReplayEntryGradeCode(entry);
-    return pullbackGateOk && qualityGateOk && Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
+    return Number.isFinite(gradeScore) && gradeScore >= 7.0 && ['A', 'S'].includes(gradeCode);
   }
   return pullbackGateOk && qualityGateOk && (Boolean(entry?.historyRecommendation) || Boolean(eligibility.entryEligible) || isJonggaRecommendationStatusLabel(entry));
 }
