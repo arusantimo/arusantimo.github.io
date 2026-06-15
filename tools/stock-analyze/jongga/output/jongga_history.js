@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-15T06:17:32+00:00",
+    "generatedAt": "2026-06-15T08:34:55+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G5)",
         "entryEligible": false,
-        "currentPrice": 1180000
+        "currentPrice": 1194000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G5, G8, Q1, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 175200
       },
       {
         "strategy": "pullback",
@@ -41,39 +56,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G5, G6, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G5, G6)",
         "entryEligible": false,
-        "currentPrice": 49600
+        "currentPrice": 48850
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "삼성전자",
         "code": "005930",
-        "score": 9.4,
-        "signalScore": 9.4,
-        "strictScore": 9.4,
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 6.7,
+        "gradeScore": 5.9,
         "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
         "entryEligible": false,
-        "currentPrice": 337750
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 8.6,
-        "signalScore": 8.6,
-        "strictScore": 8.6,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.1,
-        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
-        "entryEligible": false,
-        "currentPrice": 249000
+        "currentPrice": 337000
       },
       {
         "strategy": "accumulation",
@@ -88,7 +88,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, G5)",
         "entryEligible": false,
-        "currentPrice": 29950
+        "currentPrice": 30000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.3,
+        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
+        "entryEligible": false,
+        "currentPrice": 248000
       },
       {
         "strategy": "breakout",
@@ -103,22 +118,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.0,
         "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
         "entryEligible": false,
-        "currentPrice": 29950
+        "currentPrice": 30000
       },
       {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "삼성전기",
-        "code": "009150",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "한온시스템",
+        "code": "018880",
+        "score": 4.1,
+        "signalScore": 4.1,
+        "strictScore": 4.1,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
         "entryEligible": false,
-        "currentPrice": 1984000
+        "currentPrice": 5680
       },
       {
         "strategy": "reversal",
@@ -133,29 +148,60 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 29950
+        "currentPrice": 30000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "제주반도체",
+        "code": "080220",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 105200
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1999000
       }
     ],
     "blacklist": [
       {
-        "code": "240810",
-        "name": "원익IPS",
+        "code": "403870",
+        "name": "HPSP",
         "reasons": [
           "공매도 과열"
         ],
         "sources": [
-          "kind"
+          "kind",
+          "toss"
         ],
         "status": "confirmed"
       },
       {
-        "code": "080220",
-        "name": "제주반도체",
+        "code": "093370",
+        "name": "후성",
         "reasons": [
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
-          "kind"
+          "toss"
         ],
         "status": "confirmed"
       }
