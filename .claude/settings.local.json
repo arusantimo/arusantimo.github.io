@@ -58,7 +58,8 @@
       "Bash(python3 -c \"from datetime import datetime; import zoneinfo; print\\(datetime.now\\(zoneinfo.ZoneInfo\\('Asia/Seoul'\\)\\)\\)\")",
       "Bash(python -c \"from datetime import datetime; import zoneinfo; print\\(datetime.now\\(zoneinfo.ZoneInfo\\('Asia/Seoul'\\)\\)\\)\")",
       "Bash(ls -la *20260612*)",
-      "Bash(ls -la ../*latest*)"
+      "Bash(ls -la ../*latest*)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)"
     ]
   }
 }
