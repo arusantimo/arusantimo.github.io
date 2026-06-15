@@ -19,6 +19,13 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urljoin
 from urllib.request import Request, urlopen
 
+from jongga.blacklist import (
+    MANUAL_BLACKLIST,
+    build_blacklist_record,
+    detect_kind_blacklist_reasons,
+    detect_toss_blacklist_reasons,
+    normalize_blacklist_code,
+)
 from jongga.entry_policy import attach_entry_eligibility
 from jongga.balance_sources import (
     LARGE_CAP_MARKET_CAP_RANK_LIMIT,
@@ -970,7 +977,7 @@ def fetch_naver_orderbook_with_browser(context: Any, code: str) -> dict[str, Any
         page.close()
 
 
-def fetch_kind_event_filter_with_browser(context: Any, code: str, company_name: str) -> dict[str, Any] | None:
+def fetch_kind_disclosure_rows_with_browser(context: Any, code: str, company_name: str) -> list[dict[str, str]]:
     page = context.new_page()
     configure_browser_page(page)
     try:
@@ -990,8 +997,25 @@ def fetch_kind_event_filter_with_browser(context: Any, code: str, company_name: 
         except Exception:  # noqa: BLE001
             pass
         rows = [text.strip() for text in page.locator("table.list.type-00 tbody tr").all_inner_texts() if text.strip()]
-        parsed_rows = parse_kind_disclosure_rows(rows, company_name)
-        return build_kind_event_filter_from_rows(parsed_rows)
+        return parse_kind_disclosure_rows(rows, company_name)
+    finally:
+        page.close()
+
+
+def fetch_kind_event_filter_with_browser(context: Any, code: str, company_name: str) -> dict[str, Any] | None:
+    return build_kind_event_filter_from_rows(fetch_kind_disclosure_rows_with_browser(context, code, company_name))
+
+
+def fetch_toss_order_page_text_with_browser(context: Any, code: str) -> str:
+    page = context.new_page()
+    configure_browser_page(page)
+    try:
+        page.goto(TOSS_ORDER_URL_TEMPLATE.format(code=code), wait_until="domcontentloaded", timeout=30000)
+        try:
+            page.wait_for_timeout(1500)
+        except Exception:  # noqa: BLE001
+            pass
+        return page.locator("body").inner_text()
     finally:
         page.close()
 
@@ -1330,6 +1354,74 @@ def fetch_browser_candidate_enrichments(
             enrichments[code] = enrichment
         browser.close()
     return enrichments, errors, meta
+
+
+def collect_blacklist_records(
+    candidates: list[dict[str, Any]],
+    *,
+    mode: str = VARIANT_STABLE,
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """후보 종목이 공매도 과열·투자 주의 지정 대상인지 수집 단계에서 검증합니다.
+
+    1차 소스는 KIND 공시, 교차확인은 토스 주문페이지 뱃지입니다. 확인 실패는
+    fail-open으로 처리해 종목을 제외하지 않고 'unconfirmed'으로만 기록합니다.
+    """
+    unique: dict[str, str] = {}
+    for candidate in candidates:
+        code = normalize_blacklist_code(candidate.get("code"))
+        if code and code not in unique:
+            unique[code] = str(candidate.get("name") or "")
+    if not unique:
+        return [], []
+
+    try:
+        from playwright.sync_api import sync_playwright
+    except Exception as error:  # noqa: BLE001
+        # fail-open: 브라우저 미가용 시 전부 미확인으로 기록(제외하지 않음).
+        records = []
+        for code, name in unique.items():
+            manual = MANUAL_BLACKLIST.get(code)
+            record = build_blacklist_record(code, name, manual_reasons=manual)
+            if record:
+                records.append(record)
+        return records, [f"blacklist playwright unavailable: {error}"]
+
+    records: list[dict[str, Any]] = []
+    errors: list[str] = []
+    with sync_playwright() as p:
+        browser, context, _meta = launch_browser_context(p, mode=mode)
+        try:
+            for code, name in unique.items():
+                kind_reasons: list[str] = []
+                toss_reasons: list[str] = []
+                kind_checked = False
+                toss_checked = False
+                try:
+                    rows = fetch_kind_disclosure_rows_with_browser(context, code, name)
+                    kind_reasons = detect_kind_blacklist_reasons(row.get("title", "") for row in rows)
+                    kind_checked = True
+                except Exception as error:  # noqa: BLE001
+                    errors.append(f"blacklist kind {code}: {error}")
+                try:
+                    page_text = fetch_toss_order_page_text_with_browser(context, code)
+                    toss_reasons = detect_toss_blacklist_reasons(page_text)
+                    toss_checked = True
+                except Exception as error:  # noqa: BLE001
+                    errors.append(f"blacklist toss {code}: {error}")
+                record = build_blacklist_record(
+                    code,
+                    name,
+                    kind_reasons=kind_reasons,
+                    toss_reasons=toss_reasons,
+                    manual_reasons=MANUAL_BLACKLIST.get(code),
+                    kind_checked=kind_checked,
+                    toss_checked=toss_checked,
+                )
+                if record:
+                    records.append(record)
+        finally:
+            browser.close()
+    return records, errors
 
 
 def is_entry_field_satisfied(entry: dict[str, Any], field_key: str) -> bool:
@@ -5753,6 +5845,25 @@ def collect_live_payload(
             emit_cli_failures("눌림목 뉴스 수집 실패", pullback_news_errors)
 
     all_entries = pullback_entries + breakout_entries + accumulation_entries + reversal_entries
+
+    blacklist_started_at = perf_counter()
+    blacklist_records, blacklist_errors = collect_blacklist_records(
+        [{"code": entry["code"], "name": entry.get("name") or ""} for entry in all_entries],
+        mode=resolved_mode,
+    )
+    browser_errors.extend(blacklist_errors)
+    blacklist_confirmed = sum(1 for record in blacklist_records if record.get("status") == "confirmed")
+    log_step(
+        "blacklist_check",
+        "공매도 과열·투자 주의 검증",
+        blacklist_started_at,
+        status="partial" if blacklist_errors else "ok",
+        detail=f"확정 {blacklist_confirmed} · 미확인 {len(blacklist_records) - blacklist_confirmed}",
+        count=len(all_entries),
+    )
+    if blacklist_errors:
+        emit_cli_failures("블랙리스트 검증 실패", blacklist_errors)
+
     missing_public_metrics = sum(1 for entry in all_entries if has_actionable_public_metric_gap(entry))
     fallback_keys = ["vkospi"] if live_metrics["vkospi"]["isFallback"] else []
     manual_keys: list[str] = []
@@ -5818,6 +5929,7 @@ def collect_live_payload(
         "payloadSourceMode": PAYLOAD_SOURCE_LIVE,
         "rebuildable": True,
         "inputArchiveVersion": INPUT_ARCHIVE_VERSION,
+        "blacklist": blacklist_records,
         "dataQuality": {
             "status": data_quality_status,
             "counts": {

@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
+from jongga.blacklist import blacklisted_codes, extract_blacklist_records, normalize_blacklist_code
+
 
 try:
     KST = ZoneInfo("Asia/Seoul")
@@ -455,6 +457,7 @@ def build_history_entry(
         "status": quality.get("status") or "unknown",
         "buyCount": count_buy_entries(payload),
         "topRecommendations": extract_top_recommendations(payload, per_strategy=max(1, min(3, top_limit // 3))),
+        "blacklist": extract_blacklist_records(payload),
     }
 
 
@@ -552,7 +555,11 @@ def count_buy_entries(payload: dict[str, Any]) -> int:
 
 
 def extract_top_recommendations(payload: dict[str, Any], *, per_strategy: int = 2) -> list[dict[str, Any]]:
-    """전략별 상위만 추출합니다. 서로 다른 전략의 점수는 비교하지 않습니다."""
+    """전략별 상위만 추출합니다. 서로 다른 전략의 점수는 비교하지 않습니다.
+
+    공매도 과열·투자 주의로 확정된 블랙리스트 종목은 제외해 다음 순위가 올라오도록 합니다.
+    """
+    excluded = blacklisted_codes(extract_blacklist_records(payload))
     rows: list[dict[str, Any]] = []
     for strategy in STRATEGY_ORDER:
         if strategy == "swing":
@@ -560,6 +567,8 @@ def extract_top_recommendations(payload: dict[str, Any], *, per_strategy: int = 
         strategy_rows: list[dict[str, Any]] = []
         for row_strategy, entry in iter_buy_entries(payload):
             if row_strategy != strategy:
+                continue
+            if normalize_blacklist_code(entry.get("code")) in excluded:
                 continue
             strategy_rows.append({
                 "strategy": strategy,

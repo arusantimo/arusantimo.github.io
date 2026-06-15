@@ -775,6 +775,24 @@ function renderJonggaHistoryItem(entry) {
     recHtml = '<div class="history-empty">상위 추천 요약 없음</div>';
   }
 
+  const blacklistEntries = Array.isArray(entry.blacklist) ? entry.blacklist : [];
+  const confirmedBlacklist = blacklistEntries.filter(item => String((item && item.status) || 'confirmed') === 'confirmed');
+  let blacklistHtml = '';
+  if (confirmedBlacklist.length) {
+    const chips = confirmedBlacklist.map(item => {
+      const reasons = (Array.isArray(item.reasons) ? item.reasons : []).join(', ');
+      const label = item.name || item.code || '';
+      const codeText = item.code ? ` (${item.code})` : '';
+      const reasonText = reasons ? ` · ${reasons}` : '';
+      return `<span class="history-blacklist-chip" style="display:inline-block; margin:2px 0 0 6px; padding:2px 6px; border-radius:4px; background: rgba(220, 38, 38, 0.12); color: var(--text-warning);">${escapeHtml(label)}${escapeHtml(codeText)}${escapeHtml(reasonText)}</span>`;
+    }).join('');
+    blacklistHtml = `
+      <div class="history-blacklist" style="margin-top:8px; font-size:12px;">
+        <span style="font-weight:bold; color: var(--text-warning);">🚫 매수추천 제외 (공매도 과열·투자 주의)</span>${chips}
+      </div>
+    `;
+  }
+
   return `
     <section class="history-item" style="border-bottom: 1px solid var(--border-color); padding: 12px 5px;">
       <div class="history-head" style="display: flex; justify-content: space-between; align-items: center;">
@@ -791,6 +809,7 @@ function renderJonggaHistoryItem(entry) {
         </div>
       </div>
       ${recHtml}
+      ${blacklistHtml}
     </section>
   `;
 }

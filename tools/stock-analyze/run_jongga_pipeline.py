@@ -673,12 +673,12 @@ def main() -> int:
             print_summary(exit_code=2, quality_status="")
             return 2
     try:
-        resolved_analysis_date = resolve_pipeline_analysis_date(args.date)
+        resolve_pipeline_analysis_date(args.date)
     except ValueError as exc:
         emit("FAIL", str(exc))
         print_summary(exit_code=2, quality_status="")
         return 2
-    analysis_date_arg = resolved_analysis_date.isoformat()
+    analysis_date_arg = args.date
 
     run_preflight()
 

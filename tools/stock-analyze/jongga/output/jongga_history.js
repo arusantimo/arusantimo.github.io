@@ -1,5 +1,167 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-15",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260615.js",
+    "jsonFile": "jongga/output/202606/latest_20260615.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260615.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-15T06:17:32+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "HD현대일렉트릭",
+        "code": "267260",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G5)",
+        "entryEligible": false,
+        "currentPrice": 1180000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G5, G6, G12)",
+        "entryEligible": false,
+        "currentPrice": 49600
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.7,
+        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
+        "entryEligible": false,
+        "currentPrice": 337750
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
+        "entryEligible": false,
+        "currentPrice": 249000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, G5)",
+        "entryEligible": false,
+        "currentPrice": 29950
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 5.0,
+        "signalScore": 5.0,
+        "strictScore": 5.0,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
+        "entryEligible": false,
+        "currentPrice": 29950
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1984000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 29950
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "240810",
+        "name": "원익IPS",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "080220",
+        "name": "제주반도체",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-12",
     "variant": "stable",
     "variantLabel": "현재 버전",

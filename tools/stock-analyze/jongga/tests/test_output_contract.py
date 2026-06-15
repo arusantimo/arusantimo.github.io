@@ -14,6 +14,7 @@ from jongga.output_contract import (
     POINT_IN_TIME_STATUS_LEGACY_UNKNOWN,
     VARIANT_CANARY,
     VARIANT_STABLE,
+    build_history_entry,
     build_input_archive_path,
     build_session_archive_path,
     extract_top_recommendations,
@@ -56,6 +57,44 @@ class OutputContractTests(unittest.TestCase):
         self.assertEqual(rows[3]["code"], "000030")
         self.assertEqual(rows[2]["scoreScope"], "breakout")
         self.assertNotEqual(rows[0]["code"], "000030")
+
+    def test_extract_top_recommendations_skips_confirmed_blacklist(self):
+        payload = {
+            "blacklist": [
+                {"code": "000010", "name": "A", "reasons": ["공매도 과열"], "status": "confirmed"},
+            ],
+            "slots": [
+                {
+                    "entries": {
+                        "pullback": [
+                            {"name": "A", "code": "000010", "score": 9.0, "signalScore": 9.0, "grade": "S"},
+                            {"name": "A2", "code": "000011", "score": 7.0, "signalScore": 7.0, "grade": "A"},
+                        ],
+                    }
+                }
+            ],
+        }
+
+        rows = extract_top_recommendations(payload, per_strategy=1)
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["code"], "000011", "확정 블랙리스트가 빠지고 다음 순위가 올라온다")
+
+    def test_build_history_entry_records_blacklist(self):
+        payload = {
+            "analysisDate": "2026-06-15",
+            "variant": VARIANT_STABLE,
+            "blacklist": [
+                {"code": "A058470", "name": "리노공업", "reasons": ["공매도 과열"], "status": "confirmed"},
+            ],
+            "slots": [{"entries": {"pullback": []}}],
+        }
+
+        entry = build_history_entry(payload, "x.js", "x.json")
+
+        self.assertEqual(len(entry["blacklist"]), 1)
+        self.assertEqual(entry["blacklist"][0]["code"], "058470")
+        self.assertEqual(entry["blacklist"][0]["reasons"], ["공매도 과열"])
 
     def test_resolve_generation_variants_skips_canary_when_disabled(self):
         self.assertFalse(is_canary_channel_enabled())

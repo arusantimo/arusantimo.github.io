@@ -629,7 +629,7 @@ function normalizeJonggaEntry(rawEntry, strategy, rank, context) {
   const breakoutStopPolicyRaw = effectiveRawEntry.breakoutStopPolicy
     || ((strategy === 'breakout' || strategy === 'momentum') ? effectiveRawEntry.pullbackStopPolicy : null);
   const normalized = {
-    rank: Number(effectiveRawEntry.rank) || rank,
+    rank,
     name: getJonggaName(effectiveRawEntry),
     code,
     score,
@@ -801,17 +801,23 @@ function buildSnapshotFromJonggaSlot(slot, root = {}) {
   snapshot.effectiveRegimeLabel = context.effectiveRegimeLabel;
   snapshot.regimeAdjustmentReason = regime.regimeAdjustmentReason || macroContext.regimeAdjustmentReason || '';
   snapshot.gapScore = gapScore;
-  snapshot.pullbackEntries = collections.pullback.map((entry, index) => normalizeJonggaEntry(entry, 'pullback', index + 1, context));
-  snapshot.breakoutEntries = collections.breakout.map((entry, index) => normalizeJonggaEntry(entry, 'breakout', index + 1, context));
-  snapshot.accumulationEntries = collections.accumulation.map((entry, index) => normalizeJonggaEntry(entry, 'accumulation', index + 1, context));
+  const dropBlacklisted = typeof filterJonggaBlacklistedEntries === 'function'
+    ? filterJonggaBlacklistedEntries
+    : (entries => entries);
+  snapshot.pullbackEntries = dropBlacklisted(collections.pullback).map((entry, index) => normalizeJonggaEntry(entry, 'pullback', index + 1, context));
+  snapshot.breakoutEntries = dropBlacklisted(collections.breakout).map((entry, index) => normalizeJonggaEntry(entry, 'breakout', index + 1, context));
+  snapshot.accumulationEntries = dropBlacklisted(collections.accumulation).map((entry, index) => normalizeJonggaEntry(entry, 'accumulation', index + 1, context));
   snapshot.momentumEntries = snapshot.breakoutEntries;
-  snapshot.reversalEntries = collections.reversal.map((entry, index) => normalizeJonggaEntry(entry, 'reversal', index + 1, context));
+  snapshot.reversalEntries = dropBlacklisted(collections.reversal).map((entry, index) => normalizeJonggaEntry(entry, 'reversal', index + 1, context));
   snapshot.swingEntries = collections.swing.map((entry, index) => normalizeJonggaSwingEntry(entry, index + 1));
   snapshot.sourceText = JSON.stringify({ schemaVersion: root.schemaVersion, slotId: slot.slotId || 'slotA' });
   return snapshot;
 }
 
 function applyJonggaResultToState(payload) {
+  if (typeof setJonggaPayloadBlacklist === 'function') {
+    setJonggaPayloadBlacklist(payload && typeof payload === 'object' ? payload.blacklist : []);
+  }
   const slots = getJonggaSlots(payload);
   const hasExplicitSlots = slots.some(item => item.slotId);
   NOTION_SLOT_IDS.forEach((slotId, index) => {
