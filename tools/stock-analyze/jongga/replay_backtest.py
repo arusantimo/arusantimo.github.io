@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from jongga.blacklist import blacklisted_codes, extract_blacklist_records, normalize_blacklist_code
 from jongga.entry_policy import compute_entry_eligibility
 from jongga.grade_policy import REVERSAL_GRADE_MIN, TREND_GRADE_MIN
 from jongga.scoring import overnight_gap_risk_penalty
@@ -979,6 +980,7 @@ def run_replay(
             day_point_in_time_status = infer_payload_point_in_time_status(payload)
             day_point_in_time = point_in_time_flag_from_status(day_point_in_time_status)
             dims = extract_context_dims(payload)
+            excluded_codes = blacklisted_codes(extract_blacklist_records(payload))
             payload_source_mode = str(payload.get("payloadSourceMode") or "legacy").strip() or "legacy"
             input_archive_version = str(payload.get("inputArchiveVersion") or "").strip()
             payload_rebuildable = bool(payload.get("rebuildable"))
@@ -986,6 +988,9 @@ def run_replay(
                 day_skipped_reason = "historical_regen_excluded"
             else:
                 for strategy, entry in iter_buy_entries(payload):
+                    entry_code = normalize_blacklist_code(entry.get("code"))
+                    if entry_code and entry_code in excluded_codes:
+                        continue
                     candidate = replay_entry_view(entry, strategy, threshold_profile, dims=dims)
                     candidate["payloadSourceMode"] = payload_source_mode
                     candidate["inputArchiveVersion"] = input_archive_version

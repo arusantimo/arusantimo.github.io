@@ -56,7 +56,9 @@
       "Bash(python -m pytest jongga/tests/test_output_contract.py jongga/tests/test_blacklist.py -q)",
       "Bash(python -c \"import jongga.generate_latest as g; import jongga.output_contract as o; from jongga.output_contract import build_history_entry; p={'analysisDate':'2026-06-15','variant':'stable','blacklist':[{'code':'A058470','name':'리노공업','reasons':['공매도 과열'],'status':'confirmed'}],'slots':[{'entries':{'pullback':[{'name':'리노공업','code':'058470','score':9.0,'signalScore':9.0,'grade':'S'},{'name':'다음후보','code':'000020','score':7.0,'signalScore':7.0,'grade':'A'}]}}]}; e=build_history_entry\\(p,'x.js','x.json'\\); print\\('blacklist:', e['blacklist']\\); print\\('topRec codes:', [r['code'] for r in e['topRecommendations']]\\)\")",
       "Bash(python3 -c \"from datetime import datetime; import zoneinfo; print\\(datetime.now\\(zoneinfo.ZoneInfo\\('Asia/Seoul'\\)\\)\\)\")",
-      "Bash(python -c \"from datetime import datetime; import zoneinfo; print\\(datetime.now\\(zoneinfo.ZoneInfo\\('Asia/Seoul'\\)\\)\\)\")"
+      "Bash(python -c \"from datetime import datetime; import zoneinfo; print\\(datetime.now\\(zoneinfo.ZoneInfo\\('Asia/Seoul'\\)\\)\\)\")",
+      "Bash(ls -la *20260612*)",
+      "Bash(ls -la ../*latest*)"
     ]
   }
 }

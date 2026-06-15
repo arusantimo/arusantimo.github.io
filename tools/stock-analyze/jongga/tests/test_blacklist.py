@@ -100,6 +100,44 @@ class HelpersTest(unittest.TestCase):
         self.assertEqual(records[0]["code"], "058470")
         self.assertEqual(records[0]["reasons"], [REASON_SHORT_OVERHEAT])
 
+    def test_extract_records_falls_back_to_entry_filters_when_blacklist_field_missing(self):
+        payload = {
+            "slots": [
+                {
+                    "entries": {
+                        "reversal": [
+                            {
+                                "name": "리노공업",
+                                "code": "058470",
+                                "statusReason": "F3 미충족: KIND 최근공시 2026-06-12 공매도 과열종목 지정(공매도 거래 금지 적용)",
+                                "filters": [
+                                    {
+                                        "code": "F3",
+                                        "status": "⛔",
+                                        "note": "KIND 최근공시 2026-06-12 공매도 과열종목 지정(공매도 거래 금지 적용)",
+                                    }
+                                ],
+                            },
+                            {
+                                "name": "ISC",
+                                "code": "095340",
+                                "eventFilter": {
+                                    "blocked": True,
+                                    "note": "KIND 최근공시 2026-06-12 투자주의종목 지정",
+                                },
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
+        records = extract_blacklist_records(payload)
+        self.assertEqual(blacklisted_codes(records), {"058470", "095340"})
+        by_code = {record["code"]: record for record in records}
+        self.assertEqual(by_code["058470"]["reasons"], [REASON_SHORT_OVERHEAT])
+        self.assertEqual(by_code["095340"]["reasons"], [REASON_CAUTION])
+        self.assertIn("entry", by_code["058470"]["sources"])
+
 
 if __name__ == "__main__":
     unittest.main()

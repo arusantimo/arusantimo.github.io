@@ -20,6 +20,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
+from jongga.blacklist import blacklisted_codes, extract_blacklist_records, normalize_blacklist_code
 from jongga.generate_latest import fetch_naver_price_history, regime_bucket
 from jongga.output_contract import (
     VARIANT_CANARY,
@@ -85,6 +86,27 @@ def update_outcomes_index(existing: list[dict[str, Any]], record: dict[str, Any]
     merged.append(record)
     merged.sort(key=lambda item: (str(item.get("date") or ""), str(item.get("strategy") or ""), str(item.get("code") or "")), reverse=True)
     return merged
+
+
+def prune_outcomes_index_for_blacklisted_codes(
+    existing: list[dict[str, Any]],
+    *,
+    date_str: str,
+    variant: str,
+    excluded_codes: set[str],
+) -> list[dict[str, Any]]:
+    if not excluded_codes:
+        return list(existing)
+    target_variant = normalize_variant(variant)
+    return [
+        item
+        for item in existing
+        if not (
+            str(item.get("date") or "") == date_str
+            and normalize_variant(str(item.get("variant") or "")) == target_variant
+            and normalize_blacklist_code(item.get("code")) in excluded_codes
+        )
+    ]
 
 
 # --- 파싱 헬퍼 ---
@@ -420,10 +442,20 @@ def backfill(
             summary["skipped_no_payload"] += 1
             continue
         dims = extract_context_dims(payload)
+        excluded_codes = blacklisted_codes(extract_blacklist_records(payload))
+        index = prune_outcomes_index_for_blacklisted_codes(
+            index,
+            date_str=date_str,
+            variant=variant,
+            excluded_codes=excluded_codes,
+        )
+        existing_keys = {outcome_key(item) for item in index}
 
         for strategy, entry in iter_buy_entries(payload):
-            code = str(entry.get("code") or "")
+            code = normalize_blacklist_code(entry.get("code"))
             if not code:
+                continue
+            if code in excluded_codes:
                 continue
             key = (date_str, variant, strategy, code)
             if key in existing_keys:

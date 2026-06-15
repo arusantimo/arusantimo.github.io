@@ -180,21 +180,6 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
-        "name": "리노공업",
-        "code": "058470",
-        "score": 10.1,
-        "signalScore": 10.1,
-        "strictScore": 10.1,
-        "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G5, G13)",
-        "entryEligible": false,
-        "currentPrice": 104500
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
         "name": "현대로템",
         "code": "064350",
         "score": 10.1,
@@ -221,21 +206,6 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, G4, G5)",
         "entryEligible": false,
         "currentPrice": 1078000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "리노공업",
-        "code": "058470",
-        "score": 8.2,
-        "signalScore": 8.2,
-        "strictScore": 8.2,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 5.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, Q1, G5)",
-        "entryEligible": false,
-        "currentPrice": 104500
       },
       {
         "strategy": "accumulation",
@@ -326,36 +296,30 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 361000
-      },
+      }
+    ],
+    "blacklist": [
       {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "리노공업",
         "code": "058470",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 104500
+        "name": "리노공업",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "entry"
+        ],
+        "status": "confirmed"
       },
       {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "ISC",
         "code": "095340",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 230000
+        "name": "ISC",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "entry"
+        ],
+        "status": "confirmed"
       }
     ]
   },

@@ -45,27 +45,27 @@ def _dedupe_reasons(reasons: Iterable[str]) -> list[str]:
     return ordered
 
 
-def detect_kind_blacklist_reasons(titles: Iterable[str]) -> list[str]:
-    """KIND 공시 제목 목록에서 블랙리스트 사유를 추출합니다."""
+def _detect_blacklist_reasons_in_texts(texts: Iterable[Any]) -> list[str]:
     reasons: list[str] = []
-    for title in titles:
-        text = str(title or "")
-        if _KIND_SHORT_OVERHEAT_PATTERN.search(text):
+    for value in texts:
+        text = str(value or "")
+        if not text:
+            continue
+        if _KIND_SHORT_OVERHEAT_PATTERN.search(text) or _TOSS_SHORT_OVERHEAT_PATTERN.search(text):
             reasons.append(REASON_SHORT_OVERHEAT)
-        if _KIND_CAUTION_PATTERN.search(text):
+        if _KIND_CAUTION_PATTERN.search(text) or _TOSS_CAUTION_PATTERN.search(text):
             reasons.append(REASON_CAUTION)
     return _dedupe_reasons(reasons)
 
 
+def detect_kind_blacklist_reasons(titles: Iterable[str]) -> list[str]:
+    """KIND 공시 제목 목록에서 블랙리스트 사유를 추출합니다."""
+    return _detect_blacklist_reasons_in_texts(titles)
+
+
 def detect_toss_blacklist_reasons(page_text: str) -> list[str]:
     """토스 주문페이지 렌더링 텍스트에서 블랙리스트 사유를 추출합니다."""
-    text = str(page_text or "")
-    reasons: list[str] = []
-    if _TOSS_SHORT_OVERHEAT_PATTERN.search(text):
-        reasons.append(REASON_SHORT_OVERHEAT)
-    if _TOSS_CAUTION_PATTERN.search(text):
-        reasons.append(REASON_CAUTION)
-    return _dedupe_reasons(reasons)
+    return _detect_blacklist_reasons_in_texts([page_text])
 
 
 def build_blacklist_record(
@@ -135,6 +135,90 @@ def blacklisted_codes(records: Iterable[dict[str, Any]]) -> set[str]:
     return codes
 
 
+def _merge_blacklist_records(records: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: dict[str, dict[str, Any]] = {}
+    for item in records or []:
+        if not isinstance(item, dict):
+            continue
+        code = normalize_blacklist_code(item.get("code"))
+        if not code:
+            continue
+        existing = merged.get(code)
+        reasons = _dedupe_reasons(item.get("reasons") or [])
+        sources = [str(source) for source in (item.get("sources") or []) if str(source or "").strip()]
+        status = str(item.get("status") or STATUS_CONFIRMED)
+        if existing is None:
+            merged[code] = {
+                "code": code,
+                "name": str(item.get("name") or "").strip(),
+                "reasons": reasons,
+                "sources": sources,
+                "status": status,
+            }
+            continue
+        if not existing.get("name"):
+            existing["name"] = str(item.get("name") or "").strip()
+        existing["reasons"] = _dedupe_reasons([*existing.get("reasons", []), *reasons])
+        existing_sources = [str(source) for source in existing.get("sources", [])]
+        for source in sources:
+            if source not in existing_sources:
+                existing_sources.append(source)
+        existing["sources"] = existing_sources
+        if existing.get("status") != STATUS_CONFIRMED and status == STATUS_CONFIRMED:
+            existing["status"] = STATUS_CONFIRMED
+    return list(merged.values())
+
+
+def _iter_payload_entries(payload: dict[str, Any]):
+    for slot in payload.get("slots") or []:
+        if not isinstance(slot, dict):
+            continue
+        entries = slot.get("entries")
+        if not isinstance(entries, dict):
+            continue
+        for bucket in entries.values():
+            if not isinstance(bucket, list):
+                continue
+            for entry in bucket:
+                if isinstance(entry, dict):
+                    yield entry
+
+
+def _infer_blacklist_records_from_entries(payload: dict[str, Any]) -> list[dict[str, Any]]:
+    inferred: list[dict[str, Any]] = []
+    for entry in _iter_payload_entries(payload):
+        code = normalize_blacklist_code(entry.get("code"))
+        if not code:
+            continue
+        filter_notes = [
+            item.get("note")
+            for item in (entry.get("filters") or [])
+            if isinstance(item, dict)
+        ]
+        event_filter = entry.get("eventFilter") if isinstance(entry.get("eventFilter"), dict) else {}
+        manual_reasons = _dedupe_reasons(MANUAL_BLACKLIST.get(code, []))
+        reasons = _detect_blacklist_reasons_in_texts([
+            entry.get("statusReason"),
+            entry.get("statusReasonShort"),
+            event_filter.get("note"),
+            *filter_notes,
+        ])
+        reasons = _dedupe_reasons([*reasons, *manual_reasons])
+        if not reasons:
+            continue
+        sources = ["entry"]
+        if manual_reasons:
+            sources.append("manual")
+        inferred.append({
+            "code": code,
+            "name": str(entry.get("name") or "").strip(),
+            "reasons": reasons,
+            "sources": sources,
+            "status": STATUS_CONFIRMED,
+        })
+    return inferred
+
+
 def extract_blacklist_records(payload: dict[str, Any]) -> list[dict[str, Any]]:
     """payload 의 블랙리스트 기록을 정규화해 반환합니다."""
     raw = payload.get("blacklist") if isinstance(payload, dict) else None
@@ -152,4 +236,6 @@ def extract_blacklist_records(payload: dict[str, Any]) -> list[dict[str, Any]]:
             "sources": [str(source) for source in (item.get("sources") or [])],
             "status": str(item.get("status") or STATUS_CONFIRMED),
         })
-    return records
+    if isinstance(payload, dict):
+        records.extend(_infer_blacklist_records_from_entries(payload))
+    return _merge_blacklist_records(records)

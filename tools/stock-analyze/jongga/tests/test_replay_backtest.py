@@ -313,6 +313,41 @@ class ReplayBacktestTests(unittest.TestCase):
             self.assertEqual(run["days"][0]["skippedReason"], "historical_regen_excluded")
             self.assertEqual(run["days"][0]["pointInTimeStatus"], "historical_regen")
 
+    def test_run_replay_skips_blacklisted_candidates_from_entry_fallback(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            payload = self._payload()
+            blacklisted_entry = payload["slots"][0]["entries"]["pullback"][0]
+            blacklisted_entry["statusReason"] = "F3 미충족: KIND 최근공시 2026-06-03 공매도 과열종목 지정(공매도 거래 금지 적용)"
+            blacklisted_entry["filters"] = [
+                {
+                    "code": "F3",
+                    "status": "⛔",
+                    "note": "KIND 최근공시 2026-06-03 공매도 과열종목 지정(공매도 거래 금지 적용)",
+                }
+            ]
+            self._write_payload(out_dir, payload)
+            rows_by_code = {
+                "000002": [
+                    {"localTradedAt": "20260604", "openPrice": "20000", "highPrice": "20100", "lowPrice": "19800", "closePrice": "19950", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260603", "openPrice": "19900", "highPrice": "20100", "lowPrice": "19800", "closePrice": "20000", "accumulatedTradingVolume": "1000"},
+                ],
+            }
+
+            with mock.patch("jongga.replay_backtest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]):
+                run = run_replay(
+                    date_from=date(2026, 6, 3),
+                    date_to=date(2026, 6, 3),
+                    variant=VARIANT_STABLE,
+                    bar="1m",
+                    threshold_profile="current",
+                    out_dir=out_dir,
+                )
+
+            self.assertEqual(run["summary"]["candidateCount"], 1)
+            self.assertEqual(run["summary"]["tradeCount"], 1)
+            self.assertEqual([item["code"] for item in run["days"][0]["candidates"]], ["000002"])
+
     def test_run_replay_keeps_legacy_unknown_and_surfaces_warning(self):
         with TemporaryDirectory() as tmp:
             out_dir = Path(tmp) / "jongga" / "output"

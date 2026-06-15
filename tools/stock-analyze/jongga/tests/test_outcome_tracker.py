@@ -139,6 +139,22 @@ class StoreRoundTripTest(unittest.TestCase):
             self.assertEqual(len(ot.read_outcomes_index(path)), 1)
             self.assertIn("byCell", ot.read_outcomes_rollup(path))
 
+    def test_prune_outcomes_index_for_blacklisted_codes_removes_matching_day_only(self):
+        index = [
+            {"date": "2026-06-12", "variant": "stable", "strategy": "reversal", "code": "095340"},
+            {"date": "2026-06-12", "variant": "stable", "strategy": "pullback", "code": "000010"},
+            {"date": "2026-06-11", "variant": "stable", "strategy": "reversal", "code": "095340"},
+        ]
+        pruned = ot.prune_outcomes_index_for_blacklisted_codes(
+            index,
+            date_str="2026-06-12",
+            variant="stable",
+            excluded_codes={"095340"},
+        )
+        self.assertEqual(len(pruned), 2)
+        self.assertNotIn(("2026-06-12", "stable", "reversal", "095340"), {ot.outcome_key(item) for item in pruned})
+        self.assertIn(("2026-06-11", "stable", "reversal", "095340"), {ot.outcome_key(item) for item in pruned})
+
 
 if __name__ == "__main__":
     unittest.main()
