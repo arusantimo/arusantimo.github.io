@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-16T06:04:55+00:00",
+    "generatedAt": "2026-06-16T08:35:20+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 12,
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G5)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
         "entryEligible": false,
-        "currentPrice": 1175000
+        "currentPrice": 1183000
       },
       {
         "strategy": "pullback",
@@ -41,39 +41,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G5, G6, Q1)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G6, Q1, G12)",
         "entryEligible": false,
-        "currentPrice": 1011000
+        "currentPrice": 1002000
       },
       {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 10.2,
-        "signalScore": 10.2,
-        "strictScore": 10.2,
-        "scoreMax": 14.0,
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.3,
-        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G5, G6, G8, G12)",
         "entryEligible": false,
-        "currentPrice": 2365000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "LIG디펜스앤에어로스페이스",
-        "code": "079550",
-        "score": 9.4,
-        "signalScore": 9.4,
-        "strictScore": 9.4,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4, G5)",
-        "entryEligible": false,
-        "currentPrice": 1011000
+        "currentPrice": 57500
       },
       {
         "strategy": "accumulation",
@@ -86,24 +71,39 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 14.0,
         "grade": "B",
         "gradeScore": 6.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1, G5)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 1229000
+        "currentPrice": 1236000
       },
       {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "SK하이닉스",
         "code": "000660",
-        "score": 5.8,
-        "signalScore": 5.8,
-        "strictScore": 5.8,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 4.6,
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 2382000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 2365000
+        "currentPrice": 1002000
       },
       {
         "strategy": "breakout",
@@ -118,7 +118,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 1493000
+        "currentPrice": 1501000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "삼성E&A",
+        "code": "028050",
+        "score": 3.9,
+        "signalScore": 3.9,
+        "strictScore": 3.9,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 56700
       },
       {
         "strategy": "breakout",
@@ -133,7 +148,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 3.0,
         "statusLabel": "제외",
         "entryEligible": false,
-        "currentPrice": 76100
+        "currentPrice": 76900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "HL만도",
+        "code": "204320",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 76900
       },
       {
         "strategy": "reversal",
@@ -149,21 +179,6 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 2365000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "HL만도",
-        "code": "204320",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 76100
       },
       {
         "strategy": "reversal",
@@ -183,10 +198,11 @@ window.JONGGA_HISTORY_INDEX = [
     ],
     "blacklist": [
       {
-        "code": "475150",
-        "name": "SK이터닉스",
+        "code": "403870",
+        "name": "HPSP",
         "reasons": [
-          "투자 주의"
+          "투자 주의",
+          "공매도 과열"
         ],
         "sources": [
           "kind"
