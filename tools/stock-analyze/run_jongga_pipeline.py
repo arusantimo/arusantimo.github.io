@@ -740,7 +740,10 @@ def main() -> int:
     else:
         emit("STEP", "4/6 stable 대차 재채점 반영 — 생략(stable 미생성)")
 
-    if not args.skip_replay:
+    auto_skip_replay_for_session = session == "1730"
+    skip_replay = args.skip_replay or auto_skip_replay_for_session
+
+    if not skip_replay:
         run_replay_backtest(
             analysis_date=analysis_date_arg,
             history_js=JONGGA_OUTPUT / "jongga_history.js",
@@ -750,14 +753,20 @@ def main() -> int:
             step_label="5/6",
         )
     else:
-        emit("STEP", "5/6 리플레이 검증 — 생략(--skip-replay)")
+        skip_message = (
+            "17:30 세션에서는 자동 replay를 생략합니다."
+            if auto_skip_replay_for_session and not args.skip_replay
+            else "사용자 요청으로 자동 replay를 생략했습니다."
+        )
+        skip_label = "17:30 세션 자동 생략" if auto_skip_replay_for_session and not args.skip_replay else "--skip-replay"
+        emit("STEP", f"5/6 리플레이 검증 — 생략({skip_label})")
         from jongga.replay_backtest import write_replay_bridge
 
         write_replay_bridge(
             JONGGA_OUTPUT,
             latest_attempt={
                 "status": "skipped",
-                "message": "사용자 요청으로 자동 replay를 생략했습니다.",
+                "message": skip_message,
                 "generatedAt": datetime.now().isoformat(timespec="seconds"),
                 "variant": args.replay_variant,
                 "thresholdProfile": args.replay_threshold_profile,
