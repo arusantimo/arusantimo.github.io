@@ -1,5 +1,196 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-17",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260617.js",
+    "jsonFile": "jongga/output/202606/latest_20260617.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260617.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-17T06:05:44+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 12,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12)",
+        "entryEligible": false,
+        "currentPrice": 951000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 134000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 951000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 134000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1588000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.9,
+        "signalScore": 5.9,
+        "strictScore": 5.9,
+        "scoreMax": 12.5,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 2509500
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 5.5,
+        "signalScore": 5.5,
+        "strictScore": 5.5,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 134000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 3.6,
+        "signalScore": 3.6,
+        "strictScore": 3.6,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 2.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 344500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1588000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "347850",
+        "name": "디앤디파마텍",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-16",
     "variant": "stable",
     "variantLabel": "현재 버전",
