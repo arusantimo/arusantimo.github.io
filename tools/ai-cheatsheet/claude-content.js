@@ -10,41 +10,62 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.173</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-11</span>
+        <span class="meta-version">v2.1.179</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-16</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.173)</span>
+        <span>📋 최근 변경사항 (v2.1.179)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Claude Fable 5 모델 출시 (v2.1.170)"
-            data-tt-desc="뛰어난 성능과 안전성을 갖춘 신규 Mythos-class 모델인 Claude Fable 5가 공식 출시되었습니다."
-            data-tt-example="">안전성과 성능이 대폭 강화된 신규 모델 <code>Claude Fable 5</code> 지원 (v2.1.170) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="중첩 서브에이전트 스폰 지원 (v2.1.172)"
-            data-tt-desc="서브에이전트 세션 내에서 하위 서브에이전트를 최대 5단계 깊이까지 재귀적으로 스폰하여 실행할 수 있습니다."
-            data-tt-example="">서브에이전트의 자체 서브에이전트 생성(최대 5레벨 깊이) 지원 (v2.1.172) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Amazon Bedrock 리전 파싱 개선 (v2.1.172)"
-            data-tt-desc="AWS_REGION 환경변수가 미설정된 경우 Bedrock이 ~/.aws 설정 파일에서 리전 정보를 순서대로 읽어옵니다."
-            data-tt-example="">Amazon Bedrock의 <code>~/.aws</code> 리전 정보 탐지 및 <code>/status</code> 노출 지원 (v2.1.172) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/plugin 마켓플레이스 검색창 추가 (v2.1.172)"
-            data-tt-desc="/plugin 명령어 실행 후 마켓플레이스의 플러그인을 탐색할 때 원하는 플러그인을 빠르게 찾을 수 있도록 검색 필터 바가 지원됩니다."
-            data-tt-example=""><code>/plugin</code> 마켓플레이스 탐색 내 플러그인 검색 바 추가 (v2.1.172) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Fable 5 모델 1M context suffix 정규화 (v2.1.173)"
-            data-tt-desc="Fable 5가 기본적으로 1M 컨텍스트를 지원하여 모델명 뒤에 붙는 [1m] suffix를 자동으로 제거 및 정문화합니다."
-            data-tt-example="">Fable 5 모델명 <code>[1m]</code> suffix 자동 normalize 패치 (v2.1.173) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Windows 샌드박스 의존성 시작 경고 수정 (v2.1.173)"
-            data-tt-desc="설정에서 샌드박스를 활성화했을 때 Windows 환경에서 부정확하게 표시되던 sandbox dependencies missing 시작 경고를 해결했습니다."
-            data-tt-example="">Windows 환경의 spurious sandbox 시작 경고 버그 수정 (v2.1.173) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="wheelScrollAccelerationEnabled 설정 도입 (v2.1.174)"
+            data-tt-desc="터미널 내에서 마우스 휠 스크롤 감도를 조절하거나 빠르게 이동할 수 있도록 가속 옵션을 제공합니다."
+            data-tt-example="">휠 스크롤 가속화 설정 <code>wheelScrollAccelerationEnabled</code> 추가 (v2.1.174) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="권한 규칙 Tool(param:value) 형식 지원 (v2.1.178)"
+            data-tt-desc="도구 실행 조건부 훅(PreToolCall 등)에서 특정 파라미터 값에 기초하여 도구 실행을 사전에 제한하는 세밀한 필터링이 가능해졌습니다."
+            data-tt-example="">도구 조건부 권한 제어 내 <code>Tool(param:value)</code> 문법 지원 (v2.1.178) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="중첩 .claude/skills 스킬 로딩 지원 (v2.1.178)"
+            data-tt-desc="프로젝트 하위 디렉터리 내에 독립적으로 구성된 .claude/skills 폴더의 스킬 파일들도 메인 에이전트가 탐색하여 자동으로 로드합니다."
+            data-tt-example="">중첩 서브디렉터리 내 <code>.claude/skills</code> 스킬 파일 검색 및 기동 지원 (v2.1.178) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="자동 모드 평가 로직 최적화 (v2.1.178)"
+            data-tt-desc="자동 모드 가동 시 턴 제한 및 비용 관리 효율을 높이기 위해 프롬프트 컴팩트와 에이전트 평가 알고리즘을 갱신했습니다."
+            data-tt-example="">자동(auto) 모드 실행 상태 평가 로직 개선 및 최적화 (v2.1.178) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="연결 드롭 복구 및 WSL2 휠 스크롤 개선 (v2.1.179)"
+            data-tt-desc="네트워크 유실로 인한 세션 정지 방지를 위해 mid-stream 연결 끊김에 대응하는 재시도 로직을 가동하며, WSL2 환경 내 휠 스크롤을 개선했습니다."
+            data-tt-example="">네트워크 접속 해제(mid-stream drop) 복구 패치 및 WSL2 휠 스크롤 가속 대응 (v2.1.179) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.170~v2.1.173</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Claude Fable 5 모델 출시 (v2.1.170)"
+                data-tt-desc="뛰어난 성능과 안전성을 갖춘 신규 Mythos-class 모델인 Claude Fable 5가 공식 출시되었습니다."
+                data-tt-example="">안전성과 성능이 대폭 강화된 신규 모델 <code>Claude Fable 5</code> 지원 (v2.1.170)</li>
+              <li class="cl-tip" data-tt-title="중첩 서브에이전트 스폰 지원 (v2.1.172)"
+                data-tt-desc="서브에이전트 세션 내에서 하위 서브에이전트를 최대 5단계 깊이까지 재귀적으로 스폰하여 실행할 수 있습니다."
+                data-tt-example="">서브에이전트의 자체 서브에이전트 생성(최대 5레벨 깊이) 지원 (v2.1.172)</li>
+              <li class="cl-tip" data-tt-title="Amazon Bedrock 리전 파싱 개선 (v2.1.172)"
+                data-tt-desc="AWS_REGION 환경변수가 미설정된 경우 Bedrock이 ~/.aws 설정 파일에서 리전 정보를 순서대로 읽어옵니다."
+                data-tt-example="">Amazon Bedrock의 <code>~/.aws</code> 리전 정보 탐지 및 <code>/status</code> 노출 지원 (v2.1.172)</li>
+              <li class="cl-tip" data-tt-title="/plugin 마켓플레이스 검색창 추가 (v2.1.172)"
+                data-tt-desc="/plugin 명령어 실행 후 마켓플레이스의 플러그인을 탐색할 때 원하는 플러그인을 빠르게 찾을 수 있도록 검색 필터 바가 지원됩니다."
+                data-tt-example=""><code>/plugin</code> 마켓플레이스 탐색 내 플러그인 검색 바 추가 (v2.1.172)</li>
+              <li class="cl-tip" data-tt-title="Fable 5 모델 1M context suffix 정규화 (v2.1.173)"
+                data-tt-desc="Fable 5가 기본적으로 1M 컨텍스트를 지원하여 모델명 뒤에 붙는 [1m] suffix를 자동으로 제거 및 정문화합니다."
+                data-tt-example="">Fable 5 모델명 <code>[1m]</code> suffix 자동 normalize 패치 (v2.1.173)</li>
+              <li class="cl-tip" data-tt-title="Windows 샌드박스 의존성 시작 경고 수정 (v2.1.173)"
+                data-tt-desc="설정에서 샌드박스를 활성화했을 때 Windows 환경에서 부정확하게 표시되던 sandbox dependencies missing 시작 경고를 해결했습니다."
+                data-tt-example="">Windows 환경의 spurious sandbox 시작 경고 버그 수정 (v2.1.173)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.166~v2.1.169</summary>
@@ -455,7 +476,7 @@ const claudeContent = `
               <div class="group-label">세션 (Session)</div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/cd &lt;dir&gt;</code></div>
-                <div class="row-desc">세션 작업 디렉터리 이동 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">세션 작업 디렉터리 이동</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/clear</code></div>
@@ -951,7 +972,7 @@ const claudeContent = `
               <div class="group-label">주요 플래그</div>
               <div class="row">
                 <div class="row-key"><code>--safe-mode</code></div>
-                <div class="row-desc">세이프 모드로 세션 시작 (customizations 비활성) <span class="badge-new">NEW</span></div>
+                <div class="row-desc">세이프 모드로 세션 시작 (customizations 비활성)</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>--model</code></div>
@@ -1498,7 +1519,11 @@ const claudeContent = `
               <div class="group-label">핵심 설정 항목</div>
               <div class="row cl-tip">
                 <div class="row-key"><code>disableBundledSkills</code></div>
-                <div class="row-desc">번들 스킬 및 워크플로 비활성화 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">번들 스킬 및 워크플로 비활성화</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>wheelScrollAccelerationEnabled</code></div>
+                <div class="row-desc">터미널 마우스 휠 스크롤 가속화 여부 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>requiredMinimumVersion</code></div>
@@ -1551,7 +1576,7 @@ const claudeContent = `
               <div class="group-label">핵심 환경 변수</div>
               <div class="row">
                 <div class="row-key"><code>CLAUDE_CODE_SAFE_MODE</code></div>
-                <div class="row-desc">세이프 모드로 세션 시작 (customizations 무시) <span class="badge-new">NEW</span></div>
+                <div class="row-desc">세이프 모드로 세션 시작 (customizations 무시)</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>ANTHROPIC_API_KEY</code></div>

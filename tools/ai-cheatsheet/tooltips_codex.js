@@ -1,4 +1,24 @@
 window.CODEX_TIPS = {
+  "/delete": {
+    "title": "/delete — 세션 영구 삭제",
+    "desc": "보안 승인 절차를 거쳐 현재 세션 데이터 및 히스토리를 데이터베이스에서 영구적으로 완전히 삭제합니다.",
+    "example": "/delete"
+  },
+  "/usage": {
+    "title": "/usage — 토큰 사용 통계",
+    "desc": "일간, 주간 및 누적 계정 토큰 소비 통계를 TUI 뷰어로 확인합니다.",
+    "example": "/usage"
+  },
+  "/import": {
+    "title": "/import — 외부 설정 가져오기",
+    "desc": "Claude Code의 설정, 구성 및 최근 대화 기록을 선택적으로 가져옵니다.",
+    "example": "/import"
+  },
+  "codex delete": {
+    "title": "codex delete — CLI 세션 완전 삭제",
+    "desc": "CLI 상에서 지정된 세션 ID 또는 대화 히스토리를 안전하고 영구적으로 삭제합니다.",
+    "example": "codex delete <session-id>"
+  },
   "/app": {
     "title": "/app — 데스크톱 앱으로 전환",
     "desc": "현재 CLI 세션을 백그라운드로 남겨두고 동일한 작업 스레드를 Codex Desktop(데스크톱 앱)으로 전환하여 이어 진행합니다.",

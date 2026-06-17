@@ -1,4 +1,9 @@
 window.CLAUDE_TIPS = {
+  "wheelScrollAccelerationEnabled": {
+    "title": "wheelScrollAccelerationEnabled — 터미널 스크롤 가속 활성화",
+    "desc": "WSL2 터미널 등에서 마우스 휠 스크롤 감도를 가속화하여 긴 터미널 출력 기록을 더욱 빠르게 휠 스크롤 할 수 있도록 지원합니다.",
+    "example": "\"wheelScrollAccelerationEnabled\": true"
+  },
   "disableBundledSkills": {
     "title": "disableBundledSkills — 번들 스킬/워크플로 비활성화",
     "desc": "Claude Code의 기본 스킬, 워크플로 및 빌트인 슬래시 커맨드를 숨겨 시스템의 리소스 소모를 방지하고 커스텀 기능만 유지할 수 있도록 설정합니다.",
