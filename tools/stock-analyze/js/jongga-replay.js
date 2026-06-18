@@ -958,7 +958,8 @@ function renderReplayStrategySections() {
     }
 
     if (button) {
-      button.disabled = !actionable || !hasStrategyData;
+      const isSkipped = attemptStatus === 'skipped';
+      button.disabled = (!actionable && !isSkipped) || (!hasStrategyData && !isSkipped);
       if (!latestRun) {
         button.title = '표시할 replay 결과가 없습니다.';
       } else if (!actionable) {
