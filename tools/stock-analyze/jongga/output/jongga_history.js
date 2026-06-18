@@ -1,5 +1,165 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-18",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260618.js",
+    "jsonFile": "jongga/output/202606/latest_20260618.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260618.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-18T06:05:34+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 12,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 125400
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 234500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 125400
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.5,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1721000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.9,
+        "signalScore": 5.9,
+        "strictScore": 5.9,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 2721000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "RISE 네트워크인프라",
+        "code": "367760",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.2,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 89440
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "RISE 네트워크인프라",
+        "code": "367760",
+        "score": 9.5,
+        "signalScore": 9.5,
+        "strictScore": 9.5,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 89440
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "080220",
+        "name": "제주반도체",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "001820",
+        "name": "삼화콘덴서",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-17",
     "variant": "stable",
     "variantLabel": "현재 버전",
