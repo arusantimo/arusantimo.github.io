@@ -9,26 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-18T06:05:34+00:00",
+    "generatedAt": "2026-06-18T08:34:59+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 12,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "한화오션",
         "code": "042660",
-        "score": 7.5,
-        "signalScore": 7.5,
-        "strictScore": 7.5,
+        "score": 8.2,
+        "signalScore": 8.2,
+        "strictScore": 8.2,
         "scoreMax": 13.0,
         "grade": "B",
-        "gradeScore": 5.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "gradeScore": 6.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12)",
         "entryEligible": false,
-        "currentPrice": 125400
+        "currentPrice": 125100
       },
       {
         "strategy": "accumulation",
@@ -43,82 +43,82 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.4,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 234500
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "한화오션",
-        "code": "042660",
-        "score": 7.9,
-        "signalScore": 7.9,
-        "strictScore": 7.9,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 5.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
-        "entryEligible": false,
-        "currentPrice": 125400
+        "currentPrice": 235000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 7.7,
-        "signalScore": 7.7,
-        "strictScore": 7.7,
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.5,
+        "gradeScore": 5.8,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1721000
+        "currentPrice": 1700000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 6.8,
+        "signalScore": 6.8,
+        "strictScore": 6.8,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 125100
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "SK하이닉스",
         "code": "000660",
-        "score": 5.9,
-        "signalScore": 5.9,
-        "strictScore": 5.9,
+        "score": 6.3,
+        "signalScore": 6.3,
+        "strictScore": 6.3,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.7,
+        "gradeScore": 5.0,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 2721000
+        "currentPrice": 2685000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "RISE 네트워크인프라",
-        "code": "367760",
+        "name": "삼성전자",
+        "code": "005930",
         "score": 4.8,
         "signalScore": 4.8,
         "strictScore": 4.8,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.2,
-        "statusLabel": "제외",
+        "gradeScore": 3.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 89440
+        "currentPrice": 362500
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "RISE 네트워크인프라",
         "code": "367760",
-        "score": 9.5,
-        "signalScore": 9.5,
-        "strictScore": 9.5,
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
         "scoreMax": 10.0,
         "grade": "S",
-        "gradeScore": 9.5,
+        "gradeScore": 8.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 89440
+        "currentPrice": 88720
       }
     ],
     "blacklist": [
@@ -149,6 +149,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "code": "001820",
         "name": "삼화콘덴서",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
