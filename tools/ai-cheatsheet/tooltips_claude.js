@@ -930,6 +930,21 @@ window.CLAUDE_TIPS = {
     "title": "CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN",
     "desc": "TUI 렌더링 시 대체 화면(alternate screen) 모드를 비활성화하여, 터미널 네이티브 스크롤백 버퍼를 보존합니다.",
     "example": "export CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN=1\nclaude"
+  },
+  "/config key=value": {
+    "title": "/config key=value — 실시간 설정 변경",
+    "desc": "대화 프롬프트 상에서 직접 설정을 지정할 수 있는 단축 구문입니다. interactive, -p 및 Remote Control 모드 모두에서 작동합니다.",
+    "example": "/config thinking=false"
+  },
+  "sandbox.allowAppleEvents": {
+    "title": "sandbox.allowAppleEvents — macOS Apple Event 허용",
+    "desc": "샌드박스 내부에서 실행되는 명령이 macOS에서 Apple Event를 발송할 수 있도록 허용하는 옵트인(opt-in) 보안 설정입니다.",
+    "example": "\"sandbox.allowAppleEvents\": true"
+  },
+  "CLAUDE_CLIENT_PRESENCE_FILE": {
+    "title": "CLAUDE_CLIENT_PRESENCE_FILE — 모바일 알림 억제 마커 파일",
+    "desc": "PC 앞에 앉아 있을 때 모바일 푸시 알림을 억제하기 위해, 특정 마커 파일이 존재하면 모바일 푸시 전송을 무력화하는 경로 변수입니다.",
+    "example": "export CLAUDE_CLIENT_PRESENCE_FILE=~/.claude/presence"
   }
 }
 ;

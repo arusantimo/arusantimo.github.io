@@ -10,38 +10,59 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.179</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-16</span>
+        <span class="meta-version">v2.1.181</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-17</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.179)</span>
+        <span>📋 최근 변경사항 (v2.1.181)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="wheelScrollAccelerationEnabled 설정 도입 (v2.1.174)"
-            data-tt-desc="터미널 내에서 마우스 휠 스크롤 감도를 조절하거나 빠르게 이동할 수 있도록 가속 옵션을 제공합니다."
-            data-tt-example="">휠 스크롤 가속화 설정 <code>wheelScrollAccelerationEnabled</code> 추가 (v2.1.174) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="권한 규칙 Tool(param:value) 형식 지원 (v2.1.178)"
-            data-tt-desc="도구 실행 조건부 훅(PreToolCall 등)에서 특정 파라미터 값에 기초하여 도구 실행을 사전에 제한하는 세밀한 필터링이 가능해졌습니다."
-            data-tt-example="">도구 조건부 권한 제어 내 <code>Tool(param:value)</code> 문법 지원 (v2.1.178) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="중첩 .claude/skills 스킬 로딩 지원 (v2.1.178)"
-            data-tt-desc="프로젝트 하위 디렉터리 내에 독립적으로 구성된 .claude/skills 폴더의 스킬 파일들도 메인 에이전트가 탐색하여 자동으로 로드합니다."
-            data-tt-example="">중첩 서브디렉터리 내 <code>.claude/skills</code> 스킬 파일 검색 및 기동 지원 (v2.1.178) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="자동 모드 평가 로직 최적화 (v2.1.178)"
-            data-tt-desc="자동 모드 가동 시 턴 제한 및 비용 관리 효율을 높이기 위해 프롬프트 컴팩트와 에이전트 평가 알고리즘을 갱신했습니다."
-            data-tt-example="">자동(auto) 모드 실행 상태 평가 로직 개선 및 최적화 (v2.1.178) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="연결 드롭 복구 및 WSL2 휠 스크롤 개선 (v2.1.179)"
-            data-tt-desc="네트워크 유실로 인한 세션 정지 방지를 위해 mid-stream 연결 끊김에 대응하는 재시도 로직을 가동하며, WSL2 환경 내 휠 스크롤을 개선했습니다."
-            data-tt-example="">네트워크 접속 해제(mid-stream drop) 복구 패치 및 WSL2 휠 스크롤 가속 대응 (v2.1.179) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/config key=value 설정 추가 (v2.1.181)"
+            data-tt-desc="대화 프롬프트 상에서 직접 설정을 지정할 수 있는 단축 구문입니다. interactive, -p 및 Remote Control 모드 모두에서 작동합니다."
+            data-tt-example="/config thinking=false"><code>/config key=value</code> 문법을 통한 실시간 설정 변경 지원 (v2.1.181) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="sandbox.allowAppleEvents 설정 추가 (v2.1.181)"
+            data-tt-desc="샌드박스 내부에서 실행되는 명령이 macOS에서 Apple Event를 발송할 수 있도록 허용하는 옵트인(opt-in) 보안 설정입니다."
+            data-tt-example="sandbox.allowAppleEvents: true">macOS 샌드박스 내 Apple Event 전송 허용 <code>sandbox.allowAppleEvents</code> 추가 (v2.1.181) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_CLIENT_PRESENCE_FILE 환경변수 도입 (v2.1.181)"
+            data-tt-desc="PC 앞에 앉아 있을 때 모바일 푸시 알림을 억제하기 위해, 특정 마커 파일이 존재하면 모바일 푸시 전송을 무력화하는 경로 변수입니다."
+            data-tt-example="export CLAUDE_CLIENT_PRESENCE_FILE=~/.claude/presence">모바일 알림 제어용 <code>CLAUDE_CLIENT_PRESENCE_FILE</code> 환경변수 추가 (v2.1.181) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="API 접속 해제 자동 복구 및 재시도 (v2.1.181)"
+            data-tt-desc="에이전트가 생각하는 도중(mid-thinking) API 연결이 끊기면 끊겼다는 오류를 띄우지 않고 자동으로 연결을 재시도합니다."
+            data-tt-example="">API 중간 연결 유실(mid-thinking drop) 자동 복구 및 재시도 패치 (v2.1.181) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Bun 런타임 1.4 및 스트리밍 성능 향상 (v2.1.181)"
+            data-tt-desc="기본 탑재된 Bun 런타임 버전을 1.4로 빌드업했으며, 장문의 줄 바꿈이 생기기 전에 줄 단위로 출력을 먼저 시작하도록 스트리밍 속도를 개선했습니다."
+            data-tt-example="">Bundled Bun 런타임 v1.4 업그레이드 및 장문 줄단위 스트리밍 성능 최적화 (v2.1.181) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.174~v2.1.179</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="wheelScrollAccelerationEnabled 설정 도입 (v2.1.174)"
+                data-tt-desc="터미널 내에서 마우스 휠 스크롤 감도를 조절하거나 빠르게 이동할 수 있도록 가속 옵션을 제공합니다."
+                data-tt-example="">휠 스크롤 가속화 설정 <code>wheelScrollAccelerationEnabled</code> 추가 (v2.1.174)</li>
+              <li class="cl-tip" data-tt-title="권한 규칙 Tool(param:value) 형식 지원 (v2.1.178)"
+                data-tt-desc="도구 실행 조건부 훅(PreToolCall 등)에서 특정 파라미터 값에 기초하여 도구 실행을 사전에 제한하는 세밀한 필터링이 가능해졌습니다."
+                data-tt-example="">도구 조건부 권한 제어 내 <code>Tool(param:value)</code> 문법 지원 (v2.1.178)</li>
+              <li class="cl-tip" data-tt-title="중첩 .claude/skills 스킬 로딩 지원 (v2.1.178)"
+                data-tt-desc="프로젝트 하위 디렉터리 내에 독립적으로 구성된 .claude/skills 폴더의 스킬 파일들도 메인 에이전트가 탐색하여 자동으로 로드합니다."
+                data-tt-example="">중첩 서브디렉터리 내 <code>.claude/skills</code> 스킬 파일 검색 및 기동 지원 (v2.1.178)</li>
+              <li class="cl-tip" data-tt-title="자동 모드 평가 로직 최적화 (v2.1.178)"
+                data-tt-desc="자동 모드 가동 시 턴 제한 및 비용 관리 효율을 높이기 위해 프롬프트 컴팩트와 에이전트 평가 알고리즘을 갱신했습니다."
+                data-tt-example="">자동(auto) 모드 실행 상태 평가 로직 개선 및 최적화 (v2.1.178)</li>
+              <li class="cl-tip" data-tt-title="연결 드롭 복구 및 WSL2 휠 스크롤 개선 (v2.1.179)"
+                data-tt-desc="네트워크 유실로 인한 세션 정지 방지를 위해 mid-stream 연결 끊김에 대응하는 재시도 로직을 가동하며, WSL2 환경 내 휠 스크롤을 개선했습니다."
+                data-tt-example="">네트워크 접속 해제(mid-stream drop) 복구 패치 및 WSL2 휠 스크롤 가속 대응 (v2.1.179)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.170~v2.1.173</summary>

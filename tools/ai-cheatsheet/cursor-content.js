@@ -10,38 +10,53 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.7.36</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-13</span>
+        <span class="meta-version">v3.8.11</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-18</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.7.36)</span>
+        <span>📋 최근 변경사항 (v3.8.11)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="MCP 연결 안정성 강화 (v3.7.36)"
-            data-tt-desc="Model Context Protocol(MCP) 서버와의 커넥션 생명주기를 안정적으로 개선하고 다중 백엔드 연결 시 발생하던 간헐적 연결 끊김 버그를 해결했습니다."
-            data-tt-example="">MCP(Model Context Protocol) 서버 연동 안전성 및 커넥션 복구 메커니즘 강화 (v3.7.36) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Bugbot 성능 개선 및 /review 커맨드 추가 (2026-06-10)"
-            data-tt-desc="Bugbot이 Composer 2.5를 탑재하여 속도 ~3.5배 향상, 비용 ~22% 절감, 탐지율 10% 증가가 적용되었으며, push 전 코드/보안 검토를 위한 /review 슬래시 커맨드가 도입되었습니다."
-            data-tt-example="/review">Bugbot 성능 혁신 및 사전 PR/코드 검토를 위한 <code>/review</code> 명령어 추가 (2026-06-10)</li>
-          <li class="cl-tip" data-tt-title="Design Mode 다중 선택 및 음성 입력 (v3.7)"
-            data-tt-desc="브라우저 Design Mode에서 여러 요소를 다중 선택(Multi-select)하여 비교/조정 피드백을 전달할 수 있고, 실행 도중 음성 입력 큐잉이 가능합니다."
-            data-tt-example="">Design Mode 다중 선택(Multi-select) 및 음성(Voice) 입력 큐잉 지원 (v3.7)</li>
-          <li class="cl-tip" data-tt-title="Cursor SDK 대규모 기능 개선 (2026-06-04)"
-            data-tt-desc="@cursor/sdk 릴리스에서 SQLite 외에 JSONL/PG 커스텀 스토어, customTools 전달, local auto-review 샌드박스 정책 설정 등이 지원됩니다."
-            data-tt-example="npm install @cursor/sdk"><code>@cursor/sdk</code> 업데이트 — 커스텀 스토어, customTools 및 auto-review 지원 (2026-06-04)</li>
-          <li class="cl-tip" data-tt-title="Canvas 토큰 사용량 탐색기 및 디버그 버튼 (2026-06-04)"
-            data-tt-desc="컨버스의 토큰 할당(System, Tool, Rules, Skills) 분석 보고서를 인터랙티브 캔버스로 열어 디버깅할 수 있습니다."
-            data-tt-example="">Canvas 토큰 사용량 시각화 보고서 및 Debug with Agent 지원 (2026-06-04)</li>
+          <li class="cl-tip" data-tt-title="클라우드 개발 환경 구축 지원 (v3.8)"
+            data-tt-desc="클라우드상에서 10분 이내에 개발 환경을 구동할 수 있으며, 개발 환경을 스냅샷으로 저장해 기동 속도를 획기적으로 개선합니다."
+            data-tt-example=""><code>클라우드 개발 환경</code> 간편 셋업 및 재사용 스냅샷 백업 기능 추가 (v3.8) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="클라우드 VM 서브에이전트 스폰 (v3.8)"
+            data-tt-desc="전용 클라우드 VM에 서브에이전트를 생성하여 CI 에러 픽스나 장시간의 조사 태스크를 위임하고 로컬 터미널의 반응성을 최대로 유지합니다."
+            data-tt-example="/in-cloud fix compile error">독립형 클라우드 VM 상에서 서브에이전트 구동 <code>/in-cloud</code> 커맨드 추가 (v3.8) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Canvas 컨텍스트 사용량 시각 분석 (v3.8)"
+            data-tt-desc="시스템 프롬프트, 도구 사양, 규칙, 스킬들이 차지하는 컨텍스트(토큰) 비중을 캔버스 내에서 인터랙티브한 그래프로 분석합니다."
+            data-tt-example="">캔버스(<code>Canvas</code>) 내 에이전트의 컨텍스트(토큰) 세부 사용량 분석 보고서 도입 (v3.8) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.7.36</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="MCP 연결 안정성 강화 (v3.7.36)"
+                data-tt-desc="Model Context Protocol(MCP) 서버와의 커넥션 생명주기를 안정적으로 개선하고 다중 백엔드 연결 시 발생하던 간헐적 연결 끊김 버그를 해결했습니다."
+                data-tt-example="">MCP(Model Context Protocol) 서버 연동 안전성 및 커넥션 복구 메커니즘 강화 (v3.7.36)</li>
+              <li class="cl-tip" data-tt-title="Bugbot 성능 개선 및 /review 커맨드 추가 (2026-06-10)"
+                data-tt-desc="Bugbot이 Composer 2.5를 탑재하여 속도 ~3.5배 향상, 비용 ~22% 절감, 탐지율 10% 증가가 적용되었으며, push 전 코드/보안 검토를 위한 /review 슬래시 커맨드가 도입되었습니다."
+                data-tt-example="/review">Bugbot 성능 혁신 및 사전 PR/코드 검토를 위한 <code>/review</code> 명령어 추가 (2026-06-10)</li>
+              <li class="cl-tip" data-tt-title="Design Mode 다중 선택 및 음성 입력 (v3.7)"
+                data-tt-desc="브라우저 Design Mode에서 여러 요소를 다중 선택(Multi-select)하여 비교/조정 피드백을 전달할 수 있고, 실행 도중 음성 입력 큐잉이 가능합니다."
+                data-tt-example="">Design Mode 다중 선택(Multi-select) 및 음성(Voice) 입력 큐잉 지원 (v3.7)</li>
+              <li class="cl-tip" data-tt-title="Cursor SDK 대규모 기능 개선 (2026-06-04)"
+                data-tt-desc="@cursor/sdk 릴리스에서 SQLite 외에 JSONL/PG 커스텀 스토어, customTools 전달, local auto-review 샌드박스 정책 설정 등이 지원됩니다."
+                data-tt-example="npm install @cursor/sdk"><code>@cursor/sdk</code> 업데이트 — 커스텀 스토어, customTools 및 auto-review 지원 (2026-06-04)</li>
+              <li class="cl-tip" data-tt-title="Canvas 토큰 사용량 탐색기 및 디버그 버튼 (2026-06-04)"
+                data-tt-desc="컨버스의 토큰 할당(System, Tool, Rules, Skills) 분석 보고서를 인터랙티브 캔버스로 열어 디버깅할 수 있습니다."
+                data-tt-example="">Canvas 토큰 사용량 시각화 보고서 및 Debug with Agent 지원 (2026-06-04)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.7 (초기 버전)</summary>

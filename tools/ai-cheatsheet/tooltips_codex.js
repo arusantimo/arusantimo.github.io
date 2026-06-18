@@ -628,6 +628,21 @@ window.CODEX_TIPS = {
     "title": "/goal — 장기 목표 워크플로 (기본 활성화)",
     "desc": "기본적으로 활성화되어 작동하는 장기 목표(goal)를 관리합니다. 전용 데이터베이스 스토리지에 백업되며 일시정지, 재개, 초기화 등 TUI 컨트롤을 지원합니다.",
     "example": "/goal\n/goal pause\n/goal resume"
+  },
+  "Noise E2EE": {
+    "title": "Noise E2EE — 원격 실행기 E2EE 릴레이",
+    "desc": "원격 CLI 세션과 로컬 환경을 연동하는 리모트 러너 채널에 Noise 프로토콜을 사용한 종단간 암호화(E2EE) 보안 통신망이 가동됩니다.",
+    "example": ""
+  },
+  "SQLite WAL-reset": {
+    "title": "SQLite WAL-reset — SQLite 파일 락 방지",
+    "desc": "Windows x64 빌드 기기에서의 Windows ARM64 타겟 패키징을 수선하였고, 대규모 쓰기 트랜잭션 시 파일 락을 방지하는 SQLite WAL-reset 의존성이 락인되었습니다.",
+    "example": ""
+  },
+  "app declaration name": {
+    "title": "app declaration name — 플러그인 MCP 중복 제거",
+    "desc": "동일한 플러그인을 중복 로드하여 발생하는 MCP 충돌을 사전에 방지하고자 앱 내부 선언명 기준의 자동 중복 방지 제어를 지원합니다.",
+    "example": ""
   }
 }
 ;
