@@ -1,0 +1,116 @@
+{
+  "name": "aru-goal",
+  "version": "1.0.0",
+  "category": "product-delivery-build",
+  "tooltipSummary": "4개 에이전트에서 목표(goal)를 JSONL로 관리하고, 현재 활성 goal을 훅으로 자동 주입하는 스킬.",
+  "description": "Codex thread_goals 구조를 Claude·Cursor·Antigravity에서도 동등하게 쓸 수 있도록 JSONL goal 저장소와 PreToolUse 훅 자동 주입을 제공합니다.",
+  "tags": ["goal", "context", "hook", "project-memory"],
+  "targets": ["claude", "codex", "cursor", "antigravity"],
+  "requires": [
+    {
+      "command": "node",
+      "label": "Node.js",
+      "args": ["--version"],
+      "guide": {
+        "repo": "https://nodejs.org/",
+        "summary": "scripts/goal-cli.mjs 실행에 Node.js가 필요합니다.",
+        "verify": "node --version"
+      },
+      "install": {
+        "default": ["https://nodejs.org/en/download/"]
+      }
+    },
+    {
+      "command": "git",
+      "label": "git",
+      "args": ["--version"]
+    }
+  ],
+  "instructions": {
+    "common": "instructions/common.md"
+  },
+  "installGuide": {
+    "summary": "hook + instructions 조합 권장. Antigravity는 instructions 모드로 AGENTS.md 블록 갱신.",
+    "categoryHint": "product-delivery-build",
+    "byTarget": {
+      "cursor": {
+        "primary": "hook",
+        "secondary": ["skill", "instructions"],
+        "scope": "project"
+      },
+      "claude": {
+        "primary": "hook",
+        "secondary": ["skill", "instructions"],
+        "scope": "project"
+      },
+      "codex": {
+        "primary": "hook",
+        "secondary": ["skill", "instructions"],
+        "scope": "project"
+      },
+      "antigravity": {
+        "primary": "instructions",
+        "secondary": ["skill"],
+        "scope": "both"
+      }
+    }
+  },
+  "delivery": {
+    "cursor": {
+      "skill": true,
+      "hook": { "project": true, "global": false },
+      "instructions": { "project": true, "global": false },
+      "command": { "project": true, "global": true }
+    },
+    "claude": {
+      "skill": true,
+      "hook": { "project": true, "global": false },
+      "instructions": { "project": true, "global": false }
+    },
+    "codex": {
+      "skill": true,
+      "hook": { "project": true, "global": false },
+      "instructions": { "project": true, "global": false }
+    },
+    "antigravity": {
+      "skill": true,
+      "instructions": { "project": true, "global": true }
+    },
+    "recommended": {
+      "cursor": "hook",
+      "claude": "hook",
+      "codex": "hook",
+      "antigravity": "instructions"
+    }
+  },
+  "install": {
+    "claude": {
+      "dest": "~/.claude/skills/aru-goal",
+      "copy": "."
+    },
+    "codex": {
+      "dest": "~/.agents/skills/aru-goal",
+      "copy": "."
+    },
+    "cursor": {
+      "dest": "~/.cursor/skills/aru-goal",
+      "copy": "."
+    },
+    "antigravity": {
+      "dest": "~/.gemini/antigravity-cli/skills/aru-goal",
+      "copy": "."
+    }
+  },
+  "relatedSkills": [
+    {
+      "name": "aru-goal-mission",
+      "relation": "complements",
+      "reason": "aru-goal-mission은 인터뷰로 goal 정제, aru-goal은 저장·훅 주입 — 먼저 aru-goal-mission 후 aru-goal."
+    },
+    {
+      "name": "instruction-improver",
+      "relation": "complements",
+      "reason": "aru-goal은 현재 목표를 AGENTS.md 블록에 주입, instruction-improver는 지침 전체 품질 점검 — 병행 사용."
+    }
+  ]
+}

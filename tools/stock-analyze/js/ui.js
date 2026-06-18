@@ -506,6 +506,58 @@ function renderPullbackSupportModalSection(context = {}) {
 
 window.renderPullbackSupportModalSection = renderPullbackSupportModalSection;
 
+function renderBuyGapSellScenariosPanel(entry) {
+  if (typeof RULE_GUIDE === 'undefined' || !RULE_GUIDE.gapGrades || !RULE_GUIDE.gapSellAdjustments) {
+    return '<div class="empty-state compact">설정 데이터가 존재하지 않습니다.</div>';
+  }
+
+  const grades = RULE_GUIDE.gapGrades;
+  const sellAdjustments = RULE_GUIDE.gapSellAdjustments;
+
+  const rowsHtml = grades.map(gradeRow => {
+    const adjRow = sellAdjustments.find(a => a.grade === gradeRow.grade) || {};
+    return `
+      <tr>
+        <td style="font-weight: bold; white-space: nowrap; padding: 8px;">
+          ${escapeHtml(gradeRow.color || '')} ${escapeHtml(gradeRow.grade || '')}<br>
+          <span style="font-size: 0.85em; font-weight: normal; color: var(--text-muted);">${escapeHtml(gradeRow.label || '')}</span>
+        </td>
+        <td style="font-size: 0.9em; padding: 8px;">
+          <strong>점수 조건:</strong> ${escapeHtml(gradeRow.score || '')}<br>
+          <span style="color: var(--text-info);">${escapeHtml(gradeRow.outlook || '')}</span>
+        </td>
+        <td style="font-size: 0.9em; padding: 8px;">${escapeHtml(adjRow.premarket || '—')}</td>
+        <td style="font-size: 0.9em; padding: 8px;">${escapeHtml(adjRow.stopLoss || '—')}</td>
+        <td style="font-size: 0.9em; font-weight: 500; padding: 8px;">${escapeHtml(adjRow.swing || '—')}</td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <div class="buy-detail-summary-panel" style="padding: 10px; overflow-x: auto;">
+      <div style="font-size: 0.9em; color: var(--text-muted); margin-bottom: 12px; line-height: 1.45;">
+        💡 <strong>익일 시가 갭(Gap)</strong>은 다음 날 아침 장 시작 시점의 시장 상태에 따라 실시간으로 결정됩니다. 그 등급에 맞춰 매도 정책(프리마켓 매도 전략, 손절폭 조절, 스윙 허용 가능 여부)이 아래 시나리오대로 자동 보정되어 적용됩니다.
+      </div>
+      <table class="trade-plan-table" style="width: 100%; border-collapse: collapse; min-width: 500px;">
+        <thead>
+          <tr style="background: var(--bg-surface-hover); border-bottom: 1px solid var(--border-color);">
+            <th style="text-align: left; padding: 8px;">등급</th>
+            <th style="text-align: left; padding: 8px;">갭 조건 / 시가 전망</th>
+            <th style="text-align: left; padding: 8px;">프리마켓 대응</th>
+            <th style="text-align: left; padding: 8px;">손절폭 보정</th>
+            <th style="text-align: left; padding: 8px;">스윙 전환</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+window.renderBuyGapSellScenariosPanel = renderBuyGapSellScenariosPanel;
+
 function renderPullbackCardInsights(entry) {
   if (entry?.strategy !== 'pullback' || !entry?.pullbackContext) return '';
   const context = entry.pullbackContext;
@@ -2425,6 +2477,11 @@ function openModal(codeOrEntryKey, mode = 'sell') {
               'buy-section-gate',
               'Gate 일치 여부',
               `<div class="modal-ind-list">${renderGateList(entry)}</div>`
+            )}
+            ${renderModalCollapsibleSection(
+              'buy-section-gap-scenarios',
+              '🔮 익일 시가 갭별 매도 시나리오 가이드',
+              renderBuyGapSellScenariosPanel(entry)
             )}
           </div>
 
