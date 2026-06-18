@@ -1,5 +1,5 @@
 {
-  "runId": "replay-20260615-170058-4c228b1a",
+  "runId": "replay-20260618-203055-ab1213d7",
   "date": "2026-06-12",
   "variant": "stable",
   "thresholdProfile": "current",
@@ -8,24 +8,24 @@
   "includedCount": 0,
   "tradeCount": 8,
   "winRate": 0.625,
-  "avgNetReturnPct": -0.1541,
-  "cumNetReturnPct": -3.2224,
+  "avgNetReturnPct": 0.9897,
+  "cumNetReturnPct": 5.6844,
   "maxDrawdownPct": 17.9116,
   "degradedCount": 8,
   "ambiguousCount": 0,
-  "unfilledRate": 0.3396,
+  "unfilledRate": 0.3929,
   "overall": {
     "candidateCount": 8,
     "eligibleCount": 0,
     "includedCount": 0,
     "tradeCount": 8,
     "winRate": 0.625,
-    "avgNetReturnPct": -0.1541,
-    "cumNetReturnPct": -3.2224,
+    "avgNetReturnPct": 0.9897,
+    "cumNetReturnPct": 5.6844,
     "maxDrawdownPct": 17.9116,
     "degradedCount": 8,
     "ambiguousCount": 0,
-    "unfilledRate": 0.3396
+    "unfilledRate": 0.3929
   },
   "comparisonByCase": {
     "all": {
@@ -36,12 +36,12 @@
       "includedCount": 0,
       "tradeCount": 8,
       "winRate": 0.625,
-      "avgNetReturnPct": -0.1541,
-      "cumNetReturnPct": -3.2224,
+      "avgNetReturnPct": 0.9897,
+      "cumNetReturnPct": 5.6844,
       "maxDrawdownPct": 17.9116,
       "degradedCount": 8,
       "ambiguousCount": 0,
-      "unfilledRate": 0.3396
+      "unfilledRate": 0.3929
     },
     "a7plus": {
       "caseKey": "a7plus",
@@ -51,12 +51,12 @@
       "includedCount": 0,
       "tradeCount": 3,
       "winRate": 0.6667,
-      "avgNetReturnPct": 0.0584,
-      "cumNetReturnPct": 0.038,
+      "avgNetReturnPct": 2.356,
+      "cumNetReturnPct": 6.9012,
       "maxDrawdownPct": 4.1758,
       "degradedCount": 3,
       "ambiguousCount": 0,
-      "unfilledRate": 0.4444
+      "unfilledRate": 0.5
     },
     "recommendation": {
       "caseKey": "recommendation",
@@ -81,12 +81,12 @@
       "includedCount": 0,
       "tradeCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.1755,
-      "cumNetReturnPct": 4.3974,
+      "avgNetReturnPct": 5.6219,
+      "cumNetReturnPct": 11.5598,
       "maxDrawdownPct": 0.0,
       "degradedCount": 2,
       "ambiguousCount": 0,
-      "unfilledRate": 0.5714,
+      "unfilledRate": 0.625,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -96,12 +96,12 @@
           "includedCount": 0,
           "tradeCount": 2,
           "winRate": 1.0,
-          "avgNetReturnPct": 2.1755,
-          "cumNetReturnPct": 4.3974,
+          "avgNetReturnPct": 5.6219,
+          "cumNetReturnPct": 11.5598,
           "maxDrawdownPct": 0.0,
           "degradedCount": 2,
           "ambiguousCount": 0,
-          "unfilledRate": 0.5714
+          "unfilledRate": 0.625
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -111,12 +111,12 @@
           "includedCount": 0,
           "tradeCount": 2,
           "winRate": 1.0,
-          "avgNetReturnPct": 2.1755,
-          "cumNetReturnPct": 4.3974,
+          "avgNetReturnPct": 5.6219,
+          "cumNetReturnPct": 11.5598,
           "maxDrawdownPct": 0.0,
           "degradedCount": 2,
           "ambiguousCount": 0,
-          "unfilledRate": 0.5714
+          "unfilledRate": 0.625
         },
         "recommendation": {
           "caseKey": "recommendation",
@@ -141,12 +141,12 @@
       "includedCount": 0,
       "tradeCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.47,
-      "cumNetReturnPct": 4.9873,
+      "avgNetReturnPct": 3.5988,
+      "cumNetReturnPct": 7.2889,
       "maxDrawdownPct": 0.0,
       "degradedCount": 2,
       "ambiguousCount": 0,
-      "unfilledRate": 0.6429,
+      "unfilledRate": 0.7333,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -156,12 +156,12 @@
           "includedCount": 0,
           "tradeCount": 2,
           "winRate": 1.0,
-          "avgNetReturnPct": 2.47,
-          "cumNetReturnPct": 4.9873,
+          "avgNetReturnPct": 3.5988,
+          "cumNetReturnPct": 7.2889,
           "maxDrawdownPct": 0.0,
           "degradedCount": 2,
           "ambiguousCount": 0,
-          "unfilledRate": 0.6429
+          "unfilledRate": 0.7333
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -319,25 +319,6 @@
   "byStock": [
     {
       "strategy": "pullback",
-      "code": "064350",
-      "name": "현대로템",
-      "grade": "A",
-      "replayGrade": "A",
-      "gradeScore": 7.8,
-      "tradeCount": 1,
-      "winRate": 1.0,
-      "avgNetReturnPct": 2.4949,
-      "cumNetReturnPct": 2.4949,
-      "lastReplayDate": "2026-06-12",
-      "lastEntryFilledAt": "2026-06-12T15:30:00+09:00",
-      "lastEntryFillPrice": 208708.5,
-      "lastExitFilledAt": "2026-06-15T15:00:00+09:00",
-      "lastExitAvgFillPrice": 214365.6,
-      "lastExitFillPrice": 213000.0,
-      "lastTradeStatus": "closed"
-    },
-    {
-      "strategy": "pullback",
       "code": "012450",
       "name": "한화에어로스페이스",
       "grade": "A",
@@ -345,14 +326,33 @@
       "gradeScore": 7.2,
       "tradeCount": 1,
       "winRate": 1.0,
-      "avgNetReturnPct": 1.8562,
-      "cumNetReturnPct": 1.8562,
+      "avgNetReturnPct": 5.6219,
+      "cumNetReturnPct": 5.6219,
       "lastReplayDate": "2026-06-12",
       "lastEntryFilledAt": "2026-06-12T15:30:00+09:00",
       "lastEntryFillPrice": 1079078.0,
-      "lastExitFilledAt": "2026-06-15T15:00:00+09:00",
-      "lastExitAvgFillPrice": 1101421.0,
-      "lastExitFillPrice": 1084000.0,
+      "lastExitFilledAt": "2026-06-16T15:00:00+09:00",
+      "lastExitAvgFillPrice": 1142141.0,
+      "lastExitFillPrice": 1185800.0,
+      "lastTradeStatus": "closed"
+    },
+    {
+      "strategy": "pullback",
+      "code": "064350",
+      "name": "현대로템",
+      "grade": "A",
+      "replayGrade": "A",
+      "gradeScore": 7.8,
+      "tradeCount": 1,
+      "winRate": 1.0,
+      "avgNetReturnPct": 5.6218,
+      "cumNetReturnPct": 5.6218,
+      "lastReplayDate": "2026-06-12",
+      "lastEntryFilledAt": "2026-06-12T15:30:00+09:00",
+      "lastEntryFillPrice": 208708.5,
+      "lastExitFilledAt": "2026-06-16T15:00:00+09:00",
+      "lastExitAvgFillPrice": 220905.6,
+      "lastExitFillPrice": 229350.0,
       "lastTradeStatus": "closed"
     },
     {
@@ -364,15 +364,15 @@
       "gradeScore": 5.4,
       "tradeCount": 1,
       "winRate": 1.0,
-      "avgNetReturnPct": 3.647,
-      "cumNetReturnPct": 3.647,
+      "avgNetReturnPct": 5.5558,
+      "cumNetReturnPct": 5.5558,
       "lastReplayDate": "2026-06-12",
       "lastEntryFilledAt": "2026-06-12T15:30:00+09:00",
       "lastEntryFillPrice": 322822.5,
-      "lastExitFilledAt": "2026-06-15T15:00:00+09:00",
-      "lastExitAvgFillPrice": 335300.0,
-      "lastExitFillPrice": 337000.0,
-      "lastTradeStatus": "closed"
+      "lastExitFilledAt": "2026-06-15T09:00:00+09:00",
+      "lastExitAvgFillPrice": 332142.8571,
+      "lastExitFillPrice": 339000.0,
+      "lastTradeStatus": "open"
     },
     {
       "strategy": "accumulation",
@@ -383,14 +383,14 @@
       "gradeScore": 5.8,
       "tradeCount": 1,
       "winRate": 1.0,
-      "avgNetReturnPct": 1.2931,
-      "cumNetReturnPct": 1.2931,
+      "avgNetReturnPct": 1.6419,
+      "cumNetReturnPct": 1.6419,
       "lastReplayDate": "2026-06-12",
       "lastEntryFilledAt": "2026-06-12T15:30:00+09:00",
       "lastEntryFillPrice": 28328.3,
       "lastExitFilledAt": "2026-06-15T15:00:00+09:00",
-      "lastExitAvgFillPrice": 28755.0,
-      "lastExitFillPrice": 28650.0,
+      "lastExitAvgFillPrice": 28854.0,
+      "lastExitFillPrice": 27310.0,
       "lastTradeStatus": "closed"
     },
     {
@@ -477,12 +477,12 @@
       "includedCount": 0,
       "tradeCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.1755,
-      "cumNetReturnPct": 4.3974,
+      "avgNetReturnPct": 5.6219,
+      "cumNetReturnPct": 11.5598,
       "maxDrawdownPct": 0.0,
       "degradedCount": 2,
       "ambiguousCount": 0,
-      "unfilledRate": 0.5714,
+      "unfilledRate": 0.625,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -492,12 +492,12 @@
           "includedCount": 0,
           "tradeCount": 2,
           "winRate": 1.0,
-          "avgNetReturnPct": 2.1755,
-          "cumNetReturnPct": 4.3974,
+          "avgNetReturnPct": 5.6219,
+          "cumNetReturnPct": 11.5598,
           "maxDrawdownPct": 0.0,
           "degradedCount": 2,
           "ambiguousCount": 0,
-          "unfilledRate": 0.5714
+          "unfilledRate": 0.625
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -507,12 +507,12 @@
           "includedCount": 0,
           "tradeCount": 2,
           "winRate": 1.0,
-          "avgNetReturnPct": 2.1755,
-          "cumNetReturnPct": 4.3974,
+          "avgNetReturnPct": 5.6219,
+          "cumNetReturnPct": 11.5598,
           "maxDrawdownPct": 0.0,
           "degradedCount": 2,
           "ambiguousCount": 0,
-          "unfilledRate": 0.5714
+          "unfilledRate": 0.625
         },
         "recommendation": {
           "caseKey": "recommendation",
@@ -537,12 +537,12 @@
       "includedCount": 0,
       "tradeCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.47,
-      "cumNetReturnPct": 4.9873,
+      "avgNetReturnPct": 3.5988,
+      "cumNetReturnPct": 7.2889,
       "maxDrawdownPct": 0.0,
       "degradedCount": 2,
       "ambiguousCount": 0,
-      "unfilledRate": 0.6429,
+      "unfilledRate": 0.7333,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -552,12 +552,12 @@
           "includedCount": 0,
           "tradeCount": 2,
           "winRate": 1.0,
-          "avgNetReturnPct": 2.47,
-          "cumNetReturnPct": 4.9873,
+          "avgNetReturnPct": 3.5988,
+          "cumNetReturnPct": 7.2889,
           "maxDrawdownPct": 0.0,
           "degradedCount": 2,
           "ambiguousCount": 0,
-          "unfilledRate": 0.6429
+          "unfilledRate": 0.7333
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -807,15 +807,15 @@
       "tradeCount": 2,
       "sampleCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.1755,
-      "cumNetReturnPct": 4.3974
+      "avgNetReturnPct": 5.6219,
+      "cumNetReturnPct": 11.5598
     },
     "accumulation|conservative": {
       "tradeCount": 2,
       "sampleCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.47,
-      "cumNetReturnPct": 4.9873
+      "avgNetReturnPct": 3.5988,
+      "cumNetReturnPct": 7.2889
     },
     "breakout|conservative": {
       "tradeCount": 3,
@@ -837,15 +837,15 @@
       "tradeCount": 2,
       "sampleCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.1755,
-      "cumNetReturnPct": 4.3974
+      "avgNetReturnPct": 5.6219,
+      "cumNetReturnPct": 11.5598
     },
     "accumulation|bull|strong|G-A|conservative": {
       "tradeCount": 2,
       "sampleCount": 2,
       "winRate": 1.0,
-      "avgNetReturnPct": 2.47,
-      "cumNetReturnPct": 4.9873
+      "avgNetReturnPct": 3.5988,
+      "cumNetReturnPct": 7.2889
     },
     "breakout|bull|strong|G-A|conservative": {
       "tradeCount": 3,
@@ -862,8 +862,8 @@
       "cumNetReturnPct": -4.1758
     }
   },
-  "orderCount": 61,
-  "fillCount": 27,
+  "orderCount": 64,
+  "fillCount": 29,
   "candidates": [
     {
       "strategy": "pullback",
@@ -1361,12 +1361,12 @@
       "gradeScore": 7.2,
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 1079078.0,
-      "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 1101421.0,
-      "exitLastFillPrice": 1084000.0,
+      "exitFilledAt": "2026-06-16T15:00:00+09:00",
+      "exitAvgFillPrice": 1142141.0,
+      "exitLastFillPrice": 1185800.0,
       "tradeStatus": "closed",
-      "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 1.8562,
+      "closedReason": "swing_touch",
+      "netReturnPct": 5.6219,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-pullback",
@@ -1389,7 +1389,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "pullback",
@@ -1400,12 +1401,12 @@
       "gradeScore": 7.8,
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 208708.5,
-      "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 214365.6,
-      "exitLastFillPrice": 213000.0,
+      "exitFilledAt": "2026-06-16T15:00:00+09:00",
+      "exitAvgFillPrice": 220905.6,
+      "exitLastFillPrice": 229350.0,
       "tradeStatus": "closed",
-      "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 2.4949,
+      "closedReason": "swing_touch",
+      "netReturnPct": 5.6218,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-pullback",
@@ -1428,7 +1429,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "accumulation",
@@ -1439,12 +1441,12 @@
       "gradeScore": 5.4,
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 322822.5,
-      "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 335300.0,
-      "exitLastFillPrice": 337000.0,
-      "tradeStatus": "closed",
-      "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 3.647,
+      "exitFilledAt": "2026-06-15T09:00:00+09:00",
+      "exitAvgFillPrice": 332142.8571,
+      "exitLastFillPrice": 339000.0,
+      "tradeStatus": "open",
+      "closedReason": "swing_hold",
+      "netReturnPct": 5.5558,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-accumulation",
@@ -1467,7 +1469,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 65.0
     },
     {
       "strategy": "accumulation",
@@ -1479,11 +1482,11 @@
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 28328.3,
       "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 28755.0,
-      "exitLastFillPrice": 28650.0,
+      "exitAvgFillPrice": 28854.0,
+      "exitLastFillPrice": 27310.0,
       "tradeStatus": "closed",
-      "closedReason": "third_day_cutoff_market",
-      "netReturnPct": 1.2931,
+      "closedReason": "stop_touch",
+      "netReturnPct": 1.6419,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-accumulation",
@@ -1506,7 +1509,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "breakout",
@@ -1545,7 +1549,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "breakout",
@@ -1584,7 +1589,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "breakout",
@@ -1623,7 +1629,8 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "reversal",
@@ -1662,12 +1669,13 @@
           "active": false
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-      }
+      },
+      "remainingQuantityPct": 0.0
     }
   ],
   "results": [
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "pullback",
@@ -1677,15 +1685,15 @@
       "entryMode": "close",
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 208708.5,
-      "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 214365.6,
-      "exitLastFillPrice": 213000.0,
-      "netReturnPct": 2.4949,
+      "exitFilledAt": "2026-06-16T15:00:00+09:00",
+      "exitAvgFillPrice": 220905.6,
+      "exitLastFillPrice": 229350.0,
+      "netReturnPct": 5.6218,
       "tradeStatus": "closed",
       "ambiguousCount": 0,
       "remainingQuantityPct": 0.0,
-      "closedReason": "third_day_cutoff_market",
-      "exitFillCount": 3,
+      "closedReason": "swing_touch",
+      "exitFillCount": 4,
       "filledExitQuantityPct": 100.0,
       "regimeBucket": "bull",
       "vkospiTier": "strong",
@@ -1697,7 +1705,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "resolved",
@@ -1741,10 +1749,20 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-06-16T15:00:00+09:00",
+          "quantityPct": 35.0,
+          "price": 229350.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "swing_touch"
+        }
+      ]
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "pullback",
@@ -1754,15 +1772,15 @@
       "entryMode": "close",
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 1079078.0,
-      "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 1101421.0,
-      "exitLastFillPrice": 1084000.0,
-      "netReturnPct": 1.8562,
+      "exitFilledAt": "2026-06-16T15:00:00+09:00",
+      "exitAvgFillPrice": 1142141.0,
+      "exitLastFillPrice": 1185800.0,
+      "netReturnPct": 5.6219,
       "tradeStatus": "closed",
       "ambiguousCount": 0,
       "remainingQuantityPct": 0.0,
-      "closedReason": "third_day_cutoff_market",
-      "exitFillCount": 3,
+      "closedReason": "swing_touch",
+      "exitFillCount": 4,
       "filledExitQuantityPct": 100.0,
       "regimeBucket": "bull",
       "vkospiTier": "strong",
@@ -1774,7 +1792,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "resolved",
@@ -1818,10 +1836,20 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-06-16T15:00:00+09:00",
+          "quantityPct": 35.0,
+          "price": 1185800.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "swing_touch"
+        }
+      ]
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "accumulation",
@@ -1831,16 +1859,16 @@
       "entryMode": "close",
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 322822.5,
-      "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 335300.0,
-      "exitLastFillPrice": 337000.0,
-      "netReturnPct": 3.647,
-      "tradeStatus": "closed",
+      "exitFilledAt": "2026-06-15T09:00:00+09:00",
+      "exitAvgFillPrice": 332142.8571,
+      "exitLastFillPrice": 339000.0,
+      "netReturnPct": 5.5558,
+      "tradeStatus": "open",
       "ambiguousCount": 0,
-      "remainingQuantityPct": 0.0,
-      "closedReason": "third_day_cutoff_market",
-      "exitFillCount": 3,
-      "filledExitQuantityPct": 100.0,
+      "remainingQuantityPct": 65.0,
+      "closedReason": "swing_hold",
+      "exitFillCount": 2,
+      "filledExitQuantityPct": 35.0,
       "regimeBucket": "bull",
       "vkospiTier": "strong",
       "gapGrade": "G-A",
@@ -1851,7 +1879,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "resolved",
@@ -1898,7 +1926,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "accumulation",
@@ -1909,14 +1937,14 @@
       "entryFilledAt": "2026-06-12T15:30:00+09:00",
       "entryFillPrice": 28328.3,
       "exitFilledAt": "2026-06-15T15:00:00+09:00",
-      "exitAvgFillPrice": 28755.0,
-      "exitLastFillPrice": 28650.0,
-      "netReturnPct": 1.2931,
+      "exitAvgFillPrice": 28854.0,
+      "exitLastFillPrice": 27310.0,
+      "netReturnPct": 1.6419,
       "tradeStatus": "closed",
       "ambiguousCount": 0,
       "remainingQuantityPct": 0.0,
-      "closedReason": "third_day_cutoff_market",
-      "exitFillCount": 2,
+      "closedReason": "stop_touch",
+      "exitFillCount": 3,
       "filledExitQuantityPct": 100.0,
       "regimeBucket": "bull",
       "vkospiTier": "strong",
@@ -1928,7 +1956,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "stop_first_ambiguous",
@@ -1972,10 +2000,20 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-06-15T15:00:00+09:00",
+          "quantityPct": 60.0,
+          "price": 27310.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "stop_touch"
+        }
+      ]
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "breakout",
@@ -2005,7 +2043,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "stop_first_ambiguous",
@@ -2052,7 +2090,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "breakout",
@@ -2082,7 +2120,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "resolved",
@@ -2129,7 +2167,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "breakout",
@@ -2159,7 +2197,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "resolved",
@@ -2206,7 +2244,7 @@
       "pointInTimeStatus": "confirmed"
     },
     {
-      "runId": "replay-20260615-170058-4c228b1a",
+      "runId": "replay-20260618-203055-ab1213d7",
       "date": "2026-06-12",
       "variant": "stable",
       "strategy": "reversal",
@@ -2236,7 +2274,7 @@
         "sources": [
           "daily_ohlc_fallback"
         ],
-        "reason": "synthetic one-day replay derived from daily OHLC"
+        "reason": "synthetic multi-session replay derived from daily OHLC"
       },
       "nextTradingDate": "20260615",
       "proxyOutcomeStatus": "resolved",
@@ -2348,25 +2386,25 @@
       "fillRule": "openPhase_touch"
     },
     {
-      "orderId": "20260612|stable|pullback|064350-finalCutoff",
+      "orderId": "20260612|stable|pullback|064350-swing",
       "sourceEntryKey": "20260612|stable|pullback|064350",
       "strategy": "pullback",
       "code": "064350",
       "name": "현대로템",
       "side": "SELL",
-      "stageKey": "finalCutoff",
-      "reason": "3일차 종가 컷오프 청산",
+      "stageKey": "swing",
+      "reason": "📊 스윙 전환",
       "fillStatus": "filled",
-      "filledAt": "2026-06-15T15:00:00+09:00",
-      "fillPrice": 213000.0,
-      "filledQuantityPct": 40.0,
+      "filledAt": "2026-06-16T15:00:00+09:00",
+      "fillPrice": 229350.0,
+      "filledQuantityPct": 5.0,
       "slippagePct": 0.0,
-      "barTimestamp": "2026-06-15T15:00:00+09:00",
-      "barOpen": 211000.0,
-      "barHigh": 218000.0,
-      "barLow": 203000.0,
-      "barClose": 213000.0,
-      "fillRule": "third_day_cutoff_market"
+      "barTimestamp": "2026-06-16T15:00:00+09:00",
+      "barOpen": 221000.0,
+      "barHigh": 240000.0,
+      "barLow": 218500.0,
+      "barClose": 226500.0,
+      "fillRule": "swing_touch"
     },
     {
       "orderId": "20260612|stable|pullback|012450-entry",
@@ -2432,25 +2470,25 @@
       "fillRule": "openPhase_touch"
     },
     {
-      "orderId": "20260612|stable|pullback|012450-finalCutoff",
+      "orderId": "20260612|stable|pullback|012450-swing",
       "sourceEntryKey": "20260612|stable|pullback|012450",
       "strategy": "pullback",
       "code": "012450",
       "name": "한화에어로스페이스",
       "side": "SELL",
-      "stageKey": "finalCutoff",
-      "reason": "3일차 종가 컷오프 청산",
+      "stageKey": "swing",
+      "reason": "📊 스윙 전환",
       "fillStatus": "filled",
-      "filledAt": "2026-06-15T15:00:00+09:00",
-      "fillPrice": 1084000.0,
-      "filledQuantityPct": 40.0,
+      "filledAt": "2026-06-16T15:00:00+09:00",
+      "fillPrice": 1185800.0,
+      "filledQuantityPct": 5.0,
       "slippagePct": 0.0,
-      "barTimestamp": "2026-06-15T15:00:00+09:00",
-      "barOpen": 1123000.0,
-      "barHigh": 1123000.0,
-      "barLow": 1066000.0,
-      "barClose": 1084000.0,
-      "fillRule": "third_day_cutoff_market"
+      "barTimestamp": "2026-06-16T15:00:00+09:00",
+      "barOpen": 1147000.0,
+      "barHigh": 1212000.0,
+      "barLow": 1125000.0,
+      "barClose": 1183000.0,
+      "fillRule": "swing_touch"
     },
     {
       "orderId": "20260612|stable|accumulation|005930-entry",
@@ -2516,27 +2554,6 @@
       "fillRule": "openPhase_touch"
     },
     {
-      "orderId": "20260612|stable|accumulation|005930-finalCutoff",
-      "sourceEntryKey": "20260612|stable|accumulation|005930",
-      "strategy": "accumulation",
-      "code": "005930",
-      "name": "삼성전자",
-      "side": "SELL",
-      "stageKey": "finalCutoff",
-      "reason": "3일차 종가 컷오프 청산",
-      "fillStatus": "filled",
-      "filledAt": "2026-06-15T15:00:00+09:00",
-      "fillPrice": 337000.0,
-      "filledQuantityPct": 65.0,
-      "slippagePct": 0.0,
-      "barTimestamp": "2026-06-15T15:00:00+09:00",
-      "barOpen": 342500.0,
-      "barHigh": 344500.0,
-      "barLow": 334000.0,
-      "barClose": 337000.0,
-      "fillRule": "third_day_cutoff_market"
-    },
-    {
       "orderId": "20260612|stable|accumulation|085620-entry",
       "sourceEntryKey": "20260612|stable|accumulation|085620",
       "strategy": "accumulation",
@@ -2579,25 +2596,25 @@
       "fillRule": "premarket_touch"
     },
     {
-      "orderId": "20260612|stable|accumulation|085620-finalCutoff",
+      "orderId": "20260612|stable|accumulation|085620-swing",
       "sourceEntryKey": "20260612|stable|accumulation|085620",
       "strategy": "accumulation",
       "code": "085620",
       "name": "미래에셋생명",
       "side": "SELL",
-      "stageKey": "finalCutoff",
-      "reason": "3일차 종가 컷오프 청산",
+      "stageKey": "swing",
+      "reason": "추세 홀딩",
       "fillStatus": "filled",
-      "filledAt": "2026-06-15T15:00:00+09:00",
-      "fillPrice": 28650.0,
-      "filledQuantityPct": 85.0,
+      "filledAt": "2026-06-16T15:00:00+09:00",
+      "fillPrice": 32262.0,
+      "filledQuantityPct": 25.0,
       "slippagePct": 0.0,
-      "barTimestamp": "2026-06-15T15:00:00+09:00",
-      "barOpen": 28200.0,
-      "barHigh": 29500.0,
-      "barLow": 26800.0,
-      "barClose": 28650.0,
-      "fillRule": "third_day_cutoff_market"
+      "barTimestamp": "2026-06-16T15:00:00+09:00",
+      "barOpen": 28000.0,
+      "barHigh": 35150.0,
+      "barLow": 27300.0,
+      "barClose": 32250.0,
+      "fillRule": "swing_touch"
     },
     {
       "orderId": "20260612|stable|breakout|403870-entry",
@@ -2850,6 +2867,69 @@
       "barLow": 343000.0,
       "barClose": 347000.0,
       "fillRule": "stop_close"
+    },
+    {
+      "orderId": "20260612|stable|accumulation|085620-stop_touch",
+      "sourceEntryKey": "20260612|stable|accumulation|085620",
+      "strategy": "accumulation",
+      "code": "085620",
+      "name": "미래에셋생명",
+      "side": "SELL",
+      "stageKey": "stop",
+      "reason": "스윙 손절가 이탈",
+      "fillStatus": "filled",
+      "filledAt": "2026-06-15T15:00:00+09:00",
+      "fillPrice": 27310.0,
+      "filledQuantityPct": 60.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-06-15T15:00:00+09:00",
+      "barOpen": 28200.0,
+      "barHigh": 29500.0,
+      "barLow": 26800.0,
+      "barClose": 28650.0,
+      "fillRule": "stop_touch"
+    },
+    {
+      "orderId": "20260612|stable|pullback|064350-swing_touch",
+      "sourceEntryKey": "20260612|stable|pullback|064350",
+      "strategy": "pullback",
+      "code": "064350",
+      "name": "현대로템",
+      "side": "SELL",
+      "stageKey": "swing",
+      "reason": "스윙 목표가 도달",
+      "fillStatus": "filled",
+      "filledAt": "2026-06-16T15:00:00+09:00",
+      "fillPrice": 229350.0,
+      "filledQuantityPct": 35.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-06-16T15:00:00+09:00",
+      "barOpen": 221000.0,
+      "barHigh": 240000.0,
+      "barLow": 218500.0,
+      "barClose": 226500.0,
+      "fillRule": "swing_touch"
+    },
+    {
+      "orderId": "20260612|stable|pullback|012450-swing_touch",
+      "sourceEntryKey": "20260612|stable|pullback|012450",
+      "strategy": "pullback",
+      "code": "012450",
+      "name": "한화에어로스페이스",
+      "side": "SELL",
+      "stageKey": "swing",
+      "reason": "스윙 목표가 도달",
+      "fillStatus": "filled",
+      "filledAt": "2026-06-16T15:00:00+09:00",
+      "fillPrice": 1185800.0,
+      "filledQuantityPct": 35.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-06-16T15:00:00+09:00",
+      "barOpen": 1147000.0,
+      "barHigh": 1212000.0,
+      "barLow": 1125000.0,
+      "barClose": 1183000.0,
+      "fillRule": "swing_touch"
     }
   ]
 }

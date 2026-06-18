@@ -336,27 +336,6 @@
     "fillRule": "premarket_touch"
   },
   {
-    "orderId": "20260609|stable|accumulation|105560-finalCutoff",
-    "sourceEntryKey": "20260609|stable|accumulation|105560",
-    "strategy": "accumulation",
-    "code": "105560",
-    "name": "KB금융",
-    "side": "SELL",
-    "stageKey": "finalCutoff",
-    "reason": "3일차 종가 컷오프 청산",
-    "fillStatus": "filled",
-    "filledAt": "2026-06-11T15:00:00+09:00",
-    "fillPrice": 151500.0,
-    "filledQuantityPct": 80.0,
-    "slippagePct": 0.0,
-    "barTimestamp": "2026-06-11T15:00:00+09:00",
-    "barOpen": 153800.0,
-    "barHigh": 153800.0,
-    "barLow": 147400.0,
-    "barClose": 151500.0,
-    "fillRule": "third_day_cutoff_market"
-  },
-  {
     "orderId": "20260609|stable|breakout|035420-entry",
     "sourceEntryKey": "20260609|stable|breakout|035420",
     "strategy": "breakout",
@@ -628,5 +607,26 @@
     "barLow": 1139000.0,
     "barClose": 1210000.0,
     "fillRule": "time_stop_0915_market"
+  },
+  {
+    "orderId": "20260609|stable|accumulation|105560-stop_touch",
+    "sourceEntryKey": "20260609|stable|accumulation|105560",
+    "strategy": "accumulation",
+    "code": "105560",
+    "name": "KB금융",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-10T15:00:00+09:00",
+    "fillPrice": 150156.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-10T15:00:00+09:00",
+    "barOpen": 152800.0,
+    "barHigh": 156800.0,
+    "barLow": 149300.0,
+    "barClose": 154000.0,
+    "fillRule": "stop_touch"
   }
 ]

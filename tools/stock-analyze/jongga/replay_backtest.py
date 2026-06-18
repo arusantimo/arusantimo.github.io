@@ -592,6 +592,7 @@ def summarize_trade_rows(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "closedReason": item.get("closedReason"),
             "netReturnPct": item.get("netReturnPct"),
             "mixedExitPolicy": item.get("mixedExitPolicy"),
+            "remainingQuantityPct": item.get("remainingQuantityPct"),
         })
     return rows
 
@@ -938,6 +939,247 @@ def write_replay_bridge(
     return payload
 
 
+def _update_past_trade_result(
+    replay_dir: Path,
+    run_days: list[dict[str, Any]],
+    all_results: list[dict[str, Any]],
+    all_orders: list[dict[str, Any]],
+    source_entry_key: str,
+    entry_date_str: str,
+    exit_time: str | None,
+    exit_price: float,
+    qty_pct: float,
+    closed_reason: str,
+    variant: str,
+    strategy: str,
+    code: str,
+    name: str,
+    pos_run_id: str,
+    day_bar: dict[str, Any]
+):
+    from jongga.sim_broker import net_return_pct
+    from datetime import date
+    from jongga.output_contract import compact_date
+
+    entry_date_obj = date.fromisoformat(entry_date_str)
+    compact_entry = compact_date(entry_date_obj)
+
+    # 1. 과거 날짜가 run_days에 존재하는지 찾습니다.
+    target_day_data = None
+    for rd in run_days:
+        if rd["date"] == entry_date_str:
+            target_day_data = rd
+            break
+
+    # 만약 메모리에 없다면 로컬 파일에서 직접 로드
+    if target_day_data is None:
+        summary_path = replay_dir / f"replay_summary_{compact_entry}.json"
+        orders_path = replay_dir / f"sim_orders_{compact_entry}.json"
+        fills_path = replay_dir / f"sim_fills_{compact_entry}.json"
+
+        if summary_path.exists():
+            try:
+                summary_data = json.loads(summary_path.read_text(encoding="utf-8"))
+                past_results = summary_data.get("results") or summary_data.get("trades") or []
+            except Exception:
+                past_results = []
+        else:
+            past_results = []
+
+        if orders_path.exists():
+            try:
+                past_orders = json.loads(orders_path.read_text(encoding="utf-8"))
+            except Exception:
+                past_orders = []
+        else:
+            past_orders = []
+
+        if fills_path.exists():
+            try:
+                past_fills = json.loads(fills_path.read_text(encoding="utf-8"))
+            except Exception:
+                past_fills = []
+        else:
+            past_fills = []
+    else:
+        past_results = target_day_data.get("results") or []
+        past_orders = target_day_data.get("orders") or []
+        past_fills = target_day_data.get("fills") or []
+
+    # 2. 결과 리스트에서 대상 종목 찾기
+    result_obj = None
+    for r in past_results:
+        if r.get("sourceEntryKey") == source_entry_key:
+            result_obj = r
+            break
+
+    # all_results 에서도 참조가 동일하도록 확인
+    if result_obj is None:
+        for r in all_results:
+            if r.get("sourceEntryKey") == source_entry_key:
+                result_obj = r
+                break
+
+    if result_obj is None:
+        return
+
+    # entry_fill 찾기
+    entry_fill = None
+    for f in past_fills:
+        if f.get("sourceEntryKey") == source_entry_key and f.get("side") == "BUY":
+            entry_fill = f
+            break
+
+    if not entry_fill:
+        return
+
+    # 3. 상태 변경 적용
+    if closed_reason in {"swing_touch", "stop_touch"}:
+        new_fill = {
+            "orderId": f"{source_entry_key}-{closed_reason}",
+            "sourceEntryKey": source_entry_key,
+            "strategy": strategy,
+            "code": code,
+            "name": name,
+            "side": "SELL",
+            "stageKey": "swing" if closed_reason == "swing_touch" else "stop",
+            "reason": "스윙 목표가 도달" if closed_reason == "swing_touch" else "스윙 손절가 이탈",
+            "fillStatus": "filled",
+            "filledAt": exit_time,
+            "fillPrice": round(exit_price, 4),
+            "filledQuantityPct": round(qty_pct, 4),
+            "slippagePct": 0.0,
+            "barTimestamp": exit_time,
+            "barOpen": round(float(day_bar.get("openPrice") or exit_price), 4),
+            "barHigh": round(float(day_bar.get("highPrice") or exit_price), 4),
+            "barLow": round(float(day_bar.get("lowPrice") or exit_price), 4),
+            "barClose": round(float(day_bar.get("closePrice") or exit_price), 4),
+            "fillRule": closed_reason,
+        }
+
+        new_order = {
+            "orderId": f"{source_entry_key}-{closed_reason}",
+            "runId": pos_run_id,
+            "date": entry_date_str,
+            "variant": variant,
+            "strategy": strategy,
+            "code": code,
+            "name": name,
+            "side": "SELL",
+            "orderType": "LIMIT" if closed_reason == "swing_touch" else "STOP",
+            "requestedAt": exit_time,
+            "requestedPrice": round(exit_price, 4),
+            "quantityPct": round(qty_pct, 4),
+            "reason": "스윙 목표가 도달" if closed_reason == "swing_touch" else "스윙 손절가 이탈",
+            "sourceEntryKey": source_entry_key,
+            "stageKey": "swing" if closed_reason == "swing_touch" else "stop",
+            "finalStatus": "filled",
+            "activeFrom": exit_time,
+            "activeUntil": exit_time,
+        }
+
+        past_fills.append(new_fill)
+        past_orders.append(new_order)
+
+        if target_day_data is not None:
+            all_orders.append(new_order)
+
+        # 평균 매도가 및 수익률 갱신
+        sell_fills = [f for f in past_fills if f.get("side") == "SELL" and f.get("sourceEntryKey") == source_entry_key]
+        exit_weighted_notional = sum(float(f["fillPrice"]) * float(f["filledQuantityPct"]) / 100.0 for f in sell_fills)
+        exit_weighted_qty = sum(float(f["filledQuantityPct"]) / 100.0 for f in sell_fills)
+        exit_avg_fill_price = round(exit_weighted_notional / exit_weighted_qty, 4) if exit_weighted_qty > 0 else exit_price
+        
+        result_obj["exitFilledAt"] = exit_time
+        result_obj["exitAvgFillPrice"] = exit_avg_fill_price
+        result_obj["exitLastFillPrice"] = round(exit_price, 4)
+        result_obj["tradeStatus"] = "closed"
+        result_obj["closedReason"] = closed_reason
+        result_obj["remainingQuantityPct"] = 0.0
+        result_obj["filledExitQuantityPct"] = round(exit_weighted_qty * 100.0, 4)
+        result_obj["exitFillCount"] = len(sell_fills)
+        result_obj["netReturnPct"] = round(net_return_pct(entry_fill, sell_fills), 4)
+
+        if "positionEvents" not in result_obj:
+            result_obj["positionEvents"] = []
+        result_obj["positionEvents"].append({
+            "eventType": "exit",
+            "timestamp": exit_time,
+            "quantityPct": qty_pct,
+            "price": exit_price,
+            "remainingQuantityPct": 0.0,
+            "fillRule": closed_reason,
+        })
+    else:
+        # swing_hold (대기) 상태인 경우 평가수익률만 업데이트
+        sell_fills = [f for f in past_fills if f.get("side") == "SELL" and f.get("sourceEntryKey") == source_entry_key]
+        eval_fills = list(sell_fills)
+        eval_fills.append({
+            "filledQuantityPct": qty_pct,
+            "fillPrice": exit_price,
+        })
+        result_obj["netReturnPct"] = round(net_return_pct(entry_fill, eval_fills), 4)
+        result_obj["tradeStatus"] = "open"
+        result_obj["closedReason"] = "swing_hold"
+        result_obj["remainingQuantityPct"] = qty_pct
+
+    # 파일 및 요약정보 갱신
+    summary_path = replay_dir / f"replay_summary_{compact_entry}.json"
+    orders_path = replay_dir / f"sim_orders_{compact_entry}.json"
+    fills_path = replay_dir / f"sim_fills_{compact_entry}.json"
+
+    candidates = []
+    if summary_path.exists():
+        try:
+            summary_data = json.loads(summary_path.read_text(encoding="utf-8"))
+            candidates = summary_data.get("candidates") or []
+        except Exception:
+            pass
+
+    daily_summary = build_daily_summary(
+        run_id=pos_run_id,
+        date_str=entry_date_str,
+        variant=variant,
+        threshold_profile="current",
+        candidates=candidates,
+        results=past_results,
+        orders=past_orders,
+        fills=past_fills
+    )
+
+    summary_path.write_text(json.dumps(daily_summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    orders_path.write_text(json.dumps(past_orders, ensure_ascii=False, indent=2), encoding="utf-8")
+    fills_path.write_text(json.dumps(past_fills, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    if target_day_data is not None:
+        target_day_data["trades"] = daily_summary["trades"]
+        target_day_data["results"] = past_results
+        target_day_data["orders"] = past_orders
+        target_day_data["fills"] = past_fills
+        target_day_data["tradeCount"] = daily_summary["tradeCount"]
+
+    # replay_runs.json 도 있으면 덮어쓰기
+    runs_path = replay_dir / "replay_runs.json"
+    if runs_path.exists():
+        try:
+            runs_data = json.loads(runs_path.read_text(encoding="utf-8"))
+            runs_list = runs_data if isinstance(runs_data, list) else runs_data.get("runHistory", [])
+            for run_rec in runs_list:
+                run_rec_days = run_rec.get("days") or []
+                for rd in run_rec_days:
+                    if rd.get("date") == entry_date_str:
+                        rd_results = rd.get("results") or []
+                        for r in rd_results:
+                            if r.get("sourceEntryKey") == source_entry_key:
+                                for k, v in result_obj.items():
+                                    r[k] = v
+                        from jongga.replay_backtest import summarize_trade_rows
+                        rd["trades"] = summarize_trade_rows(rd_results)
+            runs_path.write_text(json.dumps(runs_list, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception:
+            pass
+
+
 def run_replay(
     *,
     date_from: date,
@@ -964,6 +1206,15 @@ def run_replay(
     recommendation_key_set = set(recommendation_keys or set())
     target_days = normalize_analysis_dates(analysis_dates) or list(iter_dates(date_from, date_to))
 
+    swing_pos_path = replay_dir / "swing_positions.json"
+    if replace_existing_runs or not swing_pos_path.exists():
+        active_swing_positions = []
+    else:
+        try:
+            active_swing_positions = json.loads(swing_pos_path.read_text(encoding="utf-8"))
+        except Exception:
+            active_swing_positions = []
+
     for day in target_days:
         date_str = day.isoformat()
         payload = load_daily_payload(out_root, date_str, variant)
@@ -975,6 +1226,100 @@ def run_replay(
         day_point_in_time_status = POINT_IN_TIME_STATUS_LEGACY_UNKNOWN
         day_point_in_time = False
         day_skipped_reason = ""
+
+        # 1. 기존 이월 스윙 포지션들에 대해 당일 장중 가격으로 청산 여부 판단
+        updated_active_positions = []
+        for pos in active_swing_positions:
+            entry_date_str = pos.get("entryDate")
+            if not entry_date_str or entry_date_str >= date_str:
+                updated_active_positions.append(pos)
+                continue
+
+            code = pos["code"]
+            strategy = pos["strategy"]
+            source_entry_key = pos["sourceEntryKey"]
+            entry_price = float(pos["entryPrice"])
+            swing_target_price = float(pos["swingTargetPrice"])
+            stop_price = float(pos["stopPrice"])
+            qty_pct = float(pos.get("qtyPct") or 0.0)
+            run_id_pos = pos.get("runId")
+
+            if code not in history_cache:
+                history_cache[code] = fetch_naver_price_history(code, count=40)
+
+            day_bar = None
+            for row in history_cache[code]:
+                if str(row.get("localTradedAt") or "").strip() == compact:
+                    day_bar = row
+                    break
+
+            if not day_bar:
+                updated_active_positions.append(pos)
+                continue
+
+            high = float(day_bar.get("highPrice") or 0.0)
+            low = float(day_bar.get("lowPrice") or 0.0)
+            close = float(day_bar.get("closePrice") or 0.0)
+
+            is_stop_touched = (low <= stop_price)
+            is_target_touched = (high >= swing_target_price)
+
+            closed_reason = None
+            exit_price = None
+
+            if is_stop_touched and is_target_touched:
+                closed_reason = "stop_touch"
+                exit_price = stop_price
+            elif is_stop_touched:
+                closed_reason = "stop_touch"
+                exit_price = stop_price
+            elif is_target_touched:
+                closed_reason = "swing_touch"
+                exit_price = swing_target_price
+
+            exit_time = f"{date_str}T15:00:00+09:00"
+
+            if closed_reason:
+                _update_past_trade_result(
+                    replay_dir=replay_dir,
+                    run_days=run_days,
+                    all_results=all_results,
+                    all_orders=all_orders,
+                    source_entry_key=source_entry_key,
+                    entry_date_str=entry_date_str,
+                    exit_time=exit_time,
+                    exit_price=exit_price,
+                    qty_pct=qty_pct,
+                    closed_reason=closed_reason,
+                    variant=variant,
+                    strategy=strategy,
+                    code=code,
+                    name=pos["name"],
+                    pos_run_id=run_id_pos,
+                    day_bar=day_bar
+                )
+            else:
+                _update_past_trade_result(
+                    replay_dir=replay_dir,
+                    run_days=run_days,
+                    all_results=all_results,
+                    all_orders=all_orders,
+                    source_entry_key=source_entry_key,
+                    entry_date_str=entry_date_str,
+                    exit_time=None,
+                    exit_price=close,
+                    qty_pct=qty_pct,
+                    closed_reason="swing_hold",
+                    variant=variant,
+                    strategy=strategy,
+                    code=code,
+                    name=pos["name"],
+                    pos_run_id=run_id_pos,
+                    day_bar=day_bar
+                )
+                updated_active_positions.append(pos)
+
+        active_swing_positions = updated_active_positions
 
         if payload is not None:
             day_point_in_time_status = infer_payload_point_in_time_status(payload)
@@ -1085,6 +1430,45 @@ def run_replay(
                     daily_fills.extend(simulation["fills"])
                     daily_results.append(result)
 
+                    # 신규 스윙 포지션 대기 판정 및 추가
+                    if result.get("tradeStatus") == "open" and float(result.get("remainingQuantityPct") or 0.0) > 0.0:
+                        from jongga.sim_broker import parse_trade_plan_rows
+                        plan = parse_trade_plan_rows(entry.get("tradePlanRows") or [])
+                        swing_target_price = 0.0
+                        for tp in plan["targets"]:
+                            if tp["stageKey"] == "swing" or "스윙" in tp.get("stage", ""):
+                                swing_target_price = float(tp["targetPrice"] or 0.0)
+                                break
+                        
+                        if swing_target_price <= 0.0:
+                            mixed_policy = result.get("mixedExitPolicy") or {}
+                            stages = mixed_policy.get("takeProfitStages") or []
+                            if stages:
+                                target_pct = max(float(st.get("targetPct") or 0.0) for st in stages)
+                                swing_target_price = result["entryFillPrice"] * (1.0 + target_pct / 100.0)
+                            else:
+                                swing_target_price = result["entryFillPrice"] * 1.05
+
+                        stop_price = float(plan["stop"]["targetPrice"] or 0.0)
+                        if stop_price <= 0.0:
+                            stop_pct = -2.0
+                            if result.get("mixedExitPolicy") and result["mixedExitPolicy"].get("stopPct"):
+                                stop_pct = float(result["mixedExitPolicy"]["stopPct"])
+                            stop_price = result["entryFillPrice"] * (1.0 + stop_pct / 100.0)
+
+                        active_swing_positions.append({
+                            "runId": run_id,
+                            "entryDate": date_str,
+                            "code": code,
+                            "name": result["name"],
+                            "strategy": strategy,
+                            "entryPrice": float(result["entryFillPrice"]),
+                            "swingTargetPrice": round(swing_target_price, 4),
+                            "stopPrice": round(stop_price, 4),
+                            "qtyPct": float(result["remainingQuantityPct"]),
+                            "sourceEntryKey": source_entry_key
+                        })
+
         daily_summary = build_daily_summary(
             run_id=run_id,
             date_str=date_str,
@@ -1122,6 +1506,9 @@ def run_replay(
             "orders": daily_orders,
             "fills": daily_fills,
         })
+
+    # active_swing_positions 파일 최종 저장
+    _write_json(replay_dir / "swing_positions.json", active_swing_positions)
 
     runs_path = replay_dir / "replay_runs.json"
     existing_raw = [] if replace_existing_runs else _read_json_value(runs_path)

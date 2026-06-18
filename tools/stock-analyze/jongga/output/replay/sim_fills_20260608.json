@@ -336,27 +336,6 @@
     "fillRule": "intraday2_touch"
   },
   {
-    "orderId": "20260608|stable|accumulation|005930-finalCutoff",
-    "sourceEntryKey": "20260608|stable|accumulation|005930",
-    "strategy": "accumulation",
-    "code": "005930",
-    "name": "삼성전자",
-    "side": "SELL",
-    "stageKey": "finalCutoff",
-    "reason": "3일차 종가 컷오프 청산",
-    "fillStatus": "filled",
-    "filledAt": "2026-06-10T15:00:00+09:00",
-    "fillPrice": 302500.0,
-    "filledQuantityPct": 15.0,
-    "slippagePct": 0.0,
-    "barTimestamp": "2026-06-10T15:00:00+09:00",
-    "barOpen": 311000.0,
-    "barHigh": 314500.0,
-    "barLow": 295250.0,
-    "barClose": 302500.0,
-    "fillRule": "third_day_cutoff_market"
-  },
-  {
     "orderId": "20260608|stable|accumulation|373220-entry",
     "sourceEntryKey": "20260608|stable|accumulation|373220",
     "strategy": "accumulation",
@@ -922,5 +901,26 @@
     "barLow": 228000.0,
     "barClose": 248000.0,
     "fillRule": "breakeven_fail_market"
+  },
+  {
+    "orderId": "20260608|stable|accumulation|005930-stop_touch",
+    "sourceEntryKey": "20260608|stable|accumulation|005930",
+    "strategy": "accumulation",
+    "code": "005930",
+    "name": "삼성전자",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-11T15:00:00+09:00",
+    "fillPrice": 293000.0,
+    "filledQuantityPct": 15.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-11T15:00:00+09:00",
+    "barOpen": 290500.0,
+    "barHigh": 306500.0,
+    "barLow": 287500.0,
+    "barClose": 299000.0,
+    "fillRule": "stop_touch"
   }
 ]

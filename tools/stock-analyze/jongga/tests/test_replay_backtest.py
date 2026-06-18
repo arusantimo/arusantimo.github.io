@@ -576,6 +576,140 @@ class ReplayBacktestTests(unittest.TestCase):
             self.assertEqual([day["date"] for day in recommendation_view["days"]], ["2026-06-03"])
             self.assertTrue(recommendation_view["days"][0]["candidates"][0]["historyRecommendation"])
 
+    def test_run_replay_swing_carryover_and_resolution(self):
+        with TemporaryDirectory() as tmp:
+            out_dir = Path(tmp) / "jongga" / "output"
+            
+            payload_17 = {
+                "analysisDate": "2026-06-17",
+                "variant": "stable",
+                "pointInTime": True,
+                "pointInTimeStatus": "confirmed",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "1",
+                "rebuildable": True,
+                "slots": [
+                    {
+                        "regime": {
+                            "effectiveRegimeLabel": "강세장 ✅",
+                            "macroOverlay": {"effectiveRegimeLabel": "강세장 ✅", "kospiBullTier": "strong"},
+                        },
+                        "gapScore": {"code": "G-A"},
+                        "entries": {
+                            "pullback": [
+                                {
+                                    "name": "SK하이닉스",
+                                    "code": "000660",
+                                    "strategy": "pullback",
+                                    "grade": "A",
+                                    "gradeScore": 8.5,
+                                    "strictScore": 8.5,
+                                    "signalScore": 8.5,
+                                    "score": 8.5,
+                                    "entryEligible": True,
+                                    "statusLabel": "매수추천",
+                                    "gates": [{"code": "G1", "status": "✅", "note": "ok"}],
+                                    "tradePlanRows": [
+                                        {"stage": "🌅 프리마켓", "quantity": "40% 익절", "targetYield": "+2.0%", "targetPrice": "10,200원"},
+                                        {"stage": "스윙", "quantity": "60% 익절", "targetYield": "+10.0%", "targetPrice": "11,000원"},
+                                        {"stage": "🛑 손절", "quantity": "전량", "targetYield": "-10.0%", "targetPrice": "9,000원"},
+                                    ],
+                                    "entryPrice": 10000.0,
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+
+            payload_18 = {
+                "analysisDate": "2026-06-18",
+                "variant": "stable",
+                "pointInTime": True,
+                "pointInTimeStatus": "confirmed",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "1",
+                "rebuildable": True,
+                "slots": [
+                    {
+                        "regime": {
+                            "effectiveRegimeLabel": "강세장 ✅",
+                            "macroOverlay": {"effectiveRegimeLabel": "강세장 ✅", "kospiBullTier": "strong"},
+                        },
+                        "gapScore": {"code": "G-A"},
+                        "entries": {
+                            "pullback": []
+                        }
+                    }
+                ]
+            }
+
+            payload_19 = {
+                "analysisDate": "2026-06-19",
+                "variant": "stable",
+                "pointInTime": True,
+                "pointInTimeStatus": "confirmed",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "1",
+                "rebuildable": True,
+                "slots": [
+                    {
+                        "regime": {
+                            "effectiveRegimeLabel": "강세장 ✅",
+                            "macroOverlay": {"effectiveRegimeLabel": "강세장 ✅", "kospiBullTier": "strong"},
+                        },
+                        "gapScore": {"code": "G-A"},
+                        "entries": {
+                            "pullback": []
+                        }
+                    }
+                ]
+            }
+
+            self._write_payload(out_dir, payload_17)
+            self._write_payload(out_dir, payload_18)
+            self._write_payload(out_dir, payload_19)
+
+            rows_by_code = {
+                "000660": [
+                    {"localTradedAt": "20260619", "openPrice": "10000", "highPrice": "11200", "lowPrice": "10000", "closePrice": "11100", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260618", "openPrice": "10100", "highPrice": "10500", "lowPrice": "9500", "closePrice": "10100", "accumulatedTradingVolume": "1000"},
+                    {"localTradedAt": "20260617", "openPrice": "9900", "highPrice": "10300", "lowPrice": "9800", "closePrice": "10000", "accumulatedTradingVolume": "1000"},
+                ]
+            }
+
+            with mock.patch("jongga.generate_latest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]), \
+                 mock.patch("jongga.replay_market_data.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code]), \
+                 mock.patch("jongga.replay_backtest.fetch_naver_price_history", side_effect=lambda code, count=40: rows_by_code[code], create=True):
+                
+                run_record = run_replay(
+                    date_from=date(2026, 6, 17),
+                    date_to=date(2026, 6, 19),
+                    variant="stable",
+                    bar="1m",
+                    threshold_profile="current",
+                    out_dir=out_dir,
+                )
+
+            replay_dir = out_dir / "replay"
+            summary_17_path = replay_dir / "replay_summary_20260617.json"
+            self.assertTrue(summary_17_path.exists())
+            
+            summary_17 = json.loads(summary_17_path.read_text(encoding="utf-8"))
+            trades_17 = summary_17.get("results") or summary_17.get("trades") or []
+            self.assertEqual(len(trades_17), 1)
+            sk_trade = trades_17[0]
+            
+            self.assertEqual(sk_trade["tradeStatus"], "closed")
+            self.assertEqual(sk_trade["closedReason"], "swing_touch")
+            self.assertEqual(sk_trade["exitLastFillPrice"], 11000.0)
+            self.assertEqual(sk_trade["remainingQuantityPct"], 0.0)
+            
+            swing_pos_file = replay_dir / "swing_positions.json"
+            self.assertTrue(swing_pos_file.exists())
+            swing_positions = json.loads(swing_pos_file.read_text(encoding="utf-8"))
+            self.assertEqual(len(swing_positions), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,7 @@
 [
   {
     "orderId": "20260617|stable|pullback|079550-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -21,7 +21,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -41,7 +41,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -61,7 +61,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -81,7 +81,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -101,7 +101,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -121,7 +121,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -141,7 +141,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|079550-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -150,7 +150,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 885000.0,
+    "requestedPrice": 884000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|pullback|079550",
@@ -161,7 +161,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -181,7 +181,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -201,7 +201,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -221,7 +221,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -241,7 +241,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -261,7 +261,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -281,7 +281,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -301,7 +301,7 @@
   },
   {
     "orderId": "20260617|stable|pullback|042660-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "pullback",
@@ -310,7 +310,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 125600.0,
+    "requestedPrice": 125100.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|pullback|042660",
@@ -321,7 +321,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -341,7 +341,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -361,7 +361,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -381,7 +381,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -401,7 +401,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -421,7 +421,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -441,7 +441,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -461,7 +461,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|079550-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -470,7 +470,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 885000.0,
+    "requestedPrice": 884000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|accumulation|079550",
@@ -481,7 +481,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -501,7 +501,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -521,7 +521,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -541,7 +541,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -561,7 +561,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -581,7 +581,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -601,7 +601,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -621,7 +621,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|042660-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -630,7 +630,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 125600.0,
+    "requestedPrice": 125100.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|accumulation|042660",
@@ -641,7 +641,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -661,7 +661,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -681,7 +681,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -701,7 +701,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -721,7 +721,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -741,7 +741,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -761,7 +761,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -781,7 +781,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|000660-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -790,18 +790,18 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 2729000.0,
+    "requestedPrice": 2685000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|accumulation|000660",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-18T15:00:00+09:00",
     "activeUntil": "2026-06-18T15:00:00+09:00",
-    "finalStatus": "filled"
+    "finalStatus": "open"
   },
   {
     "orderId": "20260617|stable|accumulation|402340-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -821,7 +821,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -841,7 +841,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -861,7 +861,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -881,7 +881,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -901,7 +901,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -921,7 +921,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -941,7 +941,7 @@
   },
   {
     "orderId": "20260617|stable|accumulation|402340-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "accumulation",
@@ -950,18 +950,18 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 1724000.0,
+    "requestedPrice": 1700000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|accumulation|402340",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-18T15:00:00+09:00",
     "activeUntil": "2026-06-18T15:00:00+09:00",
-    "finalStatus": "filled"
+    "finalStatus": "open"
   },
   {
     "orderId": "20260617|stable|breakout|000660-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -981,7 +981,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1001,7 +1001,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1021,7 +1021,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1041,7 +1041,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1061,7 +1061,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1081,7 +1081,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1101,7 +1101,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|000660-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1110,18 +1110,18 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 2729000.0,
+    "requestedPrice": 2685000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|breakout|000660",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-18T15:00:00+09:00",
     "activeUntil": "2026-06-18T15:00:00+09:00",
-    "finalStatus": "filled"
+    "finalStatus": "open"
   },
   {
     "orderId": "20260617|stable|breakout|402340-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1141,7 +1141,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1161,7 +1161,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1181,7 +1181,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1201,7 +1201,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1221,7 +1221,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1241,7 +1241,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1261,7 +1261,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|402340-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1270,18 +1270,18 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 1724000.0,
+    "requestedPrice": 1700000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|breakout|402340",
     "stageKey": "finalCutoff",
     "activeFrom": "2026-06-18T15:00:00+09:00",
     "activeUntil": "2026-06-18T15:00:00+09:00",
-    "finalStatus": "filled"
+    "finalStatus": "open"
   },
   {
     "orderId": "20260617|stable|breakout|042660-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1301,7 +1301,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1321,7 +1321,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1341,7 +1341,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-intraday1",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1361,7 +1361,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-intraday2",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1381,7 +1381,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-swing",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1401,7 +1401,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1421,7 +1421,7 @@
   },
   {
     "orderId": "20260617|stable|breakout|042660-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "breakout",
@@ -1430,7 +1430,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 125600.0,
+    "requestedPrice": 125100.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|breakout|042660",
@@ -1441,7 +1441,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|035420-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1461,7 +1461,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|035420-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1481,7 +1481,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|035420-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1501,7 +1501,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|035420-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1521,7 +1521,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|035420-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1541,7 +1541,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|402340-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1561,7 +1561,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|402340-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1581,7 +1581,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|402340-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1601,7 +1601,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|402340-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1621,7 +1621,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|402340-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1630,7 +1630,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 1724000.0,
+    "requestedPrice": 1700000.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|reversal|402340",
@@ -1641,7 +1641,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|347850-entry",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1661,7 +1661,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|347850-premarket",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1681,7 +1681,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|347850-openPhase",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1701,7 +1701,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|347850-stop",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1721,7 +1721,7 @@
   },
   {
     "orderId": "20260617|stable|reversal|347850-finalCutoff",
-    "runId": "replay-20260618-060548-572919b7",
+    "runId": "replay-20260618-203055-ab1213d7",
     "date": "2026-06-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -1730,7 +1730,7 @@
     "side": "SELL",
     "orderType": "MKT",
     "requestedAt": "2026-06-18T15:00:00+09:00",
-    "requestedPrice": 109100.0,
+    "requestedPrice": 108300.0,
     "quantityPct": 100.0,
     "reason": "3일차 종가 컷오프 청산",
     "sourceEntryKey": "20260617|stable|reversal|347850",
