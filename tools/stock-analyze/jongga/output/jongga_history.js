@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-19T06:05:28+00:00",
+    "generatedAt": "2026-06-19T08:35:05+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 12,
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4)",
         "entryEligible": false,
-        "currentPrice": 550000
+        "currentPrice": 555000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.9,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1780000
       },
       {
         "strategy": "accumulation",
@@ -43,7 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.6,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 358500
+        "currentPrice": 354000
       },
       {
         "strategy": "accumulation",
@@ -73,37 +88,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 2782000
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 3.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
-        "entryEligible": false,
-        "currentPrice": 358500
+        "currentPrice": 2764000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "삼성물산",
         "code": "028260",
-        "score": 4.6,
-        "signalScore": 4.6,
-        "strictScore": 4.6,
+        "score": 3.5,
+        "signalScore": 3.5,
+        "strictScore": 3.5,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.7,
+        "gradeScore": 3.3,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 493500
+        "currentPrice": 491500
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "RISE 200",
+        "code": "148020",
+        "score": 2.6,
+        "signalScore": 2.6,
+        "strictScore": 2.6,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 2.3,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 147745
       },
       {
         "strategy": "reversal",
@@ -123,8 +138,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "SK하이닉스",
-        "code": "000660",
+        "name": "LG이노텍",
+        "code": "011070",
         "score": 4.8,
         "signalScore": 4.8,
         "strictScore": 4.8,
@@ -133,10 +148,36 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 2782000
+        "currentPrice": 1145000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LS ELECTRIC",
+        "code": "010120",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 259000
       }
     ],
     "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
       {
         "code": "080220",
         "name": "제주반도체",
@@ -147,17 +188,6 @@ window.JONGGA_HISTORY_INDEX = [
         "sources": [
           "kind",
           "entry"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "009150",
-        "name": "삼성전기",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
         ],
         "status": "confirmed"
       }
