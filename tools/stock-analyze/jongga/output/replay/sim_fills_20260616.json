@@ -838,5 +838,26 @@
     "barLow": 948000.0,
     "barClose": 997000.0,
     "fillRule": "time_stop_0915_market"
+  },
+  {
+    "orderId": "20260616|stable|accumulation|000660-swing_touch",
+    "sourceEntryKey": "20260616|stable|accumulation|000660",
+    "strategy": "accumulation",
+    "code": "000660",
+    "name": "SK하이닉스",
+    "side": "SELL",
+    "stageKey": "swing",
+    "reason": "스윙 목표가 도달",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-18T15:00:00+09:00",
+    "fillPrice": 2715480.0,
+    "filledQuantityPct": 40.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-18T15:00:00+09:00",
+    "barOpen": 2556000.0,
+    "barHigh": 2738000.0,
+    "barLow": 2556000.0,
+    "barClose": 2685000.0,
+    "fillRule": "swing_touch"
   }
 ]

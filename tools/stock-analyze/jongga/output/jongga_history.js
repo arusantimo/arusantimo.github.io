@@ -1,5 +1,169 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-19",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260619.js",
+    "jsonFile": "jongga/output/202606/latest_20260619.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260619.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-19T06:05:28+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 12,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 550000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 358500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 2782000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.1,
+        "signalScore": 5.1,
+        "strictScore": 5.1,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 2782000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 358500
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 4.6,
+        "signalScore": 4.6,
+        "strictScore": 4.6,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 493500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 294500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 2782000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "080220",
+        "name": "제주반도체",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-18",
     "variant": "stable",
     "variantLabel": "현재 버전",

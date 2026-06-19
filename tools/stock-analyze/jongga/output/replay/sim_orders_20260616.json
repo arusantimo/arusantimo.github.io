@@ -1938,5 +1938,25 @@
     "activeFrom": "2026-06-18T15:00:00+09:00",
     "activeUntil": "2026-06-18T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260616|stable|accumulation|000660-swing_touch",
+    "runId": "replay-20260618-203055-ab1213d7",
+    "date": "2026-06-16",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "000660",
+    "name": "SK하이닉스",
+    "side": "SELL",
+    "orderType": "LIMIT",
+    "requestedAt": "2026-06-18T15:00:00+09:00",
+    "requestedPrice": 2715480.0,
+    "quantityPct": 40.0,
+    "reason": "스윙 목표가 도달",
+    "sourceEntryKey": "20260616|stable|accumulation|000660",
+    "stageKey": "swing",
+    "finalStatus": "filled",
+    "activeFrom": "2026-06-18T15:00:00+09:00",
+    "activeUntil": "2026-06-18T15:00:00+09:00"
   }
 ]
