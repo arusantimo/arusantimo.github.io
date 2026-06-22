@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-22T06:05:06+00:00",
+    "generatedAt": "2026-06-22T08:35:00+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 12,
+    "status": "partial",
+    "buyCount": 15,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, G5)",
+        "entryEligible": false,
+        "currentPrice": 227500
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -43,37 +58,52 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
         "entryEligible": false,
-        "currentPrice": 299000
+        "currentPrice": 301500
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "SK하이닉스",
         "code": "000660",
-        "score": 5.0,
-        "signalScore": 5.0,
-        "strictScore": 5.0,
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.0,
+        "gradeScore": 3.5,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 2895000
+        "currentPrice": 2919000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "삼성물산",
         "code": "028260",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 7.8,
+        "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 529500
+        "currentPrice": 520000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "하나마이크론",
+        "code": "067310",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 55900
       }
     ],
     "blacklist": [
@@ -101,8 +131,8 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "067310",
-        "name": "하나마이크론",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
@@ -112,10 +142,11 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "009150",
-        "name": "삼성전기",
+        "code": "403870",
+        "name": "HPSP",
         "reasons": [
-          "투자 주의"
+          "투자 주의",
+          "공매도 과열"
         ],
         "sources": [
           "kind"
