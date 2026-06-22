@@ -1,5 +1,130 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-22",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260622.js",
+    "jsonFile": "jongga/output/202606/latest_20260622.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260622.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-22T06:05:06+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 12,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G5, Q1, G12)",
+        "entryEligible": false,
+        "currentPrice": 533000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
+        "entryEligible": false,
+        "currentPrice": 299000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.0,
+        "signalScore": 5.0,
+        "strictScore": 5.0,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 2895000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 529500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "032830",
+        "name": "삼성생명",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "240810",
+        "name": "원익IPS",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "067310",
+        "name": "하나마이크론",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-19",
     "variant": "stable",
     "variantLabel": "현재 버전",
