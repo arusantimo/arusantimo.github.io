@@ -1,5 +1,136 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-23",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260623.js",
+    "jsonFile": "jongga/output/202606/latest_20260623.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260623.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-23T06:04:38+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK",
+        "code": "034730",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G12)",
+        "entryEligible": false,
+        "currentPrice": 708000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1909000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 205000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 1.7,
+        "signalScore": 1.7,
+        "strictScore": 1.7,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 1.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 1909000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK",
+        "code": "034730",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 708000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "320000",
+        "name": "한울반도체",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "080220",
+        "name": "제주반도체",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "032830",
+        "name": "삼성생명",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-22",
     "variant": "stable",
     "variantLabel": "현재 버전",

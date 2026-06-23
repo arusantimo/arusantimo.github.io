@@ -481,5 +481,26 @@
     "barLow": 346250.0,
     "barClose": 354000.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260618|stable|accumulation|402340-swing_touch",
+    "sourceEntryKey": "20260618|stable|accumulation|402340",
+    "strategy": "accumulation",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "side": "SELL",
+    "stageKey": "swing",
+    "reason": "스윙 목표가 도달",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-22T15:00:00+09:00",
+    "fillPrice": 1938000.0,
+    "filledQuantityPct": 25.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-22T15:00:00+09:00",
+    "barOpen": 1860000.0,
+    "barHigh": 1987000.0,
+    "barLow": 1800000.0,
+    "barClose": 1970000.0,
+    "fillRule": "swing_touch"
   }
 ]
