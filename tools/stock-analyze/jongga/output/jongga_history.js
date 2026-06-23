@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-23T06:04:38+00:00",
+    "generatedAt": "2026-06-23T08:34:33+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,69 +26,99 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
         "entryEligible": false,
-        "currentPrice": 708000
+        "currentPrice": 705000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 8.1,
-        "signalScore": 8.1,
-        "strictScore": 8.1,
+        "score": 8.9,
+        "signalScore": 8.9,
+        "strictScore": 8.9,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.8,
+        "gradeScore": 6.4,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1909000
+        "currentPrice": 1832000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "NAVER",
         "code": "035420",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.6,
+        "gradeScore": 5.9,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 205000
+        "currentPrice": 202500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK",
+        "code": "034730",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 705000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 1.7,
-        "signalScore": 1.7,
-        "strictScore": 1.7,
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 3.2,
+        "signalScore": 3.2,
+        "strictScore": 3.2,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 1.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "gradeScore": 2.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 1909000
+        "currentPrice": 2555000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "SK",
         "code": "034730",
-        "score": 4.0,
-        "signalScore": 4.0,
-        "strictScore": 4.0,
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
         "scoreMax": 10.0,
         "grade": "C",
-        "gradeScore": 4.0,
+        "gradeScore": 4.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 708000
+        "currentPrice": 705000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성생명",
+        "code": "032830",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 432500
       }
     ],
     "blacklist": [
@@ -114,17 +144,6 @@ window.JONGGA_HISTORY_INDEX = [
         "sources": [
           "kind",
           "entry"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "032830",
-        "name": "삼성생명",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
         ],
         "status": "confirmed"
       }
