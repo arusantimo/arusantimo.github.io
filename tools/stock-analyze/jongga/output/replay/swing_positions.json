@@ -1,18 +1,6 @@
 [
   {
     "runId": "replay-20260618-203055-ab1213d7",
-    "entryDate": "2026-06-15",
-    "code": "005930",
-    "name": "삼성전자",
-    "strategy": "accumulation",
-    "entryPrice": 337337.0,
-    "swingTargetPrice": 384180.0,
-    "stopPrice": 325205.0,
-    "qtyPct": 65.0,
-    "sourceEntryKey": "20260615|stable|accumulation|005930"
-  },
-  {
-    "runId": "replay-20260618-203055-ab1213d7",
     "entryDate": "2026-06-17",
     "code": "000660",
     "name": "SK하이닉스",
@@ -22,65 +10,5 @@
     "stopPrice": 2407000.0,
     "qtyPct": 70.0,
     "sourceEntryKey": "20260617|stable|breakout|000660"
-  },
-  {
-    "runId": "replay-20260619-060547-99c3abb6",
-    "entryDate": "2026-06-18",
-    "code": "000660",
-    "name": "SK하이닉스",
-    "strategy": "breakout",
-    "entryPrice": 2687685.0,
-    "swingTargetPrice": 3222000.0,
-    "stopPrice": 2550750.0,
-    "qtyPct": 70.0,
-    "sourceEntryKey": "20260618|stable|breakout|000660"
-  },
-  {
-    "runId": "replay-20260622-060520-7d972c0f",
-    "entryDate": "2026-06-19",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 1781780.0,
-    "swingTargetPrice": 2029200.0,
-    "stopPrice": 1717700.0,
-    "qtyPct": 25.0,
-    "sourceEntryKey": "20260619|stable|accumulation|402340"
-  },
-  {
-    "runId": "replay-20260622-060520-7d972c0f",
-    "entryDate": "2026-06-19",
-    "code": "000660",
-    "name": "SK하이닉스",
-    "strategy": "accumulation",
-    "entryPrice": 2784782.0,
-    "swingTargetPrice": 3171480.0,
-    "stopPrice": 2684630.0,
-    "qtyPct": 65.0,
-    "sourceEntryKey": "20260619|stable|accumulation|000660"
-  },
-  {
-    "runId": "replay-20260622-060520-7d972c0f",
-    "entryDate": "2026-06-19",
-    "code": "148020",
-    "name": "RISE 200",
-    "strategy": "breakout",
-    "entryPrice": 147892.745,
-    "swingTargetPrice": 177294.0,
-    "stopPrice": 144520.0,
-    "qtyPct": 85.0,
-    "sourceEntryKey": "20260619|stable|breakout|148020"
-  },
-  {
-    "runId": "replay-20260622-060520-7d972c0f",
-    "entryDate": "2026-06-19",
-    "code": "028260",
-    "name": "삼성물산",
-    "strategy": "breakout",
-    "entryPrice": 491991.5,
-    "swingTargetPrice": 589800.0,
-    "stopPrice": 480000.0,
-    "qtyPct": 70.0,
-    "sourceEntryKey": "20260619|stable|breakout|028260"
   }
 ]

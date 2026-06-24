@@ -1,5 +1,180 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-24",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260624.js",
+    "jsonFile": "jongga/output/202606/latest_20260624.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260624.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-24T06:04:58+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 12,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 13.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G13)",
+        "entryEligible": false,
+        "currentPrice": 370500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 199000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1822000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 0.5,
+        "signalScore": 0.5,
+        "strictScore": 0.5,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 0.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 338750
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 0.3,
+        "signalScore": 0.3,
+        "strictScore": 0.3,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 0.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 2590000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 0.0,
+        "signalScore": 0.0,
+        "strictScore": 0.0,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 0.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 1822000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "RISE 200",
+        "code": "148020",
+        "score": 5.3,
+        "signalScore": 5.3,
+        "strictScore": 5.3,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 138500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 4.5,
+        "signalScore": 4.5,
+        "strictScore": 4.5,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.5,
+        "statusLabel": "매매금지(갭다운 주의 · 신규 진입 보류)",
+        "entryEligible": false,
+        "currentPrice": 2590000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "028260",
+        "name": "삼성물산",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "032830",
+        "name": "삼성생명",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-23",
     "variant": "stable",
     "variantLabel": "현재 버전",

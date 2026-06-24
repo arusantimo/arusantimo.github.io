@@ -586,5 +586,26 @@
     "barLow": 234500.0,
     "barClose": 243500.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260615|stable|accumulation|005930-stop_touch",
+    "sourceEntryKey": "20260615|stable|accumulation|005930",
+    "strategy": "accumulation",
+    "code": "005930",
+    "name": "삼성전자",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-23T15:00:00+09:00",
+    "fillPrice": 325205.0,
+    "filledQuantityPct": 65.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-23T15:00:00+09:00",
+    "barOpen": 347500.0,
+    "barHigh": 353000.0,
+    "barLow": 310000.0,
+    "barClose": 310000.0,
+    "fillRule": "stop_touch"
   }
 ]
