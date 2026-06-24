@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-24T06:04:58+00:00",
+    "generatedAt": "2026-06-24T08:34:52+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 12,
+    "status": "partial",
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,22 +28,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G13)",
         "entryEligible": false,
-        "currentPrice": 370500
+        "currentPrice": 371500
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "NAVER",
         "code": "035420",
-        "score": 8.6,
-        "signalScore": 8.6,
-        "strictScore": 8.6,
+        "score": 12.4,
+        "signalScore": 12.4,
+        "strictScore": 12.4,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.1,
+        "grade": "S",
+        "gradeScore": 9.2,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 199000
+        "currentPrice": 199400
       },
       {
         "strategy": "accumulation",
@@ -58,22 +58,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.6,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1822000
+        "currentPrice": 1799000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 0.5,
-        "signalScore": 0.5,
-        "strictScore": 0.5,
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 0.6,
+        "signalScore": 0.6,
+        "strictScore": 0.6,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 0.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "gradeScore": 0.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4)",
         "entryEligible": false,
-        "currentPrice": 338750
+        "currentPrice": 90600
       },
       {
         "strategy": "breakout",
@@ -85,16 +85,16 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 0.3,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 0.2,
+        "gradeScore": 0.3,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 2590000
+        "currentPrice": 2580000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK스퀘어",
-        "code": "402340",
+        "name": "알테오젠",
+        "code": "196170",
         "score": 0.0,
         "signalScore": 0.0,
         "strictScore": 0.0,
@@ -103,7 +103,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 0.0,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 1822000
+        "currentPrice": 371500
       },
       {
         "strategy": "reversal",
@@ -134,6 +134,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지(갭다운 주의 · 신규 진입 보류)",
         "entryEligible": false,
         "currentPrice": 2590000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 3.2,
+        "signalScore": 3.2,
+        "strictScore": 3.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 3.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 489000
       }
     ],
     "blacklist": [
