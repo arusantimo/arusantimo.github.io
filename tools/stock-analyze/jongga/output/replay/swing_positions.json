@@ -10,5 +10,65 @@
     "stopPrice": 2407000.0,
     "qtyPct": 70.0,
     "sourceEntryKey": "20260617|stable|breakout|000660"
+  },
+  {
+    "runId": "replay-20260625-061123-048a62a2",
+    "entryDate": "2026-06-24",
+    "code": "196170",
+    "name": "알테오젠",
+    "strategy": "pullback",
+    "entryPrice": 371871.5,
+    "swingTargetPrice": 408650.0,
+    "stopPrice": 360355.0,
+    "qtyPct": 15.0,
+    "sourceEntryKey": "20260624|stable|pullback|196170"
+  },
+  {
+    "runId": "replay-20260625-061123-048a62a2",
+    "entryDate": "2026-06-24",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 1800799.0,
+    "swingTargetPrice": 2050860.0,
+    "stopPrice": 1736035.0,
+    "qtyPct": 25.0,
+    "sourceEntryKey": "20260624|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260625-061123-048a62a2",
+    "entryDate": "2026-06-24",
+    "code": "035420",
+    "name": "NAVER",
+    "strategy": "accumulation",
+    "entryPrice": 199599.4,
+    "swingTargetPrice": 227316.0,
+    "stopPrice": 192421.0,
+    "qtyPct": 85.0,
+    "sourceEntryKey": "20260624|stable|accumulation|035420"
+  },
+  {
+    "runId": "replay-20260625-061123-048a62a2",
+    "entryDate": "2026-06-24",
+    "code": "196170",
+    "name": "알테오젠",
+    "strategy": "breakout",
+    "entryPrice": 371871.5,
+    "swingTargetPrice": 445800.0,
+    "stopPrice": 371500.0,
+    "qtyPct": 85.0,
+    "sourceEntryKey": "20260624|stable|breakout|196170"
+  },
+  {
+    "runId": "replay-20260625-061123-048a62a2",
+    "entryDate": "2026-06-24",
+    "code": "000660",
+    "name": "SK하이닉스",
+    "strategy": "breakout",
+    "entryPrice": 2582580.0,
+    "swingTargetPrice": 3096000.0,
+    "stopPrice": 2523000.0,
+    "qtyPct": 25.0,
+    "sourceEntryKey": "20260624|stable|breakout|000660"
   }
 ]
