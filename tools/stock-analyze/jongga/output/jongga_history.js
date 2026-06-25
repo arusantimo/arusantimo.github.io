@@ -9,41 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-25T06:11:18+00:00",
+    "generatedAt": "2026-06-25T08:34:58+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 12,
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "알테오젠",
         "code": "196170",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
         "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G5)",
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G5, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 377500
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "SK네트웍스",
-        "code": "001740",
-        "score": 8.2,
-        "signalScore": 8.2,
-        "strictScore": 8.2,
-        "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, G5, G6)",
-        "entryEligible": false,
-        "currentPrice": 10770
+        "currentPrice": 375000
       },
       {
         "strategy": "pullback",
@@ -55,7 +40,7 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 7.5,
         "scoreMax": 13.0,
         "grade": "B",
-        "gradeScore": 6.5,
+        "gradeScore": 5.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G5, G7, G8, Q1)",
         "entryEligible": false,
         "currentPrice": 1924000
@@ -65,15 +50,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "accumulation",
         "name": "알테오젠",
         "code": "196170",
-        "score": 7.9,
-        "signalScore": 7.9,
-        "strictScore": 7.9,
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 6.1,
+        "gradeScore": 5.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1, G5)",
         "entryEligible": false,
-        "currentPrice": 377500
+        "currentPrice": 375000
       },
       {
         "strategy": "accumulation",
@@ -85,70 +70,55 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 6.6,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 5.1,
+        "gradeScore": 4.9,
         "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
         "entryEligible": false,
-        "currentPrice": 1924000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK네트웍스",
-        "code": "001740",
-        "score": 6.0,
-        "signalScore": 6.0,
-        "strictScore": 6.0,
-        "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 4.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1, G5)",
-        "entryEligible": false,
-        "currentPrice": 10770
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "SK",
-        "code": "034730",
-        "score": 4.9,
-        "signalScore": 4.9,
-        "strictScore": 4.9,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 4.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
-        "entryEligible": false,
-        "currentPrice": 864000
+        "currentPrice": 1899000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "SK하이닉스",
         "code": "000660",
-        "score": 3.5,
-        "signalScore": 3.5,
-        "strictScore": 3.5,
+        "score": 5.1,
+        "signalScore": 5.1,
+        "strictScore": 5.1,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.0,
+        "gradeScore": 4.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, G6)",
         "entryEligible": false,
-        "currentPrice": 2948000
+        "currentPrice": 2917000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "알테오젠",
-        "code": "196170",
-        "score": 3.3,
-        "signalScore": 3.3,
-        "strictScore": 3.3,
+        "name": "SK",
+        "code": "034730",
+        "score": 4.2,
+        "signalScore": 4.2,
+        "strictScore": 4.2,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
+        "entryEligible": false,
+        "currentPrice": 858000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 3.6,
+        "signalScore": 3.6,
+        "strictScore": 3.6,
         "scoreMax": 12.5,
         "grade": "C",
         "gradeScore": 2.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4)",
         "entryEligible": false,
-        "currentPrice": 377500
+        "currentPrice": 87800
       },
       {
         "strategy": "reversal",
@@ -163,7 +133,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 2948000
+        "currentPrice": 2917000
       },
       {
         "strategy": "reversal",
@@ -183,20 +153,43 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "SK",
-        "code": "034730",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 7.8,
+        "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 864000
+        "currentPrice": 358500
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "001740",
+        "name": "SK네트웍스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "032830",
+        "name": "삼성생명",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-06-24",
