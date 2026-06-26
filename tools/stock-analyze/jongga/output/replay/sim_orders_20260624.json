@@ -1358,5 +1358,25 @@
     "activeFrom": "2026-06-25T15:00:00+09:00",
     "activeUntil": "2026-06-25T15:00:00+09:00",
     "finalStatus": "cancelled"
+  },
+  {
+    "orderId": "20260624|stable|breakout|196170-stop_touch",
+    "runId": "replay-20260625-061123-048a62a2",
+    "date": "2026-06-24",
+    "variant": "stable",
+    "strategy": "breakout",
+    "code": "196170",
+    "name": "알테오젠",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-06-25T15:00:00+09:00",
+    "requestedPrice": 371500.0,
+    "quantityPct": 85.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260624|stable|breakout|196170",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-06-25T15:00:00+09:00",
+    "activeUntil": "2026-06-25T15:00:00+09:00"
   }
 ]

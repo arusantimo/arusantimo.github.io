@@ -50,18 +50,6 @@
   {
     "runId": "replay-20260625-061123-048a62a2",
     "entryDate": "2026-06-24",
-    "code": "196170",
-    "name": "알테오젠",
-    "strategy": "breakout",
-    "entryPrice": 371871.5,
-    "swingTargetPrice": 445800.0,
-    "stopPrice": 371500.0,
-    "qtyPct": 85.0,
-    "sourceEntryKey": "20260624|stable|breakout|196170"
-  },
-  {
-    "runId": "replay-20260625-061123-048a62a2",
-    "entryDate": "2026-06-24",
     "code": "000660",
     "name": "SK하이닉스",
     "strategy": "breakout",

@@ -691,5 +691,26 @@
     "barLow": 2865000.0,
     "barClose": 2865000.0,
     "fillRule": "openPhase_touch"
+  },
+  {
+    "orderId": "20260624|stable|breakout|196170-stop_touch",
+    "sourceEntryKey": "20260624|stable|breakout|196170",
+    "strategy": "breakout",
+    "code": "196170",
+    "name": "알테오젠",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-25T15:00:00+09:00",
+    "fillPrice": 371500.0,
+    "filledQuantityPct": 85.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-25T15:00:00+09:00",
+    "barOpen": 368000.0,
+    "barHigh": 397500.0,
+    "barLow": 365000.0,
+    "barClose": 375000.0,
+    "fillRule": "stop_touch"
   }
 ]

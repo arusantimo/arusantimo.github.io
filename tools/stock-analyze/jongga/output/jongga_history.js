@@ -1,5 +1,124 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-26",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260626.js",
+    "jsonFile": "jongga/output/202606/latest_20260626.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260626.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-26T06:04:52+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK",
+        "code": "034730",
+        "score": 6.8,
+        "signalScore": 6.8,
+        "strictScore": 6.8,
+        "scoreMax": 13.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G7, G12)",
+        "entryEligible": false,
+        "currentPrice": 806000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 194700
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1709000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK",
+        "code": "034730",
+        "score": 3.8,
+        "signalScore": 3.8,
+        "strictScore": 3.8,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 806000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지(갭다운 주의 · 신규 진입 보류)",
+        "entryEligible": false,
+        "currentPrice": 160600
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "079650",
+        "name": "서산",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-25",
     "variant": "stable",
     "variantLabel": "현재 버전",
