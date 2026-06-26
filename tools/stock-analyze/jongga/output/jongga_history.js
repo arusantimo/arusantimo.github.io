@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-26T06:04:52+00:00",
+    "generatedAt": "2026-06-26T08:34:25+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 8.8,
+        "signalScore": 8.8,
+        "strictScore": 8.8,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G12)",
+        "entryEligible": false,
+        "currentPrice": 455000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -35,15 +50,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "accumulation",
         "name": "NAVER",
         "code": "035420",
-        "score": 8.1,
-        "signalScore": 8.1,
-        "strictScore": 8.1,
+        "score": 9.5,
+        "signalScore": 9.5,
+        "strictScore": 9.5,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 5.8,
+        "grade": "A",
+        "gradeScore": 7.0,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 194700
+        "currentPrice": 196400
       },
       {
         "strategy": "accumulation",
@@ -58,37 +73,52 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.7,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1709000
+        "currentPrice": 1720000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK",
-        "code": "034730",
-        "score": 3.8,
-        "signalScore": 3.8,
-        "strictScore": 3.8,
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 3.2,
+        "signalScore": 3.2,
+        "strictScore": 3.2,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.6,
+        "gradeScore": 2.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 806000
+        "currentPrice": 163800
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "원익IPS",
         "code": "240810",
-        "score": 4.0,
-        "signalScore": 4.0,
-        "strictScore": 4.0,
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
         "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 4.0,
+        "grade": "B",
+        "gradeScore": 5.7,
         "statusLabel": "매매금지(갭다운 주의 · 신규 진입 보류)",
         "entryEligible": false,
-        "currentPrice": 160600
+        "currentPrice": 163800
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 339500
       }
     ],
     "blacklist": [
@@ -104,14 +134,23 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "009150",
-        "name": "삼성전기",
+        "code": "028260",
+        "name": "삼성물산",
         "reasons": [
-          "공매도 과열",
           "투자 주의"
         ],
         "sources": [
-          "kind",
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
           "entry"
         ],
         "status": "confirmed"
