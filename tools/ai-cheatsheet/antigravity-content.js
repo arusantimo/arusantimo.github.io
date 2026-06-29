@@ -10,43 +10,52 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.3</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-12</span>
+        <span class="meta-version">v2.3.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-29</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.3)</span>
+        <span>📋 최근 변경사항 (v2.3.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Gemini 모델 도구 호출 한도 상향 (v2.1.3)"
-            data-tt-desc="Gemini 모델의 1턴당 최대 도구 호출 횟수 제한이 512회로 대폭 확장되어 복잡하고 자율적인 다단계 작업 처리가 가능합니다."
-            data-tt-example="">Gemini 모델 1턴당 최대 도구 호출 수 512회 확장 지원 (v2.1.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="MCP 서버 실행 타임아웃 구성 (v2.1.3)"
-            data-tt-desc="MCP 서버 시작 시 타임아웃 제한 시간을 임의로 구성하거나 -1을 설정해 타임아웃을 완전 차단할 수 있습니다."
-            data-tt-example="">MCP 서버 기동 대기 타임아웃 설정 지원 (비활성: <code>-1</code>) (v2.1.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="아티팩트 뷰어 행 번호 매핑 개선 (v2.1.3)"
-            data-tt-desc="줄바꿈 처리된 텍스트 및 축소된 Mermaid 다이어그램을 포함하여 뷰어의 행 번호와 실제 소스 라인 번호가 정확히 일치하도록 매핑을 개선했습니다."
-            data-tt-example="">아티팩트 뷰어 행 번호 및 줄바꿈/Mermaid 라인 매핑 정교화 (v2.1.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="GitHub subpath 플러그인 설치 (v2.1.3)"
-            data-tt-desc="GitHub 리포지토리의 subpath 디렉터리 경로를 명시하여 브랜치 단위로 커스텀 플러그인을 직접 다운로드 및 설치할 수 있습니다."
-            data-tt-example="">GitHub subpath를 통한 플러그인 직접 다운로드 설치 지원 (v2.1.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Linux Wayland 클립보드 네이티브 지원 (v2.1.3)"
-            data-tt-desc="Linux 데스크톱 환경의 wl-paste를 네이티브 수준으로 우선 연동하며, 파일 매니저로부터 복사된 파일을 이미지 데이터보다 우선 취급합니다."
-            data-tt-example="">Linux Wayland 클립보드(<code>wl-paste</code>) 지원 및 파일 복사 우선순위 개선 (v2.1.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="settings.json 미확인 필드 유실 패치 (v2.1.3)"
-            data-tt-desc="설정 파일을 로드하거나 병합 후 저장할 때 알 수 없는 임의의 settings 필드가 영구적으로 삭제되는 현상을 수정했습니다."
-            data-tt-example="">설정(settings.json) 병합 저장 시 미인지 필드 온전 보존 패치 (v2.1.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 MCP 서버(Remote MCP) 연동 지원 (v2.3.0)"
+            data-tt-desc="SSE 기반 원격 MCP 서버에 연결하여 클라우드 도구를 로컬처럼 사용할 수 있습니다."
+            data-tt-example="/mcp connect wss://remote">원격 MCP(SSE) 연동 지원 및 오토 리뷰(Auto Review) 강화 (v2.3.0) <span class="badge-new">NEW</span></li>
         </ul>
 
 <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
 
+          
           <details class="ver-group">
+            <summary>v2.1.3</summary>
+            <ul>
+          <li class="cl-tip" data-tt-title="Gemini 모델 도구 호출 한도 상향 (v2.1.3)"
+            data-tt-desc="Gemini 모델의 1턴당 최대 도구 호출 횟수 제한이 512회로 대폭 확장되어 복잡하고 자율적인 다단계 작업 처리가 가능합니다."
+            data-tt-example="">Gemini 모델 1턴당 최대 도구 호출 수 512회 확장 지원 (v2.1.3) </li>
+          <li class="cl-tip" data-tt-title="MCP 서버 실행 타임아웃 구성 (v2.1.3)"
+            data-tt-desc="MCP 서버 시작 시 타임아웃 제한 시간을 임의로 구성하거나 -1을 설정해 타임아웃을 완전 차단할 수 있습니다."
+            data-tt-example="">MCP 서버 기동 대기 타임아웃 설정 지원 (비활성: <code>-1</code>) (v2.1.3) </li>
+          <li class="cl-tip" data-tt-title="아티팩트 뷰어 행 번호 매핑 개선 (v2.1.3)"
+            data-tt-desc="줄바꿈 처리된 텍스트 및 축소된 Mermaid 다이어그램을 포함하여 뷰어의 행 번호와 실제 소스 라인 번호가 정확히 일치하도록 매핑을 개선했습니다."
+            data-tt-example="">아티팩트 뷰어 행 번호 및 줄바꿈/Mermaid 라인 매핑 정교화 (v2.1.3) </li>
+          <li class="cl-tip" data-tt-title="GitHub subpath 플러그인 설치 (v2.1.3)"
+            data-tt-desc="GitHub 리포지토리의 subpath 디렉터리 경로를 명시하여 브랜치 단위로 커스텀 플러그인을 직접 다운로드 및 설치할 수 있습니다."
+            data-tt-example="">GitHub subpath를 통한 플러그인 직접 다운로드 설치 지원 (v2.1.3) </li>
+          <li class="cl-tip" data-tt-title="Linux Wayland 클립보드 네이티브 지원 (v2.1.3)"
+            data-tt-desc="Linux 데스크톱 환경의 wl-paste를 네이티브 수준으로 우선 연동하며, 파일 매니저로부터 복사된 파일을 이미지 데이터보다 우선 취급합니다."
+            data-tt-example="">Linux Wayland 클립보드(<code>wl-paste</code>) 지원 및 파일 복사 우선순위 개선 (v2.1.3) </li>
+          <li class="cl-tip" data-tt-title="settings.json 미확인 필드 유실 패치 (v2.1.3)"
+            data-tt-desc="설정 파일을 로드하거나 병합 후 저장할 때 알 수 없는 임의의 settings 필드가 영구적으로 삭제되는 현상을 수정했습니다."
+            data-tt-example="">설정(settings.json) 병합 저장 시 미인지 필드 온전 보존 패치 (v2.1.3) </li>
+        </ul>
+          </details>
+<details class="ver-group">
             <summary>v2.1.0</summary>
             <ul>
               <li class="cl-tip" data-tt-title="대화 및 런타임 성능 향상 (v2.1.0)"
@@ -109,6 +118,10 @@ const antigravityContent = `
             </div>
             <div class="group">
               <div class="group-label">설정 &amp; 관리</div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>/mcp connect</code></div>
+                <div class="row-desc">원격 MCP 서버 연결 <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>/mcp discover</code></div>
                 <div class="row-desc">로컬 MCP 자동 탐지</div>

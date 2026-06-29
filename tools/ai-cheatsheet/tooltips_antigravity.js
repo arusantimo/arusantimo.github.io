@@ -1,4 +1,10 @@
 window.ANTIGRAVITY_TIPS = {
+  "/mcp connect": {
+    "title": "/mcp connect — 원격 MCP 연결",
+    "desc": "로컬 프로세스가 아닌 원격(SSE/WebSocket) 환경의 MCP 서버를 연동합니다.",
+    "example": "/mcp connect wss://api.example.com/mcp"
+  },
+
   "/permissions": {
     "title": "/permissions — 보안 승인 규칙 관리",
     "desc": "CLI 환경 내에서 직접 보안 승인 규칙을 편집하거나 삭제할 수 있도록 지원하는 명령어입니다.",

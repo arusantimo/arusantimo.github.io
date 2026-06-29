@@ -1,4 +1,10 @@
 window.CODEX_TIPS = {
+  "/automate": {
+    "title": "/automate — 봇 자동화",
+    "desc": "GitHub PR 또는 Slack 반응 시 동작하는 에이전트 자동화 규칙을 설정합니다.",
+    "example": "/automate PR 리뷰 시 코드 스타일 검사"
+  },
+
   "/app": {
     "title": "/app — 데스크톱 앱으로 전환",
     "desc": "현재 CLI 세션을 백그라운드로 남겨두고 동일한 작업 스레드를 Codex Desktop(데스크톱 앱)으로 전환하여 이어 진행합니다.",

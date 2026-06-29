@@ -10,43 +10,55 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.173</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-11</span>
+        <span class="meta-version">v2.1.195</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-29</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.173)</span>
+        <span>📋 최근 변경사항 (v2.1.195)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Claude Fable 5 모델 출시 (v2.1.170)"
-            data-tt-desc="뛰어난 성능과 안전성을 갖춘 신규 Mythos-class 모델인 Claude Fable 5가 공식 출시되었습니다."
-            data-tt-example="">안전성과 성능이 대폭 강화된 신규 모델 <code>Claude Fable 5</code> 지원 (v2.1.170) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="중첩 서브에이전트 스폰 지원 (v2.1.172)"
-            data-tt-desc="서브에이전트 세션 내에서 하위 서브에이전트를 최대 5단계 깊이까지 재귀적으로 스폰하여 실행할 수 있습니다."
-            data-tt-example="">서브에이전트의 자체 서브에이전트 생성(최대 5레벨 깊이) 지원 (v2.1.172) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Amazon Bedrock 리전 파싱 개선 (v2.1.172)"
-            data-tt-desc="AWS_REGION 환경변수가 미설정된 경우 Bedrock이 ~/.aws 설정 파일에서 리전 정보를 순서대로 읽어옵니다."
-            data-tt-example="">Amazon Bedrock의 <code>~/.aws</code> 리전 정보 탐지 및 <code>/status</code> 노출 지원 (v2.1.172) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/plugin 마켓플레이스 검색창 추가 (v2.1.172)"
-            data-tt-desc="/plugin 명령어 실행 후 마켓플레이스의 플러그인을 탐색할 때 원하는 플러그인을 빠르게 찾을 수 있도록 검색 필터 바가 지원됩니다."
-            data-tt-example=""><code>/plugin</code> 마켓플레이스 탐색 내 플러그인 검색 바 추가 (v2.1.172) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Fable 5 모델 1M context suffix 정규화 (v2.1.173)"
-            data-tt-desc="Fable 5가 기본적으로 1M 컨텍스트를 지원하여 모델명 뒤에 붙는 [1m] suffix를 자동으로 제거 및 정문화합니다."
-            data-tt-example="">Fable 5 모델명 <code>[1m]</code> suffix 자동 normalize 패치 (v2.1.173) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Windows 샌드박스 의존성 시작 경고 수정 (v2.1.173)"
-            data-tt-desc="설정에서 샌드박스를 활성화했을 때 Windows 환경에서 부정확하게 표시되던 sandbox dependencies missing 시작 경고를 해결했습니다."
-            data-tt-example="">Windows 환경의 spurious sandbox 시작 경고 버그 수정 (v2.1.173) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="--safe-mode 문제 해결 모드 추가 (v2.1.195)"
+            data-tt-desc="모든 커스텀 설정(skills, plugins, hooks 등)을 무시하고 안전 모드로 실행합니다."
+            data-tt-example="claude --safe-mode">문제 해결을 위한 <code>--safe-mode</code> 옵션 추가 (v2.1.195) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="--no-chrome 통합 비활성화 (v2.1.195)"
+            data-tt-desc="Claude의 Chrome 브라우저 자동 연동 기능을 비활성화합니다."
+            data-tt-example="claude --no-chrome">Chrome 통합 비활성화를 위한 <code>--no-chrome</code> 플래그 추가 (v2.1.195) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
 
+          
           <details class="ver-group">
+            <summary>v2.1.173</summary>
+            <ul>
+          <li class="cl-tip" data-tt-title="Claude Fable 5 모델 출시 (v2.1.170)"
+            data-tt-desc="뛰어난 성능과 안전성을 갖춘 신규 Mythos-class 모델인 Claude Fable 5가 공식 출시되었습니다."
+            data-tt-example="">안전성과 성능이 대폭 강화된 신규 모델 <code>Claude Fable 5</code> 지원 (v2.1.170) </li>
+          <li class="cl-tip" data-tt-title="중첩 서브에이전트 스폰 지원 (v2.1.172)"
+            data-tt-desc="서브에이전트 세션 내에서 하위 서브에이전트를 최대 5단계 깊이까지 재귀적으로 스폰하여 실행할 수 있습니다."
+            data-tt-example="">서브에이전트의 자체 서브에이전트 생성(최대 5레벨 깊이) 지원 (v2.1.172) </li>
+          <li class="cl-tip" data-tt-title="Amazon Bedrock 리전 파싱 개선 (v2.1.172)"
+            data-tt-desc="AWS_REGION 환경변수가 미설정된 경우 Bedrock이 ~/.aws 설정 파일에서 리전 정보를 순서대로 읽어옵니다."
+            data-tt-example="">Amazon Bedrock의 <code>~/.aws</code> 리전 정보 탐지 및 <code>/status</code> 노출 지원 (v2.1.172) </li>
+          <li class="cl-tip" data-tt-title="/plugin 마켓플레이스 검색창 추가 (v2.1.172)"
+            data-tt-desc="/plugin 명령어 실행 후 마켓플레이스의 플러그인을 탐색할 때 원하는 플러그인을 빠르게 찾을 수 있도록 검색 필터 바가 지원됩니다."
+            data-tt-example=""><code>/plugin</code> 마켓플레이스 탐색 내 플러그인 검색 바 추가 (v2.1.172) </li>
+          <li class="cl-tip" data-tt-title="Fable 5 모델 1M context suffix 정규화 (v2.1.173)"
+            data-tt-desc="Fable 5가 기본적으로 1M 컨텍스트를 지원하여 모델명 뒤에 붙는 [1m] suffix를 자동으로 제거 및 정문화합니다."
+            data-tt-example="">Fable 5 모델명 <code>[1m]</code> suffix 자동 normalize 패치 (v2.1.173) </li>
+          <li class="cl-tip" data-tt-title="Windows 샌드박스 의존성 시작 경고 수정 (v2.1.173)"
+            data-tt-desc="설정에서 샌드박스를 활성화했을 때 Windows 환경에서 부정확하게 표시되던 sandbox dependencies missing 시작 경고를 해결했습니다."
+            data-tt-example="">Windows 환경의 spurious sandbox 시작 경고 버그 수정 (v2.1.173) </li>
+        </ul>
+          </details>
+<details class="ver-group">
             <summary>v2.1.166~v2.1.169</summary>
             <ul>
               <li class="cl-tip" data-tt-title="fallbackModel 멀티 폴백 설정 (v2.1.166)"
@@ -949,6 +961,14 @@ const claudeContent = `
           <div>
             <div class="group">
               <div class="group-label">주요 플래그</div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--no-chrome</code></div>
+                <div class="row-desc">Chrome 연동 비활성화 <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>--safe-mode</code></div>
+                <div class="row-desc">안전 모드 (문제 해결) <span class="badge-new">NEW</span></div>
+              </div>
               <div class="row">
                 <div class="row-key"><code>--safe-mode</code></div>
                 <div class="row-desc">세이프 모드로 세션 시작 (customizations 비활성) <span class="badge-new">NEW</span></div>

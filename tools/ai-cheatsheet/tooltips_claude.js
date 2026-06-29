@@ -1,4 +1,15 @@
 window.CLAUDE_TIPS = {
+  "--safe-mode": {
+    "title": "--safe-mode — 커스텀 설정 무시",
+    "desc": "플러그인, 훅 등을 로드하지 않고 순정 상태로 실행하여 환경 문제를 디버깅합니다.",
+    "example": "claude --safe-mode"
+  },
+  "--no-chrome": {
+    "title": "--no-chrome — Chrome 통합 비활성화",
+    "desc": "자동으로 Chrome 세션에 연결하거나 탭을 제어하는 기능을 중지합니다.",
+    "example": "claude --no-chrome"
+  },
+
   "disableBundledSkills": {
     "title": "disableBundledSkills — 번들 스킬/워크플로 비활성화",
     "desc": "Claude Code의 기본 스킬, 워크플로 및 빌트인 슬래시 커맨드를 숨겨 시스템의 리소스 소모를 방지하고 커스텀 기능만 유지할 수 있도록 설정합니다.",

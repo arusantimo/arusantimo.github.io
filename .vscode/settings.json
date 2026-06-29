@@ -21,6 +21,7 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "git -C .": true
+        "git -C .": true,
+        "git commit": true
     }
 }

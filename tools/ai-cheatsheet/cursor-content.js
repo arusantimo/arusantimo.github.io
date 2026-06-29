@@ -10,8 +10,8 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.7</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-10</span>
+        <span class="meta-version">v3.8</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-29</span>
       </div>
     </div>
 
@@ -22,25 +22,37 @@ const cursorContent = `
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Bugbot 성능 개선 및 /review 커맨드 추가 (2026-06-10)"
-            data-tt-desc="Bugbot이 Composer 2.5를 탑재하여 속도 ~3.5배 향상, 비용 ~22% 절감, 탐지율 10% 증가가 적용되었으며, push 전 코드/보안 검토를 위한 /review 슬래시 커맨드가 도입되었습니다."
-            data-tt-example="/review">Bugbot 성능 혁신 및 사전 PR/코드 검토를 위한 <code>/review</code> 명령어 추가 (2026-06-10) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Design Mode 다중 선택 및 음성 입력 (v3.7)"
-            data-tt-desc="브라우저 Design Mode에서 여러 요소를 다중 선택(Multi-select)하여 비교/조정 피드백을 전달할 수 있고, 실행 도중 음성 입력 큐잉이 가능합니다."
-            data-tt-example="">Design Mode 다중 선택(Multi-select) 및 음성(Voice) 입력 큐잉 지원 (v3.7) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor SDK 대규모 기능 개선 (2026-06-04)"
-            data-tt-desc="@cursor/sdk 릴리스에서 SQLite 외에 JSONL/PG 커스텀 스토어, customTools 전달, local auto-review 샌드박스 정책 설정 등이 지원됩니다."
-            data-tt-example="npm install @cursor/sdk"><code>@cursor/sdk</code> 업데이트 — 커스텀 스토어, customTools 및 auto-review 지원 (2026-06-04) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Canvas 토큰 사용량 탐색기 및 디버그 버튼 (2026-06-04)"
-            data-tt-desc="컨버스의 토큰 할당(System, Tool, Rules, Skills) 분석 보고서를 인터랙티브 캔버스로 열어 디버깅할 수 있습니다."
-            data-tt-example="">Canvas 토큰 사용량 시각화 보고서 및 Debug with Agent 지원 (2026-06-04) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Customize 페이지 및 Marketplace 리더보드 (v3.8)"
+            data-tt-desc="플러그인, 스킬, MCP, 서브에이전트 등을 관리하는 통합 Customize 페이지가 추가되었습니다."
+            data-tt-example="">통합 Customize 페이지 및 플러그인 캔버스 지원 (v3.8) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor Automations 강화 및 Computer Use (v3.8)"
+            data-tt-desc="자동화 스크립트에 컴퓨터 제어(Computer Use) 기능이 추가되어 GUI 자동화가 가능해졌습니다."
+            data-tt-example="">Automations 기능 강화 및 Computer Use 지원 (v3.8) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
 
+          
           <details class="ver-group">
+            <summary>v3.7</summary>
+            <ul>
+          <li class="cl-tip" data-tt-title="Bugbot 성능 개선 및 /review 커맨드 추가 (2026-06-10)"
+            data-tt-desc="Bugbot이 Composer 2.5를 탑재하여 속도 ~3.5배 향상, 비용 ~22% 절감, 탐지율 10% 증가가 적용되었으며, push 전 코드/보안 검토를 위한 /review 슬래시 커맨드가 도입되었습니다."
+            data-tt-example="/review">Bugbot 성능 혁신 및 사전 PR/코드 검토를 위한 <code>/review</code> 명령어 추가 (2026-06-10) </li>
+          <li class="cl-tip" data-tt-title="Design Mode 다중 선택 및 음성 입력 (v3.7)"
+            data-tt-desc="브라우저 Design Mode에서 여러 요소를 다중 선택(Multi-select)하여 비교/조정 피드백을 전달할 수 있고, 실행 도중 음성 입력 큐잉이 가능합니다."
+            data-tt-example="">Design Mode 다중 선택(Multi-select) 및 음성(Voice) 입력 큐잉 지원 (v3.7) </li>
+          <li class="cl-tip" data-tt-title="Cursor SDK 대규모 기능 개선 (2026-06-04)"
+            data-tt-desc="@cursor/sdk 릴리스에서 SQLite 외에 JSONL/PG 커스텀 스토어, customTools 전달, local auto-review 샌드박스 정책 설정 등이 지원됩니다."
+            data-tt-example="npm install @cursor/sdk"><code>@cursor/sdk</code> 업데이트 — 커스텀 스토어, customTools 및 auto-review 지원 (2026-06-04) </li>
+          <li class="cl-tip" data-tt-title="Canvas 토큰 사용량 탐색기 및 디버그 버튼 (2026-06-04)"
+            data-tt-desc="컨버스의 토큰 할당(System, Tool, Rules, Skills) 분석 보고서를 인터랙티브 캔버스로 열어 디버깅할 수 있습니다."
+            data-tt-example="">Canvas 토큰 사용량 시각화 보고서 및 Debug with Agent 지원 (2026-06-04) </li>
+        </ul>
+          </details>
+<details class="ver-group">
             <summary>v3.7 (초기 버전)</summary>
             <ul>
               <li class="cl-tip" data-tt-title="Canvas Improvements (v3.7)"
