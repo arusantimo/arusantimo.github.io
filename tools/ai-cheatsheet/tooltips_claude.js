@@ -1,15 +1,9 @@
 window.CLAUDE_TIPS = {
-  "--safe-mode": {
-    "title": "--safe-mode — 커스텀 설정 무시",
-    "desc": "플러그인, 훅 등을 로드하지 않고 순정 상태로 실행하여 환경 문제를 디버깅합니다.",
-    "example": "claude --safe-mode"
+  "wheelScrollAccelerationEnabled": {
+    "title": "wheelScrollAccelerationEnabled — 터미널 스크롤 가속 활성화",
+    "desc": "WSL2 터미널 등에서 마우스 휠 스크롤 감도를 가속화하여 긴 터미널 출력 기록을 더욱 빠르게 휠 스크롤 할 수 있도록 지원합니다.",
+    "example": "\"wheelScrollAccelerationEnabled\": true"
   },
-  "--no-chrome": {
-    "title": "--no-chrome — Chrome 통합 비활성화",
-    "desc": "자동으로 Chrome 세션에 연결하거나 탭을 제어하는 기능을 중지합니다.",
-    "example": "claude --no-chrome"
-  },
-
   "disableBundledSkills": {
     "title": "disableBundledSkills — 번들 스킬/워크플로 비활성화",
     "desc": "Claude Code의 기본 스킬, 워크플로 및 빌트인 슬래시 커맨드를 숨겨 시스템의 리소스 소모를 방지하고 커스텀 기능만 유지할 수 있도록 설정합니다.",
@@ -936,6 +930,21 @@ window.CLAUDE_TIPS = {
     "title": "CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN",
     "desc": "TUI 렌더링 시 대체 화면(alternate screen) 모드를 비활성화하여, 터미널 네이티브 스크롤백 버퍼를 보존합니다.",
     "example": "export CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN=1\nclaude"
+  },
+  "/config key=value": {
+    "title": "/config key=value — 실시간 설정 변경",
+    "desc": "대화 프롬프트 상에서 직접 설정을 지정할 수 있는 단축 구문입니다. interactive, -p 및 Remote Control 모드 모두에서 작동합니다.",
+    "example": "/config thinking=false"
+  },
+  "sandbox.allowAppleEvents": {
+    "title": "sandbox.allowAppleEvents — macOS Apple Event 허용",
+    "desc": "샌드박스 내부에서 실행되는 명령이 macOS에서 Apple Event를 발송할 수 있도록 허용하는 옵트인(opt-in) 보안 설정입니다.",
+    "example": "\"sandbox.allowAppleEvents\": true"
+  },
+  "CLAUDE_CLIENT_PRESENCE_FILE": {
+    "title": "CLAUDE_CLIENT_PRESENCE_FILE — 모바일 알림 억제 마커 파일",
+    "desc": "PC 앞에 앉아 있을 때 모바일 푸시 알림을 억제하기 위해, 특정 마커 파일이 존재하면 모바일 푸시 전송을 무력화하는 경로 변수입니다.",
+    "example": "export CLAUDE_CLIENT_PRESENCE_FILE=~/.claude/presence"
   }
 }
 ;

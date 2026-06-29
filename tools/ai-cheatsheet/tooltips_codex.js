@@ -1,10 +1,24 @@
 window.CODEX_TIPS = {
-  "/automate": {
-    "title": "/automate — 봇 자동화",
-    "desc": "GitHub PR 또는 Slack 반응 시 동작하는 에이전트 자동화 규칙을 설정합니다.",
-    "example": "/automate PR 리뷰 시 코드 스타일 검사"
+  "/delete": {
+    "title": "/delete — 세션 영구 삭제",
+    "desc": "보안 승인 절차를 거쳐 현재 세션 데이터 및 히스토리를 데이터베이스에서 영구적으로 완전히 삭제합니다.",
+    "example": "/delete"
   },
-
+  "/usage": {
+    "title": "/usage — 토큰 사용 통계",
+    "desc": "일간, 주간 및 누적 계정 토큰 소비 통계를 TUI 뷰어로 확인합니다.",
+    "example": "/usage"
+  },
+  "/import": {
+    "title": "/import — 외부 설정 가져오기",
+    "desc": "Claude Code의 설정, 구성 및 최근 대화 기록을 선택적으로 가져옵니다.",
+    "example": "/import"
+  },
+  "codex delete": {
+    "title": "codex delete — CLI 세션 완전 삭제",
+    "desc": "CLI 상에서 지정된 세션 ID 또는 대화 히스토리를 안전하고 영구적으로 삭제합니다.",
+    "example": "codex delete <session-id>"
+  },
   "/app": {
     "title": "/app — 데스크톱 앱으로 전환",
     "desc": "현재 CLI 세션을 백그라운드로 남겨두고 동일한 작업 스레드를 Codex Desktop(데스크톱 앱)으로 전환하여 이어 진행합니다.",
@@ -614,6 +628,21 @@ window.CODEX_TIPS = {
     "title": "/goal — 장기 목표 워크플로 (기본 활성화)",
     "desc": "기본적으로 활성화되어 작동하는 장기 목표(goal)를 관리합니다. 전용 데이터베이스 스토리지에 백업되며 일시정지, 재개, 초기화 등 TUI 컨트롤을 지원합니다.",
     "example": "/goal\n/goal pause\n/goal resume"
+  },
+  "Noise E2EE": {
+    "title": "Noise E2EE — 원격 실행기 E2EE 릴레이",
+    "desc": "원격 CLI 세션과 로컬 환경을 연동하는 리모트 러너 채널에 Noise 프로토콜을 사용한 종단간 암호화(E2EE) 보안 통신망이 가동됩니다.",
+    "example": ""
+  },
+  "SQLite WAL-reset": {
+    "title": "SQLite WAL-reset — SQLite 파일 락 방지",
+    "desc": "Windows x64 빌드 기기에서의 Windows ARM64 타겟 패키징을 수선하였고, 대규모 쓰기 트랜잭션 시 파일 락을 방지하는 SQLite WAL-reset 의존성이 락인되었습니다.",
+    "example": ""
+  },
+  "app declaration name": {
+    "title": "app declaration name — 플러그인 MCP 중복 제거",
+    "desc": "동일한 플러그인을 중복 로드하여 발생하는 MCP 충돌을 사전에 방지하고자 앱 내부 선언명 기준의 자동 중복 방지 제어를 지원합니다.",
+    "example": ""
   }
 }
 ;

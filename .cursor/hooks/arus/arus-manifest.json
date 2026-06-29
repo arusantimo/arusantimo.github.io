@@ -1,0 +1,13 @@
+{
+  "skills": {
+    "aru-goal": {
+      "targets": {
+        "cursor": {
+          "scopes": {
+            "project": true
+          }
+        }
+      }
+    }
+  }
+}

@@ -157,7 +157,7 @@ class SimBrokerTests(unittest.TestCase):
     def test_partial_target_fill_then_same_day_close_can_stop_remaining(self):
         result = self._simulate(self._market_data(day1_high=10300.0, day1_low=9600.0, day1_close=9600.0))
         self.assertEqual(result["result"]["tradeStatus"], "closed")
-        self.assertEqual(result["result"]["closedReason"], "same_day_close_stop")
+        self.assertEqual(result["result"]["closedReason"], "profit_then_stop")
         self.assertEqual(result["result"]["ambiguousCount"], 0)
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
         sell_fills = [fill for fill in result["fills"] if fill["orderId"].endswith(("premarket", "stop"))]
@@ -346,7 +346,7 @@ class SimBrokerTests(unittest.TestCase):
             )
         )
         self.assertEqual(result["result"]["tradeStatus"], "closed")
-        self.assertEqual(result["result"]["closedReason"], "stop_close")
+        self.assertEqual(result["result"]["closedReason"], "profit_then_stop")
         self.assertEqual(result["result"]["exitFilledAt"], "2026-06-05T15:00:00+09:00")
         self.assertEqual(result["result"]["exitLastFillPrice"], 9600.0)
         self.assertEqual(result["result"]["filledExitQuantityPct"], 100.0)
@@ -463,6 +463,43 @@ class SimBrokerTests(unittest.TestCase):
         ])
         self.assertEqual(result["result"]["closedReason"], "breakeven_fail")
         self.assertEqual(result["result"]["exitLastFillPrice"], 10000.0)
+
+    def test_swing_hold_rather_than_cutoff(self):
+        plan = [
+            {"stage": "🌅 프리마켓", "quantity": "40% 익절", "targetYield": "+2.0%", "targetPrice": "10,200원"},
+            {"stage": "🔔 장초반", "quantity": "40% 익절", "targetYield": "+4.0%", "targetPrice": "10,400원"},
+            {"stage": "📊 스윙 전환", "quantity": "20% 익절", "targetYield": "+10.0%", "targetPrice": "11,000원", "stageKey": "swing"},
+            {"stage": "🛑 손절", "quantity": "전량", "targetYield": "-3.0%", "targetPrice": "9,700원"},
+        ]
+        market_data = self._market_data(
+            day1_open=10000.0,
+            day1_high=10300.0,
+            day1_low=9800.0,
+            day1_close=10100.0,
+            day2_open=10080.0,
+            day2_high=10500.0,
+            day2_low=9800.0,
+            day2_close=10080.0,
+        )
+        result = simulate_trade(
+            run_id="run-1",
+            date="2026-06-03",
+            variant="stable",
+            strategy="pullback",
+            code="000001",
+            name="테스트",
+            source_entry_key="20260603|stable|pullback|000001",
+            trade_plan_rows=plan,
+            market_data=market_data,
+            auto_flatten=True,
+        )
+        self.assertEqual(result["result"]["tradeStatus"], "open")
+        self.assertEqual(result["result"]["closedReason"], "swing_hold")
+        self.assertEqual(result["result"]["remainingQuantityPct"], 60.0)
+        self.assertIsNotNone(result["result"]["netReturnPct"])
+        
+        sell_fills = [fill for fill in result["fills"] if fill["side"] == "SELL"]
+        self.assertFalse(any(fill["fillRule"] == "swing_hold" for fill in result["fills"]))
 
 
 if __name__ == "__main__":

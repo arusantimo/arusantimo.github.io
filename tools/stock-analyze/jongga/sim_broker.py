@@ -452,7 +452,11 @@ def simulate_exit_plan(
             if stop_order and stop_order is not market_order and stop_order.get("finalStatus") == "open":
                 stop_order["finalStatus"] = "cancelled"
             remaining = 0.0
-            closed_reason = "same_day_close_stop"
+            has_prior_profit = any(
+                f.get("side") == "SELL" and f.get("stageKey") not in {"stop", "finalCutoff", ""}
+                for f in fills
+            )
+            closed_reason = "profit_then_stop" if has_prior_profit else "same_day_close_stop"
             break
 
         stop_hit = bool(
@@ -481,7 +485,11 @@ def simulate_exit_plan(
             if final_order and final_order.get("finalStatus") == "open":
                 final_order["finalStatus"] = "cancelled"
             remaining = 0.0
-            closed_reason = "stop_close"
+            has_prior_profit = any(
+                f.get("side") == "SELL" and f.get("stageKey") not in {"stop", "finalCutoff", ""}
+                for f in fills
+            )
+            closed_reason = "profit_then_stop" if has_prior_profit else "stop_close"
             break
 
     if remaining > 0 and auto_flatten and final_exit_at:
@@ -489,37 +497,44 @@ def simulate_exit_plan(
         if final_bar is None and bars:
             final_bar = bars[-1]
         if final_bar is not None:
-            if final_order is None:
-                final_order = make_order(
-                    order_id=f"{orders[0]['orderId'].rsplit('-', 1)[0]}-final",
-                    run_id=str(orders[0].get("runId") or ""),
-                    date=str(orders[0].get("date") or ""),
-                    variant=str(orders[0].get("variant") or ""),
-                    strategy=str(orders[0].get("strategy") or ""),
-                    code=str(orders[0].get("code") or ""),
-                    name=str(orders[0].get("name") or ""),
-                    side="SELL",
-                    order_type="MKT",
-                    requested_at=str(final_bar.get("timestamp") or ""),
-                    requested_price=float(final_bar.get("close") or 0.0),
-                    quantity_pct=remaining,
-                    reason="3일차 종가 컷오프 청산",
-                    source_entry_key=str(orders[0].get("sourceEntryKey") or ""),
-                    stage_key="finalCutoff",
+            swing_order = next((order for order in orders if order.get("stageKey") == "swing"), None)
+            swing_target_price = float(swing_order.get("requestedPrice") or 0.0) if swing_order else 0.0
+
+            if swing_order and swing_target_price > 0.0:
+                swing_order["finalStatus"] = "open"
+                closed_reason = "swing_hold"
+            else:
+                if final_order is None:
+                    final_order = make_order(
+                        order_id=f"{orders[0]['orderId'].rsplit('-', 1)[0]}-final",
+                        run_id=str(orders[0].get("runId") or ""),
+                        date=str(orders[0].get("date") or ""),
+                        variant=str(orders[0].get("variant") or ""),
+                        strategy=str(orders[0].get("strategy") or ""),
+                        code=str(orders[0].get("code") or ""),
+                        name=str(orders[0].get("name") or ""),
+                        side="SELL",
+                        order_type="MKT",
+                        requested_at=str(final_bar.get("timestamp") or ""),
+                        requested_price=float(final_bar.get("close") or 0.0),
+                        quantity_pct=remaining,
+                        reason="3일차 종가 컷오프 청산",
+                        source_entry_key=str(orders[0].get("sourceEntryKey") or ""),
+                        stage_key="finalCutoff",
+                    )
+                    orders.append(final_order)
+                final_order["finalStatus"] = "filled"
+                fills.append(
+                    _fill_from_bar(
+                        final_order,
+                        final_bar,
+                        qty=remaining,
+                        fill_rule="third_day_cutoff_market",
+                        fill_price=float(final_bar.get("close") or 0.0),
+                    )
                 )
-                orders.append(final_order)
-            final_order["finalStatus"] = "filled"
-            fills.append(
-                _fill_from_bar(
-                    final_order,
-                    final_bar,
-                    qty=remaining,
-                    fill_rule="third_day_cutoff_market",
-                    fill_price=float(final_bar.get("close") or 0.0),
-                )
-            )
-            remaining = 0.0
-            closed_reason = "third_day_cutoff_market"
+                remaining = 0.0
+                closed_reason = "third_day_cutoff_market"
 
     return fills, {
         "remainingQuantityPct": round(remaining, 4),
@@ -696,7 +711,14 @@ def simulate_trade(
     )
     fills.extend(exit_fills)
     sell_fills = [fill for fill in exit_fills if fill.get("orderId") != entry_order["orderId"]]
-    result_return = net_return_pct(entry_fill, sell_fills)
+    eval_fills = list(sell_fills)
+    if exit_meta["remainingQuantityPct"] > 0 and len(replay_bars) > 0:
+        last_bar = replay_bars[-1]
+        eval_fills.append({
+            "filledQuantityPct": exit_meta["remainingQuantityPct"],
+            "fillPrice": float(last_bar.get("close") or 0.0),
+        })
+    result_return = net_return_pct(entry_fill, eval_fills)
     exit_prices = [float(fill.get("fillPrice") or 0.0) for fill in sell_fills if float(fill.get("fillPrice") or 0.0) > 0]
     exit_weighted_notional = sum(
         float(fill.get("fillPrice") or 0.0) * (float(fill.get("filledQuantityPct") or 0.0) / 100.0)

@@ -883,3 +883,30 @@ test('missing replay data disables strategy button and renders empty state', () 
   assert.equal(button.disabled, true);
   assert.match(summary.innerHTML, /검증 데이터 없음|자동 검증 실패/);
 });
+
+test('skipped replay status keeps strategy button enabled but renders skipped message', () => {
+  const context = loadReplayContext();
+  const badge = createElementStub();
+  const summary = createElementStub();
+  const button = createElementStub();
+  context.elements.set('jongga-replay-badge-pullback', badge);
+  context.elements.set('jongga-replay-summary-pullback', summary);
+  context.elements.set('btn-open-jongga-replay-pullback', button);
+
+  context.window.JONGGA_REPLAY_RUNS = {
+    latestRun: {
+      strategyViews: {}
+    },
+    latestAttempt: {
+      status: 'skipped',
+      message: '17:30 세션에서는 자동 replay를 생략합니다.'
+    }
+  };
+
+  context.renderReplayStrategySections();
+
+  assert.equal(badge.textContent, '생략');
+  assert.equal(button.disabled, false);
+  assert.equal(button.title, '17:30 세션에서는 자동 replay를 생략합니다.');
+  assert.match(summary.innerHTML, /자동 replay를 생략합니다/);
+});

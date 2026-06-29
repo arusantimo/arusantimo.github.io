@@ -1,7 +1,7 @@
 window.__MARKET_ANALYZE_MANIFEST__ = {
-  "latestDate": "20260615",
-  "latestFile": "store/results/result-20260615.js",
-  "generatedAt": "2026-06-15T05:06:45+00:00",
+  "latestDate": "20260626",
+  "latestFile": "store/results/result-20260626.js",
+  "generatedAt": "2026-06-26T05:13:40+00:00",
   "availableDates": [
     "20260523",
     "20260524",
@@ -19,7 +19,16 @@ window.__MARKET_ANALYZE_MANIFEST__ = {
     "20260610",
     "20260611",
     "20260612",
-    "20260615"
+    "20260615",
+    "20260616",
+    "20260617",
+    "20260618",
+    "20260619",
+    "20260622",
+    "20260623",
+    "20260624",
+    "20260625",
+    "20260626"
   ],
   "schemaVersion": "1.2.2"
 };

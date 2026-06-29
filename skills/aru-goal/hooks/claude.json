@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{ARUS_HOOK_CMD}}",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

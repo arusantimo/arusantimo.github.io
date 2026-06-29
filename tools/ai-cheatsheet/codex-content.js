@@ -10,46 +10,76 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.142.3</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-29</span>
+        <span class="meta-version">v0.141.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-18</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.142.3)</span>
+        <span>📋 최근 변경사항 (v0.141.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Codex /automate 스킬 및 다중 레포 지원 (v0.142.3)"
-            data-tt-desc="자연어로 자동화 스크립트를 생성하고, Slack 트리거나 다중 리포지토리에 연결할 수 있습니다."
-            data-tt-example="/automate"><code>/automate</code> 자동화 스킬 및 다중 레포트리거 지원 (v0.142.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 실행기 Noise E2EE 릴레이 적용 (v0.141.0)"
+            data-tt-desc="원격 CLI 세션과 로컬 환경을 연동하는 리모트 러너 채널에 Noise 프로토콜을 사용한 종단간 암호화(E2EE) 보안 통신망이 가동됩니다."
+            data-tt-example="">원격 실행기용 <code>Noise E2EE</code> 릴레이 채널 적용 (v0.141.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Windows ARM64 패키지 및 SQLite 고정 (v0.141.0)"
+            data-tt-desc="Windows x64 빌드 기기에서의 Windows ARM64 타겟 패키징을 수선하였고, 대규모 쓰기 트랜잭션 시 파일 락을 방지하는 SQLite WAL-reset 의존성이 락인되었습니다."
+            data-tt-example="">Windows ARM64 크로스 패키징 안정화 및 <code>SQLite WAL-reset</code> 버그 수정 의존성 핀 (v0.141.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="플러그인 MCP 선언 중복 제거 (v0.141.0)"
+            data-tt-desc="동일한 플러그인을 중복 로드하여 발생하는 MCP 충돌을 사전에 방지하고자 앱 내부 선언명 기준의 자동 중복 방지 제어를 지원합니다."
+            data-tt-example="">플러그인 MCP의 애플리케이션 선언 명칭(<code>app declaration name</code>) 기반 중복 제거 (v0.141.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
 
-          
+          <details class="ver-group">
+            <summary>v0.140.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="/usage 토큰 사용량 모니터링 도입 (v0.140.0)"
+                data-tt-desc="일간, 주간 및 누적 계정 토큰 소비 통계를 간편하게 확인할 수 있는 TUI 뷰어를 제공합니다."
+                data-tt-example="">일간/주간/누적 토큰 소비 분석 <code>/usage</code> 뷰어 추가 (v0.140.0)</li>
+              <li class="cl-tip" data-tt-title="/delete 및 codex delete 세션 삭제 지원 (v0.140.0)"
+                data-tt-desc="실수로 유출되거나 더 이상 필요 없는 세션 데이터를 프레임워크 수준에서 완전히 삭제할 수 있는 안전한 영구 삭제 기능을 지원합니다."
+                data-tt-example="">안전 필터 기반 세션 영구 제거 <code>/delete</code> 및 <code>codex delete</code> 추가 (v0.140.0)</li>
+              <li class="cl-tip" data-tt-title="통합 멘션 @ 메뉴 기본 노출 (v0.140.0)"
+                data-tt-desc="@ 기호를 입력하면 파일, 플러그인, 커스텀 스킬 목록을 한눈에 보고 선택할 수 있는 팝업 멘션 창이 기본 활성화됩니다."
+                data-tt-example="">파일/플러그인/스킬 통합 멘션 <code>@</code> 메뉴 기본 노출 지원 (v0.140.0)</li>
+              <li class="cl-tip" data-tt-title="/import Claude Code 이력 마이그레이션 (v0.140.0)"
+                data-tt-desc="Claude Code의 환경 설정 정보 및 최근 나눈 대화 세션을 불러와 이어서 대화할 수 있는 마이그레이션 기능을 제공합니다."
+                data-tt-example="">Claude Code 설정 및 스레드 마이그레이션 <code>/import</code> 지원 (v0.140.0)</li>
+              <li class="cl-tip" data-tt-title="Amazon Bedrock API key 인증 및 OAuth 자격증명 암호화 (v0.140.0)"
+                data-tt-desc="Bedrock API 키를 독자적으로 저장할 수 있는 세션 키 체인 및 로컬 OAuth 자격 증명의 대칭 암호화 처리를 적용했습니다."
+                data-tt-example="">Bedrock API key 인증 및 로컬 OAuth 크리덴셜 대칭 암호화 저장 패치 (v0.140.0)</li>
+              <li class="cl-tip" data-tt-title="대형 레포 반응성 최적화 및 SQLite 복구 로직 (v0.140.0)"
+                data-tt-desc="Git FSMonitor를 재사용하여 불필요한 IO 스캔을 단축하고, SQLite DB 훼손 시 백업 및 자동 재생성 복구를 적용했습니다."
+                data-tt-example="">대용량 저장소 IO 반응 속도 개선 및 SQLite 데이터베이스 파손 자동 복구 (v0.140.0)</li>
+            </ul>
+          </details>
+
           <details class="ver-group">
             <summary>v0.139.0</summary>
             <ul>
-          <li class="cl-tip" data-tt-title="독립 웹 검색 직접 호출 지원 (v0.139.0)"
-            data-tt-desc="Code 모드에서 중첩 JS 도구 호출 및 독립 웹 검색 직접 실행을 지원하며, 획득한 평문 검색 결과를 인라인으로 처리합니다."
-            data-tt-example="">독립 웹 검색(Web Search) 직접 실행 및 평문 결과 획득 지원 (v0.139.0) </li>
-          <li class="cl-tip" data-tt-title="codex doctor 환경 변수 수집 개선 (v0.139.0)"
-            data-tt-desc="codex doctor 실행 시 진단을 위해 에디터 및 페이저 환경 변수 상세 정보를 마스킹 처리하여 안전하게 수집합니다."
-            data-tt-example="codex doctor"><code>codex doctor</code> 환경 변수 진단 마스킹 및 수집 개선 (v0.139.0) </li>
-          <li class="cl-tip" data-tt-title="resume 및 fork 명령어 버그 수정 (v0.139.0)"
-            data-tt-desc="codex resume 및 codex fork 실행 시 전달된 trailing arguments를 초기 프롬프트로 정확히 매핑하여 해석하도록 개선되었습니다."
-            data-tt-example="codex resume 'auth-bug'"><code>codex resume</code> / <code>fork</code> 후행 인수 초기 프롬프트 파싱 버그 수정 (v0.139.0) </li>
-          <li class="cl-tip" data-tt-title="V8 툴체인 및 디버그 기호 아카이브 분리 (v0.139.0)"
-            data-tt-desc="임베디드 V8 툴체인을 rusty_v8 149.2.0으로 업데이트하고, 디버깅을 위해 기호(symbol) 아카이브를 분리하여 출시합니다."
-            data-tt-example="">임베디드 <code>rusty_v8 149.2.0</code> 툴체인 업데이트 및 심볼 분리 배포 (v0.139.0) </li>
-        </ul>
+              <li class="cl-tip" data-tt-title="독립 웹 검색 직접 호출 지원 (v0.139.0)"
+                data-tt-desc="Code 모드에서 중첩 JS 도구 호출 및 독립 웹 검색 직접 실행을 지원하며, 획득한 평문 검색 결과를 인라인으로 처리합니다."
+                data-tt-example="">독립 웹 검색(Web Search) 직접 실행 및 평문 결과 획득 지원 (v0.139.0)</li>
+              <li class="cl-tip" data-tt-title="codex doctor 환경 변수 수집 개선 (v0.139.0)"
+                data-tt-desc="codex doctor 실행 시 진단을 위해 에디터 및 페이저 환경 변수 상세 정보를 마스킹 처리하여 안전하게 수집합니다."
+                data-tt-example="codex doctor"><code>codex doctor</code> 환경 변수 진단 마스킹 및 수집 개선 (v0.139.0)</li>
+              <li class="cl-tip" data-tt-title="resume 및 fork 명령어 버그 수정 (v0.139.0)"
+                data-tt-desc="codex resume 및 codex fork 실행 시 전달된 trailing arguments를 초기 프롬프트로 정확히 매핑하여 해석하도록 개선되었습니다."
+                data-tt-example="codex resume 'auth-bug'"><code>codex resume</code> / <code>fork</code> 후행 인수 초기 프롬프트 파싱 버그 수정 (v0.139.0)</li>
+              <li class="cl-tip" data-tt-title="V8 툴체인 및 디버그 기호 아카이브 분리 (v0.139.0)"
+                data-tt-desc="임베디드 V8 툴체인을 rusty_v8 149.2.0으로 업데이트하고, 디버깅을 위해 기호(symbol) 아카이브를 분리하여 출시합니다."
+                data-tt-example="">임베디드 <code>rusty_v8 149.2.0</code> 툴체인 업데이트 및 심볼 분리 배포 (v0.139.0)</li>
+            </ul>
           </details>
-<details class="ver-group">
+
+          <details class="ver-group">
             <summary>v0.138.0</summary>
             <ul>
               <li class="cl-tip" data-tt-title="/app 명령어 데스크톱 앱 전환 (v0.138.0)"
@@ -337,6 +367,18 @@ const codexContent = `
             <div class="row-key"><code>/goal</code></div>
             <div class="row-desc">장기 목표(goal) 워크플로 관리</div>
           </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/delete</code></div>
+            <div class="row-desc">세션 영구 삭제 <span class="badge-new">NEW</span></div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/usage</code></div>
+            <div class="row-desc">토큰 사용 통계 뷰어 <span class="badge-new">NEW</span></div>
+          </div>
+          <div class="row cl-tip">
+            <div class="row-key"><code>/import</code></div>
+            <div class="row-desc">Claude Code 설정/이력 가져오기 <span class="badge-new">NEW</span></div>
+          </div>
         </div>
         <div class="group">
           <div class="group-label">작업 흐름</div>
@@ -459,6 +501,10 @@ const codexContent = `
               <div class="row">
                 <div class="row-key"><code>codex update</code></div>
                 <div class="row-desc">최신 버전으로 업데이트</div>
+              </div>
+              <div class="row cl-tip">
+                <div class="row-key"><code>codex delete</code></div>
+                <div class="row-desc">지정된 세션 ID 영구 삭제 <span class="badge-new">NEW</span></div>
               </div>
             </div>
             <div class="group">

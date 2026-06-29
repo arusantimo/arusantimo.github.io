@@ -8,7 +8,7 @@ const JONGGA_REPLAY_STRATEGY_ORDER = ['pullback', 'accumulation', 'breakout', 'r
 const REPLAY_DAY_PAGE_SIZE = 5;
 
 let currentReplayStrategy = null;
-let replayStockSectionCollapsed = false;
+let replayStockSectionCollapsed = true;
 let replayDayPageIndex = 0;
 
 function getJonggaReplayBridge() {
@@ -224,17 +224,21 @@ function getReplayClosedReasonLabel(value) {
     swing_touch: '스윙 목표가 도달',
     breakeven_fail: '본절가 이탈 청산',
     breakeven_fail_market: '본절가 실패 청산',
+    time_stop_0915: '09:15 시간 청산',
     time_stop_0915_market: '09:15 시간 청산',
     reversal_intraday_stop: '장중 데드라인 이탈 손절',
     third_day_cutoff_market: '3일차 종가 컷오프 청산',
     stop_close: '종가 손절',
     stop_touch: '손절',
-    ambiguous_stop_first: '동일봉 손절 우선'
+    ambiguous_stop_first: '동일봉 손절 우선',
+    same_day_close_stop: '당일 종가 손절',
+    profit_then_stop: '익절 후 종가 청산',
+    swing_hold: '스윙 전환 대기'
   };
   return labels[String(value || '').trim()] || String(value || '-');
 }
 
-function getReplaySellStageLabel(value) {
+function getReplaySellStageLabel(value, remainingQuantityPct = null) {
   const labels = {
     premarket_touch: '💚 프리마켓 익절',
     premarket_target_touch: '💚 프리마켓 익절',
@@ -247,14 +251,27 @@ function getReplaySellStageLabel(value) {
     swing_touch: '💚 스윙 익절',
     breakeven_fail: '🛡️ 본절 청산',
     breakeven_fail_market: '🛡️ 본절 실패 청산',
+    time_stop_0915: '🕘 시간 청산',
     time_stop_0915_market: '🕘 시간 청산',
-    third_day_cutoff_market: '📊 스윙 전환',
+    third_day_cutoff_market: '🛑 컷오프 청산',
     reversal_intraday_stop: '🛑 장중 손절',
     stop_close: '🛑 손절',
     stop_touch: '🛑 손절',
-    ambiguous_stop_first: '🛑 손절'
+    ambiguous_stop_first: '🛑 손절',
+    same_day_close_stop: '🛑 당일 종가 손절',
+    profit_then_stop: '🛑 익절 후 종가 청산',
+    swing_hold: '📊 스윙 전환'
   };
-  return labels[String(value || '').trim()] || '—';
+  const key = String(value || '').trim();
+  if (key === 'swing_hold') {
+    console.log("getReplaySellStageLabel swing_hold trigger:", { value, remainingQuantityPct, type: typeof remainingQuantityPct });
+    const pct = parseFloat(remainingQuantityPct);
+    if (!isNaN(pct) && pct > 0) {
+      return `📊 스윙 전환(${pct}%)`;
+    }
+    return '📊 스윙 전환';
+  }
+  return labels[key] || '—';
 }
 
 function normalizeReplayDate(value) {
@@ -300,7 +317,7 @@ function toggleReplayStockSection() {
 }
 
 function resetReplayModalViewState() {
-  replayStockSectionCollapsed = false;
+  replayStockSectionCollapsed = true;
   replayDayPageIndex = 0;
 }
 
@@ -540,6 +557,7 @@ function summarizeReplayTradeRows(results = [], fills = []) {
     closedReason: item?.closedReason,
     netReturnPct: item?.netReturnPct,
     mixedExitPolicy: item?.mixedExitPolicy || null,
+    remainingQuantityPct: item?.remainingQuantityPct,
     fills: fillsByEntryKey.get(String(item?.sourceEntryKey || '')) || []
   }));
 }
@@ -958,7 +976,8 @@ function renderReplayStrategySections() {
     }
 
     if (button) {
-      button.disabled = !actionable || !hasStrategyData;
+      const isSkipped = attemptStatus === 'skipped';
+      button.disabled = (!actionable && !isSkipped) || (!hasStrategyData && !isSkipped);
       if (!latestRun) {
         button.title = '표시할 replay 결과가 없습니다.';
       } else if (!actionable) {
@@ -1038,6 +1057,9 @@ function renderReplayTradeTable(rows = []) {
         </thead>
         <tbody>
           ${rows.map(item => {
+            if (item && item.code === '012450') {
+              console.log("renderReplayTradeTable Hanwha item:", JSON.stringify(item));
+            }
             const tradeKey = getReplayTradeKey(item);
             const rowId = buildReplayTradeRowId(item);
             const detailId = buildReplayTradeDetailRowId(item);
@@ -1062,7 +1084,7 @@ function renderReplayTradeTable(rows = []) {
                 ${escapeHtml(formatReplayPrice(item.exitAvgFillPrice || item.exitLastFillPrice))}
                 <div class="replay-cell-sub">${escapeHtml(formatReplayDate(item.exitFilledAt))}</div>
               </td>
-              <td>${escapeHtml(getReplaySellStageLabel(item.closedReason))}</td>
+              <td>${escapeHtml(getReplaySellStageLabel(item.closedReason, item.remainingQuantityPct))}</td>
               <td>${renderColoredPercent(item.netReturnPct)}</td>
               <td>
                 ${escapeHtml(item.tradeStatus || '-')}
@@ -1186,7 +1208,7 @@ function renderJonggaReplayModal(strategy = currentReplayStrategy) {
     )}
     ${hasStrategyData
       ? (replayStockSectionCollapsed
-        ? '<div class="replay-section-collapsed-note">종목별 수익 표를 접어둔 상태입니다.</div>'
+        ? ''
         : renderReplayStockTable(strategyView?.stocks || []))
       : '<div class="replay-empty">종목별 수익 데이터가 없습니다.</div>'}
     ${renderReplaySectionHead('일자별 요약', hasStrategyData ? renderReplayDayPager(dayPageState) : '')}

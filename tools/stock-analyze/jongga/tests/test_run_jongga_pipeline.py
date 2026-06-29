@@ -462,7 +462,7 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
              mock.patch.object(pipeline, "run_replay_backtest", return_value=(0, {"status": "complete"})) as run_replay_backtest, \
              mock.patch.object(pipeline, "validate_outputs", return_value=(0, {"status": "complete"})) as validate_outputs, \
              mock.patch.object(pipeline, "print_summary") as print_summary, \
-             mock.patch.object(pipeline.sys, "argv", ["run_jongga_pipeline.py", "--session", "1730"]):
+             mock.patch.object(pipeline.sys, "argv", ["run_jongga_pipeline.py", "--session", "1500", "--date", "2026-06-12"]):
             exit_code = pipeline.main()
 
         self.assertEqual(exit_code, 0)
@@ -474,6 +474,36 @@ class RunJonggaPipelineReplayTests(unittest.TestCase):
             top_limit=40,
         )
         run_replay_backtest.assert_called_once()
+        validate_outputs.assert_called_once()
+        print_summary.assert_called_once()
+
+    def test_main_skips_replay_for_1730_session(self):
+        with mock.patch.object(pipeline, "run_preflight") as run_preflight, \
+             mock.patch.object(pipeline, "resolve_pipeline_analysis_date", return_value=date(2026, 6, 12)), \
+             mock.patch.object(pipeline, "run_generate", return_value=0) as run_generate, \
+             mock.patch.object(pipeline, "run_outcome_backfill") as run_outcome_backfill, \
+             mock.patch.object(pipeline, "publish_rescored_stable_output", return_value=(0, {"changedEntries": 2})) as publish_rescored_stable_output, \
+             mock.patch.object(pipeline, "run_replay_backtest", return_value=(0, {"status": "complete"})) as run_replay_backtest, \
+             mock.patch("jongga.replay_backtest.write_replay_bridge") as write_replay_bridge, \
+             mock.patch.object(pipeline, "validate_outputs", return_value=(0, {"status": "complete"})) as validate_outputs, \
+             mock.patch.object(pipeline, "print_summary") as print_summary, \
+             mock.patch.object(pipeline.sys, "argv", ["run_jongga_pipeline.py", "--session", "1730", "--date", "2026-06-12"]):
+            exit_code = pipeline.main()
+
+        self.assertEqual(exit_code, 0)
+        run_preflight.assert_called_once()
+        run_outcome_backfill.assert_called_once()
+        run_generate.assert_called_once()
+        publish_rescored_stable_output.assert_called_once_with(
+            analysis_date="2026-06-12",
+            top_limit=40,
+        )
+        run_replay_backtest.assert_not_called()
+        write_replay_bridge.assert_called_once()
+        self.assertEqual(
+            write_replay_bridge.call_args.kwargs["latest_attempt"]["message"],
+            "17:30 세션에서는 자동 replay를 생략합니다.",
+        )
         validate_outputs.assert_called_once()
         print_summary.assert_called_once()
 

@@ -49,5 +49,15 @@ window.ANTIGRAVITY_TIPS = {
     "title": "웹 브라우저 자동화 토글 (/browser)",
     "desc": "에이전트가 헤드리스 크롬(Chrome) 등을 띄워 웹 사이트 크롤링이나 웹 앱의 프론트엔드 UI 검증을 수행할 수 있도록 설정합니다.",
     "example": "/browser"
+  },
+  "/btw": {
+    "title": "/btw — 가벼운 질문 및 응답",
+    "desc": "가벼운 대화를 나누는 /btw 명령어 구동 시 불필요한 토큰 낭비를 절감하고 중간 응답을 실시간 텍스트 스트리밍 방식으로 수신합니다.",
+    "example": "/btw '이 코드 구조에 대해 간단히 설명해줘'"
+  },
+  "/hooks": {
+    "title": "/hooks — 훅 설정 구성",
+    "desc": "훅 구성 저장 경로를 shared config 경로(~/.gemini/config/hooks.json)로 이전하여 IDE 등과 동기화되도록 수정했습니다.",
+    "example": "/hooks"
   }
 };
