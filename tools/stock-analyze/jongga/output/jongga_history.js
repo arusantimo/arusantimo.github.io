@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-29T06:06:00+00:00",
+    "generatedAt": "2026-06-29T08:35:06+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 12,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,39 +26,54 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G5, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 371000
+        "currentPrice": 373000
       },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "삼성SDI",
         "code": "006400",
-        "score": 9.2,
-        "signalScore": 9.2,
-        "strictScore": 9.2,
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
         "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G5, G6)",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G6)",
         "entryEligible": false,
-        "currentPrice": 511000
+        "currentPrice": 512000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G5, G6)",
+        "entryEligible": false,
+        "currentPrice": 50100
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "LG전자",
         "code": "066570",
-        "score": 8.3,
-        "signalScore": 8.3,
-        "strictScore": 8.3,
+        "score": 9.8,
+        "signalScore": 9.8,
+        "strictScore": 9.8,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 5.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1, G5)",
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 197900
+        "currentPrice": 196700
       },
       {
         "strategy": "accumulation",
@@ -70,40 +85,40 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 6.6,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.7,
-        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
+        "gradeScore": 4.9,
+        "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1671000
+        "currentPrice": 1640000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 4.0,
-        "signalScore": 4.0,
-        "strictScore": 4.0,
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 3.6,
+        "signalScore": 3.6,
+        "strictScore": 3.6,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.2,
+        "gradeScore": 2.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 1671000
+        "currentPrice": 88000
       },
       {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "에코프로",
-        "code": "086520",
-        "score": 2.8,
-        "signalScore": 2.8,
-        "strictScore": 2.8,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 2.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 117300
+        "currentPrice": 50100
       },
       {
         "strategy": "reversal",
@@ -119,20 +134,24 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 117300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 88000
       }
     ],
     "blacklist": [
-      {
-        "code": "475150",
-        "name": "SK이터닉스",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "373220",
         "name": "LG에너지솔루션",
