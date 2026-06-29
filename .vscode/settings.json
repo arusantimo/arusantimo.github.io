@@ -22,6 +22,7 @@
             "matchCommandLine": true
         },
         "git -C .": true,
-        "git commit": true
+        "git commit": true,
+        "git push": true
     }
 }
