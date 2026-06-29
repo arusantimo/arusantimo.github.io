@@ -1,5 +1,165 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-29",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260629.js",
+    "jsonFile": "jongga/output/202606/latest_20260629.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260629.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-29T06:06:00+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 12,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G5, G13)",
+        "entryEligible": false,
+        "currentPrice": 371000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G5, G6)",
+        "entryEligible": false,
+        "currentPrice": 511000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1, G5)",
+        "entryEligible": false,
+        "currentPrice": 197900
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "시장 Gate 차단 · 신규 진입 보류",
+        "entryEligible": false,
+        "currentPrice": 1671000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 1671000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "에코프로",
+        "code": "086520",
+        "score": 2.8,
+        "signalScore": 2.8,
+        "strictScore": 2.8,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 2.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
+        "entryEligible": false,
+        "currentPrice": 117300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "에코프로",
+        "code": "086520",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 117300
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "373220",
+        "name": "LG에너지솔루션",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-26",
     "variant": "stable",
     "variantLabel": "현재 버전",
