@@ -67,9 +67,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-jongga-${{ hashFiles('tools/stock-analyze/requirements-ci.txt') }}
+          # Playwright 1.49+ headless 실행은 chromium-headless-shell 바이너리를 사용합니다.
+          key: playwright-${{ runner.os }}-jongga-headless-shell-${{ hashFiles('tools/stock-analyze/requirements-ci.txt') }}
           restore-keys: |
-            playwright-${{ runner.os }}-jongga-
+            playwright-${{ runner.os }}-jongga-headless-shell-
 
       - name: Install Python dependencies
         working-directory: tools/stock-analyze
@@ -77,15 +78,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-ci.txt
 
-      - name: Install Playwright Chromium (cache miss)
+      - name: Install Playwright headless shell (cache miss)
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         working-directory: tools/stock-analyze
-        run: python -m playwright install chromium --with-deps
+        run: python -m playwright install --with-deps --only-shell
 
-      - name: Install Playwright system deps only (cache hit)
+      - name: Install Playwright system deps and headless shell (cache hit)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         working-directory: tools/stock-analyze
-        run: python -m playwright install-deps chromium
+        run: |
+          python -m playwright install-deps chromium-headless-shell
+          python -m playwright install chromium-headless-shell
 
       - name: Verify Playwright runtime
         working-directory: tools/stock-analyze
