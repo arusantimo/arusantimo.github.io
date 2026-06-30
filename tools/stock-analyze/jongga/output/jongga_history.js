@@ -1,5 +1,147 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-06-30",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202606/jongga_data_20260630.js",
+    "jsonFile": "jongga/output/202606/latest_20260630.json",
+    "inputArchiveFile": "jongga/output/archive/202606/inputs_20260630.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-06-30T07:44:42+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, G6)",
+        "entryEligible": false,
+        "currentPrice": 201000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1697000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 3.8,
+        "signalScore": 3.8,
+        "strictScore": 3.8,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 86800
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1697000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LS ELECTRIC",
+        "code": "010120",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 238000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "080220",
+        "name": "제주반도체",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-29",
     "variant": "stable",
     "variantLabel": "현재 버전",

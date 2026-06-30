@@ -775,5 +775,26 @@
     "barLow": 190300.0,
     "barClose": 196400.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260624|stable|breakout|000660-stop_touch",
+    "sourceEntryKey": "20260624|stable|breakout|000660",
+    "strategy": "breakout",
+    "code": "000660",
+    "name": "SK하이닉스",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-29T15:00:00+09:00",
+    "fillPrice": 2523000.0,
+    "filledQuantityPct": 25.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-29T15:00:00+09:00",
+    "barOpen": 2636000.0,
+    "barHigh": 2688000.0,
+    "barLow": 2517000.0,
+    "barClose": 2628000.0,
+    "fillRule": "stop_touch"
   }
 ]

@@ -12,15 +12,15 @@
     "sourceEntryKey": "20260617|stable|breakout|000660"
   },
   {
-    "runId": "replay-20260625-061123-048a62a2",
-    "entryDate": "2026-06-24",
-    "code": "000660",
-    "name": "SK하이닉스",
-    "strategy": "breakout",
-    "entryPrice": 2582580.0,
-    "swingTargetPrice": 3096000.0,
-    "stopPrice": 2523000.0,
-    "qtyPct": 25.0,
-    "sourceEntryKey": "20260624|stable|breakout|000660"
+    "runId": "replay-20260630-074458-8cde84a9",
+    "entryDate": "2026-06-29",
+    "code": "475150",
+    "name": "SK이터닉스",
+    "strategy": "pullback",
+    "entryPrice": 50150.1,
+    "swingTargetPrice": 55110.0,
+    "stopPrice": 48346.0,
+    "qtyPct": 5.0,
+    "sourceEntryKey": "20260629|stable|pullback|475150"
   }
 ]

@@ -1438,5 +1438,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-06-26T15:00:00+09:00",
     "activeUntil": "2026-06-26T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260624|stable|breakout|000660-stop_touch",
+    "runId": "replay-20260625-061123-048a62a2",
+    "date": "2026-06-24",
+    "variant": "stable",
+    "strategy": "breakout",
+    "code": "000660",
+    "name": "SK하이닉스",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-06-29T15:00:00+09:00",
+    "requestedPrice": 2523000.0,
+    "quantityPct": 25.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260624|stable|breakout|000660",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-06-29T15:00:00+09:00",
+    "activeUntil": "2026-06-29T15:00:00+09:00"
   }
 ]
