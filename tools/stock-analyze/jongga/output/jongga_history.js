@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-30T07:44:42+00:00",
+    "generatedAt": "2026-06-30T08:34:33+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -44,6 +44,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "관심후보",
         "entryEligible": false,
         "currentPrice": 1697000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 6.8,
+        "signalScore": 6.8,
+        "strictScore": 6.8,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 86800
       },
       {
         "strategy": "breakout",
@@ -89,6 +104,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 238000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "제주반도체",
+        "code": "080220",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 103900
       }
     ],
     "blacklist": [
@@ -99,7 +129,8 @@ window.JONGGA_HISTORY_INDEX = [
           "투자 주의"
         ],
         "sources": [
-          "kind"
+          "kind",
+          "toss"
         ],
         "status": "confirmed"
       },
@@ -110,8 +141,7 @@ window.JONGGA_HISTORY_INDEX = [
           "투자 주의"
         ],
         "sources": [
-          "kind",
-          "toss"
+          "kind"
         ],
         "status": "confirmed"
       },
@@ -121,18 +151,6 @@ window.JONGGA_HISTORY_INDEX = [
         "reasons": [
           "공매도 과열",
           "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "080220",
-        "name": "제주반도체",
-        "reasons": [
-          "투자 주의",
-          "공매도 과열"
         ],
         "sources": [
           "kind"
