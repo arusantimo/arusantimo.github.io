@@ -1,11 +1,17 @@
 ---
-description: Claude Code와 Codex CLI 치트시트를 최신 버전으로 자동 업데이트합니다
+description: Claude Code, Codex CLI, Cursor 및 Antigravity 치트시트를 최신 버전으로 자동 업데이트합니다
 ---
 
 다음 통합 치트시트 파일들을 최신 버전으로 업데이트해주세요:
-- `tools/ai-cheatsheet.html` — 상단 탭 버튼의 버전 업데이트
-- `tools/claude-content.js` — Claude Code 콘텐츠 영역
-- `tools/codex-content.js` — Codex CLI 콘텐츠 영역
+- `tools/ai-cheatsheet/index.html` — 상단 탭 버튼의 버전 업데이트
+- `tools/ai-cheatsheet/claude-content.js` — Claude Code 콘텐츠 영역
+- `tools/ai-cheatsheet/codex-content.js` — Codex CLI 콘텐츠 영역
+- `tools/ai-cheatsheet/cursor-content.js` — Cursor 콘텐츠 영역
+- `tools/ai-cheatsheet/antigravity-content.js` — Antigravity 콘텐츠 영역
+- `tools/ai-cheatsheet/tooltips_claude.js` — Claude Code 툴팁 (변경사항이 있을 때)
+- `tools/ai-cheatsheet/tooltips_codex.js` — Codex CLI 툴팁 (변경사항이 있을 때)
+- `tools/ai-cheatsheet/tooltips_cursor.js` — Cursor 툴팁 (변경사항이 있을 때)
+- `tools/ai-cheatsheet/tooltips_antigravity.js` — Antigravity 툴팁 (변경사항이 있을 때)
 
 ## 단계별 작업
 
@@ -21,45 +27,82 @@ description: Claude Code와 Codex CLI 치트시트를 최신 버전으로 자동
 
 **Codex CLI:**
 - https://github.com/openai/codex/releases (Latest 태그 확인, Pre-release 제외)
+- 필요 시 GitHub Releases의 개별 버전 노트에서 추가/삭제된 명령어·플래그 확인
+
+**Cursor:**
+- https://cursor.com/changelog (공식 버전, 날짜, 릴리스 노트 확인)
+- https://cursor.com/docs (기능 설명 및 세부 동작 확인)
+- https://cursor.com/cli 또는 https://cursor.com/docs/cli/overview (Cursor CLI / cursor-agent 관련 문서 확인)
+- **로컬 확인**: 설치되어 있으면 `cursor --version`, `cursor-agent --help`로 문서에 아직 반영되지 않은 명령어·워크플로우 존재 여부 확인
+
+**Antigravity:**
+- https://antigravity.google/changelog (공식 변경 내역 확인)
+- https://antigravity.google/releases (최신 릴리스, 날짜, 배포 단위 확인)
+- https://antigravity.google/product 및 https://antigravity.google/docs (IDE/CLI/SDK 기능 설명 확인)
+- **로컬 확인**: 설치되어 있으면 `agy --help`로 신규 명령어·서브커맨드가 치트시트에 반영되어 있는지 확인
 
 ### 2단계: 현재 버전 확인
 
 아래 파일들에서 `<span class="meta-version">` 태그 안의 버전을 읽어 업스트림 버전과 비교하세요.
 
-- Claude Code: `tools/claude-content.js` 내 `<span class="meta-version">`
-- Codex CLI: `tools/codex-content.js` 내 `<span class="meta-version">`
+- Claude Code: `tools/ai-cheatsheet/claude-content.js` 내 `<span class="meta-version">`
+- Codex CLI: `tools/ai-cheatsheet/codex-content.js` 내 `<span class="meta-version">`
+- Cursor: `tools/ai-cheatsheet/cursor-content.js` 내 `<span class="meta-version">`
+- Antigravity: `tools/ai-cheatsheet/antigravity-content.js` 내 `<span class="meta-version">`
 
 ### 3단계: 변경사항이 있을 경우 업데이트
 
 업스트림 버전이 더 새로우면 각 파일에서 아래 항목을 수정하세요. (중간에 누락된 버전이 있다면 그 버전들의 내역도 포함해서 처리합니다.)
 이때 기존에 붙어있던 구버전의 `NEW` 뱃지들을 모두 제거하는 과정이 포함되어야 합니다.
 
-**`tools/ai-cheatsheet.html` 수정 위치:**
-1. 탭 버튼 영역 내 `<span class="tab-ver">vX.X.XXX</span>` 버전 업데이트 (Claude 및 Codex)
+**`tools/ai-cheatsheet/index.html` 수정 위치:**
+1. 탭 버튼 영역 내 `<span class="tab-ver">vX.X.XXX</span>` 버전 업데이트 (Claude Code, Codex CLI, Cursor, Antigravity)
 
-**`tools/claude-content.js` 수정 위치:**
+**`tools/ai-cheatsheet/claude-content.js` 수정 위치:**
 1. `<span class="meta-version">` 버전 번호
 2. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
 3. changelog-toggle span: `📋 최근 변경사항 (vX.X.XXX)` — 최신 버전만 표시하도록 레이블 수정
 4. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-claude" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
 
-**`tools/codex-content.js` 수정 위치:**
+**`tools/ai-cheatsheet/codex-content.js` 수정 위치:**
 1. `<span class="meta-version">` 버전 번호
 2. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
 3. changelog-toggle span: `📋 최근 변경사항 (vX.X.X)` — 최신 버전만 표시하도록 레이블 수정
 4. `<ul>` 안 `<li>` 목록 — 기존 최신 항목을 아래 `<div id="hist-codex" class="history-container">`로 이동시킨 후, 신규 항목을 상단 `<ul>`에 삽입 (`<span class="badge-new">NEW</span>` 뱃지 부여). 이때 이전 내역은 `<details class="ver-group">` 태그를 사용하여 버전별로 그룹화하여 보관합니다.
 
+**`tools/ai-cheatsheet/cursor-content.js` 수정 위치:**
+1. `<span class="meta-version">` 버전 번호
+2. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
+3. changelog-toggle span: `📋 최근 변경사항 (vX.X.X)` — 최신 버전만 표시하도록 레이블 수정
+4. `<ul>` 안 `<li>` 목록 — 신규 항목을 상단에 삽입하고 `NEW` 뱃지를 부여합니다.
+5. 현재 파일에 이전 버전 히스토리 영역이 없다면 Claude/Codex와 같은 패턴으로 `<div class="hist-divider" ...>` 및 `<div id="hist-cursor" class="history-container">`를 추가하고, 기존 최신 항목을 `<details class="ver-group">`로 버전별 그룹화하여 이동합니다.
+
+**`tools/ai-cheatsheet/antigravity-content.js` 수정 위치:**
+1. `<span class="meta-version">` 버전 번호
+2. `<span style="font-size:10px;color:var(--muted2);">YYYY-MM-DD</span>` 날짜
+3. changelog-toggle span: `📋 최근 변경사항 (vX.X.X)` — 최신 버전만 표시하도록 레이블 수정
+4. `<ul>` 안 `<li>` 목록 — 신규 항목을 상단에 삽입하고 `NEW` 뱃지를 부여합니다.
+5. 현재 파일에 이전 버전 히스토리 영역이 없다면 Claude/Codex와 같은 패턴으로 `<div class="hist-divider" ...>` 및 `<div id="hist-antigravity" class="history-container">`를 추가하고, 기존 최신 항목을 `<details class="ver-group">`로 버전별 그룹화하여 이동합니다.
+
 ### 4단계: 툴팁 JS 파일 업데이트
 
-changelog `<li>` 항목에 툴팁을 추가한 경우 `tools/tooltips_claude.js` 또는 `tools/tooltips_codex.js`를 함께 업데이트하세요.
+changelog `<li>` 항목에 툴팁을 추가한 경우 해당 도구의 tooltip 파일도 함께 업데이트하세요.
 
 각 파일 형식:
 ```js
 window.CLAUDE_TIPS = { "키": { "title": "...", "desc": "...", "example": "..." }, ... }
 window.CODEX_TIPS  = { "키": { "title": "...", "desc": "...", "example": "..." }, ... }
+window.CURSOR_TIPS = { "키": { "title": "...", "desc": "...", "example": "..." }, ... }
+window.ANTIGRAVITY_TIPS = { "키": { "title": "...", "desc": "...", "example": "..." }, ... }
 ```
 
 툴팁 키는 해당 `.row-key code` 안의 `textContent`와 정확히 일치해야 합니다.
+
+대응 파일:
+- Claude Code: `tools/ai-cheatsheet/tooltips_claude.js`
+- Codex CLI: `tools/ai-cheatsheet/tooltips_codex.js`
+- Cursor: `tools/ai-cheatsheet/tooltips_cursor.js`
+- Antigravity: `tools/ai-cheatsheet/tooltips_antigravity.js`
 
 ### 5단계: 변경사항 내용 선별 기준
 
@@ -101,4 +144,6 @@ window.CODEX_TIPS  = { "키": { "title": "...", "desc": "...", "example": "..." 
 업데이트한 항목을 요약해서 알려주세요:
 - Claude Code: 이전 버전 → 신규 버전, 릴리스 날짜
 - Codex CLI: 이전 버전 → 신규 버전, 릴리스 날짜
+- Cursor: 이전 버전 → 신규 버전, 릴리스 날짜
+- Antigravity: 이전 버전 → 신규 버전, 릴리스 날짜
 - 이미 최신이면 "변경 없음"으로 보고
