@@ -4472,3 +4472,72 @@ body.modal-scroll-locked {
   color: #34d399;
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
+
+/* ── 매수추천 제외 리스트 스타일 ── */
+.blacklist-container {
+  background: var(--bg-danger-light);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--border-radius-md);
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.blacklist-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.blacklist-icon {
+  font-size: 14px;
+}
+
+.blacklist-title {
+  color: var(--text-danger);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.blacklist-subtitle {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.blacklist-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blacklist-item-badge {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.blacklist-item-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.blacklist-item-code {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+
+.blacklist-item-reason {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--text-danger);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+

@@ -1506,7 +1506,76 @@ function renderBuyStockCards() {
   }
   renderGroup(notionSnapshot.reversalEntries, 'buy-list-reversal');
   updateBuyBreakoutVisibilityUI();
+  renderBuyBlacklist();
 }
+
+function renderBuyBlacklist() {
+  const container = document.getElementById('buy-blacklist-container');
+  const listContainer = document.getElementById('buy-blacklist-list');
+  if (!container || !listContainer) return;
+
+  const excludedEntries = getJonggaExcludedEntries();
+
+  if (excludedEntries.length === 0) {
+    container.style.display = 'none';
+    listContainer.innerHTML = '';
+    return;
+  }
+
+  listContainer.innerHTML = excludedEntries.map(entry => {
+    const code = entry.code;
+    const name = entry.name;
+    const reasons = entry.reasons || [];
+    const reasonBadges = reasons.map(r => `<span class="blacklist-item-reason">${escapeHtml(r)}</span>`).join(' ');
+    
+    return `
+      <div class="blacklist-item-badge">
+        <span class="blacklist-item-name">${escapeHtml(name)}</span>
+        <span class="blacklist-item-code">${escapeHtml(code)}</span>
+        ${reasonBadges}
+      </div>
+    `;
+  }).join('');
+
+  container.style.display = 'block';
+}
+
+function getJonggaExcludedEntries() {
+  const payload = typeof jonggaLastPayload !== 'undefined' ? jonggaLastPayload : null;
+  if (!payload) return [];
+  
+  const slots = typeof getJonggaSlots === 'function' ? getJonggaSlots(payload) : [];
+  const activeSlotId = typeof activeBuySlot !== 'undefined' ? activeBuySlot : 'slotA';
+  const slot = slots.find(s => s.slotId === activeSlotId) || slots[0];
+  if (!slot) return [];
+  
+  const collections = typeof getJonggaEntryCollections === 'function' ? getJonggaEntryCollections(slot) : null;
+  if (!collections) return [];
+  
+  const allCandidates = [
+    ...(collections.pullback || []),
+    ...(collections.breakout || []),
+    ...(collections.accumulation || []),
+    ...(collections.reversal || [])
+  ];
+  
+  const excludedMap = new Map();
+  allCandidates.forEach(entry => {
+    const code = typeof getJonggaCode === 'function' ? getJonggaCode(entry) : (entry.code || '');
+    if (!code) return;
+    
+    if (typeof isJonggaBlacklisted === 'function' && isJonggaBlacklisted(code)) {
+      if (!excludedMap.has(code)) {
+        const name = typeof getJonggaName === 'function' ? getJonggaName(entry) : (entry.name || '');
+        const reasons = typeof getJonggaBlacklistReasons === 'function' ? getJonggaBlacklistReasons(code) : [];
+        excludedMap.set(code, { code, name, reasons });
+      }
+    }
+  });
+  
+  return Array.from(excludedMap.values());
+}
+
 
 function renderAll() {
   if (typeof syncSlotSwitchers === 'function') {
