@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-01T06:06:34+00:00",
+    "generatedAt": "2026-07-01T08:34:38+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 907000
+      },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
@@ -40,25 +55,10 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 6.6,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.7,
+        "gradeScore": 4.9,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1711000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "이수페타시스",
-        "code": "007660",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.0,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 132700
+        "currentPrice": 1757000
       },
       {
         "strategy": "reversal",
@@ -74,6 +74,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 51300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "이수페타시스",
+        "code": "007660",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 132900
       },
       {
         "strategy": "reversal",
