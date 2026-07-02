@@ -9,10 +9,10 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-02T06:05:53+00:00",
+    "generatedAt": "2026-07-02T08:34:50+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
+    "status": "partial",
     "buyCount": 10,
     "topRecommendations": [
       {
@@ -26,9 +26,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 229500
+        "currentPrice": 227500
       },
       {
         "strategy": "pullback",
@@ -43,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
         "entryEligible": false,
-        "currentPrice": 1144000
+        "currentPrice": 1116000
       },
       {
         "strategy": "accumulation",
@@ -58,37 +58,52 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.7,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1570000
+        "currentPrice": 1525000
       },
       {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "한화에어로스페이스",
-        "code": "012450",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 5.7,
-        "statusLabel": "매매금지",
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 4.2,
+        "signalScore": 4.2,
+        "strictScore": 4.2,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 1144000
+        "currentPrice": 104500
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "KB금융",
         "code": "105560",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
         "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 5.2,
+        "grade": "B",
+        "gradeScore": 6.5,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 166600
+        "currentPrice": 165000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1116000
       }
     ],
     "blacklist": [
@@ -104,11 +119,10 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "006340",
-        "name": "대원전선",
+        "code": "475150",
+        "name": "SK이터닉스",
         "reasons": [
-          "투자 주의",
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
@@ -116,10 +130,11 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "475150",
-        "name": "SK이터닉스",
+        "code": "006340",
+        "name": "대원전선",
         "reasons": [
-          "투자 주의"
+          "투자 주의",
+          "공매도 과열"
         ],
         "sources": [
           "kind"
