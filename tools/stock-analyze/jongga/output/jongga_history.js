@@ -1,5 +1,134 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-02",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260702.js",
+    "jsonFile": "jongga/output/202607/latest_20260702.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260702.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-02T06:05:53+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12)",
+        "entryEligible": false,
+        "currentPrice": 229500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
+        "entryEligible": false,
+        "currentPrice": 1144000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1570000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1144000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 166600
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-07-01",
     "variant": "stable",
     "variantLabel": "현재 버전",
