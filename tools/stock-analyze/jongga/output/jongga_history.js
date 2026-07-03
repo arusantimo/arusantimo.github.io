@@ -1,5 +1,295 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-02",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260702.js",
+    "jsonFile": "jongga/output/202607/latest_20260702.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260702.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-02T08:34:50+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 227500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
+        "entryEligible": false,
+        "currentPrice": 1116000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1525000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 4.2,
+        "signalScore": 4.2,
+        "strictScore": 4.2,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 104500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 165000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1116000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
+    "date": "2026-07-01",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260701.js",
+    "jsonFile": "jongga/output/202607/latest_20260701.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260701.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-01T08:34:38+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 13,
+    "topRecommendations": [
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 907000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK",
+        "code": "034730",
+        "score": 7.3,
+        "signalScore": 7.3,
+        "strictScore": 7.3,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 762000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.9,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1757000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성E&A",
+        "code": "028050",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 51300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "이수페타시스",
+        "code": "007660",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 132900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 239500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-06-30",
     "variant": "stable",
     "variantLabel": "현재 버전",
@@ -9,11 +299,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-06-30T07:44:42+00:00",
+    "generatedAt": "2026-06-30T08:34:33+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -44,6 +334,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "관심후보",
         "entryEligible": false,
         "currentPrice": 1697000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 6.8,
+        "signalScore": 6.8,
+        "strictScore": 6.8,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 86800
       },
       {
         "strategy": "breakout",
@@ -89,6 +394,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 238000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "제주반도체",
+        "code": "080220",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 103900
       }
     ],
     "blacklist": [
@@ -99,7 +419,8 @@ window.JONGGA_HISTORY_INDEX = [
           "투자 주의"
         ],
         "sources": [
-          "kind"
+          "kind",
+          "toss"
         ],
         "status": "confirmed"
       },
@@ -110,8 +431,7 @@ window.JONGGA_HISTORY_INDEX = [
           "투자 주의"
         ],
         "sources": [
-          "kind",
-          "toss"
+          "kind"
         ],
         "status": "confirmed"
       },
@@ -121,18 +441,6 @@ window.JONGGA_HISTORY_INDEX = [
         "reasons": [
           "공매도 과열",
           "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "080220",
-        "name": "제주반도체",
-        "reasons": [
-          "투자 주의",
-          "공매도 과열"
         ],
         "sources": [
           "kind"

@@ -649,5 +649,26 @@
     "barLow": 106600.0,
     "barClose": 118100.0,
     "fillRule": "time_stop_0915_market"
+  },
+  {
+    "orderId": "20260629|stable|pullback|475150-stop_touch",
+    "sourceEntryKey": "20260629|stable|pullback|475150",
+    "strategy": "pullback",
+    "code": "475150",
+    "name": "SK이터닉스",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-06-30T15:00:00+09:00",
+    "fillPrice": 48346.0,
+    "filledQuantityPct": 5.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-06-30T15:00:00+09:00",
+    "barOpen": 49100.0,
+    "barHigh": 54400.0,
+    "barLow": 45950.0,
+    "barClose": 51700.0,
+    "fillRule": "stop_touch"
   }
 ]

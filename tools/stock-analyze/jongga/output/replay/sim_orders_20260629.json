@@ -1218,5 +1218,25 @@
     "activeFrom": "2026-06-30T15:00:00+09:00",
     "activeUntil": "2026-06-30T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260629|stable|pullback|475150-stop_touch",
+    "runId": "replay-20260630-074458-8cde84a9",
+    "date": "2026-06-29",
+    "variant": "stable",
+    "strategy": "pullback",
+    "code": "475150",
+    "name": "SK이터닉스",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-06-30T15:00:00+09:00",
+    "requestedPrice": 48346.0,
+    "quantityPct": 5.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260629|stable|pullback|475150",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-06-30T15:00:00+09:00",
+    "activeUntil": "2026-06-30T15:00:00+09:00"
   }
 ]

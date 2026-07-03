@@ -23,6 +23,7 @@
         },
         "git -C .": true,
         "git commit": true,
-        "git push": true
+        "git push": true,
+        ".claude/commands/update-cheatsheets.md": true
     }
 }
