@@ -6,8 +6,47 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 from jongga.output_contract import INPUT_ARCHIVE_VERSION, PAYLOAD_SOURCE_LIVE, VARIANT_STABLE, build_daily_output_paths, read_js_assignment
-from jongga.replay_backtest import REPLAY_RUNS_MARKER, grade_from_threshold_profile, iter_dates, normalize_analysis_dates, replay_entry_view, run_replay
+from jongga.replay_backtest import (
+    REPLAY_RUNS_MARKER,
+    build_summary_metrics,
+    grade_from_threshold_profile,
+    iter_dates,
+    normalize_analysis_dates,
+    replay_entry_view,
+    run_replay,
+)
 from jongga.replay_market_data import build_replay_market_data
+
+
+class DailyEqualWeightMetricsTests(unittest.TestCase):
+    """cumNetReturnPct/maxDrawdownPct는 같은 날 병렬 포지션을 등가중으로 묶어
+    일간 복리로 계산해야 한다(트레이드 단위 순차 복리 금지)."""
+
+    def _result(self, date_str, ret):
+        return {"date": date_str, "strategy": "pullback", "code": "000001", "netReturnPct": ret}
+
+    def test_same_day_positions_are_equal_weighted_before_compounding(self):
+        # 하루 11개 포지션이 각 -6.9% → 등가중 하루 수익은 -6.9%,
+        # 순차 복리(구버전)면 (0.931**11 - 1) ≈ -54.5%로 과장된다.
+        results = [self._result("2026-06-25", -6.9) for _ in range(11)]
+        metrics = build_summary_metrics(candidates=[], results=results, orders=[])
+        self.assertAlmostEqual(metrics["cumNetReturnPct"], -6.9, places=4)
+        self.assertAlmostEqual(metrics["avgNetReturnPct"], -6.9, places=4)
+        self.assertAlmostEqual(metrics["maxDrawdownPct"], 6.9, places=4)
+
+    def test_multi_day_compounds_daily_equal_weight_returns(self):
+        # 6/24: +2%와 0% → 하루 +1%. 6/25: -10%와 -6% → 하루 -8%.
+        # 누적 = (1.01 * 0.92 - 1) * 100 = -7.08%.
+        results = [
+            self._result("2026-06-24", 2.0),
+            self._result("2026-06-24", 0.0),
+            self._result("2026-06-25", -10.0),
+            self._result("2026-06-25", -6.0),
+        ]
+        metrics = build_summary_metrics(candidates=[], results=results, orders=[])
+        self.assertAlmostEqual(metrics["cumNetReturnPct"], -7.08, places=4)
+        # avg는 트레이드 단위 그대로: (2 + 0 - 10 - 6) / 4 = -3.5%.
+        self.assertAlmostEqual(metrics["avgNetReturnPct"], -3.5, places=4)
 
 
 class ReplayBacktestTests(unittest.TestCase):

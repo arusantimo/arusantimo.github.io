@@ -325,6 +325,27 @@ def _metric_returns(results: list[dict[str, Any]]) -> list[float]:
     return [float(item["netReturnPct"]) for item in ordered_results]
 
 
+def _daily_equal_weight_returns(results: list[dict[str, Any]]) -> list[float]:
+    """같은 날 병렬 포지션을 등가중 평균으로 묶어 하루 1개의 수익률로 환산한다.
+
+    누적수익(`cumNetReturnPct`)·최대낙폭(`maxDrawdownPct`)을 트레이드 단위
+    순차 복리가 아니라 "일별 포트폴리오 수익률의 일간 복리"로 계산하기 위한
+    입력이다. 동시에 열리는 여러 포지션을 한 종목씩 순차 재투자하는 것처럼
+    (1+r)로 곱하면 상관 손실이 겹치는 날의 드로다운이 실제(등가중)보다
+    5~8배 과장되던 문제를 없앤다. 날짜순으로 정렬해 복리 체이닝 순서를 고정한다.
+    """
+    by_date: dict[str, list[float]] = {}
+    for item in results:
+        ret = item.get("netReturnPct")
+        if ret is None:
+            continue
+        by_date.setdefault(str(item.get("date") or ""), []).append(float(ret))
+    return [
+        sum(day_returns) / len(day_returns)
+        for _, day_returns in sorted(by_date.items())
+    ]
+
+
 def build_summary_metrics(
     *,
     candidates: list[dict[str, Any]],
@@ -336,16 +357,18 @@ def build_summary_metrics(
     strategy_orders = [item for item in orders if item.get("side") == "SELL"]
     pending_orders = [item for item in strategy_orders if item.get("finalStatus") == "open"]
     returns = _metric_returns(results)
+    daily_returns = _daily_equal_weight_returns(results)
     wins = [ret for ret in returns if ret > 0]
     return {
         "candidateCount": len(candidates),
         "eligibleCount": len(eligible),
         "includedCount": len(included),
         "tradeCount": len(results),
+        # winRate/avg는 트레이드 단위 유지(정직한 등가중 평균), 누적/낙폭만 일간 복리.
         "winRate": round(len(wins) / len(returns), 4) if returns else None,
         "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
-        "cumNetReturnPct": cumulative_return_pct(returns),
-        "maxDrawdownPct": max_drawdown_pct(returns) if returns else None,
+        "cumNetReturnPct": cumulative_return_pct(daily_returns),
+        "maxDrawdownPct": max_drawdown_pct(daily_returns) if daily_returns else None,
         "degradedCount": sum(1 for item in results if str(item.get("dataQualityStatus") or "") == "degraded"),
         "ambiguousCount": sum(int(item.get("ambiguousCount") or 0) for item in results),
         "unfilledRate": round(len(pending_orders) / len(strategy_orders), 4) if strategy_orders else None,
@@ -413,6 +436,7 @@ def build_stock_stats(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for (strategy, code, name), items in grouped.items():
         returns = _metric_returns(items)
+        daily_returns = _daily_equal_weight_returns(items)
         wins = [ret for ret in returns if ret > 0]
         latest_item = sort_results_for_returns(items)[-1]
         last_replay_date = str(latest_item.get("date") or "")
@@ -426,7 +450,7 @@ def build_stock_stats(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "tradeCount": len(items),
             "winRate": round(len(wins) / len(returns), 4) if returns else None,
             "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
-            "cumNetReturnPct": cumulative_return_pct(returns),
+            "cumNetReturnPct": cumulative_return_pct(daily_returns),
             "lastReplayDate": last_replay_date,
             "lastEntryFilledAt": latest_item.get("entryFilledAt"),
             "lastEntryFillPrice": latest_item.get("entryFillPrice"),
@@ -464,13 +488,14 @@ def build_take_profit_profile_stats(results: list[dict[str, Any]]) -> dict[str, 
         output: dict[str, Any] = {}
         for key, items in grouped.items():
             returns = _metric_returns(items)
+            daily_returns = _daily_equal_weight_returns(items)
             wins = [ret for ret in returns if ret > 0]
             output[key] = {
                 "tradeCount": len(items),
                 "sampleCount": len(items),
                 "winRate": round(len(wins) / len(returns), 4) if returns else None,
                 "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
-                "cumNetReturnPct": cumulative_return_pct(returns),
+                "cumNetReturnPct": cumulative_return_pct(daily_returns),
             }
         return output
 
@@ -499,6 +524,7 @@ def build_strategy_recommendation_matrix(results: list[dict[str, Any]]) -> dict[
                 if matches_mixed_recommendation_case(item, case_key)
             ]
             returns = _metric_returns(case_results)
+            daily_returns = _daily_equal_weight_returns(case_results)
             wins = [ret for ret in returns if ret > 0]
             matrix[f"{strategy}|{case_key}"] = {
                 "strategy": strategy,
@@ -507,8 +533,8 @@ def build_strategy_recommendation_matrix(results: list[dict[str, Any]]) -> dict[
                 "tradeCount": len(case_results),
                 "winRate": round(len(wins) / len(returns), 4) if returns else None,
                 "avgNetReturnPct": round(sum(returns) / len(returns), 4) if returns else None,
-                "cumNetReturnPct": cumulative_return_pct(returns),
-                "maxDrawdownPct": max_drawdown_pct(returns) if returns else None,
+                "cumNetReturnPct": cumulative_return_pct(daily_returns),
+                "maxDrawdownPct": max_drawdown_pct(daily_returns) if daily_returns else None,
                 "recommendedExitPolicyKey": mixed_exit_policy_key_for_cell(strategy, case_key),
             }
     return matrix
