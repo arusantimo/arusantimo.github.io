@@ -1,14 +1,1 @@
-[
-  {
-    "runId": "replay-20260618-203055-ab1213d7",
-    "entryDate": "2026-06-17",
-    "code": "000660",
-    "name": "SK하이닉스",
-    "strategy": "breakout",
-    "entryPrice": 2523521.0,
-    "swingTargetPrice": 3025200.0,
-    "stopPrice": 2407000.0,
-    "qtyPct": 70.0,
-    "sourceEntryKey": "20260617|stable|breakout|000660"
-  }
-]
+[]
