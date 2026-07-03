@@ -90,15 +90,15 @@
                 </div>
             </div>
 
-            <!-- 투자 비율 설정 -->
+            <!-- 투자 원금 설정 -->
             <div class="card">
-                <h2>🎯 투자 비율 & 목표 설정</h2>
+                <h2>🎯 투자 원금 & 목표 설정</h2>
 
                 <div class="input-group">
-                    <label class="input-label">장기 투자 비율</label>
+                    <label class="input-label">장기 투자 원금</label>
                     <div class="input-wrapper">
-                        <input type="number" id="longTermRatio" value="60" min="0" max="100" step="1">
-                        <span class="unit">%</span>
+                        <input type="number" id="longTermRatio" value="300000000" min="0" step="1000000">
+                        <span class="unit">원</span>
                     </div>
                 </div>
 
@@ -111,22 +111,28 @@
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label">단기 투자 비율</label>
+                    <label class="input-label">단기 투자 원금</label>
                     <div class="input-wrapper">
-                        <input type="number" id="shortTermRatio" value="40" min="0" max="100" step="1">
-                        <span class="unit">%</span>
+                        <input type="number" id="shortTermRatio" value="200000000" min="0" step="1000000">
+                        <span class="unit">원</span>
                     </div>
                 </div>
 
                 <div class="allocation-display">
-                    <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 6px;">투자 비율 배분</div>
+                    <div style="color: var(--text-secondary); font-size: 11px; margin-bottom: 6px;">투자 원금 배분</div>
                     <div class="allocation-bar">
                         <div class="allocation-segment long-term-segment" id="longTermBar" style="width: 60%;">
-                            <span id="longTermText">60%</span>
+                            <span id="longTermText">300,000,000원</span>
                         </div>
                         <div class="allocation-segment short-term-segment" id="shortTermBar" style="width: 40%;">
-                            <span id="shortTermText">40%</span>
+                            <span id="shortTermText">200,000,000원</span>
                         </div>
+                    </div>
+                    <div id="principalAllocationSplit"
+                        style="margin-top:8px; font-size:11px; color:var(--text-secondary);">
+                        초기 원금: <span id="principalAllocationTotal" class="number">-</span>원 —
+                        <span id="longTermPrincipalAmount" class="number">-</span>원(장) +
+                        <span id="shortTermPrincipalAmount" class="number">-</span>원(단)
                     </div>
                     <div id="monthlyInvestmentSplit"
                         style="margin-top:8px; font-size:11px; color:var(--text-secondary);">
@@ -219,11 +225,20 @@
                     </div>
 
                     <div class="input-group">
-                        <label class="input-label">월 재투자 금액</label>
+                        <label class="input-label">장기 월 재투자 금액</label>
                         <div class="input-wrapper">
-                            <input type="number" id="modalMonthlyInvestment" min="0">
+                            <input type="number" id="modalLongTermMonthlyInvestment" min="0">
                             <span class="unit">원</span>
                         </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">단기 월 재투자 금액</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="modalShortTermMonthlyInvestment" min="0">
+                            <span class="unit">원</span>
+                        </div>
+                        <div style="font-size:10px; color:var(--text-secondary); margin-top:4px;">두 금액의 합계가 해당 월부터 적용되는 월 재투자 총액입니다.</div>
                     </div>
 
                     <div class="input-group" style="margin-top:15px; border-top:1px dashed var(--border-color); padding-top:10px;">
@@ -236,15 +251,15 @@
                     </div>
                 </div>
 
-                <!-- 오른쪽 컬럼: 투자 비율 -->
+                <!-- 오른쪽 컬럼: 투자 원금 -->
                 <div style="flex: 1; min-width: 300px;">
-                    <h3 style="font-size:13px; color:var(--text-primary); margin-bottom:12px; padding-bottom:6px; border-bottom:1px dashed var(--border-color);">🎯 투자 비율 & 목표 설정</h3>
+                    <h3 style="font-size:13px; color:var(--text-primary); margin-bottom:12px; padding-bottom:6px; border-bottom:1px dashed var(--border-color);">🎯 투자 원금 & 목표 설정</h3>
                     
                     <div class="input-group">
-                        <label class="input-label">장기 투자 비율</label>
+                        <label class="input-label">장기 투자 원금</label>
                         <div class="input-wrapper">
-                            <input type="number" id="modalLongTermRatio" min="0" max="100" step="1">
-                            <span class="unit">%</span>
+                            <input type="number" id="modalLongTermRatio" min="0" step="1000000">
+                            <span class="unit">원</span>
                         </div>
                     </div>
 
@@ -257,10 +272,10 @@
                     </div>
 
                     <div class="input-group">
-                        <label class="input-label">단기 투자 비율</label>
+                        <label class="input-label">단기 투자 원금</label>
                         <div class="input-wrapper">
-                            <input type="number" id="modalShortTermRatio" min="0" max="100" step="1">
-                            <span class="unit">%</span>
+                            <input type="number" id="modalShortTermRatio" min="0" step="1000000">
+                            <span class="unit">원</span>
                         </div>
                     </div>
                 </div>

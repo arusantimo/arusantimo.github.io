@@ -7,25 +7,51 @@
         normalizeRatios
     } = app.utils;
 
-    function updateAllocationDisplay(normalizedLongTerm, normalizedShortTerm, monthlyInvestment) {
+    function updateAllocationDisplay(normalizedLongTerm, normalizedShortTerm, monthlyInvestment, principal) {
         const longTermBar = document.getElementById('longTermBar');
         const longTermText = document.getElementById('longTermText');
         const shortTermBar = document.getElementById('shortTermBar');
         const shortTermText = document.getElementById('shortTermText');
+        const { formatKoreanCurrency } = app.utils;
+
+        const longTermPrincipalAmount = principal * normalizedLongTerm;
+        const shortTermPrincipalAmount = principal * normalizedShortTerm;
+        const longTermPrincipalText = `${Math.floor(longTermPrincipalAmount).toLocaleString('ko-KR')}원`;
+        const shortTermPrincipalText = `${Math.floor(shortTermPrincipalAmount).toLocaleString('ko-KR')}원`;
 
         if (longTermBar) longTermBar.style.width = `${normalizedLongTerm * 100}%`;
-        if (longTermText) longTermText.textContent = `${(normalizedLongTerm * 100).toFixed(0)}%`;
+        if (longTermText) {
+            longTermText.textContent = longTermPrincipalText;
+            longTermText.setAttribute('data-tooltip', `장기 투자 원금 (${formatKoreanCurrency(longTermPrincipalAmount)})`);
+        }
         if (shortTermBar) shortTermBar.style.width = `${normalizedShortTerm * 100}%`;
-        if (shortTermText) shortTermText.textContent = `${(normalizedShortTerm * 100).toFixed(0)}%`;
+        if (shortTermText) {
+            shortTermText.textContent = shortTermPrincipalText;
+            shortTermText.setAttribute('data-tooltip', `단기 투자 원금 (${formatKoreanCurrency(shortTermPrincipalAmount)})`);
+        }
 
         const longTermInvestAmount = monthlyInvestment * normalizedLongTerm;
         const shortTermInvestAmount = monthlyInvestment * normalizedShortTerm;
 
+        const totalPrincipalEl = document.getElementById('principalAllocationTotal');
+        const longPrincipalEl = document.getElementById('longTermPrincipalAmount');
+        const shortPrincipalEl = document.getElementById('shortTermPrincipalAmount');
         const totalInvestEl = document.getElementById('monthlyInvestmentTotal');
         const longInvestEl = document.getElementById('longTermInvestAmount');
         const shortInvestEl = document.getElementById('shortTermInvestAmount');
 
-        const { formatKoreanCurrency } = app.utils;
+        if (totalPrincipalEl) {
+            totalPrincipalEl.textContent = Math.floor(principal).toLocaleString('ko-KR');
+            totalPrincipalEl.setAttribute('data-tooltip', formatKoreanCurrency(principal));
+        }
+        if (longPrincipalEl) {
+            longPrincipalEl.textContent = Math.floor(longTermPrincipalAmount).toLocaleString('ko-KR');
+            longPrincipalEl.setAttribute('data-tooltip', `장기 투자 원금 (${formatKoreanCurrency(longTermPrincipalAmount)})`);
+        }
+        if (shortPrincipalEl) {
+            shortPrincipalEl.textContent = Math.floor(shortTermPrincipalAmount).toLocaleString('ko-KR');
+            shortPrincipalEl.setAttribute('data-tooltip', `단기 투자 원금 (${formatKoreanCurrency(shortTermPrincipalAmount)})`);
+        }
         if (totalInvestEl) {
             totalInvestEl.textContent = Math.floor(monthlyInvestment).toLocaleString('ko-KR');
             totalInvestEl.setAttribute('data-tooltip', formatKoreanCurrency(monthlyInvestment));
@@ -38,6 +64,30 @@
             shortInvestEl.textContent = Math.floor(shortTermInvestAmount).toLocaleString('ko-KR');
             shortInvestEl.setAttribute('data-tooltip', `단기 투자 배분액 (${formatKoreanCurrency(shortTermInvestAmount)})`);
         }
+    }
+
+    function getMonthlyInvestmentSplit(settings, normalizedRatios) {
+        const hasLongTermMonthlyInvestment = settings.longTermMonthlyInvestment !== undefined
+            && settings.longTermMonthlyInvestment !== null;
+        const hasShortTermMonthlyInvestment = settings.shortTermMonthlyInvestment !== undefined
+            && settings.shortTermMonthlyInvestment !== null;
+
+        if (hasLongTermMonthlyInvestment || hasShortTermMonthlyInvestment) {
+            const longTermMonthlyInvestment = Math.max(parseFloat(settings.longTermMonthlyInvestment) || 0, 0);
+            const shortTermMonthlyInvestment = Math.max(parseFloat(settings.shortTermMonthlyInvestment) || 0, 0);
+            return {
+                currentMonthlyInvestment: longTermMonthlyInvestment + shortTermMonthlyInvestment,
+                longTermMonthlyInvestment,
+                shortTermMonthlyInvestment
+            };
+        }
+
+        const currentMonthlyInvestment = parseFloat(settings.monthlyInvestment) || 0;
+        return {
+            currentMonthlyInvestment,
+            longTermMonthlyInvestment: currentMonthlyInvestment * normalizedRatios.normalizedLongTerm,
+            shortTermMonthlyInvestment: currentMonthlyInvestment * normalizedRatios.normalizedShortTerm
+        };
     }
 
     function calculateAndDisplay(state, { createYearTabs, renderTableByYear, renderChart }) {
@@ -54,7 +104,7 @@
         state.longTermPrincipalGlobal = principal * normalizedLongTerm;
         state.shortTermPrincipalGlobal = principal * normalizedShortTerm;
 
-        updateAllocationDisplay(normalizedLongTerm, normalizedShortTerm, monthlyInvestment);
+        updateAllocationDisplay(normalizedLongTerm, normalizedShortTerm, monthlyInvestment, principal);
 
         const months = getMonthsDifference(startDate, endDate);
         let currentSettings = {
@@ -82,18 +132,23 @@
             const dateStr = formatDate(currentDate);
 
             let currentAdditionalSeed = 0;
+            let shouldRebalanceAllocation = false;
             if (state.monthSettingsOverrides[month]) {
                 const { additionalSeed, ...persistentSettings } = state.monthSettingsOverrides[month];
                 currentSettings = { ...currentSettings, ...persistentSettings };
                 currentAdditionalSeed = additionalSeed || 0;
+                shouldRebalanceAllocation = Object.prototype.hasOwnProperty.call(persistentSettings, 'longTermRatio')
+                    || Object.prototype.hasOwnProperty.call(persistentSettings, 'shortTermRatio');
             }
 
             const normalizedCurrentRatios = normalizeRatios(currentSettings.longTermRatio, currentSettings.shortTermRatio);
             const targetMonthlyRate = Math.pow(1 + currentSettings.annualTargetRate / 100, 1 / 12) - 1;
             const longTermMonthlyRate = Math.pow(1 + currentSettings.longTermAnnualTarget / 100, 1 / 12) - 1;
-            const longTermContribution = normalizedCurrentRatios.normalizedLongTerm * longTermMonthlyRate;
-            const shortTermMonthlyRequired = (targetMonthlyRate - longTermContribution) / normalizedCurrentRatios.normalizedShortTerm;
-            const currentMonthlyInvestment = currentSettings.monthlyInvestment;
+            const {
+                currentMonthlyInvestment,
+                longTermMonthlyInvestment,
+                shortTermMonthlyInvestment
+            } = getMonthlyInvestmentSplit(currentSettings, normalizedCurrentRatios);
 
             const assetAtMonthStart = carryAssetForNextMonth !== null ? carryAssetForNextMonth : currentAsset;
             carryAssetForNextMonth = null;
@@ -102,28 +157,36 @@
             if (hasNumericValue(prevActualLongCumulInput)) {
                 longTermAccumulated = Number(prevActualLongCumulInput);
             }
-            const prevLongTermAccumulated = longTermAccumulated;
 
             const longTermAssetAtMonth = assetAtMonthStart * normalizedCurrentRatios.normalizedLongTerm;
             const shortTermAssetAtMonth = assetAtMonthStart * normalizedCurrentRatios.normalizedShortTerm;
+            if (shouldRebalanceAllocation) {
+                longTermAccumulated = longTermAssetAtMonth;
+                runningLongPrincipal = longTermAssetAtMonth;
+                runningShortPrincipal = shortTermAssetAtMonth;
+                shortTermCumulativeProfitTotal = 0;
+            }
+
+            const prevLongTermAccumulated = longTermAccumulated;
+            const monthlyProfitDynamic = assetAtMonthStart * targetMonthlyRate;
             const longTermMonthlyProfit = longTermAssetAtMonth * longTermMonthlyRate;
-            const shortTermMonthlyProfit = shortTermAssetAtMonth * shortTermMonthlyRequired;
+            const shortTermMonthlyProfit = monthlyProfitDynamic - longTermMonthlyProfit;
 
             const actualShortInput = state.actualValues[month]?.shortTerm ?? null;
             const shortToAdd = hasNumericValue(actualShortInput) ? Number(actualShortInput) : shortTermMonthlyProfit;
             shortTermCumulativeProfitTotal += shortToAdd;
 
-            const monthlyProfitDynamic = longTermMonthlyProfit + shortTermMonthlyProfit;
-            const longTermInvest = (currentMonthlyInvestment * normalizedCurrentRatios.normalizedLongTerm)
+            const longTermInvest = longTermMonthlyInvestment
                 + (currentAdditionalSeed * normalizedCurrentRatios.normalizedLongTerm);
-            const shortTermInvest = (currentMonthlyInvestment * normalizedCurrentRatios.normalizedShortTerm)
+            const shortTermInvest = shortTermMonthlyInvestment
                 + (currentAdditionalSeed * normalizedCurrentRatios.normalizedShortTerm);
 
             longTermAccumulated += longTermInvest + longTermMonthlyProfit;
             currentAsset = assetAtMonthStart + currentMonthlyInvestment + currentAdditionalSeed + monthlyProfitDynamic;
 
+            const cleanTargetProfit = cleanCurrentAsset * targetMonthlyRate;
             const cleanLongProfit = cleanCurrentAsset * normalizedCurrentRatios.normalizedLongTerm * longTermMonthlyRate;
-            const cleanShortProfit = cleanCurrentAsset * normalizedCurrentRatios.normalizedShortTerm * shortTermMonthlyRequired;
+            const cleanShortProfit = cleanTargetProfit - cleanLongProfit;
             const initialAssetAfter = cleanCurrentAsset + currentMonthlyInvestment + currentAdditionalSeed + cleanLongProfit + cleanShortProfit;
             cleanCurrentAsset = initialAssetAfter;
 
@@ -144,12 +207,16 @@
                 dateStr,
                 assetBefore: assetAtMonthStart,
                 monthlyInvest: currentMonthlyInvestment + currentAdditionalSeed,
+                longTermMonthlyInvest: longTermMonthlyInvestment,
+                shortTermMonthlyInvest: shortTermMonthlyInvestment,
                 longTermInvest,
                 profit: monthlyProfitDynamic,
                 shortTermProfit: shortTermMonthlyProfit,
                 shortTermAssetAtMonth,
                 shortTermPrincipal: runningShortPrincipal,
                 shortTermCumulativeProfit: shortTermCumulativeProfitTotal,
+                allocationRebalanced: shouldRebalanceAllocation,
+                longTermBalanceBefore: prevLongTermAccumulated,
                 longTermAccumulated,
                 longTermPrincipal: runningLongPrincipal,
                 assetAfter: currentAsset,

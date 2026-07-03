@@ -42,9 +42,9 @@
         const actualLongCumul = hasNumericValue(state.actualValues[reportRow.month]?.longTermCumul)
             ? Number(state.actualValues[reportRow.month].longTermCumul)
             : reportRow.longTermAccumulated;
-        const previousLongActual = reportRow.month > 1
+        const previousLongActual = reportRow.longTermBalanceBefore ?? (reportRow.month > 1
             ? (state.actualValues[reportRow.month - 1]?.longTermCumul ?? state.allTableRows[reportRow.month - 2].longTermAccumulated)
-            : state.longTermPrincipalGlobal;
+            : state.longTermPrincipalGlobal);
         const actualLongProfit = actualLongCumul - previousLongActual - reportRow.longTermInvest;
         const targetLongProfit = reportRow.profit - reportRow.shortTermProfit;
 

@@ -1,11 +1,162 @@
 (function (app) {
-    const { getMonthDate } = app.utils;
+    const { getMonthDate, normalizeRatios } = app.utils;
 
     function setInputValue(id, value) {
         const element = document.getElementById(id);
         if (element) {
             element.value = value ?? '';
         }
+    }
+
+    function clampAmount(value, maxAmount) {
+        const parsedValue = parseFloat(value);
+        if (Number.isNaN(parsedValue)) return 0;
+        return Math.min(Math.max(parsedValue, 0), Math.max(maxAmount, 0));
+    }
+
+    function amountToRatios(amount, baseAmount) {
+        if (baseAmount <= 0) {
+            return { longTermRatio: 0, shortTermRatio: 0 };
+        }
+
+        const longTermRatio = (amount / baseAmount) * 100;
+        return {
+            longTermRatio: Number(longTermRatio.toFixed(4)),
+            shortTermRatio: Number((100 - longTermRatio).toFixed(4))
+        };
+    }
+
+    function getAllocationBaseForMonth(state, month) {
+        if (!month) {
+            return parseFloat(state.globalSettings.principal) || 0;
+        }
+
+        const row = state.allTableRows.find((item) => item.month === month);
+        return parseFloat(row?.assetBefore ?? state.globalSettings.principal) || 0;
+    }
+
+    function getAllocationAmounts(baseAmount, longTermRatio, shortTermRatio) {
+        const { normalizedLongTerm, normalizedShortTerm } = normalizeRatios(
+            parseFloat(longTermRatio) || 0,
+            parseFloat(shortTermRatio) || 0
+        );
+
+        return {
+            longTermAmount: Math.round(baseAmount * normalizedLongTerm),
+            shortTermAmount: Math.round(baseAmount * normalizedShortTerm)
+        };
+    }
+
+    function getCurrentMonthAllocationAmounts(state, month, fallbackLongTermRatio, fallbackShortTermRatio) {
+        const baseAmount = getAllocationBaseForMonth(state, month);
+        const row = state.allTableRows.find((item) => item.month === month);
+
+        if (month && row && row.longTermBalanceBefore !== undefined) {
+            const longTermAmount = clampAmount(row.longTermBalanceBefore, baseAmount);
+            return {
+                longTermAmount: Math.round(longTermAmount),
+                shortTermAmount: Math.round(baseAmount - longTermAmount)
+            };
+        }
+
+        return getAllocationAmounts(baseAmount, fallbackLongTermRatio, fallbackShortTermRatio);
+    }
+
+    function getMonthlyInvestmentAmounts(settings) {
+        const monthlyInvestment = parseFloat(settings.monthlyInvestment) || 0;
+        const hasLongTermMonthlyInvestment = settings.longTermMonthlyInvestment !== undefined
+            && settings.longTermMonthlyInvestment !== null;
+        const hasShortTermMonthlyInvestment = settings.shortTermMonthlyInvestment !== undefined
+            && settings.shortTermMonthlyInvestment !== null;
+
+        if (hasLongTermMonthlyInvestment || hasShortTermMonthlyInvestment) {
+            const longTermMonthlyInvestment = Math.max(parseFloat(settings.longTermMonthlyInvestment) || 0, 0);
+            const shortTermMonthlyInvestment = Math.max(parseFloat(settings.shortTermMonthlyInvestment) || 0, 0);
+            return { longTermMonthlyInvestment, shortTermMonthlyInvestment };
+        }
+
+        const { normalizedLongTerm, normalizedShortTerm } = normalizeRatios(
+            parseFloat(settings.longTermRatio) || 0,
+            parseFloat(settings.shortTermRatio) || 0
+        );
+
+        return {
+            longTermMonthlyInvestment: Math.round(monthlyInvestment * normalizedLongTerm),
+            shortTermMonthlyInvestment: Math.round(monthlyInvestment * normalizedShortTerm)
+        };
+    }
+
+    function setAllocationInputValues(longInputId, shortInputId, baseAmount, longTermRatio, shortTermRatio) {
+        const { longTermAmount, shortTermAmount } = getAllocationAmounts(baseAmount, longTermRatio, shortTermRatio);
+        setInputValue(longInputId, longTermAmount);
+        setInputValue(shortInputId, shortTermAmount);
+    }
+
+    function syncMainAllocationInputs(state) {
+        const effective = state.currentSettingsTab === 0
+            ? state.globalSettings
+            : getEffectiveSettingsForMonth(state, state.currentSettingsTab);
+        if (state.currentSettingsTab === 0) {
+            setAllocationInputValues(
+                'longTermRatio',
+                'shortTermRatio',
+                getAllocationBaseForMonth(state, state.currentSettingsTab),
+                effective.longTermRatio,
+                effective.shortTermRatio
+            );
+            return;
+        }
+
+        const { longTermAmount, shortTermAmount } = getCurrentMonthAllocationAmounts(
+            state,
+            state.currentSettingsTab,
+            effective.longTermRatio,
+            effective.shortTermRatio
+        );
+        setInputValue('longTermRatio', longTermAmount);
+        setInputValue('shortTermRatio', shortTermAmount);
+    }
+
+    function setAllocationRatios(state, longTermAmount, baseAmount) {
+        const ratios = amountToRatios(longTermAmount, baseAmount);
+        if (state.currentSettingsTab === 0) {
+            state.globalSettings.longTermRatio = ratios.longTermRatio;
+            state.globalSettings.shortTermRatio = ratios.shortTermRatio;
+            return;
+        }
+
+        if (!state.monthSettingsOverrides[state.currentSettingsTab]) {
+            state.monthSettingsOverrides[state.currentSettingsTab] = {};
+        }
+        state.monthSettingsOverrides[state.currentSettingsTab].longTermRatio = ratios.longTermRatio;
+        state.monthSettingsOverrides[state.currentSettingsTab].shortTermRatio = ratios.shortTermRatio;
+    }
+
+    function handleAllocationAmountInput(state, side, value, dependencies) {
+        const baseAmount = getAllocationBaseForMonth(state, state.currentSettingsTab);
+        const changedAmount = clampAmount(value, baseAmount);
+        const longTermAmount = side === 'long' ? changedAmount : baseAmount - changedAmount;
+
+        setAllocationRatios(state, longTermAmount, baseAmount);
+        setInputValue('longTermRatio', Math.round(longTermAmount));
+        setInputValue('shortTermRatio', Math.round(baseAmount - longTermAmount));
+
+        dependencies.saveToLocalStorage();
+        dependencies.calculateAndDisplay();
+        syncMainAllocationInputs(state);
+    }
+
+    function syncModalCounterpart(state, side, value) {
+        const baseAmount = getAllocationBaseForMonth(state, state.currentEditingMonth);
+        const changedAmount = clampAmount(value, baseAmount);
+        if (side === 'long') {
+            setInputValue('modalLongTermRatio', Math.round(changedAmount));
+            setInputValue('modalShortTermRatio', Math.round(baseAmount - changedAmount));
+            return;
+        }
+
+        setInputValue('modalShortTermRatio', Math.round(changedAmount));
+        setInputValue('modalLongTermRatio', Math.round(baseAmount - changedAmount));
     }
 
     function getEffectiveSettingsForMonth(state, month) {
@@ -52,8 +203,6 @@
             ['monthlyInvestment', 'change', 'monthlyInvestment', true],
             ['startDate', 'change', 'startDate', false],
             ['endDate', 'change', 'endDate', false],
-            ['longTermRatio', 'input', 'longTermRatio', true],
-            ['shortTermRatio', 'input', 'shortTermRatio', true],
             ['longTermAnnualTarget', 'input', 'longTermAnnualTarget', true],
             ['additionalSeed', 'change', 'additionalSeed', true]
         ];
@@ -63,7 +212,21 @@
             if (!element) return;
             element.addEventListener(eventName, (event) => {
                 handleSettingInput(state, field, event.target.value, isNumber, dependencies);
+                syncMainAllocationInputs(state);
             });
+        });
+
+        document.getElementById('longTermRatio')?.addEventListener('input', (event) => {
+            handleAllocationAmountInput(state, 'long', event.target.value, dependencies);
+        });
+        document.getElementById('shortTermRatio')?.addEventListener('input', (event) => {
+            handleAllocationAmountInput(state, 'short', event.target.value, dependencies);
+        });
+        document.getElementById('modalLongTermRatio')?.addEventListener('input', (event) => {
+            syncModalCounterpart(state, 'long', event.target.value);
+        });
+        document.getElementById('modalShortTermRatio')?.addEventListener('input', (event) => {
+            syncModalCounterpart(state, 'short', event.target.value);
         });
     }
 
@@ -101,8 +264,7 @@
         if (month === 0) {
             setInputValue('annualTargetRate', state.globalSettings.annualTargetRate);
             setInputValue('monthlyInvestment', state.globalSettings.monthlyInvestment);
-            setInputValue('longTermRatio', state.globalSettings.longTermRatio);
-            setInputValue('shortTermRatio', state.globalSettings.shortTermRatio);
+            syncMainAllocationInputs(state);
             setInputValue('longTermAnnualTarget', state.globalSettings.longTermAnnualTarget);
 
             if (principalGroup) principalGroup.style.display = 'block';
@@ -122,8 +284,7 @@
 
         setInputValue('annualTargetRate', override.annualTargetRate ?? state.globalSettings.annualTargetRate);
         setInputValue('monthlyInvestment', override.monthlyInvestment ?? state.globalSettings.monthlyInvestment);
-        setInputValue('longTermRatio', override.longTermRatio ?? state.globalSettings.longTermRatio);
-        setInputValue('shortTermRatio', override.shortTermRatio ?? state.globalSettings.shortTermRatio);
+        syncMainAllocationInputs(state);
         setInputValue('longTermAnnualTarget', override.longTermAnnualTarget ?? state.globalSettings.longTermAnnualTarget);
 
         if (principalGroup) principalGroup.style.display = 'none';
@@ -170,10 +331,18 @@
         }
 
         const effective = getEffectiveSettingsForMonth(state, month);
+        const monthlyInvestments = getMonthlyInvestmentAmounts(effective);
+        const allocationAmounts = getCurrentMonthAllocationAmounts(
+            state,
+            month,
+            effective.longTermRatio,
+            effective.shortTermRatio
+        );
         setInputValue('modalAnnualTargetRate', effective.annualTargetRate);
-        setInputValue('modalMonthlyInvestment', effective.monthlyInvestment);
-        setInputValue('modalLongTermRatio', effective.longTermRatio);
-        setInputValue('modalShortTermRatio', effective.shortTermRatio);
+        setInputValue('modalLongTermMonthlyInvestment', monthlyInvestments.longTermMonthlyInvestment);
+        setInputValue('modalShortTermMonthlyInvestment', monthlyInvestments.shortTermMonthlyInvestment);
+        setInputValue('modalLongTermRatio', allocationAmounts.longTermAmount);
+        setInputValue('modalShortTermRatio', allocationAmounts.shortTermAmount);
         setInputValue('modalLongTermAnnualTarget', effective.longTermAnnualTarget);
         setInputValue('modalAdditionalSeed', state.monthSettingsOverrides[month]?.additionalSeed ?? '');
 
@@ -189,11 +358,19 @@
     function saveMonthSettings(state, dependencies) {
         if (!state.currentEditingMonth) return;
 
+        const baseAmount = getAllocationBaseForMonth(state, state.currentEditingMonth);
+        const longTermAmount = clampAmount(document.getElementById('modalLongTermRatio')?.value, baseAmount);
+        const allocationRatios = amountToRatios(longTermAmount, baseAmount);
+        const longTermMonthlyInvestment = Math.max(parseFloat(document.getElementById('modalLongTermMonthlyInvestment')?.value) || 0, 0);
+        const shortTermMonthlyInvestment = Math.max(parseFloat(document.getElementById('modalShortTermMonthlyInvestment')?.value) || 0, 0);
+
         const settings = {
             annualTargetRate: parseFloat(document.getElementById('modalAnnualTargetRate')?.value),
-            monthlyInvestment: parseFloat(document.getElementById('modalMonthlyInvestment')?.value),
-            longTermRatio: parseFloat(document.getElementById('modalLongTermRatio')?.value),
-            shortTermRatio: parseFloat(document.getElementById('modalShortTermRatio')?.value),
+            monthlyInvestment: longTermMonthlyInvestment + shortTermMonthlyInvestment,
+            longTermMonthlyInvestment,
+            shortTermMonthlyInvestment,
+            longTermRatio: allocationRatios.longTermRatio,
+            shortTermRatio: allocationRatios.shortTermRatio,
             longTermAnnualTarget: parseFloat(document.getElementById('modalLongTermAnnualTarget')?.value)
         };
 

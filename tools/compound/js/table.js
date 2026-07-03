@@ -5,8 +5,16 @@
         let actualShortCumulative = 0;
         let prevActualShortCumulative = 0;
         let prevTargetShortCumulative = 0;
+        let startMonth = 1;
 
-        for (let index = 1; index <= month; index += 1) {
+        for (let index = month; index >= 1; index -= 1) {
+            if (state.allTableRows[index - 1]?.allocationRebalanced) {
+                startMonth = index;
+                break;
+            }
+        }
+
+        for (let index = startMonth; index <= month; index += 1) {
             const targetRow = state.allTableRows[index - 1];
             actualShortCumulative += state.actualValues[index]?.shortTerm ?? targetRow.shortTermProfit;
             if (index < month) {
@@ -25,11 +33,11 @@
     function buildRowHtml(state, row, now) {
         const idx = row.month - 1;
         const prevRow = idx > 0 ? state.allTableRows[idx - 1] : null;
-        const prevActualLongAccum = !prevRow
+        const previousLongBalance = row.longTermBalanceBefore ?? (!prevRow
             ? state.longTermPrincipalGlobal
             : (state.actualValues[prevRow.month]?.longTermCumul != null
                 ? Number(state.actualValues[prevRow.month].longTermCumul)
-                : prevRow.longTermAccumulated);
+                : prevRow.longTermAccumulated));
 
         const longTermROI = row.longTermPrincipal > 0
             ? (((row.longTermAccumulated - row.longTermPrincipal) / row.longTermPrincipal) * 100).toFixed(2)
@@ -42,7 +50,7 @@
         const hasActualInput = hasNumericValue(actualShort) || hasNumericValue(actualLongCumul);
         const effectiveShort = hasNumericValue(actualShort) ? Number(actualShort) : row.shortTermProfit;
         const effectiveLongCumul = hasNumericValue(actualLongCumul) ? Number(actualLongCumul) : row.longTermAccumulated;
-        const actualLongProfit = effectiveLongCumul - prevActualLongAccum - row.longTermInvest;
+        const actualLongProfit = effectiveLongCumul - previousLongBalance - row.longTermInvest;
         const actualTotalProfit = effectiveShort + actualLongProfit;
         const rate = hasActualInput && row.profit > 0 ? ((actualTotalProfit / row.profit) * 100).toFixed(1) : null;
         const actualEndAssetDisplay = hasActualInput ? row.assetBefore + row.monthlyInvest + actualTotalProfit : null;
@@ -75,7 +83,7 @@
         const longTermTargetProfit = row.profit - row.shortTermProfit;
         let longTermProfitRate = null;
         if (hasNumericValue(actualLongCumul)) {
-            const longTermActualProfit = Number(actualLongCumul) - prevActualLongAccum - row.longTermInvest;
+            const longTermActualProfit = Number(actualLongCumul) - previousLongBalance - row.longTermInvest;
             if (longTermTargetProfit > 0) {
                 longTermProfitRate = (longTermActualProfit / longTermTargetProfit) * 100;
             } else if (longTermTargetProfit === 0) {
@@ -95,6 +103,13 @@
         const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
         const rowClass = row.highlight ? 'highlight-row' : isCurrentMonth ? 'current-month-row' : '';
         const override = state.monthSettingsOverrides[row.month];
+        const overrideLongTermAmount = formatNumber(row.longTermPrincipal);
+        const overrideShortTermAmount = formatNumber(row.shortTermPrincipal);
+        const overrideMonthlyInvestmentText = override
+            && (override.longTermMonthlyInvestment !== undefined || override.shortTermMonthlyInvestment !== undefined)
+            ? `월 재투자: ${formatNumber(override.monthlyInvestment)}원<br>
+                                장기 재투자: ${formatNumber(row.longTermMonthlyInvest)}원 / 단기 재투자: ${formatNumber(row.shortTermMonthlyInvest)}원<br>`
+            : `월 재투자: ${formatNumber(override?.monthlyInvestment)}원<br>`;
 
         return `
             <tr ${rowClass ? `class="${rowClass}"` : ''}>
@@ -108,10 +123,10 @@
                             <div class="table-tooltip-content">
                                 <span style="color:var(--accent-warning); font-weight:600;">[적용된 새 설정]</span><br>
                                 연 수익: ${override.annualTargetRate}%<br>
-                                월 재투자: ${formatNumber(override.monthlyInvestment)}원<br>
+                                ${overrideMonthlyInvestmentText}
                                 ${override.additionalSeed ? `<span style="color:var(--accent-primary);">시드 증감: ${formatNumber(override.additionalSeed)}원</span><br>` : ''}
-                                장기: ${override.longTermRatio}% (목표 연 ${override.longTermAnnualTarget}%)<br>
-                                단기: ${override.shortTermRatio}%
+                                장기 원금: ${overrideLongTermAmount}원 (목표 연 ${override.longTermAnnualTarget}%)<br>
+                                단기 원금: ${overrideShortTermAmount}원
                             </div>
                         </div>
                         ` : ''}
