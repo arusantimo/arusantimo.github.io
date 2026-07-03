@@ -10,32 +10,56 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.8.11</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-18</span>
+        <span class="meta-version">v3.9</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-30</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.8.11)</span>
+        <span>📋 최근 변경사항 (v3.9)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="클라우드 개발 환경 구축 지원 (v3.8)"
-            data-tt-desc="클라우드상에서 10분 이내에 개발 환경을 구동할 수 있으며, 개발 환경을 스냅샷으로 저장해 기동 속도를 획기적으로 개선합니다."
-            data-tt-example=""><code>클라우드 개발 환경</code> 간편 셋업 및 재사용 스냅샷 백업 기능 추가 (v3.8) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="클라우드 VM 서브에이전트 스폰 (v3.8)"
-            data-tt-desc="전용 클라우드 VM에 서브에이전트를 생성하여 CI 에러 픽스나 장시간의 조사 태스크를 위임하고 로컬 터미널의 반응성을 최대로 유지합니다."
-            data-tt-example="/in-cloud fix compile error">독립형 클라우드 VM 상에서 서브에이전트 구동 <code>/in-cloud</code> 커맨드 추가 (v3.8) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Canvas 컨텍스트 사용량 시각 분석 (v3.8)"
-            data-tt-desc="시스템 프롬프트, 도구 사양, 규칙, 스킬들이 차지하는 컨텍스트(토큰) 비중을 캔버스 내에서 인터랙티브한 그래프로 분석합니다."
-            data-tt-example="">캔버스(<code>Canvas</code>) 내 에이전트의 컨텍스트(토큰) 세부 사용량 분석 보고서 도입 (v3.8) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="팀 MCP 마켓플레이스 배포 (v3.9)"
+            data-tt-desc="관리자가 구성한 팀 MCP 서버를 클라우드 에이전트, Agents Window, IDE, CLI 전반에 팀 마켓플레이스로 배포할 수 있습니다."
+            data-tt-example="Dashboard > Integrations & MCP">팀 MCP 서버를 Cloud Agent/IDE/CLI 전반에 배포하는 팀 마켓플레이스 지원 (v3.9) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="조직 그룹별 마켓플레이스 접근 제어 (v3.9)"
+            data-tt-desc="팀 마켓플레이스가 SCIM 디렉터리 그룹 외에 조직 그룹 기반 접근 제한을 지원합니다."
+            data-tt-example="Dashboard > Plugins > Team Marketplaces">조직 그룹 단위 Team Marketplace 접근 제어 지원 (v3.9) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor for iOS 공개 베타 (v3.9)"
+            data-tt-desc="모든 유료 플랜에서 모바일 앱으로 repo를 선택하고 Cloud Agent를 시작하거나 관리할 수 있습니다."
+            data-tt-example="Cursor for iOS">iOS 모바일 앱 공개 베타 및 모바일 Cloud Agent 실행 지원 (v3.9) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 제어와 Live Activities (v3.9)"
+            data-tt-desc="휴대폰에서 실행 중인 에이전트를 원격 제어하고, Live Activities 및 푸시 알림으로 상태를 확인합니다."
+            data-tt-example="Agents Window > Remote Control">모바일 원격 제어, Live Activities, push notification 지원 (v3.9) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor Customize 페이지 (v3.9)"
+            data-tt-desc="플러그인, 스킬, MCP, 하위 에이전트, 규칙, 명령어, 훅을 사용자/팀/워크스페이스 수준에서 한곳에 관리합니다."
+            data-tt-example="Customize">Customize 페이지에서 플러그인·스킬·MCP·규칙·훅 통합 관리 (v3.9) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="플러그인 Canvas 및 팀 마켓플레이스 import (v3.9)"
+            data-tt-desc="플러그인이 공유 Canvas 템플릿을 제공할 수 있고, 팀 마켓플레이스는 GitLab, Bitbucket, Azure DevOps 저장소 import를 지원합니다."
+            data-tt-example="Team Marketplace import">Plugin Canvas 및 GitLab/Bitbucket/Azure DevOps 플러그인 저장소 import 지원 (v3.9) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.8</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="클라우드 개발 환경 구축 지원 (v3.8)"
+                data-tt-desc="클라우드상에서 10분 이내에 개발 환경을 구동할 수 있으며, 개발 환경을 스냅샷으로 저장해 기동 속도를 획기적으로 개선합니다."
+                data-tt-example=""><code>클라우드 개발 환경</code> 간편 셋업 및 재사용 스냅샷 백업 기능 추가 (v3.8)</li>
+              <li class="cl-tip" data-tt-title="클라우드 VM 서브에이전트 스폰 (v3.8)"
+                data-tt-desc="전용 클라우드 VM에 서브에이전트를 생성하여 CI 에러 픽스나 장시간의 조사 태스크를 위임하고 로컬 터미널의 반응성을 최대로 유지합니다."
+                data-tt-example="/in-cloud fix compile error">독립형 클라우드 VM 상에서 서브에이전트 구동 <code>/in-cloud</code> 커맨드 추가 (v3.8)</li>
+              <li class="cl-tip" data-tt-title="Canvas 컨텍스트 사용량 시각 분석 (v3.8)"
+                data-tt-desc="시스템 프롬프트, 도구 사양, 규칙, 스킬들이 차지하는 컨텍스트(토큰) 비중을 캔버스 내에서 인터랙티브한 그래프로 분석합니다."
+                data-tt-example="">캔버스(<code>Canvas</code>) 내 에이전트의 컨텍스트(토큰) 세부 사용량 분석 보고서 도입 (v3.8)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.7.36</summary>
@@ -269,30 +293,30 @@ const cursorContent = `
           </div>
           <div>
             <div class="group">
-              <div class="group-label">cursor-agent CLI (독립 에이전트)</div>
+              <div class="group-label">agent CLI (독립 에이전트)</div>
               <div class="row">
-                <div class="row-key"><code>cursor-agent</code></div>
-                <div class="row-desc">터미널 대화형 코딩 에이전트 실행</div>
+                <div class="row-key"><code>agent</code></div>
+                <div class="row-desc">터미널 대화형 코딩 에이전트 실행 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
-                <div class="row-key"><code>cursor-agent login</code></div>
-                <div class="row-desc">브라우저를 연동하여 CLI 계정 로그인 인증 진행</div>
+                <div class="row-key"><code>agent --mode=plan</code></div>
+                <div class="row-desc">Plan 모드로 접근 설계 후 실행</div>
               </div>
               <div class="row">
-                <div class="row-key"><code>cursor-agent -p "Prompt"</code></div>
-                <div class="row-desc">자동화 모드로 프롬프트의 요구사항을 즉각 실행</div>
+                <div class="row-key"><code>agent -p "Prompt"</code></div>
+                <div class="row-desc">비대화형 print 모드로 프롬프트 실행 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
-                <div class="row-key"><code>cursor-agent resume</code></div>
+                <div class="row-key"><code>agent ls</code></div>
+                <div class="row-desc">이전 채팅 목록을 열고 세션 선택</div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>agent resume</code></div>
                 <div class="row-desc">최근 실행하던 이전 세션을 불러와 이어하기</div>
               </div>
               <div class="row">
-                <div class="row-key"><code>cursor-agent ls</code></div>
-                <div class="row-desc">활성화된 이전 에이전트 세션의 리스트 출력</div>
-              </div>
-              <div class="row">
-                <div class="row-key"><code>cursor-agent logout</code></div>
-                <div class="row-desc">CLI 인증 정보 제거 및 로그아웃</div>
+                <div class="row-key"><code>&amp; prompt</code></div>
+                <div class="row-desc">현재 대화를 Cloud Agent로 넘겨 백그라운드 실행 <span class="badge-new">NEW</span></div>
               </div>
             </div>
           </div>

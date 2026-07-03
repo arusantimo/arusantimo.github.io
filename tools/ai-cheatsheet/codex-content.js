@@ -10,32 +10,68 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.141.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-18</span>
+        <span class="meta-version">v0.142.5</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-30</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.141.0)</span>
+        <span>📋 최근 변경사항 (v0.142.5)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="원격 실행기 Noise E2EE 릴레이 적용 (v0.141.0)"
-            data-tt-desc="원격 CLI 세션과 로컬 환경을 연동하는 리모트 러너 채널에 Noise 프로토콜을 사용한 종단간 암호화(E2EE) 보안 통신망이 가동됩니다."
-            data-tt-example="">원격 실행기용 <code>Noise E2EE</code> 릴레이 채널 적용 (v0.141.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Windows ARM64 패키지 및 SQLite 고정 (v0.141.0)"
-            data-tt-desc="Windows x64 빌드 기기에서의 Windows ARM64 타겟 패키징을 수선하였고, 대규모 쓰기 트랜잭션 시 파일 락을 방지하는 SQLite WAL-reset 의존성이 락인되었습니다."
-            data-tt-example="">Windows ARM64 크로스 패키징 안정화 및 <code>SQLite WAL-reset</code> 버그 수정 의존성 핀 (v0.141.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="플러그인 MCP 선언 중복 제거 (v0.141.0)"
-            data-tt-desc="동일한 플러그인을 중복 로드하여 발생하는 MCP 충돌을 사전에 방지하고자 앱 내부 선언명 기준의 자동 중복 방지 제어를 지원합니다."
-            data-tt-example="">플러그인 MCP의 애플리케이션 선언 명칭(<code>app declaration name</code>) 기반 중복 제거 (v0.141.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Responses WebSocket trace 보안 패치 (v0.142.5)"
+            data-tt-desc="Responses WebSocket 요청 전체 payload가 trace 로그에 기록되지 않도록 차단한 보안/개인정보 보호 패치입니다."
+            data-tt-example="">Responses WebSocket request payload의 trace log 기록 방지 패치 (v0.142.5) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.142.1~v0.142.4</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Windows system proxy 인증 지원 (v0.142.1)"
+                data-tt-desc="Windows 인증 클라이언트가 PAC, WPAD, 정적 프록시, bypass rule을 포함한 시스템 프록시를 opt-in으로 사용할 수 있습니다."
+                data-tt-example="respect_system_proxy = true">Windows 인증용 system proxy/PAC/WPAD 지원 추가 (v0.142.1)</li>
+              <li class="cl-tip" data-tt-title="MCP tools tool search 기본 사용 (v0.142.2)"
+                data-tt-desc="지원되는 모델과 provider에서 MCP 도구가 tool search를 기본 사용해 도구 탐색 효율을 높입니다."
+                data-tt-example="">MCP 도구의 <code>tool search</code> 기본 사용 전환 (v0.142.2)</li>
+              <li class="cl-tip" data-tt-title="macOS system proxy 인증 지원 (v0.142.2)"
+                data-tt-desc="macOS 인증 클라이언트도 respect_system_proxy 설정 시 시스템 프록시, PAC, WPAD 설정을 반영합니다."
+                data-tt-example="respect_system_proxy = true">macOS 인증 클라이언트 system proxy/PAC/WPAD 연동 추가 (v0.142.2)</li>
+              <li class="cl-tip" data-tt-title="플러그인 dark-mode 로고 메타데이터 (v0.142.2)"
+                data-tt-desc="로컬 manifest 및 원격 catalog에서 다크 모드 전용 플러그인 로고를 제공할 수 있습니다."
+                data-tt-example="plugin.dark_logo">플러그인 로컬/원격 catalog dark-mode 로고 지원 (v0.142.2)</li>
+              <li class="cl-tip" data-tt-title="Bedrock 자격증명 오류 안내 개선 (v0.142.2)"
+                data-tt-desc="만료된 Amazon Bedrock credentials가 generic authorization error 대신 복구 가능한 안내를 표시합니다."
+                data-tt-example="codex doctor">만료 Bedrock credentials 오류에 actionable recovery guidance 제공 (v0.142.2)</li>
+              <li class="cl-tip" data-tt-title="PowerShell AST 안전 검사 강화 (v0.142.2)"
+                data-tt-desc="safety classifier가 검사할 수 없는 executable AST 영역을 포함한 PowerShell 명령은 승인을 요구하도록 변경되었습니다."
+                data-tt-example="powershell -Command ...">PowerShell executable AST 미검사 영역 실행 시 승인 요구 강화 (v0.142.2)</li>
+              <li class="cl-tip" data-tt-title="v0.142.3/v0.142.4 유지보수 릴리스"
+                data-tt-desc="0.142.3과 0.142.4는 사용자 노출 변경이 없는 maintenance-only/chores 릴리스입니다."
+                data-tt-example="">0.142.3 및 0.142.4는 사용자 노출 변경 없음</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v0.141.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="원격 실행기 Noise E2EE 릴레이 적용 (v0.141.0)"
+                data-tt-desc="원격 CLI 세션과 로컬 환경을 연동하는 리모트 러너 채널에 Noise 프로토콜을 사용한 종단간 암호화(E2EE) 보안 통신망이 가동됩니다."
+                data-tt-example="">원격 실행기용 <code>Noise E2EE</code> 릴레이 채널 적용 (v0.141.0)</li>
+              <li class="cl-tip" data-tt-title="Windows ARM64 패키지 및 SQLite 고정 (v0.141.0)"
+                data-tt-desc="Windows x64 빌드 기기에서의 Windows ARM64 타겟 패키징을 수선하였고, 대규모 쓰기 트랜잭션 시 파일 락을 방지하는 SQLite WAL-reset 의존성이 락인되었습니다."
+                data-tt-example="">Windows ARM64 크로스 패키징 안정화 및 <code>SQLite WAL-reset</code> 버그 수정 의존성 핀 (v0.141.0)</li>
+              <li class="cl-tip" data-tt-title="플러그인 MCP 선언 중복 제거 (v0.141.0)"
+                data-tt-desc="동일한 플러그인을 중복 로드하여 발생하는 MCP 충돌을 사전에 방지하고자 앱 내부 선언명 기준의 자동 중복 방지 제어를 지원합니다."
+                data-tt-example="">플러그인 MCP의 애플리케이션 선언 명칭(<code>app declaration name</code>) 기반 중복 제거 (v0.141.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.140.0</summary>
@@ -369,15 +405,15 @@ const codexContent = `
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/delete</code></div>
-            <div class="row-desc">세션 영구 삭제 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">세션 영구 삭제</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/usage</code></div>
-            <div class="row-desc">토큰 사용 통계 뷰어 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">토큰 사용 통계 뷰어</div>
           </div>
           <div class="row cl-tip">
             <div class="row-key"><code>/import</code></div>
-            <div class="row-desc">Claude Code 설정/이력 가져오기 <span class="badge-new">NEW</span></div>
+            <div class="row-desc">Claude Code 설정/이력 가져오기</div>
           </div>
         </div>
         <div class="group">
@@ -504,7 +540,7 @@ const codexContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>codex delete</code></div>
-                <div class="row-desc">지정된 세션 ID 영구 삭제 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">지정된 세션 ID 영구 삭제</div>
               </div>
             </div>
             <div class="group">

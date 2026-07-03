@@ -10,38 +10,98 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.181</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-17</span>
+        <span class="meta-version">v2.1.199</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-07-02</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.181)</span>
+        <span>📋 최근 변경사항 (v2.1.199)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="/config key=value 설정 추가 (v2.1.181)"
-            data-tt-desc="대화 프롬프트 상에서 직접 설정을 지정할 수 있는 단축 구문입니다. interactive, -p 및 Remote Control 모드 모두에서 작동합니다."
-            data-tt-example="/config thinking=false"><code>/config key=value</code> 문법을 통한 실시간 설정 변경 지원 (v2.1.181) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="sandbox.allowAppleEvents 설정 추가 (v2.1.181)"
-            data-tt-desc="샌드박스 내부에서 실행되는 명령이 macOS에서 Apple Event를 발송할 수 있도록 허용하는 옵트인(opt-in) 보안 설정입니다."
-            data-tt-example="sandbox.allowAppleEvents: true">macOS 샌드박스 내 Apple Event 전송 허용 <code>sandbox.allowAppleEvents</code> 추가 (v2.1.181) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="CLAUDE_CLIENT_PRESENCE_FILE 환경변수 도입 (v2.1.181)"
-            data-tt-desc="PC 앞에 앉아 있을 때 모바일 푸시 알림을 억제하기 위해, 특정 마커 파일이 존재하면 모바일 푸시 전송을 무력화하는 경로 변수입니다."
-            data-tt-example="export CLAUDE_CLIENT_PRESENCE_FILE=~/.claude/presence">모바일 알림 제어용 <code>CLAUDE_CLIENT_PRESENCE_FILE</code> 환경변수 추가 (v2.1.181) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="API 접속 해제 자동 복구 및 재시도 (v2.1.181)"
-            data-tt-desc="에이전트가 생각하는 도중(mid-thinking) API 연결이 끊기면 끊겼다는 오류를 띄우지 않고 자동으로 연결을 재시도합니다."
-            data-tt-example="">API 중간 연결 유실(mid-thinking drop) 자동 복구 및 재시도 패치 (v2.1.181) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Bun 런타임 1.4 및 스트리밍 성능 향상 (v2.1.181)"
-            data-tt-desc="기본 탑재된 Bun 런타임 버전을 1.4로 빌드업했으며, 장문의 줄 바꿈이 생기기 전에 줄 단위로 출력을 먼저 시작하도록 스트리밍 속도를 개선했습니다."
-            data-tt-example="">Bundled Bun 런타임 v1.4 업그레이드 및 장문 줄단위 스트리밍 성능 최적화 (v2.1.181) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="스택형 slash-skill 호출 지원 (v2.1.199)"
+            data-tt-desc="프롬프트 앞에 여러 스킬을 연속으로 붙이면 최대 5개까지 선행 스킬을 모두 로드합니다."
+            data-tt-example="/skill-a /skill-b do XYZ">스택형 slash-skill 호출(<code>/skill-a /skill-b</code>) 최대 5개 로드 지원 (v2.1.199) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="TLS 인증서 오류 빠른 실패 처리 (v2.1.199)"
+            data-tt-desc="TLS 검사 프록시, 누락된 NODE_EXTRA_CA_CERTS, 만료 인증서 오류를 재시도 소진 전에 즉시 안내합니다."
+            data-tt-example="export NODE_EXTRA_CA_CERTS=/path/to/cert.pem">TLS 인증서 오류를 즉시 중단하고 해결 힌트를 표시하도록 개선 (v2.1.199) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="스트리밍 부분 응답 보존 (v2.1.199)"
+            data-tt-desc="API가 부분 출력 이후 overload/server error를 반환해도 이미 받은 응답을 버리지 않고 incomplete-response 안내와 함께 보존합니다."
+            data-tt-example="">중간 서버 오류 발생 시 스트리밍 부분 응답 보존 처리 (v2.1.199) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="서브에이전트 오류/부분 결과 전파 (v2.1.199)"
+            data-tt-desc="rate limit 또는 서버 오류로 끊긴 서브에이전트가 조용히 실패하지 않고 부모 에이전트에 오류와 부분 결과를 반환합니다."
+            data-tt-example="">서브에이전트 rate-limit/server-error 부분 작업 및 오류 보고 강화 (v2.1.199) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_CODE_RETRY_WATCHDOG 재시도 정책 (v2.1.199)"
+            data-tt-desc="비용량성 일시 오류에서 watchdog 기본 재시도 수를 300으로 올리고 CLAUDE_CODE_MAX_RETRIES의 15회 상한을 해제합니다."
+            data-tt-example="export CLAUDE_CODE_RETRY_WATCHDOG=1"><code>CLAUDE_CODE_RETRY_WATCHDOG</code> 일시 오류 재시도 정책 강화 (v2.1.199) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.183~v2.1.198</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Claude Sonnet 5 기본 모델 도입 (v2.1.197)"
+                data-tt-desc="Claude Sonnet 5가 기본 모델로 도입되었고 네이티브 1M 토큰 컨텍스트 윈도우를 제공합니다."
+                data-tt-example="/model">Claude Sonnet 5 기본 모델 및 1M 컨텍스트 지원 (v2.1.197)</li>
+              <li class="cl-tip" data-tt-title="서브에이전트 기본 백그라운드 실행 (v2.1.198)"
+                data-tt-desc="서브에이전트가 기본적으로 백그라운드에서 실행되어 Claude가 계속 작업하고 완료 시 알림을 받습니다."
+                data-tt-example="claude agents">서브에이전트 기본 백그라운드 실행 및 완료/입력 필요 알림 (v2.1.198)</li>
+              <li class="cl-tip" data-tt-title="Claude in Chrome GA 및 /dataviz 스킬 (v2.1.198)"
+                data-tt-desc="Claude in Chrome이 정식 제공되며, 차트/대시보드 설계를 위한 /dataviz 스킬이 추가되었습니다."
+                data-tt-example="/dataviz">Claude in Chrome 정식화 및 <code>/dataviz</code> 스킬 추가 (v2.1.198)</li>
+              <li class="cl-tip" data-tt-title="/agents wizard 제거 (v2.1.198)"
+                data-tt-desc="기존 /agents 마법사가 제거되어, Claude에게 서브에이전트 생성을 요청하거나 .claude/agents/를 직접 편집하는 방식으로 전환되었습니다."
+                data-tt-example=".claude/agents/"><code>/agents</code> wizard 제거 및 파일 기반 서브에이전트 관리 권장 (v2.1.198)</li>
+              <li class="cl-tip" data-tt-title="조직 기본 모델 및 파일 첨부 클릭 (v2.1.196)"
+                data-tt-desc="조직 관리자가 기본 모델을 지정할 수 있고, 채팅 내 파일 첨부를 Ctrl/Cmd-click으로 Finder/Explorer에서 열 수 있습니다."
+                data-tt-example="/model">조직 기본 모델 표시 및 채팅 파일 첨부 클릭 열기 지원 (v2.1.196)</li>
+              <li class="cl-tip" data-tt-title="백그라운드 세션 안정화 및 스트림 watchdog (v2.1.196)"
+                data-tt-desc="Windows 포함 장기 실행 백그라운드 셸 생존성이 개선되고, 5분 무응답 스트림 watchdog이 기본 활성화되었습니다."
+                data-tt-example="CLAUDE_ENABLE_STREAM_WATCHDOG=0">백그라운드 세션 재시작 내구성 및 스트리밍 idle watchdog 기본 활성화 (v2.1.196)</li>
+              <li class="cl-tip" data-tt-title="마우스 클릭 비활성 환경변수 (v2.1.195)"
+                data-tt-desc="fullscreen 모드에서 wheel scroll은 유지하면서 click/drag/hover만 끌 수 있는 환경변수입니다."
+                data-tt-example="export CLAUDE_CODE_DISABLE_MOUSE_CLICKS=1"><code>CLAUDE_CODE_DISABLE_MOUSE_CLICKS</code> 환경변수 추가 (v2.1.195)</li>
+              <li class="cl-tip" data-tt-title="autoMode.classifyAllShell 및 OTel 응답 로그 (v2.1.193)"
+                data-tt-desc="모든 Bash/PowerShell 명령을 auto-mode classifier로 라우팅하는 설정과 assistant_response OTel 로그 이벤트가 추가되었습니다."
+                data-tt-example="autoMode.classifyAllShell: true"><code>autoMode.classifyAllShell</code> 및 <code>claude_code.assistant_response</code> 추가 (v2.1.193)</li>
+              <li class="cl-tip" data-tt-title="sandbox.credentials 및 조직 모델 제한 (v2.1.187)"
+                data-tt-desc="샌드박스 명령의 credential 파일/비밀 환경변수 접근 차단 설정과 조직 모델 제한 표시가 추가되었습니다."
+                data-tt-example="sandbox.credentials: false"><code>sandbox.credentials</code> 보안 설정 및 조직 모델 제한 표시 추가 (v2.1.187)</li>
+              <li class="cl-tip" data-tt-title="MCP CLI 인증 명령 추가 (v2.1.186)"
+                data-tt-desc="대화형 /mcp 메뉴 없이 CLI에서 MCP 서버 로그인을 처리하는 claude mcp login/logout 명령이 추가되었습니다."
+                data-tt-example="claude mcp login github --no-browser"><code>claude mcp login/logout</code> CLI 인증 명령 추가 (v2.1.186)</li>
+              <li class="cl-tip" data-tt-title="Auto mode 안전성 및 /config 도움말 (v2.1.183)"
+                data-tt-desc="파괴적 git/infra 명령 차단이 강화되고, /config --help 및 attribution.sessionUrl 설정이 추가되었습니다."
+                data-tt-example="/config --help">파괴적 명령 auto-mode 차단 강화 및 <code>/config --help</code> 추가 (v2.1.183)</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.1.181</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="/config key=value 설정 추가 (v2.1.181)"
+                data-tt-desc="대화 프롬프트 상에서 직접 설정을 지정할 수 있는 단축 구문입니다. interactive, -p 및 Remote Control 모드 모두에서 작동합니다."
+                data-tt-example="/config thinking=false"><code>/config key=value</code> 문법을 통한 실시간 설정 변경 지원 (v2.1.181)</li>
+              <li class="cl-tip" data-tt-title="sandbox.allowAppleEvents 설정 추가 (v2.1.181)"
+                data-tt-desc="샌드박스 내부에서 실행되는 명령이 macOS에서 Apple Event를 발송할 수 있도록 허용하는 옵트인(opt-in) 보안 설정입니다."
+                data-tt-example="sandbox.allowAppleEvents: true">macOS 샌드박스 내 Apple Event 전송 허용 <code>sandbox.allowAppleEvents</code> 추가 (v2.1.181)</li>
+              <li class="cl-tip" data-tt-title="CLAUDE_CLIENT_PRESENCE_FILE 환경변수 도입 (v2.1.181)"
+                data-tt-desc="PC 앞에 앉아 있을 때 모바일 푸시 알림을 억제하기 위해, 특정 마커 파일이 존재하면 모바일 푸시 전송을 무력화하는 경로 변수입니다."
+                data-tt-example="export CLAUDE_CLIENT_PRESENCE_FILE=~/.claude/presence">모바일 알림 제어용 <code>CLAUDE_CLIENT_PRESENCE_FILE</code> 환경변수 추가 (v2.1.181)</li>
+              <li class="cl-tip" data-tt-title="API 접속 해제 자동 복구 및 재시도 (v2.1.181)"
+                data-tt-desc="에이전트가 생각하는 도중(mid-thinking) API 연결이 끊기면 끊겼다는 오류를 띄우지 않고 자동으로 연결을 재시도합니다."
+                data-tt-example="">API 중간 연결 유실(mid-thinking drop) 자동 복구 및 재시도 패치 (v2.1.181)</li>
+              <li class="cl-tip" data-tt-title="Bun 런타임 1.4 및 스트리밍 성능 향상 (v2.1.181)"
+                data-tt-desc="기본 탑재된 Bun 런타임 버전을 1.4로 빌드업했으며, 장문의 줄 바꿈이 생기기 전에 줄 단위로 출력을 먼저 시작하도록 스트리밍 속도를 개선했습니다."
+                data-tt-example="">Bundled Bun 런타임 v1.4 업그레이드 및 장문 줄단위 스트리밍 성능 최적화 (v2.1.181)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.174~v2.1.179</summary>
@@ -1544,7 +1604,7 @@ const claudeContent = `
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>wheelScrollAccelerationEnabled</code></div>
-                <div class="row-desc">터미널 마우스 휠 스크롤 가속화 여부 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">터미널 마우스 휠 스크롤 가속화 여부</div>
               </div>
               <div class="row cl-tip">
                 <div class="row-key"><code>requiredMinimumVersion</code></div>

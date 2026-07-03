@@ -10,41 +10,65 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.4</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-17</span>
+        <span class="meta-version">v2.2.1</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-06-25</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.4)</span>
+        <span>📋 최근 변경사항 (v2.2.1)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="슬래시 커맨드 이력 및 위 화살표 입력 (v2.1.4)"
-            data-tt-desc="TUI 상단 입력창에서 위쪽 화살표(↑) 키를 눌러 이전에 실행했던 슬래시 커맨드 히스토리를 순차적으로 복원해 재실행할 수 있습니다."
-            data-tt-example="">슬래시 커맨드 실행 이력(↑ 키 히스토리 이동) 기능 지원 (v2.1.4) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Models &amp; Quota 페이지 재설계 (v2.1.4)"
-            data-tt-desc="비활성화된 쿼터 버킷의 경우 흐리게 표시하고 게이지를 생략하여 가독성을 높였으며, 기존 사용량 페이지를 대체해 기본 활성화됩니다."
-            data-tt-example="">쿼터 비활성 버킷 가독성 보완 및 Models &amp; Quota 화면 재설계 (v2.1.4) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="상태 표시줄 실시간 정보 노출 강화 (v2.1.4)"
-            data-tt-desc="하단 statusline에 현재 세션의 누적 쿼터 소모량 및 실행 모드 정보가 실시간으로 상시 출력되도록 연동했습니다."
-            data-tt-example="">하단 상태줄(statusline) 실시간 쿼터 소모량 및 실행 모드 표시 지원 (v2.1.4) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/btw 토큰 소모 최적화 및 스트리밍 (v2.1.4)"
-            data-tt-desc="가벼운 대화를 나누는 /btw 명령어 구동 시 불필요한 토큰 낭비를 절감하고 중간 응답을 실시간 텍스트 스트리밍 방식으로 수신합니다."
-            data-tt-example=""><code>/btw</code> 가벼운 질문 기능 토큰 효율화 및 스트리밍 응답 패치 (v2.1.4) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/hooks 구성 공용 폴더 연동 (v2.1.4)"
-            data-tt-desc="훅 구성 저장 경로를 기존의 private 경로에서 shared config 경로(~/.gemini/config/hooks.json)로 이전하여 IDE 등과 동기화되도록 수정했습니다."
-            data-tt-example="">훅 설정(<code>/hooks</code>) 저장 경로 공용 config 폴더 이전 및 동기화 (v2.1.4) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="구형 CPU compatibility (SIGILL 방지) (v2.1.4)"
-            data-tt-desc="AES-NI 명령어가 없는 구형 CPU(Intel Ivy Bridge 등)나 VM 샌드박스 가상 환경 내에서 기동 시 SIGILL 시그널로 즉시 크래시되던 문제를 패치했습니다."
-            data-tt-example="">AES-NI 명령어 부재 CPU 및 가상 머신(VM) 환경 SIGILL 크래시 방지 패치 (v2.1.4) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Antigravity Guide 내장 스킬 (v2.2.1)"
+            data-tt-desc="Antigravity 사용법과 워크플로우를 안내하는 built-in Guide 스킬이 추가되었습니다."
+            data-tt-example="Antigravity Guide">내장 <code>Antigravity Guide</code> 스킬 추가 (v2.2.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="오디오 파일 렌더링 지원 (v2.2.1)"
+            data-tt-desc="아티팩트/첨부 파일 흐름에서 오디오 파일을 렌더링해 검토할 수 있도록 지원합니다."
+            data-tt-example="">오디오 파일 렌더링 지원 추가 (v2.2.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="부분 문자열 파일 검색 개선 (v2.2.1)"
+            data-tt-desc="파일 검색에서 substring 매칭 품질과 탐색 정확도가 개선되었습니다."
+            data-tt-example="">substring 기반 file search 개선 (v2.2.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLI 시작 경로 성능 최적화 (v2.2.1)"
+            data-tt-desc="VCS detection을 동기 CLI 시작 경로 밖으로 옮겨 초기화 지연을 줄였습니다."
+            data-tt-example="agy">VCS detection을 CLI startup sync path 밖으로 이동해 초기화 지연 감소 (v2.2.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="rules.json 제외/허용 규칙 패치 (v2.2.1)"
+            data-tt-desc="rules.json의 exclusion rule과 allowlist가 무시되어 모든 .md rule이 로드되던 문제를 수정했습니다."
+            data-tt-example="rules.json">rules.json exclusion/allowlist 무시로 인한 rule discovery 과다 로드 수정 (v2.2.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="MCP 서버 초기화 병렬화 (v2.2.1)"
+            data-tt-desc="느리거나 멈춘 MCP 서버가 독립적인 빠른 서버 로딩을 막지 않도록 초기화 시퀀스를 병렬화했습니다."
+            data-tt-example="agy plugin list">MCP server initialization 병렬화로 startup/config reload 블로킹 완화 (v2.2.1) <span class="badge-new">NEW</span></li>
         </ul>
 
-<div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
+        <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.4</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="슬래시 커맨드 이력 및 위 화살표 입력 (v2.1.4)"
+                data-tt-desc="TUI 상단 입력창에서 위쪽 화살표(↑) 키를 눌러 이전에 실행했던 슬래시 커맨드 히스토리를 순차적으로 복원해 재실행할 수 있습니다."
+                data-tt-example="">슬래시 커맨드 실행 이력(↑ 키 히스토리 이동) 기능 지원 (v2.1.4)</li>
+              <li class="cl-tip" data-tt-title="Models &amp; Quota 페이지 재설계 (v2.1.4)"
+                data-tt-desc="비활성화된 쿼터 버킷의 경우 흐리게 표시하고 게이지를 생략하여 가독성을 높였으며, 기존 사용량 페이지를 대체해 기본 활성화됩니다."
+                data-tt-example="">쿼터 비활성 버킷 가독성 보완 및 Models &amp; Quota 화면 재설계 (v2.1.4)</li>
+              <li class="cl-tip" data-tt-title="상태 표시줄 실시간 정보 노출 강화 (v2.1.4)"
+                data-tt-desc="하단 statusline에 현재 세션의 누적 쿼터 소모량 및 실행 모드 정보가 실시간으로 상시 출력되도록 연동했습니다."
+                data-tt-example="">하단 상태줄(statusline) 실시간 쿼터 소모량 및 실행 모드 표시 지원 (v2.1.4)</li>
+              <li class="cl-tip" data-tt-title="/btw 토큰 소모 최적화 및 스트리밍 (v2.1.4)"
+                data-tt-desc="가벼운 대화를 나누는 /btw 명령어 구동 시 불필요한 토큰 낭비를 절감하고 중간 응답을 실시간 텍스트 스트리밍 방식으로 수신합니다."
+                data-tt-example=""><code>/btw</code> 가벼운 질문 기능 토큰 효율화 및 스트리밍 응답 패치 (v2.1.4)</li>
+              <li class="cl-tip" data-tt-title="/hooks 구성 공용 폴더 연동 (v2.1.4)"
+                data-tt-desc="훅 구성 저장 경로를 기존의 private 경로에서 shared config 경로(~/.gemini/config/hooks.json)로 이전하여 IDE 등과 동기화되도록 수정했습니다."
+                data-tt-example="">훅 설정(<code>/hooks</code>) 저장 경로 공용 config 폴더 이전 및 동기화 (v2.1.4)</li>
+              <li class="cl-tip" data-tt-title="구형 CPU compatibility (SIGILL 방지) (v2.1.4)"
+                data-tt-desc="AES-NI 명령어가 없는 구형 CPU(Intel Ivy Bridge 등)나 VM 샌드박스 가상 환경 내에서 기동 시 SIGILL 시그널로 즉시 크래시되던 문제를 패치했습니다."
+                data-tt-example="">AES-NI 명령어 부재 CPU 및 가상 머신(VM) 환경 SIGILL 크래시 방지 패치 (v2.1.4)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.3</summary>
@@ -268,12 +292,16 @@ const antigravityContent = `
                 <div class="row-desc">사용 가능한 모델 목록 조회</div>
               </div>
               <div class="row">
-                <div class="row-key"><code>agy inspect</code></div>
-                <div class="row-desc">현재 프로젝트 구조 및 에이전트 스킬 목록 요약 출력</div>
+                <div class="row-key"><code>agy changelog</code></div>
+                <div class="row-desc">CLI 변경 내역과 릴리스 노트 출력 <span class="badge-new">NEW</span></div>
               </div>
               <div class="row">
-                <div class="row-key"><code>agy plugin import gemini</code></div>
-                <div class="row-desc">구형 Gemini CLI의 설정 및 인증 정보를 원클릭 마이그레이션</div>
+                <div class="row-key"><code>agy plugin</code></div>
+                <div class="row-desc">플러그인 install/list/enable/disable 관리 <span class="badge-new">NEW</span></div>
+              </div>
+              <div class="row">
+                <div class="row-key"><code>agy update</code></div>
+                <div class="row-desc">CLI 최신 버전 업데이트 <span class="badge-new">NEW</span></div>
               </div>
             </div>
           </div>
