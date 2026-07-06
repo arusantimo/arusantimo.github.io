@@ -1,5 +1,156 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-06",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260706.js",
+    "jsonFile": "jongga/output/202607/latest_20260706.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260706.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-06T06:05:29+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "기아",
+        "code": "000270",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 160500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, Q1, G13)",
+        "entryEligible": false,
+        "currentPrice": 510000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "현대차",
+        "code": "005380",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 498500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 84700
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "마키나락스",
+        "code": "477850",
+        "score": 5.9,
+        "signalScore": 5.9,
+        "strictScore": 5.9,
+        "scoreMax": 12.5,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
+        "entryEligible": false,
+        "currentPrice": 30400
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "마키나락스",
+        "code": "477850",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 30400
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 316000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-07-03",
     "variant": "stable",
     "variantLabel": "현재 버전",
