@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-06T06:05:29+00:00",
+    "generatedAt": "2026-07-06T08:35:06+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G13)",
         "entryEligible": false,
-        "currentPrice": 160500
+        "currentPrice": 160700
       },
       {
         "strategy": "pullback",
@@ -41,9 +41,39 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, Q1, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, Q1, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 510000
+        "currentPrice": 515000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 85500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "기아",
+        "code": "000270",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 160700
       },
       {
         "strategy": "accumulation",
@@ -58,37 +88,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 498500
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "두산에너빌리티",
-        "code": "034020",
-        "score": 7.5,
-        "signalScore": 7.5,
-        "strictScore": 7.5,
-        "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
-        "entryEligible": false,
-        "currentPrice": 84700
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "마키나락스",
-        "code": "477850",
-        "score": 5.9,
-        "signalScore": 5.9,
-        "strictScore": 5.9,
-        "scoreMax": 12.5,
-        "grade": "B",
-        "gradeScore": 6.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
-        "entryEligible": false,
-        "currentPrice": 30400
+        "currentPrice": 502000
       },
       {
         "strategy": "reversal",
@@ -104,6 +104,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 30400
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화오션",
+        "code": "042660",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 116100
       },
       {
         "strategy": "reversal",
@@ -142,6 +157,17 @@ window.JONGGA_HISTORY_INDEX = [
         "reasons": [
           "투자 주의",
           "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "028260",
+        "name": "삼성물산",
+        "reasons": [
+          "투자 주의"
         ],
         "sources": [
           "kind"
