@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-07T06:05:40+00:00",
+    "generatedAt": "2026-07-07T08:35:23+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK",
+        "code": "034730",
+        "score": 8.8,
+        "signalScore": 8.8,
+        "strictScore": 8.8,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
+        "entryEligible": false,
+        "currentPrice": 626000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -28,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, G4, G12)",
         "entryEligible": false,
-        "currentPrice": 547000
+        "currentPrice": 552000
       },
       {
         "strategy": "pullback",
@@ -50,15 +65,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "accumulation",
         "name": "NAVER",
         "code": "035420",
-        "score": 7.4,
-        "signalScore": 7.4,
-        "strictScore": 7.4,
+        "score": 7.3,
+        "signalScore": 7.3,
+        "strictScore": 7.3,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 5.3,
+        "gradeScore": 5.2,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 195800
+        "currentPrice": 197200
       },
       {
         "strategy": "accumulation",
@@ -70,55 +85,40 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 6.6,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.7,
+        "gradeScore": 4.9,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1354000
+        "currentPrice": 1356000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "KB금융",
-        "code": "105560",
+        "name": "금호타이어",
+        "code": "073240",
         "score": 4.9,
         "signalScore": 4.9,
         "strictScore": 4.9,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 3.5,
-        "statusLabel": "제외",
+        "gradeScore": 3.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
         "entryEligible": false,
-        "currentPrice": 171300
+        "currentPrice": 6330
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "디앤디파마텍",
-        "code": "347850",
-        "score": 2.1,
-        "signalScore": 2.1,
-        "strictScore": 2.1,
+        "name": "한화오션",
+        "code": "042660",
+        "score": 3.1,
+        "signalScore": 3.1,
+        "strictScore": 3.1,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 1.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "gradeScore": 2.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2)",
         "entryEligible": false,
-        "currentPrice": 85000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "디앤디파마텍",
-        "code": "347850",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 5.7,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 85000
+        "currentPrice": 89800
       },
       {
         "strategy": "reversal",
@@ -134,6 +134,36 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 187500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "금호타이어",
+        "code": "073240",
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 6330
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "디앤디파마텍",
+        "code": "347850",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 85300
       }
     ],
     "blacklist": [
