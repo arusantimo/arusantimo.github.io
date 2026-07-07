@@ -1,5 +1,158 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-07",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260707.js",
+    "jsonFile": "jongga/output/202607/latest_20260707.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260707.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-07T06:05:40+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, G4, G12)",
+        "entryEligible": false,
+        "currentPrice": 547000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "디앤디파마텍",
+        "code": "347850",
+        "score": 6.0,
+        "signalScore": 6.0,
+        "strictScore": 6.0,
+        "scoreMax": 13.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 85000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.3,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 195800
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1354000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 4.9,
+        "signalScore": 4.9,
+        "strictScore": 4.9,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 3.5,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 171300
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "디앤디파마텍",
+        "code": "347850",
+        "score": 2.1,
+        "signalScore": 2.1,
+        "strictScore": 2.1,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 1.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 85000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "디앤디파마텍",
+        "code": "347850",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 85000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 187500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-07-06",
     "variant": "stable",
     "variantLabel": "현재 버전",
