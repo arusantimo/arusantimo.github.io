@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-08T06:04:17+00:00",
+    "generatedAt": "2026-07-08T08:33:36+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 6,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,6 +33,21 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
+        "name": "마키나락스",
+        "code": "477850",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 27050
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
         "name": "KB금융",
         "code": "105560",
         "score": 5.7,
@@ -48,13 +63,14 @@ window.JONGGA_HISTORY_INDEX = [
     ],
     "blacklist": [
       {
-        "code": "477850",
-        "name": "마키나락스",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
-          "투자 주의"
+          "공매도 과열"
         ],
         "sources": [
-          "kind"
+          "kind",
+          "entry"
         ],
         "status": "confirmed"
       }
