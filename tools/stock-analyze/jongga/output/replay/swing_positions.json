@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "runId": "replay-20260708-060418-eec1171e",
+    "entryDate": "2026-07-07",
+    "code": "035420",
+    "name": "NAVER",
+    "strategy": "accumulation",
+    "entryPrice": 197397.2,
+    "swingTargetPrice": 218892.0,
+    "stopPrice": 190298.0,
+    "qtyPct": 100.0,
+    "sourceEntryKey": "20260707|stable|accumulation|035420"
+  },
+  {
+    "runId": "replay-20260708-060418-eec1171e",
+    "entryDate": "2026-07-07",
+    "code": "073240",
+    "name": "금호타이어",
+    "strategy": "accumulation",
+    "entryPrice": 6336.33,
+    "swingTargetPrice": 7026.0,
+    "stopPrice": 6108.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260707|stable|accumulation|073240"
+  },
+  {
+    "runId": "replay-20260708-060418-eec1171e",
+    "entryDate": "2026-07-07",
+    "code": "105560",
+    "name": "KB금융",
+    "strategy": "accumulation",
+    "entryPrice": 171471.3,
+    "swingTargetPrice": 190143.0,
+    "stopPrice": 170200.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260707|stable|accumulation|105560"
+  }
+]
