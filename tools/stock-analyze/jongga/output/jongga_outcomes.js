@@ -1,5 +1,230 @@
 window.JONGGA_OUTCOMES_INDEX = [
   {
+    "date": "2026-07-08",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "477850",
+    "name": "마키나락스",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 27050.0,
+    "nextTradingDate": "20260709",
+    "nextDayOHLC": {
+      "open": 26800.0,
+      "high": 31400.0,
+      "low": 26750.0,
+      "close": 28800.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 27862.0,
+        "targetRate": 3.0,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.04388
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 28402.0,
+        "targetRate": 5.0,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.038
+      }
+    ],
+    "stopPrice": 26509.0,
+    "stopRate": -2.0,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.038,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-07-08",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 1270000.0,
+    "nextTradingDate": "20260709",
+    "nextDayOHLC": {
+      "open": 1323000.0,
+      "high": 1385000.0,
+      "low": 1258000.0,
+      "close": 1339000.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 1308100.0,
+        "targetRate": 3.0,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.03973
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 1333500.0,
+        "targetRate": 5.0,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.038
+      }
+    ],
+    "stopPrice": 1244600.0,
+    "stopRate": -2.0,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.038,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-07-08",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "105560",
+    "name": "KB금융",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 171000.0,
+    "nextTradingDate": "20260709",
+    "nextDayOHLC": {
+      "open": 175900.0,
+      "high": 176000.0,
+      "low": 169400.0,
+      "close": 175600.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 174861.0,
+        "targetRate": 2.3,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.02456
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 176850.0,
+        "targetRate": 3.4,
+        "qty": 40,
+        "hit": false,
+        "stageRealizedReturn": 0.02456
+      }
+    ],
+    "stopPrice": 169200.0,
+    "stopRate": -1.1,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "premarket",
+    "realizedReturnProxy": 0.02456,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-07-08",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "066570",
+    "name": "LG전자",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 195800.0,
+    "nextTradingDate": "20260709",
+    "nextDayOHLC": {
+      "open": 195000.0,
+      "high": 195400.0,
+      "low": 175400.0,
+      "close": 178400.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 198600.0,
+        "targetRate": 1.4,
+        "qty": 60,
+        "hit": false,
+        "stageRealizedReturn": -0.02
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 201000.0,
+        "targetRate": 2.7,
+        "qty": 40,
+        "hit": false,
+        "stageRealizedReturn": -0.02
+      }
+    ],
+    "stopPrice": 191884.0,
+    "stopRate": -2.0,
+    "stopHit": true,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": null,
+    "realizedReturnProxy": -0.02,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-07-08",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "011070",
+    "name": "LG이노텍",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 765000.0,
+    "nextTradingDate": "20260709",
+    "nextDayOHLC": {
+      "open": 763000.0,
+      "high": 792000.0,
+      "low": 702000.0,
+      "close": 735000.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 787950.0,
+        "targetRate": 3.0,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.00231
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 803250.0,
+        "targetRate": 5.0,
+        "qty": 40,
+        "hit": false,
+        "stageRealizedReturn": 0.00231
+      }
+    ],
+    "stopPrice": 750000.0,
+    "stopRate": -2.0,
+    "stopHit": true,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "premarket",
+    "realizedReturnProxy": 0.00231,
+    "outcomeStatus": "stop_first_ambiguous"
+  },
+  {
     "date": "2026-07-07",
     "variant": "stable",
     "strategy": "reversal",
@@ -45616,6 +45841,18 @@ window.JONGGA_OUTCOMES_INDEX = [
 ];
 window.JONGGA_OUTCOMES_ROLLUP = {
   "byCell": {
+    "reversal|weak|weak|G-C|premarket": {
+      "hitRate": 0.8,
+      "sampleCount": 5,
+      "avgRealizedReturn": 0.02014,
+      "avgStageReturn": 0.0181
+    },
+    "reversal|weak|weak|G-C|openPhase": {
+      "hitRate": 0.4,
+      "sampleCount": 5,
+      "avgRealizedReturn": 0.02014,
+      "avgStageReturn": 0.01657
+    },
     "reversal|box|weak|G-C|premarket": {
       "hitRate": 0.6667,
       "sampleCount": 3,
@@ -46927,16 +47164,16 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   },
   "byStrategyStage": {
     "reversal|premarket": {
-      "hitRate": 0.6667,
-      "sampleCount": 192,
-      "avgRealizedReturn": 0.00668,
-      "avgStageReturn": 0.01165
+      "hitRate": 0.6701,
+      "sampleCount": 197,
+      "avgRealizedReturn": 0.00706,
+      "avgStageReturn": 0.01186
     },
     "reversal|openPhase": {
-      "hitRate": 0.5677,
-      "sampleCount": 192,
-      "avgRealizedReturn": 0.00668,
-      "avgStageReturn": 0.00849
+      "hitRate": 0.5635,
+      "sampleCount": 197,
+      "avgRealizedReturn": 0.00706,
+      "avgStageReturn": 0.00876
     },
     "pullback|premarket": {
       "hitRate": 0.6316,
@@ -47036,6 +47273,12 @@ window.JONGGA_OUTCOMES_ROLLUP = {
     }
   },
   "byTakeProfitProfileCell": {
+    "reversal|weak|weak|G-C|conservative": {
+      "hitRate": 0.0,
+      "sampleCount": 5,
+      "avgRealizedReturn": 0.02014,
+      "avgStageReturn": null
+    },
     "reversal|box|weak|G-C|conservative": {
       "hitRate": 0.0,
       "sampleCount": 3,
@@ -47376,8 +47619,8 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfile": {
     "reversal|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 129,
-      "avgRealizedReturn": 0.00534,
+      "sampleCount": 134,
+      "avgRealizedReturn": 0.00594,
       "avgStageReturn": null
     },
     "pullback|balanced": {

@@ -1,5 +1,68 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-09",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260709.js",
+    "jsonFile": "jongga/output/202607/latest_20260709.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260709.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-09T06:04:20+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 170700
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 2170000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-07-08",
     "variant": "stable",
     "variantLabel": "현재 버전",
