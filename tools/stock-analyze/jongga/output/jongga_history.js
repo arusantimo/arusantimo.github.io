@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-09T06:04:20+00:00",
+    "generatedAt": "2026-07-09T08:44:12+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 6,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,8 +33,23 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "SK하이닉스",
-        "code": "000660",
+        "name": "LS ELECTRIC",
+        "code": "010120",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 189400
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화오션",
+        "code": "042660",
         "score": 5.2,
         "signalScore": 5.2,
         "strictScore": 5.2,
@@ -43,7 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 2170000
+        "currentPrice": 78600
       }
     ],
     "blacklist": [
@@ -51,11 +66,9 @@ window.JONGGA_HISTORY_INDEX = [
         "code": "002990",
         "name": "금호건설",
         "reasons": [
-          "공매도 과열",
-          "투자 주의"
+          "공매도 과열"
         ],
         "sources": [
-          "kind",
           "entry"
         ],
         "status": "confirmed"
