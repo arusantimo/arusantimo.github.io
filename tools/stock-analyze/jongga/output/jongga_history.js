@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-10T06:06:00+00:00",
+    "generatedAt": "2026-07-10T08:35:35+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,24 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G6, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4, G6)",
         "entryEligible": false,
-        "currentPrice": 124400
+        "currentPrice": 125000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "삼성전자",
         "code": "005930",
-        "score": 9.8,
-        "signalScore": 9.8,
-        "strictScore": 9.8,
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
         "scoreMax": 14.0,
-        "grade": "A",
-        "gradeScore": 7.0,
+        "grade": "B",
+        "gradeScore": 6.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 289000
+        "currentPrice": 285000
       },
       {
         "strategy": "accumulation",
@@ -63,17 +63,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 6.6,
-        "signalScore": 6.6,
-        "strictScore": 6.6,
+        "name": "현대차",
+        "code": "005380",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.7,
-        "statusLabel": "관심후보",
+        "gradeScore": 5.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 1407000
+        "currentPrice": 457500
       },
       {
         "strategy": "breakout",
@@ -88,13 +88,13 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.2,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 186100
+        "currentPrice": 184400
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "두산에너빌리티",
-        "code": "034020",
+        "name": "제주반도체",
+        "code": "080220",
         "score": 6.5,
         "signalScore": 6.5,
         "strictScore": 6.5,
@@ -103,7 +103,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.5,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 78700
+        "currentPrice": 90300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 191900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 78100
       }
     ],
     "blacklist": [
@@ -130,11 +160,10 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "080220",
-        "name": "제주반도체",
+        "code": "319660",
+        "name": "피에스케이",
         "reasons": [
-          "투자 주의",
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
