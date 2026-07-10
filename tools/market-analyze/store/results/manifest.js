@@ -1,7 +1,7 @@
 window.__MARKET_ANALYZE_MANIFEST__ = {
-  "latestDate": "20260709",
-  "latestFile": "store/results/result-20260709.js",
-  "generatedAt": "2026-07-09T05:10:32+00:00",
+  "latestDate": "20260710",
+  "latestFile": "store/results/result-20260710.js",
+  "generatedAt": "2026-07-10T05:09:44+00:00",
   "availableDates": [
     "20260523",
     "20260524",
@@ -37,7 +37,8 @@ window.__MARKET_ANALYZE_MANIFEST__ = {
     "20260706",
     "20260707",
     "20260708",
-    "20260709"
+    "20260709",
+    "20260710"
   ],
   "schemaVersion": "1.2.2"
 };
