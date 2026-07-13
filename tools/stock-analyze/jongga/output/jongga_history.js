@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-13",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260713.js",
+    "jsonFile": "jongga/output/202607/latest_20260713.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260713.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-13T06:04:29+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 186300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 187600
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-07-10",
     "variant": "stable",
     "variantLabel": "현재 버전",

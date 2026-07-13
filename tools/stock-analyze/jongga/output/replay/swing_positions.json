@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "runId": "replay-20260713-060430-50a75a39",
+    "entryDate": "2026-07-10",
+    "code": "105560",
+    "name": "KB금융",
+    "strategy": "breakout",
+    "entryPrice": 184584.4,
+    "swingTargetPrice": 209294.0,
+    "stopPrice": 182700.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260710|stable|breakout|105560"
+  }
+]
