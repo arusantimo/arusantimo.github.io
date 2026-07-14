@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-14T06:04:45+00:00",
+    "generatedAt": "2026-07-14T08:33:59+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,24 +20,23 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "주성엔지니어링",
         "code": "036930",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
+        "grade": "B",
+        "gradeScore": 6.5,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 192000
+        "currentPrice": 192600
       }
     ],
     "blacklist": [
       {
-        "code": "006340",
-        "name": "대원전선",
+        "code": "475150",
+        "name": "SK이터닉스",
         "reasons": [
-          "투자 주의",
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
@@ -45,10 +44,11 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "475150",
-        "name": "SK이터닉스",
+        "code": "006340",
+        "name": "대원전선",
         "reasons": [
-          "투자 주의"
+          "투자 주의",
+          "공매도 과열"
         ],
         "sources": [
           "kind"
