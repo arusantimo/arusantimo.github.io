@@ -565,5 +565,26 @@
     "barLow": 76700.0,
     "barClose": 88800.0,
     "fillRule": "breakeven_fail_market"
+  },
+  {
+    "orderId": "20260710|stable|breakout|105560-stop_touch",
+    "sourceEntryKey": "20260710|stable|breakout|105560",
+    "strategy": "breakout",
+    "code": "105560",
+    "name": "KB금융",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-07-14T15:00:00+09:00",
+    "fillPrice": 182700.0,
+    "filledQuantityPct": 60.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-07-14T15:00:00+09:00",
+    "barOpen": 189800.0,
+    "barHigh": 190200.0,
+    "barLow": 179600.0,
+    "barClose": 180000.0,
+    "fillRule": "stop_touch"
   }
 ]

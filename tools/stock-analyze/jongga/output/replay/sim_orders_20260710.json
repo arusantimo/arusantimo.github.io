@@ -1238,5 +1238,25 @@
     "activeFrom": "2026-07-13T15:00:00+09:00",
     "activeUntil": "2026-07-13T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260710|stable|breakout|105560-stop_touch",
+    "runId": "replay-20260713-060430-50a75a39",
+    "date": "2026-07-10",
+    "variant": "stable",
+    "strategy": "breakout",
+    "code": "105560",
+    "name": "KB금융",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-07-14T15:00:00+09:00",
+    "requestedPrice": 182700.0,
+    "quantityPct": 60.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260710|stable|breakout|105560",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-07-14T15:00:00+09:00",
+    "activeUntil": "2026-07-14T15:00:00+09:00"
   }
 ]
