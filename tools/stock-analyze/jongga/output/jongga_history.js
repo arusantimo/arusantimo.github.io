@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-15T06:05:46+00:00",
+    "generatedAt": "2026-07-15T08:35:24+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -43,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, G5)",
         "entryEligible": false,
-        "currentPrice": 211000
+        "currentPrice": 209500
       },
       {
         "strategy": "accumulation",
@@ -58,22 +58,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
         "entryEligible": false,
-        "currentPrice": 194300
+        "currentPrice": 194000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "현대차",
         "code": "005380",
-        "score": 7.3,
-        "signalScore": 7.3,
-        "strictScore": 7.3,
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
         "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.2,
+        "grade": "B",
+        "gradeScore": 5.5,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1, G5)",
         "entryEligible": false,
-        "currentPrice": 435000
+        "currentPrice": 434000
       },
       {
         "strategy": "accumulation",
@@ -88,22 +88,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.7,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1407000
+        "currentPrice": 1382000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 3.8,
-        "signalScore": 3.8,
-        "strictScore": 3.8,
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 3.6,
+        "signalScore": 3.6,
+        "strictScore": 3.6,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.0,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "gradeScore": 2.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
         "entryEligible": false,
-        "currentPrice": 2125000
+        "currentPrice": 269500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대원전선",
+        "code": "006340",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 13350
       },
       {
         "strategy": "reversal",
@@ -123,8 +138,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "LG전자",
-        "code": "066570",
+        "name": "한미반도체",
+        "code": "042700",
         "score": 7.0,
         "signalScore": 7.0,
         "strictScore": 7.0,
@@ -133,7 +148,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 194300
+        "currentPrice": 269500
       }
     ],
     "blacklist": [
@@ -142,18 +157,6 @@ window.JONGGA_HISTORY_INDEX = [
         "name": "SK이터닉스",
         "reasons": [
           "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "006340",
-        "name": "대원전선",
-        "reasons": [
-          "투자 주의",
-          "공매도 과열"
         ],
         "sources": [
           "kind"
