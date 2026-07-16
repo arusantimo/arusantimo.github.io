@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-16T06:06:39+00:00",
+    "generatedAt": "2026-07-16T08:35:19+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
         "entryEligible": false,
-        "currentPrice": 244500
+        "currentPrice": 242500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
+        "entryEligible": false,
+        "currentPrice": 140700
       },
       {
         "strategy": "pullback",
@@ -41,39 +56,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 121600
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "한화오션",
-        "code": "042660",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G3, G4, G13)",
-        "entryEligible": false,
-        "currentPrice": 86800
+        "currentPrice": 121400
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "SK이노베이션",
-        "code": "096770",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 6.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 121600
+        "currentPrice": 242500
       },
       {
         "strategy": "accumulation",
@@ -84,26 +84,41 @@ window.JONGGA_HISTORY_INDEX = [
         "signalScore": 8.7,
         "strictScore": 8.7,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.2,
+        "grade": "A",
+        "gradeScore": 7.2,
         "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 143100
+        "currentPrice": 140700
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 52800
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "SK이노베이션",
         "code": "096770",
-        "score": 5.4,
-        "signalScore": 5.4,
-        "strictScore": 5.4,
+        "score": 4.6,
+        "signalScore": 4.6,
+        "strictScore": 4.6,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.3,
+        "gradeScore": 3.7,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 121600
+        "currentPrice": 121400
       },
       {
         "strategy": "reversal",
@@ -138,32 +153,20 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "하나금융지주",
-        "code": "086790",
-        "score": 6.5,
-        "signalScore": 6.5,
-        "strictScore": 6.5,
+        "name": "신한지주",
+        "code": "055550",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
         "scoreMax": 10.0,
         "grade": "B",
-        "gradeScore": 6.5,
+        "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 135800
+        "currentPrice": 107900
       }
     ],
-    "blacklist": [
-      {
-        "code": "475150",
-        "name": "SK이터닉스",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      }
-    ]
+    "blacklist": []
   },
   {
     "date": "2026-07-15",
