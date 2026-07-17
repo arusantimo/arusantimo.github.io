@@ -1,5 +1,152 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-07-17",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202607/jongga_data_20260717.js",
+    "jsonFile": "jongga/output/202607/latest_20260717.json",
+    "inputArchiveFile": "jongga/output/archive/202607/inputs_20260717.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-07-17T06:05:22+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 121400
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 8.2,
+        "signalScore": 8.2,
+        "strictScore": 8.2,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
+        "entryEligible": false,
+        "currentPrice": 140700
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "현대차",
+        "code": "005380",
+        "score": 6.9,
+        "signalScore": 6.9,
+        "strictScore": 6.9,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 425000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1212000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "제외",
+        "entryEligible": false,
+        "currentPrice": 181100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "신한지주",
+        "code": "055550",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 107900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "하나금융지주",
+        "code": "086790",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 136800
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "004310",
+        "name": "현대약품",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-07-16",
     "variant": "stable",
     "variantLabel": "현재 버전",
