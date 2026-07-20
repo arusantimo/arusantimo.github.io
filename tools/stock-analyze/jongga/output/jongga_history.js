@@ -9,27 +9,12 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-20T06:04:18+00:00",
+    "generatedAt": "2026-07-20T08:33:19+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 4,
     "topRecommendations": [
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "하나금융지주",
-        "code": "086790",
-        "score": 6.5,
-        "signalScore": 6.5,
-        "strictScore": 6.5,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.5,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 132100
-      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -43,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 167100
+        "currentPrice": 168800
       },
       {
         "strategy": "reversal",
@@ -59,9 +44,36 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 83700
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "하나금융지주",
+        "code": "086790",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 133400
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-07-17",
