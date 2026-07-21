@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-21T06:04:23+00:00",
+    "generatedAt": "2026-07-21T08:33:53+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 6,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -61,7 +61,20 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 1310000
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-07-20",
