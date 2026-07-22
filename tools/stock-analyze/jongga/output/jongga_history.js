@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-22T06:04:18+00:00",
+    "generatedAt": "2026-07-22T08:33:51+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 6,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -29,33 +29,39 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 481500
-      }
-    ],
-    "blacklist": [
-      {
-        "code": "006340",
-        "name": "대원전선",
-        "reasons": [
-          "투자 주의",
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
       },
       {
-        "code": "475150",
-        "name": "SK이터닉스",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대원전선",
+        "code": "006340",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 12500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK텔레콤",
+        "code": "017670",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 94100
       }
-    ]
+    ],
+    "blacklist": []
   },
   {
     "date": "2026-07-21",
