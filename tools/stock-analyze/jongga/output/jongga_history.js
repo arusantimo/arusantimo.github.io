@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-23T06:05:11+00:00",
+    "generatedAt": "2026-07-23T08:34:25+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G6, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 221500
+        "currentPrice": 223500
       },
       {
         "strategy": "pullback",
@@ -41,9 +41,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G8, G13)",
         "entryEligible": false,
-        "currentPrice": 130100
+        "currentPrice": 132200
       },
       {
         "strategy": "pullback",
@@ -58,7 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G13)",
         "entryEligible": false,
-        "currentPrice": 219500
+        "currentPrice": 220000
       },
       {
         "strategy": "accumulation",
@@ -73,37 +73,52 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.7,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
         "entryEligible": false,
-        "currentPrice": 130100
+        "currentPrice": 132200
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 7.9,
-        "signalScore": 7.9,
-        "strictScore": 7.9,
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.6,
-        "statusLabel": "관심후보",
+        "gradeScore": 6.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 219500
+        "currentPrice": 1448000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 187500
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK이노베이션",
-        "code": "096770",
-        "score": 6.6,
-        "signalScore": 6.6,
-        "strictScore": 6.6,
+        "name": "GS건설",
+        "code": "006360",
+        "score": 6.7,
+        "signalScore": 6.7,
+        "strictScore": 6.7,
         "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 5.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
         "entryEligible": false,
-        "currentPrice": 130100
+        "currentPrice": 34400
       },
       {
         "strategy": "reversal",
@@ -118,7 +133,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 219500
+        "currentPrice": 220000
       },
       {
         "strategy": "reversal",
@@ -134,6 +149,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 46900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "GS건설",
+        "code": "006360",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 34400
       }
     ],
     "blacklist": [
