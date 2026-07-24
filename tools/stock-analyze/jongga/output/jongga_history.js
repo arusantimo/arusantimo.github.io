@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-24T06:05:56+00:00",
+    "generatedAt": "2026-07-24T08:35:03+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
         "entryEligible": false,
-        "currentPrice": 201500
+        "currentPrice": 202000
       },
       {
         "strategy": "pullback",
@@ -41,9 +41,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G10, G13)",
         "entryEligible": false,
-        "currentPrice": 128300
+        "currentPrice": 130100
       },
       {
         "strategy": "pullback",
@@ -56,24 +56,39 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "B",
         "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
         "entryEligible": false,
-        "currentPrice": 47450
+        "currentPrice": 47600
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "SK이노베이션",
         "code": "096770",
-        "score": 9.4,
-        "signalScore": 9.4,
-        "strictScore": 9.4,
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 6.7,
+        "gradeScore": 5.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
         "entryEligible": false,
-        "currentPrice": 128300
+        "currentPrice": 130100
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 762000
       },
       {
         "strategy": "accumulation",
@@ -93,17 +108,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK텔레콤",
-        "code": "017670",
-        "score": 4.6,
-        "signalScore": 4.6,
-        "strictScore": 4.6,
+        "name": "삼성바이오로직스",
+        "code": "207940",
+        "score": 5.9,
+        "signalScore": 5.9,
+        "strictScore": 5.9,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.7,
+        "gradeScore": 4.7,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 101900
+        "currentPrice": 1518000
       },
       {
         "strategy": "reversal",
@@ -133,7 +148,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 101900
+        "currentPrice": 100000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 762000
       }
     ],
     "blacklist": [
