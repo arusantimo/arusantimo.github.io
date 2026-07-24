@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "runId": "replay-20260724-060617-b8dd5972",
+    "entryDate": "2026-07-23",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "strategy": "accumulation",
+    "entryPrice": 132332.2,
+    "swingTargetPrice": 146742.0,
+    "stopPrice": 128234.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260723|stable|accumulation|096770"
+  }
+]
