@@ -9,27 +9,12 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-27T06:04:49+00:00",
+    "generatedAt": "2026-07-27T08:33:41+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 5,
     "topRecommendations": [
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "삼성바이오로직스",
-        "code": "207940",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 1551000
-      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -44,6 +29,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 150200
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성바이오로직스",
+        "code": "207940",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1545000
       },
       {
         "strategy": "reversal",
