@@ -8,24 +8,24 @@
   "includedCount": 0,
   "tradeCount": 11,
   "winRate": 0.0909,
-  "avgNetReturnPct": -5.2181,
-  "cumNetReturnPct": -5.2181,
-  "maxDrawdownPct": 5.2181,
+  "avgNetReturnPct": -5.2766,
+  "cumNetReturnPct": -5.2766,
+  "maxDrawdownPct": 5.2766,
   "degradedCount": 11,
   "ambiguousCount": 0,
-  "unfilledRate": 0.1077,
+  "unfilledRate": 0.1061,
   "overall": {
     "candidateCount": 11,
     "eligibleCount": 0,
     "includedCount": 0,
     "tradeCount": 11,
     "winRate": 0.0909,
-    "avgNetReturnPct": -5.2181,
-    "cumNetReturnPct": -5.2181,
-    "maxDrawdownPct": 5.2181,
+    "avgNetReturnPct": -5.2766,
+    "cumNetReturnPct": -5.2766,
+    "maxDrawdownPct": 5.2766,
     "degradedCount": 11,
     "ambiguousCount": 0,
-    "unfilledRate": 0.1077
+    "unfilledRate": 0.1061
   },
   "comparisonByCase": {
     "all": {
@@ -36,12 +36,12 @@
       "includedCount": 0,
       "tradeCount": 11,
       "winRate": 0.0909,
-      "avgNetReturnPct": -5.2181,
-      "cumNetReturnPct": -5.2181,
-      "maxDrawdownPct": 5.2181,
+      "avgNetReturnPct": -5.2766,
+      "cumNetReturnPct": -5.2766,
+      "maxDrawdownPct": 5.2766,
       "degradedCount": 11,
       "ambiguousCount": 0,
-      "unfilledRate": 0.1077
+      "unfilledRate": 0.1061
     },
     "a7plus": {
       "caseKey": "a7plus",
@@ -141,12 +141,12 @@
       "includedCount": 0,
       "tradeCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -6.4862,
-      "cumNetReturnPct": -6.4862,
-      "maxDrawdownPct": 6.4862,
+      "avgNetReturnPct": -6.6469,
+      "cumNetReturnPct": -6.6469,
+      "maxDrawdownPct": 6.6469,
       "degradedCount": 4,
       "ambiguousCount": 0,
-      "unfilledRate": 0.2143,
+      "unfilledRate": 0.2069,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -156,12 +156,12 @@
           "includedCount": 0,
           "tradeCount": 4,
           "winRate": 0.0,
-          "avgNetReturnPct": -6.4862,
-          "cumNetReturnPct": -6.4862,
-          "maxDrawdownPct": 6.4862,
+          "avgNetReturnPct": -6.6469,
+          "cumNetReturnPct": -6.6469,
+          "maxDrawdownPct": 6.6469,
           "degradedCount": 4,
           "ambiguousCount": 0,
-          "unfilledRate": 0.2143
+          "unfilledRate": 0.2069
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -383,15 +383,15 @@
       "gradeScore": 6.7,
       "tradeCount": 1,
       "winRate": 0.0,
-      "avgNetReturnPct": -2.0139,
-      "cumNetReturnPct": -2.0139,
+      "avgNetReturnPct": -2.657,
+      "cumNetReturnPct": -2.657,
       "lastReplayDate": "2026-07-23",
       "lastEntryFilledAt": "2026-07-23T15:30:00+09:00",
       "lastEntryFillPrice": 132332.2,
-      "lastExitFilledAt": "2026-07-24T10:00:00+09:00",
-      "lastExitAvgFillPrice": 132500.0,
-      "lastExitFillPrice": 132500.0,
-      "lastTradeStatus": "open"
+      "lastExitFilledAt": "2026-07-24T15:00:00+09:00",
+      "lastExitAvgFillPrice": 129087.2,
+      "lastExitFillPrice": 128234.0,
+      "lastTradeStatus": "closed"
     },
     {
       "strategy": "accumulation",
@@ -594,12 +594,12 @@
       "includedCount": 0,
       "tradeCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -6.4862,
-      "cumNetReturnPct": -6.4862,
-      "maxDrawdownPct": 6.4862,
+      "avgNetReturnPct": -6.6469,
+      "cumNetReturnPct": -6.6469,
+      "maxDrawdownPct": 6.6469,
       "degradedCount": 4,
       "ambiguousCount": 0,
-      "unfilledRate": 0.2143,
+      "unfilledRate": 0.2069,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -609,12 +609,12 @@
           "includedCount": 0,
           "tradeCount": 4,
           "winRate": 0.0,
-          "avgNetReturnPct": -6.4862,
-          "cumNetReturnPct": -6.4862,
-          "maxDrawdownPct": 6.4862,
+          "avgNetReturnPct": -6.6469,
+          "cumNetReturnPct": -6.6469,
+          "maxDrawdownPct": 6.6469,
           "degradedCount": 4,
           "ambiguousCount": 0,
-          "unfilledRate": 0.2143
+          "unfilledRate": 0.2069
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -871,8 +871,8 @@
       "tradeCount": 4,
       "sampleCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -6.4862,
-      "cumNetReturnPct": -6.4862
+      "avgNetReturnPct": -6.6469,
+      "cumNetReturnPct": -6.6469
     },
     "breakout|conservative": {
       "tradeCount": 1,
@@ -901,8 +901,8 @@
       "tradeCount": 4,
       "sampleCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -6.4862,
-      "cumNetReturnPct": -6.4862
+      "avgNetReturnPct": -6.6469,
+      "cumNetReturnPct": -6.6469
     },
     "breakout|box|weak|G-B|conservative": {
       "tradeCount": 1,
@@ -919,8 +919,8 @@
       "cumNetReturnPct": -0.8833
     }
   },
-  "orderCount": 76,
-  "fillCount": 24,
+  "orderCount": 77,
+  "fillCount": 25,
   "candidates": [
     {
       "strategy": "pullback",
@@ -1841,12 +1841,12 @@
       "gradeScore": 6.7,
       "entryFilledAt": "2026-07-23T15:30:00+09:00",
       "entryFillPrice": 132332.2,
-      "exitFilledAt": "2026-07-24T10:00:00+09:00",
-      "exitAvgFillPrice": 132500.0,
-      "exitLastFillPrice": 132500.0,
-      "tradeStatus": "open",
-      "closedReason": "swing_hold",
-      "netReturnPct": -2.0139,
+      "exitFilledAt": "2026-07-24T15:00:00+09:00",
+      "exitAvgFillPrice": 129087.2,
+      "exitLastFillPrice": 128234.0,
+      "tradeStatus": "closed",
+      "closedReason": "stop_touch",
+      "netReturnPct": -2.657,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-accumulation",
@@ -1870,7 +1870,7 @@
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
       },
-      "remainingQuantityPct": 80.0
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "breakout",
@@ -2276,16 +2276,16 @@
       "entryMode": "close",
       "entryFilledAt": "2026-07-23T15:30:00+09:00",
       "entryFillPrice": 132332.2,
-      "exitFilledAt": "2026-07-24T10:00:00+09:00",
-      "exitAvgFillPrice": 132500.0,
-      "exitLastFillPrice": 132500.0,
-      "netReturnPct": -2.0139,
-      "tradeStatus": "open",
+      "exitFilledAt": "2026-07-24T15:00:00+09:00",
+      "exitAvgFillPrice": 129087.2,
+      "exitLastFillPrice": 128234.0,
+      "netReturnPct": -2.657,
+      "tradeStatus": "closed",
       "ambiguousCount": 0,
-      "remainingQuantityPct": 80.0,
-      "closedReason": "swing_hold",
-      "exitFillCount": 1,
-      "filledExitQuantityPct": 20.0,
+      "remainingQuantityPct": 0.0,
+      "closedReason": "stop_touch",
+      "exitFillCount": 2,
+      "filledExitQuantityPct": 100.0,
       "regimeBucket": "box",
       "vkospiTier": "weak",
       "gapGrade": "G-B",
@@ -2340,7 +2340,17 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-07-24T15:00:00+09:00",
+          "quantityPct": 80.0,
+          "price": 128234.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "stop_touch"
+        }
+      ]
     },
     {
       "runId": "replay-20260724-060617-b8dd5972",
@@ -3386,6 +3396,27 @@
       "barLow": 45500.0,
       "barClose": 46750.0,
       "fillRule": "openPhase_touch"
+    },
+    {
+      "orderId": "20260723|stable|accumulation|096770-stop_touch",
+      "sourceEntryKey": "20260723|stable|accumulation|096770",
+      "strategy": "accumulation",
+      "code": "096770",
+      "name": "SK이노베이션",
+      "side": "SELL",
+      "stageKey": "stop",
+      "reason": "스윙 손절가 이탈",
+      "fillStatus": "filled",
+      "filledAt": "2026-07-24T15:00:00+09:00",
+      "fillPrice": 128234.0,
+      "filledQuantityPct": 80.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-07-24T15:00:00+09:00",
+      "barOpen": 129700.0,
+      "barHigh": 135800.0,
+      "barLow": 126500.0,
+      "barClose": 130100.0,
+      "fillRule": "stop_touch"
     }
   ]
 }

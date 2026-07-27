@@ -1518,5 +1518,25 @@
     "activeFrom": "2026-07-24T15:00:00+09:00",
     "activeUntil": "2026-07-24T15:00:00+09:00",
     "finalStatus": "cancelled"
+  },
+  {
+    "orderId": "20260723|stable|accumulation|096770-stop_touch",
+    "runId": "replay-20260724-060617-b8dd5972",
+    "date": "2026-07-23",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-07-24T15:00:00+09:00",
+    "requestedPrice": 128234.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260723|stable|accumulation|096770",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-07-24T15:00:00+09:00",
+    "activeUntil": "2026-07-24T15:00:00+09:00"
   }
 ]

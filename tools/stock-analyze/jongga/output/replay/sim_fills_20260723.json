@@ -502,5 +502,26 @@
     "barLow": 45500.0,
     "barClose": 46750.0,
     "fillRule": "openPhase_touch"
+  },
+  {
+    "orderId": "20260723|stable|accumulation|096770-stop_touch",
+    "sourceEntryKey": "20260723|stable|accumulation|096770",
+    "strategy": "accumulation",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-07-24T15:00:00+09:00",
+    "fillPrice": 128234.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-07-24T15:00:00+09:00",
+    "barOpen": 129700.0,
+    "barHigh": 135800.0,
+    "barLow": 126500.0,
+    "barClose": 130100.0,
+    "fillRule": "stop_touch"
   }
 ]

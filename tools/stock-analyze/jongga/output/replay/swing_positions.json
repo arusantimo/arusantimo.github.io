@@ -1,14 +1,26 @@
 [
   {
-    "runId": "replay-20260724-060617-b8dd5972",
-    "entryDate": "2026-07-23",
-    "code": "096770",
-    "name": "SK이노베이션",
+    "runId": "replay-20260727-060450-fb545fba",
+    "entryDate": "2026-07-24",
+    "code": "028050",
+    "name": "삼성E&A",
     "strategy": "accumulation",
-    "entryPrice": 132332.2,
-    "swingTargetPrice": 146742.0,
-    "stopPrice": 128234.0,
+    "entryPrice": 47497.45,
+    "swingTargetPrice": 52670.0,
+    "stopPrice": 45789.0,
     "qtyPct": 80.0,
-    "sourceEntryKey": "20260723|stable|accumulation|096770"
+    "sourceEntryKey": "20260724|stable|accumulation|028050"
+  },
+  {
+    "runId": "replay-20260727-060450-fb545fba",
+    "entryDate": "2026-07-24",
+    "code": "207940",
+    "name": "삼성바이오로직스",
+    "strategy": "breakout",
+    "entryPrice": 1519518.0,
+    "swingTargetPrice": 1722930.0,
+    "stopPrice": 1515000.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260724|stable|breakout|207940"
   }
 ]
