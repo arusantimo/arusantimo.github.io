@@ -9,26 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-28T06:04:09+00:00",
+    "generatedAt": "2026-07-28T08:33:34+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "셀트리온",
-        "code": "068270",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
+        "name": "삼성바이오로직스",
+        "code": "207940",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 5.7,
+        "grade": "C",
+        "gradeScore": 5.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 176900
+        "currentPrice": 1549000
       },
       {
         "strategy": "reversal",
@@ -48,20 +48,33 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성바이오로직스",
-        "code": "207940",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
         "scoreMax": 10.0,
         "grade": "C",
-        "gradeScore": 4.8,
+        "gradeScore": 4.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1539000
+        "currentPrice": 177400
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "439960",
+        "name": "코스모로보틱스",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-07-27",
