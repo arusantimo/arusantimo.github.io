@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-29T06:04:29+00:00",
+    "generatedAt": "2026-07-29T08:33:38+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 6,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 167600
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -33,8 +48,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "RISE 200",
-        "code": "148020",
+        "name": "SK스퀘어",
+        "code": "402340",
         "score": 5.2,
         "signalScore": 5.2,
         "strictScore": 5.2,
@@ -43,22 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 89015
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 4.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 200500
+        "currentPrice": 850000
       }
     ],
     "blacklist": []
