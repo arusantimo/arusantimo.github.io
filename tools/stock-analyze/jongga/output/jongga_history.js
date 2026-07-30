@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-30T06:03:40+00:00",
+    "generatedAt": "2026-07-30T08:33:55+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,21 +33,6 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "셀트리온",
-        "code": "068270",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.1,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 189100
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
         "name": "삼성물산",
         "code": "028260",
         "score": 6.1,
@@ -59,6 +44,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 291500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 207000
       }
     ],
     "blacklist": []
