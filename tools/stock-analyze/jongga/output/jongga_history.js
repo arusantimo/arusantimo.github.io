@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-07-31T06:04:07+00:00",
+    "generatedAt": "2026-07-31T08:34:12+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,32 +33,35 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "한미반도체",
-        "code": "042700",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
         "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.1,
+        "grade": "A",
+        "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 215500
+        "currentPrice": 262500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1718000
       }
     ],
-    "blacklist": [
-      {
-        "code": "006340",
-        "name": "대원전선",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      }
-    ]
+    "blacklist": []
   },
   {
     "date": "2026-07-30",
