@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-03T06:03:58+00:00",
+    "generatedAt": "2026-08-03T08:34:43+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,8 +33,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "두산",
-        "code": "000150",
+        "name": "코스모로보틱스",
+        "code": "439960",
         "score": 7.8,
         "signalScore": 7.8,
         "strictScore": 7.8,
@@ -43,19 +43,45 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1222000
+        "currentPrice": 17790
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산",
+        "code": "000150",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1238000
       }
     ],
     "blacklist": [
       {
-        "code": "439960",
-        "name": "코스모로보틱스",
+        "code": "058610",
+        "name": "에스피지",
         "reasons": [
-          "투자 주의",
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "277810",
+        "name": "레인보우로보틱스",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
         ],
         "status": "confirmed"
       }
