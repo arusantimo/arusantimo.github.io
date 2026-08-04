@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-04T06:04:02+00:00",
+    "generatedAt": "2026-08-04T08:33:35+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 91300
+        "currentPrice": 91400
       },
       {
         "strategy": "reversal",
@@ -44,18 +44,42 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 195900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 165500
       }
     ],
     "blacklist": [
       {
-        "code": "475150",
-        "name": "SK이터닉스",
+        "code": "119850",
+        "name": "지엔씨에너지",
         "reasons": [
-          "공매도 과열",
           "투자 주의"
         ],
         "sources": [
-          "kind",
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "475150",
+        "name": "SK이터닉스",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
           "entry"
         ],
         "status": "confirmed"
