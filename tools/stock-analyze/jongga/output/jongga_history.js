@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-05T06:03:59+00:00",
+    "generatedAt": "2026-08-05T08:33:26+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,17 +33,32 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "한화솔루션",
-        "code": "009830",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 7.8,
+        "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 30850
+        "currentPrice": 77000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화솔루션",
+        "code": "009830",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 30150
       }
     ],
     "blacklist": [
