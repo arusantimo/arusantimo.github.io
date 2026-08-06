@@ -1,5 +1,152 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-08-06",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202608/jongga_data_20260806.js",
+    "jsonFile": "jongga/output/202608/latest_20260806.json",
+    "inputArchiveFile": "jongga/output/archive/202608/inputs_20260806.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-08-06T06:05:49+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "대우건설",
+        "code": "047040",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G13)",
+        "entryEligible": false,
+        "currentPrice": 16890
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "GS건설",
+        "code": "006360",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
+        "entryEligible": false,
+        "currentPrice": 32850
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 225000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "GS건설",
+        "code": "006360",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 32850
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 4.2,
+        "signalScore": 4.2,
+        "strictScore": 4.2,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 295000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 295000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "레몬헬스케어",
+        "code": "365660",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 6640
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "477850",
+        "name": "마키나락스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-08-05",
     "variant": "stable",
     "variantLabel": "현재 버전",
