@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-06T06:05:49+00:00",
+    "generatedAt": "2026-08-06T08:35:10+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -43,7 +43,52 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
         "entryEligible": false,
-        "currentPrice": 32850
+        "currentPrice": 32600
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
+        "entryEligible": false,
+        "currentPrice": 195000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 175200
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 195000
       },
       {
         "strategy": "accumulation",
@@ -58,37 +103,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.4,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 225000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "GS건설",
-        "code": "006360",
-        "score": 7.5,
-        "signalScore": 7.5,
-        "strictScore": 7.5,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 5.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
-        "entryEligible": false,
-        "currentPrice": 32850
+        "currentPrice": 226000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "알테오젠",
-        "code": "196170",
-        "score": 4.2,
-        "signalScore": 4.2,
-        "strictScore": 4.2,
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 5.9,
+        "signalScore": 5.9,
+        "strictScore": 5.9,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.4,
+        "gradeScore": 4.7,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 295000
+        "currentPrice": 195000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 195000
       },
       {
         "strategy": "reversal",
@@ -103,7 +148,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 295000
+        "currentPrice": 293500
       },
       {
         "strategy": "reversal",
@@ -125,17 +170,6 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "code": "477850",
         "name": "마키나락스",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "009150",
-        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
