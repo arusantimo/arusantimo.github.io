@@ -1,1 +1,38 @@
-[]
+[
+  {
+    "runId": "replay-20260807-060523-d07ad15b",
+    "entryDate": "2026-08-06",
+    "code": "066570",
+    "name": "LG전자",
+    "strategy": "accumulation",
+    "entryPrice": 175375.2,
+    "swingTargetPrice": 194472.0,
+    "stopPrice": 170900.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260806|stable|accumulation|066570"
+  },
+  {
+    "runId": "replay-20260807-060523-d07ad15b",
+    "entryDate": "2026-08-06",
+    "code": "068270",
+    "name": "셀트리온",
+    "strategy": "accumulation",
+    "entryPrice": 195195.0,
+    "swingTargetPrice": 216450.0,
+    "stopPrice": 189150.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260806|stable|accumulation|068270"
+  },
+  {
+    "runId": "replay-20260807-060523-d07ad15b",
+    "entryDate": "2026-08-06",
+    "code": "068270",
+    "name": "셀트리온",
+    "strategy": "breakout",
+    "entryPrice": 195195.0,
+    "swingTargetPrice": 222300.0,
+    "stopPrice": 193000.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260806|stable|breakout|068270"
+  }
+]
