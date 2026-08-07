@@ -1,7 +1,7 @@
 {
-  "latestDate": "20260806",
-  "latestFile": "store/results/result-20260806.js",
-  "generatedAt": "2026-08-06T05:07:01+00:00",
+  "latestDate": "20260807",
+  "latestFile": "store/results/result-20260807.js",
+  "generatedAt": "2026-08-07T05:07:31+00:00",
   "availableDates": [
     "20260523",
     "20260524",
@@ -57,7 +57,8 @@
     "20260803",
     "20260804",
     "20260805",
-    "20260806"
+    "20260806",
+    "20260807"
   ],
   "schemaVersion": "1.2.2"
 }
