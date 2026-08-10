@@ -1,5 +1,167 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-08-10",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202608/jongga_data_20260810.js",
+    "jsonFile": "jongga/output/202608/latest_20260810.json",
+    "inputArchiveFile": "jongga/output/archive/202608/inputs_20260810.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-08-10T06:06:25+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, Q1, G13)",
+        "entryEligible": false,
+        "currentPrice": 1153000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "현대차",
+        "code": "005380",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, Q1, G13)",
+        "entryEligible": false,
+        "currentPrice": 408000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "GS건설",
+        "code": "006360",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 34550
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 10.2,
+        "signalScore": 10.2,
+        "strictScore": 10.2,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.3,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1153000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 189400
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 824000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 534000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 482500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "010170",
+        "name": "대한광통신",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-08-07",
     "variant": "stable",
     "variantLabel": "현재 버전",

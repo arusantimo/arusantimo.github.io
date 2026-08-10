@@ -34,5 +34,65 @@
     "stopPrice": 193000.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260806|stable|breakout|068270"
+  },
+  {
+    "runId": "replay-20260810-060637-39e596a6",
+    "entryDate": "2026-08-07",
+    "code": "012450",
+    "name": "한화에어로스페이스",
+    "strategy": "accumulation",
+    "entryPrice": 1098097.0,
+    "swingTargetPrice": 1217670.0,
+    "stopPrice": 1064090.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260807|stable|accumulation|012450"
+  },
+  {
+    "runId": "replay-20260810-060637-39e596a6",
+    "entryDate": "2026-08-07",
+    "code": "005380",
+    "name": "현대차",
+    "strategy": "accumulation",
+    "entryPrice": 395895.5,
+    "swingTargetPrice": 439005.0,
+    "stopPrice": 383635.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260807|stable|accumulation|005380"
+  },
+  {
+    "runId": "replay-20260810-060637-39e596a6",
+    "entryDate": "2026-08-07",
+    "code": "068270",
+    "name": "셀트리온",
+    "strategy": "accumulation",
+    "entryPrice": 199199.0,
+    "swingTargetPrice": 220890.0,
+    "stopPrice": 193030.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260807|stable|accumulation|068270"
+  },
+  {
+    "runId": "replay-20260810-060637-39e596a6",
+    "entryDate": "2026-08-07",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 936936.0,
+    "swingTargetPrice": 1038960.0,
+    "stopPrice": 907920.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260807|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260810-060637-39e596a6",
+    "entryDate": "2026-08-07",
+    "code": "068270",
+    "name": "셀트리온",
+    "strategy": "breakout",
+    "entryPrice": 199499.3,
+    "swingTargetPrice": 227202.0,
+    "stopPrice": 199300.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260807|stable|breakout|068270"
   }
 ]
