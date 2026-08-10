@@ -9,26 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-10T06:06:25+00:00",
+    "generatedAt": "2026-08-10T08:35:14+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "한화에어로스페이스",
         "code": "012450",
-        "score": 9.9,
-        "signalScore": 9.9,
-        "strictScore": 9.9,
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
         "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, Q1, G13)",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G13)",
         "entryEligible": false,
-        "currentPrice": 1153000
+        "currentPrice": 1152000
       },
       {
         "strategy": "pullback",
@@ -41,7 +41,7 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, Q1, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3, Q1, G12, G13)",
         "entryEligible": false,
         "currentPrice": 408000
       },
@@ -56,24 +56,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
         "entryEligible": false,
-        "currentPrice": 34550
+        "currentPrice": 34900
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "한화에어로스페이스",
         "code": "012450",
-        "score": 10.2,
-        "signalScore": 10.2,
-        "strictScore": 10.2,
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
         "scoreMax": 14.0,
-        "grade": "A",
-        "gradeScore": 7.3,
+        "grade": "B",
+        "gradeScore": 6.7,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1153000
+        "currentPrice": 1152000
       },
       {
         "strategy": "accumulation",
@@ -91,34 +91,34 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 189400
       },
       {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "LIG디펜스앤에어로스페이스",
-        "code": "079550",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 4.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 824000
+        "currentPrice": 949000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "HD현대중공업",
         "code": "329180",
-        "score": 8.6,
-        "signalScore": 8.6,
-        "strictScore": 8.6,
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.6,
+        "grade": "A",
+        "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 534000
+        "currentPrice": 532000
       },
       {
         "strategy": "reversal",
@@ -133,13 +133,28 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 482500
+        "currentPrice": 481500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LIG디펜스앤에어로스페이스",
+        "code": "079550",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 823000
       }
     ],
     "blacklist": [
       {
-        "code": "009150",
-        "name": "삼성전기",
+        "code": "010170",
+        "name": "대한광통신",
         "reasons": [
           "투자 주의"
         ],
@@ -149,8 +164,8 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "010170",
-        "name": "대한광통신",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
