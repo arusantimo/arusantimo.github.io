@@ -880,5 +880,26 @@
     "barLow": 253000.0,
     "barClose": 267000.0,
     "fillRule": "openPhase_touch"
+  },
+  {
+    "orderId": "20260807|stable|breakout|068270-stop_touch",
+    "sourceEntryKey": "20260807|stable|breakout|068270",
+    "strategy": "breakout",
+    "code": "068270",
+    "name": "셀트리온",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-10T15:00:00+09:00",
+    "fillPrice": 199300.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-10T15:00:00+09:00",
+    "barOpen": 197700.0,
+    "barHigh": 202000.0,
+    "barLow": 194850.0,
+    "barClose": 201000.0,
+    "fillRule": "stop_touch"
   }
 ]
