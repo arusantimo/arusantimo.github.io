@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-11T06:05:45+00:00",
+    "generatedAt": "2026-08-11T08:35:33+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 15,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "진입 가능(B·조건부)",
+        "entryEligible": true,
+        "currentPrice": 210500
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -28,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G8)",
         "entryEligible": false,
-        "currentPrice": 36650
+        "currentPrice": 36350
       },
       {
         "strategy": "pullback",
@@ -48,6 +63,21 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 181700
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "한화에어로스페이스",
         "code": "012450",
         "score": 9.0,
@@ -58,7 +88,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.4,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1095000
+        "currentPrice": 1098000
       },
       {
         "strategy": "accumulation",
@@ -73,37 +103,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.1,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 211000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "GS건설",
-        "code": "006360",
-        "score": 8.2,
-        "signalScore": 8.2,
-        "strictScore": 8.2,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
-        "entryEligible": false,
-        "currentPrice": 34900
+        "currentPrice": 210500
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "셀트리온",
         "code": "068270",
-        "score": 6.5,
-        "signalScore": 6.5,
-        "strictScore": 6.5,
+        "score": 6.3,
+        "signalScore": 6.3,
+        "strictScore": 6.3,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 5.2,
+        "gradeScore": 5.0,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 211000
+        "currentPrice": 210500
       },
       {
         "strategy": "reversal",
@@ -119,12 +134,42 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 36650
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 104500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 214000
       }
     ],
     "blacklist": [
       {
-        "code": "058610",
-        "name": "에스피지",
+        "code": "006340",
+        "name": "대원전선",
         "reasons": [
           "투자 주의"
         ],
@@ -134,10 +179,10 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "240810",
-        "name": "원익IPS",
+        "code": "058610",
+        "name": "에스피지",
         "reasons": [
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
