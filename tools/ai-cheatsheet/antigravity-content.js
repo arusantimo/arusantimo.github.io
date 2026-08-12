@@ -10,41 +10,110 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.2.1</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-25</span>
+        <span class="meta-version">v2.4.3</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-07-28</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.2.1)</span>
+        <span>📋 최근 변경사항 (v2.4.3)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Antigravity Guide 내장 스킬 (v2.2.1)"
-            data-tt-desc="Antigravity 사용법과 워크플로우를 안내하는 built-in Guide 스킬이 추가되었습니다."
-            data-tt-example="Antigravity Guide">내장 <code>Antigravity Guide</code> 스킬 추가 (v2.2.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="오디오 파일 렌더링 지원 (v2.2.1)"
-            data-tt-desc="아티팩트/첨부 파일 흐름에서 오디오 파일을 렌더링해 검토할 수 있도록 지원합니다."
-            data-tt-example="">오디오 파일 렌더링 지원 추가 (v2.2.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="부분 문자열 파일 검색 개선 (v2.2.1)"
-            data-tt-desc="파일 검색에서 substring 매칭 품질과 탐색 정확도가 개선되었습니다."
-            data-tt-example="">substring 기반 file search 개선 (v2.2.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="CLI 시작 경로 성능 최적화 (v2.2.1)"
-            data-tt-desc="VCS detection을 동기 CLI 시작 경로 밖으로 옮겨 초기화 지연을 줄였습니다."
-            data-tt-example="agy">VCS detection을 CLI startup sync path 밖으로 이동해 초기화 지연 감소 (v2.2.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="rules.json 제외/허용 규칙 패치 (v2.2.1)"
-            data-tt-desc="rules.json의 exclusion rule과 allowlist가 무시되어 모든 .md rule이 로드되던 문제를 수정했습니다."
-            data-tt-example="rules.json">rules.json exclusion/allowlist 무시로 인한 rule discovery 과다 로드 수정 (v2.2.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="MCP 서버 초기화 병렬화 (v2.2.1)"
-            data-tt-desc="느리거나 멈춘 MCP 서버가 독립적인 빠른 서버 로딩을 막지 않도록 초기화 시퀀스를 병렬화했습니다."
-            data-tt-example="agy plugin list">MCP server initialization 병렬화로 startup/config reload 블로킹 완화 (v2.2.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="미리보기 탭(Preview Tabs) 추가 (v2.4.3)"
+            data-tt-desc="보조 패널에서 파일을 임시로 여는 미리보기 탭이 추가되어, 클릭한 파일이 영구 탭 없이 임시 슬롯으로 열립니다."
+            data-tt-example="">보조 패널 미리보기 탭(Preview Tabs) 지원 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="JSON/MD/CSV 첨부 지원 (v2.4.3)"
+            data-tt-desc="JSON, Markdown, CSV 파일을 시각적 배지와 함께 첨부할 수 있도록 지원이 확장되었습니다."
+            data-tt-example="">JSON/Markdown/CSV 파일 첨부 지원 확장 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="MCP 서버 연결/도구 호출 타임아웃 방지 (v2.4.3)"
+            data-tt-desc="MCP 서버 연결과 도구 호출이 무한 대기하지 않도록 타임아웃 처리가 추가되었습니다."
+            data-tt-example="">MCP 서버 연결/도구 호출 무한 대기 방지 타임아웃 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="선택 텍스트 인용 단축키 (v2.4.3)"
+            data-tt-desc="Cmd+L(macOS) / Ctrl+L(Windows)로 선택한 텍스트를 채팅에 바로 인용할 수 있습니다."
+            data-tt-example="Cmd+L"><code>Cmd+L</code>/<code>Ctrl+L</code>로 선택 텍스트 채팅 인용 단축키 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Conversation History 안 읽음 필터 (v2.4.3)"
+            data-tt-desc="Conversation History에서 읽지 않은 대화만 걸러보는 'Only Unread' 필터가 추가되었습니다."
+            data-tt-example="Conversation History">Conversation History에 "Only Unread" 필터 옵션 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Download Diagnostics 명령 추가 (v2.4.3)"
+            data-tt-desc="문제 해결을 위한 진단 정보를 내려받는 Download Diagnostics 명령이 추가되었습니다."
+            data-tt-example="Download Diagnostics">문제 해결용 <code>Download Diagnostics</code> 명령 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="명령 승인 규칙 개선 (v2.4.3)"
+            data-tt-desc="중복되는 명령 승인 프롬프트를 줄이도록 명령 승인 규칙이 정교화되었습니다."
+            data-tt-example="">명령 승인 규칙 정교화로 중복 승인 프롬프트 감소 (v2.4.3) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="큐잉된 메시지 실행 옵션 (v2.3.0)"
+            data-tt-desc="에이전트 작업 중 보낸 메시지를 큐에 쌓고 실행 방식을 설정할 수 있으며, 'Send Now'로 즉시 실행도 가능합니다."
+            data-tt-example="Send Now">큐잉된 메시지 실행 옵션 및 "Send Now" 즉시 실행 지원 (v2.3.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="일반 텍스트(.txt) 첨부 지원 (v2.3.0)"
+            data-tt-desc="일반 텍스트(.txt) 파일 첨부가 지원됩니다."
+            data-tt-example="">일반 텍스트(<code>.txt</code>) 파일 첨부 지원 추가 (v2.3.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="백엔드 과부하 시 자동 재시도 (v2.3.0)"
+            data-tt-desc="백엔드 과부하가 발생하면 자동으로 재시도하도록 개선되었습니다."
+            data-tt-example="">백엔드 과부하 발생 시 자동 재시도 지원 (v2.3.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.3.0~v2.3.1 (기타 변경사항)</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="CLI 시작 성능 최적화 (v2.3.0)"
+                data-tt-desc="시작 성능을 최적화해 초기 로딩 지연을 줄였습니다."
+                data-tt-example="">시작(startup) 성능 최적화로 초기 로딩 지연 감소 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="명령 승인 규칙 세부 조정 (v2.3.0)"
+                data-tt-desc="명령 실행 승인 규칙이 세부 조정되었습니다."
+                data-tt-example="">명령 실행 승인(command permission) 규칙 세부 조정 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="기본 UI 테마 시스템 설정 반영 (v2.3.0)"
+                data-tt-desc="기본 UI 테마가 OS의 시스템 환경설정(라이트/다크)을 따르도록 변경되었습니다."
+                data-tt-example="">기본 UI 테마가 OS 시스템 설정(라이트/다크)을 따르도록 변경 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="가상화 파일 뷰 검색 버그 수정 (v2.3.0)"
+                data-tt-desc="가상화된 파일 뷰에서 페이지 내 찾기(find-in-page) 검색이 동작하지 않던 문제를 수정했습니다."
+                data-tt-example="">가상화 파일 뷰 페이지 내 찾기(find-in-page) 버그 수정 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="/btw 지속성 및 사고 과정 표시 수정 (v2.3.0)"
+                data-tt-desc="/btw 사이드 질문의 지속성 문제와 에이전트 사고 과정(thinking) 표시 문제를 수정했습니다."
+                data-tt-example="/btw"><code>/btw</code> 사이드 질문 지속성 및 에이전트 thinking 표시 버그 수정 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="대화 보관 후 백그라운드 작업 중단 수정 (v2.3.0)"
+                data-tt-desc="대화를 보관(archive)한 후 백그라운드 작업이 멈추던 문제를 수정했습니다."
+                data-tt-example="">대화 보관(archive) 후 백그라운드 작업 중단 버그 수정 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="1000줄 초과 diff 렌더링 수정 (v2.3.0)"
+                data-tt-desc="1000줄이 넘는 파일의 diff 렌더링 문제를 수정했습니다."
+                data-tt-example="">1000줄 초과 파일 diff 렌더링 버그 수정 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="서브에이전트 완료 후 행 걸림 수정 (v2.3.0)"
+                data-tt-desc="서브에이전트 완료 후 에이전트가 응답 없이 멈추던(hanging) 문제를 수정했습니다."
+                data-tt-example="">서브에이전트 완료 후 에이전트 행(hang) 걸림 버그 수정 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="손상된 config.json 시작 실패 수정 (v2.3.1)"
+                data-tt-desc="~/.gemini/config/의 비어 있거나 손상된 config.json 파일로 인해 앱이 시작되지 않던 치명적 문제를 수정한 hotfix입니다."
+                data-tt-example="">손상/빈 <code>config.json</code>으로 인한 시작 실패 치명적 버그 수정 (v2.3.1 hotfix)</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v2.2.1</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Antigravity Guide 내장 스킬 (v2.2.1)"
+                data-tt-desc="Antigravity 사용법과 워크플로우를 안내하는 built-in Guide 스킬이 추가되었습니다."
+                data-tt-example="Antigravity Guide">내장 <code>Antigravity Guide</code> 스킬 추가 (v2.2.1)</li>
+              <li class="cl-tip" data-tt-title="오디오 파일 렌더링 지원 (v2.2.1)"
+                data-tt-desc="아티팩트/첨부 파일 흐름에서 오디오 파일을 렌더링해 검토할 수 있도록 지원합니다."
+                data-tt-example="">오디오 파일 렌더링 지원 추가 (v2.2.1)</li>
+              <li class="cl-tip" data-tt-title="부분 문자열 파일 검색 개선 (v2.2.1)"
+                data-tt-desc="파일 검색에서 substring 매칭 품질과 탐색 정확도가 개선되었습니다."
+                data-tt-example="">substring 기반 file search 개선 (v2.2.1)</li>
+              <li class="cl-tip" data-tt-title="CLI 시작 경로 성능 최적화 (v2.2.1)"
+                data-tt-desc="VCS detection을 동기 CLI 시작 경로 밖으로 옮겨 초기화 지연을 줄였습니다."
+                data-tt-example="agy">VCS detection을 CLI startup sync path 밖으로 이동해 초기화 지연 감소 (v2.2.1)</li>
+              <li class="cl-tip" data-tt-title="rules.json 제외/허용 규칙 패치 (v2.2.1)"
+                data-tt-desc="rules.json의 exclusion rule과 allowlist가 무시되어 모든 .md rule이 로드되던 문제를 수정했습니다."
+                data-tt-example="rules.json">rules.json exclusion/allowlist 무시로 인한 rule discovery 과다 로드 수정 (v2.2.1)</li>
+              <li class="cl-tip" data-tt-title="MCP 서버 초기화 병렬화 (v2.2.1)"
+                data-tt-desc="느리거나 멈춘 MCP 서버가 독립적인 빠른 서버 로딩을 막지 않도록 초기화 시퀀스를 병렬화했습니다."
+                data-tt-example="agy plugin list">MCP server initialization 병렬화로 startup/config reload 블로킹 완화 (v2.2.1)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.4</summary>

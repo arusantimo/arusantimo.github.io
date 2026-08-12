@@ -10,41 +10,71 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.9</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-30</span>
+        <span class="meta-version">v3.11</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-07-28</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.9)</span>
+        <span>📋 최근 변경사항 (v3.11)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="팀 MCP 마켓플레이스 배포 (v3.9)"
-            data-tt-desc="관리자가 구성한 팀 MCP 서버를 클라우드 에이전트, Agents Window, IDE, CLI 전반에 팀 마켓플레이스로 배포할 수 있습니다."
-            data-tt-example="Dashboard > Integrations & MCP">팀 MCP 서버를 Cloud Agent/IDE/CLI 전반에 배포하는 팀 마켓플레이스 지원 (v3.9) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="조직 그룹별 마켓플레이스 접근 제어 (v3.9)"
-            data-tt-desc="팀 마켓플레이스가 SCIM 디렉터리 그룹 외에 조직 그룹 기반 접근 제한을 지원합니다."
-            data-tt-example="Dashboard > Plugins > Team Marketplaces">조직 그룹 단위 Team Marketplace 접근 제어 지원 (v3.9) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor for iOS 공개 베타 (v3.9)"
-            data-tt-desc="모든 유료 플랜에서 모바일 앱으로 repo를 선택하고 Cloud Agent를 시작하거나 관리할 수 있습니다."
-            data-tt-example="Cursor for iOS">iOS 모바일 앱 공개 베타 및 모바일 Cloud Agent 실행 지원 (v3.9) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="원격 제어와 Live Activities (v3.9)"
-            data-tt-desc="휴대폰에서 실행 중인 에이전트를 원격 제어하고, Live Activities 및 푸시 알림으로 상태를 확인합니다."
-            data-tt-example="Agents Window > Remote Control">모바일 원격 제어, Live Activities, push notification 지원 (v3.9) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor Customize 페이지 (v3.9)"
-            data-tt-desc="플러그인, 스킬, MCP, 하위 에이전트, 규칙, 명령어, 훅을 사용자/팀/워크스페이스 수준에서 한곳에 관리합니다."
-            data-tt-example="Customize">Customize 페이지에서 플러그인·스킬·MCP·규칙·훅 통합 관리 (v3.9) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="플러그인 Canvas 및 팀 마켓플레이스 import (v3.9)"
-            data-tt-desc="플러그인이 공유 Canvas 템플릿을 제공할 수 있고, 팀 마켓플레이스는 GitLab, Bitbucket, Azure DevOps 저장소 import를 지원합니다."
-            data-tt-example="Team Marketplace import">Plugin Canvas 및 GitLab/Bitbucket/Azure DevOps 플러그인 저장소 import 지원 (v3.9) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor Start 인도향 저가 플랜 (2026-07-28)"
+            data-tt-desc="인도 개발자를 위한 월 ₹649 플랜으로, Grok 4.5와 Composer 모델, Cloud Agent, iOS 원격 제어를 제공합니다. UPI/카드 결제 기반 INR 청구입니다."
+            data-tt-example="Cursor Start">Cursor Start(₹649/월, 인도향) Grok 4.5·Composer·Cloud Agent 제공 (2026-07-28) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor Router 지능형 모델 라우팅 (2026-07-22)"
+            data-tt-desc="Auto mode가 요청을 분석해 적합한 모델로 자동 라우팅합니다. Intelligence/Balance/Cost 세 가지 최적화 모드를 제공하며 Teams 플랜은 기본 활성화됩니다."
+            data-tt-example="Auto mode > Router">Cursor Router로 Auto mode 지능형 모델 라우팅(Intelligence/Balance/Cost) (2026-07-22) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor in Slack 실행 전 플랜 미리보기 (2026-07-17)"
+            data-tt-desc="Cursor in Slack이 작업을 시작하기 전 계획을 먼저 제시해 사용자가 조기에 방향을 조정할 수 있습니다. 멀티 레포 환경 타겟팅도 지원합니다."
+            data-tt-example="Slack > /cursor">Cursor in Slack 실행 전 플랜 미리보기 및 멀티 레포 환경 타겟팅 지원 (2026-07-17) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="사이드 대화(Side Chats) 지원 (v3.11)"
+            data-tt-desc="/side 또는 /btw 명령으로 메인 대화와 별개로 진행되는 병렬 사이드 대화를 시작할 수 있습니다."
+            data-tt-example="/side 이 함수 설명해줘"><code>/side</code>·<code>/btw</code> 병렬 사이드 대화(Side Chats) 지원 (v3.11) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="에이전트 트랜스크립트 검색 (v3.11)"
+            data-tt-desc="커맨드 팔레트에서 에이전트 대화 트랜스크립트를 검색할 수 있으며, 대규모 환경에서도 빠르도록 로컬 인덱싱을 사용합니다."
+            data-tt-example="Cmd+K > Search transcripts">커맨드 팔레트에서 에이전트 트랜스크립트 검색 지원 (v3.11) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="레포/프로젝트 선택기 재설계 (v3.11)"
+            data-tt-desc="This Computer, Cloud, Remote Machines 범위로 검색 범위를 좁힐 수 있도록 레포·프로젝트 선택기가 재설계되었습니다."
+            data-tt-example="">레포/프로젝트 선택기 재설계, 범위별(This Computer/Cloud/Remote) 검색 지원 (v3.11) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="클라우드 에이전트 훅(Cloud Agent Hooks) (v3.11)"
+            data-tt-desc="prompt, response, thinking, 서브에이전트 관리를 포함해 에이전트 대화를 관찰하고 제어할 수 있는 신규 훅입니다."
+            data-tt-example="">클라우드 에이전트 대화 관찰/제어용 신규 훅(Cloud Agent Hooks) 추가 (v3.11) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="팀 마켓플레이스 MCP·조직 그룹 지원 (v3.10)"
+            data-tt-desc="관리자가 팀 MCP 서버를 한 번 구성해 여러 플랫폼에 배포할 수 있고, SCIM 디렉터리 그룹 외에 조직 그룹 기반 접근 제어도 지원합니다."
+            data-tt-example="Dashboard > Integrations & MCP">팀 MCP 서버 멀티플랫폼 배포 및 조직 그룹 기반 접근 제어 (v3.10) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.9</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="팀 MCP 마켓플레이스 배포 (v3.9)"
+                data-tt-desc="관리자가 구성한 팀 MCP 서버를 클라우드 에이전트, Agents Window, IDE, CLI 전반에 팀 마켓플레이스로 배포할 수 있습니다."
+                data-tt-example="Dashboard > Integrations & MCP">팀 MCP 서버를 Cloud Agent/IDE/CLI 전반에 배포하는 팀 마켓플레이스 지원 (v3.9)</li>
+              <li class="cl-tip" data-tt-title="조직 그룹별 마켓플레이스 접근 제어 (v3.9)"
+                data-tt-desc="팀 마켓플레이스가 SCIM 디렉터리 그룹 외에 조직 그룹 기반 접근 제한을 지원합니다."
+                data-tt-example="Dashboard > Plugins > Team Marketplaces">조직 그룹 단위 Team Marketplace 접근 제어 지원 (v3.9)</li>
+              <li class="cl-tip" data-tt-title="Cursor for iOS 공개 베타 (v3.9)"
+                data-tt-desc="모든 유료 플랜에서 모바일 앱으로 repo를 선택하고 Cloud Agent를 시작하거나 관리할 수 있습니다."
+                data-tt-example="Cursor for iOS">iOS 모바일 앱 공개 베타 및 모바일 Cloud Agent 실행 지원 (v3.9)</li>
+              <li class="cl-tip" data-tt-title="원격 제어와 Live Activities (v3.9)"
+                data-tt-desc="휴대폰에서 실행 중인 에이전트를 원격 제어하고, Live Activities 및 푸시 알림으로 상태를 확인합니다."
+                data-tt-example="Agents Window > Remote Control">모바일 원격 제어, Live Activities, push notification 지원 (v3.9)</li>
+              <li class="cl-tip" data-tt-title="Cursor Customize 페이지 (v3.9)"
+                data-tt-desc="플러그인, 스킬, MCP, 하위 에이전트, 규칙, 명령어, 훅을 사용자/팀/워크스페이스 수준에서 한곳에 관리합니다."
+                data-tt-example="Customize">Customize 페이지에서 플러그인·스킬·MCP·규칙·훅 통합 관리 (v3.9)</li>
+              <li class="cl-tip" data-tt-title="플러그인 Canvas 및 팀 마켓플레이스 import (v3.9)"
+                data-tt-desc="플러그인이 공유 Canvas 템플릿을 제공할 수 있고, 팀 마켓플레이스는 GitLab, Bitbucket, Azure DevOps 저장소 import를 지원합니다."
+                data-tt-example="Team Marketplace import">Plugin Canvas 및 GitLab/Bitbucket/Azure DevOps 플러그인 저장소 import 지원 (v3.9)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.8</summary>

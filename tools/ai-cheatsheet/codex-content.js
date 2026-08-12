@@ -10,26 +10,107 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.142.5</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-06-30</span>
+        <span class="meta-version">v0.146.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-07-29</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.142.5)</span>
+        <span>📋 최근 변경사항 (v0.146.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Responses WebSocket trace 보안 패치 (v0.142.5)"
-            data-tt-desc="Responses WebSocket 요청 전체 payload가 trace 로그에 기록되지 않도록 차단한 보안/개인정보 보호 패치입니다."
-            data-tt-example="">Responses WebSocket request payload의 trace log 기록 방지 패치 (v0.142.5) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="세션 이름 지정 및 사이드 대화 (v0.146.0)"
+            data-tt-desc="/new 또는 /clear로 새 세션에 이름을 붙이고, 중요한 스레드를 pin하며, 대화를 닫지 않고 사이드 대화로 전환할 수 있습니다."
+            data-tt-example="/new my-session"><code>/new</code>·<code>/clear</code> 세션 이름 지정, 스레드 pin, 사이드 대화 전환 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Agent Plugins manifest 및 워크스페이스 배포 (v0.146.0)"
+            data-tt-desc="Agent Plugins manifest, 워크스페이스 플러그인 배포, Amazon Bedrock·Claude Code용 추가 마켓플레이스를 지원합니다."
+            data-tt-example="">Agent Plugins manifest 및 워크스페이스 플러그인 배포/마켓플레이스 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="스레드 포크(fork) 지원 (v0.146.0)"
+            data-tt-desc="페이지네이션된 히스토리를 포함해 스레드를 포크할 수 있으며, 스레드 목록에 나타나지 않는 임시 포크도 지원합니다."
+            data-tt-example="">페이지네이션 히스토리 기반 스레드 포크(임시 포크 포함) 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 Code Mode 호스트 WebSocket 연결 (v0.146.0)"
+            data-tt-desc="app-server가 WebSocket을 통해 원격 Code Mode 호스트에 연결할 수 있습니다."
+            data-tt-example="">app-server의 원격 Code Mode 호스트 WebSocket 연결 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="커스텀 모델 provider 웹 검색 (v0.146.0)"
+            data-tt-desc="호환되는 커스텀 모델 provider에서 독립형 웹 검색 기능을 사용할 수 있습니다."
+            data-tt-example="">호환 커스텀 모델 provider용 standalone 웹 검색 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="페이지네이션 스레드 히스토리 (실험적) (v0.145.0)"
+            data-tt-desc="효율적인 재개, 검색, 이름 저장, 서브에이전트 지원, 메모리를 포함한 실험적 페이지네이션 스레드 히스토리가 추가되었습니다."
+            data-tt-example="">실험적 페이지네이션 스레드 히스토리(검색·메모리 포함) 추가 (v0.145.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/import Cursor·Claude Code 마이그레이션 확장 (v0.145.0)"
+            data-tt-desc="/import가 Cursor와 Claude Code의 설정, MCP 서버, 플러그인, 세션, 커맨드, 프로젝트 범위 메모리까지 이전하도록 확장되었습니다."
+            data-tt-example="/import"><code>/import</code>로 Cursor·Claude Code 설정/MCP/플러그인/세션 마이그레이션 (v0.145.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="오디오 입출력 및 realtime V3 스트리밍 (v0.145.0)"
+            data-tt-desc="일반적인 로컬 오디오 포맷을 포함한 오디오 입력·도구 출력이 추가되었고, 스트리밍 realtime V3 대화가 도입되었습니다."
+            data-tt-example="">오디오 입력/출력 지원 및 스트리밍 realtime V3 대화 도입 (v0.145.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="멀티 에이전트 V2 정식 안정화 (v0.145.0)"
+            data-tt-desc="opt-in 상태였던 멀티 에이전트 V2가 안정화되어, 서브에이전트별 모델·추론 레벨·동시성 설정과 역할 복원, 개선된 탐색을 지원합니다."
+            data-tt-example="">멀티 에이전트 V2 안정화, 서브에이전트별 모델/추론 레벨/동시성 설정 지원 (v0.145.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Amazon Bedrock 로그인 및 커스텀 엔드포인트 (실험적) (v0.145.0)"
+            data-tt-desc="실험적 Amazon Bedrock 로그인, 커스텀 엔드포인트/인증 지원이 추가되었고, GPT-5.6 Sol이 기본 Bedrock 모델로 지정되었습니다."
+            data-tt-example="">실험적 Amazon Bedrock 로그인/커스텀 엔드포인트, GPT-5.6 Sol 기본 모델 지정 (v0.145.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.144.0~v0.144.6</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="writes app-approval 모드 추가 (v0.144.0)"
+                data-tt-desc="선언된 read-only 동작은 허용하고 write 동작에만 승인을 요구하는 writes 앱 승인 모드가 추가되었습니다."
+                data-tt-example="approval_mode = writes"><code>writes</code> app-approval 모드로 read-only 자동 허용 + write만 승인 요구 (v0.144.0)</li>
+              <li class="cl-tip" data-tt-title="사용량 한도 초기화 크레딧 상세 표시 (v0.144.0)"
+                data-tt-desc="사용량 한도 초기화 크레딧이 종류와 만료일을 표시하고, 어떤 크레딧을 사용할지 선택할 수 있습니다."
+                data-tt-example="">사용량 한도 리셋 크레딧 종류·만료일 표시 및 선택 사용 지원 (v0.144.0)</li>
+              <li class="cl-tip" data-tt-title="MCP 도구 대화형 인증 정식화 (v0.144.0)"
+                data-tt-desc="MCP 도구가 실험적 opt-in 없이도 대화형으로 인증을 요청할 수 있습니다."
+                data-tt-example="">MCP 도구 대화형 인증 요청이 실험적 opt-in 없이 정식 지원 (v0.144.0)</li>
+              <li class="cl-tip" data-tt-title="pnpm 전역 설치 감지 (v0.144.0)"
+                data-tt-desc="전역 pnpm 설치를 감지해 진단과 업데이트가 올바른 패키지 매니저를 사용하도록 개선했습니다."
+                data-tt-example="">전역 pnpm 설치 감지로 진단/업데이트 패키지 매니저 판별 개선 (v0.144.0)</li>
+              <li class="cl-tip" data-tt-title="Ultra 추론 고동시성 경고 (v0.144.0)"
+                data-tt-desc="Ultra 추론 레벨 선택 시 높은 멀티 에이전트 동시성이 사용량을 빠르게 늘릴 수 있다는 경고를 표시합니다."
+                data-tt-example="">Ultra 추론 선택 시 고동시성 사용량 급증 경고 추가 (v0.144.0)</li>
+              <li class="cl-tip" data-tt-title="GPT-5.6 Sol/Terra/Luna 컨텍스트 윈도우 수정 (v0.144.6)"
+                data-tt-desc="GPT-5.6 Sol, Terra, Luna의 번들 instruction을 갱신하고 컨텍스트 윈도우를 272,000 토큰으로 정정한 hotfix입니다."
+                data-tt-example="">GPT-5.6 Sol/Terra/Luna 컨텍스트 윈도우 272,000 토큰으로 정정 (v0.144.6 hotfix)</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v0.143.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="원격 플러그인 기본 활성화 (v0.143.0)"
+                data-tt-desc="원격 플러그인이 기본으로 활성화되며, 더 풍부한 카탈로그 행, npm 마켓플레이스 소스, 원격/로컬 버전 표시가 추가되었습니다."
+                data-tt-example="">원격 플러그인 기본 활성화 및 npm 마켓플레이스 소스 지원 (v0.143.0)</li>
+              <li class="cl-tip" data-tt-title="codex remote-control pair 명령 추가 (v0.143.0)"
+                data-tt-desc="실행 중인 데몬으로부터 수동 페어링 코드를 생성하는 명령입니다."
+                data-tt-example="codex remote-control pair"><code>codex remote-control pair</code>로 수동 페어링 코드 생성 지원 (v0.143.0)</li>
+              <li class="cl-tip" data-tt-title="Bedrock GPT-5.6 Sol/Terra/Luna 모델 추가 (v0.143.0)"
+                data-tt-desc="Amazon Bedrock에서 GPT-5.6 Sol, Terra, Luna 모델을 사용할 수 있으며 max 추론 레벨을 1급으로 지원합니다."
+                data-tt-example="">Amazon Bedrock GPT-5.6 Sol/Terra/Luna 모델 및 <code>max</code> 추론 레벨 지원 (v0.143.0)</li>
+              <li class="cl-tip" data-tt-title="MCP 도구 tool search 기본 사용 확대 (v0.143.0)"
+                data-tt-desc="MCP 도구가 기본으로 tool search를 사용하며, ChatGPT 호스팅 MCP 서버는 세션 인증을 명시적으로 사용할 수 있습니다."
+                data-tt-example="">MCP 도구 <code>tool search</code> 기본 사용 확대 (v0.143.0)</li>
+              <li class="cl-tip" data-tt-title="app-server 환경/스레드 조회 API (v0.143.0)"
+                data-tt-desc="app-server 클라이언트가 환경을 조회하고, 하위 스레드 목록을 확인하며, 특정 turn 기준으로 히스토리를 포크할 수 있습니다."
+                data-tt-example="">app-server의 환경 조회/하위 스레드 목록/turn 기준 히스토리 포크 API 추가 (v0.143.0)</li>
+            </ul>
+          </details>
+
+          <details class="ver-group">
+            <summary>v0.142.5</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Responses WebSocket trace 보안 패치 (v0.142.5)"
+                data-tt-desc="Responses WebSocket 요청 전체 payload가 trace 로그에 기록되지 않도록 차단한 보안/개인정보 보호 패치입니다."
+                data-tt-example="">Responses WebSocket request payload의 trace log 기록 방지 패치 (v0.142.5)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.142.1~v0.142.4</summary>

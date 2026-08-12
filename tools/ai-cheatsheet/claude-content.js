@@ -10,38 +10,122 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.199</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-07-02</span>
+        <span class="meta-version">v2.1.220</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-07-25</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.199)</span>
+        <span>📋 최근 변경사항 (v2.1.220)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="스택형 slash-skill 호출 지원 (v2.1.199)"
-            data-tt-desc="프롬프트 앞에 여러 스킬을 연속으로 붙이면 최대 5개까지 선행 스킬을 모두 로드합니다."
-            data-tt-example="/skill-a /skill-b do XYZ">스택형 slash-skill 호출(<code>/skill-a /skill-b</code>) 최대 5개 로드 지원 (v2.1.199) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="TLS 인증서 오류 빠른 실패 처리 (v2.1.199)"
-            data-tt-desc="TLS 검사 프록시, 누락된 NODE_EXTRA_CA_CERTS, 만료 인증서 오류를 재시도 소진 전에 즉시 안내합니다."
-            data-tt-example="export NODE_EXTRA_CA_CERTS=/path/to/cert.pem">TLS 인증서 오류를 즉시 중단하고 해결 힌트를 표시하도록 개선 (v2.1.199) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="스트리밍 부분 응답 보존 (v2.1.199)"
-            data-tt-desc="API가 부분 출력 이후 overload/server error를 반환해도 이미 받은 응답을 버리지 않고 incomplete-response 안내와 함께 보존합니다."
-            data-tt-example="">중간 서버 오류 발생 시 스트리밍 부분 응답 보존 처리 (v2.1.199) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="서브에이전트 오류/부분 결과 전파 (v2.1.199)"
-            data-tt-desc="rate limit 또는 서버 오류로 끊긴 서브에이전트가 조용히 실패하지 않고 부모 에이전트에 오류와 부분 결과를 반환합니다."
-            data-tt-example="">서브에이전트 rate-limit/server-error 부분 작업 및 오류 보고 강화 (v2.1.199) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="CLAUDE_CODE_RETRY_WATCHDOG 재시도 정책 (v2.1.199)"
-            data-tt-desc="비용량성 일시 오류에서 watchdog 기본 재시도 수를 300으로 올리고 CLAUDE_CODE_MAX_RETRIES의 15회 상한을 해제합니다."
-            data-tt-example="export CLAUDE_CODE_RETRY_WATCHDOG=1"><code>CLAUDE_CODE_RETRY_WATCHDOG</code> 일시 오류 재시도 정책 강화 (v2.1.199) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Claude Opus 5 기본 Opus 모델 도입 (v2.1.219)"
+            data-tt-desc="Claude Opus 5(claude-opus-5)가 기본 Opus 모델로 추가되었습니다. 1M 컨텍스트를 지원하며 fast mode 요금은 $10/$50 per Mtok입니다."
+            data-tt-example="/model">Claude Opus 5(<code>claude-opus-5</code>) 기본 Opus 모델 도입, 1M 컨텍스트 지원 (v2.1.219) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="sandbox.network.strictAllowlist 설정 (v2.1.219)"
+            data-tt-desc="샌드박스 명령이 허용목록에 없는 호스트로 나가려 할 때 승인 프롬프트 없이 곧바로 차단하는 설정입니다."
+            data-tt-example="sandbox.network.strictAllowlist: true"><code>sandbox.network.strictAllowlist</code> 비허용 호스트 자동 차단 설정 추가 (v2.1.219) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/doctor 전체 점검 도구로 확장 (v2.1.205)"
+            data-tt-desc="/doctor가 단순 업데이트 확인을 넘어 설치 전반을 진단하고 수정하는 전체 점검 도구로 확장되었습니다. /checkup은 동일 기능의 별칭입니다."
+            data-tt-example="/doctor"><code>/doctor</code>가 전체 설치 진단/수정 도구로 확장, <code>/checkup</code> 별칭 추가 (v2.1.205) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="기본 권한 모드 명칭을 Manual로 변경 (v2.1.200)"
+            data-tt-desc="CLI, --help, VS Code, JetBrains 전반에서 기본 권한 모드 이름이 'Manual'로 바뀌었습니다. --permission-mode manual 및 defaultMode: manual도 함께 인식됩니다."
+            data-tt-example="claude --permission-mode manual">기본 권한 모드 명칭 "Manual"로 통일, <code>--permission-mode manual</code> 지원 (v2.1.200) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Dynamic workflow size 기본값 medium (v2.1.219)"
+            data-tt-desc="/config의 Dynamic workflow size 설정이 15개 미만 에이전트를 지향하는 medium을 기본값으로 사용하도록 변경되었습니다."
+            data-tt-example="/config">동적 워크플로우 크기 기본값 "medium"(15개 미만 에이전트)으로 변경 (v2.1.219) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="화면 낭독기 모드 추가 (v2.1.208)"
+            data-tt-desc="시각장애 사용자를 위한 평문 렌더링 모드입니다. claude --ax-screen-reader 실행, CLAUDE_AX_SCREEN_READER=1, 또는 settings의 axScreenReader: true로 활성화합니다."
+            data-tt-example="claude --ax-screen-reader">화면 낭독기 모드(<code>--ax-screen-reader</code>) 추가 (v2.1.208) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/code-review 백그라운드 서브에이전트 실행 (v2.1.218)"
+            data-tt-desc="/code-review가 백그라운드 서브에이전트로 실행되어 대화창을 채우지 않고, 누적된 slash 커맨드를 리뷰 대상으로 유지합니다."
+            data-tt-example="/code-review"><code>/code-review</code>가 백그라운드 서브에이전트로 실행되도록 변경 (v2.1.218) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="서브에이전트 중첩 스폰 깊이 3단계 기본화 (v2.1.219)"
+            data-tt-desc="서브에이전트가 기본적으로 depth 3까지 중첩 스폰될 수 있습니다(기존 1). CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1로 비활성화할 수 있습니다."
+            data-tt-example="export CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1">서브에이전트 중첩 스폰 기본 깊이 3단계로 확대 (v2.1.219) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Auto mode Bedrock/Vertex/Foundry 기본 제공 (v2.1.207)"
+            data-tt-desc="Auto mode가 Bedrock, Vertex AI, Foundry에서 CLAUDE_CODE_ENABLE_AUTO_MODE opt-in 없이 기본 제공됩니다. settings의 disableAutoMode로 끌 수 있습니다."
+            data-tt-example="disableAutoMode: true">Auto mode가 Bedrock/Vertex AI/Foundry에서 opt-in 없이 기본 제공 (v2.1.207) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="vimInsertModeRemaps 설정 (v2.1.208)"
+            data-tt-desc="vim 모드의 insert 상태에서 jj 같은 두 글자 조합을 Escape로 매핑할 수 있는 설정입니다."
+            data-tt-example="vimInsertModeRemaps: { jj: Escape }"><code>vimInsertModeRemaps</code>로 vim insert 모드 2글자 조합 리맵 지원 (v2.1.208) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="CLAUDE_CODE_PROCESS_WRAPPER 추가 (v2.1.208)"
+            data-tt-desc="agent view와 백그라운드 서비스가 Claude Code 자기 재실행 시 사내 런처(래퍼 실행 파일)를 반드시 거치도록 강제하는 기업용 설정입니다."
+            data-tt-example="export CLAUDE_CODE_PROCESS_WRAPPER=/opt/corp/launcher"><code>CLAUDE_CODE_PROCESS_WRAPPER</code>로 기업용 런처 강제 경유 지원 (v2.1.208) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="AskUserQuestion 자동 진행 기본 해제 (v2.1.200)"
+            data-tt-desc="AskUserQuestion 대화상자가 더 이상 기본으로 자동 진행되지 않으며, /config에서 idle timeout을 opt-in으로 설정할 수 있습니다."
+            data-tt-example="/config"><code>AskUserQuestion</code> 자동 진행(auto-continue) 기본 해제 (v2.1.200) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.199~v2.1.218 (기타 변경사항)</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="스택형 slash-skill 호출 지원 (v2.1.199)"
+                data-tt-desc="프롬프트 앞에 여러 스킬을 연속으로 붙이면 최대 5개까지 선행 스킬을 모두 로드합니다."
+                data-tt-example="/skill-a /skill-b do XYZ">스택형 slash-skill 호출(<code>/skill-a /skill-b</code>) 최대 5개 로드 지원 (v2.1.199)</li>
+              <li class="cl-tip" data-tt-title="TLS 인증서 오류 빠른 실패 처리 (v2.1.199)"
+                data-tt-desc="TLS 검사 프록시, 누락된 NODE_EXTRA_CA_CERTS, 만료 인증서 오류를 재시도 소진 전에 즉시 안내합니다."
+                data-tt-example="export NODE_EXTRA_CA_CERTS=/path/to/cert.pem">TLS 인증서 오류를 즉시 중단하고 해결 힌트를 표시하도록 개선 (v2.1.199)</li>
+              <li class="cl-tip" data-tt-title="스트리밍 부분 응답 보존 (v2.1.199)"
+                data-tt-desc="API가 부분 출력 이후 overload/server error를 반환해도 이미 받은 응답을 버리지 않고 incomplete-response 안내와 함께 보존합니다."
+                data-tt-example="">중간 서버 오류 발생 시 스트리밍 부분 응답 보존 처리 (v2.1.199)</li>
+              <li class="cl-tip" data-tt-title="서브에이전트 오류/부분 결과 전파 (v2.1.199)"
+                data-tt-desc="rate limit 또는 서버 오류로 끊긴 서브에이전트가 조용히 실패하지 않고 부모 에이전트에 오류와 부분 결과를 반환합니다."
+                data-tt-example="">서브에이전트 rate-limit/server-error 부분 작업 및 오류 보고 강화 (v2.1.199)</li>
+              <li class="cl-tip" data-tt-title="CLAUDE_CODE_RETRY_WATCHDOG 재시도 정책 (v2.1.199)"
+                data-tt-desc="비용량성 일시 오류에서 watchdog 기본 재시도 수를 300으로 올리고 CLAUDE_CODE_MAX_RETRIES의 15회 상한을 해제합니다."
+                data-tt-example="export CLAUDE_CODE_RETRY_WATCHDOG=1"><code>CLAUDE_CODE_RETRY_WATCHDOG</code> 일시 오류 재시도 정책 강화 (v2.1.199)</li>
+              <li class="cl-tip" data-tt-title="Dynamic workflow size 설정 도입 (v2.1.202)"
+                data-tt-desc="/config에서 동적 워크플로우의 에이전트 규모(소/중/대)를 조절하는 권고성(강제 아님) 설정입니다."
+                data-tt-example="/config">Dynamic workflow size 설정(<code>/config</code>) 도입 (v2.1.202)</li>
+              <li class="cl-tip" data-tt-title="/review PR 단일 패스로 환원 (v2.1.202)"
+                data-tt-desc="/review &lt;pr&gt;가 다시 빠른 단일 패스 리뷰로 동작하며, 멀티 에이전트 리뷰는 /code-review &lt;level&gt; &lt;pr#&gt;를 사용합니다."
+                data-tt-example="/code-review high 123"><code>/review &lt;pr&gt;</code> 단일 패스 환원, 멀티 에이전트는 <code>/code-review</code> 사용 (v2.1.202)</li>
+              <li class="cl-tip" data-tt-title="claude agents 다중 세션 안정화 (v2.1.203)"
+                data-tt-desc="백그라운드 에이전트 세션 전환, 워크트리 격리, PATH 상속, 데몬 재시작 관련 다수의 안정성 버그가 수정되었습니다."
+                data-tt-example="claude agents">백그라운드 에이전트(<code>claude agents</code>) 세션 안정성 대규모 개선 (v2.1.203)</li>
+              <li class="cl-tip" data-tt-title="Cowork VM 세션 로그인 오류 수정 (v2.1.205)"
+                data-tt-desc="Cowork VM 모드의 로컬 에이전트 세션이 CLI 2.1.203+에서 로그인 오류로 시작 실패하던 문제를 수정했습니다."
+                data-tt-example="">Cowork VM 모드 세션 로그인 실패 문제 수정 (v2.1.205)</li>
+              <li class="cl-tip" data-tt-title="auto mode rm -rf 변수 확인 강화 (v2.1.205)"
+                data-tt-desc="auto mode가 컨텍스트에서 확인할 수 없는 변수를 대상으로 한 rm -rf 실행 전에 먼저 확인을 요청하도록 개선되었습니다."
+                data-tt-example="">Auto mode가 미확인 변수 대상 <code>rm -rf</code> 실행 전 확인 요청 (v2.1.205)</li>
+              <li class="cl-tip" data-tt-title="claude agents 디렉토리 경로 자동완성 (v2.1.206)"
+                data-tt-desc="/cd에 디렉토리 경로 자동완성 제안이 추가되어 /add-dir와 동일하게 동작합니다."
+                data-tt-example="/cd"><code>/cd</code> 디렉토리 경로 자동완성 추가, <code>/add-dir</code>와 동작 통일 (v2.1.206)</li>
+              <li class="cl-tip" data-tt-title="/commit-push-pr 기본 push remote 자동 허용 (v2.1.206)"
+                data-tt-desc="/commit-push-pr가 origin 외에도 remote.pushDefault로 지정된 저장소 push를 자동 허용합니다."
+                data-tt-example="/commit-push-pr"><code>/commit-push-pr</code>가 <code>remote.pushDefault</code> push도 자동 허용 (v2.1.206)</li>
+              <li class="cl-tip" data-tt-title="EnterWorktree 워크트리 외부 진입 확인 (v2.1.206)"
+                data-tt-desc="EnterWorktree가 .claude/worktrees/ 외부 워크트리에 진입하기 전 확인을 요청하도록 변경되었습니다."
+                data-tt-example="">워크트리 프로젝트 외부 진입 시 <code>EnterWorktree</code> 확인 요청 추가 (v2.1.206)</li>
+              <li class="cl-tip" data-tt-title="Bedrock/Vertex/AWS 기본 모델 Opus 4.8 (v2.1.207)"
+                data-tt-desc="Bedrock, Vertex, AWS의 Claude Platform이 기본 모델로 Claude Opus 4.8을 사용하도록 변경되었습니다."
+                data-tt-example="">Bedrock/Vertex/AWS Claude Platform 기본 모델 Opus 4.8로 변경 (v2.1.207)</li>
+              <li class="cl-tip" data-tt-title="플러그인 옵션 shell-injection 보안 수정 (v2.1.207)"
+                data-tt-desc="플러그인 hooks/monitors/MCP headersHelper의 shell-form 명령에서 user_config 값(중괄호 치환 문법) 사용을 금지하는 보안 수정입니다. exec form이나 CLAUDE_PLUGIN_OPTION_&lt;KEY&gt;를 사용해야 합니다."
+                data-tt-example="">플러그인 옵션 shell-injection 취약점 보안 수정 (v2.1.207)</li>
+              <li class="cl-tip" data-tt-title="메모리/성능 최적화 다수 (v2.1.208)"
+                data-tt-desc="MCP stdio 서버 stderr 누적, LSP 문서 무제한 보관, 세션 트랜스크립트 크기(최대 79배) 등 다수의 메모리 누수·성능 문제가 수정되었습니다."
+                data-tt-example="">세션 메모리 누수 다수 수정 및 트랜스크립트 크기 최대 79배 절감 (v2.1.208)</li>
+              <li class="cl-tip" data-tt-title="claude agents 마우스 클릭 다중 선택 (v2.1.208)"
+                data-tt-desc="fullscreen 모드에서 다중 선택 메뉴와 'Other' 입력 행에 마우스 클릭 지원이 추가되었습니다."
+                data-tt-example="">fullscreen 다중 선택 메뉴 마우스 클릭 지원 추가 (v2.1.208)</li>
+              <li class="cl-tip" data-tt-title="Windows 경로 CJK 손상 버그 수정 (v2.1.218)"
+                data-tt-desc="C:\\Users\\unicorn처럼 \\u로 시작하는 Windows 경로가 도구 입력에서 CJK 문자로 손상되어 파일에 접근할 수 없던 문제를 수정했습니다."
+                data-tt-example="">Windows <code>\\u</code> 접두 경로 CJK 손상 버그 수정 (v2.1.218)</li>
+              <li class="cl-tip" data-tt-title="화면 낭독기 삭제 텍스트 안내 (v2.1.218)"
+                data-tt-desc="--ax-screen-reader 모드에서 단어/줄 삭제(Option+Delete, Ctrl+W 등) 시 삭제된 텍스트를 음성으로 안내합니다."
+                data-tt-example="">화면 낭독기 모드 단어/줄 삭제 텍스트 음성 안내 추가 (v2.1.218)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.183~v2.1.198</summary>
