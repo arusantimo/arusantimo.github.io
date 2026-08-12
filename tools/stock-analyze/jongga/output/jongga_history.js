@@ -9,41 +9,41 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-12T06:13:45+00:00",
+    "generatedAt": "2026-08-12T08:35:59+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "주성엔지니어링",
         "code": "036930",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
         "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G12)",
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G13)",
         "entryEligible": false,
-        "currentPrice": 173800
+        "currentPrice": 174000
       },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
-        "name": "원익IPS",
-        "code": "240810",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
         "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G3)",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, Q1, G13)",
         "entryEligible": false,
-        "currentPrice": 110900
+        "currentPrice": 1156000
       },
       {
         "strategy": "pullback",
@@ -54,8 +54,8 @@ window.JONGGA_HISTORY_INDEX = [
         "signalScore": 8.2,
         "strictScore": 8.2,
         "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.1,
+        "grade": "B",
+        "gradeScore": 6.3,
         "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
         "entryEligible": false,
         "currentPrice": 202000
@@ -65,27 +65,27 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "accumulation",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 6.6,
-        "signalScore": 6.6,
-        "strictScore": 6.6,
+        "score": 9.5,
+        "signalScore": 9.5,
+        "strictScore": 9.5,
         "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.1,
+        "grade": "A",
+        "gradeScore": 7.0,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1031500
+        "currentPrice": 1024000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "NAVER",
         "code": "035420",
-        "score": 6.6,
-        "signalScore": 6.6,
-        "strictScore": 6.6,
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 5.1,
+        "gradeScore": 5.4,
         "statusLabel": "관심후보",
         "entryEligible": false,
         "currentPrice": 215500
@@ -93,32 +93,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 6.0,
-        "signalScore": 6.0,
-        "strictScore": 6.0,
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 6.8,
+        "signalScore": 6.8,
+        "strictScore": 6.8,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "gradeScore": 4.9,
+        "statusLabel": "제외",
         "entryEligible": false,
-        "currentPrice": 256250
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "대원전선",
-        "code": "006340",
-        "score": 4.1,
-        "signalScore": 4.1,
-        "strictScore": 4.1,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 3.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
-        "entryEligible": false,
-        "currentPrice": 16030
+        "currentPrice": 202000
       },
       {
         "strategy": "reversal",
@@ -140,33 +125,64 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "LG전자",
         "code": "066570",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.0,
+        "grade": "B",
+        "gradeScore": 6.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 204500
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "대원전선",
-        "code": "006340",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.0,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 16030
+        "currentPrice": 205000
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "240810",
+        "name": "원익IPS",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "006340",
+        "name": "대원전선",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "257720",
+        "name": "실리콘투",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-08-11",
