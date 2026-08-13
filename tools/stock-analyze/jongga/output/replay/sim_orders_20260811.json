@@ -1618,5 +1618,25 @@
     "activeFrom": "2026-08-12T15:00:00+09:00",
     "activeUntil": "2026-08-12T15:00:00+09:00",
     "finalStatus": "cancelled"
+  },
+  {
+    "orderId": "20260811|stable|accumulation|012450-stop_touch",
+    "runId": "replay-20260812-061349-0ee84b02",
+    "date": "2026-08-11",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "012450",
+    "name": "한화에어로스페이스",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-12T15:00:00+09:00",
+    "requestedPrice": 1118000.0,
+    "quantityPct": 15.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260811|stable|accumulation|012450",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-12T15:00:00+09:00",
+    "activeUntil": "2026-08-12T15:00:00+09:00"
   }
 ]

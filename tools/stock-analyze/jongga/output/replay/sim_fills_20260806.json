@@ -733,5 +733,26 @@
     "barLow": 6040.0,
     "barClose": 6720.0,
     "fillRule": "openPhase_touch"
+  },
+  {
+    "orderId": "20260806|stable|accumulation|066570-swing_touch",
+    "sourceEntryKey": "20260806|stable|accumulation|066570",
+    "strategy": "accumulation",
+    "code": "066570",
+    "name": "LG전자",
+    "side": "SELL",
+    "stageKey": "swing",
+    "reason": "스윙 목표가 도달",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-12T15:00:00+09:00",
+    "fillPrice": 194472.0,
+    "filledQuantityPct": 35.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-12T15:00:00+09:00",
+    "barOpen": 184200.0,
+    "barHigh": 212500.0,
+    "barLow": 184200.0,
+    "barClose": 205000.0,
+    "fillRule": "swing_touch"
   }
 ]

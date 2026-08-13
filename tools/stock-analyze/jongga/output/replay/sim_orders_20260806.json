@@ -1778,5 +1778,25 @@
     "activeFrom": "2026-08-07T15:00:00+09:00",
     "activeUntil": "2026-08-07T15:00:00+09:00",
     "finalStatus": "cancelled"
+  },
+  {
+    "orderId": "20260806|stable|accumulation|066570-swing_touch",
+    "runId": "replay-20260807-060523-d07ad15b",
+    "date": "2026-08-06",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "066570",
+    "name": "LG전자",
+    "side": "SELL",
+    "orderType": "LIMIT",
+    "requestedAt": "2026-08-12T15:00:00+09:00",
+    "requestedPrice": 194472.0,
+    "quantityPct": 35.0,
+    "reason": "스윙 목표가 도달",
+    "sourceEntryKey": "20260806|stable|accumulation|066570",
+    "stageKey": "swing",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-12T15:00:00+09:00",
+    "activeUntil": "2026-08-12T15:00:00+09:00"
   }
 ]
