@@ -9,12 +9,42 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-13T06:03:53+00:00",
+    "generatedAt": "2026-08-13T08:35:58+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 3,
+    "status": "partial",
+    "buyCount": 5,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 57100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 103300
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -29,36 +59,9 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 177600
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "한화에어로스페이스",
-        "code": "012450",
-        "score": 6.5,
-        "signalScore": 6.5,
-        "strictScore": 6.5,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.5,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 1186000
       }
     ],
-    "blacklist": [
-      {
-        "code": "001820",
-        "name": "삼화콘덴서",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      }
-    ]
+    "blacklist": []
   },
   {
     "date": "2026-08-12",
