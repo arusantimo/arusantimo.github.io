@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-14T06:06:49+00:00",
+    "generatedAt": "2026-08-14T08:34:46+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -43,22 +43,52 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
         "entryEligible": false,
-        "currentPrice": 214000
+        "currentPrice": 215000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
+        "entryEligible": false,
+        "currentPrice": 516000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 10.2,
+        "signalScore": 10.2,
+        "strictScore": 10.2,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.3,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 228000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "주성엔지니어링",
         "code": "036930",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.4,
+        "grade": "A",
+        "gradeScore": 7.2,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 176700
+        "currentPrice": 177800
       },
       {
         "strategy": "accumulation",
@@ -74,6 +104,51 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
         "currentPrice": 1644000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK텔레콤",
+        "code": "017670",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 100500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이터닉스",
+        "code": "475150",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 58300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "현대무벡스",
+        "code": "319400",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 27900
       }
     ],
     "blacklist": [
@@ -91,41 +166,6 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "code": "001210",
         "name": "금호전기",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind",
-          "toss"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "475150",
-        "name": "SK이터닉스",
-        "reasons": [
-          "공매도 과열",
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "319400",
-        "name": "현대무벡스",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "058610",
-        "name": "에스피지",
         "reasons": [
           "투자 주의"
         ],
