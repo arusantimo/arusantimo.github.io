@@ -86,18 +86,6 @@
   {
     "runId": "replay-20260813-060354-8526c232",
     "entryDate": "2026-08-12",
-    "code": "068270",
-    "name": "셀트리온",
-    "strategy": "accumulation",
-    "entryPrice": 202202.0,
-    "swingTargetPrice": 224220.0,
-    "stopPrice": 200000.0,
-    "qtyPct": 100.0,
-    "sourceEntryKey": "20260812|stable|accumulation|068270"
-  },
-  {
-    "runId": "replay-20260813-060354-8526c232",
-    "entryDate": "2026-08-12",
     "code": "005930",
     "name": "삼성전자",
     "strategy": "accumulation",
