@@ -38,18 +38,6 @@
   {
     "runId": "replay-20260810-060637-39e596a6",
     "entryDate": "2026-08-07",
-    "code": "005380",
-    "name": "현대차",
-    "strategy": "accumulation",
-    "entryPrice": 395895.5,
-    "swingTargetPrice": 439005.0,
-    "stopPrice": 383635.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260807|stable|accumulation|005380"
-  },
-  {
-    "runId": "replay-20260810-060637-39e596a6",
-    "entryDate": "2026-08-07",
     "code": "068270",
     "name": "셀트리온",
     "strategy": "accumulation",
@@ -58,18 +46,6 @@
     "stopPrice": 193030.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260807|stable|accumulation|068270"
-  },
-  {
-    "runId": "replay-20260812-061349-0ee84b02",
-    "entryDate": "2026-08-11",
-    "code": "006360",
-    "name": "GS건설",
-    "strategy": "accumulation",
-    "entryPrice": 34934.9,
-    "swingTargetPrice": 38739.0,
-    "stopPrice": 33853.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260811|stable|accumulation|006360"
   },
   {
     "runId": "replay-20260813-060354-8526c232",

@@ -838,5 +838,26 @@
     "barLow": 1083000.0,
     "barClose": 1156000.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260811|stable|accumulation|006360-stop_touch",
+    "sourceEntryKey": "20260811|stable|accumulation|006360",
+    "strategy": "accumulation",
+    "code": "006360",
+    "name": "GS건설",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-14T15:00:00+09:00",
+    "fillPrice": 33853.0,
+    "filledQuantityPct": 60.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-14T15:00:00+09:00",
+    "barOpen": 36450.0,
+    "barHigh": 36650.0,
+    "barLow": 33750.0,
+    "barClose": 35350.0,
+    "fillRule": "stop_touch"
   }
 ]
