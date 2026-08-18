@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-18T06:05:36+00:00",
+    "generatedAt": "2026-08-18T08:35:28+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,15 +26,30 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G3, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G3)",
         "entryEligible": false,
-        "currentPrice": 429000
+        "currentPrice": 435000
       },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "현대모비스",
         "code": "012330",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G13)",
+        "entryEligible": false,
+        "currentPrice": 518000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
         "score": 9.9,
         "signalScore": 9.9,
         "strictScore": 9.9,
@@ -43,7 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 513000
+        "currentPrice": 1135000
       },
       {
         "strategy": "accumulation",
@@ -58,37 +73,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.6,
         "statusLabel": "매수추천",
         "entryEligible": true,
-        "currentPrice": 216000
+        "currentPrice": 217000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 8.1,
-        "signalScore": 8.1,
-        "strictScore": 8.1,
+        "name": "현대차",
+        "code": "005380",
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.8,
-        "statusLabel": "관심후보",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 1125000
+        "currentPrice": 435000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 6.8,
-        "signalScore": 6.8,
-        "strictScore": 6.8,
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
         "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 4.9,
+        "grade": "B",
+        "gradeScore": 6.2,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 488000
+        "currentPrice": 518000
       },
       {
         "strategy": "breakout",
@@ -108,6 +123,36 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 268500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "현대차",
+        "code": "005380",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 435000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
         "name": "SK하이닉스",
         "code": "000660",
         "score": 4.8,
@@ -119,35 +164,9 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 1651000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 4.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 266000
       }
     ],
     "blacklist": [
-      {
-        "code": "009150",
-        "name": "삼성전기",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "067310",
         "name": "하나마이크론",
