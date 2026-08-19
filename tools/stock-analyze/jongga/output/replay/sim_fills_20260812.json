@@ -712,5 +712,26 @@
     "barLow": 199800.0,
     "barClose": 202000.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260812|stable|accumulation|005930-swing_touch",
+    "sourceEntryKey": "20260812|stable|accumulation|005930",
+    "strategy": "accumulation",
+    "code": "005930",
+    "name": "삼성전자",
+    "side": "SELL",
+    "stageKey": "swing",
+    "reason": "스윙 목표가 도달",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-18T15:00:00+09:00",
+    "fillPrice": 284438.0,
+    "filledQuantityPct": 35.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-18T15:00:00+09:00",
+    "barOpen": 283000.0,
+    "barHigh": 288000.0,
+    "barLow": 265000.0,
+    "barClose": 268500.0,
+    "fillRule": "swing_touch"
   }
 ]

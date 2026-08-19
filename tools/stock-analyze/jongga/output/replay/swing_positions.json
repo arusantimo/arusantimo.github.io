@@ -60,15 +60,15 @@
     "sourceEntryKey": "20260812|stable|accumulation|035420"
   },
   {
-    "runId": "replay-20260813-060354-8526c232",
-    "entryDate": "2026-08-12",
-    "code": "005930",
-    "name": "삼성전자",
-    "strategy": "accumulation",
-    "entryPrice": 256506.25,
-    "swingTargetPrice": 284438.0,
-    "stopPrice": 247281.0,
-    "qtyPct": 35.0,
-    "sourceEntryKey": "20260812|stable|accumulation|005930"
+    "runId": "replay-20260819-060531-846ac794",
+    "entryDate": "2026-08-18",
+    "code": "006400",
+    "name": "삼성SDI",
+    "strategy": "breakout",
+    "entryPrice": 488488.0,
+    "swingTargetPrice": 553880.0,
+    "stopPrice": 484500.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260818|stable|breakout|006400"
   }
 ]
