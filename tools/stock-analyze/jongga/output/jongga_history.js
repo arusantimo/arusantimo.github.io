@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-20T06:05:23+00:00",
+    "generatedAt": "2026-08-20T08:35:18+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G13)",
         "entryEligible": false,
-        "currentPrice": 338500
+        "currentPrice": 339500
       },
       {
         "strategy": "pullback",
@@ -43,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G8)",
         "entryEligible": false,
-        "currentPrice": 48050
+        "currentPrice": 48000
       },
       {
         "strategy": "pullback",
@@ -78,6 +78,21 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.3,
+        "signalScore": 7.3,
+        "strictScore": 7.3,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 219500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "알테오젠",
         "code": "196170",
         "score": 7.1,
@@ -88,22 +103,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
         "entryEligible": false,
-        "currentPrice": 338500
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 6.6,
-        "signalScore": 6.6,
-        "strictScore": 6.6,
-        "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 4.7,
-        "statusLabel": "관심후보",
-        "entryEligible": false,
-        "currentPrice": 1110000
+        "currentPrice": 339500
       },
       {
         "strategy": "breakout",
@@ -118,28 +118,13 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.7,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 338500
+        "currentPrice": 339500
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "알테오젠",
         "code": "196170",
-        "score": 8.6,
-        "signalScore": 8.6,
-        "strictScore": 8.6,
-        "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.6,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 338500
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "HPSP",
-        "code": "403870",
         "score": 7.8,
         "signalScore": 7.8,
         "strictScore": 7.8,
@@ -148,7 +133,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 48050
+        "currentPrice": 339500
       },
       {
         "strategy": "reversal",
@@ -164,9 +149,36 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 220500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "HPSP",
+        "code": "403870",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 48000
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-08-19",
