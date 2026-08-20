@@ -733,5 +733,26 @@
     "barLow": 265000.0,
     "barClose": 268500.0,
     "fillRule": "swing_touch"
+  },
+  {
+    "orderId": "20260812|stable|accumulation|035420-stop_touch",
+    "sourceEntryKey": "20260812|stable|accumulation|035420",
+    "strategy": "accumulation",
+    "code": "035420",
+    "name": "NAVER",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-19T15:00:00+09:00",
+    "fillPrice": 214000.0,
+    "filledQuantityPct": 35.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-19T15:00:00+09:00",
+    "barOpen": 208500.0,
+    "barHigh": 209500.0,
+    "barLow": 203000.0,
+    "barClose": 208000.0,
+    "fillRule": "stop_touch"
   }
 ]

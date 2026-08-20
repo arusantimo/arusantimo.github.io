@@ -12,63 +12,39 @@
     "sourceEntryKey": "20260806|stable|accumulation|068270"
   },
   {
-    "runId": "replay-20260807-060523-d07ad15b",
-    "entryDate": "2026-08-06",
-    "code": "068270",
-    "name": "셀트리온",
-    "strategy": "breakout",
-    "entryPrice": 195195.0,
-    "swingTargetPrice": 222300.0,
-    "stopPrice": 193000.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260806|stable|breakout|068270"
-  },
-  {
-    "runId": "replay-20260810-060637-39e596a6",
-    "entryDate": "2026-08-07",
-    "code": "012450",
-    "name": "한화에어로스페이스",
-    "strategy": "accumulation",
-    "entryPrice": 1098097.0,
-    "swingTargetPrice": 1217670.0,
-    "stopPrice": 1064090.0,
-    "qtyPct": 35.0,
-    "sourceEntryKey": "20260807|stable|accumulation|012450"
-  },
-  {
-    "runId": "replay-20260810-060637-39e596a6",
-    "entryDate": "2026-08-07",
-    "code": "068270",
-    "name": "셀트리온",
-    "strategy": "accumulation",
-    "entryPrice": 199199.0,
-    "swingTargetPrice": 220890.0,
-    "stopPrice": 193030.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260807|stable|accumulation|068270"
-  },
-  {
-    "runId": "replay-20260813-060354-8526c232",
-    "entryDate": "2026-08-12",
+    "runId": "replay-20260820-060539-0a493638",
+    "entryDate": "2026-08-19",
     "code": "035420",
     "name": "NAVER",
     "strategy": "accumulation",
-    "entryPrice": 215715.5,
-    "swingTargetPrice": 239205.0,
-    "stopPrice": 214000.0,
+    "entryPrice": 207207.0,
+    "swingTargetPrice": 229770.0,
+    "stopPrice": 199755.0,
     "qtyPct": 35.0,
-    "sourceEntryKey": "20260812|stable|accumulation|035420"
+    "sourceEntryKey": "20260819|stable|accumulation|035420"
   },
   {
-    "runId": "replay-20260819-060531-846ac794",
-    "entryDate": "2026-08-18",
-    "code": "006400",
-    "name": "삼성SDI",
-    "strategy": "breakout",
-    "entryPrice": 488488.0,
-    "swingTargetPrice": 553880.0,
-    "stopPrice": 484500.0,
+    "runId": "replay-20260820-060539-0a493638",
+    "entryDate": "2026-08-19",
+    "code": "007660",
+    "name": "이수페타시스",
+    "strategy": "accumulation",
+    "entryPrice": 104504.4,
+    "swingTargetPrice": 115884.0,
+    "stopPrice": 100746.0,
     "qtyPct": 80.0,
-    "sourceEntryKey": "20260818|stable|breakout|006400"
+    "sourceEntryKey": "20260819|stable|accumulation|007660"
+  },
+  {
+    "runId": "replay-20260820-060539-0a493638",
+    "entryDate": "2026-08-19",
+    "code": "007660",
+    "name": "이수페타시스",
+    "strategy": "breakout",
+    "entryPrice": 104504.4,
+    "swingTargetPrice": 118494.0,
+    "stopPrice": 104300.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260819|stable|breakout|007660"
   }
 ]

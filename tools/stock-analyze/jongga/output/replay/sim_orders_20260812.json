@@ -1298,5 +1298,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-08-18T15:00:00+09:00",
     "activeUntil": "2026-08-18T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260812|stable|accumulation|035420-stop_touch",
+    "runId": "replay-20260813-060354-8526c232",
+    "date": "2026-08-12",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "035420",
+    "name": "NAVER",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-19T15:00:00+09:00",
+    "requestedPrice": 214000.0,
+    "quantityPct": 35.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260812|stable|accumulation|035420",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-19T15:00:00+09:00",
+    "activeUntil": "2026-08-19T15:00:00+09:00"
   }
 ]
