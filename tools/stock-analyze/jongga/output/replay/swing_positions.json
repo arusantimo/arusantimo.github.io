@@ -36,15 +36,27 @@
     "sourceEntryKey": "20260819|stable|accumulation|007660"
   },
   {
-    "runId": "replay-20260820-060539-0a493638",
-    "entryDate": "2026-08-19",
-    "code": "007660",
-    "name": "이수페타시스",
-    "strategy": "breakout",
-    "entryPrice": 104504.4,
-    "swingTargetPrice": 118494.0,
-    "stopPrice": 104300.0,
+    "runId": "replay-20260821-060526-750316dd",
+    "entryDate": "2026-08-20",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 1124123.0,
+    "swingTargetPrice": 1246530.0,
+    "stopPrice": 1083695.0,
     "qtyPct": 80.0,
-    "sourceEntryKey": "20260819|stable|breakout|007660"
+    "sourceEntryKey": "20260820|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260821-060526-750316dd",
+    "entryDate": "2026-08-20",
+    "code": "035420",
+    "name": "NAVER",
+    "strategy": "accumulation",
+    "entryPrice": 219719.5,
+    "swingTargetPrice": 243645.0,
+    "stopPrice": 211818.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260820|stable|accumulation|035420"
   }
 ]
