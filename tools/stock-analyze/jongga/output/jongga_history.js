@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-21T06:05:11+00:00",
+    "generatedAt": "2026-08-21T08:35:26+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
         "entryEligible": false,
-        "currentPrice": 397000
+        "currentPrice": 395500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G13)",
+        "entryEligible": false,
+        "currentPrice": 1085000
       },
       {
         "strategy": "pullback",
@@ -46,36 +61,6 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 325000
       },
       {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 8.7,
-        "signalScore": 8.7,
-        "strictScore": 8.7,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, Q1, G13)",
-        "entryEligible": false,
-        "currentPrice": 222500
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 9.4,
-        "signalScore": 9.4,
-        "strictScore": 9.4,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.7,
-        "statusLabel": "관심후보",
-        "entryEligible": false,
-        "currentPrice": 222500
-      },
-      {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "한화에어로스페이스",
@@ -88,7 +73,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.7,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1091000
+        "currentPrice": 1085000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 222000
       },
       {
         "strategy": "accumulation",
@@ -108,17 +108,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "삼성생명",
-        "code": "032830",
-        "score": 4.5,
-        "signalScore": 4.5,
-        "strictScore": 4.5,
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 4.1,
+        "signalScore": 4.1,
+        "strictScore": 4.1,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "gradeScore": 3.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 325000
+        "currentPrice": 395500
       },
       {
         "strategy": "reversal",
@@ -133,7 +133,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.6,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 325000
+        "currentPrice": 328500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 222000
       },
       {
         "strategy": "reversal",
@@ -149,21 +164,6 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 1731000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 222500
       }
     ],
     "blacklist": []

@@ -1,26 +1,28 @@
 window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
 window.JONGGA_DAILY_DATA["2026-08-21"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-08-21T06:05:11+00:00",
+  "generatedAt": "2026-08-21T08:35:26+00:00",
   "variant": "stable",
   "payloadSourceMode": "live",
   "rebuildable": true,
   "inputArchiveVersion": "jongga_inputs.v1",
   "blacklist": [],
   "dataQuality": {
-    "status": "success",
+    "status": "partial",
     "counts": {
       "total": 22,
       "failed": 0,
       "stale": 0,
       "manual": 0,
-      "fallback": 0,
+      "fallback": 1,
       "slots": 1
     },
     "failedKeys": [],
     "staleKeys": [],
     "manualKeys": [],
-    "fallbackKeys": [],
+    "fallbackKeys": [
+      "overtime_price"
+    ],
     "providerHealth": {
       "naver_mobile": {
         "ok": 22
@@ -56,17 +58,29 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
       "cnbc_quote": {
         "ok": 1
       },
+      "naver_overtime_board": {
+        "fallback": 1
+      },
       "krx_pykrx_short_balance": {
-        "ok": 16
+        "ok": 17
       }
     },
-    "fallbackUsage": [],
+    "fallbackUsage": [
+      {
+        "key": "overtime_price",
+        "provider": "naver_overtime_board",
+        "layer": "session_close",
+        "fallbackLevel": 1,
+        "confidence": 0.4,
+        "stale": false
+      }
+    ],
     "collectionLog": [
       {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 1264.2,
+        "durationMs": 1440.6,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -74,7 +88,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 240.6,
+        "durationMs": 274.4,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -82,43 +96,51 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "step": "gap_score",
         "label": "갭 스코어 계산",
         "status": "ok",
-        "durationMs": 0.0,
+        "durationMs": 0.1,
         "detail": "G-C 🟡"
       },
       {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 1355.7,
+        "durationMs": 2015.0,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 352.5,
+        "durationMs": 371.6,
         "detail": "박스권 ⚠️ (거시 완충)"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 38984.1,
+        "durationMs": 57060.3,
         "count": 22
+      },
+      {
+        "step": "overtime_price",
+        "label": "시간외 단일가 종가 보강",
+        "status": "fallback",
+        "durationMs": 1294.5,
+        "detail": "정규장 종가로 대체",
+        "count": 0
       },
       {
         "step": "short_balance_trend",
         "label": "대차잔고(공매도) 추이 보강 (대형주)",
         "status": "ok",
-        "durationMs": 17973.5,
-        "detail": "후보 16종목 중 16건 수집",
-        "count": 16
+        "durationMs": 15509.7,
+        "detail": "후보 17종목 중 17건 수집",
+        "count": 17
       },
       {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 6129.4,
+        "durationMs": 8974.7,
         "detail": "성공 22 / 실패 0",
         "count": 22
       },
@@ -126,7 +148,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 7087.0,
+        "durationMs": 9371.8,
         "detail": "direct-http · 체결강도 22 / 호가 22 / 틱프록시 22",
         "count": 22
       },
@@ -134,7 +156,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 57793.1,
+        "durationMs": 63080.2,
         "detail": "pullback 3, breakout 1, accumulation 3, reversal 3",
         "count": 10
       },
@@ -142,7 +164,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "step": "browser_enrichment",
         "label": "KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 8094.5,
+        "durationMs": 10213.6,
         "detail": "playwright-chromium · KIND 1",
         "count": 1
       },
@@ -158,7 +180,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "step": "blacklist_check",
         "label": "공매도 과열·투자 주의 검증",
         "status": "ok",
-        "durationMs": 53105.2,
+        "durationMs": 67328.3,
         "detail": "확정 0 · 미확인 0",
         "count": 10
       }
@@ -185,11 +207,11 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
           },
           {
             "item": "KOSPI",
-            "value": "6907.74 (+0.80%)"
+            "value": "6912.95 (+0.88%)"
           },
           {
             "item": "VKOSPI",
-            "value": "VKOSPI 58.06"
+            "value": "VKOSPI 58.03"
           },
           {
             "item": "진입 전략",
@@ -223,17 +245,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "evidence": [
           {
             "item": "KOSPI 60MA",
-            "value": "7477.22",
+            "value": "7477.31",
             "verdict": "❌"
           },
           {
             "item": "KOSPI 20MA",
-            "value": "6460.45",
+            "value": "6460.71",
             "verdict": "✅"
           },
           {
             "item": "VKOSPI",
-            "value": "VKOSPI 58.06",
+            "value": "VKOSPI 58.03",
             "verdict": "❌"
           },
           {
@@ -271,9 +293,9 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
           "bubbleRegimeLabel": "표준 버블 경계",
           "riskIndex": 36.377743732492775,
           "stageOverrideReason": "지지력 보정: raw P 42 -> adjusted P 36 · F_support 20점",
-          "kospiClose": 6907.74,
-          "kospiMa5": 6815.852000000001,
-          "vkospiValue": 58.06,
+          "kospiClose": 6912.95,
+          "kospiMa5": 6816.894,
+          "vkospiValue": 58.03,
           "vkospiLabel": "VKOSPI",
           "riseJustifiedByMacro": true
         },
@@ -285,7 +307,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "-2.51%",
+            "actualValue": "-2.29%",
             "baseScore": "-2점",
             "weight": "×2.5",
             "formula": "-2 × 2.5 = -5.0점",
@@ -293,7 +315,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
           },
           {
             "indicator": "VIX 수준",
-            "actualValue": "+16.01",
+            "actualValue": "+15.87",
             "baseScore": "+1점",
             "weight": "×2.0",
             "formula": "+1 × 2.0 = +2.0점",
@@ -309,7 +331,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
           },
           {
             "indicator": "원달러 환율 변화",
-            "actualValue": "-31.09원",
+            "actualValue": "-33.69원",
             "baseScore": "+2점",
             "weight": "×1.5",
             "formula": "+2 × 1.5 = +3.0점",
@@ -371,7 +393,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.5,
                 "maxPoints": 1.5,
                 "evalStatus": "met",
-                "note": "종가 397,000 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위"
+                "note": "종가 395,500 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위"
               },
               {
                 "code": "C1",
@@ -379,7 +401,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "양봉 (시가 370,000 ≤ 종가 397,000)"
+                "note": "양봉 (시가 370,000 ≤ 종가 395,500)"
               },
               {
                 "code": "C5",
@@ -395,7 +417,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 2.5,
                 "maxPoints": 2.5,
                 "evalStatus": "met",
-                "note": "52주 고가 대비 -29.9% (≥12% 만점·8~12% 부분) · 충족"
+                "note": "52주 고가 대비 -30.1% (≥12% 만점·8~12% 부분) · 충족"
               },
               {
                 "code": "D2",
@@ -411,7 +433,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 2.0,
                 "maxPoints": 2.0,
                 "evalStatus": "met",
-                "note": "거래량 114% (≥100% 만점·80~100% 부분) · 충족"
+                "note": "거래량 126% (≥100% 만점·80~100% 부분) · 충족"
               },
               {
                 "code": "D4",
@@ -431,7 +453,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               }
             ],
             "scoreScope": "pullback",
-            "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
             "strategy": "pullback",
             "gates": [
               {
@@ -443,19 +465,19 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "G1",
                 "status": "⛔",
-                "note": "5MA 371,200 > 20MA 342,300 > 60MA 401,600 · 상승선 5MA, 20MA · 정배열 미충족",
+                "note": "5MA 370,900 > 20MA 342,225 > 60MA 401,575 · 상승선 5MA, 20MA · 정배열 미충족",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G2",
                 "status": "⛔",
-                "note": "종가 397,000 / 60MA 401,600",
+                "note": "종가 395,500 / 60MA 401,575",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G3",
                 "status": "✅",
-                "note": "주봉 RSI 53.7 (필요 ≥ 50)",
+                "note": "주봉 RSI 53.6 (필요 ≥ 50)",
                 "evalStatus": "met"
               },
               {
@@ -467,31 +489,31 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "G5",
                 "status": "⚠️",
-                "note": "KOSPI 6,908 / 5MA 6,816 (+1.3%) · VKOSPI 58.1 · 변동성 경계",
+                "note": "KOSPI 6,913 / 5MA 6,817 (+1.4%) · VKOSPI 58.0 · 변동성 경계",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G6",
                 "status": "✅",
-                "note": "당일 등락 +6.15% (필요 ≤ +12%)",
+                "note": "당일 등락 +5.75% (필요 ≤ +12%)",
                 "evalStatus": "met"
               },
               {
                 "code": "G7",
                 "status": "✅",
-                "note": "주봉 RSI 53.7 (필요 ≤ 80)",
+                "note": "주봉 RSI 53.6 (필요 ≤ 80)",
                 "evalStatus": "met"
               },
               {
                 "code": "G8",
                 "status": "✅",
-                "note": "이격 20MA +16.0% (필요 ≤ +25%) · 60MA -1.1% (필요 ≤ +60%)",
+                "note": "이격 20MA +15.6% (필요 ≤ +25%) · 60MA -1.5% (필요 ≤ +60%)",
                 "evalStatus": "met"
               },
               {
                 "code": "Q1",
                 "status": "✅",
-                "note": "52주 고가 대비 -29.9% (≥12%) · 거래량 114% (≥80%) · 수급추세 +0 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "note": "52주 고가 대비 -30.1% (≥12%) · 거래량 126% (≥80%) · 수급추세 +0 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
                 "evalStatus": "met"
               },
               {
@@ -514,14 +536,14 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "G12",
-                "status": "⛔",
-                "note": "마지막 30분 비율 0.29:1 / 마지막 30분 평균 45.2% / 마지막 1시간 45.2% · 장 막판 투매 경고",
+                "status": "⚠️",
+                "note": "당일 평균 129.0% / 마지막 1시간 21.1% · 마지막 30분 프록시 없음 · 장후반 약화 경고",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G13",
                 "status": "⛔",
-                "note": "KIND 최근공시 2026-08-10 기업설명회(IR) 개최(안내공시)",
+                "note": "KIND 최근공시 2026-08-21 기업설명회(IR) 개최(안내공시)",
                 "evalStatus": "not_met"
               }
             ],
@@ -533,22 +555,22 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "P2",
-                "note": "종가 397,000 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위",
+                "note": "종가 395,500 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위",
                 "evalStatus": "met"
               },
               {
                 "code": "C1",
-                "note": "양봉 (시가 370,000 ≤ 종가 397,000)",
+                "note": "양봉 (시가 370,000 ≤ 종가 395,500)",
                 "evalStatus": "met"
               },
               {
                 "code": "D1",
-                "note": "52주 고가 대비 -29.9% (≥12% 만점·8~12% 부분) · 충족",
+                "note": "52주 고가 대비 -30.1% (≥12% 만점·8~12% 부분) · 충족",
                 "evalStatus": "met"
               },
               {
                 "code": "D3",
-                "note": "거래량 114% (≥100% 만점·80~100% 부분) · 충족",
+                "note": "거래량 126% (≥100% 만점·80~100% 부분) · 충족",
                 "evalStatus": "met"
               },
               {
@@ -569,55 +591,55 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "evalStatus": "not_met"
               }
             ],
-            "currentPrice": 397000,
+            "currentPrice": 395500,
             "previousClose": 374000,
-            "dailyChange": 23000,
-            "dailyChangePct": 6.15,
+            "dailyChange": 21500,
+            "dailyChangePct": 5.75,
             "dailyDirection": "up",
-            "entryPriceText": "397,000원 (당일 종가 기준)",
-            "entryPrice": 397000,
+            "entryPriceText": "395,500원 (당일 종가 기준)",
+            "entryPrice": 395500,
             "entryMeta": "당일 종가 기준",
-            "marketCapTrillion": 64.3805,
+            "marketCapTrillion": 64.1373,
             "marketCapRank": 9,
-            "marketCapUniverseCount": 2551,
+            "marketCapUniverseCount": 2552,
             "keyPoint": "5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 11,883주 / 기관 27,793주. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
             "notes": [
               "앵커 중심값 데이터 부족",
               "앵커 거래량 데이터 부족"
             ],
             "toss": {
-              "avgStrength": 140.0,
-              "note": "토스 공개 체결강도 140.0% / 최근 체결 2분 프록시",
+              "avgStrength": 129.0,
+              "note": "토스 공개 체결강도 129.0% / 최근 체결 37분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A028260/order",
-              "asOf": "2026-08-21T06:03:07Z",
+              "asOf": "2026-08-21T08:33:00Z",
               "intradayAbove100Ratio": 0.0,
-              "observedMinutes": 2,
+              "observedMinutes": 37,
               "observedTickCount": 120,
-              "coverageNote": "최근 체결 2분 프록시",
-              "lastHourAvgStrength": 45.2,
-              "lastHourObservedMinutes": 2,
-              "last30AvgStrength": 45.2,
-              "last30ObservedMinutes": 2,
-              "last30BuySellRatio": 0.2892,
-              "last30BuyVolume": 330.0,
-              "last30SellVolume": 1141.0
+              "coverageNote": "최근 체결 37분 프록시",
+              "lastHourAvgStrength": 21.1,
+              "lastHourObservedMinutes": 37,
+              "last30AvgStrength": 0.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 0.0,
+              "last30BuyVolume": 0.0,
+              "last30SellVolume": 1.0
             },
             "eventFilter": {
               "blocked": true,
               "earningsDays": null,
               "corporateActionDays": null,
-              "note": "KIND 최근공시 2026-08-10 기업설명회(IR) 개최(안내공시)",
+              "note": "KIND 최근공시 2026-08-21 기업설명회(IR) 개최(안내공시)",
               "source": "kind_playwright_recent_disclosure"
             },
             "pullbackContext": {
               "support": {
-                "summary": "주지지 394,948원 (0.52% 아래) · 강도 65점 · family 3개 · 수평 지지·매물대 지지",
+                "summary": "주지지 369,698원 (6.52% 아래) · 강도 65점 · family 3개 · 수평 지지·매물대 지지",
                 "lines": [
                   {
                     "label": "복합 지지",
-                    "price": 394948,
-                    "distancePct": 0.52,
+                    "price": 369698,
+                    "distancePct": 6.52,
                     "families": [
                       "horizontal",
                       "volumeShelf"
@@ -627,7 +649,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                       "매물대 지지"
                     ],
                     "familyCount": 2,
-                    "count": 14,
+                    "count": 12,
                     "lastSeenDaysAgo": 0,
                     "strengthPoints": 65,
                     "consensusBonus": 10,
@@ -637,7 +659,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                   {
                     "label": "복합 지지",
                     "price": 344586,
-                    "distancePct": 13.2,
+                    "distancePct": 12.87,
                     "families": [
                       "horizontal",
                       "volumeShelf"
@@ -657,7 +679,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                   {
                     "label": "복합 지지",
                     "price": 334193,
-                    "distancePct": 15.82,
+                    "distancePct": 15.5,
                     "families": [
                       "horizontal",
                       "swingCluster"
@@ -677,7 +699,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                   {
                     "label": "복합 지지",
                     "price": 308000,
-                    "distancePct": 22.42,
+                    "distancePct": 22.12,
                     "families": [
                       "horizontal",
                       "swingCluster"
@@ -696,8 +718,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                   },
                   {
                     "label": "수평 지지",
-                    "price": 383500,
-                    "distancePct": 3.4,
+                    "price": 395167,
+                    "distancePct": 0.08,
                     "families": [
                       "horizontal"
                     ],
@@ -705,8 +727,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                       "수평 지지"
                     ],
                     "familyCount": 1,
-                    "count": 5,
-                    "lastSeenDaysAgo": 28,
+                    "count": 9,
+                    "lastSeenDaysAgo": 0,
                     "strengthPoints": 30,
                     "consensusBonus": 0,
                     "valid": true,
@@ -715,8 +737,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 ],
                 "primaryLine": {
                   "label": "복합 지지",
-                  "price": 394948,
-                  "distancePct": 0.52,
+                  "price": 369698,
+                  "distancePct": 6.52,
                   "families": [
                     "horizontal",
                     "volumeShelf"
@@ -726,7 +748,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "매물대 지지"
                   ],
                   "familyCount": 2,
-                  "count": 14,
+                  "count": 12,
                   "lastSeenDaysAgo": 0,
                   "strengthPoints": 65,
                   "consensusBonus": 10,
@@ -747,7 +769,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 284250,
-                    "distancePct": 28.4,
+                    "distancePct": 28.13,
                     "count": 2,
                     "lastSeenDaysAgo": 15,
                     "valid": true,
@@ -764,7 +786,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 294750,
-                    "distancePct": 25.76,
+                    "distancePct": 25.47,
                     "count": 2,
                     "lastSeenDaysAgo": 15,
                     "valid": true,
@@ -781,7 +803,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 306250,
-                    "distancePct": 22.86,
+                    "distancePct": 22.57,
                     "count": 2,
                     "lastSeenDaysAgo": 17,
                     "valid": true,
@@ -798,7 +820,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 314333,
-                    "distancePct": 20.82,
+                    "distancePct": 20.52,
                     "count": 2,
                     "lastSeenDaysAgo": 12,
                     "valid": true,
@@ -815,7 +837,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 322917,
-                    "distancePct": 18.66,
+                    "distancePct": 18.35,
                     "count": 6,
                     "lastSeenDaysAgo": 8,
                     "valid": true,
@@ -832,7 +854,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 333636,
-                    "distancePct": 15.96,
+                    "distancePct": 15.64,
                     "count": 11,
                     "lastSeenDaysAgo": 2,
                     "valid": true,
@@ -849,7 +871,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 345111,
-                    "distancePct": 13.07,
+                    "distancePct": 12.74,
                     "count": 9,
                     "lastSeenDaysAgo": 1,
                     "valid": true,
@@ -866,7 +888,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 353857,
-                    "distancePct": 10.87,
+                    "distancePct": 10.53,
                     "count": 6,
                     "lastSeenDaysAgo": 6,
                     "valid": true,
@@ -883,7 +905,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 361357,
-                    "distancePct": 8.98,
+                    "distancePct": 8.63,
                     "count": 6,
                     "lastSeenDaysAgo": 3,
                     "valid": true,
@@ -900,7 +922,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 370083,
-                    "distancePct": 6.78,
+                    "distancePct": 6.43,
                     "count": 6,
                     "lastSeenDaysAgo": 0,
                     "valid": true,
@@ -917,7 +939,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 383500,
-                    "distancePct": 3.4,
+                    "distancePct": 3.03,
                     "count": 5,
                     "lastSeenDaysAgo": 28,
                     "valid": true,
@@ -933,8 +955,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "family": "horizontal",
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
-                    "price": 395333,
-                    "distancePct": 0.42,
+                    "price": 395167,
+                    "distancePct": 0.08,
                     "count": 9,
                     "lastSeenDaysAgo": 0,
                     "valid": true,
@@ -951,7 +973,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 408625,
-                    "distancePct": -2.93,
+                    "distancePct": -3.32,
                     "count": 7,
                     "lastSeenDaysAgo": 31,
                     "valid": false,
@@ -968,7 +990,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 422333,
-                    "distancePct": -6.38,
+                    "distancePct": -6.78,
                     "count": 3,
                     "lastSeenDaysAgo": 31,
                     "valid": false,
@@ -985,7 +1007,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 433214,
-                    "distancePct": -9.12,
+                    "distancePct": -9.54,
                     "count": 7,
                     "lastSeenDaysAgo": 32,
                     "valid": false,
@@ -1002,7 +1024,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 441833,
-                    "distancePct": -11.29,
+                    "distancePct": -11.72,
                     "count": 3,
                     "lastSeenDaysAgo": 36,
                     "valid": false,
@@ -1018,7 +1040,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 456214,
-                    "distancePct": -14.92,
+                    "distancePct": -15.35,
                     "count": 6,
                     "lastSeenDaysAgo": 32,
                     "valid": false,
@@ -1035,7 +1057,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 471167,
-                    "distancePct": -18.68,
+                    "distancePct": -19.13,
                     "count": 6,
                     "lastSeenDaysAgo": 36,
                     "valid": false,
@@ -1052,7 +1074,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 485188,
-                    "distancePct": -22.21,
+                    "distancePct": -22.68,
                     "count": 7,
                     "lastSeenDaysAgo": 40,
                     "valid": false,
@@ -1069,7 +1091,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 495000,
-                    "distancePct": -24.69,
+                    "distancePct": -25.16,
                     "count": 4,
                     "lastSeenDaysAgo": 38,
                     "valid": false,
@@ -1086,7 +1108,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "수평 지지",
                     "label": "수평 지지",
                     "price": 519333,
-                    "distancePct": -30.81,
+                    "distancePct": -31.31,
                     "count": 2,
                     "lastSeenDaysAgo": 39,
                     "valid": false,
@@ -1105,7 +1127,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "스윙로우 군집",
                     "label": "스윙로우 군집",
                     "price": 309750,
-                    "distancePct": 21.98,
+                    "distancePct": 21.68,
                     "count": 2,
                     "lastSeenDaysAgo": 12,
                     "valid": true,
@@ -1119,7 +1141,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "스윙로우 군집",
                     "label": "스윙로우 군집",
                     "price": 334750,
-                    "distancePct": 15.68,
+                    "distancePct": 15.36,
                     "count": 2,
                     "lastSeenDaysAgo": 2,
                     "valid": true,
@@ -1135,7 +1157,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "매물대 지지",
                     "label": "매물대 지지",
                     "price": 344062,
-                    "distancePct": 13.33,
+                    "distancePct": 13.01,
                     "count": 8,
                     "lastSeenDaysAgo": 2,
                     "valid": true,
@@ -1150,7 +1172,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "familyLabel": "매물대 지지",
                     "label": "매물대 지지",
                     "price": 470312,
-                    "distancePct": -18.47,
+                    "distancePct": -18.92,
                     "count": 4,
                     "lastSeenDaysAgo": 36,
                     "valid": false,
@@ -1164,16 +1186,16 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "family": "volumeShelf",
                     "familyLabel": "매물대 지지",
                     "label": "매물대 지지",
-                    "price": 394562,
-                    "distancePct": 0.61,
-                    "count": 5,
-                    "lastSeenDaysAgo": 0,
+                    "price": 369312,
+                    "distancePct": 6.62,
+                    "count": 6,
+                    "lastSeenDaysAgo": 1,
                     "valid": true,
                     "weight": 25,
-                    "volume": 3061238,
-                    "binIndex": 10,
-                    "binLow": 388250,
-                    "binHigh": 400875
+                    "volume": 2944002,
+                    "binIndex": 8,
+                    "binLow": 363000,
+                    "binHigh": 375625
                   }
                 ],
                 "eventAnchors": []
@@ -1195,8 +1217,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                   "summary": "앵커 중심값 데이터 부족"
                 },
                 "intradayClose": {
-                  "status": "⛔",
-                  "summary": "마지막 30분 비율 0.29:1 / 마지막 30분 평균 45.2% / 마지막 1시간 45.2% · 장 막판 투매 경고"
+                  "status": "⚠️",
+                  "summary": "당일 평균 129.0% / 마지막 1시간 21.1% · 마지막 30분 프록시 없음 · 장후반 약화 경고"
                 }
               },
               "newsFlow": {
@@ -1220,12 +1242,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "strategyFit": "favorable",
               "scoreDelta": 0.75,
               "summary": "유리 (고변동성 장세라 눌림목 반등 포착에 유리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세라 눌림목 반등 포착에 유리합니다. VKOSPI 58.06, ATR10 6.50%, 일간 표준편차 6.45%, 당일 레인지 8.56%.",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세라 눌림목 반등 포착에 유리합니다. VKOSPI 58.03, ATR10 6.50%, 일간 표준편차 6.43%, 당일 레인지 8.56%.",
               "metrics": {
                 "atrPct10": 6.5,
-                "returnStd20": 6.45,
+                "returnStd20": 6.43,
                 "todayRangePct": 8.56,
-                "vkospi": 58.06
+                "vkospi": 58.03
               },
               "strategyLabel": "눌림목"
             },
@@ -1249,17 +1271,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "anchorVolumeRatio": null,
               "anchorStopMode": "",
               "anchorStopPrice": null,
-              "ma10Price": 359550,
+              "ma10Price": 359400,
               "ma10PrevPrice": 353250,
-              "ma20Price": 342300,
+              "ma20Price": 342225,
               "ma20PrevPrice": 340450,
               "ma10WarningPrice": null,
-              "hardStopPrice": 385090,
-              "fallbackStopPrice": 385090,
-              "effectiveStopPrice": 385090,
+              "hardStopPrice": 383635,
+              "fallbackStopPrice": 383635,
+              "effectiveStopPrice": 383635,
               "warningRuleSummary": "10일선 경고 없음",
-              "hardStopRuleSummary": "앵커 부재 → 기존 % 손절 385,090원 사용",
-              "reasonSummary": "앵커 부재로 기존 % 손절 385,090원를 유지합니다."
+              "hardStopRuleSummary": "앵커 부재 → 기존 % 손절 383,635원 사용",
+              "reasonSummary": "앵커 부재로 기존 % 손절 383,635원를 유지합니다."
             },
             "tradePlanRows": [
               {
@@ -1268,7 +1290,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+1.5% 도달",
                 "quantity": "35% 익절",
                 "targetYield": "+1.5%",
-                "targetPrice": "402,955원",
+                "targetPrice": "401,432원",
                 "historicalHitRate": 0.45,
                 "recommended": false
               },
@@ -1278,7 +1300,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+2.5% 도달",
                 "quantity": "30% 익절",
                 "targetYield": "+2.5%",
-                "targetPrice": "406,925원",
+                "targetPrice": "405,387원",
                 "historicalHitRate": 0.35,
                 "recommended": false
               },
@@ -1288,7 +1310,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+4.5% 도달",
                 "quantity": "25% 익절",
                 "targetYield": "+4.5%",
-                "targetPrice": "414,865원",
+                "targetPrice": "413,298원",
                 "historicalHitRate": 0.2,
                 "recommended": false
               },
@@ -1298,26 +1320,26 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "추세 유지 시",
                 "quantity": "10% 익절",
                 "targetYield": "+6.0%",
-                "targetPrice": "420,820원",
+                "targetPrice": "419,230원",
                 "historicalHitRate": 0.1,
                 "recommended": true
               },
               {
                 "stage": "🛑 손절",
                 "stageKey": "stop",
-                "condition": "유효 손절가 385,090원 하향 이탈",
+                "condition": "유효 손절가 383,635원 하향 이탈",
                 "quantity": "전량",
                 "targetYield": "-3.0%",
-                "targetPrice": "385,090원"
+                "targetPrice": "383,635원"
               }
             ],
             "rr": "1 : 1.0",
             "source": "jongga-live",
             "recommendedEntryBand": {
-              "low": 392038,
-              "high": 396008,
-              "anchor": 397000,
-              "label": "392,038~396,008원 (종가 ±, 분할매수)"
+              "low": 390556,
+              "high": 394511,
+              "anchor": 395500,
+              "label": "390,556~394,511원 (종가 ±, 분할매수)"
             },
             "pullbackTakeProfitProfiles": [
               {
@@ -1337,7 +1359,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+1.5% 도달",
                     "quantity": "35% 익절",
                     "targetYield": "+1.5%",
-                    "targetPrice": "402,955원",
+                    "targetPrice": "401,432원",
                     "historicalHitRate": 0.45,
                     "recommended": false
                   },
@@ -1347,7 +1369,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+2.5% 도달",
                     "quantity": "30% 익절",
                     "targetYield": "+2.5%",
-                    "targetPrice": "406,925원",
+                    "targetPrice": "405,387원",
                     "historicalHitRate": 0.35,
                     "recommended": false
                   },
@@ -1357,7 +1379,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+4.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+4.5%",
-                    "targetPrice": "414,865원",
+                    "targetPrice": "413,298원",
                     "historicalHitRate": 0.2,
                     "recommended": false
                   },
@@ -1367,17 +1389,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "10% 익절",
                     "targetYield": "+6.0%",
-                    "targetPrice": "420,820원",
+                    "targetPrice": "419,230원",
                     "historicalHitRate": 0.1,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 손절가 385,090원 하향 이탈",
+                    "condition": "유효 손절가 383,635원 하향 이탈",
                     "quantity": "전량",
                     "targetYield": "-3.0%",
-                    "targetPrice": "385,090원"
+                    "targetPrice": "383,635원"
                   }
                 ],
                 "recommendedStage": {
@@ -1394,7 +1416,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "label": "1차 저항 반영형",
                 "recommended": true,
                 "selectionBasis": "fallback_same_as_aggressive",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 17건)",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 20건)",
                 "nearestResistanceType": "none",
                 "nearestResistancePrice": null,
                 "secondaryResistanceType": "none",
@@ -1406,7 +1428,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+1.5% 도달",
                     "quantity": "35% 익절",
                     "targetYield": "+1.5%",
-                    "targetPrice": "402,955원",
+                    "targetPrice": "401,432원",
                     "historicalHitRate": 0.45,
                     "recommended": false
                   },
@@ -1416,7 +1438,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+2.5% 도달",
                     "quantity": "30% 익절",
                     "targetYield": "+2.5%",
-                    "targetPrice": "406,925원",
+                    "targetPrice": "405,387원",
                     "historicalHitRate": 0.35,
                     "recommended": false
                   },
@@ -1426,7 +1448,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+4.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+4.5%",
-                    "targetPrice": "414,865원",
+                    "targetPrice": "413,298원",
                     "historicalHitRate": 0.2,
                     "recommended": false
                   },
@@ -1436,17 +1458,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "10% 익절",
                     "targetYield": "+6.0%",
-                    "targetPrice": "420,820원",
+                    "targetPrice": "419,230원",
                     "historicalHitRate": 0.1,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 손절가 385,090원 하향 이탈",
+                    "condition": "유효 손절가 383,635원 하향 이탈",
                     "quantity": "전량",
                     "targetYield": "-3.0%",
-                    "targetPrice": "385,090원"
+                    "targetPrice": "383,635원"
                   }
                 ],
                 "recommendedStage": {
@@ -1475,7 +1497,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+1.5% 도달",
                     "quantity": "35% 익절",
                     "targetYield": "+1.5%",
-                    "targetPrice": "402,955원",
+                    "targetPrice": "401,432원",
                     "historicalHitRate": 0.45,
                     "recommended": false
                   },
@@ -1485,7 +1507,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+2.5% 도달",
                     "quantity": "30% 익절",
                     "targetYield": "+2.5%",
-                    "targetPrice": "406,925원",
+                    "targetPrice": "405,387원",
                     "historicalHitRate": 0.35,
                     "recommended": false
                   },
@@ -1495,7 +1517,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+4.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+4.5%",
-                    "targetPrice": "414,865원",
+                    "targetPrice": "413,298원",
                     "historicalHitRate": 0.2,
                     "recommended": false
                   },
@@ -1505,17 +1527,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "10% 익절",
                     "targetYield": "+6.0%",
-                    "targetPrice": "420,820원",
+                    "targetPrice": "419,230원",
                     "historicalHitRate": 0.1,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 손절가 385,090원 하향 이탈",
+                    "condition": "유효 손절가 383,635원 하향 이탈",
                     "quantity": "전량",
                     "targetYield": "-3.0%",
-                    "targetPrice": "385,090원"
+                    "targetPrice": "383,635원"
                   }
                 ],
                 "recommendedStage": {
@@ -1532,9 +1554,9 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "profileKey": "balanced",
               "label": "1차 저항 반영형",
               "selectionBasis": "fallback_same_as_aggressive",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 17건)",
-              "sampleCount": 17,
-              "ev": -2.2439
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 20건)",
+              "sampleCount": 20,
+              "ev": -2.9095
             },
             "recommendedStage": {
               "stageKey": "intraday2",
@@ -1572,43 +1594,2329 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "entryBlockers": [
               "핵심 Gate 미충족: G1",
               "핵심 Gate 미충족: G2",
-              "핵심 Gate 미충족: G12",
               "핵심 Gate 미충족: G13",
-              "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)"
+              "매매금지(핵심 Gate 미충족: G1, G2, G13)"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G1 미충족: 5MA 371,200 > 20MA 342,300 > 60MA 401,600 · 상승선 5MA, 20MA · 정배열 미충족 · 외 3건",
-            "statusReason": "G1 미충족: 5MA 371,200 > 20MA 342,300 > 60MA 401,600 · 상승선 5MA, 20MA · 정배열 미충족 / G2 미충족: 종가 397,000 / 60MA 401,600 / G12 미충족: 마지막 30분 비율 0.29:1 / 마지막 30분 평균 45.2% / 마지막 1시간 45.2% · 장 막판 투매 경고 / 외 1건",
+            "statusReasonShort": "G1 미충족: 5MA 370,900 > 20MA 342,225 > 60MA 401,575 · 상승선 5MA, 20MA · 정배열 미충족 · 외 2건",
+            "statusReason": "G1 미충족: 5MA 370,900 > 20MA 342,225 > 60MA 401,575 · 상승선 5MA, 20MA · 정배열 미충족 / G2 미충족: 종가 395,500 / 60MA 401,575 / G13 미충족: KIND 최근공시 2026-08-21 기업설명회(IR) 개최(안내공시)",
             "stockIndicators": {
               "snapshot": {
-                "currentPrice": 397000.0,
-                "vs52wHighPct": 70.14134275618375,
-                "vs52wLowPct": 162.91390728476821,
-                "dropFrom52wHighPct": 29.858657243816257,
-                "ma20GapPct": 15.98013438504236,
-                "rsi14": 58.37037618868858,
-                "volumeRatio20d": 114.22716543703663,
-                "rs20Pct": 10.277777777777777,
-                "supportDistancePct": 0.52,
-                "tradingValueRank": 28.0,
+                "currentPrice": 395500.0,
+                "vs52wHighPct": 69.87632508833921,
+                "vs52wLowPct": 161.9205298013245,
+                "dropFrom52wHighPct": 30.123674911660775,
+                "ma20GapPct": 15.567243772371977,
+                "rsi14": 58.095051968861945,
+                "volumeRatio20d": 126.04213339846424,
+                "rs20Pct": 9.86111111111111,
+                "supportDistancePct": 6.52,
+                "tradingValueRank": 27.0,
                 "marketCapRank": 9.0,
-                "marketCapTrillion": 64.3805,
-                "per": 28.03,
+                "marketCapTrillion": 64.1373,
+                "per": 27.92,
                 "pbr": 1.04,
-                "cnsPer": 24.01,
+                "cnsPer": 23.92,
                 "foreignRate": 31.01,
                 "supplyTrendScore": 0.0,
                 "shortBalanceChangePct": -14.75998290679455
               },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           },
           {
             "rank": 2,
+            "name": "한화에어로스페이스",
+            "code": "012450",
+            "strictScore": 9.9,
+            "signalScore": 9.9,
+            "score": 9.9,
+            "scoreMax": 13.0,
+            "effectiveScoreMax": 13.0,
+            "gradeScore": 7.6,
+            "grade": "A",
+            "overnightGapPenalty": 0.0,
+            "scoreBreakdown": [
+              {
+                "code": "S2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "외인 13,645주 / 기관 5,898주 · 당일 순매수"
+              },
+              {
+                "code": "P2",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "종가 1,085,000 · 5MA·10MA·20MA 중 20MA 위"
+              },
+              {
+                "code": "C1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "음봉 · 아래꼬리:몸통 0.13 (필요 ≥ 1.0)"
+              },
+              {
+                "code": "C5",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 0.5,
+                "evalStatus": "not_met",
+                "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함"
+              },
+              {
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -36.7% (≥12% 만점·8~12% 부분) · 충족"
+              },
+              {
+                "code": "D2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "수급추세 +2 (≥+2 만점·+1 부분) · 충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "거래량 84% (≥100% 만점·80~100% 부분) · 부분 충족"
+              },
+              {
+                "code": "D4",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "대차잔고 -42.2% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 충족"
+              },
+              {
+                "code": "V1",
+                "strictPoints": 0.75,
+                "signalPoints": 0.75,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "유리 (고변동성 장세라 눌림목 반등 포착에 유리합니다)"
+              }
+            ],
+            "scoreScope": "pullback",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G13)",
+            "strategy": "pullback",
+            "gates": [
+              {
+                "code": "G0",
+                "status": "⛔",
+                "note": "최근 20일 최대 거래량 급증 178% (필요 ≥ 200%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "5MA 1,147,000 > 20MA 1,037,600 > 60MA 1,049,250 · 상승선 20MA · 정배열 미충족",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "종가 1,085,000 / 60MA 1,049,250",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "주봉 RSI 50.5 (필요 ≥ 50)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "MACD 히스토그램 0선 위 또는 음전환 후 3일 이내",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G5",
+                "status": "⚠️",
+                "note": "KOSPI 6,913 / 5MA 6,817 (+1.4%) · VKOSPI 58.0 · 변동성 경계",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G6",
+                "status": "✅",
+                "note": "당일 등락 -7.03% (필요 ≤ +12%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G7",
+                "status": "✅",
+                "note": "주봉 RSI 50.5 (필요 ≤ 80)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G8",
+                "status": "✅",
+                "note": "이격 20MA +4.6% (필요 ≤ +25%) · 60MA +3.4% (필요 ≤ +60%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -36.7% (≥12%) · 거래량 84% (≥80%) · 수급추세 +2 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G9",
+                "status": "⚠️",
+                "note": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G10",
+                "status": "⚠️",
+                "note": "앵커 거래량 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "G11",
+                "status": "⚠️",
+                "note": "앵커 중심값 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "G12",
+                "status": "✅",
+                "note": "마지막 30분 비율 189.00:1 / 마지막 30분 평균 300.0% / 마지막 1시간 212.2% · 장 막판 매수세 유지",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G13",
+                "status": "⛔",
+                "note": "KIND 최근공시 2026-08-07 주주총회소집결의",
+                "evalStatus": "not_met"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S2",
+                "note": "외인 13,645주 / 기관 5,898주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P2",
+                "note": "종가 1,085,000 · 5MA·10MA·20MA 중 20MA 위",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -36.7% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +2 (≥+2 만점·+1 부분) · 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D4",
+                "note": "대차잔고 -42.2% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 충족",
+                "evalStatus": "met"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "C1",
+                "note": "음봉 · 아래꼬리:몸통 0.13 (필요 ≥ 1.0)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C5",
+                "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 84% (≥100% 만점·80~100% 부분) · 부분 충족",
+                "evalStatus": "met"
+              }
+            ],
+            "currentPrice": 1085000,
+            "previousClose": 1167000,
+            "dailyChange": -82000,
+            "dailyChangePct": -7.03,
+            "dailyDirection": "down",
+            "entryPriceText": "1,085,000원 (당일 종가 기준)",
+            "entryPrice": 1085000,
+            "entryMeta": "당일 종가 기준",
+            "marketCapTrillion": 55.9463,
+            "marketCapRank": 11,
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 13,645주 / 기관 5,898주. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "notes": [
+              "앵커 중심값 데이터 부족",
+              "앵커 거래량 데이터 부족"
+            ],
+            "toss": {
+              "avgStrength": 60.0,
+              "note": "토스 공개 체결강도 60.0% / 최근 체결 36분 프록시",
+              "source": "toss_http_combo",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A012450/order",
+              "asOf": "2026-08-21T08:32:59Z",
+              "intradayAbove100Ratio": 60.0,
+              "observedMinutes": 36,
+              "observedTickCount": 120,
+              "coverageNote": "최근 체결 36분 프록시",
+              "lastHourAvgStrength": 212.2,
+              "lastHourObservedMinutes": 36,
+              "last30AvgStrength": 300.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 189.0,
+              "last30BuyVolume": 189.0,
+              "last30SellVolume": 0.0
+            },
+            "eventFilter": {
+              "blocked": true,
+              "earningsDays": null,
+              "corporateActionDays": null,
+              "note": "KIND 최근공시 2026-08-07 주주총회소집결의",
+              "source": "kind_playwright_recent_disclosure"
+            },
+            "pullbackContext": {
+              "support": {
+                "summary": "주지지 1,074,948원 (0.93% 아래) · 강도 65점 · family 3개 · 수평 지지·매물대 지지",
+                "lines": [
+                  {
+                    "label": "복합 지지",
+                    "price": 1074948,
+                    "distancePct": 0.93,
+                    "families": [
+                      "horizontal",
+                      "volumeShelf"
+                    ],
+                    "familyLabels": [
+                      "수평 지지",
+                      "매물대 지지"
+                    ],
+                    "familyCount": 2,
+                    "count": 16,
+                    "lastSeenDaysAgo": 0,
+                    "strengthPoints": 65,
+                    "consensusBonus": 10,
+                    "valid": true,
+                    "role": "primary"
+                  },
+                  {
+                    "label": "복합 지지",
+                    "price": 960958,
+                    "distancePct": 11.43,
+                    "families": [
+                      "horizontal",
+                      "swingCluster"
+                    ],
+                    "familyLabels": [
+                      "수평 지지",
+                      "스윙로우 군집"
+                    ],
+                    "familyCount": 2,
+                    "count": 11,
+                    "lastSeenDaysAgo": 19,
+                    "strengthPoints": 65,
+                    "consensusBonus": 10,
+                    "valid": true,
+                    "role": "secondary"
+                  },
+                  {
+                    "label": "복합 지지",
+                    "price": 863150,
+                    "distancePct": 20.45,
+                    "families": [
+                      "horizontal",
+                      "swingCluster"
+                    ],
+                    "familyLabels": [
+                      "수평 지지",
+                      "스윙로우 군집"
+                    ],
+                    "familyCount": 2,
+                    "count": 9,
+                    "lastSeenDaysAgo": 14,
+                    "strengthPoints": 65,
+                    "consensusBonus": 10,
+                    "valid": true,
+                    "role": "secondary"
+                  },
+                  {
+                    "label": "수평 지지",
+                    "price": 1099250,
+                    "distancePct": -1.31,
+                    "families": [
+                      "horizontal"
+                    ],
+                    "familyLabels": [
+                      "수평 지지"
+                    ],
+                    "familyCount": 1,
+                    "count": 8,
+                    "lastSeenDaysAgo": 7,
+                    "strengthPoints": 30,
+                    "consensusBonus": 0,
+                    "valid": true,
+                    "role": "secondary"
+                  },
+                  {
+                    "label": "수평 지지",
+                    "price": 1041455,
+                    "distancePct": 4.01,
+                    "families": [
+                      "horizontal"
+                    ],
+                    "familyLabels": [
+                      "수평 지지"
+                    ],
+                    "familyCount": 1,
+                    "count": 11,
+                    "lastSeenDaysAgo": 9,
+                    "strengthPoints": 30,
+                    "consensusBonus": 0,
+                    "valid": true,
+                    "role": "secondary"
+                  }
+                ],
+                "primaryLine": {
+                  "label": "복합 지지",
+                  "price": 1074948,
+                  "distancePct": 0.93,
+                  "families": [
+                    "horizontal",
+                    "volumeShelf"
+                  ],
+                  "familyLabels": [
+                    "수평 지지",
+                    "매물대 지지"
+                  ],
+                  "familyCount": 2,
+                  "count": 16,
+                  "lastSeenDaysAgo": 0,
+                  "strengthPoints": 65,
+                  "consensusBonus": 10,
+                  "valid": true,
+                  "role": "primary"
+                },
+                "strengthScore": 65,
+                "strengthLabel": "watch",
+                "warningLevel": "warning",
+                "warningReason": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
+                "activeFamilyCount": 3,
+                "barCount": 60
+              },
+              "families": {
+                "horizontal": [
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 809500,
+                    "distancePct": 25.39,
+                    "count": 2,
+                    "lastSeenDaysAgo": 15,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 809000,
+                    "bandHigh": 810000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 867300,
+                    "distancePct": 20.06,
+                    "count": 7,
+                    "lastSeenDaysAgo": 14,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 856000,
+                    "bandHigh": 875000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 897889,
+                    "distancePct": 17.25,
+                    "count": 8,
+                    "lastSeenDaysAgo": 12,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 886000,
+                    "bandHigh": 906000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 924857,
+                    "distancePct": 14.76,
+                    "count": 6,
+                    "lastSeenDaysAgo": 13,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 917000,
+                    "bandHigh": 936000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 959250,
+                    "distancePct": 11.59,
+                    "count": 8,
+                    "lastSeenDaysAgo": 19,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 943000,
+                    "bandHigh": 968000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 988833,
+                    "distancePct": 8.86,
+                    "count": 6,
+                    "lastSeenDaysAgo": 11,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 979000,
+                    "bandHigh": 998000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1010750,
+                    "distancePct": 6.84,
+                    "count": 12,
+                    "lastSeenDaysAgo": 10,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1004000,
+                    "bandHigh": 1021000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1041455,
+                    "distancePct": 4.01,
+                    "count": 11,
+                    "lastSeenDaysAgo": 9,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1028000,
+                    "bandHigh": 1054000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1073833,
+                    "distancePct": 1.03,
+                    "count": 9,
+                    "lastSeenDaysAgo": 0,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1064000,
+                    "bandHigh": 1085000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1099250,
+                    "distancePct": -1.31,
+                    "count": 8,
+                    "lastSeenDaysAgo": 7,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1091000,
+                    "bandHigh": 1112000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1124833,
+                    "distancePct": -3.67,
+                    "count": 10,
+                    "lastSeenDaysAgo": 1,
+                    "valid": false,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1116000,
+                    "bandHigh": 1138000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1161667,
+                    "distancePct": -7.07,
+                    "count": 10,
+                    "lastSeenDaysAgo": 1,
+                    "valid": false,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1146000,
+                    "bandHigh": 1177000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1188429,
+                    "distancePct": -9.53,
+                    "count": 5,
+                    "lastSeenDaysAgo": 5,
+                    "valid": false,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1181000,
+                    "bandHigh": 1200000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 1236667,
+                    "distancePct": -13.98,
+                    "count": 2,
+                    "lastSeenDaysAgo": 45,
+                    "valid": false,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 1224000,
+                    "bandHigh": 1244000
+                  }
+                ],
+                "swingCluster": [
+                  {
+                    "family": "swingCluster",
+                    "familyLabel": "스윙로우 군집",
+                    "label": "스윙로우 군집",
+                    "price": 859000,
+                    "distancePct": 20.83,
+                    "count": 2,
+                    "lastSeenDaysAgo": 22,
+                    "valid": true,
+                    "weight": 25,
+                    "pivotCount": 2,
+                    "bandLow": 856000,
+                    "bandHigh": 862000
+                  },
+                  {
+                    "family": "swingCluster",
+                    "familyLabel": "스윙로우 군집",
+                    "label": "스윙로우 군집",
+                    "price": 962667,
+                    "distancePct": 11.27,
+                    "count": 3,
+                    "lastSeenDaysAgo": 36,
+                    "valid": true,
+                    "weight": 25,
+                    "pivotCount": 3,
+                    "bandLow": 955000,
+                    "bandHigh": 968000
+                  }
+                ],
+                "volumeShelf": [
+                  {
+                    "family": "volumeShelf",
+                    "familyLabel": "매물대 지지",
+                    "label": "매물대 지지",
+                    "price": 1076062,
+                    "distancePct": 0.82,
+                    "count": 7,
+                    "lastSeenDaysAgo": 9,
+                    "valid": true,
+                    "weight": 25,
+                    "volume": 1748954,
+                    "binIndex": 13,
+                    "binLow": 1065208,
+                    "binHigh": 1086917
+                  },
+                  {
+                    "family": "volumeShelf",
+                    "familyLabel": "매물대 지지",
+                    "label": "매물대 지지",
+                    "price": 1141188,
+                    "distancePct": -5.18,
+                    "count": 6,
+                    "lastSeenDaysAgo": 3,
+                    "valid": false,
+                    "weight": 25,
+                    "volume": 1703715,
+                    "binIndex": 16,
+                    "binLow": 1130333,
+                    "binHigh": 1152042
+                  },
+                  {
+                    "family": "volumeShelf",
+                    "familyLabel": "매물대 지지",
+                    "label": "매물대 지지",
+                    "price": 1162896,
+                    "distancePct": -7.18,
+                    "count": 5,
+                    "lastSeenDaysAgo": 1,
+                    "valid": false,
+                    "weight": 25,
+                    "volume": 1391948,
+                    "binIndex": 17,
+                    "binLow": 1152042,
+                    "binHigh": 1173750
+                  }
+                ],
+                "eventAnchors": []
+              },
+              "volumeBurst": {
+                "summary": "최근 20일 최대 거래량 178% (2일 전)",
+                "burstCount": 0,
+                "maxRatioPct": 177.5,
+                "latestBurstDaysAgo": null
+              },
+              "anchor": null,
+              "trapDiagnostics": {
+                "volumeTrap": {
+                  "status": "⚠️",
+                  "summary": "앵커 거래량 데이터 부족"
+                },
+                "supportDefense": {
+                  "status": "⚠️",
+                  "summary": "앵커 중심값 데이터 부족"
+                },
+                "intradayClose": {
+                  "status": "✅",
+                  "summary": "마지막 30분 비율 189.00:1 / 마지막 30분 평균 300.0% / 마지막 1시간 212.2% · 장 막판 매수세 유지"
+                }
+              },
+              "newsFlow": {
+                "lookbackDays": 5,
+                "headlineCount": 0,
+                "positiveCount": 0,
+                "negativeCount": 0,
+                "latestPositiveDate": "",
+                "latestNegativeDate": "",
+                "status": "neutral",
+                "summary": "최근 5거래일 종목 뉴스 없음",
+                "headlines": [],
+                "freshPositiveCount": 0,
+                "freshNegativeCount": 0
+              }
+            },
+            "volatilityContext": {
+              "marketState": "volatile",
+              "stockState": "volatile",
+              "blendedState": "volatile",
+              "strategyFit": "favorable",
+              "scoreDelta": 0.75,
+              "summary": "유리 (고변동성 장세라 눌림목 반등 포착에 유리합니다)",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세라 눌림목 반등 포착에 유리합니다. VKOSPI 58.03, ATR10 6.82%, 일간 표준편차 4.87%, 당일 레인지 5.83%.",
+              "metrics": {
+                "atrPct10": 6.82,
+                "returnStd20": 4.87,
+                "todayRangePct": 5.83,
+                "vkospi": 58.03
+              },
+              "strategyLabel": "눌림목"
+            },
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "pullbackStopPolicy": {
+              "version": "pullback-stop-v1",
+              "anchorSource": "fallback_percent_stop",
+              "anchorLookbackDays": 20,
+              "anchorDate": "",
+              "anchorOpen": null,
+              "anchorClose": null,
+              "anchorHigh": null,
+              "anchorLow": null,
+              "anchorBodyMid": null,
+              "anchorVolumeRatio": null,
+              "anchorStopMode": "",
+              "anchorStopPrice": null,
+              "ma10Price": 1142300,
+              "ma10PrevPrice": 1139200,
+              "ma20Price": 1037600,
+              "ma20PrevPrice": 1031250,
+              "ma10WarningPrice": null,
+              "hardStopPrice": 1052450,
+              "fallbackStopPrice": 1052450,
+              "effectiveStopPrice": 1052450,
+              "warningRuleSummary": "10일선 경고 없음",
+              "hardStopRuleSummary": "앵커 부재 → 기존 % 손절 1,052,450원 사용",
+              "reasonSummary": "앵커 부재로 기존 % 손절 1,052,450원를 유지합니다."
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "stageKey": "premarket",
+                "condition": "+1.5% 도달",
+                "quantity": "35% 익절",
+                "targetYield": "+1.5%",
+                "targetPrice": "1,101,275원",
+                "historicalHitRate": 0.45,
+                "recommended": false
+              },
+              {
+                "stage": "🔔 장초반",
+                "stageKey": "openPhase",
+                "condition": "+2.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+2.5%",
+                "targetPrice": "1,112,125원",
+                "historicalHitRate": 0.35,
+                "recommended": false
+              },
+              {
+                "stage": "📈 장중 1차",
+                "stageKey": "intraday1",
+                "condition": "+4.5% 도달",
+                "quantity": "25% 익절",
+                "targetYield": "+4.5%",
+                "targetPrice": "1,133,825원",
+                "historicalHitRate": 0.2,
+                "recommended": false
+              },
+              {
+                "stage": "📈 장중 2차",
+                "stageKey": "intraday2",
+                "condition": "추세 유지 시",
+                "quantity": "10% 익절",
+                "targetYield": "+6.0%",
+                "targetPrice": "1,150,100원",
+                "historicalHitRate": 0.1,
+                "recommended": true
+              },
+              {
+                "stage": "🛑 손절",
+                "stageKey": "stop",
+                "condition": "유효 손절가 1,052,450원 하향 이탈",
+                "quantity": "전량",
+                "targetYield": "-3.0%",
+                "targetPrice": "1,052,450원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live",
+            "recommendedEntryBand": {
+              "low": 1071438,
+              "high": 1082288,
+              "anchor": 1085000,
+              "label": "1,071,438~1,082,288원 (종가 ±, 분할매수)"
+            },
+            "pullbackTakeProfitProfiles": [
+              {
+                "profileKey": "aggressive",
+                "label": "기본 목표형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
+                "nearestResistanceType": "ma5",
+                "nearestResistancePrice": 1147000,
+                "secondaryResistanceType": "none",
+                "secondaryResistancePrice": null,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "+1.5% 도달",
+                    "quantity": "35% 익절",
+                    "targetYield": "+1.5%",
+                    "targetPrice": "1,101,275원",
+                    "historicalHitRate": 0.45,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+2.5% 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+2.5%",
+                    "targetPrice": "1,112,125원",
+                    "historicalHitRate": 0.35,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "+4.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+4.5%",
+                    "targetPrice": "1,133,825원",
+                    "historicalHitRate": 0.2,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 2차",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "10% 익절",
+                    "targetYield": "+6.0%",
+                    "targetPrice": "1,150,100원",
+                    "historicalHitRate": 0.1,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 손절가 1,052,450원 하향 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.0%",
+                    "targetPrice": "1,052,450원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "intraday2",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 20건)",
+                  "hitRate": 0.1,
+                  "ev": -0.786,
+                  "sampleCount": 20
+                }
+              },
+              {
+                "profileKey": "balanced",
+                "label": "1차 저항 반영형",
+                "recommended": true,
+                "selectionBasis": "fallback_same_as_aggressive",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 20건)",
+                "nearestResistanceType": "ma5",
+                "nearestResistancePrice": 1147000,
+                "secondaryResistanceType": "none",
+                "secondaryResistancePrice": null,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "+1.5% 도달",
+                    "quantity": "35% 익절",
+                    "targetYield": "+1.5%",
+                    "targetPrice": "1,101,275원",
+                    "historicalHitRate": 0.45,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+2.5% 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+2.5%",
+                    "targetPrice": "1,112,125원",
+                    "historicalHitRate": 0.35,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "+4.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+4.5%",
+                    "targetPrice": "1,133,825원",
+                    "historicalHitRate": 0.2,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 2차",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "10% 익절",
+                    "targetYield": "+6.0%",
+                    "targetPrice": "1,150,100원",
+                    "historicalHitRate": 0.1,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 손절가 1,052,450원 하향 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.0%",
+                    "targetPrice": "1,052,450원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "intraday2",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 20건)",
+                  "hitRate": 0.1,
+                  "ev": -0.786,
+                  "sampleCount": 20
+                }
+              },
+              {
+                "profileKey": "conservative",
+                "label": "저항 우선형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "가장 가까운 5일선 저항을 앞단 목표가에 반영하고 다음 목표는 기존값을 유지합니다.",
+                "nearestResistanceType": "ma5",
+                "nearestResistancePrice": 1147000,
+                "secondaryResistanceType": "none",
+                "secondaryResistancePrice": null,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "5일선 저항 도달",
+                    "quantity": "35% 익절",
+                    "targetYield": "+5.7%",
+                    "targetPrice": "1,147,000원",
+                    "historicalHitRate": 0.45,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+2.5% 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+5.7%",
+                    "targetPrice": "1,147,000원",
+                    "historicalHitRate": 0.35,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "+4.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+5.7%",
+                    "targetPrice": "1,147,000원",
+                    "historicalHitRate": 0.2,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 2차",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "10% 익절",
+                    "targetYield": "+6.0%",
+                    "targetPrice": "1,150,100원",
+                    "historicalHitRate": 0.1,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 손절가 1,052,450원 하향 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.0%",
+                    "targetPrice": "1,052,450원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "intraday2",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 20건)",
+                  "hitRate": 0.1,
+                  "ev": -0.786,
+                  "sampleCount": 20
+                }
+              }
+            ],
+            "recommendedTakeProfitProfile": {
+              "profileKey": "balanced",
+              "label": "1차 저항 반영형",
+              "selectionBasis": "fallback_same_as_aggressive",
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 20건)",
+              "sampleCount": 20,
+              "ev": -2.9095
+            },
+            "recommendedStage": {
+              "stageKey": "intraday2",
+              "evBasis": "historical:netStageReturn",
+              "reason": "EV=순수익 argmax (과거 20건)",
+              "hitRate": 0.1,
+              "ev": -0.786,
+              "sampleCount": 20
+            },
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-pullback",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "entryEligible": false,
+            "entryWatch": false,
+            "entryBlockers": [
+              "핵심 Gate 미충족: G0",
+              "핵심 Gate 미충족: G1",
+              "핵심 Gate 미충족: G13",
+              "매매금지(핵심 Gate 미충족: G0, G1, G13)"
+            ],
+            "setupQuality": "setup_weak",
+            "statusReasonShort": "G0 미충족: 최근 20일 최대 거래량 급증 178% (필요 ≥ 200%) · 외 2건",
+            "statusReason": "G0 미충족: 최근 20일 최대 거래량 급증 178% (필요 ≥ 200%) / G1 미충족: 5MA 1,147,000 > 20MA 1,037,600 > 60MA 1,049,250 · 상승선 20MA · 정배열 미충족 / G13 미충족: KIND 최근공시 2026-08-07 주주총회소집결의",
+            "stockIndicators": {
+              "snapshot": {
+                "currentPrice": 1085000.0,
+                "vs52wHighPct": 63.33917104495038,
+                "vs52wLowPct": 38.569604086845466,
+                "dropFrom52wHighPct": 36.66082895504962,
+                "ma20GapPct": 4.568234387047031,
+                "rsi14": 51.966969838389694,
+                "volumeRatio20d": 84.29718032855394,
+                "rs20Pct": 13.256784968684759,
+                "supportDistancePct": 0.93,
+                "tradingValueRank": 31.0,
+                "marketCapRank": 11.0,
+                "marketCapTrillion": 55.9463,
+                "per": 37.97,
+                "pbr": 5.61,
+                "cnsPer": 24.22,
+                "foreignRate": 45.51,
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": -42.21902017291067
+              },
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
+              "source": "jongga_analysis"
+            },
+            "stockExchangeName": "KOSPI",
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
+          },
+          {
+            "rank": 3,
+            "name": "알테오젠",
+            "code": "196170",
+            "strictScore": 8.2,
+            "signalScore": 8.2,
+            "score": 8.2,
+            "scoreMax": 13.0,
+            "effectiveScoreMax": 13.0,
+            "gradeScore": 6.3,
+            "grade": "B",
+            "overnightGapPenalty": 0.0,
+            "scoreBreakdown": [
+              {
+                "code": "S2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "외인 87,887주 / 기관 156,382주 · 당일 순매수"
+              },
+              {
+                "code": "P2",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "종가 320,000 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위"
+              },
+              {
+                "code": "C1",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "아래꼬리:몸통 2.00 (필요 ≥ 1.0)"
+              },
+              {
+                "code": "C5",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 0.5,
+                "evalStatus": "not_met",
+                "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함"
+              },
+              {
+                "code": "D1",
+                "strictPoints": 2.5,
+                "signalPoints": 2.5,
+                "maxPoints": 2.5,
+                "evalStatus": "met",
+                "note": "52주 고가 대비 -26.9% (≥12% 만점·8~12% 부분) · 충족"
+              },
+              {
+                "code": "D2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "수급추세 +4 (≥+2 만점·+1 부분) · 충족"
+              },
+              {
+                "code": "D3",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "거래량 84% (≥100% 만점·80~100% 부분) · 부분 충족"
+              },
+              {
+                "code": "D4",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.5,
+                "evalStatus": "not_met",
+                "note": "대차잔고 +14.1% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 미충족"
+              },
+              {
+                "code": "V1",
+                "strictPoints": 0.75,
+                "signalPoints": 0.75,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "유리 (고변동성 장세라 눌림목 반등 포착에 유리합니다)"
+              }
+            ],
+            "scoreScope": "pullback",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G0, G13)",
+            "strategy": "pullback",
+            "gates": [
+              {
+                "code": "G0",
+                "status": "⛔",
+                "note": "최근 20일 최대 거래량 급증 177% (필요 ≥ 200%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "5MA 315,000 > 20MA 282,077 > 60MA 265,639 · 상승선 5MA, 20MA, 60MA",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "종가 320,000 / 60MA 265,639",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "주봉 RSI 57.6 (필요 ≥ 50)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "MACD 히스토그램 0선 위 또는 음전환 후 3일 이내",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G5",
+                "status": "⚠️",
+                "note": "KOSPI 6,913 / 5MA 6,817 (+1.4%) · VKOSPI 58.0 · 변동성 경계",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G6",
+                "status": "✅",
+                "note": "당일 등락 -5.74% (필요 ≤ +12%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G7",
+                "status": "✅",
+                "note": "주봉 RSI 57.6 (필요 ≤ 80)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G8",
+                "status": "✅",
+                "note": "이격 20MA +13.4% (필요 ≤ +25%) · 60MA +20.5% (필요 ≤ +60%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "52주 고가 대비 -26.9% (≥12%) · 거래량 84% (≥80%) · 수급추세 +4 (≥0) · 진짜 눌림+반등 거래량+수급 유지",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G9",
+                "status": "⚠️",
+                "note": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G10",
+                "status": "⚠️",
+                "note": "앵커 거래량 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "G11",
+                "status": "⚠️",
+                "note": "앵커 중심값 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "G12",
+                "status": "✅",
+                "note": "마지막 30분 비율 2.00:1 / 마지막 30분 평균 300.0% / 마지막 1시간 139.7% · 장 막판 매수세 유지",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G13",
+                "status": "⛔",
+                "note": "KIND 최근공시 2026-08-07 연결재무제표 기준 영업(잠정)실적(공정공시)",
+                "evalStatus": "not_met"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S2",
+                "note": "외인 87,887주 / 기관 156,382주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P2",
+                "note": "종가 320,000 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C1",
+                "note": "아래꼬리:몸통 2.00 (필요 ≥ 1.0)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D1",
+                "note": "52주 고가 대비 -26.9% (≥12% 만점·8~12% 부분) · 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D2",
+                "note": "수급추세 +4 (≥+2 만점·+1 부분) · 충족",
+                "evalStatus": "met"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "C5",
+                "note": "최근 5거래일 종목 뉴스 없음 · 최근 재료 신선도 약함",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "D3",
+                "note": "거래량 84% (≥100% 만점·80~100% 부분) · 부분 충족",
+                "evalStatus": "met"
+              },
+              {
+                "code": "D4",
+                "note": "대차잔고 +14.1% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 숏커버링 징후) · 미충족",
+                "evalStatus": "not_met"
+              }
+            ],
+            "currentPrice": 320000,
+            "previousClose": 339500,
+            "dailyChange": -19500,
+            "dailyChangePct": -5.74,
+            "dailyDirection": "down",
+            "entryPriceText": "320,000원 (당일 종가 기준)",
+            "entryPrice": 320000,
+            "entryMeta": "당일 종가 기준",
+            "marketCapTrillion": 17.1476,
+            "marketCapRank": 44,
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "5/20/60MA 정렬과 거래대금 상위 여부를 공개 데이터로 점검했습니다. 외인 87,887주 / 기관 156,382주. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "notes": [
+              "앵커 중심값 데이터 부족",
+              "앵커 거래량 데이터 부족"
+            ],
+            "toss": {
+              "avgStrength": 74.0,
+              "note": "토스 공개 체결강도 74.0% / 최근 체결 34분 프록시",
+              "source": "toss_http_combo",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A196170/order",
+              "asOf": "2026-08-21T08:32:55Z",
+              "intradayAbove100Ratio": 66.7,
+              "observedMinutes": 34,
+              "observedTickCount": 120,
+              "coverageNote": "최근 체결 34분 프록시",
+              "lastHourAvgStrength": 139.7,
+              "lastHourObservedMinutes": 34,
+              "last30AvgStrength": 300.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 2.0,
+              "last30BuyVolume": 2.0,
+              "last30SellVolume": 0.0
+            },
+            "eventFilter": {
+              "blocked": true,
+              "earningsDays": null,
+              "corporateActionDays": null,
+              "note": "KIND 최근공시 2026-08-07 연결재무제표 기준 영업(잠정)실적(공정공시)",
+              "source": "kind_playwright_recent_disclosure"
+            },
+            "pullbackContext": {
+              "support": {
+                "summary": "주지지 285,076원 (10.91% 아래) · 강도 65점 · family 2개 · 수평 지지·매물대 지지",
+                "lines": [
+                  {
+                    "label": "복합 지지",
+                    "price": 285076,
+                    "distancePct": 10.91,
+                    "families": [
+                      "horizontal",
+                      "volumeShelf"
+                    ],
+                    "familyLabels": [
+                      "수평 지지",
+                      "매물대 지지"
+                    ],
+                    "familyCount": 2,
+                    "count": 15,
+                    "lastSeenDaysAgo": 2,
+                    "strengthPoints": 65,
+                    "consensusBonus": 10,
+                    "valid": true,
+                    "role": "primary"
+                  },
+                  {
+                    "label": "복합 지지",
+                    "price": 277444,
+                    "distancePct": 13.3,
+                    "families": [
+                      "horizontal",
+                      "volumeShelf"
+                    ],
+                    "familyLabels": [
+                      "수평 지지",
+                      "매물대 지지"
+                    ],
+                    "familyCount": 2,
+                    "count": 15,
+                    "lastSeenDaysAgo": 11,
+                    "strengthPoints": 65,
+                    "consensusBonus": 10,
+                    "valid": true,
+                    "role": "secondary"
+                  },
+                  {
+                    "label": "복합 지지",
+                    "price": 217255,
+                    "distancePct": 32.11,
+                    "families": [
+                      "horizontal",
+                      "volumeShelf"
+                    ],
+                    "familyLabels": [
+                      "수평 지지",
+                      "매물대 지지"
+                    ],
+                    "familyCount": 2,
+                    "count": 9,
+                    "lastSeenDaysAgo": 14,
+                    "strengthPoints": 65,
+                    "consensusBonus": 10,
+                    "valid": true,
+                    "role": "secondary"
+                  },
+                  {
+                    "label": "수평 지지",
+                    "price": 319400,
+                    "distancePct": 0.19,
+                    "families": [
+                      "horizontal"
+                    ],
+                    "familyLabels": [
+                      "수평 지지"
+                    ],
+                    "familyCount": 1,
+                    "count": 5,
+                    "lastSeenDaysAgo": 0,
+                    "strengthPoints": 30,
+                    "consensusBonus": 0,
+                    "valid": true,
+                    "role": "secondary"
+                  },
+                  {
+                    "label": "수평 지지",
+                    "price": 311250,
+                    "distancePct": 2.73,
+                    "families": [
+                      "horizontal"
+                    ],
+                    "familyLabels": [
+                      "수평 지지"
+                    ],
+                    "familyCount": 1,
+                    "count": 5,
+                    "lastSeenDaysAgo": 0,
+                    "strengthPoints": 30,
+                    "consensusBonus": 0,
+                    "valid": true,
+                    "role": "secondary"
+                  }
+                ],
+                "primaryLine": {
+                  "label": "복합 지지",
+                  "price": 285076,
+                  "distancePct": 10.91,
+                  "families": [
+                    "horizontal",
+                    "volumeShelf"
+                  ],
+                  "familyLabels": [
+                    "수평 지지",
+                    "매물대 지지"
+                  ],
+                  "familyCount": 2,
+                  "count": 15,
+                  "lastSeenDaysAgo": 2,
+                  "strengthPoints": 65,
+                  "consensusBonus": 10,
+                  "valid": true,
+                  "role": "primary"
+                },
+                "strengthScore": 65,
+                "strengthLabel": "watch",
+                "warningLevel": "warning",
+                "warningReason": "복합 지지선은 있으나 합의 강도가 중간 수준입니다.",
+                "activeFamilyCount": 2,
+                "barCount": 60
+              },
+              "families": {
+                "horizontal": [
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 206653,
+                    "distancePct": 35.42,
+                    "count": 5,
+                    "lastSeenDaysAgo": 16,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 205059,
+                    "bandHigh": 209291
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 211022,
+                    "distancePct": 34.06,
+                    "count": 3,
+                    "lastSeenDaysAgo": 15,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 210060,
+                    "bandHigh": 212753
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 216312,
+                    "distancePct": 32.4,
+                    "count": 4,
+                    "lastSeenDaysAgo": 14,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 215061,
+                    "bandHigh": 217755
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 221448,
+                    "distancePct": 30.8,
+                    "count": 4,
+                    "lastSeenDaysAgo": 17,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 220063,
+                    "bandHigh": 222756
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 230023,
+                    "distancePct": 28.12,
+                    "count": 7,
+                    "lastSeenDaysAgo": 13,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 227757,
+                    "bandHigh": 231989
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 239203,
+                    "distancePct": 25.25,
+                    "count": 6,
+                    "lastSeenDaysAgo": 14,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 235837,
+                    "bandHigh": 242377
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 243659,
+                    "distancePct": 23.86,
+                    "count": 3,
+                    "lastSeenDaysAgo": 12,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 243146,
+                    "bandHigh": 244301
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 253630,
+                    "distancePct": 20.74,
+                    "count": 9,
+                    "lastSeenDaysAgo": 28,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 249302,
+                    "bandHigh": 256227
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 261421,
+                    "distancePct": 18.31,
+                    "count": 7,
+                    "lastSeenDaysAgo": 31,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 259305,
+                    "bandHigh": 264306
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 269362,
+                    "distancePct": 15.82,
+                    "count": 14,
+                    "lastSeenDaysAgo": 10,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 265461,
+                    "bandHigh": 272386
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 276190,
+                    "distancePct": 13.69,
+                    "count": 8,
+                    "lastSeenDaysAgo": 11,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 273540,
+                    "bandHigh": 278541
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 284734,
+                    "distancePct": 11.02,
+                    "count": 10,
+                    "lastSeenDaysAgo": 2,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 280850,
+                    "bandHigh": 288544
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 296098,
+                    "distancePct": 7.47,
+                    "count": 3,
+                    "lastSeenDaysAgo": 3,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 293500,
+                    "bandHigh": 298000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 304250,
+                    "distancePct": 4.92,
+                    "count": 2,
+                    "lastSeenDaysAgo": 2,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close"
+                    ],
+                    "bandLow": 303500,
+                    "bandHigh": 305000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 311250,
+                    "distancePct": 2.73,
+                    "count": 5,
+                    "lastSeenDaysAgo": 0,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 310000,
+                    "bandHigh": 314000
+                  },
+                  {
+                    "family": "horizontal",
+                    "familyLabel": "수평 지지",
+                    "label": "수평 지지",
+                    "price": 319400,
+                    "distancePct": 0.19,
+                    "count": 5,
+                    "lastSeenDaysAgo": 0,
+                    "valid": true,
+                    "weight": 30,
+                    "sources": [
+                      "close",
+                      "low"
+                    ],
+                    "bandLow": 317500,
+                    "bandHigh": 322000
+                  }
+                ],
+                "swingCluster": [],
+                "volumeShelf": [
+                  {
+                    "family": "volumeShelf",
+                    "familyLabel": "매물대 지지",
+                    "label": "매물대 지지",
+                    "price": 278697,
+                    "distancePct": 12.91,
+                    "count": 7,
+                    "lastSeenDaysAgo": 11,
+                    "valid": true,
+                    "weight": 25,
+                    "volume": 5126429,
+                    "binIndex": 12,
+                    "binLow": 275336,
+                    "binHigh": 282058
+                  },
+                  {
+                    "family": "volumeShelf",
+                    "familyLabel": "매물대 지지",
+                    "label": "매물대 지지",
+                    "price": 218198,
+                    "distancePct": 31.81,
+                    "count": 5,
+                    "lastSeenDaysAgo": 15,
+                    "valid": true,
+                    "weight": 25,
+                    "volume": 4082755,
+                    "binIndex": 3,
+                    "binLow": 214837,
+                    "binHigh": 221559
+                  },
+                  {
+                    "family": "volumeShelf",
+                    "familyLabel": "매물대 지지",
+                    "label": "매물대 지지",
+                    "price": 285419,
+                    "distancePct": 10.81,
+                    "count": 5,
+                    "lastSeenDaysAgo": 37,
+                    "valid": true,
+                    "weight": 25,
+                    "volume": 3565256,
+                    "binIndex": 13,
+                    "binLow": 282058,
+                    "binHigh": 288780
+                  }
+                ],
+                "eventAnchors": []
+              },
+              "volumeBurst": {
+                "summary": "최근 20일 최대 거래량 177% (8일 전)",
+                "burstCount": 0,
+                "maxRatioPct": 176.7,
+                "latestBurstDaysAgo": null
+              },
+              "anchor": null,
+              "trapDiagnostics": {
+                "volumeTrap": {
+                  "status": "⚠️",
+                  "summary": "앵커 거래량 데이터 부족"
+                },
+                "supportDefense": {
+                  "status": "⚠️",
+                  "summary": "앵커 중심값 데이터 부족"
+                },
+                "intradayClose": {
+                  "status": "✅",
+                  "summary": "마지막 30분 비율 2.00:1 / 마지막 30분 평균 300.0% / 마지막 1시간 139.7% · 장 막판 매수세 유지"
+                }
+              },
+              "newsFlow": {
+                "lookbackDays": 5,
+                "headlineCount": 0,
+                "positiveCount": 0,
+                "negativeCount": 0,
+                "latestPositiveDate": "",
+                "latestNegativeDate": "",
+                "status": "neutral",
+                "summary": "최근 5거래일 종목 뉴스 없음",
+                "headlines": [],
+                "freshPositiveCount": 0,
+                "freshNegativeCount": 0
+              }
+            },
+            "volatilityContext": {
+              "marketState": "volatile",
+              "stockState": "volatile",
+              "blendedState": "volatile",
+              "strategyFit": "favorable",
+              "scoreDelta": 0.75,
+              "summary": "유리 (고변동성 장세라 눌림목 반등 포착에 유리합니다)",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세라 눌림목 반등 포착에 유리합니다. VKOSPI 58.03, ATR10 8.04%, 일간 표준편차 6.01%, 당일 레인지 5.30%.",
+              "metrics": {
+                "atrPct10": 8.04,
+                "returnStd20": 6.01,
+                "todayRangePct": 5.3,
+                "vkospi": 58.03
+              },
+              "strategyLabel": "눌림목"
+            },
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "pullbackStopPolicy": {
+              "version": "pullback-stop-v1",
+              "anchorSource": "fallback_percent_stop",
+              "anchorLookbackDays": 20,
+              "anchorDate": "",
+              "anchorOpen": null,
+              "anchorClose": null,
+              "anchorHigh": null,
+              "anchorLow": null,
+              "anchorBodyMid": null,
+              "anchorVolumeRatio": null,
+              "anchorStopMode": "",
+              "anchorStopPrice": null,
+              "ma10Price": 319050,
+              "ma10PrevPrice": 316400,
+              "ma20Price": 282077,
+              "ma20PrevPrice": 277869,
+              "ma10WarningPrice": null,
+              "hardStopPrice": 310400,
+              "fallbackStopPrice": 310400,
+              "effectiveStopPrice": 310400,
+              "warningRuleSummary": "10일선 경고 없음",
+              "hardStopRuleSummary": "앵커 부재 → 기존 % 손절 310,400원 사용",
+              "reasonSummary": "앵커 부재로 기존 % 손절 310,400원를 유지합니다."
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "stageKey": "premarket",
+                "condition": "+1.5% 도달",
+                "quantity": "35% 익절",
+                "targetYield": "+1.5%",
+                "targetPrice": "324,800원",
+                "historicalHitRate": 0.45,
+                "recommended": false
+              },
+              {
+                "stage": "🔔 장초반",
+                "stageKey": "openPhase",
+                "condition": "+2.5% 도달",
+                "quantity": "30% 익절",
+                "targetYield": "+2.5%",
+                "targetPrice": "328,000원",
+                "historicalHitRate": 0.35,
+                "recommended": false
+              },
+              {
+                "stage": "📈 장중 1차",
+                "stageKey": "intraday1",
+                "condition": "+4.5% 도달",
+                "quantity": "25% 익절",
+                "targetYield": "+4.5%",
+                "targetPrice": "334,400원",
+                "historicalHitRate": 0.2,
+                "recommended": false
+              },
+              {
+                "stage": "📈 장중 2차",
+                "stageKey": "intraday2",
+                "condition": "추세 유지 시",
+                "quantity": "10% 익절",
+                "targetYield": "+6.0%",
+                "targetPrice": "339,200원",
+                "historicalHitRate": 0.1,
+                "recommended": true
+              },
+              {
+                "stage": "🛑 손절",
+                "stageKey": "stop",
+                "condition": "유효 손절가 310,400원 하향 이탈",
+                "quantity": "전량",
+                "targetYield": "-3.0%",
+                "targetPrice": "310,400원"
+              }
+            ],
+            "rr": "1 : 1.0",
+            "source": "jongga-live",
+            "recommendedEntryBand": {
+              "low": 316000,
+              "high": 319200,
+              "anchor": 320000,
+              "label": "316,000~319,200원 (종가 ±, 분할매수)"
+            },
+            "pullbackTakeProfitProfiles": [
+              {
+                "profileKey": "aggressive",
+                "label": "기본 목표형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
+                "nearestResistanceType": "none",
+                "nearestResistancePrice": null,
+                "secondaryResistanceType": "none",
+                "secondaryResistancePrice": null,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "+1.5% 도달",
+                    "quantity": "35% 익절",
+                    "targetYield": "+1.5%",
+                    "targetPrice": "324,800원",
+                    "historicalHitRate": 0.45,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+2.5% 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+2.5%",
+                    "targetPrice": "328,000원",
+                    "historicalHitRate": 0.35,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "+4.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+4.5%",
+                    "targetPrice": "334,400원",
+                    "historicalHitRate": 0.2,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 2차",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "10% 익절",
+                    "targetYield": "+6.0%",
+                    "targetPrice": "339,200원",
+                    "historicalHitRate": 0.1,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 손절가 310,400원 하향 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.0%",
+                    "targetPrice": "310,400원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "intraday2",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 20건)",
+                  "hitRate": 0.1,
+                  "ev": -0.786,
+                  "sampleCount": 20
+                }
+              },
+              {
+                "profileKey": "balanced",
+                "label": "1차 저항 반영형",
+                "recommended": true,
+                "selectionBasis": "fallback_same_as_aggressive",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 20건)",
+                "nearestResistanceType": "none",
+                "nearestResistancePrice": null,
+                "secondaryResistanceType": "none",
+                "secondaryResistancePrice": null,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "+1.5% 도달",
+                    "quantity": "35% 익절",
+                    "targetYield": "+1.5%",
+                    "targetPrice": "324,800원",
+                    "historicalHitRate": 0.45,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+2.5% 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+2.5%",
+                    "targetPrice": "328,000원",
+                    "historicalHitRate": 0.35,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "+4.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+4.5%",
+                    "targetPrice": "334,400원",
+                    "historicalHitRate": 0.2,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 2차",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "10% 익절",
+                    "targetYield": "+6.0%",
+                    "targetPrice": "339,200원",
+                    "historicalHitRate": 0.1,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 손절가 310,400원 하향 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.0%",
+                    "targetPrice": "310,400원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "intraday2",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 20건)",
+                  "hitRate": 0.1,
+                  "ev": -0.786,
+                  "sampleCount": 20
+                }
+              },
+              {
+                "profileKey": "conservative",
+                "label": "저항 우선형",
+                "recommended": false,
+                "selectionBasis": "fallback_same_as_aggressive",
+                "reasonSummary": "가까운 5일선/10일선 저항이 없어 기본 목표형과 동일합니다.",
+                "nearestResistanceType": "none",
+                "nearestResistancePrice": null,
+                "secondaryResistanceType": "none",
+                "secondaryResistancePrice": null,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "+1.5% 도달",
+                    "quantity": "35% 익절",
+                    "targetYield": "+1.5%",
+                    "targetPrice": "324,800원",
+                    "historicalHitRate": 0.45,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+2.5% 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+2.5%",
+                    "targetPrice": "328,000원",
+                    "historicalHitRate": 0.35,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "+4.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+4.5%",
+                    "targetPrice": "334,400원",
+                    "historicalHitRate": 0.2,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "📈 장중 2차",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "10% 익절",
+                    "targetYield": "+6.0%",
+                    "targetPrice": "339,200원",
+                    "historicalHitRate": 0.1,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 손절가 310,400원 하향 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.0%",
+                    "targetPrice": "310,400원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "intraday2",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 20건)",
+                  "hitRate": 0.1,
+                  "ev": -0.786,
+                  "sampleCount": 20
+                }
+              }
+            ],
+            "recommendedTakeProfitProfile": {
+              "profileKey": "balanced",
+              "label": "1차 저항 반영형",
+              "selectionBasis": "fallback_same_as_aggressive",
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 20건)",
+              "sampleCount": 20,
+              "ev": -2.9095
+            },
+            "recommendedStage": {
+              "stageKey": "intraday2",
+              "evBasis": "historical:netStageReturn",
+              "reason": "EV=순수익 argmax (과거 20건)",
+              "hitRate": 0.1,
+              "ev": -0.786,
+              "sampleCount": 20
+            },
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-pullback",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "entryEligible": false,
+            "entryWatch": false,
+            "entryBlockers": [
+              "핵심 Gate 미충족: G0",
+              "핵심 Gate 미충족: G13",
+              "매매금지(핵심 Gate 미충족: G0, G13)"
+            ],
+            "setupQuality": "setup_weak",
+            "statusReasonShort": "G0 미충족: 최근 20일 최대 거래량 급증 177% (필요 ≥ 200%) · 외 1건",
+            "statusReason": "G0 미충족: 최근 20일 최대 거래량 급증 177% (필요 ≥ 200%) / G13 미충족: KIND 최근공시 2026-08-07 연결재무제표 기준 영업(잠정)실적(공정공시)",
+            "stockIndicators": {
+              "snapshot": {
+                "currentPrice": 320000.0,
+                "vs52wHighPct": 73.0897313495562,
+                "vs52wLowPct": 64.37990250217032,
+                "dropFrom52wHighPct": 26.91026865044379,
+                "ma20GapPct": 13.444221514732057,
+                "rsi14": 59.5054078953305,
+                "volumeRatio20d": 83.94156746558384,
+                "rs20Pct": 35.68693631618448,
+                "supportDistancePct": 10.91,
+                "tradingValueRank": 39.0,
+                "marketCapRank": 44.0,
+                "marketCapTrillion": 17.1476,
+                "per": 172.23,
+                "pbr": 44.52,
+                "cnsPer": 82.41,
+                "foreignRate": 15.07,
+                "supplyTrendScore": 4.0,
+                "shortBalanceChangePct": 14.111848640691004
+              },
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
+              "source": "jongga_analysis"
+            },
+            "stockExchangeName": "KOSDAQ",
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
+          },
+          {
+            "rank": 4,
             "name": "삼성생명",
             "code": "032830",
             "strictScore": 8.7,
@@ -2877,7 +5185,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "analysisSessionLabel": "3시 분석"
           },
           {
-            "rank": 3,
+            "rank": 5,
             "name": "NAVER",
             "code": "035420",
             "strictScore": 8.7,
@@ -4021,40 +6329,40 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "breakout": [
           {
             "rank": 1,
-            "name": "삼성생명",
-            "code": "032830",
-            "strictScore": 4.5,
-            "signalScore": 4.5,
-            "score": 4.5,
+            "name": "삼성물산",
+            "code": "028260",
+            "strictScore": 4.1,
+            "signalScore": 4.1,
+            "score": 4.1,
             "scoreMax": 12.5,
-            "effectiveScoreMax": 12.5,
-            "gradeScore": 3.6,
+            "effectiveScoreMax": 10.5,
+            "gradeScore": 3.9,
             "grade": "C",
             "overnightGapPenalty": 0.0,
             "scoreBreakdown": [
               {
                 "code": "RS",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
                 "maxPoints": 1.5,
-                "evalStatus": "not_met",
-                "note": "3개월 상대강도 상위 25% 밖"
+                "evalStatus": "met",
+                "note": "3개월 상대강도 상위 25%"
               },
               {
                 "code": "S1",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 2.0,
-                "evalStatus": "not_met",
-                "note": "외인 -18,443주 / 기관 20,472주 · 양매수 아님"
-              },
-              {
-                "code": "S2",
                 "strictPoints": 2.0,
                 "signalPoints": 2.0,
                 "maxPoints": 2.0,
                 "evalStatus": "met",
-                "note": "당일 평균 133.0% / 100% 유지 100.0% (필요 ≥110%·≥70%)"
+                "note": "외인 11,883주 / 기관 27,793주 · 외인·기관 양매수"
+              },
+              {
+                "code": "S2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 2.0,
+                "evalStatus": "manual_required",
+                "note": "당일 평균 체결강도 129.0% · 100% 유지 비율 미입력"
               },
               {
                 "code": "P1",
@@ -4066,11 +6374,11 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "P2",
-                "strictPoints": 1.12,
-                "signalPoints": 1.12,
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
                 "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "당일 거래량 / 20일 평균 205% · 강한 급증 (≥200%)"
+                "evalStatus": "not_met",
+                "note": "당일 거래량 / 20일 평균 126% (필요 ≥ 150%)"
               },
               {
                 "code": "C1",
@@ -4086,15 +6394,15 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.75,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "몸통 81% / 윗꼬리·몸통 0.10 · 강마감 기준 충족"
+                "note": "몸통 80% / 윗꼬리·몸통 0.18 · 강마감 기준 충족"
               },
               {
                 "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
                 "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "매수/매도 호가잔량 1.24 (필요 ≥ 1.2) · 매수 잔량 우위"
+                "evalStatus": "not_met",
+                "note": "매수/매도 호가잔량 0.77 (필요 ≥ 1.2)"
               },
               {
                 "code": "L1",
@@ -4102,7 +6410,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.0,
                 "maxPoints": 1.0,
                 "evalStatus": "not_met",
-                "note": "대차잔고 -7.0% (최근 10거래일) (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력) · 미충족"
+                "note": "대차잔고 -14.8% (최근 10거래일) (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력) · 미충족"
               },
               {
                 "code": "V1",
@@ -4114,56 +6422,61 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               }
             ],
             "scoreScope": "breakout",
-            "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+            "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
             "strategy": "breakout",
             "gates": [
               {
                 "code": "G1",
                 "status": "✅",
-                "note": "5일 초과 +10.1% / 20일 초과 +1.3%",
+                "note": "5일 초과 +6.9% / 20일 초과 +12.5%",
                 "evalStatus": "met"
               },
               {
                 "code": "G2",
                 "status": "⛔",
-                "note": "52주 고가 대비 62.7% (필요 ≥ 90%)",
+                "note": "52주 고가 대비 69.9% (필요 ≥ 90%)",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G3",
                 "status": "✅",
-                "note": "거래대금 TOP100 순위 22",
+                "note": "거래대금 TOP100 순위 27",
                 "evalStatus": "met"
               },
               {
                 "code": "G4",
-                "status": "✅",
-                "note": "당일 거래량 / 20일 평균 205% · 강한 급증 (≥200%)",
-                "evalStatus": "met"
+                "status": "⛔",
+                "note": "당일 거래량 / 20일 평균 126% (필요 ≥ 150%)",
+                "evalStatus": "not_met"
               },
               {
                 "code": "G5",
                 "status": "✅",
-                "note": "몸통 81% / 윗꼬리·몸통 0.10 · 강마감 기준 충족",
+                "note": "몸통 80% / 윗꼬리·몸통 0.18 · 강마감 기준 충족",
                 "evalStatus": "met"
               },
               {
                 "code": "G6",
                 "status": "✅",
-                "note": "당일 등락 +9.43% (필요 ≤ +12%)",
+                "note": "당일 등락 +5.75% (필요 ≤ +12%)",
                 "evalStatus": "met"
               },
               {
                 "code": "G7",
                 "status": "✅",
-                "note": "종가 325,000 / 5MA 301,900 (전일 5MA 295,200) · 5MA 위·우상향",
+                "note": "종가 395,500 / 5MA 370,900 (전일 5MA 364,800) · 5MA 위·우상향",
                 "evalStatus": "met"
               }
             ],
             "matchedRules": [
               {
-                "code": "S2",
-                "note": "당일 평균 133.0% / 100% 유지 100.0% (필요 ≥110%·≥70%)",
+                "code": "RS",
+                "note": "3개월 상대강도 상위 25%",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S1",
+                "note": "외인 11,883주 / 기관 27,793주 · 외인·기관 양매수",
                 "evalStatus": "met"
               },
               {
@@ -4175,78 +6488,73 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "code": "C1",
                 "note": "종가 / 당일 고가 98.9% (필요 ≥ 95%)",
                 "evalStatus": "met"
-              },
-              {
-                "code": "C3",
-                "note": "매수/매도 호가잔량 1.24 (필요 ≥ 1.2) · 매수 잔량 우위",
-                "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
               {
-                "code": "RS",
-                "note": "3개월 상대강도 상위 25% 밖",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "S1",
-                "note": "외인 -18,443주 / 기관 20,472주 · 양매수 아님",
-                "evalStatus": "not_met"
+                "code": "S2",
+                "note": "당일 평균 체결강도 129.0% · 100% 유지 비율 미입력",
+                "evalStatus": "manual_required"
               },
               {
                 "code": "P2",
-                "note": "당일 거래량 / 20일 평균 205% · 강한 급증 (≥200%)",
-                "evalStatus": "met"
+                "note": "당일 거래량 / 20일 평균 126% (필요 ≥ 150%)",
+                "evalStatus": "not_met"
               },
               {
                 "code": "C2",
-                "note": "몸통 81% / 윗꼬리·몸통 0.10 · 강마감 기준 충족",
+                "note": "몸통 80% / 윗꼬리·몸통 0.18 · 강마감 기준 충족",
                 "evalStatus": "met"
               },
               {
+                "code": "C3",
+                "note": "매수/매도 호가잔량 0.77 (필요 ≥ 1.2)",
+                "evalStatus": "not_met"
+              },
+              {
                 "code": "L1",
-                "note": "대차잔고 -7.0% (최근 10거래일) (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력) · 미충족",
+                "note": "대차잔고 -14.8% (최근 10거래일) (증가 ≥10% 만점·5~10% 부분, 숏스퀴즈 동력) · 미충족",
                 "evalStatus": "not_met"
               }
             ],
-            "currentPrice": 325000,
-            "previousClose": 297000,
-            "dailyChange": 28000,
-            "dailyChangePct": 9.43,
+            "currentPrice": 395500,
+            "previousClose": 374000,
+            "dailyChange": 21500,
+            "dailyChangePct": 5.75,
             "dailyDirection": "up",
-            "entryPriceText": "325,000원 (당일 종가 기준)",
-            "entryPrice": 325000,
+            "entryPriceText": "395,500원 (당일 종가 기준)",
+            "entryPrice": 395500,
             "entryMeta": "당일 종가 기준",
-            "marketCapTrillion": 65.0,
-            "marketCapRank": 8,
-            "marketCapUniverseCount": 2551,
-            "keyPoint": "주도주 돌파형 — RS·거래량·강마감·5MA 추세를 점검했습니다. 외인 -18,443주 / 기관 20,472주. 고변동성 장세라 현재 전략은 보수적으로 해석해야 합니다.",
+            "marketCapTrillion": 64.1373,
+            "marketCapRank": 9,
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "주도주 돌파형 — RS·거래량·강마감·5MA 추세를 점검했습니다. 외인 11,883주 / 기관 27,793주. 고변동성 장세라 현재 전략은 보수적으로 해석해야 합니다.",
             "notes": [],
             "toss": {
-              "avgStrength": 133.0,
-              "note": "토스 공개 체결강도 133.0% / 최근 체결 2분 프록시",
+              "avgStrength": 129.0,
+              "note": "토스 공개 체결강도 129.0% / 최근 체결 37분 프록시",
               "source": "toss_http_combo",
-              "sourceUrl": "https://www.tossinvest.com/stocks/A032830/order",
-              "asOf": "2026-08-21T06:03:05Z",
-              "intradayAbove100Ratio": 100.0,
-              "observedMinutes": 2,
+              "sourceUrl": "https://www.tossinvest.com/stocks/A028260/order",
+              "asOf": "2026-08-21T08:33:00Z",
+              "intradayAbove100Ratio": 0.0,
+              "observedMinutes": 37,
               "observedTickCount": 120,
-              "coverageNote": "최근 체결 2분 프록시",
-              "lastHourAvgStrength": 216.2,
-              "lastHourObservedMinutes": 2,
-              "last30AvgStrength": 216.2,
-              "last30ObservedMinutes": 2,
-              "last30BuySellRatio": 1.3646,
-              "last30BuyVolume": 1366.0,
-              "last30SellVolume": 1001.0
+              "coverageNote": "최근 체결 37분 프록시",
+              "lastHourAvgStrength": 21.1,
+              "lastHourObservedMinutes": 37,
+              "last30AvgStrength": 0.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 0.0,
+              "last30BuyVolume": 0.0,
+              "last30SellVolume": 1.0
             },
             "orderbook": {
-              "bidAskRatio": 1.2373,
-              "bidTotal": 9203,
-              "askTotal": 7438,
-              "note": "Naver 호가잔량합계 매수 9,203 / 매도 7,438",
+              "bidAskRatio": 0.7722,
+              "bidTotal": 12028,
+              "askTotal": 15577,
+              "note": "Naver 호가잔량합계 매수 12,028 / 매도 15,577",
               "source": "naver_orderbook_http",
-              "sourceUrl": "https://finance.naver.com/item/main.nhn?code=032830"
+              "sourceUrl": "https://finance.naver.com/item/main.nhn?code=028260"
             },
             "volatilityContext": {
               "marketState": "volatile",
@@ -4255,12 +6563,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "strategyFit": "unfavorable",
               "scoreDelta": -1.0,
               "summary": "불리 (고변동성 장세라 실패 돌파·윗꼬리 위험이 커 불리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세라 실패 돌파·윗꼬리 위험이 커 불리합니다. VKOSPI 58.06, ATR10 8.14%, 일간 표준편차 6.79%, 당일 레인지 13.97%.",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세라 실패 돌파·윗꼬리 위험이 커 불리합니다. VKOSPI 58.03, ATR10 6.50%, 일간 표준편차 6.43%, 당일 레인지 8.56%.",
               "metrics": {
-                "atrPct10": 8.14,
-                "returnStd20": 6.79,
-                "todayRangePct": 13.97,
-                "vkospi": 58.06
+                "atrPct10": 6.5,
+                "returnStd20": 6.43,
+                "todayRangePct": 8.56,
+                "vkospi": 58.03
               },
               "strategyLabel": "주도주돌파형"
             },
@@ -4276,20 +6584,20 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "referenceSource": "prior_resistance_band",
               "referenceLookbackDays": 60,
               "referenceClusterPct": 1.0,
-              "referencePrice": 324500,
-              "referenceBandLow": 321500,
-              "referenceBandHigh": 324500,
-              "entryDayOpenPrice": 291500,
-              "fallbackStopPrice": 310375,
-              "effectiveHardStopPrice": 324500,
+              "referencePrice": 394000,
+              "referenceBandLow": 394000,
+              "referenceBandHigh": 394000,
+              "entryDayOpenPrice": 370000,
+              "fallbackStopPrice": 377702,
+              "effectiveHardStopPrice": 394000,
               "openExitCheckCutoff": "10:00",
               "microTrendBarUnit": "3m",
               "microTrendShortMa": 8,
               "microTrendLongMa": 10,
-              "hardStopRuleSummary": "직전 돌파 저항 밴드 324,500원와 기존 % 손절 310,375원 중 더 높은 324,500원을 하드 스톱으로 사용합니다.",
+              "hardStopRuleSummary": "직전 돌파 저항 밴드 394,000원와 기존 % 손절 377,702원 중 더 높은 394,000원을 하드 스톱으로 사용합니다.",
               "openExitRuleSummary": "09:00~10:00에 돌파 기준선 재이탈 또는 갭 시가 이탈이 나오면 즉시 손절합니다.",
               "microTrendRuleSummary": "09:05~10:00에는 3분 프록시 8EMA/10EMA 아래 2개 연속 마감 시 즉시 손절합니다.",
-              "reasonSummary": "돌파 기준선은 직전 돌파 저항 밴드 324,500원이며, 기존 % 손절 310,375원보다 느슨해지지 않게 324,500원으로 고정합니다."
+              "reasonSummary": "돌파 기준선은 직전 돌파 저항 밴드 394,000원이며, 기존 % 손절 377,702원보다 느슨해지지 않게 394,000원으로 고정합니다."
             },
             "tradePlanRows": [
               {
@@ -4297,8 +6605,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "stageKey": "premarket",
                 "condition": "상단 매물대 1 도달",
                 "quantity": "20% 익절",
-                "targetYield": "+0.2%",
-                "targetPrice": "325,500원",
+                "targetYield": "+1.1%",
+                "targetPrice": "400,000원",
                 "historicalHitRate": 0.6458,
                 "recommended": false
               },
@@ -4307,8 +6615,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "stageKey": "openPhase",
                 "condition": "상단 매물대 2 도달",
                 "quantity": "20% 익절",
-                "targetYield": "+2.6%",
-                "targetPrice": "333,500원",
+                "targetYield": "+4.4%",
+                "targetPrice": "413,000원",
                 "historicalHitRate": 0.4028,
                 "recommended": false
               },
@@ -4318,7 +6626,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+7.5% 도달",
                 "quantity": "25% 익절",
                 "targetYield": "+7.5%",
-                "targetPrice": "349,375원",
+                "targetPrice": "425,162원",
                 "historicalHitRate": 0.2778,
                 "recommended": false
               },
@@ -4328,7 +6636,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "추세 유지 시",
                 "quantity": "20% 익절",
                 "targetYield": "+10.5%",
-                "targetPrice": "359,125원",
+                "targetPrice": "437,028원",
                 "historicalHitRate": 0.2292,
                 "recommended": false
               },
@@ -4338,26 +6646,26 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "V 조건 충족 시",
                 "quantity": "15% 익절",
                 "targetYield": "+13.5%",
-                "targetPrice": "368,875원",
+                "targetPrice": "448,892원",
                 "historicalHitRate": 0.1603,
                 "recommended": true
               },
               {
                 "stage": "🛑 손절",
                 "stageKey": "stop",
-                "condition": "유효 하드 스톱 324,500원 종가 이탈",
+                "condition": "유효 하드 스톱 394,000원 종가 이탈",
                 "quantity": "전량",
-                "targetYield": "-0.2%",
-                "targetPrice": "324,500원"
+                "targetYield": "-0.4%",
+                "targetPrice": "394,000원"
               }
             ],
-            "rr": "1 : 32.8",
+            "rr": "1 : 17.7",
             "source": "jongga-live",
             "recommendedEntryBand": {
-              "low": 320938,
-              "high": 324188,
-              "anchor": 325000,
-              "label": "320,938~324,188원 (종가 ±, 분할매수)"
+              "low": 390556,
+              "high": 394511,
+              "anchor": 395500,
+              "label": "390,556~394,511원 (종가 ±, 분할매수)"
             },
             "breakoutTakeProfitProfiles": [
               {
@@ -4366,8 +6674,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "recommended": false,
                 "selectionBasis": "market_stock_heuristic",
                 "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
-                "nearestResistancePrice": 325500,
-                "secondaryResistancePrice": 333500,
+                "nearestResistancePrice": 400000,
+                "secondaryResistancePrice": 413000,
                 "tradePlanRows": [
                   {
                     "stage": "🌅 프리마켓",
@@ -4375,7 +6683,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+2.5% 도달",
                     "quantity": "20% 익절",
                     "targetYield": "+2.5%",
-                    "targetPrice": "333,125원",
+                    "targetPrice": "405,387원",
                     "historicalHitRate": 0.6458,
                     "recommended": false
                   },
@@ -4385,7 +6693,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+4.5% 도달",
                     "quantity": "20% 익절",
                     "targetYield": "+4.5%",
-                    "targetPrice": "339,625원",
+                    "targetPrice": "413,298원",
                     "historicalHitRate": 0.4028,
                     "recommended": false
                   },
@@ -4395,7 +6703,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+7.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+7.5%",
-                    "targetPrice": "349,375원",
+                    "targetPrice": "425,162원",
                     "historicalHitRate": 0.2778,
                     "recommended": false
                   },
@@ -4405,7 +6713,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "20% 익절",
                     "targetYield": "+10.5%",
-                    "targetPrice": "359,125원",
+                    "targetPrice": "437,028원",
                     "historicalHitRate": 0.2292,
                     "recommended": false
                   },
@@ -4415,17 +6723,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "V 조건 충족 시",
                     "quantity": "15% 익절",
                     "targetYield": "+13.5%",
-                    "targetPrice": "368,875원",
+                    "targetPrice": "448,892원",
                     "historicalHitRate": 0.1603,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 324,500원 종가 이탈",
+                    "condition": "유효 하드 스톱 394,000원 종가 이탈",
                     "quantity": "전량",
-                    "targetYield": "-0.2%",
-                    "targetPrice": "324,500원"
+                    "targetYield": "-0.4%",
+                    "targetPrice": "394,000원"
                   }
                 ],
                 "trailingActivationPct": 8.0,
@@ -4445,16 +6753,16 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "recommended": false,
                 "selectionBasis": "market_stock_heuristic",
                 "reasonSummary": "상단 매물대 1 / 상단 매물대 2 저항만 앞단 목표가에 반영합니다.",
-                "nearestResistancePrice": 325500,
-                "secondaryResistancePrice": 333500,
+                "nearestResistancePrice": 400000,
+                "secondaryResistancePrice": 413000,
                 "tradePlanRows": [
                   {
                     "stage": "🌅 프리마켓",
                     "stageKey": "premarket",
                     "condition": "상단 매물대 1 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+0.2%",
-                    "targetPrice": "325,500원",
+                    "targetYield": "+1.1%",
+                    "targetPrice": "400,000원",
                     "historicalHitRate": 0.6458,
                     "recommended": false
                   },
@@ -4463,8 +6771,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "stageKey": "openPhase",
                     "condition": "상단 매물대 2 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+2.6%",
-                    "targetPrice": "333,500원",
+                    "targetYield": "+4.4%",
+                    "targetPrice": "413,000원",
                     "historicalHitRate": 0.4028,
                     "recommended": false
                   },
@@ -4474,7 +6782,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+7.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+7.5%",
-                    "targetPrice": "349,375원",
+                    "targetPrice": "425,162원",
                     "historicalHitRate": 0.2778,
                     "recommended": false
                   },
@@ -4484,7 +6792,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "20% 익절",
                     "targetYield": "+10.5%",
-                    "targetPrice": "359,125원",
+                    "targetPrice": "437,028원",
                     "historicalHitRate": 0.2292,
                     "recommended": false
                   },
@@ -4494,17 +6802,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "V 조건 충족 시",
                     "quantity": "15% 익절",
                     "targetYield": "+13.5%",
-                    "targetPrice": "368,875원",
+                    "targetPrice": "448,892원",
                     "historicalHitRate": 0.1603,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 324,500원 종가 이탈",
+                    "condition": "유효 하드 스톱 394,000원 종가 이탈",
                     "quantity": "전량",
-                    "targetYield": "-0.2%",
-                    "targetPrice": "324,500원"
+                    "targetYield": "-0.4%",
+                    "targetPrice": "394,000원"
                   }
                 ],
                 "trailingActivationPct": 6.0,
@@ -4523,17 +6831,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "label": "저항 우선형",
                 "recommended": true,
                 "selectionBasis": "historical_profile_ev",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 49건)",
-                "nearestResistancePrice": 325500,
-                "secondaryResistancePrice": 333500,
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 50건)",
+                "nearestResistancePrice": 400000,
+                "secondaryResistancePrice": 413000,
                 "tradePlanRows": [
                   {
                     "stage": "🌅 프리마켓",
                     "stageKey": "premarket",
                     "condition": "상단 매물대 1 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+0.2%",
-                    "targetPrice": "325,500원",
+                    "targetYield": "+1.1%",
+                    "targetPrice": "400,000원",
                     "historicalHitRate": 0.6458,
                     "recommended": false
                   },
@@ -4542,8 +6850,8 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "stageKey": "openPhase",
                     "condition": "상단 매물대 2 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+2.6%",
-                    "targetPrice": "333,500원",
+                    "targetYield": "+4.4%",
+                    "targetPrice": "413,000원",
                     "historicalHitRate": 0.4028,
                     "recommended": false
                   },
@@ -4553,7 +6861,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+7.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+7.5%",
-                    "targetPrice": "349,375원",
+                    "targetPrice": "425,162원",
                     "historicalHitRate": 0.2778,
                     "recommended": false
                   },
@@ -4563,7 +6871,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "20% 익절",
                     "targetYield": "+10.5%",
-                    "targetPrice": "359,125원",
+                    "targetPrice": "437,028원",
                     "historicalHitRate": 0.2292,
                     "recommended": false
                   },
@@ -4573,17 +6881,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "V 조건 충족 시",
                     "quantity": "15% 익절",
                     "targetYield": "+13.5%",
-                    "targetPrice": "368,875원",
+                    "targetPrice": "448,892원",
                     "historicalHitRate": 0.1603,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 324,500원 종가 이탈",
+                    "condition": "유효 하드 스톱 394,000원 종가 이탈",
                     "quantity": "전량",
-                    "targetYield": "-0.2%",
-                    "targetPrice": "324,500원"
+                    "targetYield": "-0.4%",
+                    "targetPrice": "394,000원"
                   }
                 ],
                 "trailingActivationPct": 4.5,
@@ -4602,9 +6910,9 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "profileKey": "conservative",
               "label": "저항 우선형",
               "selectionBasis": "historical_profile_ev",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 49건)",
-              "sampleCount": 49,
-              "ev": -1.5429
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 50건)",
+              "sampleCount": 50,
+              "ev": -1.6373
             },
             "recommendedStage": {
               "stageKey": "swing",
@@ -4656,796 +6964,44 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "entryWatch": false,
             "entryBlockers": [
               "핵심 Gate 미충족: G2",
-              "매매금지(핵심 Gate 미충족: G2)",
+              "핵심 Gate 미충족: G4",
+              "매매금지(핵심 Gate 미충족: G2, G4)",
               "등급 C — 진입 최소 A, B, S"
             ],
             "setupQuality": "setup_weak",
-            "statusReasonShort": "G2 미충족: 52주 고가 대비 62.7% (필요 ≥ 90%)",
-            "statusReason": "G2 미충족: 52주 고가 대비 62.7% (필요 ≥ 90%)",
+            "statusReasonShort": "G2 미충족: 52주 고가 대비 69.9% (필요 ≥ 90%) · 외 1건",
+            "statusReason": "G2 미충족: 52주 고가 대비 69.9% (필요 ≥ 90%) / G4 미충족: 당일 거래량 / 20일 평균 126% (필요 ≥ 150%)",
             "stockIndicators": {
               "snapshot": {
-                "currentPrice": 325000.0,
-                "vs52wHighPct": 62.74131274131274,
-                "vs52wLowPct": 138.97058823529412,
-                "dropFrom52wHighPct": 37.25868725868725,
-                "ma20GapPct": 11.082628385883961,
-                "rsi14": 53.8471907540853,
-                "volumeRatio20d": 204.8181255216607,
-                "rs20Pct": -1.3657056145675266,
-                "tradingValueRank": 22.0,
-                "marketCapRank": 8.0,
-                "marketCapTrillion": 65.0,
-                "per": 22.64,
-                "pbr": 0.72,
-                "cnsPer": 22.39,
-                "foreignRate": 23.4,
-                "supplyTrendScore": -2.0,
-                "shortBalanceChangePct": -6.978204448413473
+                "currentPrice": 395500.0,
+                "vs52wHighPct": 69.87632508833921,
+                "vs52wLowPct": 161.9205298013245,
+                "dropFrom52wHighPct": 30.123674911660775,
+                "ma20GapPct": 15.567243772371977,
+                "rsi14": 58.095051968861945,
+                "volumeRatio20d": 126.04213339846424,
+                "rs20Pct": 9.86111111111111,
+                "tradingValueRank": 27.0,
+                "marketCapRank": 9.0,
+                "marketCapTrillion": 64.1373,
+                "per": 27.92,
+                "pbr": 1.04,
+                "cnsPer": 23.92,
+                "foreignRate": 31.01,
+                "supplyTrendScore": 0.0,
+                "shortBalanceChangePct": -14.75998290679455
               },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           }
         ],
         "accumulation": [
           {
             "rank": 1,
-            "name": "NAVER",
-            "code": "035420",
-            "strictScore": 9.4,
-            "signalScore": 9.4,
-            "score": 9.4,
-            "scoreMax": 14.0,
-            "effectiveScoreMax": 14.0,
-            "gradeScore": 6.7,
-            "grade": "B",
-            "overnightGapPenalty": 0.0,
-            "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "외인 188,436주 / 기관 74,229주 · 외인·기관 양매수"
-              },
-              {
-                "code": "S2",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "외인 당일 +188,436 / 전일 +4,210 · 기관 당일 +74,229 / 전일 -209,734 · 당일 양매수 + 전일 수급 유입"
-              },
-              {
-                "code": "S3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "마지막 1시간 평균 체결강도 294.1% (필요 ≥ 100%)"
-              },
-              {
-                "code": "S4",
-                "strictPoints": 0.5,
-                "signalPoints": 0.5,
-                "maxPoints": 0.5,
-                "evalStatus": "met",
-                "note": "당일 평균 121.0% / 마지막 1시간 294.1% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화"
-              },
-              {
-                "code": "S5",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "외국인 최근 5일 누적 +384,790주 · 양수 4/5일 · 증가 2회"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.5,
-                "evalStatus": "not_met",
-                "note": "종가 / 20MA 103.3% (필요 98~102%)"
-              },
-              {
-                "code": "P2",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "5MA 219,000 / 20MA 215,410 · 5MA > 20MA"
-              },
-              {
-                "code": "C1",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 거래량 / 5일 평균 83% (필요 ≤ 90%)"
-              },
-              {
-                "code": "C2",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "당일 등락 +1.37% (필요 -3% ~ +5%)"
-              },
-              {
-                "code": "C3",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "동종업종 평균 -2.56% / KOSPI +0.80% underperform"
-              },
-              {
-                "code": "C4",
-                "strictPoints": 0.5,
-                "signalPoints": 0.5,
-                "maxPoints": 0.5,
-                "evalStatus": "met",
-                "note": "마지막 30분 틱프록시 매수/매도 2.92:1 · 평균 체결강도 294.1% (필요 ≥ 1.1:1) · 장마감 매수 우위"
-              },
-              {
-                "code": "L1",
-                "strictPoints": 0.5,
-                "signalPoints": 0.5,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "대차잔고 -6.8% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 부분 충족"
-              },
-              {
-                "code": "V1",
-                "strictPoints": 0.75,
-                "signalPoints": 0.75,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "유리 (고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다)"
-              }
-            ],
-            "scoreScope": "accumulation",
-            "statusLabel": "관심후보",
-            "strategy": "accumulation",
-            "gates": [
-              {
-                "code": "G0",
-                "status": "✅",
-                "note": "외인 전일 +4,210/당일 +188,436 · 기관 전일 -209,734/당일 +74,229 · 2일 연속 수급 유입",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G1",
-                "status": "✅",
-                "note": "종가 222,500 / 60MA 216,298",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G2",
-                "status": "✅",
-                "note": "52주 고가 대비 72.1% (필요 < 92%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G3",
-                "status": "✅",
-                "note": "거래대금 TOP100 순위 31",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G4",
-                "status": "✅",
-                "note": "당일 거래량 / 20일 평균 62% (필요 < 150%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "Q1",
-                "status": "✅",
-                "note": "외인 보유율 35.3% (≥25%) · 20일 수익률 +1.1% (≥0%) · 매집 주체 존재+가격 지탱",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G5",
-                "status": "⚠️",
-                "note": "KOSPI 6,908 / 5MA 6,816 (+1.3%) · VKOSPI 58.1 · 변동성 경계",
-                "evalStatus": "not_met"
-              }
-            ],
-            "matchedRules": [
-              {
-                "code": "S1",
-                "note": "외인 188,436주 / 기관 74,229주 · 외인·기관 양매수",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S2",
-                "note": "외인 당일 +188,436 / 전일 +4,210 · 기관 당일 +74,229 / 전일 -209,734 · 당일 양매수 + 전일 수급 유입",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S3",
-                "note": "마지막 1시간 평균 체결강도 294.1% (필요 ≥ 100%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S4",
-                "note": "당일 평균 121.0% / 마지막 1시간 294.1% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S5",
-                "note": "외국인 최근 5일 누적 +384,790주 · 양수 4/5일 · 증가 2회",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P2",
-                "note": "5MA 219,000 / 20MA 215,410 · 5MA > 20MA",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C1",
-                "note": "당일 거래량 / 5일 평균 83% (필요 ≤ 90%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C2",
-                "note": "당일 등락 +1.37% (필요 -3% ~ +5%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C4",
-                "note": "마지막 30분 틱프록시 매수/매도 2.92:1 · 평균 체결강도 294.1% (필요 ≥ 1.1:1) · 장마감 매수 우위",
-                "evalStatus": "met"
-              }
-            ],
-            "unmatchedRules": [
-              {
-                "code": "P1",
-                "note": "종가 / 20MA 103.3% (필요 98~102%)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "C3",
-                "note": "동종업종 평균 -2.56% / KOSPI +0.80% underperform",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "L1",
-                "note": "대차잔고 -6.8% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 부분 충족",
-                "evalStatus": "met"
-              }
-            ],
-            "currentPrice": 222500,
-            "previousClose": 219500,
-            "dailyChange": 3000,
-            "dailyChangePct": 1.37,
-            "dailyDirection": "up",
-            "entryPriceText": "222,500원 (당일 종가 기준)",
-            "entryPrice": 222500,
-            "entryMeta": "당일 종가 기준",
-            "marketCapTrillion": 34.9275,
-            "marketCapRank": 21,
-            "marketCapUniverseCount": 2551,
-            "keyPoint": "수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 188,436주 / 기관 74,229주 / 마지막 1시간 294.1% · 장후반 매수세 강화 · 마지막 30분 틱 2.92:1. 외국인 최근 5일 매집 추세 강화 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
-            "notes": [],
-            "toss": {
-              "avgStrength": 121.0,
-              "note": "토스 공개 체결강도 121.0% / 최근 체결 2분 프록시",
-              "source": "toss_http_combo",
-              "sourceUrl": "https://www.tossinvest.com/stocks/A035420/order",
-              "asOf": "2026-08-21T06:03:08Z",
-              "intradayAbove100Ratio": 100.0,
-              "observedMinutes": 2,
-              "observedTickCount": 120,
-              "coverageNote": "최근 체결 2분 프록시",
-              "lastHourAvgStrength": 294.1,
-              "lastHourObservedMinutes": 2,
-              "last30AvgStrength": 294.1,
-              "last30ObservedMinutes": 2,
-              "last30BuySellRatio": 2.9167,
-              "last30BuyVolume": 770.0,
-              "last30SellVolume": 264.0
-            },
-            "volatilityContext": {
-              "marketState": "volatile",
-              "stockState": "volatile",
-              "blendedState": "volatile",
-              "strategyFit": "favorable",
-              "scoreDelta": 0.75,
-              "summary": "유리 (고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다. VKOSPI 58.06, ATR10 5.14%, 일간 표준편차 4.80%, 당일 레인지 5.01%.",
-              "metrics": {
-                "atrPct10": 5.14,
-                "returnStd20": 4.8,
-                "todayRangePct": 5.01,
-                "vkospi": 58.06
-              },
-              "strategyLabel": "수급매집형"
-            },
-            "accumulationTrend": {
-              "lookbackDays": 5,
-              "sponsor": "foreign",
-              "cumulativeNet": 384790.0,
-              "positiveDays": 4,
-              "improvementCount": 2,
-              "series": {
-                "foreign": [
-                  {
-                    "date": "20260820",
-                    "net": 188436.0
-                  },
-                  {
-                    "date": "20260819",
-                    "net": 4210.0
-                  },
-                  {
-                    "date": "20260818",
-                    "net": -39093.0
-                  },
-                  {
-                    "date": "20260814",
-                    "net": 32305.0
-                  },
-                  {
-                    "date": "20260813",
-                    "net": 198932.0
-                  }
-                ],
-                "institution": [
-                  {
-                    "date": "20260820",
-                    "net": 74229.0
-                  },
-                  {
-                    "date": "20260819",
-                    "net": -209734.0
-                  },
-                  {
-                    "date": "20260818",
-                    "net": -65560.0
-                  },
-                  {
-                    "date": "20260814",
-                    "net": 43561.0
-                  },
-                  {
-                    "date": "20260813",
-                    "net": 277776.0
-                  }
-                ],
-                "sponsor": [
-                  {
-                    "date": "20260820",
-                    "net": 188436.0
-                  },
-                  {
-                    "date": "20260819",
-                    "net": 4210.0
-                  },
-                  {
-                    "date": "20260818",
-                    "net": -39093.0
-                  },
-                  {
-                    "date": "20260814",
-                    "net": 32305.0
-                  },
-                  {
-                    "date": "20260813",
-                    "net": 198932.0
-                  }
-                ]
-              },
-              "status": "met",
-              "score": 1.0,
-              "summary": "외국인 최근 5일 매집 추세 강화",
-              "note": "외국인 최근 5일 누적 +384,790주 · 양수 4/5일 · 증가 2회"
-            },
-            "manualInput": {
-              "required": false,
-              "fields": [],
-              "missingFieldCodes": [],
-              "summary": "현재 수동 입력 필드가 없습니다.",
-              "source": "public_data_only"
-            },
-            "tradePlanRows": [
-              {
-                "stage": "1차 익절",
-                "stageKey": "premarket",
-                "condition": "상단 매물대 1 도달",
-                "quantity": "20% 익절",
-                "targetYield": "+0.4%",
-                "targetPrice": "223,500원",
-                "historicalHitRate": 0.5556,
-                "recommended": true
-              },
-              {
-                "stage": "2차 익절",
-                "stageKey": "openPhase",
-                "condition": "상단 매물대 2 도달",
-                "quantity": "20% 익절",
-                "targetYield": "+2.7%",
-                "targetPrice": "228,500원",
-                "historicalHitRate": 0.2222,
-                "recommended": false
-              },
-              {
-                "stage": "3차 익절",
-                "stageKey": "intraday1",
-                "condition": "+5.5% 도달",
-                "quantity": "25% 익절",
-                "targetYield": "+5.5%",
-                "targetPrice": "234,738원",
-                "historicalHitRate": 0.1852,
-                "recommended": false
-              },
-              {
-                "stage": "4차 익절",
-                "stageKey": "intraday2",
-                "condition": "추세 유지 시",
-                "quantity": "20% 익절",
-                "targetYield": "+8.0%",
-                "targetPrice": "240,300원",
-                "historicalHitRate": 0.0741,
-                "recommended": false
-              },
-              {
-                "stage": "추세 홀딩",
-                "stageKey": "swing",
-                "condition": "V 조건 충족 시",
-                "quantity": "15% 익절",
-                "targetYield": "+11.0%",
-                "targetPrice": "246,975원",
-                "historicalHitRate": 0.0741,
-                "recommended": false
-              },
-              {
-                "stage": "손절",
-                "stageKey": "stop",
-                "condition": "유효 하드 스톱 214,712원 종가 이탈",
-                "quantity": "전량",
-                "targetYield": "-3.5%",
-                "targetPrice": "214,712원"
-              }
-            ],
-            "accumulationStopPolicy": {
-              "version": "accumulation-stop-v1-live",
-              "anchorSource": "prior_sponsor_candle",
-              "sponsorMode": "both",
-              "anchorDate": "20260820",
-              "anchorOpen": 210500,
-              "anchorClose": 219500,
-              "anchorVolumeRatio20d": 0.7,
-              "anchorStopPrice": 210500,
-              "fallbackStopPrice": 214712,
-              "effectiveHardStopPrice": 214712,
-              "openExitCheckCutoff": "10:00",
-              "openExitMode": "flow_and_price_confirm",
-              "openExitRuleSummary": "09:00~10:00 장초반에 수급 주체가 순매도로 돌아섰고 현재가가 진입가/하드 스톱 이하이면 즉시 손절합니다.",
-              "hardStopRuleSummary": "당일 매집 시작 봉 시가 210,500원와 기존 % 손절 214,712원 중 더 높은 214,712원를 하드 스톱으로 사용합니다.",
-              "marketShockHoldRuleSummary": "갭 등급 G-C 또는 고변동성 장세에서 수급 주체 순매수가 유지되면 장초반 흔들림 손절은 보류하고 종가형 하드 스톱만 유지합니다.",
-              "reasonSummary": "외인·기관 매집 시작 봉(-) 시가 210,500원를 기준으로 잡고, 기존 % 손절 214,712원보다 느슨해지지 않게 214,712원로 고정합니다."
-            },
-            "rr": "1 : 1.5",
-            "source": "jongga-live",
-            "recommendedEntryBand": {
-              "low": 219719,
-              "high": 221944,
-              "anchor": 222500,
-              "label": "219,719~221,944원 (종가 ±, 분할매수)"
-            },
-            "accumulationTakeProfitProfiles": [
-              {
-                "profileKey": "aggressive",
-                "label": "기본 목표형",
-                "recommended": false,
-                "selectionBasis": "market_stock_heuristic",
-                "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
-                "nearestResistancePrice": 223500,
-                "secondaryResistancePrice": 228500,
-                "tradePlanRows": [
-                  {
-                    "stage": "1차 익절",
-                    "stageKey": "premarket",
-                    "condition": "+1.5% 도달",
-                    "quantity": "20% 익절",
-                    "targetYield": "+1.5%",
-                    "targetPrice": "225,837원",
-                    "historicalHitRate": 0.5556,
-                    "recommended": true
-                  },
-                  {
-                    "stage": "2차 익절",
-                    "stageKey": "openPhase",
-                    "condition": "+3.0% 도달",
-                    "quantity": "20% 익절",
-                    "targetYield": "+3.0%",
-                    "targetPrice": "229,175원",
-                    "historicalHitRate": 0.2222,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "3차 익절",
-                    "stageKey": "intraday1",
-                    "condition": "+5.5% 도달",
-                    "quantity": "25% 익절",
-                    "targetYield": "+5.5%",
-                    "targetPrice": "234,738원",
-                    "historicalHitRate": 0.1852,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "4차 익절",
-                    "stageKey": "intraday2",
-                    "condition": "추세 유지 시",
-                    "quantity": "20% 익절",
-                    "targetYield": "+8.0%",
-                    "targetPrice": "240,300원",
-                    "historicalHitRate": 0.0741,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "추세 홀딩",
-                    "stageKey": "swing",
-                    "condition": "V 조건 충족 시",
-                    "quantity": "15% 익절",
-                    "targetYield": "+11.0%",
-                    "targetPrice": "246,975원",
-                    "historicalHitRate": 0.0741,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "손절",
-                    "stageKey": "stop",
-                    "condition": "유효 하드 스톱 214,712원 종가 이탈",
-                    "quantity": "전량",
-                    "targetYield": "-3.5%",
-                    "targetPrice": "214,712원"
-                  }
-                ],
-                "recommendedStage": {
-                  "stageKey": "premarket",
-                  "evBasis": "historical:netStageReturn",
-                  "reason": "EV=순수익 argmax (과거 27건)",
-                  "hitRate": 0.5556,
-                  "ev": -0.4,
-                  "sampleCount": 27
-                }
-              },
-              {
-                "profileKey": "balanced",
-                "label": "1차 저항 반영형",
-                "recommended": false,
-                "selectionBasis": "market_stock_heuristic",
-                "reasonSummary": "상단 매물대 1 / 상단 매물대 2 저항만 앞단 목표가에 반영합니다.",
-                "nearestResistancePrice": 223500,
-                "secondaryResistancePrice": 228500,
-                "tradePlanRows": [
-                  {
-                    "stage": "1차 익절",
-                    "stageKey": "premarket",
-                    "condition": "상단 매물대 1 도달",
-                    "quantity": "20% 익절",
-                    "targetYield": "+0.4%",
-                    "targetPrice": "223,500원",
-                    "historicalHitRate": 0.5556,
-                    "recommended": true
-                  },
-                  {
-                    "stage": "2차 익절",
-                    "stageKey": "openPhase",
-                    "condition": "상단 매물대 2 도달",
-                    "quantity": "20% 익절",
-                    "targetYield": "+2.7%",
-                    "targetPrice": "228,500원",
-                    "historicalHitRate": 0.2222,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "3차 익절",
-                    "stageKey": "intraday1",
-                    "condition": "+5.5% 도달",
-                    "quantity": "25% 익절",
-                    "targetYield": "+5.5%",
-                    "targetPrice": "234,738원",
-                    "historicalHitRate": 0.1852,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "4차 익절",
-                    "stageKey": "intraday2",
-                    "condition": "추세 유지 시",
-                    "quantity": "20% 익절",
-                    "targetYield": "+8.0%",
-                    "targetPrice": "240,300원",
-                    "historicalHitRate": 0.0741,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "추세 홀딩",
-                    "stageKey": "swing",
-                    "condition": "V 조건 충족 시",
-                    "quantity": "15% 익절",
-                    "targetYield": "+11.0%",
-                    "targetPrice": "246,975원",
-                    "historicalHitRate": 0.0741,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "손절",
-                    "stageKey": "stop",
-                    "condition": "유효 하드 스톱 214,712원 종가 이탈",
-                    "quantity": "전량",
-                    "targetYield": "-3.5%",
-                    "targetPrice": "214,712원"
-                  }
-                ],
-                "recommendedStage": {
-                  "stageKey": "premarket",
-                  "evBasis": "historical:netStageReturn",
-                  "reason": "EV=순수익 argmax (과거 27건)",
-                  "hitRate": 0.5556,
-                  "ev": -0.4,
-                  "sampleCount": 27
-                }
-              },
-              {
-                "profileKey": "conservative",
-                "label": "저항 우선형",
-                "recommended": true,
-                "selectionBasis": "historical_profile_ev",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 23건)",
-                "nearestResistancePrice": 223500,
-                "secondaryResistancePrice": 228500,
-                "tradePlanRows": [
-                  {
-                    "stage": "1차 익절",
-                    "stageKey": "premarket",
-                    "condition": "상단 매물대 1 도달",
-                    "quantity": "20% 익절",
-                    "targetYield": "+0.4%",
-                    "targetPrice": "223,500원",
-                    "historicalHitRate": 0.5556,
-                    "recommended": true
-                  },
-                  {
-                    "stage": "2차 익절",
-                    "stageKey": "openPhase",
-                    "condition": "상단 매물대 2 도달",
-                    "quantity": "20% 익절",
-                    "targetYield": "+2.7%",
-                    "targetPrice": "228,500원",
-                    "historicalHitRate": 0.2222,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "3차 익절",
-                    "stageKey": "intraday1",
-                    "condition": "+5.5% 도달",
-                    "quantity": "25% 익절",
-                    "targetYield": "+5.5%",
-                    "targetPrice": "234,738원",
-                    "historicalHitRate": 0.1852,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "4차 익절",
-                    "stageKey": "intraday2",
-                    "condition": "추세 유지 시",
-                    "quantity": "20% 익절",
-                    "targetYield": "+8.0%",
-                    "targetPrice": "240,300원",
-                    "historicalHitRate": 0.0741,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "추세 홀딩",
-                    "stageKey": "swing",
-                    "condition": "V 조건 충족 시",
-                    "quantity": "15% 익절",
-                    "targetYield": "+11.0%",
-                    "targetPrice": "246,975원",
-                    "historicalHitRate": 0.0741,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "손절",
-                    "stageKey": "stop",
-                    "condition": "유효 하드 스톱 214,712원 종가 이탈",
-                    "quantity": "전량",
-                    "targetYield": "-3.5%",
-                    "targetPrice": "214,712원"
-                  }
-                ],
-                "recommendedStage": {
-                  "stageKey": "premarket",
-                  "evBasis": "historical:netStageReturn",
-                  "reason": "EV=순수익 argmax (과거 27건)",
-                  "hitRate": 0.5556,
-                  "ev": -0.4,
-                  "sampleCount": 27
-                }
-              }
-            ],
-            "recommendedTakeProfitProfile": {
-              "profileKey": "conservative",
-              "label": "저항 우선형",
-              "selectionBasis": "historical_profile_ev",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 23건)",
-              "sampleCount": 23,
-              "ev": -3.0094
-            },
-            "recommendedStage": {
-              "stageKey": "premarket",
-              "evBasis": "historical:netStageReturn",
-              "reason": "EV=순수익 argmax (과거 27건)",
-              "hitRate": 0.5556,
-              "ev": -0.4,
-              "sampleCount": 27
-            },
-            "mixedExitPolicy": {
-              "version": "mixed-exit-v1-balanced",
-              "policyKey": "observe-accumulation",
-              "label": "관찰 전용",
-              "active": false,
-              "priority": null,
-              "strategyCase": "",
-              "recommendationCase": "",
-              "stopPct": null,
-              "stopExecution": "close",
-              "stopCondition": "",
-              "stopTiming": "자동 진입 제외",
-              "takeProfitStages": [],
-              "positionWeightHint": "observe",
-              "positionWeightMultiplier": 0.0,
-              "intradayRiskRule": {
-                "active": false
-              },
-              "volatilityOverlay": {
-                "active": false
-              },
-              "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
-            },
-            "entryEligible": false,
-            "entryWatch": true,
-            "entryBlockers": [],
-            "setupQuality": "setup_weak",
-            "statusReasonShort": "",
-            "statusReason": "",
-            "stockIndicators": {
-              "snapshot": {
-                "currentPrice": 222500.0,
-                "vs52wHighPct": 72.12317666126418,
-                "vs52wLowPct": 22.860298177802317,
-                "dropFrom52wHighPct": 27.876823338735818,
-                "ma20GapPct": 3.291397799545054,
-                "rsi14": 54.627264243585905,
-                "volumeRatio20d": 61.57523651159017,
-                "rs20Pct": 1.1363636363636365,
-                "tradingValueRank": 31.0,
-                "marketCapRank": 21.0,
-                "marketCapTrillion": 34.9275,
-                "per": 17.27,
-                "pbr": 1.13,
-                "cnsPer": 17.74,
-                "foreignRate": 35.33,
-                "supplyTrendScore": 2.0,
-                "shortBalanceChangePct": -6.793673262007367
-              },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
-              "source": "jongga_analysis"
-            },
-            "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
-          },
-          {
-            "rank": 2,
             "name": "한화에어로스페이스",
             "code": "012450",
             "strictScore": 9.4,
@@ -5479,7 +7035,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "마지막 1시간 평균 체결강도 250.0% (필요 ≥ 100%)"
+                "note": "마지막 1시간 평균 체결강도 212.2% (필요 ≥ 100%)"
               },
               {
                 "code": "S4",
@@ -5487,7 +7043,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.5,
                 "maxPoints": 0.5,
                 "evalStatus": "met",
-                "note": "당일 평균 59.0% / 마지막 1시간 250.0% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화"
+                "note": "당일 평균 60.0% / 마지막 1시간 212.2% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화"
               },
               {
                 "code": "S5",
@@ -5503,7 +7059,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.0,
                 "maxPoints": 1.5,
                 "evalStatus": "not_met",
-                "note": "종가 / 20MA 105.1% (필요 98~102%)"
+                "note": "종가 / 20MA 104.6% (필요 98~102%)"
               },
               {
                 "code": "P2",
@@ -5511,7 +7067,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.5,
                 "maxPoints": 1.5,
                 "evalStatus": "met",
-                "note": "5MA 1,148,200 / 20MA 1,037,900 · 5MA > 20MA"
+                "note": "5MA 1,147,000 / 20MA 1,037,600 · 5MA > 20MA"
               },
               {
                 "code": "C1",
@@ -5519,7 +7075,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "당일 거래량 / 5일 평균 64% (필요 ≤ 90%)"
+                "note": "당일 거래량 / 5일 평균 75% (필요 ≤ 90%)"
               },
               {
                 "code": "C2",
@@ -5527,7 +7083,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.0,
                 "maxPoints": 1.0,
                 "evalStatus": "not_met",
-                "note": "당일 등락 -6.51% (필요 -3% ~ +5%)"
+                "note": "당일 등락 -7.03% (필요 -3% ~ +5%)"
               },
               {
                 "code": "C3",
@@ -5535,7 +7091,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.0,
                 "maxPoints": 1.0,
                 "evalStatus": "not_met",
-                "note": "동종업종 평균 -6.54% / KOSPI +0.80% underperform"
+                "note": "동종업종 평균 -6.40% / KOSPI +0.88% underperform"
               },
               {
                 "code": "C4",
@@ -5543,7 +7099,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.5,
                 "maxPoints": 0.5,
                 "evalStatus": "met",
-                "note": "마지막 30분 틱프록시 매수/매도 5.94:1 · 평균 체결강도 250.0% (필요 ≥ 1.1:1) · 장마감 매수 우위"
+                "note": "마지막 30분 틱프록시 매수/매도 189.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위"
               },
               {
                 "code": "L1",
@@ -5575,37 +7131,37 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "G1",
                 "status": "✅",
-                "note": "종가 1,091,000 / 60MA 1,049,350",
+                "note": "종가 1,085,000 / 60MA 1,049,250",
                 "evalStatus": "met"
               },
               {
                 "code": "G2",
                 "status": "✅",
-                "note": "52주 고가 대비 63.7% (필요 < 92%)",
+                "note": "52주 고가 대비 63.3% (필요 < 92%)",
                 "evalStatus": "met"
               },
               {
                 "code": "G3",
                 "status": "✅",
-                "note": "거래대금 TOP100 순위 32",
+                "note": "거래대금 TOP100 순위 31",
                 "evalStatus": "met"
               },
               {
                 "code": "G4",
                 "status": "✅",
-                "note": "당일 거래량 / 20일 평균 72% (필요 < 150%)",
+                "note": "당일 거래량 / 20일 평균 84% (필요 < 150%)",
                 "evalStatus": "met"
               },
               {
                 "code": "Q1",
                 "status": "✅",
-                "note": "외인 보유율 45.5% (≥25%) · 20일 수익률 +13.9% (≥0%) · 매집 주체 존재+가격 지탱",
+                "note": "외인 보유율 45.5% (≥25%) · 20일 수익률 +13.3% (≥0%) · 매집 주체 존재+가격 지탱",
                 "evalStatus": "met"
               },
               {
                 "code": "G5",
                 "status": "⚠️",
-                "note": "KOSPI 6,908 / 5MA 6,816 (+1.3%) · VKOSPI 58.1 · 변동성 경계",
+                "note": "KOSPI 6,913 / 5MA 6,817 (+1.4%) · VKOSPI 58.0 · 변동성 경계",
                 "evalStatus": "not_met"
               }
             ],
@@ -5622,12 +7178,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "S3",
-                "note": "마지막 1시간 평균 체결강도 250.0% (필요 ≥ 100%)",
+                "note": "마지막 1시간 평균 체결강도 212.2% (필요 ≥ 100%)",
                 "evalStatus": "met"
               },
               {
                 "code": "S4",
-                "note": "당일 평균 59.0% / 마지막 1시간 250.0% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화",
+                "note": "당일 평균 60.0% / 마지막 1시간 212.2% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화",
                 "evalStatus": "met"
               },
               {
@@ -5637,17 +7193,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "P2",
-                "note": "5MA 1,148,200 / 20MA 1,037,900 · 5MA > 20MA",
+                "note": "5MA 1,147,000 / 20MA 1,037,600 · 5MA > 20MA",
                 "evalStatus": "met"
               },
               {
                 "code": "C1",
-                "note": "당일 거래량 / 5일 평균 64% (필요 ≤ 90%)",
+                "note": "당일 거래량 / 5일 평균 75% (필요 ≤ 90%)",
                 "evalStatus": "met"
               },
               {
                 "code": "C4",
-                "note": "마지막 30분 틱프록시 매수/매도 5.94:1 · 평균 체결강도 250.0% (필요 ≥ 1.1:1) · 장마감 매수 우위",
+                "note": "마지막 30분 틱프록시 매수/매도 189.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위",
                 "evalStatus": "met"
               },
               {
@@ -5659,50 +7215,50 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "unmatchedRules": [
               {
                 "code": "P1",
-                "note": "종가 / 20MA 105.1% (필요 98~102%)",
+                "note": "종가 / 20MA 104.6% (필요 98~102%)",
                 "evalStatus": "not_met"
               },
               {
                 "code": "C2",
-                "note": "당일 등락 -6.51% (필요 -3% ~ +5%)",
+                "note": "당일 등락 -7.03% (필요 -3% ~ +5%)",
                 "evalStatus": "not_met"
               },
               {
                 "code": "C3",
-                "note": "동종업종 평균 -6.54% / KOSPI +0.80% underperform",
+                "note": "동종업종 평균 -6.40% / KOSPI +0.88% underperform",
                 "evalStatus": "not_met"
               }
             ],
-            "currentPrice": 1091000,
+            "currentPrice": 1085000,
             "previousClose": 1167000,
-            "dailyChange": -76000,
-            "dailyChangePct": -6.51,
+            "dailyChange": -82000,
+            "dailyChangePct": -7.03,
             "dailyDirection": "down",
-            "entryPriceText": "1,091,000원 (당일 종가 기준)",
-            "entryPrice": 1091000,
+            "entryPriceText": "1,085,000원 (당일 종가 기준)",
+            "entryPrice": 1085000,
             "entryMeta": "당일 종가 기준",
-            "marketCapTrillion": 56.2557,
+            "marketCapTrillion": 55.9463,
             "marketCapRank": 11,
-            "marketCapUniverseCount": 2551,
-            "keyPoint": "수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 13,645주 / 기관 5,898주 / 마지막 1시간 250.0% · 장후반 매수세 강화 · 마지막 30분 틱 5.94:1. 외국인 최근 5일 매집 추세 강화 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 13,645주 / 기관 5,898주 / 마지막 1시간 212.2% · 장후반 매수세 강화 · 마지막 30분 틱 189.00:1. 외국인 최근 5일 매집 추세 강화 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
             "notes": [],
             "toss": {
-              "avgStrength": 59.0,
-              "note": "토스 공개 체결강도 59.0% / 최근 체결 4분 프록시",
+              "avgStrength": 60.0,
+              "note": "토스 공개 체결강도 60.0% / 최근 체결 36분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A012450/order",
-              "asOf": "2026-08-21T06:03:06Z",
-              "intradayAbove100Ratio": 100.0,
-              "observedMinutes": 4,
+              "asOf": "2026-08-21T08:32:59Z",
+              "intradayAbove100Ratio": 60.0,
+              "observedMinutes": 36,
               "observedTickCount": 120,
-              "coverageNote": "최근 체결 4분 프록시",
-              "lastHourAvgStrength": 250.0,
-              "lastHourObservedMinutes": 4,
-              "last30AvgStrength": 250.0,
-              "last30ObservedMinutes": 4,
-              "last30BuySellRatio": 5.9404,
-              "last30BuyVolume": 897.0,
-              "last30SellVolume": 151.0
+              "coverageNote": "최근 체결 36분 프록시",
+              "lastHourAvgStrength": 212.2,
+              "lastHourObservedMinutes": 36,
+              "last30AvgStrength": 300.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 189.0,
+              "last30BuyVolume": 189.0,
+              "last30SellVolume": 0.0
             },
             "volatilityContext": {
               "marketState": "volatile",
@@ -5711,12 +7267,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "strategyFit": "favorable",
               "scoreDelta": 0.75,
               "summary": "유리 (고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다. VKOSPI 58.06, ATR10 6.81%, 일간 표준편차 4.83%, 당일 레인지 5.83%.",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다. VKOSPI 58.03, ATR10 6.82%, 일간 표준편차 4.87%, 당일 레인지 5.83%.",
               "metrics": {
-                "atrPct10": 6.81,
-                "returnStd20": 4.83,
+                "atrPct10": 6.82,
+                "returnStd20": 4.87,
                 "todayRangePct": 5.83,
-                "vkospi": 58.06
+                "vkospi": 58.03
               },
               "strategyLabel": "수급매집형"
             },
@@ -5812,7 +7368,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "stageKey": "premarket",
                 "condition": "상단 매물대 1 도달",
                 "quantity": "20% 익절",
-                "targetYield": "+0.8%",
+                "targetYield": "+1.4%",
                 "targetPrice": "1,100,000원",
                 "historicalHitRate": 0.5556,
                 "recommended": true
@@ -5822,7 +7378,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "stageKey": "openPhase",
                 "condition": "상단 매물대 2 도달",
                 "quantity": "20% 익절",
-                "targetYield": "+4.4%",
+                "targetYield": "+5.0%",
                 "targetPrice": "1,139,000원",
                 "historicalHitRate": 0.2222,
                 "recommended": false
@@ -5833,7 +7389,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+5.5% 도달",
                 "quantity": "25% 익절",
                 "targetYield": "+5.5%",
-                "targetPrice": "1,151,005원",
+                "targetPrice": "1,144,675원",
                 "historicalHitRate": 0.1852,
                 "recommended": false
               },
@@ -5843,7 +7399,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "추세 유지 시",
                 "quantity": "20% 익절",
                 "targetYield": "+8.0%",
-                "targetPrice": "1,178,280원",
+                "targetPrice": "1,171,800원",
                 "historicalHitRate": 0.0741,
                 "recommended": false
               },
@@ -5853,17 +7409,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "V 조건 충족 시",
                 "quantity": "15% 익절",
                 "targetYield": "+11.0%",
-                "targetPrice": "1,211,010원",
+                "targetPrice": "1,204,350원",
                 "historicalHitRate": 0.0741,
                 "recommended": false
               },
               {
                 "stage": "손절",
                 "stageKey": "stop",
-                "condition": "유효 하드 스톱 1,052,815원 종가 이탈",
+                "condition": "유효 하드 스톱 1,047,025원 종가 이탈",
                 "quantity": "전량",
                 "targetYield": "-3.5%",
-                "targetPrice": "1,052,815원"
+                "targetPrice": "1,047,025원"
               }
             ],
             "accumulationStopPolicy": {
@@ -5875,22 +7431,22 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "anchorClose": null,
               "anchorVolumeRatio20d": null,
               "anchorStopPrice": null,
-              "fallbackStopPrice": 1052815,
-              "effectiveHardStopPrice": 1052815,
+              "fallbackStopPrice": 1047025,
+              "effectiveHardStopPrice": 1047025,
               "openExitCheckCutoff": "10:00",
               "openExitMode": "flow_and_price_confirm",
               "openExitRuleSummary": "09:00~10:00 장초반에 수급 주체가 순매도로 돌아섰고 현재가가 진입가/하드 스톱 이하이면 즉시 손절합니다.",
-              "hardStopRuleSummary": "앵커 부재 → 기존 % 손절 1,052,815원 사용",
+              "hardStopRuleSummary": "앵커 부재 → 기존 % 손절 1,047,025원 사용",
               "marketShockHoldRuleSummary": "갭 등급 G-C 또는 고변동성 장세에서 수급 주체 순매수가 유지되면 장초반 흔들림 손절은 보류하고 종가형 하드 스톱만 유지합니다.",
-              "reasonSummary": "앵커가 없어 기존 % 손절 1,052,815원만 유지합니다."
+              "reasonSummary": "앵커가 없어 기존 % 손절 1,047,025원만 유지합니다."
             },
-            "rr": "1 : 1.6",
+            "rr": "1 : 1.7",
             "source": "jongga-live",
             "recommendedEntryBand": {
-              "low": 1077362,
-              "high": 1088272,
-              "anchor": 1091000,
-              "label": "1,077,362~1,088,272원 (종가 ±, 분할매수)"
+              "low": 1071438,
+              "high": 1082288,
+              "anchor": 1085000,
+              "label": "1,071,438~1,082,288원 (종가 ±, 분할매수)"
             },
             "accumulationTakeProfitProfiles": [
               {
@@ -5908,7 +7464,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+1.5% 도달",
                     "quantity": "20% 익절",
                     "targetYield": "+1.5%",
-                    "targetPrice": "1,107,365원",
+                    "targetPrice": "1,101,275원",
                     "historicalHitRate": 0.5556,
                     "recommended": true
                   },
@@ -5918,7 +7474,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+3.0% 도달",
                     "quantity": "20% 익절",
                     "targetYield": "+3.0%",
-                    "targetPrice": "1,123,730원",
+                    "targetPrice": "1,117,550원",
                     "historicalHitRate": 0.2222,
                     "recommended": false
                   },
@@ -5928,7 +7484,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+5.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+5.5%",
-                    "targetPrice": "1,151,005원",
+                    "targetPrice": "1,144,675원",
                     "historicalHitRate": 0.1852,
                     "recommended": false
                   },
@@ -5938,7 +7494,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "20% 익절",
                     "targetYield": "+8.0%",
-                    "targetPrice": "1,178,280원",
+                    "targetPrice": "1,171,800원",
                     "historicalHitRate": 0.0741,
                     "recommended": false
                   },
@@ -5948,17 +7504,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "V 조건 충족 시",
                     "quantity": "15% 익절",
                     "targetYield": "+11.0%",
-                    "targetPrice": "1,211,010원",
+                    "targetPrice": "1,204,350원",
                     "historicalHitRate": 0.0741,
                     "recommended": false
                   },
                   {
                     "stage": "손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 1,052,815원 종가 이탈",
+                    "condition": "유효 하드 스톱 1,047,025원 종가 이탈",
                     "quantity": "전량",
                     "targetYield": "-3.5%",
-                    "targetPrice": "1,052,815원"
+                    "targetPrice": "1,047,025원"
                   }
                 ],
                 "recommendedStage": {
@@ -5984,7 +7540,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "stageKey": "premarket",
                     "condition": "상단 매물대 1 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+0.8%",
+                    "targetYield": "+1.4%",
                     "targetPrice": "1,100,000원",
                     "historicalHitRate": 0.5556,
                     "recommended": true
@@ -5995,7 +7551,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+3.0% 도달",
                     "quantity": "20% 익절",
                     "targetYield": "+3.0%",
-                    "targetPrice": "1,123,730원",
+                    "targetPrice": "1,117,550원",
                     "historicalHitRate": 0.2222,
                     "recommended": false
                   },
@@ -6005,7 +7561,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+5.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+5.5%",
-                    "targetPrice": "1,151,005원",
+                    "targetPrice": "1,144,675원",
                     "historicalHitRate": 0.1852,
                     "recommended": false
                   },
@@ -6015,7 +7571,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "20% 익절",
                     "targetYield": "+8.0%",
-                    "targetPrice": "1,178,280원",
+                    "targetPrice": "1,171,800원",
                     "historicalHitRate": 0.0741,
                     "recommended": false
                   },
@@ -6025,17 +7581,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "V 조건 충족 시",
                     "quantity": "15% 익절",
                     "targetYield": "+11.0%",
-                    "targetPrice": "1,211,010원",
+                    "targetPrice": "1,204,350원",
                     "historicalHitRate": 0.0741,
                     "recommended": false
                   },
                   {
                     "stage": "손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 1,052,815원 종가 이탈",
+                    "condition": "유효 하드 스톱 1,047,025원 종가 이탈",
                     "quantity": "전량",
                     "targetYield": "-3.5%",
-                    "targetPrice": "1,052,815원"
+                    "targetPrice": "1,047,025원"
                   }
                 ],
                 "recommendedStage": {
@@ -6052,7 +7608,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "label": "저항 우선형",
                 "recommended": true,
                 "selectionBasis": "historical_profile_ev",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 23건)",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 27건)",
                 "nearestResistancePrice": 1100000,
                 "secondaryResistancePrice": 1139000,
                 "tradePlanRows": [
@@ -6061,7 +7617,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "stageKey": "premarket",
                     "condition": "상단 매물대 1 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+0.8%",
+                    "targetYield": "+1.4%",
                     "targetPrice": "1,100,000원",
                     "historicalHitRate": 0.5556,
                     "recommended": true
@@ -6071,7 +7627,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "stageKey": "openPhase",
                     "condition": "상단 매물대 2 도달",
                     "quantity": "20% 익절",
-                    "targetYield": "+4.4%",
+                    "targetYield": "+5.0%",
                     "targetPrice": "1,139,000원",
                     "historicalHitRate": 0.2222,
                     "recommended": false
@@ -6082,7 +7638,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+5.5% 도달",
                     "quantity": "25% 익절",
                     "targetYield": "+5.5%",
-                    "targetPrice": "1,151,005원",
+                    "targetPrice": "1,144,675원",
                     "historicalHitRate": 0.1852,
                     "recommended": false
                   },
@@ -6092,7 +7648,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "추세 유지 시",
                     "quantity": "20% 익절",
                     "targetYield": "+8.0%",
-                    "targetPrice": "1,178,280원",
+                    "targetPrice": "1,171,800원",
                     "historicalHitRate": 0.0741,
                     "recommended": false
                   },
@@ -6102,17 +7658,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "V 조건 충족 시",
                     "quantity": "15% 익절",
                     "targetYield": "+11.0%",
-                    "targetPrice": "1,211,010원",
+                    "targetPrice": "1,204,350원",
                     "historicalHitRate": 0.0741,
                     "recommended": false
                   },
                   {
                     "stage": "손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 1,052,815원 종가 이탈",
+                    "condition": "유효 하드 스톱 1,047,025원 종가 이탈",
                     "quantity": "전량",
                     "targetYield": "-3.5%",
-                    "targetPrice": "1,052,815원"
+                    "targetPrice": "1,047,025원"
                   }
                 ],
                 "recommendedStage": {
@@ -6129,9 +7685,9 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "profileKey": "conservative",
               "label": "저항 우선형",
               "selectionBasis": "historical_profile_ev",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 23건)",
-              "sampleCount": 23,
-              "ev": -3.0094
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 27건)",
+              "sampleCount": 27,
+              "ev": -3.0054
             },
             "recommendedStage": {
               "stageKey": "premarket",
@@ -6172,30 +7728,783 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "statusReason": "",
             "stockIndicators": {
               "snapshot": {
-                "currentPrice": 1091000.0,
-                "vs52wHighPct": 63.68943374197315,
-                "vs52wLowPct": 39.33588761174968,
-                "dropFrom52wHighPct": 36.31056625802685,
-                "ma20GapPct": 5.116099816938048,
-                "rsi14": 52.52033988843996,
-                "volumeRatio20d": 71.99839109740564,
-                "rs20Pct": 13.883089770354907,
-                "tradingValueRank": 32.0,
+                "currentPrice": 1085000.0,
+                "vs52wHighPct": 63.33917104495038,
+                "vs52wLowPct": 38.569604086845466,
+                "dropFrom52wHighPct": 36.66082895504962,
+                "ma20GapPct": 4.568234387047031,
+                "rsi14": 51.966969838389694,
+                "volumeRatio20d": 84.29718032855394,
+                "rs20Pct": 13.256784968684759,
+                "tradingValueRank": 31.0,
                 "marketCapRank": 11.0,
-                "marketCapTrillion": 56.2557,
-                "per": 38.18,
-                "pbr": 5.64,
-                "cnsPer": 24.36,
+                "marketCapTrillion": 55.9463,
+                "per": 37.97,
+                "pbr": 5.61,
+                "cnsPer": 24.22,
                 "foreignRate": 45.51,
                 "supplyTrendScore": 2.0,
                 "shortBalanceChangePct": -42.21902017291067
               },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
+          },
+          {
+            "rank": 2,
+            "name": "NAVER",
+            "code": "035420",
+            "strictScore": 8.6,
+            "signalScore": 8.6,
+            "score": 8.6,
+            "scoreMax": 14.0,
+            "effectiveScoreMax": 14.0,
+            "gradeScore": 6.1,
+            "grade": "B",
+            "overnightGapPenalty": 0.0,
+            "scoreBreakdown": [
+              {
+                "code": "S1",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "외인 188,436주 / 기관 74,229주 · 외인·기관 양매수"
+              },
+              {
+                "code": "S2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "외인 당일 +188,436 / 전일 +4,210 · 기관 당일 +74,229 / 전일 -209,734 · 당일 양매수 + 전일 수급 유입"
+              },
+              {
+                "code": "S3",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "마지막 1시간 평균 체결강도 163.1% (필요 ≥ 100%)"
+              },
+              {
+                "code": "S4",
+                "strictPoints": 0.5,
+                "signalPoints": 0.5,
+                "maxPoints": 0.5,
+                "evalStatus": "met",
+                "note": "당일 평균 115.0% / 마지막 1시간 163.1% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화"
+              },
+              {
+                "code": "S5",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "외국인 최근 5일 누적 +384,790주 · 양수 4/5일 · 증가 2회"
+              },
+              {
+                "code": "P1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.5,
+                "evalStatus": "not_met",
+                "note": "종가 / 20MA 103.1% (필요 98~102%)"
+              },
+              {
+                "code": "P2",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "5MA 218,900 / 20MA 215,385 · 5MA > 20MA"
+              },
+              {
+                "code": "C1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "당일 거래량 / 5일 평균 97% (필요 ≤ 90%)"
+              },
+              {
+                "code": "C2",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "당일 등락 +1.14% (필요 -3% ~ +5%)"
+              },
+              {
+                "code": "C3",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "동종업종 평균 -2.17% / KOSPI +0.88% underperform"
+              },
+              {
+                "code": "C4",
+                "strictPoints": 0.5,
+                "signalPoints": 0.5,
+                "maxPoints": 0.5,
+                "evalStatus": "met",
+                "note": "마지막 30분 틱프록시 매수/매도 17.36:1 · 평균 체결강도 182.1% (필요 ≥ 1.1:1) · 장마감 매수 우위"
+              },
+              {
+                "code": "L1",
+                "strictPoints": 0.5,
+                "signalPoints": 0.5,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "대차잔고 -6.8% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 부분 충족"
+              },
+              {
+                "code": "V1",
+                "strictPoints": 0.75,
+                "signalPoints": 0.75,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "유리 (고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다)"
+              }
+            ],
+            "scoreScope": "accumulation",
+            "statusLabel": "관심후보",
+            "strategy": "accumulation",
+            "gates": [
+              {
+                "code": "G0",
+                "status": "✅",
+                "note": "외인 전일 +4,210/당일 +188,436 · 기관 전일 -209,734/당일 +74,229 · 2일 연속 수급 유입",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G1",
+                "status": "✅",
+                "note": "종가 222,000 / 60MA 216,290",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "52주 고가 대비 72.0% (필요 < 92%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "거래대금 TOP100 순위 29",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "당일 거래량 / 20일 평균 72% (필요 < 150%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "외인 보유율 35.3% (≥25%) · 20일 수익률 +0.9% (≥0%) · 매집 주체 존재+가격 지탱",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G5",
+                "status": "⚠️",
+                "note": "KOSPI 6,913 / 5MA 6,817 (+1.4%) · VKOSPI 58.0 · 변동성 경계",
+                "evalStatus": "not_met"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "외인 188,436주 / 기관 74,229주 · 외인·기관 양매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S2",
+                "note": "외인 당일 +188,436 / 전일 +4,210 · 기관 당일 +74,229 / 전일 -209,734 · 당일 양매수 + 전일 수급 유입",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S3",
+                "note": "마지막 1시간 평균 체결강도 163.1% (필요 ≥ 100%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S4",
+                "note": "당일 평균 115.0% / 마지막 1시간 163.1% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S5",
+                "note": "외국인 최근 5일 누적 +384,790주 · 양수 4/5일 · 증가 2회",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P2",
+                "note": "5MA 218,900 / 20MA 215,385 · 5MA > 20MA",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C2",
+                "note": "당일 등락 +1.14% (필요 -3% ~ +5%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C4",
+                "note": "마지막 30분 틱프록시 매수/매도 17.36:1 · 평균 체결강도 182.1% (필요 ≥ 1.1:1) · 장마감 매수 우위",
+                "evalStatus": "met"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "P1",
+                "note": "종가 / 20MA 103.1% (필요 98~102%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C1",
+                "note": "당일 거래량 / 5일 평균 97% (필요 ≤ 90%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 -2.17% / KOSPI +0.88% underperform",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "L1",
+                "note": "대차잔고 -6.8% (최근 10거래일) (감소 ≥10% 만점·5~10% 부분, 클린 매집 징후) · 부분 충족",
+                "evalStatus": "met"
+              }
+            ],
+            "currentPrice": 222000,
+            "previousClose": 219500,
+            "dailyChange": 2500,
+            "dailyChangePct": 1.14,
+            "dailyDirection": "up",
+            "entryPriceText": "222,000원 (당일 종가 기준)",
+            "entryPrice": 222000,
+            "entryMeta": "당일 종가 기준",
+            "marketCapTrillion": 34.849,
+            "marketCapRank": 21,
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 188,436주 / 기관 74,229주 / 마지막 1시간 163.1% · 장후반 매수세 강화 · 마지막 30분 틱 17.36:1. 외국인 최근 5일 매집 추세 강화 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "notes": [],
+            "toss": {
+              "avgStrength": 115.0,
+              "note": "토스 공개 체결강도 115.0% / 최근 체결 39분 프록시",
+              "source": "toss_http_combo",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A035420/order",
+              "asOf": "2026-08-21T08:32:53Z",
+              "intradayAbove100Ratio": 57.1,
+              "observedMinutes": 39,
+              "observedTickCount": 120,
+              "coverageNote": "최근 체결 39분 프록시",
+              "lastHourAvgStrength": 163.1,
+              "lastHourObservedMinutes": 39,
+              "last30AvgStrength": 182.1,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 17.3571,
+              "last30BuyVolume": 486.0,
+              "last30SellVolume": 28.0
+            },
+            "volatilityContext": {
+              "marketState": "volatile",
+              "stockState": "volatile",
+              "blendedState": "volatile",
+              "strategyFit": "favorable",
+              "scoreDelta": 0.75,
+              "summary": "유리 (고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다)",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다. VKOSPI 58.03, ATR10 5.14%, 일간 표준편차 4.80%, 당일 레인지 5.01%.",
+              "metrics": {
+                "atrPct10": 5.14,
+                "returnStd20": 4.8,
+                "todayRangePct": 5.01,
+                "vkospi": 58.03
+              },
+              "strategyLabel": "수급매집형"
+            },
+            "accumulationTrend": {
+              "lookbackDays": 5,
+              "sponsor": "foreign",
+              "cumulativeNet": 384790.0,
+              "positiveDays": 4,
+              "improvementCount": 2,
+              "series": {
+                "foreign": [
+                  {
+                    "date": "20260820",
+                    "net": 188436.0
+                  },
+                  {
+                    "date": "20260819",
+                    "net": 4210.0
+                  },
+                  {
+                    "date": "20260818",
+                    "net": -39093.0
+                  },
+                  {
+                    "date": "20260814",
+                    "net": 32305.0
+                  },
+                  {
+                    "date": "20260813",
+                    "net": 198932.0
+                  }
+                ],
+                "institution": [
+                  {
+                    "date": "20260820",
+                    "net": 74229.0
+                  },
+                  {
+                    "date": "20260819",
+                    "net": -209734.0
+                  },
+                  {
+                    "date": "20260818",
+                    "net": -65560.0
+                  },
+                  {
+                    "date": "20260814",
+                    "net": 43561.0
+                  },
+                  {
+                    "date": "20260813",
+                    "net": 277776.0
+                  }
+                ],
+                "sponsor": [
+                  {
+                    "date": "20260820",
+                    "net": 188436.0
+                  },
+                  {
+                    "date": "20260819",
+                    "net": 4210.0
+                  },
+                  {
+                    "date": "20260818",
+                    "net": -39093.0
+                  },
+                  {
+                    "date": "20260814",
+                    "net": 32305.0
+                  },
+                  {
+                    "date": "20260813",
+                    "net": 198932.0
+                  }
+                ]
+              },
+              "status": "met",
+              "score": 1.0,
+              "summary": "외국인 최근 5일 매집 추세 강화",
+              "note": "외국인 최근 5일 누적 +384,790주 · 양수 4/5일 · 증가 2회"
+            },
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "1차 익절",
+                "stageKey": "premarket",
+                "condition": "상단 매물대 1 도달",
+                "quantity": "20% 익절",
+                "targetYield": "+0.7%",
+                "targetPrice": "223,500원",
+                "historicalHitRate": 0.5556,
+                "recommended": true
+              },
+              {
+                "stage": "2차 익절",
+                "stageKey": "openPhase",
+                "condition": "상단 매물대 2 도달",
+                "quantity": "20% 익절",
+                "targetYield": "+2.9%",
+                "targetPrice": "228,500원",
+                "historicalHitRate": 0.2222,
+                "recommended": false
+              },
+              {
+                "stage": "3차 익절",
+                "stageKey": "intraday1",
+                "condition": "+5.5% 도달",
+                "quantity": "25% 익절",
+                "targetYield": "+5.5%",
+                "targetPrice": "234,210원",
+                "historicalHitRate": 0.1852,
+                "recommended": false
+              },
+              {
+                "stage": "4차 익절",
+                "stageKey": "intraday2",
+                "condition": "추세 유지 시",
+                "quantity": "20% 익절",
+                "targetYield": "+8.0%",
+                "targetPrice": "239,760원",
+                "historicalHitRate": 0.0741,
+                "recommended": false
+              },
+              {
+                "stage": "추세 홀딩",
+                "stageKey": "swing",
+                "condition": "V 조건 충족 시",
+                "quantity": "15% 익절",
+                "targetYield": "+11.0%",
+                "targetPrice": "246,420원",
+                "historicalHitRate": 0.0741,
+                "recommended": false
+              },
+              {
+                "stage": "손절",
+                "stageKey": "stop",
+                "condition": "유효 하드 스톱 214,230원 종가 이탈",
+                "quantity": "전량",
+                "targetYield": "-3.5%",
+                "targetPrice": "214,230원"
+              }
+            ],
+            "accumulationStopPolicy": {
+              "version": "accumulation-stop-v1-live",
+              "anchorSource": "prior_sponsor_candle",
+              "sponsorMode": "both",
+              "anchorDate": "20260820",
+              "anchorOpen": 210500,
+              "anchorClose": 219500,
+              "anchorVolumeRatio20d": 0.7,
+              "anchorStopPrice": 210500,
+              "fallbackStopPrice": 214230,
+              "effectiveHardStopPrice": 214230,
+              "openExitCheckCutoff": "10:00",
+              "openExitMode": "flow_and_price_confirm",
+              "openExitRuleSummary": "09:00~10:00 장초반에 수급 주체가 순매도로 돌아섰고 현재가가 진입가/하드 스톱 이하이면 즉시 손절합니다.",
+              "hardStopRuleSummary": "당일 매집 시작 봉 시가 210,500원와 기존 % 손절 214,230원 중 더 높은 214,230원를 하드 스톱으로 사용합니다.",
+              "marketShockHoldRuleSummary": "갭 등급 G-C 또는 고변동성 장세에서 수급 주체 순매수가 유지되면 장초반 흔들림 손절은 보류하고 종가형 하드 스톱만 유지합니다.",
+              "reasonSummary": "외인·기관 매집 시작 봉(-) 시가 210,500원를 기준으로 잡고, 기존 % 손절 214,230원보다 느슨해지지 않게 214,230원로 고정합니다."
+            },
+            "rr": "1 : 1.5",
+            "source": "jongga-live",
+            "recommendedEntryBand": {
+              "low": 219225,
+              "high": 221445,
+              "anchor": 222000,
+              "label": "219,225~221,445원 (종가 ±, 분할매수)"
+            },
+            "accumulationTakeProfitProfiles": [
+              {
+                "profileKey": "aggressive",
+                "label": "기본 목표형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "기존 퍼센트 목표가를 그대로 따르는 기본형입니다.",
+                "nearestResistancePrice": 223500,
+                "secondaryResistancePrice": 228500,
+                "tradePlanRows": [
+                  {
+                    "stage": "1차 익절",
+                    "stageKey": "premarket",
+                    "condition": "+1.5% 도달",
+                    "quantity": "20% 익절",
+                    "targetYield": "+1.5%",
+                    "targetPrice": "225,330원",
+                    "historicalHitRate": 0.5556,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "2차 익절",
+                    "stageKey": "openPhase",
+                    "condition": "+3.0% 도달",
+                    "quantity": "20% 익절",
+                    "targetYield": "+3.0%",
+                    "targetPrice": "228,660원",
+                    "historicalHitRate": 0.2222,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "3차 익절",
+                    "stageKey": "intraday1",
+                    "condition": "+5.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+5.5%",
+                    "targetPrice": "234,210원",
+                    "historicalHitRate": 0.1852,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "4차 익절",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "20% 익절",
+                    "targetYield": "+8.0%",
+                    "targetPrice": "239,760원",
+                    "historicalHitRate": 0.0741,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "추세 홀딩",
+                    "stageKey": "swing",
+                    "condition": "V 조건 충족 시",
+                    "quantity": "15% 익절",
+                    "targetYield": "+11.0%",
+                    "targetPrice": "246,420원",
+                    "historicalHitRate": 0.0741,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 214,230원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.5%",
+                    "targetPrice": "214,230원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "premarket",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 27건)",
+                  "hitRate": 0.5556,
+                  "ev": -0.4,
+                  "sampleCount": 27
+                }
+              },
+              {
+                "profileKey": "balanced",
+                "label": "1차 저항 반영형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "상단 매물대 1 / 상단 매물대 2 저항만 앞단 목표가에 반영합니다.",
+                "nearestResistancePrice": 223500,
+                "secondaryResistancePrice": 228500,
+                "tradePlanRows": [
+                  {
+                    "stage": "1차 익절",
+                    "stageKey": "premarket",
+                    "condition": "상단 매물대 1 도달",
+                    "quantity": "20% 익절",
+                    "targetYield": "+0.7%",
+                    "targetPrice": "223,500원",
+                    "historicalHitRate": 0.5556,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "2차 익절",
+                    "stageKey": "openPhase",
+                    "condition": "상단 매물대 2 도달",
+                    "quantity": "20% 익절",
+                    "targetYield": "+2.9%",
+                    "targetPrice": "228,500원",
+                    "historicalHitRate": 0.2222,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "3차 익절",
+                    "stageKey": "intraday1",
+                    "condition": "+5.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+5.5%",
+                    "targetPrice": "234,210원",
+                    "historicalHitRate": 0.1852,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "4차 익절",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "20% 익절",
+                    "targetYield": "+8.0%",
+                    "targetPrice": "239,760원",
+                    "historicalHitRate": 0.0741,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "추세 홀딩",
+                    "stageKey": "swing",
+                    "condition": "V 조건 충족 시",
+                    "quantity": "15% 익절",
+                    "targetYield": "+11.0%",
+                    "targetPrice": "246,420원",
+                    "historicalHitRate": 0.0741,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 214,230원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.5%",
+                    "targetPrice": "214,230원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "premarket",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 27건)",
+                  "hitRate": 0.5556,
+                  "ev": -0.4,
+                  "sampleCount": 27
+                }
+              },
+              {
+                "profileKey": "conservative",
+                "label": "저항 우선형",
+                "recommended": true,
+                "selectionBasis": "historical_profile_ev",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 27건)",
+                "nearestResistancePrice": 223500,
+                "secondaryResistancePrice": 228500,
+                "tradePlanRows": [
+                  {
+                    "stage": "1차 익절",
+                    "stageKey": "premarket",
+                    "condition": "상단 매물대 1 도달",
+                    "quantity": "20% 익절",
+                    "targetYield": "+0.7%",
+                    "targetPrice": "223,500원",
+                    "historicalHitRate": 0.5556,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "2차 익절",
+                    "stageKey": "openPhase",
+                    "condition": "상단 매물대 2 도달",
+                    "quantity": "20% 익절",
+                    "targetYield": "+2.9%",
+                    "targetPrice": "228,500원",
+                    "historicalHitRate": 0.2222,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "3차 익절",
+                    "stageKey": "intraday1",
+                    "condition": "+5.5% 도달",
+                    "quantity": "25% 익절",
+                    "targetYield": "+5.5%",
+                    "targetPrice": "234,210원",
+                    "historicalHitRate": 0.1852,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "4차 익절",
+                    "stageKey": "intraday2",
+                    "condition": "추세 유지 시",
+                    "quantity": "20% 익절",
+                    "targetYield": "+8.0%",
+                    "targetPrice": "239,760원",
+                    "historicalHitRate": 0.0741,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "추세 홀딩",
+                    "stageKey": "swing",
+                    "condition": "V 조건 충족 시",
+                    "quantity": "15% 익절",
+                    "targetYield": "+11.0%",
+                    "targetPrice": "246,420원",
+                    "historicalHitRate": 0.0741,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 214,230원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-3.5%",
+                    "targetPrice": "214,230원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "premarket",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 27건)",
+                  "hitRate": 0.5556,
+                  "ev": -0.4,
+                  "sampleCount": 27
+                }
+              }
+            ],
+            "recommendedTakeProfitProfile": {
+              "profileKey": "conservative",
+              "label": "저항 우선형",
+              "selectionBasis": "historical_profile_ev",
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 27건)",
+              "sampleCount": 27,
+              "ev": -3.0054
+            },
+            "recommendedStage": {
+              "stageKey": "premarket",
+              "evBasis": "historical:netStageReturn",
+              "reason": "EV=순수익 argmax (과거 27건)",
+              "hitRate": 0.5556,
+              "ev": -0.4,
+              "sampleCount": 27
+            },
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-accumulation",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
+            },
+            "entryEligible": false,
+            "entryWatch": true,
+            "entryBlockers": [],
+            "setupQuality": "setup_weak",
+            "statusReasonShort": "",
+            "statusReason": "",
+            "stockIndicators": {
+              "snapshot": {
+                "currentPrice": 222000.0,
+                "vs52wHighPct": 71.96110210696921,
+                "vs52wLowPct": 22.58420762009939,
+                "dropFrom52wHighPct": 28.038897893030796,
+                "ma20GapPct": 3.0712445156347936,
+                "rsi14": 54.40867661418771,
+                "volumeRatio20d": 71.95509687524647,
+                "rs20Pct": 0.9090909090909091,
+                "tradingValueRank": 29.0,
+                "marketCapRank": 21.0,
+                "marketCapTrillion": 34.849,
+                "per": 17.23,
+                "pbr": 1.12,
+                "cnsPer": 17.7,
+                "foreignRate": 35.33,
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": -6.793673262007367
+              },
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
+              "source": "jongga_analysis"
+            },
+            "stockExchangeName": "KOSPI",
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           },
           {
             "rank": 3,
@@ -6232,7 +8541,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "마지막 1시간 평균 체결강도 278.9% (필요 ≥ 100%)"
+                "note": "마지막 1시간 평균 체결강도 139.7% (필요 ≥ 100%)"
               },
               {
                 "code": "S4",
@@ -6240,7 +8549,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.5,
                 "maxPoints": 0.5,
                 "evalStatus": "met",
-                "note": "당일 평균 73.0% / 마지막 1시간 278.9% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화"
+                "note": "당일 평균 74.0% / 마지막 1시간 139.7% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화"
               },
               {
                 "code": "S5",
@@ -6272,7 +8581,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "당일 거래량 / 5일 평균 81% (필요 ≤ 90%)"
+                "note": "당일 거래량 / 5일 평균 85% (필요 ≤ 90%)"
               },
               {
                 "code": "C2",
@@ -6288,7 +8597,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.0,
                 "maxPoints": 1.0,
                 "evalStatus": "not_met",
-                "note": "동종업종 평균 -5.47% / KOSPI +0.80% underperform"
+                "note": "동종업종 평균 -5.62% / KOSPI +0.88% underperform"
               },
               {
                 "code": "C4",
@@ -6296,7 +8605,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 0.5,
                 "maxPoints": 0.5,
                 "evalStatus": "met",
-                "note": "마지막 30분 틱프록시 매수/매도 8.24:1 · 평균 체결강도 278.9% (필요 ≥ 1.1:1) · 장마감 매수 우위"
+                "note": "마지막 30분 틱프록시 매수/매도 2.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위"
               },
               {
                 "code": "L1",
@@ -6346,7 +8655,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "G4",
                 "status": "✅",
-                "note": "당일 거래량 / 20일 평균 79% (필요 < 150%)",
+                "note": "당일 거래량 / 20일 평균 84% (필요 < 150%)",
                 "evalStatus": "met"
               },
               {
@@ -6358,7 +8667,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "G5",
                 "status": "⚠️",
-                "note": "KOSPI 6,908 / 5MA 6,816 (+1.3%) · VKOSPI 58.1 · 변동성 경계",
+                "note": "KOSPI 6,913 / 5MA 6,817 (+1.4%) · VKOSPI 58.0 · 변동성 경계",
                 "evalStatus": "not_met"
               }
             ],
@@ -6375,12 +8684,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "S3",
-                "note": "마지막 1시간 평균 체결강도 278.9% (필요 ≥ 100%)",
+                "note": "마지막 1시간 평균 체결강도 139.7% (필요 ≥ 100%)",
                 "evalStatus": "met"
               },
               {
                 "code": "S4",
-                "note": "당일 평균 73.0% / 마지막 1시간 278.9% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화",
+                "note": "당일 평균 74.0% / 마지막 1시간 139.7% (필요 마지막 1시간 > 당일 평균) · 장후반 매수세 강화",
                 "evalStatus": "met"
               },
               {
@@ -6395,12 +8704,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "C1",
-                "note": "당일 거래량 / 5일 평균 81% (필요 ≤ 90%)",
+                "note": "당일 거래량 / 5일 평균 85% (필요 ≤ 90%)",
                 "evalStatus": "met"
               },
               {
                 "code": "C4",
-                "note": "마지막 30분 틱프록시 매수/매도 8.24:1 · 평균 체결강도 278.9% (필요 ≥ 1.1:1) · 장마감 매수 우위",
+                "note": "마지막 30분 틱프록시 매수/매도 2.00:1 · 평균 체결강도 300.0% (필요 ≥ 1.1:1) · 장마감 매수 우위",
                 "evalStatus": "met"
               }
             ],
@@ -6417,7 +8726,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "C3",
-                "note": "동종업종 평균 -5.47% / KOSPI +0.80% underperform",
+                "note": "동종업종 평균 -5.62% / KOSPI +0.88% underperform",
                 "evalStatus": "not_met"
               },
               {
@@ -6436,26 +8745,26 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "entryMeta": "당일 종가 기준",
             "marketCapTrillion": 17.1476,
             "marketCapRank": 44,
-            "marketCapUniverseCount": 2551,
-            "keyPoint": "수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 87,887주 / 기관 156,382주 / 마지막 1시간 278.9% · 장후반 매수세 강화 · 마지막 30분 틱 8.24:1. 외국인 최근 5일 매집 추세 강화 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "수급 매집형 — 조용한 거래량·20MA 횡보·양매수 흐름과 장후반 수급 강화 여부를 점검했습니다. 외인 87,887주 / 기관 156,382주 / 마지막 1시간 139.7% · 장후반 매수세 강화 · 마지막 30분 틱 2.00:1. 외국인 최근 5일 매집 추세 강화 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
             "notes": [],
             "toss": {
-              "avgStrength": 73.0,
-              "note": "토스 공개 체결강도 73.0% / 최근 체결 4분 프록시",
+              "avgStrength": 74.0,
+              "note": "토스 공개 체결강도 74.0% / 최근 체결 34분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A196170/order",
-              "asOf": "2026-08-21T06:03:08Z",
-              "intradayAbove100Ratio": 100.0,
-              "observedMinutes": 4,
+              "asOf": "2026-08-21T08:32:55Z",
+              "intradayAbove100Ratio": 66.7,
+              "observedMinutes": 34,
               "observedTickCount": 120,
-              "coverageNote": "최근 체결 4분 프록시",
-              "lastHourAvgStrength": 278.9,
-              "lastHourObservedMinutes": 4,
-              "last30AvgStrength": 278.9,
-              "last30ObservedMinutes": 4,
-              "last30BuySellRatio": 8.2423,
-              "last30BuyVolume": 2687.0,
-              "last30SellVolume": 326.0
+              "coverageNote": "최근 체결 34분 프록시",
+              "lastHourAvgStrength": 139.7,
+              "lastHourObservedMinutes": 34,
+              "last30AvgStrength": 300.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 2.0,
+              "last30BuyVolume": 2.0,
+              "last30SellVolume": 0.0
             },
             "volatilityContext": {
               "marketState": "volatile",
@@ -6464,12 +8773,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "strategyFit": "favorable",
               "scoreDelta": 0.75,
               "summary": "유리 (고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다. VKOSPI 58.06, ATR10 8.04%, 일간 표준편차 6.01%, 당일 레인지 5.30%.",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 조용한 매집 구간이 상대적으로 유리합니다. VKOSPI 58.03, ATR10 8.04%, 일간 표준편차 6.01%, 당일 레인지 5.30%.",
               "metrics": {
                 "atrPct10": 8.04,
                 "returnStd20": 6.01,
                 "todayRangePct": 5.3,
-                "vkospi": 58.06
+                "vkospi": 58.03
               },
               "strategyLabel": "수급매집형"
             },
@@ -6805,7 +9114,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "label": "저항 우선형",
                 "recommended": true,
                 "selectionBasis": "historical_profile_ev",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 23건)",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 27건)",
                 "nearestResistancePrice": 322500,
                 "secondaryResistancePrice": 344000,
                 "tradePlanRows": [
@@ -6882,9 +9191,9 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "profileKey": "conservative",
               "label": "저항 우선형",
               "selectionBasis": "historical_profile_ev",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 23건)",
-              "sampleCount": 23,
-              "ev": -3.0094
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 27건)",
+              "sampleCount": 27,
+              "ev": -3.0054
             },
             "recommendedStage": {
               "stageKey": "premarket",
@@ -6934,7 +9243,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "dropFrom52wHighPct": 26.91026865044379,
                 "ma20GapPct": 13.444221514732057,
                 "rsi14": 59.5054078953305,
-                "volumeRatio20d": 79.21622874065595,
+                "volumeRatio20d": 83.94156746558384,
                 "rs20Pct": 35.68693631618448,
                 "tradingValueRank": 39.0,
                 "marketCapRank": 44.0,
@@ -6946,12 +9255,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "supplyTrendScore": 4.0,
                 "shortBalanceChangePct": 14.111848640691004
               },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSDAQ",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           }
         ],
         "reversal": [
@@ -6982,7 +9291,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 2.0,
                 "maxPoints": 2.0,
                 "evalStatus": "met",
-                "note": "당일 평균 133.0% / 마지막 1시간 216.2% (필요 ≥90%·≥100%)"
+                "note": "당일 평균 126.0% / 마지막 1시간 151.4% (필요 ≥90%·≥100%)"
               },
               {
                 "code": "P1",
@@ -6990,7 +9299,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.5,
                 "maxPoints": 1.5,
                 "evalStatus": "met",
-                "note": "종가 325,000 / 20MA 292,575 (111.1% · 필요 ≥ 98%) · 20MA 근접 회복"
+                "note": "종가 328,500 / 20MA 292,750 (112.2% · 필요 ≥ 98%) · 20MA 근접 회복"
               },
               {
                 "code": "P2",
@@ -6998,15 +9307,15 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.5,
                 "maxPoints": 1.5,
                 "evalStatus": "met",
-                "note": "당일 레인지 상단 92% (필요 ≥ 50%)"
+                "note": "당일 레인지 상단 99% (필요 ≥ 50%)"
               },
               {
                 "code": "C1",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
                 "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 181% (필요 ≥ 200%)"
+                "evalStatus": "met",
+                "note": "당일 거래량 / 5일 평균 205% (필요 ≥ 200%) · 투매 클라이맥스"
               },
               {
                 "code": "C2",
@@ -7014,15 +9323,15 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "signalPoints": 1.0,
                 "maxPoints": 1.0,
                 "evalStatus": "met",
-                "note": "매수/매도 호가잔량 1.24 (필요 ≥ 1.0) · 하방 흡수 확인"
+                "note": "매수/매도 호가잔량 2.35 (필요 ≥ 1.0) · 하방 흡수 확인"
               },
               {
                 "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
                 "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "직전 30분봉 종가 324000, 전봉 종가 321500 충족"
+                "evalStatus": "not_met",
+                "note": "직전 30분봉 종가 328500, 전봉 종가 324500 미달"
               },
               {
                 "code": "V1",
@@ -7046,7 +9355,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "F2",
                 "status": "✅",
-                "note": "시총 65.0조 (필요 ≥ 5조)",
+                "note": "시총 65.7조 (필요 ≥ 5조)",
                 "evalStatus": "met"
               },
               {
@@ -7066,19 +9375,19 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "G1",
                 "status": "⛔",
-                "note": "1개월 수익률 +1.6% (필요 ≥ +15%)",
+                "note": "1개월 수익률 +2.7% (필요 ≥ +15%)",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G2",
                 "status": "⛔",
-                "note": "20일 고점 대비 -1.1% (필요 -5%~-25%)",
+                "note": "20일 고점 대비 -0.2% (필요 -5%~-25%)",
                 "evalStatus": "not_met"
               },
               {
                 "code": "G3",
                 "status": "⛔",
-                "note": "종가 325,000 / 60MA 355,733",
+                "note": "종가 328,500 / 60MA 355,792",
                 "evalStatus": "not_met"
               },
               {
@@ -7096,7 +9405,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               {
                 "code": "Q1",
                 "status": "✅",
-                "note": "20MA 이격 +11.1% (≤+22%) · RSI14 54 (≤72) · 과이격·과매수 반등 아님",
+                "note": "20MA 이격 +12.2% (≤+22%) · RSI14 55 (≤72) · 과이격·과매수 반등 아님",
                 "evalStatus": "met"
               }
             ],
@@ -7108,49 +9417,49 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               },
               {
                 "code": "S2",
-                "note": "당일 평균 133.0% / 마지막 1시간 216.2% (필요 ≥90%·≥100%)",
+                "note": "당일 평균 126.0% / 마지막 1시간 151.4% (필요 ≥90%·≥100%)",
                 "evalStatus": "met"
               },
               {
                 "code": "P1",
-                "note": "종가 325,000 / 20MA 292,575 (111.1% · 필요 ≥ 98%) · 20MA 근접 회복",
+                "note": "종가 328,500 / 20MA 292,750 (112.2% · 필요 ≥ 98%) · 20MA 근접 회복",
                 "evalStatus": "met"
               },
               {
                 "code": "P2",
-                "note": "당일 레인지 상단 92% (필요 ≥ 50%)",
+                "note": "당일 레인지 상단 99% (필요 ≥ 50%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C1",
+                "note": "당일 거래량 / 5일 평균 205% (필요 ≥ 200%) · 투매 클라이맥스",
                 "evalStatus": "met"
               },
               {
                 "code": "C2",
-                "note": "매수/매도 호가잔량 1.24 (필요 ≥ 1.0) · 하방 흡수 확인",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C3",
-                "note": "직전 30분봉 종가 324000, 전봉 종가 321500 충족",
+                "note": "매수/매도 호가잔량 2.35 (필요 ≥ 1.0) · 하방 흡수 확인",
                 "evalStatus": "met"
               }
             ],
             "unmatchedRules": [
               {
-                "code": "C1",
-                "note": "당일 거래량 / 5일 평균 181% (필요 ≥ 200%)",
+                "code": "C3",
+                "note": "직전 30분봉 종가 328500, 전봉 종가 324500 미달",
                 "evalStatus": "not_met"
               }
             ],
-            "currentPrice": 325000,
+            "currentPrice": 328500,
             "previousClose": 297000,
-            "dailyChange": 28000,
-            "dailyChangePct": 9.43,
+            "dailyChange": 31500,
+            "dailyChangePct": 10.61,
             "dailyDirection": "up",
-            "entryPriceText": "325,000원 (당일 종가 기준)",
-            "entryPrice": 325000,
+            "entryPriceText": "328,500원 (당일 종가 기준)",
+            "entryPrice": 328500,
             "entryMeta": "당일 종가 기준",
-            "marketCapTrillion": 65.0,
+            "marketCapTrillion": 65.7,
             "marketCapRank": 8,
-            "marketCapUniverseCount": 2551,
-            "keyPoint": "20일 고점 대비 -1.1% 조정 후 안정화 패턴 여부를 점검했습니다. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "20일 고점 대비 -0.2% 조정 후 안정화 패턴 여부를 점검했습니다. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
             "notes": [],
             "manualInput": {
               "required": false,
@@ -7168,37 +9477,37 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             },
             "intraday30m": {
               "available": true,
-              "signal": true,
+              "signal": false,
               "interval": "30m",
               "source": "yahoo_chart",
-              "note": "직전 30분봉 종가 324000, 전봉 종가 321500",
-              "latestOpen": 321500.0,
-              "latestClose": 324000.0,
-              "previousClose": 321500.0
+              "note": "직전 30분봉 종가 328500, 전봉 종가 324500",
+              "latestOpen": 328500.0,
+              "latestClose": 328500.0,
+              "previousClose": 324500.0
             },
             "toss": {
-              "avgStrength": 133.0,
-              "note": "토스 공개 체결강도 133.0% / 최근 체결 2분 프록시",
+              "avgStrength": 126.0,
+              "note": "토스 공개 체결강도 126.0% / 최근 체결 28분 프록시",
               "source": "toss_http_combo",
               "sourceUrl": "https://www.tossinvest.com/stocks/A032830/order",
-              "asOf": "2026-08-21T06:03:05Z",
-              "intradayAbove100Ratio": 100.0,
-              "observedMinutes": 2,
+              "asOf": "2026-08-21T08:32:55Z",
+              "intradayAbove100Ratio": 66.7,
+              "observedMinutes": 28,
               "observedTickCount": 120,
-              "coverageNote": "최근 체결 2분 프록시",
-              "lastHourAvgStrength": 216.2,
-              "lastHourObservedMinutes": 2,
-              "last30AvgStrength": 216.2,
-              "last30ObservedMinutes": 2,
-              "last30BuySellRatio": 1.3646,
-              "last30BuyVolume": 1366.0,
-              "last30SellVolume": 1001.0
+              "coverageNote": "최근 체결 28분 프록시",
+              "lastHourAvgStrength": 151.4,
+              "lastHourObservedMinutes": 28,
+              "last30AvgStrength": 151.4,
+              "last30ObservedMinutes": 28,
+              "last30BuySellRatio": 1.6153,
+              "last30BuyVolume": 2066.0,
+              "last30SellVolume": 1279.0
             },
             "orderbook": {
-              "bidAskRatio": 1.2373,
-              "bidTotal": 9203,
-              "askTotal": 7438,
-              "note": "Naver 호가잔량합계 매수 9,203 / 매도 7,438",
+              "bidAskRatio": 2.3506,
+              "bidTotal": 22060,
+              "askTotal": 9385,
+              "note": "Naver 호가잔량합계 매수 22,060 / 매도 9,385",
               "source": "naver_orderbook_http",
               "sourceUrl": "https://finance.naver.com/item/main.nhn?code=032830"
             },
@@ -7209,12 +9518,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "strategyFit": "favorable",
               "scoreDelta": 1.0,
               "summary": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다. VKOSPI 58.06, ATR10 8.14%, 일간 표준편차 6.79%, 당일 레인지 13.97%.",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다. VKOSPI 58.03, ATR10 8.14%, 일간 표준편차 6.88%, 당일 레인지 14.14%.",
               "metrics": {
                 "atrPct10": 8.14,
-                "returnStd20": 6.79,
-                "todayRangePct": 13.97,
-                "vkospi": 58.06
+                "returnStd20": 6.88,
+                "todayRangePct": 14.14,
+                "vkospi": 58.03
               },
               "strategyLabel": "낙주 매매"
             },
@@ -7225,7 +9534,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+3% 조기 반등 도달",
                 "quantity": "55% 익절",
                 "targetYield": "+3.0%",
-                "targetPrice": "334,750원",
+                "targetPrice": "338,355원",
                 "historicalHitRate": 0.4762,
                 "recommended": false
               },
@@ -7235,28 +9544,28 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "condition": "+5% 조기 회수 도달",
                 "quantity": "45% 익절 (잔량 전량)",
                 "targetYield": "+5.0%",
-                "targetPrice": "341,250원",
+                "targetPrice": "344,925원",
                 "historicalHitRate": 0.3333,
                 "recommended": true
               },
               {
                 "stage": "🛑 손절",
                 "stageKey": "stop",
-                "condition": "유효 하드 스톱 317,525원 종가 이탈",
+                "condition": "유효 하드 스톱 320,944원 종가 이탈",
                 "quantity": "전량",
                 "targetYield": "-2.3%",
-                "targetPrice": "317,525원"
+                "targetPrice": "320,944원"
               }
             ],
             "reversalStopPolicy": {
               "version": "reversal-stop-v1",
               "anchorSource": "entry_day_low",
               "anchorLowPrice": 287000,
-              "fallbackStopPrice": 317525,
-              "effectiveHardStopPrice": 317525,
+              "fallbackStopPrice": 320944,
+              "effectiveHardStopPrice": 320944,
               "stopExecutionMode": "close_only",
-              "hardStopRuleSummary": "진입 당일 저가 287,000원와 기존 % 손절 317,525원 중 더 높은 317,525원을 종가 손절가로 사용합니다.",
-              "reasonSummary": "반등 가정의 핵심 지지선은 진입 당일 저가 287,000원이며, 기존 % 손절 317,525원보다 느슨해지지 않게 317,525원으로 고정하고 종가 기준으로 확인합니다."
+              "hardStopRuleSummary": "진입 당일 저가 287,000원와 기존 % 손절 320,944원 중 더 높은 320,944원을 종가 손절가로 사용합니다.",
+              "reasonSummary": "반등 가정의 핵심 지지선은 진입 당일 저가 287,000원이며, 기존 % 손절 320,944원보다 느슨해지지 않게 320,944원으로 고정하고 종가 기준으로 확인합니다."
             },
             "reversalLiveExitPolicy": {
               "version": "reversal-live-exit-v1",
@@ -7270,10 +9579,10 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "rr": "1 : 1.7",
             "source": "jongga-live",
             "recommendedEntryBand": {
-              "low": 320938,
-              "high": 324188,
-              "anchor": 325000,
-              "label": "320,938~324,188원 (종가 ±, 분할매수)"
+              "low": 324394,
+              "high": 327679,
+              "anchor": 328500,
+              "label": "324,394~327,679원 (종가 ±, 분할매수)"
             },
             "reversalTakeProfitProfiles": [
               {
@@ -7282,10 +9591,10 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "recommended": false,
                 "selectionBasis": "market_stock_heuristic",
                 "reasonSummary": "하락폭 33%·50% 되돌림과 최근 고점 재도전까지 열어둔 공격형입니다.",
-                "recentHighPrice": 328500,
-                "retrace33Price": 326155,
-                "retrace50Price": 326750,
-                "nearestResistancePrice": 325500,
+                "recentHighPrice": 329000,
+                "retrace33Price": 328665,
+                "retrace50Price": 328750,
+                "nearestResistancePrice": 329000,
                 "secondaryResistancePrice": null,
                 "tradePlanRows": [
                   {
@@ -7294,7 +9603,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+1.3% 도달",
                     "quantity": "55% 익절",
                     "targetYield": "+1.3%",
-                    "targetPrice": "329,225원",
+                    "targetPrice": "332,770원",
                     "historicalHitRate": 0.4762,
                     "recommended": false
                   },
@@ -7304,7 +9613,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+2.5% 도달",
                     "quantity": "30% 익절",
                     "targetYield": "+2.5%",
-                    "targetPrice": "333,125원",
+                    "targetPrice": "336,712원",
                     "historicalHitRate": 0.3333,
                     "recommended": true
                   },
@@ -7314,17 +9623,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "최근 고점 재도전",
                     "quantity": "15% 익절 (잔량 전량)",
                     "targetYield": "+3.5%",
-                    "targetPrice": "336,375원",
+                    "targetPrice": "339,998원",
                     "historicalHitRate": 0.3968,
                     "recommended": false
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 317,525원 종가 이탈",
+                    "condition": "유효 하드 스톱 320,944원 종가 이탈",
                     "quantity": "전량",
                     "targetYield": "-2.3%",
-                    "targetPrice": "317,525원"
+                    "targetPrice": "320,944원"
                   }
                 ],
                 "recommendedStage": {
@@ -7342,10 +9651,10 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "recommended": false,
                 "selectionBasis": "market_stock_heuristic",
                 "reasonSummary": "하락폭 33%·50% 수학적 반등 구간을 우선 추적하는 중립형입니다.",
-                "recentHighPrice": 328500,
-                "retrace33Price": 326155,
-                "retrace50Price": 326750,
-                "nearestResistancePrice": 325500,
+                "recentHighPrice": 329000,
+                "retrace33Price": 328665,
+                "retrace50Price": 328750,
+                "nearestResistancePrice": 329000,
                 "secondaryResistancePrice": null,
                 "tradePlanRows": [
                   {
@@ -7354,7 +9663,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+1.3% 도달",
                     "quantity": "55% 익절",
                     "targetYield": "+1.3%",
-                    "targetPrice": "329,225원",
+                    "targetPrice": "332,770원",
                     "historicalHitRate": 0.4762,
                     "recommended": false
                   },
@@ -7364,17 +9673,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+2.5% 도달",
                     "quantity": "45% 익절 (잔량 전량)",
                     "targetYield": "+2.5%",
-                    "targetPrice": "333,125원",
+                    "targetPrice": "336,712원",
                     "historicalHitRate": 0.3333,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 317,525원 종가 이탈",
+                    "condition": "유효 하드 스톱 320,944원 종가 이탈",
                     "quantity": "전량",
                     "targetYield": "-2.3%",
-                    "targetPrice": "317,525원"
+                    "targetPrice": "320,944원"
                   }
                 ],
                 "recommendedStage": {
@@ -7391,11 +9700,11 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                 "label": "보수형",
                 "recommended": true,
                 "selectionBasis": "historical_profile_ev",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 17건)",
-                "recentHighPrice": 328500,
-                "retrace33Price": 326155,
-                "retrace50Price": 326750,
-                "nearestResistancePrice": 325500,
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 21건)",
+                "recentHighPrice": 329000,
+                "retrace33Price": 328665,
+                "retrace50Price": 328750,
+                "nearestResistancePrice": 329000,
                 "secondaryResistancePrice": null,
                 "tradePlanRows": [
                   {
@@ -7404,7 +9713,7 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+3% 조기 반등 도달",
                     "quantity": "55% 익절",
                     "targetYield": "+3.0%",
-                    "targetPrice": "334,750원",
+                    "targetPrice": "338,355원",
                     "historicalHitRate": 0.4762,
                     "recommended": false
                   },
@@ -7414,17 +9723,17 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
                     "condition": "+5% 조기 회수 도달",
                     "quantity": "45% 익절 (잔량 전량)",
                     "targetYield": "+5.0%",
-                    "targetPrice": "341,250원",
+                    "targetPrice": "344,925원",
                     "historicalHitRate": 0.3333,
                     "recommended": true
                   },
                   {
                     "stage": "🛑 손절",
                     "stageKey": "stop",
-                    "condition": "유효 하드 스톱 317,525원 종가 이탈",
+                    "condition": "유효 하드 스톱 320,944원 종가 이탈",
                     "quantity": "전량",
                     "targetYield": "-2.3%",
-                    "targetPrice": "317,525원"
+                    "targetPrice": "320,944원"
                   }
                 ],
                 "recommendedStage": {
@@ -7441,9 +9750,9 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
               "profileKey": "conservative",
               "label": "보수형",
               "selectionBasis": "historical_profile_ev",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 17건)",
-              "sampleCount": 17,
-              "ev": -0.4605
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 21건)",
+              "sampleCount": 21,
+              "ev": -0.5041
             },
             "recommendedStage": {
               "stageKey": "openPhase",
@@ -7487,36 +9796,1153 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             ],
             "setupQuality": "setup_weak",
             "statusReasonShort": "F3 미충족: KIND 최근공시 2026-08-13 연결재무제표기준영업(잠정)실적(공정공시) · 외 3건",
-            "statusReason": "F3 미충족: KIND 최근공시 2026-08-13 연결재무제표기준영업(잠정)실적(공정공시) / G1 미충족: 1개월 수익률 +1.6% (필요 ≥ +15%) / G2 미충족: 20일 고점 대비 -1.1% (필요 -5%~-25%) / 외 1건",
+            "statusReason": "F3 미충족: KIND 최근공시 2026-08-13 연결재무제표기준영업(잠정)실적(공정공시) / G1 미충족: 1개월 수익률 +2.7% (필요 ≥ +15%) / G2 미충족: 20일 고점 대비 -0.2% (필요 -5%~-25%) / 외 1건",
             "stockIndicators": {
               "snapshot": {
-                "currentPrice": 325000.0,
-                "vs52wHighPct": 62.74131274131274,
-                "vs52wLowPct": 138.97058823529412,
-                "dropFrom52wHighPct": 37.25868725868725,
-                "ma20GapPct": 11.082628385883961,
-                "rsi14": 53.8471907540853,
-                "volumeRatio20d": 204.8181255216607,
-                "rs20Pct": -1.3657056145675266,
+                "currentPrice": 328500.0,
+                "vs52wHighPct": 63.41698841698842,
+                "vs52wLowPct": 141.54411764705884,
+                "dropFrom52wHighPct": 36.58301158301158,
+                "ma20GapPct": 12.211784799316822,
+                "rsi14": 54.5330420992034,
+                "volumeRatio20d": 232.71631530294465,
+                "rs20Pct": -0.30349013657056145,
                 "tradingValueRank": 22.0,
                 "marketCapRank": 8.0,
-                "marketCapTrillion": 65.0,
-                "per": 22.64,
-                "pbr": 0.72,
-                "cnsPer": 22.39,
+                "marketCapTrillion": 65.7,
+                "per": 22.88,
+                "pbr": 0.73,
+                "cnsPer": 22.63,
                 "foreignRate": 23.4,
                 "supplyTrendScore": -2.0,
                 "shortBalanceChangePct": -6.978204448413473
               },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           },
           {
             "rank": 2,
+            "name": "NAVER",
+            "code": "035420",
+            "strictScore": 7.8,
+            "signalScore": 7.8,
+            "score": 7.8,
+            "scoreMax": 10.0,
+            "effectiveScoreMax": 10.0,
+            "gradeScore": 7.8,
+            "grade": "A",
+            "overnightGapPenalty": 0.0,
+            "scoreBreakdown": [
+              {
+                "code": "S1",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "외인 4,210→188,436 / 기관 -209,734→74,229 · 순매수 전환"
+              },
+              {
+                "code": "S2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "당일 평균 115.0% / 마지막 1시간 163.1% (필요 ≥90%·≥100%)"
+              },
+              {
+                "code": "P1",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "종가 222,000 / 20MA 215,385 (103.1% · 필요 ≥ 98%) · 20MA 근접 회복"
+              },
+              {
+                "code": "P2",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "당일 레인지 상단 73% (필요 ≥ 50%)"
+              },
+              {
+                "code": "C1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "당일 거래량 / 5일 평균 97% (필요 ≥ 200%)"
+              },
+              {
+                "code": "C2",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "매수/매도 호가잔량 1.27 (필요 ≥ 1.0) · 하방 흡수 확인"
+              },
+              {
+                "code": "C3",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "직전 30분봉 종가 222000, 전봉 종가 223500 미달"
+              },
+              {
+                "code": "V1",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)"
+              }
+            ],
+            "scoreScope": "reversal",
+            "statusLabel": "매매금지",
+            "strategy": "reversal",
+            "filters": [
+              {
+                "code": "F1",
+                "status": "✅",
+                "note": "당일 거래대금 순위 29위 (필요 ≤ 100위)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "F2",
+                "status": "✅",
+                "note": "시총 34.8조 (필요 ≥ 5조)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "F3",
+                "status": "⛔",
+                "note": "KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "F4",
+                "status": "⛔",
+                "note": "최근 손절 이력 1건 (최근: 2026-08-14) · 재진입 차단",
+                "evalStatus": "not_met"
+              }
+            ],
+            "gates": [
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "1개월 수익률 +12.7% (필요 ≥ +15%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "20일 고점 대비 -5.3% (필요 -5%~-25%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G3",
+                "status": "✅",
+                "note": "종가 222,000 / 60MA 216,290",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "최근 5거래일 최저 -4.8% (필요 -3% 이하 급락 1회 이상)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G5-a",
+                "status": "✅",
+                "note": "양봉 안정화 캔들",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "20MA 이격 +3.1% (≤+22%) · RSI14 54 (≤72) · 과이격·과매수 반등 아님",
+                "evalStatus": "met"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "외인 4,210→188,436 / 기관 -209,734→74,229 · 순매수 전환",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S2",
+                "note": "당일 평균 115.0% / 마지막 1시간 163.1% (필요 ≥90%·≥100%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P1",
+                "note": "종가 222,000 / 20MA 215,385 (103.1% · 필요 ≥ 98%) · 20MA 근접 회복",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P2",
+                "note": "당일 레인지 상단 73% (필요 ≥ 50%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C2",
+                "note": "매수/매도 호가잔량 1.27 (필요 ≥ 1.0) · 하방 흡수 확인",
+                "evalStatus": "met"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "C1",
+                "note": "당일 거래량 / 5일 평균 97% (필요 ≥ 200%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C3",
+                "note": "직전 30분봉 종가 222000, 전봉 종가 223500 미달",
+                "evalStatus": "not_met"
+              }
+            ],
+            "currentPrice": 222000,
+            "previousClose": 219500,
+            "dailyChange": 2500,
+            "dailyChangePct": 1.14,
+            "dailyDirection": "up",
+            "entryPriceText": "222,000원 (당일 종가 기준)",
+            "entryPrice": 222000,
+            "entryMeta": "당일 종가 기준",
+            "marketCapTrillion": 34.849,
+            "marketCapRank": 21,
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "20일 고점 대비 -5.3% 조정 후 안정화 패턴 여부를 점검했습니다. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "notes": [],
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "eventFilter": {
+              "blocked": true,
+              "earningsDays": null,
+              "corporateActionDays": null,
+              "note": "KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시)",
+              "source": "kind_playwright_recent_disclosure"
+            },
+            "intraday30m": {
+              "available": true,
+              "signal": false,
+              "interval": "30m",
+              "source": "yahoo_chart",
+              "note": "직전 30분봉 종가 222000, 전봉 종가 223500",
+              "latestOpen": 222000.0,
+              "latestClose": 222000.0,
+              "previousClose": 223500.0
+            },
+            "toss": {
+              "avgStrength": 115.0,
+              "note": "토스 공개 체결강도 115.0% / 최근 체결 39분 프록시",
+              "source": "toss_http_combo",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A035420/order",
+              "asOf": "2026-08-21T08:32:53Z",
+              "intradayAbove100Ratio": 57.1,
+              "observedMinutes": 39,
+              "observedTickCount": 120,
+              "coverageNote": "최근 체결 39분 프록시",
+              "lastHourAvgStrength": 163.1,
+              "lastHourObservedMinutes": 39,
+              "last30AvgStrength": 182.1,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 17.3571,
+              "last30BuyVolume": 486.0,
+              "last30SellVolume": 28.0
+            },
+            "orderbook": {
+              "bidAskRatio": 1.2673,
+              "bidTotal": 92798,
+              "askTotal": 73224,
+              "note": "Naver 호가잔량합계 매수 92,798 / 매도 73,224",
+              "source": "naver_orderbook_http",
+              "sourceUrl": "https://finance.naver.com/item/main.nhn?code=035420"
+            },
+            "volatilityContext": {
+              "marketState": "volatile",
+              "stockState": "volatile",
+              "blendedState": "volatile",
+              "strategyFit": "favorable",
+              "scoreDelta": 1.0,
+              "summary": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다. VKOSPI 58.03, ATR10 5.14%, 일간 표준편차 4.80%, 당일 레인지 5.01%.",
+              "metrics": {
+                "atrPct10": 5.14,
+                "returnStd20": 4.8,
+                "todayRangePct": 5.01,
+                "vkospi": 58.03
+              },
+              "strategyLabel": "낙주 매매"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "stageKey": "premarket",
+                "condition": "하락폭 33% 되돌림 도달",
+                "quantity": "55% 익절",
+                "targetYield": "+1.9%",
+                "targetPrice": "226,125원",
+                "historicalHitRate": 0.4762,
+                "recommended": false
+              },
+              {
+                "stage": "🔔 장초반",
+                "stageKey": "openPhase",
+                "condition": "하락폭 50% 되돌림 도달",
+                "quantity": "45% 익절 (잔량 전량)",
+                "targetYield": "+2.8%",
+                "targetPrice": "228,250원",
+                "historicalHitRate": 0.3333,
+                "recommended": true
+              },
+              {
+                "stage": "🛑 손절",
+                "stageKey": "stop",
+                "condition": "유효 하드 스톱 216,894원 종가 이탈",
+                "quantity": "전량",
+                "targetYield": "-2.3%",
+                "targetPrice": "216,894원"
+              }
+            ],
+            "reversalStopPolicy": {
+              "version": "reversal-stop-v1",
+              "anchorSource": "entry_day_low",
+              "anchorLowPrice": 214000,
+              "fallbackStopPrice": 216894,
+              "effectiveHardStopPrice": 216894,
+              "stopExecutionMode": "close_only",
+              "hardStopRuleSummary": "진입 당일 저가 214,000원와 기존 % 손절 216,894원 중 더 높은 216,894원을 종가 손절가로 사용합니다.",
+              "reasonSummary": "반등 가정의 핵심 지지선은 진입 당일 저가 214,000원이며, 기존 % 손절 216,894원보다 느슨해지지 않게 216,894원으로 고정하고 종가 기준으로 확인합니다."
+            },
+            "reversalLiveExitPolicy": {
+              "version": "reversal-live-exit-v1",
+              "timeStopCutoff": "09:15",
+              "timeStopMinBouncePct": 1.0,
+              "breakevenActivationPct": 3.0,
+              "earlySpikeWindowEnd": "09:10",
+              "timeStopRuleSummary": "09:15까지 세션 고점이 +1.0% 미만이고 시가/진입가도 회복하지 못하면 조건형 시간손절을 실행합니다.",
+              "breakevenRuleSummary": "+3.0% 이상 반등이 나온 뒤 본전까지 밀리면 기술적 반등 실패로 보고 잔량 전량 정리합니다."
+            },
+            "rr": "1 : 1.0",
+            "source": "jongga-live",
+            "recommendedEntryBand": {
+              "low": 219225,
+              "high": 221445,
+              "anchor": 222000,
+              "label": "219,225~221,445원 (종가 ±, 분할매수)"
+            },
+            "reversalTakeProfitProfiles": [
+              {
+                "profileKey": "aggressive",
+                "label": "공격형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "하락폭 33%·50% 되돌림과 최근 고점 재도전까지 열어둔 공격형입니다.",
+                "recentHighPrice": 234500,
+                "retrace33Price": 226125,
+                "retrace50Price": 228250,
+                "nearestResistancePrice": 223500,
+                "secondaryResistancePrice": 230000,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "하락폭 33% 되돌림 도달",
+                    "quantity": "55% 익절",
+                    "targetYield": "+1.9%",
+                    "targetPrice": "226,125원",
+                    "historicalHitRate": 0.4762,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "하락폭 50% 되돌림 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+2.8%",
+                    "targetPrice": "228,250원",
+                    "historicalHitRate": 0.3333,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "최근 고점 재도전",
+                    "quantity": "15% 익절 (잔량 전량)",
+                    "targetYield": "+5.6%",
+                    "targetPrice": "234,500원",
+                    "historicalHitRate": 0.3968,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 216,894원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-2.3%",
+                    "targetPrice": "216,894원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "openPhase",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 21건)",
+                  "hitRate": 0.3333,
+                  "ev": 0.394,
+                  "sampleCount": 21
+                }
+              },
+              {
+                "profileKey": "balanced",
+                "label": "중립형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "하락폭 33%·50% 수학적 반등 구간을 우선 추적하는 중립형입니다.",
+                "recentHighPrice": 234500,
+                "retrace33Price": 226125,
+                "retrace50Price": 228250,
+                "nearestResistancePrice": 223500,
+                "secondaryResistancePrice": 230000,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "하락폭 33% 되돌림 도달",
+                    "quantity": "55% 익절",
+                    "targetYield": "+1.9%",
+                    "targetPrice": "226,125원",
+                    "historicalHitRate": 0.4762,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "하락폭 50% 되돌림 도달",
+                    "quantity": "45% 익절 (잔량 전량)",
+                    "targetYield": "+2.8%",
+                    "targetPrice": "228,250원",
+                    "historicalHitRate": 0.3333,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 216,894원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-2.3%",
+                    "targetPrice": "216,894원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "openPhase",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 21건)",
+                  "hitRate": 0.3333,
+                  "ev": 0.394,
+                  "sampleCount": 21
+                }
+              },
+              {
+                "profileKey": "conservative",
+                "label": "보수형",
+                "recommended": true,
+                "selectionBasis": "historical_profile_ev",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 21건)",
+                "recentHighPrice": 234500,
+                "retrace33Price": 226125,
+                "retrace50Price": 228250,
+                "nearestResistancePrice": 223500,
+                "secondaryResistancePrice": 230000,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "하락폭 33% 되돌림 도달",
+                    "quantity": "55% 익절",
+                    "targetYield": "+1.9%",
+                    "targetPrice": "226,125원",
+                    "historicalHitRate": 0.4762,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "하락폭 50% 되돌림 도달",
+                    "quantity": "45% 익절 (잔량 전량)",
+                    "targetYield": "+2.8%",
+                    "targetPrice": "228,250원",
+                    "historicalHitRate": 0.3333,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 216,894원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-2.3%",
+                    "targetPrice": "216,894원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "openPhase",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 21건)",
+                  "hitRate": 0.3333,
+                  "ev": 0.394,
+                  "sampleCount": 21
+                }
+              }
+            ],
+            "recommendedTakeProfitProfile": {
+              "profileKey": "conservative",
+              "label": "보수형",
+              "selectionBasis": "historical_profile_ev",
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 21건)",
+              "sampleCount": 21,
+              "ev": -0.5041
+            },
+            "recommendedStage": {
+              "stageKey": "openPhase",
+              "evBasis": "historical:netStageReturn",
+              "reason": "EV=순수익 argmax (과거 21건)",
+              "hitRate": 0.3333,
+              "ev": 0.394,
+              "sampleCount": 21
+            },
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-reversal",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "entryEligible": false,
+            "entryWatch": false,
+            "entryBlockers": [
+              "핵심 Gate 미충족: F3",
+              "핵심 Gate 미충족: F4",
+              "핵심 Gate 미충족: G1",
+              "매매금지"
+            ],
+            "setupQuality": "setup_weak",
+            "statusReasonShort": "F3 미충족: KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시) · 외 2건",
+            "statusReason": "F3 미충족: KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시) / F4 미충족: 최근 손절 이력 1건 (최근: 2026-08-14) · 재진입 차단 / G1 미충족: 1개월 수익률 +12.7% (필요 ≥ +15%)",
+            "stockIndicators": {
+              "snapshot": {
+                "currentPrice": 222000.0,
+                "vs52wHighPct": 71.96110210696921,
+                "vs52wLowPct": 22.58420762009939,
+                "dropFrom52wHighPct": 28.038897893030796,
+                "ma20GapPct": 3.0712445156347936,
+                "rsi14": 54.40867661418771,
+                "volumeRatio20d": 71.95509687524647,
+                "rs20Pct": 0.9090909090909091,
+                "tradingValueRank": 29.0,
+                "marketCapRank": 21.0,
+                "marketCapTrillion": 34.849,
+                "per": 17.23,
+                "pbr": 1.12,
+                "cnsPer": 17.7,
+                "foreignRate": 35.33,
+                "supplyTrendScore": 2.0,
+                "shortBalanceChangePct": -6.793673262007367
+              },
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
+              "source": "jongga_analysis"
+            },
+            "stockExchangeName": "KOSPI",
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
+          },
+          {
+            "rank": 3,
+            "name": "SK스퀘어",
+            "code": "402340",
+            "strictScore": 7.0,
+            "signalScore": 7.0,
+            "score": 7.0,
+            "scoreMax": 10.0,
+            "effectiveScoreMax": 10.0,
+            "gradeScore": 7.0,
+            "grade": "A",
+            "overnightGapPenalty": 0.0,
+            "scoreBreakdown": [
+              {
+                "code": "S1",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "외인 -213,363→68,091 / 기관 -23,196→-19,027 · 순매수 전환"
+              },
+              {
+                "code": "S2",
+                "strictPoints": 2.0,
+                "signalPoints": 2.0,
+                "maxPoints": 2.0,
+                "evalStatus": "met",
+                "note": "당일 평균 97.0% / 마지막 1시간 208.6% (필요 ≥90%·≥100%)"
+              },
+              {
+                "code": "P1",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "종가 1,123,000 / 20MA 1,025,200 (109.5% · 필요 ≥ 98%) · 20MA 근접 회복"
+              },
+              {
+                "code": "P2",
+                "strictPoints": 1.5,
+                "signalPoints": 1.5,
+                "maxPoints": 1.5,
+                "evalStatus": "met",
+                "note": "당일 레인지 상단 71% (필요 ≥ 50%)"
+              },
+              {
+                "code": "C1",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "당일 거래량 / 5일 평균 83% (필요 ≥ 200%)"
+              },
+              {
+                "code": "C2",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "매수/매도 호가잔량 0.13 (필요 ≥ 1.0)"
+              },
+              {
+                "code": "C3",
+                "strictPoints": 0.0,
+                "signalPoints": 0.0,
+                "maxPoints": 1.0,
+                "evalStatus": "not_met",
+                "note": "직전 30분봉 종가 1123000, 전봉 종가 1120000 미달"
+              },
+              {
+                "code": "V1",
+                "strictPoints": 1.0,
+                "signalPoints": 1.0,
+                "maxPoints": 1.0,
+                "evalStatus": "met",
+                "note": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)"
+              }
+            ],
+            "scoreScope": "reversal",
+            "statusLabel": "매매금지",
+            "strategy": "reversal",
+            "filters": [
+              {
+                "code": "F1",
+                "status": "✅",
+                "note": "당일 거래대금 순위 11위 (필요 ≤ 100위)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "F2",
+                "status": "✅",
+                "note": "시총 148.2조 (필요 ≥ 5조)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "F3",
+                "status": "⛔",
+                "note": "KIND 최근공시 2026-08-07 현금ㆍ현물 배당 결정(자회사의 주요경영사항)",
+                "evalStatus": "manual_required"
+              },
+              {
+                "code": "F4",
+                "status": "✅",
+                "note": "최근 5거래일(2026-08-11~) 동일 종목 반등 진입 이력 없음 · 자동 확인",
+                "evalStatus": "met"
+              }
+            ],
+            "gates": [
+              {
+                "code": "G1",
+                "status": "⛔",
+                "note": "1개월 수익률 -8.7% (필요 ≥ +15%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G2",
+                "status": "✅",
+                "note": "20일 고점 대비 -11.2% (필요 -5%~-25%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G3",
+                "status": "⛔",
+                "note": "종가 1,123,000 / 60MA 1,295,467",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "G4",
+                "status": "✅",
+                "note": "최근 5거래일 최저 -11.5% (필요 -3% 이하 급락 1회 이상)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "G5-a",
+                "status": "✅",
+                "note": "양봉 안정화 캔들",
+                "evalStatus": "met"
+              },
+              {
+                "code": "Q1",
+                "status": "✅",
+                "note": "20MA 이격 +9.5% (≤+22%) · RSI14 50 (≤72) · 과이격·과매수 반등 아님",
+                "evalStatus": "met"
+              }
+            ],
+            "matchedRules": [
+              {
+                "code": "S1",
+                "note": "외인 -213,363→68,091 / 기관 -23,196→-19,027 · 순매수 전환",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S2",
+                "note": "당일 평균 97.0% / 마지막 1시간 208.6% (필요 ≥90%·≥100%)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P1",
+                "note": "종가 1,123,000 / 20MA 1,025,200 (109.5% · 필요 ≥ 98%) · 20MA 근접 회복",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P2",
+                "note": "당일 레인지 상단 71% (필요 ≥ 50%)",
+                "evalStatus": "met"
+              }
+            ],
+            "unmatchedRules": [
+              {
+                "code": "C1",
+                "note": "당일 거래량 / 5일 평균 83% (필요 ≥ 200%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C2",
+                "note": "매수/매도 호가잔량 0.13 (필요 ≥ 1.0)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C3",
+                "note": "직전 30분봉 종가 1123000, 전봉 종가 1120000 미달",
+                "evalStatus": "not_met"
+              }
+            ],
+            "currentPrice": 1123000,
+            "previousClose": 1123000,
+            "dailyChange": 0,
+            "dailyChangePct": 0.0,
+            "dailyDirection": "flat",
+            "entryPriceText": "1,123,000원 (당일 종가 기준)",
+            "entryPrice": 1123000,
+            "entryMeta": "당일 종가 기준",
+            "marketCapTrillion": 148.1506,
+            "marketCapRank": 3,
+            "marketCapUniverseCount": 2552,
+            "keyPoint": "20일 고점 대비 -11.2% 조정 후 안정화 패턴 여부를 점검했습니다. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
+            "notes": [],
+            "manualInput": {
+              "required": false,
+              "fields": [],
+              "missingFieldCodes": [],
+              "summary": "현재 수동 입력 필드가 없습니다.",
+              "source": "public_data_only"
+            },
+            "eventFilter": {
+              "blocked": true,
+              "earningsDays": null,
+              "corporateActionDays": null,
+              "note": "KIND 최근공시 2026-08-07 현금ㆍ현물 배당 결정(자회사의 주요경영사항)",
+              "source": "kind_playwright_recent_disclosure"
+            },
+            "intraday30m": {
+              "available": true,
+              "signal": false,
+              "interval": "30m",
+              "source": "yahoo_chart",
+              "note": "직전 30분봉 종가 1123000, 전봉 종가 1120000",
+              "latestOpen": 1123000.0,
+              "latestClose": 1123000.0,
+              "previousClose": 1120000.0
+            },
+            "toss": {
+              "avgStrength": 97.0,
+              "note": "토스 공개 체결강도 97.0% / 최근 체결 35분 프록시",
+              "source": "toss_http_combo",
+              "sourceUrl": "https://www.tossinvest.com/stocks/A402340/order",
+              "asOf": "2026-08-21T08:32:56Z",
+              "intradayAbove100Ratio": 80.0,
+              "observedMinutes": 35,
+              "observedTickCount": 120,
+              "coverageNote": "최근 체결 35분 프록시",
+              "lastHourAvgStrength": 208.6,
+              "lastHourObservedMinutes": 35,
+              "last30AvgStrength": 225.0,
+              "last30ObservedMinutes": 30,
+              "last30BuySellRatio": 2.5,
+              "last30BuyVolume": 10.0,
+              "last30SellVolume": 4.0
+            },
+            "orderbook": {
+              "bidAskRatio": 0.1319,
+              "bidTotal": 2273,
+              "askTotal": 17238,
+              "note": "Naver 호가잔량합계 매수 2,273 / 매도 17,238",
+              "source": "naver_orderbook_http",
+              "sourceUrl": "https://finance.naver.com/item/main.nhn?code=402340"
+            },
+            "volatilityContext": {
+              "marketState": "volatile",
+              "stockState": "volatile",
+              "blendedState": "volatile",
+              "strategyFit": "favorable",
+              "scoreDelta": 1.0,
+              "summary": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)",
+              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다. VKOSPI 58.03, ATR10 9.14%, 일간 표준편차 10.00%, 당일 레인지 5.61%.",
+              "metrics": {
+                "atrPct10": 9.14,
+                "returnStd20": 10.0,
+                "todayRangePct": 5.61,
+                "vkospi": 58.03
+              },
+              "strategyLabel": "낙주 매매"
+            },
+            "tradePlanRows": [
+              {
+                "stage": "🌅 프리마켓",
+                "stageKey": "premarket",
+                "condition": "+3% 조기 반등 도달",
+                "quantity": "55% 익절",
+                "targetYield": "+3.0%",
+                "targetPrice": "1,156,690원",
+                "historicalHitRate": 0.4762,
+                "recommended": false
+              },
+              {
+                "stage": "🔔 장초반",
+                "stageKey": "openPhase",
+                "condition": "+5% 조기 회수 도달",
+                "quantity": "45% 익절 (잔량 전량)",
+                "targetYield": "+5.0%",
+                "targetPrice": "1,179,150원",
+                "historicalHitRate": 0.3333,
+                "recommended": true
+              },
+              {
+                "stage": "🛑 손절",
+                "stageKey": "stop",
+                "condition": "유효 하드 스톱 1,097,171원 종가 이탈",
+                "quantity": "전량",
+                "targetYield": "-2.3%",
+                "targetPrice": "1,097,171원"
+              }
+            ],
+            "reversalStopPolicy": {
+              "version": "reversal-stop-v1",
+              "anchorSource": "entry_day_low",
+              "anchorLowPrice": 1078000,
+              "fallbackStopPrice": 1097171,
+              "effectiveHardStopPrice": 1097171,
+              "stopExecutionMode": "close_only",
+              "hardStopRuleSummary": "진입 당일 저가 1,078,000원와 기존 % 손절 1,097,171원 중 더 높은 1,097,171원을 종가 손절가로 사용합니다.",
+              "reasonSummary": "반등 가정의 핵심 지지선은 진입 당일 저가 1,078,000원이며, 기존 % 손절 1,097,171원보다 느슨해지지 않게 1,097,171원으로 고정하고 종가 기준으로 확인합니다."
+            },
+            "reversalLiveExitPolicy": {
+              "version": "reversal-live-exit-v1",
+              "timeStopCutoff": "09:15",
+              "timeStopMinBouncePct": 1.0,
+              "breakevenActivationPct": 3.0,
+              "earlySpikeWindowEnd": "09:10",
+              "timeStopRuleSummary": "09:15까지 세션 고점이 +1.0% 미만이고 시가/진입가도 회복하지 못하면 조건형 시간손절을 실행합니다.",
+              "breakevenRuleSummary": "+3.0% 이상 반등이 나온 뒤 본전까지 밀리면 기술적 반등 실패로 보고 잔량 전량 정리합니다."
+            },
+            "rr": "1 : 1.7",
+            "source": "jongga-live",
+            "recommendedEntryBand": {
+              "low": 1108962,
+              "high": 1120192,
+              "anchor": 1123000,
+              "label": "1,108,962~1,120,192원 (종가 ±, 분할매수)"
+            },
+            "reversalTakeProfitProfiles": [
+              {
+                "profileKey": "aggressive",
+                "label": "공격형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "하락폭 33%·50% 되돌림과 최근 고점 재도전까지 열어둔 공격형입니다.",
+                "recentHighPrice": 1265000,
+                "retrace33Price": 1169860,
+                "retrace50Price": 1194000,
+                "nearestResistancePrice": 1131000,
+                "secondaryResistancePrice": 1183000,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "하락폭 33% 되돌림 도달",
+                    "quantity": "55% 익절",
+                    "targetYield": "+4.2%",
+                    "targetPrice": "1,169,860원",
+                    "historicalHitRate": 0.4762,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "상단 매물대 2 도달",
+                    "quantity": "30% 익절",
+                    "targetYield": "+5.3%",
+                    "targetPrice": "1,183,000원",
+                    "historicalHitRate": 0.3333,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "📈 장중 1차",
+                    "stageKey": "intraday1",
+                    "condition": "최근 고점 재도전",
+                    "quantity": "15% 익절 (잔량 전량)",
+                    "targetYield": "+12.6%",
+                    "targetPrice": "1,265,000원",
+                    "historicalHitRate": 0.3968,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 1,097,171원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-2.3%",
+                    "targetPrice": "1,097,171원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "openPhase",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 21건)",
+                  "hitRate": 0.3333,
+                  "ev": 0.394,
+                  "sampleCount": 21
+                }
+              },
+              {
+                "profileKey": "balanced",
+                "label": "중립형",
+                "recommended": false,
+                "selectionBasis": "market_stock_heuristic",
+                "reasonSummary": "하락폭 33%·50% 수학적 반등 구간을 우선 추적하는 중립형입니다.",
+                "recentHighPrice": 1265000,
+                "retrace33Price": 1169860,
+                "retrace50Price": 1194000,
+                "nearestResistancePrice": 1131000,
+                "secondaryResistancePrice": 1183000,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "하락폭 33% 되돌림 도달",
+                    "quantity": "55% 익절",
+                    "targetYield": "+4.2%",
+                    "targetPrice": "1,169,860원",
+                    "historicalHitRate": 0.4762,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "상단 매물대 2 도달",
+                    "quantity": "45% 익절 (잔량 전량)",
+                    "targetYield": "+5.3%",
+                    "targetPrice": "1,183,000원",
+                    "historicalHitRate": 0.3333,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 1,097,171원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-2.3%",
+                    "targetPrice": "1,097,171원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "openPhase",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 21건)",
+                  "hitRate": 0.3333,
+                  "ev": 0.394,
+                  "sampleCount": 21
+                }
+              },
+              {
+                "profileKey": "conservative",
+                "label": "보수형",
+                "recommended": true,
+                "selectionBasis": "historical_profile_ev",
+                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 21건)",
+                "recentHighPrice": 1265000,
+                "retrace33Price": 1169860,
+                "retrace50Price": 1194000,
+                "nearestResistancePrice": 1131000,
+                "secondaryResistancePrice": 1183000,
+                "tradePlanRows": [
+                  {
+                    "stage": "🌅 프리마켓",
+                    "stageKey": "premarket",
+                    "condition": "+3% 조기 반등 도달",
+                    "quantity": "55% 익절",
+                    "targetYield": "+3.0%",
+                    "targetPrice": "1,156,690원",
+                    "historicalHitRate": 0.4762,
+                    "recommended": false
+                  },
+                  {
+                    "stage": "🔔 장초반",
+                    "stageKey": "openPhase",
+                    "condition": "+5% 조기 회수 도달",
+                    "quantity": "45% 익절 (잔량 전량)",
+                    "targetYield": "+5.0%",
+                    "targetPrice": "1,179,150원",
+                    "historicalHitRate": 0.3333,
+                    "recommended": true
+                  },
+                  {
+                    "stage": "🛑 손절",
+                    "stageKey": "stop",
+                    "condition": "유효 하드 스톱 1,097,171원 종가 이탈",
+                    "quantity": "전량",
+                    "targetYield": "-2.3%",
+                    "targetPrice": "1,097,171원"
+                  }
+                ],
+                "recommendedStage": {
+                  "stageKey": "openPhase",
+                  "evBasis": "historical:netStageReturn",
+                  "reason": "EV=순수익 argmax (과거 21건)",
+                  "hitRate": 0.3333,
+                  "ev": 0.394,
+                  "sampleCount": 21
+                }
+              }
+            ],
+            "recommendedTakeProfitProfile": {
+              "profileKey": "conservative",
+              "label": "보수형",
+              "selectionBasis": "historical_profile_ev",
+              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 21건)",
+              "sampleCount": 21,
+              "ev": -0.5041
+            },
+            "recommendedStage": {
+              "stageKey": "openPhase",
+              "evBasis": "historical:netStageReturn",
+              "reason": "EV=순수익 argmax (과거 21건)",
+              "hitRate": 0.3333,
+              "ev": 0.394,
+              "sampleCount": 21
+            },
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-reversal",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "entryEligible": false,
+            "entryWatch": false,
+            "entryBlockers": [
+              "핵심 Gate 미충족: G1",
+              "핵심 Gate 미충족: G3",
+              "매매금지"
+            ],
+            "setupQuality": "setup_weak",
+            "statusReasonShort": "G1 미충족: 1개월 수익률 -8.7% (필요 ≥ +15%) · 외 1건",
+            "statusReason": "G1 미충족: 1개월 수익률 -8.7% (필요 ≥ +15%) / G3 미충족: 종가 1,123,000 / 60MA 1,295,467",
+            "stockIndicators": {
+              "snapshot": {
+                "currentPrice": 1123000.0,
+                "vs52wHighPct": 48.03250641573995,
+                "vs52wLowPct": 741.1985018726591,
+                "dropFrom52wHighPct": 51.96749358426005,
+                "ma20GapPct": 9.539602028872416,
+                "rsi14": 50.382760745472815,
+                "volumeRatio20d": 72.3855846128573,
+                "rs20Pct": -8.026208026208026,
+                "tradingValueRank": 11.0,
+                "marketCapRank": 3.0,
+                "marketCapTrillion": 148.1506,
+                "per": 16.9,
+                "pbr": 4.1,
+                "cnsPer": 3.43,
+                "foreignRate": 46.26,
+                "supplyTrendScore": -2.0,
+                "shortBalanceChangePct": -5.806438521554742
+              },
+              "evaluatedAt": "2026-08-21T17:34:08+09:00",
+              "source": "jongga_analysis"
+            },
+            "stockExchangeName": "KOSPI",
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
+          },
+          {
+            "rank": 4,
             "name": "SK하이닉스",
             "code": "000660",
             "strictScore": 7.8,
@@ -8073,571 +11499,12 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
             "stockExchangeName": "KOSPI",
             "analysisSession": "1500",
             "analysisSessionLabel": "3시 분석"
-          },
-          {
-            "rank": 3,
-            "name": "NAVER",
-            "code": "035420",
-            "strictScore": 7.8,
-            "signalScore": 7.8,
-            "score": 7.8,
-            "scoreMax": 10.0,
-            "effectiveScoreMax": 10.0,
-            "gradeScore": 7.8,
-            "grade": "A",
-            "overnightGapPenalty": 0.0,
-            "scoreBreakdown": [
-              {
-                "code": "S1",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "외인 4,210→188,436 / 기관 -209,734→74,229 · 순매수 전환"
-              },
-              {
-                "code": "S2",
-                "strictPoints": 2.0,
-                "signalPoints": 2.0,
-                "maxPoints": 2.0,
-                "evalStatus": "met",
-                "note": "당일 평균 121.0% / 마지막 1시간 294.1% (필요 ≥90%·≥100%)"
-              },
-              {
-                "code": "P1",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "종가 222,500 / 20MA 215,410 (103.3% · 필요 ≥ 98%) · 20MA 근접 회복"
-              },
-              {
-                "code": "P2",
-                "strictPoints": 1.5,
-                "signalPoints": 1.5,
-                "maxPoints": 1.5,
-                "evalStatus": "met",
-                "note": "당일 레인지 상단 77% (필요 ≥ 50%)"
-              },
-              {
-                "code": "C1",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "당일 거래량 / 5일 평균 83% (필요 ≥ 200%)"
-              },
-              {
-                "code": "C2",
-                "strictPoints": 0.0,
-                "signalPoints": 0.0,
-                "maxPoints": 1.0,
-                "evalStatus": "not_met",
-                "note": "매수/매도 호가잔량 0.85 (필요 ≥ 1.0)"
-              },
-              {
-                "code": "C3",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "직전 30분봉 종가 224000, 전봉 종가 223500 충족"
-              },
-              {
-                "code": "V1",
-                "strictPoints": 1.0,
-                "signalPoints": 1.0,
-                "maxPoints": 1.0,
-                "evalStatus": "met",
-                "note": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)"
-              }
-            ],
-            "scoreScope": "reversal",
-            "statusLabel": "매매금지",
-            "strategy": "reversal",
-            "filters": [
-              {
-                "code": "F1",
-                "status": "✅",
-                "note": "당일 거래대금 순위 31위 (필요 ≤ 100위)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "F2",
-                "status": "✅",
-                "note": "시총 34.9조 (필요 ≥ 5조)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "F3",
-                "status": "⛔",
-                "note": "KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "F4",
-                "status": "⛔",
-                "note": "최근 손절 이력 1건 (최근: 2026-08-14) · 재진입 차단",
-                "evalStatus": "not_met"
-              }
-            ],
-            "gates": [
-              {
-                "code": "G1",
-                "status": "⛔",
-                "note": "1개월 수익률 +13.0% (필요 ≥ +15%)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "G2",
-                "status": "✅",
-                "note": "20일 고점 대비 -5.1% (필요 -5%~-25%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G3",
-                "status": "✅",
-                "note": "종가 222,500 / 60MA 216,298",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G4",
-                "status": "✅",
-                "note": "최근 5거래일 최저 -4.8% (필요 -3% 이하 급락 1회 이상)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "G5-a",
-                "status": "✅",
-                "note": "양봉 안정화 캔들",
-                "evalStatus": "met"
-              },
-              {
-                "code": "Q1",
-                "status": "✅",
-                "note": "20MA 이격 +3.3% (≤+22%) · RSI14 55 (≤72) · 과이격·과매수 반등 아님",
-                "evalStatus": "met"
-              }
-            ],
-            "matchedRules": [
-              {
-                "code": "S1",
-                "note": "외인 4,210→188,436 / 기관 -209,734→74,229 · 순매수 전환",
-                "evalStatus": "met"
-              },
-              {
-                "code": "S2",
-                "note": "당일 평균 121.0% / 마지막 1시간 294.1% (필요 ≥90%·≥100%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P1",
-                "note": "종가 222,500 / 20MA 215,410 (103.3% · 필요 ≥ 98%) · 20MA 근접 회복",
-                "evalStatus": "met"
-              },
-              {
-                "code": "P2",
-                "note": "당일 레인지 상단 77% (필요 ≥ 50%)",
-                "evalStatus": "met"
-              },
-              {
-                "code": "C3",
-                "note": "직전 30분봉 종가 224000, 전봉 종가 223500 충족",
-                "evalStatus": "met"
-              }
-            ],
-            "unmatchedRules": [
-              {
-                "code": "C1",
-                "note": "당일 거래량 / 5일 평균 83% (필요 ≥ 200%)",
-                "evalStatus": "not_met"
-              },
-              {
-                "code": "C2",
-                "note": "매수/매도 호가잔량 0.85 (필요 ≥ 1.0)",
-                "evalStatus": "not_met"
-              }
-            ],
-            "currentPrice": 222500,
-            "previousClose": 219500,
-            "dailyChange": 3000,
-            "dailyChangePct": 1.37,
-            "dailyDirection": "up",
-            "entryPriceText": "222,500원 (당일 종가 기준)",
-            "entryPrice": 222500,
-            "entryMeta": "당일 종가 기준",
-            "marketCapTrillion": 34.9275,
-            "marketCapRank": 21,
-            "marketCapUniverseCount": 2551,
-            "keyPoint": "20일 고점 대비 -5.1% 조정 후 안정화 패턴 여부를 점검했습니다. 고변동성 장세라 현재 전략이 상대적으로 유리합니다.",
-            "notes": [],
-            "manualInput": {
-              "required": false,
-              "fields": [],
-              "missingFieldCodes": [],
-              "summary": "현재 수동 입력 필드가 없습니다.",
-              "source": "public_data_only"
-            },
-            "eventFilter": {
-              "blocked": true,
-              "earningsDays": null,
-              "corporateActionDays": null,
-              "note": "KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시)",
-              "source": "kind_playwright_recent_disclosure"
-            },
-            "intraday30m": {
-              "available": true,
-              "signal": true,
-              "interval": "30m",
-              "source": "yahoo_chart",
-              "note": "직전 30분봉 종가 224000, 전봉 종가 223500",
-              "latestOpen": 223500.0,
-              "latestClose": 224000.0,
-              "previousClose": 223500.0
-            },
-            "toss": {
-              "avgStrength": 121.0,
-              "note": "토스 공개 체결강도 121.0% / 최근 체결 2분 프록시",
-              "source": "toss_http_combo",
-              "sourceUrl": "https://www.tossinvest.com/stocks/A035420/order",
-              "asOf": "2026-08-21T06:03:08Z",
-              "intradayAbove100Ratio": 100.0,
-              "observedMinutes": 2,
-              "observedTickCount": 120,
-              "coverageNote": "최근 체결 2분 프록시",
-              "lastHourAvgStrength": 294.1,
-              "lastHourObservedMinutes": 2,
-              "last30AvgStrength": 294.1,
-              "last30ObservedMinutes": 2,
-              "last30BuySellRatio": 2.9167,
-              "last30BuyVolume": 770.0,
-              "last30SellVolume": 264.0
-            },
-            "orderbook": {
-              "bidAskRatio": 0.8549,
-              "bidTotal": 40925,
-              "askTotal": 47870,
-              "note": "Naver 호가잔량합계 매수 40,925 / 매도 47,870",
-              "source": "naver_orderbook_http",
-              "sourceUrl": "https://finance.naver.com/item/main.nhn?code=035420"
-            },
-            "volatilityContext": {
-              "marketState": "volatile",
-              "stockState": "volatile",
-              "blendedState": "volatile",
-              "strategyFit": "favorable",
-              "scoreDelta": 1.0,
-              "summary": "유리 (고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다)",
-              "reason": "시장 고변동성 / 종목 고변동성 → 혼합 고변동성. 고변동성 장세에서는 낙주 매매 기회가 늘어 유리합니다. VKOSPI 58.06, ATR10 5.14%, 일간 표준편차 4.80%, 당일 레인지 5.01%.",
-              "metrics": {
-                "atrPct10": 5.14,
-                "returnStd20": 4.8,
-                "todayRangePct": 5.01,
-                "vkospi": 58.06
-              },
-              "strategyLabel": "낙주 매매"
-            },
-            "tradePlanRows": [
-              {
-                "stage": "🌅 프리마켓",
-                "stageKey": "premarket",
-                "condition": "하락폭 33% 되돌림 도달",
-                "quantity": "55% 익절",
-                "targetYield": "+1.8%",
-                "targetPrice": "226,460원",
-                "historicalHitRate": 0.4762,
-                "recommended": false
-              },
-              {
-                "stage": "🔔 장초반",
-                "stageKey": "openPhase",
-                "condition": "하락폭 50% 되돌림 도달",
-                "quantity": "45% 익절 (잔량 전량)",
-                "targetYield": "+2.7%",
-                "targetPrice": "228,500원",
-                "historicalHitRate": 0.3333,
-                "recommended": true
-              },
-              {
-                "stage": "🛑 손절",
-                "stageKey": "stop",
-                "condition": "유효 하드 스톱 217,382원 종가 이탈",
-                "quantity": "전량",
-                "targetYield": "-2.3%",
-                "targetPrice": "217,382원"
-              }
-            ],
-            "reversalStopPolicy": {
-              "version": "reversal-stop-v1",
-              "anchorSource": "entry_day_low",
-              "anchorLowPrice": 214000,
-              "fallbackStopPrice": 217382,
-              "effectiveHardStopPrice": 217382,
-              "stopExecutionMode": "close_only",
-              "hardStopRuleSummary": "진입 당일 저가 214,000원와 기존 % 손절 217,382원 중 더 높은 217,382원을 종가 손절가로 사용합니다.",
-              "reasonSummary": "반등 가정의 핵심 지지선은 진입 당일 저가 214,000원이며, 기존 % 손절 217,382원보다 느슨해지지 않게 217,382원으로 고정하고 종가 기준으로 확인합니다."
-            },
-            "reversalLiveExitPolicy": {
-              "version": "reversal-live-exit-v1",
-              "timeStopCutoff": "09:15",
-              "timeStopMinBouncePct": 1.0,
-              "breakevenActivationPct": 3.0,
-              "earlySpikeWindowEnd": "09:10",
-              "timeStopRuleSummary": "09:15까지 세션 고점이 +1.0% 미만이고 시가/진입가도 회복하지 못하면 조건형 시간손절을 실행합니다.",
-              "breakevenRuleSummary": "+3.0% 이상 반등이 나온 뒤 본전까지 밀리면 기술적 반등 실패로 보고 잔량 전량 정리합니다."
-            },
-            "rr": "1 : 1.0",
-            "source": "jongga-live",
-            "recommendedEntryBand": {
-              "low": 219719,
-              "high": 221944,
-              "anchor": 222500,
-              "label": "219,719~221,944원 (종가 ±, 분할매수)"
-            },
-            "reversalTakeProfitProfiles": [
-              {
-                "profileKey": "aggressive",
-                "label": "공격형",
-                "recommended": false,
-                "selectionBasis": "market_stock_heuristic",
-                "reasonSummary": "하락폭 33%·50% 되돌림과 최근 고점 재도전까지 열어둔 공격형입니다.",
-                "recentHighPrice": 234500,
-                "retrace33Price": 226460,
-                "retrace50Price": 228500,
-                "nearestResistancePrice": 223500,
-                "secondaryResistancePrice": 230000,
-                "tradePlanRows": [
-                  {
-                    "stage": "🌅 프리마켓",
-                    "stageKey": "premarket",
-                    "condition": "하락폭 33% 되돌림 도달",
-                    "quantity": "55% 익절",
-                    "targetYield": "+1.8%",
-                    "targetPrice": "226,460원",
-                    "historicalHitRate": 0.4762,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "🔔 장초반",
-                    "stageKey": "openPhase",
-                    "condition": "하락폭 50% 되돌림 도달",
-                    "quantity": "30% 익절",
-                    "targetYield": "+2.7%",
-                    "targetPrice": "228,500원",
-                    "historicalHitRate": 0.3333,
-                    "recommended": true
-                  },
-                  {
-                    "stage": "📈 장중 1차",
-                    "stageKey": "intraday1",
-                    "condition": "최근 고점 재도전",
-                    "quantity": "15% 익절 (잔량 전량)",
-                    "targetYield": "+5.4%",
-                    "targetPrice": "234,500원",
-                    "historicalHitRate": 0.3968,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "🛑 손절",
-                    "stageKey": "stop",
-                    "condition": "유효 하드 스톱 217,382원 종가 이탈",
-                    "quantity": "전량",
-                    "targetYield": "-2.3%",
-                    "targetPrice": "217,382원"
-                  }
-                ],
-                "recommendedStage": {
-                  "stageKey": "openPhase",
-                  "evBasis": "historical:netStageReturn",
-                  "reason": "EV=순수익 argmax (과거 21건)",
-                  "hitRate": 0.3333,
-                  "ev": 0.394,
-                  "sampleCount": 21
-                }
-              },
-              {
-                "profileKey": "balanced",
-                "label": "중립형",
-                "recommended": false,
-                "selectionBasis": "market_stock_heuristic",
-                "reasonSummary": "하락폭 33%·50% 수학적 반등 구간을 우선 추적하는 중립형입니다.",
-                "recentHighPrice": 234500,
-                "retrace33Price": 226460,
-                "retrace50Price": 228500,
-                "nearestResistancePrice": 223500,
-                "secondaryResistancePrice": 230000,
-                "tradePlanRows": [
-                  {
-                    "stage": "🌅 프리마켓",
-                    "stageKey": "premarket",
-                    "condition": "하락폭 33% 되돌림 도달",
-                    "quantity": "55% 익절",
-                    "targetYield": "+1.8%",
-                    "targetPrice": "226,460원",
-                    "historicalHitRate": 0.4762,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "🔔 장초반",
-                    "stageKey": "openPhase",
-                    "condition": "하락폭 50% 되돌림 도달",
-                    "quantity": "45% 익절 (잔량 전량)",
-                    "targetYield": "+2.7%",
-                    "targetPrice": "228,500원",
-                    "historicalHitRate": 0.3333,
-                    "recommended": true
-                  },
-                  {
-                    "stage": "🛑 손절",
-                    "stageKey": "stop",
-                    "condition": "유효 하드 스톱 217,382원 종가 이탈",
-                    "quantity": "전량",
-                    "targetYield": "-2.3%",
-                    "targetPrice": "217,382원"
-                  }
-                ],
-                "recommendedStage": {
-                  "stageKey": "openPhase",
-                  "evBasis": "historical:netStageReturn",
-                  "reason": "EV=순수익 argmax (과거 21건)",
-                  "hitRate": 0.3333,
-                  "ev": 0.394,
-                  "sampleCount": 21
-                }
-              },
-              {
-                "profileKey": "conservative",
-                "label": "보수형",
-                "recommended": true,
-                "selectionBasis": "historical_profile_ev",
-                "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 17건)",
-                "recentHighPrice": 234500,
-                "retrace33Price": 226460,
-                "retrace50Price": 228500,
-                "nearestResistancePrice": 223500,
-                "secondaryResistancePrice": 230000,
-                "tradePlanRows": [
-                  {
-                    "stage": "🌅 프리마켓",
-                    "stageKey": "premarket",
-                    "condition": "하락폭 33% 되돌림 도달",
-                    "quantity": "55% 익절",
-                    "targetYield": "+1.8%",
-                    "targetPrice": "226,460원",
-                    "historicalHitRate": 0.4762,
-                    "recommended": false
-                  },
-                  {
-                    "stage": "🔔 장초반",
-                    "stageKey": "openPhase",
-                    "condition": "하락폭 50% 되돌림 도달",
-                    "quantity": "45% 익절 (잔량 전량)",
-                    "targetYield": "+2.7%",
-                    "targetPrice": "228,500원",
-                    "historicalHitRate": 0.3333,
-                    "recommended": true
-                  },
-                  {
-                    "stage": "🛑 손절",
-                    "stageKey": "stop",
-                    "condition": "유효 하드 스톱 217,382원 종가 이탈",
-                    "quantity": "전량",
-                    "targetYield": "-2.3%",
-                    "targetPrice": "217,382원"
-                  }
-                ],
-                "recommendedStage": {
-                  "stageKey": "openPhase",
-                  "evBasis": "historical:netStageReturn",
-                  "reason": "EV=순수익 argmax (과거 21건)",
-                  "hitRate": 0.3333,
-                  "ev": 0.394,
-                  "sampleCount": 21
-                }
-              }
-            ],
-            "recommendedTakeProfitProfile": {
-              "profileKey": "conservative",
-              "label": "보수형",
-              "selectionBasis": "historical_profile_ev",
-              "reasonSummary": "리플레이 평균 수익률 기준 최적 프로필입니다. (과거 17건)",
-              "sampleCount": 17,
-              "ev": -0.4605
-            },
-            "recommendedStage": {
-              "stageKey": "openPhase",
-              "evBasis": "historical:netStageReturn",
-              "reason": "EV=순수익 argmax (과거 21건)",
-              "hitRate": 0.3333,
-              "ev": 0.394,
-              "sampleCount": 21
-            },
-            "mixedExitPolicy": {
-              "version": "mixed-exit-v1-balanced",
-              "policyKey": "observe-reversal",
-              "label": "관찰 전용",
-              "active": false,
-              "priority": null,
-              "strategyCase": "",
-              "recommendationCase": "",
-              "stopPct": null,
-              "stopExecution": "close",
-              "stopCondition": "",
-              "stopTiming": "자동 진입 제외",
-              "takeProfitStages": [],
-              "positionWeightHint": "observe",
-              "positionWeightMultiplier": 0.0,
-              "intradayRiskRule": {
-                "active": false
-              },
-              "volatilityOverlay": {
-                "active": false
-              },
-              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-            },
-            "entryEligible": false,
-            "entryWatch": false,
-            "entryBlockers": [
-              "핵심 Gate 미충족: F3",
-              "핵심 Gate 미충족: F4",
-              "핵심 Gate 미충족: G1",
-              "매매금지"
-            ],
-            "setupQuality": "setup_weak",
-            "statusReasonShort": "F3 미충족: KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시) · 외 2건",
-            "statusReason": "F3 미충족: KIND 최근공시 2026-08-07 영업(잠정)실적(공정공시) / F4 미충족: 최근 손절 이력 1건 (최근: 2026-08-14) · 재진입 차단 / G1 미충족: 1개월 수익률 +13.0% (필요 ≥ +15%)",
-            "stockIndicators": {
-              "snapshot": {
-                "currentPrice": 222500.0,
-                "vs52wHighPct": 72.12317666126418,
-                "vs52wLowPct": 22.860298177802317,
-                "dropFrom52wHighPct": 27.876823338735818,
-                "ma20GapPct": 3.291397799545054,
-                "rsi14": 54.627264243585905,
-                "volumeRatio20d": 61.57523651159017,
-                "rs20Pct": 1.1363636363636365,
-                "tradingValueRank": 31.0,
-                "marketCapRank": 21.0,
-                "marketCapTrillion": 34.9275,
-                "per": 17.27,
-                "pbr": 1.13,
-                "cnsPer": 17.74,
-                "foreignRate": 35.33,
-                "supplyTrendScore": 2.0,
-                "shortBalanceChangePct": -6.793673262007367
-              },
-              "evaluatedAt": "2026-08-21T15:04:10+09:00",
-              "source": "jongga_analysis"
-            },
-            "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
           }
         ],
         "swing": []
       },
       "dataQuality": {
-        "status": "success",
+        "status": "partial",
         "source": "live-public-run",
         "counts": {
           "stale": 0
@@ -8649,10 +11516,11 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
   "analysisDate": "2026-08-21",
   "pointInTime": true,
   "pointInTimeStatus": "confirmed",
-  "analysisSession": "1500",
-  "analysisSessionLabel": "3시 분석",
+  "analysisSession": "1730",
+  "analysisSessionLabel": "5시반 분석",
   "sessionSources": [
-    "1500"
+    "1500",
+    "1730"
   ],
   "rescoreMeta": {
     "rescoredRules": {
@@ -8678,6 +11546,36 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
         "strategy": "pullback",
         "code": "028260",
         "name": "삼성물산",
+        "changedFields": [
+          "strictScore",
+          "signalScore",
+          "score",
+          "gradeScore",
+          "grade"
+        ],
+        "before": {
+          "strictScore": 8.6,
+          "signalScore": 8.6,
+          "score": 8.6,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 6.6,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 9.9,
+          "signalScore": 9.9,
+          "score": 9.9,
+          "scoreMax": 13.0,
+          "effectiveScoreMax": 13.0,
+          "gradeScore": 7.6,
+          "grade": "A"
+        }
+      },
+      {
+        "strategy": "pullback",
+        "code": "012450",
+        "name": "한화에어로스페이스",
         "changedFields": [
           "strictScore",
           "signalScore",
@@ -8764,35 +11662,6 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
       },
       {
         "strategy": "accumulation",
-        "code": "035420",
-        "name": "NAVER",
-        "changedFields": [
-          "strictScore",
-          "signalScore",
-          "score",
-          "gradeScore"
-        ],
-        "before": {
-          "strictScore": 9.0,
-          "signalScore": 9.0,
-          "score": 9.0,
-          "scoreMax": 14.0,
-          "effectiveScoreMax": 14.0,
-          "gradeScore": 6.4,
-          "grade": "B"
-        },
-        "after": {
-          "strictScore": 9.4,
-          "signalScore": 9.4,
-          "score": 9.4,
-          "scoreMax": 14.0,
-          "effectiveScoreMax": 14.0,
-          "gradeScore": 6.7,
-          "grade": "B"
-        }
-      },
-      {
-        "strategy": "accumulation",
         "code": "012450",
         "name": "한화에어로스페이스",
         "changedFields": [
@@ -8818,6 +11687,62 @@ window.JONGGA_DAILY_DATA["2026-08-21"] = {
           "effectiveScoreMax": 14.0,
           "gradeScore": 6.7,
           "grade": "B"
+        }
+      },
+      {
+        "strategy": "accumulation",
+        "code": "035420",
+        "name": "NAVER",
+        "changedFields": [
+          "strictScore",
+          "signalScore",
+          "score",
+          "gradeScore"
+        ],
+        "before": {
+          "strictScore": 8.2,
+          "signalScore": 8.2,
+          "score": 8.2,
+          "scoreMax": 14.0,
+          "effectiveScoreMax": 14.0,
+          "gradeScore": 5.9,
+          "grade": "B"
+        },
+        "after": {
+          "strictScore": 8.6,
+          "signalScore": 8.6,
+          "score": 8.6,
+          "scoreMax": 14.0,
+          "effectiveScoreMax": 14.0,
+          "gradeScore": 6.1,
+          "grade": "B"
+        }
+      },
+      {
+        "strategy": "breakout",
+        "code": "028260",
+        "name": "삼성물산",
+        "changedFields": [
+          "signalScore",
+          "score"
+        ],
+        "before": {
+          "strictScore": 4.1,
+          "signalScore": 4.8,
+          "score": 4.8,
+          "scoreMax": 12.5,
+          "effectiveScoreMax": 10.5,
+          "gradeScore": 3.9,
+          "grade": "C"
+        },
+        "after": {
+          "strictScore": 4.1,
+          "signalScore": 4.1,
+          "score": 4.1,
+          "scoreMax": 12.5,
+          "effectiveScoreMax": 10.5,
+          "gradeScore": 3.9,
+          "grade": "C"
         }
       }
     ],
