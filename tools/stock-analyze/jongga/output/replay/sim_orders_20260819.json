@@ -1278,5 +1278,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-08-20T15:00:00+09:00",
     "activeUntil": "2026-08-20T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260819|stable|accumulation|007660-stop_touch",
+    "runId": "replay-20260820-060539-0a493638",
+    "date": "2026-08-19",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "007660",
+    "name": "이수페타시스",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-21T15:00:00+09:00",
+    "requestedPrice": 100746.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260819|stable|accumulation|007660",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-21T15:00:00+09:00",
+    "activeUntil": "2026-08-21T15:00:00+09:00"
   }
 ]

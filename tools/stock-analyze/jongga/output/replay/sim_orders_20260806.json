@@ -1818,5 +1818,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-08-19T15:00:00+09:00",
     "activeUntil": "2026-08-19T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260806|stable|accumulation|068270-stop_touch",
+    "runId": "replay-20260807-060523-d07ad15b",
+    "date": "2026-08-06",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "068270",
+    "name": "셀트리온",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-21T15:00:00+09:00",
+    "requestedPrice": 189150.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260806|stable|accumulation|068270",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-21T15:00:00+09:00",
+    "activeUntil": "2026-08-21T15:00:00+09:00"
   }
 ]

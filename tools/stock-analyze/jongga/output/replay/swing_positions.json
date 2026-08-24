@@ -1,17 +1,5 @@
 [
   {
-    "runId": "replay-20260807-060523-d07ad15b",
-    "entryDate": "2026-08-06",
-    "code": "068270",
-    "name": "셀트리온",
-    "strategy": "accumulation",
-    "entryPrice": 195195.0,
-    "swingTargetPrice": 216450.0,
-    "stopPrice": 189150.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260806|stable|accumulation|068270"
-  },
-  {
     "runId": "replay-20260820-060539-0a493638",
     "entryDate": "2026-08-19",
     "code": "035420",
@@ -24,30 +12,6 @@
     "sourceEntryKey": "20260819|stable|accumulation|035420"
   },
   {
-    "runId": "replay-20260820-060539-0a493638",
-    "entryDate": "2026-08-19",
-    "code": "007660",
-    "name": "이수페타시스",
-    "strategy": "accumulation",
-    "entryPrice": 104504.4,
-    "swingTargetPrice": 115884.0,
-    "stopPrice": 100746.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260819|stable|accumulation|007660"
-  },
-  {
-    "runId": "replay-20260821-060526-750316dd",
-    "entryDate": "2026-08-20",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 1124123.0,
-    "swingTargetPrice": 1246530.0,
-    "stopPrice": 1083695.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260820|stable|accumulation|402340"
-  },
-  {
     "runId": "replay-20260821-060526-750316dd",
     "entryDate": "2026-08-20",
     "code": "035420",
@@ -58,5 +22,29 @@
     "stopPrice": 211818.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260820|stable|accumulation|035420"
+  },
+  {
+    "runId": "replay-20260824-060547-f4aad4a4",
+    "entryDate": "2026-08-21",
+    "code": "012450",
+    "name": "한화에어로스페이스",
+    "strategy": "accumulation",
+    "entryPrice": 1086085.0,
+    "swingTargetPrice": 1204350.0,
+    "stopPrice": 1047025.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260821|stable|accumulation|012450"
+  },
+  {
+    "runId": "replay-20260824-060547-f4aad4a4",
+    "entryDate": "2026-08-21",
+    "code": "035420",
+    "name": "NAVER",
+    "strategy": "accumulation",
+    "entryPrice": 222222.0,
+    "swingTargetPrice": 246420.0,
+    "stopPrice": 214230.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260821|stable|accumulation|035420"
   }
 ]
