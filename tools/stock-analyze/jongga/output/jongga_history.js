@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-24T06:05:33+00:00",
+    "generatedAt": "2026-08-24T08:34:49+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.2,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3)",
         "entryEligible": false,
-        "currentPrice": 224000
+        "currentPrice": 223500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
+        "entryEligible": false,
+        "currentPrice": 364500
       },
       {
         "strategy": "pullback",
@@ -41,54 +56,54 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "B",
         "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 408500
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 7.9,
-        "signalScore": 7.9,
-        "strictScore": 7.9,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 5.6,
-        "statusLabel": "관심후보",
-        "entryEligible": false,
-        "currentPrice": 1070000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "에이피알",
-        "code": "278470",
-        "score": 7.5,
-        "signalScore": 7.5,
-        "strictScore": 7.5,
-        "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.4,
-        "statusLabel": "제외",
-        "entryEligible": false,
-        "currentPrice": 408500
+        "currentPrice": 409500
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "현대차",
         "code": "005380",
-        "score": 7.1,
-        "signalScore": 7.1,
-        "strictScore": 7.1,
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
         "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.1,
+        "grade": "B",
+        "gradeScore": 6.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 410500
+        "currentPrice": 414000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 1671000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1076000
       },
       {
         "strategy": "breakout",
@@ -153,10 +168,10 @@ window.JONGGA_HISTORY_INDEX = [
     ],
     "blacklist": [
       {
-        "code": "373220",
-        "name": "LG에너지솔루션",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
