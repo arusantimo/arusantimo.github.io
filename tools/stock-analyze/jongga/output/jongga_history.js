@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-25T06:05:27+00:00",
+    "generatedAt": "2026-08-25T08:35:40+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G13)",
+        "entryEligible": false,
+        "currentPrice": 498000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -48,6 +63,21 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 220500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "대우건설",
         "code": "047040",
         "score": 7.9,
@@ -63,32 +93,32 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 7.9,
-        "signalScore": 7.9,
-        "strictScore": 7.9,
+        "name": "현대모비스",
+        "code": "012330",
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.6,
-        "statusLabel": "관심후보",
+        "gradeScore": 5.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 221000
+        "currentPrice": 498000
       },
       {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
+        "strategy": "breakout",
+        "scoreScope": "breakout",
         "name": "에이피알",
         "code": "278470",
-        "score": 7.1,
-        "signalScore": 7.1,
-        "strictScore": 7.1,
-        "scoreMax": 14.0,
+        "score": 5.0,
+        "signalScore": 5.0,
+        "strictScore": 5.0,
+        "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 5.1,
-        "statusLabel": "제외",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 437500
+        "currentPrice": 440500
       },
       {
         "strategy": "reversal",
@@ -103,7 +133,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 81400
+        "currentPrice": 80700
       },
       {
         "strategy": "reversal",
@@ -137,6 +167,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "code": "000720",
         "name": "현대건설",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "052690",
+        "name": "한전기술",
         "reasons": [
           "투자 주의"
         ],
