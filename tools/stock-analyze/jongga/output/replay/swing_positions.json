@@ -1,17 +1,5 @@
 [
   {
-    "runId": "replay-20260820-060539-0a493638",
-    "entryDate": "2026-08-19",
-    "code": "035420",
-    "name": "NAVER",
-    "strategy": "accumulation",
-    "entryPrice": 207207.0,
-    "swingTargetPrice": 229770.0,
-    "stopPrice": 199755.0,
-    "qtyPct": 35.0,
-    "sourceEntryKey": "20260819|stable|accumulation|035420"
-  },
-  {
     "runId": "replay-20260821-060526-750316dd",
     "entryDate": "2026-08-20",
     "code": "035420",
@@ -46,5 +34,29 @@
     "stopPrice": 214230.0,
     "qtyPct": 35.0,
     "sourceEntryKey": "20260821|stable|accumulation|035420"
+  },
+  {
+    "runId": "replay-20260825-060543-cb89e58a",
+    "entryDate": "2026-08-24",
+    "code": "005380",
+    "name": "현대차",
+    "strategy": "accumulation",
+    "entryPrice": 414414.0,
+    "swingTargetPrice": 459540.0,
+    "stopPrice": 406500.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260824|stable|accumulation|005380"
+  },
+  {
+    "runId": "replay-20260825-060543-cb89e58a",
+    "entryDate": "2026-08-24",
+    "code": "278470",
+    "name": "에이피알",
+    "strategy": "accumulation",
+    "entryPrice": 408908.5,
+    "swingTargetPrice": 453435.0,
+    "stopPrice": 394202.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260824|stable|accumulation|278470"
   }
 ]
