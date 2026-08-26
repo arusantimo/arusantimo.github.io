@@ -1,5 +1,164 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-08-26",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202608/jongga_data_20260826.js",
+    "jsonFile": "jongga/output/202608/latest_20260826.json",
+    "inputArchiveFile": "jongga/output/archive/202608/inputs_20260826.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-08-26T06:05:53+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 10.3,
+        "signalScore": 10.3,
+        "strictScore": 10.3,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 111500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "대우건설",
+        "code": "047040",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
+        "entryEligible": false,
+        "currentPrice": 19210
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "GS건설",
+        "code": "006360",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+        "entryEligible": false,
+        "currentPrice": 37950
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "대우건설",
+        "code": "047040",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 19210
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "대우건설",
+        "code": "047040",
+        "score": 6.9,
+        "signalScore": 6.9,
+        "strictScore": 6.9,
+        "scoreMax": 12.5,
+        "grade": "B",
+        "gradeScore": 5.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 19210
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대우건설",
+        "code": "047040",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 19210
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 85700
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "010170",
+        "name": "대한광통신",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "052690",
+        "name": "한전기술",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-08-25",
     "variant": "stable",
     "variantLabel": "현재 버전",

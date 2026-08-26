@@ -775,5 +775,26 @@
     "barLow": 117000.0,
     "barClose": 120300.0,
     "fillRule": "third_day_cutoff_market"
+  },
+  {
+    "orderId": "20260824|stable|accumulation|005380-stop_touch",
+    "sourceEntryKey": "20260824|stable|accumulation|005380",
+    "strategy": "accumulation",
+    "code": "005380",
+    "name": "현대차",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-25T15:00:00+09:00",
+    "fillPrice": 406500.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-25T15:00:00+09:00",
+    "barOpen": 422000.0,
+    "barHigh": 427250.0,
+    "barLow": 406000.0,
+    "barClose": 421000.0,
+    "fillRule": "stop_touch"
   }
 ]

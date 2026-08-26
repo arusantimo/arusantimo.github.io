@@ -1858,5 +1858,25 @@
     "activeFrom": "2026-08-25T15:00:00+09:00",
     "activeUntil": "2026-08-25T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260824|stable|accumulation|005380-stop_touch",
+    "runId": "replay-20260825-060543-cb89e58a",
+    "date": "2026-08-24",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "005380",
+    "name": "현대차",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-25T15:00:00+09:00",
+    "requestedPrice": 406500.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260824|stable|accumulation|005380",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-25T15:00:00+09:00",
+    "activeUntil": "2026-08-25T15:00:00+09:00"
   }
 ]
