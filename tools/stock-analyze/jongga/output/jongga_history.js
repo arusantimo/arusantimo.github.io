@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-26T06:05:53+00:00",
+    "generatedAt": "2026-08-26T08:35:54+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G3, G13)",
         "entryEligible": false,
-        "currentPrice": 111500
+        "currentPrice": 111200
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "GS건설",
+        "code": "006360",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 37800
       },
       {
         "strategy": "pullback",
@@ -43,22 +58,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
         "entryEligible": false,
-        "currentPrice": 19210
+        "currentPrice": 19100
       },
       {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "GS건설",
-        "code": "006360",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
-        "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.9,
+        "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 37950
+        "currentPrice": 220000
       },
       {
         "strategy": "accumulation",
@@ -76,6 +91,21 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 19210
       },
       {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 13530
+      },
+      {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "대우건설",
@@ -88,7 +118,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.5,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 19210
+        "currentPrice": 19100
       },
       {
         "strategy": "reversal",
@@ -119,20 +149,24 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 85700
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1688000
       }
     ],
     "blacklist": [
-      {
-        "code": "010170",
-        "name": "대한광통신",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "002990",
         "name": "금호건설",
@@ -153,6 +187,18 @@ window.JONGGA_HISTORY_INDEX = [
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "015760",
+        "name": "한국전력",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
         ],
         "status": "confirmed"
       }
