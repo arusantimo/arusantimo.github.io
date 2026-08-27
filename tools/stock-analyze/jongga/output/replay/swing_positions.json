@@ -26,18 +26,6 @@
   {
     "runId": "replay-20260826-060605-792bda76",
     "entryDate": "2026-08-25",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 1061060.0,
-    "swingTargetPrice": 1176600.0,
-    "stopPrice": 1034000.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260825|stable|accumulation|402340"
-  },
-  {
-    "runId": "replay-20260826-060605-792bda76",
-    "entryDate": "2026-08-25",
     "code": "278470",
     "name": "에이피알",
     "strategy": "accumulation",
@@ -48,15 +36,15 @@
     "sourceEntryKey": "20260825|stable|accumulation|278470"
   },
   {
-    "runId": "replay-20260826-060605-792bda76",
-    "entryDate": "2026-08-25",
-    "code": "278470",
-    "name": "에이피알",
-    "strategy": "breakout",
-    "entryPrice": 440940.5,
-    "swingTargetPrice": 502170.0,
-    "stopPrice": 440500.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260825|stable|breakout|278470"
+    "runId": "replay-20260827-060554-d3e352bc",
+    "entryDate": "2026-08-26",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 1059058.0,
+    "swingTargetPrice": 1174380.0,
+    "stopPrice": 1034000.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260826|stable|accumulation|402340"
   }
 ]
