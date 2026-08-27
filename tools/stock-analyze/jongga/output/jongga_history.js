@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-27T06:05:39+00:00",
+    "generatedAt": "2026-08-27T08:34:59+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 218500
+        "currentPrice": 219500
       },
       {
         "strategy": "pullback",
@@ -41,9 +41,39 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "B",
         "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
         "currentPrice": 20000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LS ELECTRIC",
+        "code": "010120",
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 219500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 266000
       },
       {
         "strategy": "accumulation",
@@ -61,49 +91,49 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 86000
       },
       {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 7.1,
-        "signalScore": 7.1,
-        "strictScore": 7.1,
-        "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
-        "entryEligible": false,
-        "currentPrice": 264750
-      },
-      {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 4.6,
-        "signalScore": 4.6,
-        "strictScore": 4.6,
+        "name": "가온전선",
+        "code": "000500",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "gradeScore": 4.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
         "entryEligible": false,
-        "currentPrice": 567000
+        "currentPrice": 211500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지",
+        "entryEligible": true,
+        "currentPrice": 1150000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "효성중공업",
         "code": "298040",
-        "score": 8.6,
-        "signalScore": 8.6,
-        "strictScore": 8.6,
+        "score": 7.8,
+        "signalScore": 7.8,
+        "strictScore": 7.8,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.6,
+        "grade": "A",
+        "gradeScore": 7.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 3070000
+        "currentPrice": 3079000
       },
       {
         "strategy": "reversal",
@@ -119,21 +149,6 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 86000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "LS ELECTRIC",
-        "code": "010120",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 218500
       }
     ],
     "blacklist": [
