@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-28T06:05:24+00:00",
+    "generatedAt": "2026-08-28T08:34:22+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.2,
         "statusLabel": "매수추천",
         "entryEligible": true,
-        "currentPrice": 569000
+        "currentPrice": 571000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G13)",
+        "entryEligible": false,
+        "currentPrice": 171600
       },
       {
         "strategy": "pullback",
@@ -46,21 +61,6 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 320000
       },
       {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "두산에너빌리티",
-        "code": "034020",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G12, G13)",
-        "entryEligible": false,
-        "currentPrice": 88600
-      },
-      {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "삼성SDI",
@@ -73,7 +73,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.8,
         "statusLabel": "매수추천",
         "entryEligible": true,
-        "currentPrice": 569000
+        "currentPrice": 571000
       },
       {
         "strategy": "accumulation",
@@ -89,6 +89,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
         "currentPrice": 320000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "효성중공업",
+        "code": "298040",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 3153000
       },
       {
         "strategy": "reversal",
@@ -118,24 +133,28 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 569000
+        "currentPrice": 571000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 320000
       }
     ],
     "blacklist": [
       {
         "code": "001210",
         "name": "금호전기",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "009150",
-        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
