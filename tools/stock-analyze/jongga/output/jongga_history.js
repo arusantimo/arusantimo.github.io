@@ -1,5 +1,152 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-08-28",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202608/jongga_data_20260828.js",
+    "jsonFile": "jongga/output/202608/latest_20260828.json",
+    "inputArchiveFile": "jongga/output/archive/202608/inputs_20260828.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-08-28T06:05:24+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.2,
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 569000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 10.2,
+        "signalScore": 10.2,
+        "strictScore": 10.2,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G13)",
+        "entryEligible": false,
+        "currentPrice": 320000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 88600
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 569000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 320000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "HPSP",
+        "code": "403870",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 51000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 569000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "001210",
+        "name": "금호전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-08-27",
     "variant": "stable",
     "variantLabel": "현재 버전",
