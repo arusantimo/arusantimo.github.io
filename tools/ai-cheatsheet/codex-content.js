@@ -10,53 +10,98 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.146.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-07-29</span>
+        <span class="meta-version">v0.150.1</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-08-27</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.146.0)</span>
+        <span>📋 최근 변경사항 (v0.150.1)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="세션 이름 지정 및 사이드 대화 (v0.146.0)"
-            data-tt-desc="/new 또는 /clear로 새 세션에 이름을 붙이고, 중요한 스레드를 pin하며, 대화를 닫지 않고 사이드 대화로 전환할 수 있습니다."
-            data-tt-example="/new my-session"><code>/new</code>·<code>/clear</code> 세션 이름 지정, 스레드 pin, 사이드 대화 전환 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Agent Plugins manifest 및 워크스페이스 배포 (v0.146.0)"
-            data-tt-desc="Agent Plugins manifest, 워크스페이스 플러그인 배포, Amazon Bedrock·Claude Code용 추가 마켓플레이스를 지원합니다."
-            data-tt-example="">Agent Plugins manifest 및 워크스페이스 플러그인 배포/마켓플레이스 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="스레드 포크(fork) 지원 (v0.146.0)"
-            data-tt-desc="페이지네이션된 히스토리를 포함해 스레드를 포크할 수 있으며, 스레드 목록에 나타나지 않는 임시 포크도 지원합니다."
-            data-tt-example="">페이지네이션 히스토리 기반 스레드 포크(임시 포크 포함) 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="원격 Code Mode 호스트 WebSocket 연결 (v0.146.0)"
-            data-tt-desc="app-server가 WebSocket을 통해 원격 Code Mode 호스트에 연결할 수 있습니다."
-            data-tt-example="">app-server의 원격 Code Mode 호스트 WebSocket 연결 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="커스텀 모델 provider 웹 검색 (v0.146.0)"
-            data-tt-desc="호환되는 커스텀 모델 provider에서 독립형 웹 검색 기능을 사용할 수 있습니다."
-            data-tt-example="">호환 커스텀 모델 provider용 standalone 웹 검색 지원 (v0.146.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="페이지네이션 스레드 히스토리 (실험적) (v0.145.0)"
-            data-tt-desc="효율적인 재개, 검색, 이름 저장, 서브에이전트 지원, 메모리를 포함한 실험적 페이지네이션 스레드 히스토리가 추가되었습니다."
-            data-tt-example="">실험적 페이지네이션 스레드 히스토리(검색·메모리 포함) 추가 (v0.145.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/import Cursor·Claude Code 마이그레이션 확장 (v0.145.0)"
-            data-tt-desc="/import가 Cursor와 Claude Code의 설정, MCP 서버, 플러그인, 세션, 커맨드, 프로젝트 범위 메모리까지 이전하도록 확장되었습니다."
-            data-tt-example="/import"><code>/import</code>로 Cursor·Claude Code 설정/MCP/플러그인/세션 마이그레이션 (v0.145.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="오디오 입출력 및 realtime V3 스트리밍 (v0.145.0)"
-            data-tt-desc="일반적인 로컬 오디오 포맷을 포함한 오디오 입력·도구 출력이 추가되었고, 스트리밍 realtime V3 대화가 도입되었습니다."
-            data-tt-example="">오디오 입력/출력 지원 및 스트리밍 realtime V3 대화 도입 (v0.145.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="멀티 에이전트 V2 정식 안정화 (v0.145.0)"
-            data-tt-desc="opt-in 상태였던 멀티 에이전트 V2가 안정화되어, 서브에이전트별 모델·추론 레벨·동시성 설정과 역할 복원, 개선된 탐색을 지원합니다."
-            data-tt-example="">멀티 에이전트 V2 안정화, 서브에이전트별 모델/추론 레벨/동시성 설정 지원 (v0.145.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Amazon Bedrock 로그인 및 커스텀 엔드포인트 (실험적) (v0.145.0)"
-            data-tt-desc="실험적 Amazon Bedrock 로그인, 커스텀 엔드포인트/인증 지원이 추가되었고, GPT-5.6 Sol이 기본 Bedrock 모델로 지정되었습니다."
-            data-tt-example="">실험적 Amazon Bedrock 로그인/커스텀 엔드포인트, GPT-5.6 Sol 기본 모델 지정 (v0.145.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 압축 이미지 토큰 버짓 최적화 (v0.150.1)"
+            data-tt-desc="원격 압축 시 보존된 이미지를 토큰 예산에 기본 포함하여 오래된 이미지를 정리하고 긴 세션의 토큰 소비를 예측 가능하게 유지합니다."
+            data-tt-example="">원격 압축 이미지 토큰 버짓 최적화 및 장기 세션 예측성 개선 (v0.150.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="@ 멘션으로 다른 Codex 작업 참조·메시지 (v0.150.0)"
+            data-tt-desc="@ 멘션으로 다른 Codex 태스크를 참조하고, 터미널에서 작업을 생성하거나 직접 메시지를 주고받을 수 있습니다."
+            data-tt-example="@task-123"><code>@</code> 멘션 기반 작업(Task) 참조, 생성 및 터미널 간 직접 메시징 지원 (v0.150.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/copy 선택기 도입 (v0.150.0)"
+            data-tt-desc="/copy 명령에 선택기가 추가되어 전체 응답, 개별 코드 블록, 인용구를 선택해 클립보드에 복사할 수 있습니다."
+            data-tt-example="/copy"><code>/copy</code> 명령에 응답/코드블록/인용구 복사 선택기(Picker) 추가 (v0.150.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="터미널 작업 자동 명명 및 /rename 제안 (v0.150.0)"
+            data-tt-desc="이름 없는 터미널 작업에 대화 맥락에 기반한 제목이 자동 부여되며, /rename 실행 시 적절한 이름을 제안합니다."
+            data-tt-example="/rename">터미널 태스크 자동 명명 및 <code>/rename</code> 대화 맥락 기반 이름 제안 (v0.150.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="인터럽트 훅(Interrupt hooks) 추가 (v0.150.0)"
+            data-tt-desc="최상위 턴이 중단(Interrupt)될 때 지정된 명령어나 MCP 핸들러를 자동으로 실행할 수 있는 신규 훅입니다."
+            data-tt-example="">턴 중단 시 명령어/MCP 핸들러를 실행하는 인터럽트 훅(Interrupt hooks) 추가 (v0.150.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Vim 모드 dot-repeat(.) 지원 (v0.150.0)"
+            data-tt-desc="Vim 모드에서 '.' 키를 눌러 마지막 편집 작업을 즉시 반복 실행할 수 있습니다."
+            data-tt-example=".">Vim 모드 마지막 편집 작업 반복(<code>.</code> dot-repeat) 지원 (v0.150.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex agents 대시보드 도입 (v0.149.0)"
+            data-tt-desc="터미널에서 태스크를 인터랙티브하게 검색, 시작, 열기, 이름 변경, 중단할 수 있는 통합 TUI 대시보드입니다."
+            data-tt-example="codex agents"><code>codex agents</code> 대화형 작업 관리 대시보드(검색/시작/중단) 추가 (v0.149.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/cd, /pwd, /cwd 디렉터리 관리 명령 (v0.149.0)"
+            data-tt-desc="세션 내에서 현재 작업 디렉터리를 확인하고 변경할 수 있는 디렉터리 관리 명령어가 추가되었습니다."
+            data-tt-example="/cd /path/to/dir"><code>/cd</code>·<code>/pwd</code>·<code>/cwd</code> 세션 내 작업 디렉터리 관리 슬래시 커맨드 추가 (v0.149.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex queue 백그라운드 세션 큐 (v0.149.0)"
+            data-tt-desc="개별 터미널 창을 직접 열지 않고도 세션에 작업을 전달하고 큐를 관리할 수 있습니다."
+            data-tt-example="codex queue"><code>codex queue</code> 백그라운드 세션 작업 전달 및 큐 관리 지원 (v0.149.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="codex exec fork 및 세션 아카이브 제어 (v0.148.0)"
+            data-tt-desc="세션을 포크(fork)하여 다른 방향으로 분기할 수 있으며, TUI resume 선택기에서 아카이브 및 복원을 제어합니다."
+            data-tt-example="codex exec fork"><code>codex exec fork</code> 세션 분기 및 TUI 세션 아카이브/복원 제어 추가 (v0.148.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/export 마크다운 대화 내보내기 (v0.148.0)"
+            data-tt-desc="전체 TUI 대화 기록을 클립보드 또는 마크다운(.md) 파일로 즉시 내보낼 수 있습니다."
+            data-tt-example="/export my-log.md"><code>/export</code> 전체 TUI 대화 기록 Markdown(클립보드/파일) 내보내기 (v0.148.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Amazon Bedrock Runtime 빌트인 공급자 정식 통합 (v0.148.0)"
+            data-tt-desc="Amazon Bedrock Runtime이 기본 제공 프로바이더로 정식 탑재되었습니다."
+            data-tt-example="">Amazon Bedrock Runtime 빌트인 프로바이더 정식 통합 (v0.148.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="이동식 Agent Plugins 카탈로그 지원 (v0.147.0)"
+            data-tt-desc="로컬, 개인, 원격 카탈로그 전반에서 이동식 Agent Plugin을 검색하고 간편하게 설치할 수 있습니다."
+            data-tt-example="codex plugin install <name>">이동식 Agent Plugins 카탈로그 검색 및 설치 지원 (v0.147.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.145.0~v0.146.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="세션 이름 지정 및 사이드 대화 (v0.146.0)"
+                data-tt-desc="/new 또는 /clear로 새 세션에 이름을 붙이고, 중요한 스레드를 pin하며, 대화를 닫지 않고 사이드 대화로 전환할 수 있습니다."
+                data-tt-example="/new my-session"><code>/new</code>·<code>/clear</code> 세션 이름 지정, 스레드 pin, 사이드 대화 전환 지원 (v0.146.0)</li>
+              <li class="cl-tip" data-tt-title="Agent Plugins manifest 및 워크스페이스 배포 (v0.146.0)"
+                data-tt-desc="Agent Plugins manifest, 워크스페이스 플러그인 배포, Amazon Bedrock·Claude Code용 추가 마켓플레이스를 지원합니다."
+                data-tt-example="">Agent Plugins manifest 및 워크스페이스 플러그인 배포/마켓플레이스 지원 (v0.146.0)</li>
+              <li class="cl-tip" data-tt-title="스레드 포크(fork) 지원 (v0.146.0)"
+                data-tt-desc="페이지네이션된 히스토리를 포함해 스레드를 포크할 수 있으며, 스레드 목록에 나타나지 않는 임시 포크도 지원합니다."
+                data-tt-example="">페이지네이션 히스토리 기반 스레드 포크(임시 포크 포함) 지원 (v0.146.0)</li>
+              <li class="cl-tip" data-tt-title="원격 Code Mode 호스트 WebSocket 연결 (v0.146.0)"
+                data-tt-desc="app-server가 WebSocket을 통해 원격 Code Mode 호스트에 연결할 수 있습니다."
+                data-tt-example="">app-server의 원격 Code Mode 호스트 WebSocket 연결 지원 (v0.146.0)</li>
+              <li class="cl-tip" data-tt-title="커스텀 모델 provider 웹 검색 (v0.146.0)"
+                data-tt-desc="호환되는 커스텀 모델 provider에서 독립형 웹 검색 기능을 사용할 수 있습니다."
+                data-tt-example="">호환 커스텀 모델 provider용 standalone 웹 검색 지원 (v0.146.0)</li>
+              <li class="cl-tip" data-tt-title="페이지네이션 스레드 히스토리 (실험적) (v0.145.0)"
+                data-tt-desc="효율적인 재개, 검색, 이름 저장, 서브에이전트 지원, 메모리를 포함한 실험적 페이지네이션 스레드 히스토리가 추가되었습니다."
+                data-tt-example="">실험적 페이지네이션 스레드 히스토리(검색·메모리 포함) 추가 (v0.145.0)</li>
+              <li class="cl-tip" data-tt-title="/import Cursor·Claude Code 마이그레이션 확장 (v0.145.0)"
+                data-tt-desc="/import가 Cursor와 Claude Code의 설정, MCP 서버, 플러그인, 세션, 커맨드, 프로젝트 범위 메모리까지 이전하도록 확장되었습니다."
+                data-tt-example="/import"><code>/import</code>로 Cursor·Claude Code 설정/MCP/플러그인/세션 마이그레이션 (v0.145.0)</li>
+              <li class="cl-tip" data-tt-title="오디오 입출력 및 realtime V3 스트리밍 (v0.145.0)"
+                data-tt-desc="일반적인 로컬 오디오 포맷을 포함한 오디오 입력·도구 출력이 추가되었고, 스트리밍 realtime V3 대화가 도입되었습니다."
+                data-tt-example="">오디오 입력/출력 지원 및 스트리밍 realtime V3 대화 도입 (v0.145.0)</li>
+              <li class="cl-tip" data-tt-title="멀티 에이전트 V2 정식 안정화 (v0.145.0)"
+                data-tt-desc="opt-in 상태였던 멀티 에이전트 V2가 안정화되어, 서브에이전트별 모델·추론 레벨·동시성 설정과 역할 복원, 개선된 탐색을 지원합니다."
+                data-tt-example="">멀티 에이전트 V2 안정화, 서브에이전트별 모델/추론 레벨/동시성 설정 지원 (v0.145.0)</li>
+              <li class="cl-tip" data-tt-title="Amazon Bedrock 로그인 및 커스텀 엔드포인트 (실험적) (v0.145.0)"
+                data-tt-desc="실험적 Amazon Bedrock 로그인, 커스텀 엔드포인트/인증 지원이 추가되었고, GPT-5.6 Sol이 기본 Bedrock 모델로 지정되었습니다."
+                data-tt-example="">실험적 Amazon Bedrock 로그인/커스텀 엔드포인트, GPT-5.6 Sol 기본 모델 지정 (v0.145.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.144.0~v0.144.6</summary>

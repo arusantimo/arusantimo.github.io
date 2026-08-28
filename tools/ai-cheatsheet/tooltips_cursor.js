@@ -1,4 +1,29 @@
 window.CURSOR_TIPS = {
+  "agent": {
+    "title": "agent — 터미널 대화형 코딩 에이전트",
+    "desc": "터미널에서 직접 실행할 수 있는 독립형 대화형 코딩 에이전트 CLI입니다.",
+    "example": "agent"
+  },
+  "agent --mode=plan": {
+    "title": "agent --mode=plan — 플랜 모드 실행",
+    "desc": "코드 수정 전 구현 계획을 먼저 작성하고 사용자 승인을 받은 후 실행합니다.",
+    "example": "agent --mode=plan"
+  },
+  "& prompt": {
+    "title": "& prompt — Cloud Agent 백그라운드 위임",
+    "desc": "현재 프롬프트나 대화를 Cloud Agent로 넘겨 클라우드 환경에서 백그라운드로 실행합니다.",
+    "example": "& test suite 통과하도록 수정해줘"
+  },
+  "/side": {
+    "title": "/side — 병렬 사이드 대화 시작",
+    "desc": "메인 대화의 컨텍스트를 오염시키지 않고 별도로 진행되는 사이드 대화를 엽니다.",
+    "example": "/side 이 함수 설명해줘"
+  },
+  "/btw": {
+    "title": "/btw — 부가 질문 사이드 대화",
+    "desc": "메인 작업 진행 중 짧은 확인이나 단발성 질문을 위한 사이드 대화를 수행합니다.",
+    "example": "/btw 이 라이브러리 라이선스가 뭐야?"
+  },
   "/review": {
     "title": "/review — 코드 및 보안 사전 검토",
     "desc": "코드를 push하기 전 버그나 보안 위험 요소를 사전에 분석합니다. /review-bugbot 및 /review-security 명령어로 각각 독립적인 검토를 실행할 수도 있습니다.",

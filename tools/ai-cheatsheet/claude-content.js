@@ -10,59 +10,101 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.220</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-07-25</span>
+        <span class="meta-version">v2.1.250</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-08-28</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.220)</span>
+        <span>📋 최근 변경사항 (v2.1.250)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Claude Opus 5 기본 Opus 모델 도입 (v2.1.219)"
-            data-tt-desc="Claude Opus 5(claude-opus-5)가 기본 Opus 모델로 추가되었습니다. 1M 컨텍스트를 지원하며 fast mode 요금은 $10/$50 per Mtok입니다."
-            data-tt-example="/model">Claude Opus 5(<code>claude-opus-5</code>) 기본 Opus 모델 도입, 1M 컨텍스트 지원 (v2.1.219) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="sandbox.network.strictAllowlist 설정 (v2.1.219)"
-            data-tt-desc="샌드박스 명령이 허용목록에 없는 호스트로 나가려 할 때 승인 프롬프트 없이 곧바로 차단하는 설정입니다."
-            data-tt-example="sandbox.network.strictAllowlist: true"><code>sandbox.network.strictAllowlist</code> 비허용 호스트 자동 차단 설정 추가 (v2.1.219) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/doctor 전체 점검 도구로 확장 (v2.1.205)"
-            data-tt-desc="/doctor가 단순 업데이트 확인을 넘어 설치 전반을 진단하고 수정하는 전체 점검 도구로 확장되었습니다. /checkup은 동일 기능의 별칭입니다."
-            data-tt-example="/doctor"><code>/doctor</code>가 전체 설치 진단/수정 도구로 확장, <code>/checkup</code> 별칭 추가 (v2.1.205) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="기본 권한 모드 명칭을 Manual로 변경 (v2.1.200)"
-            data-tt-desc="CLI, --help, VS Code, JetBrains 전반에서 기본 권한 모드 이름이 'Manual'로 바뀌었습니다. --permission-mode manual 및 defaultMode: manual도 함께 인식됩니다."
-            data-tt-example="claude --permission-mode manual">기본 권한 모드 명칭 "Manual"로 통일, <code>--permission-mode manual</code> 지원 (v2.1.200) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Dynamic workflow size 기본값 medium (v2.1.219)"
-            data-tt-desc="/config의 Dynamic workflow size 설정이 15개 미만 에이전트를 지향하는 medium을 기본값으로 사용하도록 변경되었습니다."
-            data-tt-example="/config">동적 워크플로우 크기 기본값 "medium"(15개 미만 에이전트)으로 변경 (v2.1.219) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="화면 낭독기 모드 추가 (v2.1.208)"
-            data-tt-desc="시각장애 사용자를 위한 평문 렌더링 모드입니다. claude --ax-screen-reader 실행, CLAUDE_AX_SCREEN_READER=1, 또는 settings의 axScreenReader: true로 활성화합니다."
-            data-tt-example="claude --ax-screen-reader">화면 낭독기 모드(<code>--ax-screen-reader</code>) 추가 (v2.1.208) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/code-review 백그라운드 서브에이전트 실행 (v2.1.218)"
-            data-tt-desc="/code-review가 백그라운드 서브에이전트로 실행되어 대화창을 채우지 않고, 누적된 slash 커맨드를 리뷰 대상으로 유지합니다."
-            data-tt-example="/code-review"><code>/code-review</code>가 백그라운드 서브에이전트로 실행되도록 변경 (v2.1.218) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="서브에이전트 중첩 스폰 깊이 3단계 기본화 (v2.1.219)"
-            data-tt-desc="서브에이전트가 기본적으로 depth 3까지 중첩 스폰될 수 있습니다(기존 1). CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1로 비활성화할 수 있습니다."
-            data-tt-example="export CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1">서브에이전트 중첩 스폰 기본 깊이 3단계로 확대 (v2.1.219) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Auto mode Bedrock/Vertex/Foundry 기본 제공 (v2.1.207)"
-            data-tt-desc="Auto mode가 Bedrock, Vertex AI, Foundry에서 CLAUDE_CODE_ENABLE_AUTO_MODE opt-in 없이 기본 제공됩니다. settings의 disableAutoMode로 끌 수 있습니다."
-            data-tt-example="disableAutoMode: true">Auto mode가 Bedrock/Vertex AI/Foundry에서 opt-in 없이 기본 제공 (v2.1.207) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="vimInsertModeRemaps 설정 (v2.1.208)"
-            data-tt-desc="vim 모드의 insert 상태에서 jj 같은 두 글자 조합을 Escape로 매핑할 수 있는 설정입니다."
-            data-tt-example="vimInsertModeRemaps: { jj: Escape }"><code>vimInsertModeRemaps</code>로 vim insert 모드 2글자 조합 리맵 지원 (v2.1.208) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="CLAUDE_CODE_PROCESS_WRAPPER 추가 (v2.1.208)"
-            data-tt-desc="agent view와 백그라운드 서비스가 Claude Code 자기 재실행 시 사내 런처(래퍼 실행 파일)를 반드시 거치도록 강제하는 기업용 설정입니다."
-            data-tt-example="export CLAUDE_CODE_PROCESS_WRAPPER=/opt/corp/launcher"><code>CLAUDE_CODE_PROCESS_WRAPPER</code>로 기업용 런처 강제 경유 지원 (v2.1.208) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="AskUserQuestion 자동 진행 기본 해제 (v2.1.200)"
-            data-tt-desc="AskUserQuestion 대화상자가 더 이상 기본으로 자동 진행되지 않으며, /config에서 idle timeout을 opt-in으로 설정할 수 있습니다."
-            data-tt-example="/config"><code>AskUserQuestion</code> 자동 진행(auto-continue) 기본 해제 (v2.1.200) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="--restricted 제한 실행 모드 추가 (v2.1.248)"
+            data-tt-desc="코드/명령 실행 도구 및 WebFetch를 제외하고 작업 디렉터리 외부 접근 및 bypassPermissions를 차단하는 엄격한 제한 모드입니다."
+            data-tt-example="claude --restricted"><code>--restricted</code> 플래그(<code>CLAUDE_CODE_RESTRICTED=1</code>) 제한 실행 모드 추가 (v2.1.248) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="experimental.cacheTtl 에이전트 캐시 TTL (v2.1.248)"
+            data-tt-desc="에이전트 프론트매터에 에이전트별 프롬프트 캐시 TTL(5m 또는 1h)을 설정할 수 있습니다."
+            data-tt-example="experimental.cacheTtl: 1h"><code>experimental.cacheTtl</code> 에이전트별 프롬프트 캐시 TTL(5m/1h) 설정 지원 (v2.1.248) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="self-hosted-runner 클라이언트 레이블 지정 (v2.1.248)"
+            data-tt-desc="self-hosted-runner 등록 시 호스트명 대신 사용할 커스텀 클라이언트 레이블을 지정할 수 있습니다."
+            data-tt-example="claude self-hosted-runner --client-label my-runner"><code>claude self-hosted-runner --client-label</code> 클라이언트 레이블 지정 지원 (v2.1.248) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Bedrock/Vertex/Foundry 세션 간 메시지 전송 (v2.1.248)"
+            data-tt-desc="동일 머신 내 Bedrock, Vertex AI, Foundry 및 텔레메트리 비활성 세션 간 SendMessage/ListAgents 통신을 지원합니다."
+            data-tt-example="SendMessage">Bedrock/Vertex/Foundry 동일 머신 세션 간 <code>SendMessage</code>/<code>ListAgents</code> 지원 (v2.1.248) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="SendFeedback 도구 및 /feedback 연동 (v2.1.247)"
+            data-tt-desc="세션 중 문제 발생 시 피드백 보고서 초안을 자동 작성하고 /feedback에서 검토 후 제출할 수 있습니다."
+            data-tt-example="/feedback"><code>SendFeedback</code> 도구 및 <code>/feedback</code> 피드백 보고서 초안 자동 작성 지원 (v2.1.247) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/claude-api cost-optimize 비용 최적화 (v2.1.247)"
+            data-tt-desc="프로젝트의 Claude API 비용을 프로파일링하고 캐싱, 토큰 위생, 배치, 모델 선택 등 최적화 레버를 안내합니다."
+            data-tt-example="/claude-api cost-optimize"><code>/claude-api cost-optimize</code> API 비용 프로파일링 및 최적화 가이드 추가 (v2.1.247) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/permissions Auto mode 규칙 편집 탭 (v2.1.246)"
+            data-tt-desc="/permissions에 Auto mode 탭이 추가되어 자동 모드 분류 규칙을 직접 확인하고 편집할 수 있습니다."
+            data-tt-example="/permissions"><code>/permissions</code>에 Auto mode 분류 규칙 조회/편집 탭 추가 (v2.1.246) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/usage Loops 상세 분석 추가 (v2.1.243)"
+            data-tt-desc="/usage에서 루프별 실행 횟수, 총 토큰, 실행당 토큰, 마지막 실행 시점을 분석해 폭주 루프를 감지할 수 있습니다."
+            data-tt-example="/usage"><code>/usage</code>에 Loops 분석(실행 횟수, 토큰량, 폭주 감지) 추가 (v2.1.243) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="modelPicker 커스텀 모델 목록 구성 (v2.1.243)"
+            data-tt-desc="/model 선택기 목록을 사용자/조직 맞춤형 모델 목록(Bedrock/Vertex ID 포함)으로 구성하거나 교체할 수 있습니다."
+            data-tt-example="modelPicker: [...]"><code>modelPicker</code> 설정으로 <code>/model</code> 선택기 모델 목록 맞춤 구성 지원 (v2.1.243) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="promptCacheTtl & subagentPromptCacheTtl 분리 (v2.1.243)"
+            data-tt-desc="메인 대화의 프롬프트 캐시를 1시간으로 유지하면서 서브에이전트는 5분으로 분리 지정할 수 있습니다."
+            data-tt-example="promptCacheTtl: 1h"><code>promptCacheTtl</code> 및 <code>subagentPromptCacheTtl</code> 캐시 분리 설정 지원 (v2.1.243) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="modelPricing 조직 맞춤 단가 반영 (v2.1.243)"
+            data-tt-desc="조직 계약 단가 및 할인 배율을 /cost, 상태줄, 텔레메트리 비용 계산에 적용합니다."
+            data-tt-example="modelPricing: { ... }"><code>modelPricing</code> 관리 설정으로 조직 계약 단가/할인율 반영 지원 (v2.1.243) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="네이티브 설치/업데이트 zstd 압축 도입 (v2.1.243)"
+            data-tt-desc="바이너리 zstd 압축을 적용하여 다운로드 크기를 약 75MB로 대폭 축소(기존 ~340MB)했습니다."
+            data-tt-example="">네이티브 바이너리 zstd 압축 도입으로 다운로드 크기 대폭 축소 (v2.1.243) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.219~v2.1.220</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Claude Opus 5 기본 Opus 모델 도입 (v2.1.219)"
+                data-tt-desc="Claude Opus 5(claude-opus-5)가 기본 Opus 모델로 추가되었습니다. 1M 컨텍스트를 지원하며 fast mode 요금은 $10/$50 per Mtok입니다."
+                data-tt-example="/model">Claude Opus 5(<code>claude-opus-5</code>) 기본 Opus 모델 도입, 1M 컨텍스트 지원 (v2.1.219)</li>
+              <li class="cl-tip" data-tt-title="sandbox.network.strictAllowlist 설정 (v2.1.219)"
+                data-tt-desc="샌드박스 명령이 허용목록에 없는 호스트로 나가려 할 때 승인 프롬프트 없이 곧바로 차단하는 설정입니다."
+                data-tt-example="sandbox.network.strictAllowlist: true"><code>sandbox.network.strictAllowlist</code> 비허용 호스트 자동 차단 설정 추가 (v2.1.219)</li>
+              <li class="cl-tip" data-tt-title="/doctor 전체 점검 도구로 확장 (v2.1.205)"
+                data-tt-desc="/doctor가 단순 업데이트 확인을 넘어 설치 전반을 진단하고 수정하는 전체 점검 도구로 확장되었습니다. /checkup은 동일 기능의 별칭입니다."
+                data-tt-example="/doctor"><code>/doctor</code>가 전체 설치 진단/수정 도구로 확장, <code>/checkup</code> 별칭 추가 (v2.1.205)</li>
+              <li class="cl-tip" data-tt-title="기본 권한 모드 명칭을 Manual로 변경 (v2.1.200)"
+                data-tt-desc="CLI, --help, VS Code, JetBrains 전반에서 기본 권한 모드 이름이 'Manual'로 바뀌었습니다. --permission-mode manual 및 defaultMode: manual도 함께 인식됩니다."
+                data-tt-example="claude --permission-mode manual">기본 권한 모드 명칭 "Manual"로 통일, <code>--permission-mode manual</code> 지원 (v2.1.200)</li>
+              <li class="cl-tip" data-tt-title="Dynamic workflow size 기본값 medium (v2.1.219)"
+                data-tt-desc="/config의 Dynamic workflow size 설정이 15개 미만 에이전트를 지향하는 medium을 기본값으로 사용하도록 변경되었습니다."
+                data-tt-example="/config">동적 워크플로우 크기 기본값 "medium"(15개 미만 에이전트)으로 변경 (v2.1.219)</li>
+              <li class="cl-tip" data-tt-title="화면 낭독기 모드 추가 (v2.1.208)"
+                data-tt-desc="시각장애 사용자를 위한 평문 렌더링 모드입니다. claude --ax-screen-reader 실행, CLAUDE_AX_SCREEN_READER=1, 또는 settings의 axScreenReader: true로 활성화합니다."
+                data-tt-example="claude --ax-screen-reader">화면 낭독기 모드(<code>--ax-screen-reader</code>) 추가 (v2.1.208)</li>
+              <li class="cl-tip" data-tt-title="/code-review 백그라운드 서브에이전트 실행 (v2.1.218)"
+                data-tt-desc="/code-review가 백그라운드 서브에이전트로 실행되어 대화창을 채우지 않고, 누적된 slash 커맨드를 리뷰 대상으로 유지합니다."
+                data-tt-example="/code-review"><code>/code-review</code>가 백그라운드 서브에이전트로 실행되도록 변경 (v2.1.218)</li>
+              <li class="cl-tip" data-tt-title="서브에이전트 중첩 스폰 깊이 3단계 기본화 (v2.1.219)"
+                data-tt-desc="서브에이전트가 기본적으로 depth 3까지 중첩 스폰될 수 있습니다(기존 1). CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1로 비활성화할 수 있습니다."
+                data-tt-example="export CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1">서브에이전트 중첩 스폰 기본 깊이 3단계로 확대 (v2.1.219)</li>
+              <li class="cl-tip" data-tt-title="Auto mode Bedrock/Vertex/Foundry 기본 제공 (v2.1.207)"
+                data-tt-desc="Auto mode가 Bedrock, Vertex AI, Foundry에서 CLAUDE_CODE_ENABLE_AUTO_MODE opt-in 없이 기본 제공됩니다. settings의 disableAutoMode로 끌 수 있습니다."
+                data-tt-example="disableAutoMode: true">Auto mode가 Bedrock/Vertex AI/Foundry에서 opt-in 없이 기본 제공 (v2.1.207)</li>
+              <li class="cl-tip" data-tt-title="vimInsertModeRemaps 설정 (v2.1.208)"
+                data-tt-desc="vim 모드의 insert 상태에서 jj 같은 두 글자 조합을 Escape로 매핑할 수 있는 설정입니다."
+                data-tt-example="vimInsertModeRemaps: { jj: Escape }"><code>vimInsertModeRemaps</code>로 vim insert 모드 2글자 조합 리맵 지원 (v2.1.208)</li>
+              <li class="cl-tip" data-tt-title="CLAUDE_CODE_PROCESS_WRAPPER 추가 (v2.1.208)"
+                data-tt-desc="agent view와 백그라운드 서비스가 Claude Code 자기 재실행 시 사내 런처(래퍼 실행 파일)를 반드시 거치도록 강제하는 기업용 설정입니다."
+                data-tt-example="export CLAUDE_CODE_PROCESS_WRAPPER=/opt/corp/launcher"><code>CLAUDE_CODE_PROCESS_WRAPPER</code>로 기업용 런처 강제 경유 지원 (v2.1.208)</li>
+              <li class="cl-tip" data-tt-title="AskUserQuestion 자동 진행 기본 해제 (v2.1.200)"
+                data-tt-desc="AskUserQuestion 대화상자가 더 이상 기본으로 자동 진행되지 않으며, /config에서 idle timeout을 opt-in으로 설정할 수 있습니다."
+                data-tt-example="/config"><code>AskUserQuestion</code> 자동 진행(auto-continue) 기본 해제 (v2.1.200)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.199~v2.1.218 (기타 변경사항)</summary>

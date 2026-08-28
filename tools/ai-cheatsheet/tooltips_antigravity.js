@@ -1,4 +1,19 @@
 window.ANTIGRAVITY_TIPS = {
+  "agy changelog": {
+    "title": "agy changelog — CLI 릴리스 노트 출력",
+    "desc": "Antigravity CLI의 버전별 릴리스 노트와 변경 내역을 터미널에 출력합니다.",
+    "example": "agy changelog"
+  },
+  "agy plugin": {
+    "title": "agy plugin — 플러그인 관리",
+    "desc": "플러그인 설치, 목록 조회, 활성화/비활성화를 터미널에서 제어합니다.",
+    "example": "agy plugin list\nagy plugin install <name>"
+  },
+  "agy update": {
+    "title": "agy update — CLI 최신 버전 업데이트",
+    "desc": "Antigravity CLI를 최신 배포 버전으로 즉시 업데이트합니다.",
+    "example": "agy update"
+  },
   "/mcp connect": {
     "title": "/mcp connect — 원격 MCP 연결",
     "desc": "로컬 프로세스가 아닌 원격(SSE/WebSocket) 환경의 MCP 서버를 연동합니다.",

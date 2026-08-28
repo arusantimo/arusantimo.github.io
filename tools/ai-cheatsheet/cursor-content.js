@@ -10,47 +10,74 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.11</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-07-28</span>
+        <span class="meta-version">v3.17.21</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-08-19</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.11)</span>
+        <span>📋 최근 변경사항 (v3.17.21)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Cursor Start 인도향 저가 플랜 (2026-07-28)"
-            data-tt-desc="인도 개발자를 위한 월 ₹649 플랜으로, Grok 4.5와 Composer 모델, Cloud Agent, iOS 원격 제어를 제공합니다. UPI/카드 결제 기반 INR 청구입니다."
-            data-tt-example="Cursor Start">Cursor Start(₹649/월, 인도향) Grok 4.5·Composer·Cloud Agent 제공 (2026-07-28) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor Router 지능형 모델 라우팅 (2026-07-22)"
-            data-tt-desc="Auto mode가 요청을 분석해 적합한 모델로 자동 라우팅합니다. Intelligence/Balance/Cost 세 가지 최적화 모드를 제공하며 Teams 플랜은 기본 활성화됩니다."
-            data-tt-example="Auto mode > Router">Cursor Router로 Auto mode 지능형 모델 라우팅(Intelligence/Balance/Cost) (2026-07-22) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cursor in Slack 실행 전 플랜 미리보기 (2026-07-17)"
-            data-tt-desc="Cursor in Slack이 작업을 시작하기 전 계획을 먼저 제시해 사용자가 조기에 방향을 조정할 수 있습니다. 멀티 레포 환경 타겟팅도 지원합니다."
-            data-tt-example="Slack > /cursor">Cursor in Slack 실행 전 플랜 미리보기 및 멀티 레포 환경 타겟팅 지원 (2026-07-17) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="사이드 대화(Side Chats) 지원 (v3.11)"
-            data-tt-desc="/side 또는 /btw 명령으로 메인 대화와 별개로 진행되는 병렬 사이드 대화를 시작할 수 있습니다."
-            data-tt-example="/side 이 함수 설명해줘"><code>/side</code>·<code>/btw</code> 병렬 사이드 대화(Side Chats) 지원 (v3.11) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="에이전트 트랜스크립트 검색 (v3.11)"
-            data-tt-desc="커맨드 팔레트에서 에이전트 대화 트랜스크립트를 검색할 수 있으며, 대규모 환경에서도 빠르도록 로컬 인덱싱을 사용합니다."
-            data-tt-example="Cmd+K > Search transcripts">커맨드 팔레트에서 에이전트 트랜스크립트 검색 지원 (v3.11) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="레포/프로젝트 선택기 재설계 (v3.11)"
-            data-tt-desc="This Computer, Cloud, Remote Machines 범위로 검색 범위를 좁힐 수 있도록 레포·프로젝트 선택기가 재설계되었습니다."
-            data-tt-example="">레포/프로젝트 선택기 재설계, 범위별(This Computer/Cloud/Remote) 검색 지원 (v3.11) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="클라우드 에이전트 훅(Cloud Agent Hooks) (v3.11)"
-            data-tt-desc="prompt, response, thinking, 서브에이전트 관리를 포함해 에이전트 대화를 관찰하고 제어할 수 있는 신규 훅입니다."
-            data-tt-example="">클라우드 에이전트 대화 관찰/제어용 신규 훅(Cloud Agent Hooks) 추가 (v3.11) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="팀 마켓플레이스 MCP·조직 그룹 지원 (v3.10)"
-            data-tt-desc="관리자가 팀 MCP 서버를 한 번 구성해 여러 플랫폼에 배포할 수 있고, SCIM 디렉터리 그룹 외에 조직 그룹 기반 접근 제어도 지원합니다."
-            data-tt-example="Dashboard > Integrations & MCP">팀 MCP 서버 멀티플랫폼 배포 및 조직 그룹 기반 접근 제어 (v3.10) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cloud Agents & Cursor Harness 대규모 강화 (2026-08-19)"
+            data-tt-desc="Cloud Agent가 이벤트에 반응하고, 목표 달성까지 상태를 유지하는 지속성(Goal Persistence)을 갖추어 장시간 자율 운영 체계로 진화했습니다."
+            data-tt-example="Cloud Agents">Cloud Agents &amp; Cursor Harness 대규모 강화: 이벤트 기반 자동화 및 목표 지속성 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cloud Agents 이벤트 구독(Subscriptions) (2026-08-19)"
+            data-tt-desc="PR 생성/업데이트, Slack 스레드, 정기 스케줄 등 이벤트 소스를 구독하여 새 활동 발생 시 에이전트가 자동 기동됩니다."
+            data-tt-example="Subscriptions">Cloud Agents 이벤트 소스(PR/Slack/스케줄) 구독 및 자동 기동 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cloud Agents용 Builds 도입 (2026-08-13)"
+            data-tt-desc="개발 환경의 사전 빌드 복사본(Builds)을 활용해 Cloud Agent 부팅 시간을 10배 단축하고 의존성 설치 없이 즉시 작업을 시작합니다."
+            data-tt-example="Cloud Agents > Builds">Cloud Agents용 Builds(개발 환경 스냅샷) 도입으로 부팅 속도 10배 단축 (2026-08-13) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Google Workspace 플러그인 지원 (2026-08-03)"
+            data-tt-desc="에디터 내 코딩 에이전트가 Gmail, Google Drive, Google Calendar와 직접 연동하여 작업할 수 있는 플러그인이 추가되었습니다."
+            data-tt-example="Google Workspace Plugin">Google Workspace 플러그인(Gmail, Drive, Calendar) 직접 연동 지원 (2026-08-03) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="독립 Origin 저장소 자동 생성 (2026-08-19)"
+            data-tt-desc="외부 SCM 연결 없이도 레포 선택기에서 처음부터 작업을 시작하면 Cursor가 독립 Origin 저장소를 자동 생성합니다."
+            data-tt-example="Repo Picker > New">외부 SCM 연결 없는 독립 Origin 저장소 자동 생성 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="라이브 미리보기 및 Vercel 원클릭 배포 (2026-08-19)"
+            data-tt-desc="Cloud Agent 환경을 브라우저로 포트 포워딩하여 실시간 미리보기를 제공하며, 연결된 Vercel 계정으로 즉시 배포할 수 있습니다."
+            data-tt-example="Live Preview > Deploy">Cloud Agent 라이브 포트 포워딩 미리보기 및 Vercel 연동 배포 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Self-Hosted Cloud Agents 지원"
+            data-tt-desc="코드와 빌드 출력, 시크릿을 자체 인프라 내에 격리 유지하면서 Cursor 클라우드 에이전트 경험을 활용할 수 있습니다."
+            data-tt-example="Self-hosted Agents">자체 인프라 보안 유지를 위한 Self-Hosted Cloud Agents 지원 <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.10~v3.11</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Cursor Start 인도향 저가 플랜 (2026-07-28)"
+                data-tt-desc="인도 개발자를 위한 월 ₹649 플랜으로, Grok 4.5와 Composer 모델, Cloud Agent, iOS 원격 제어를 제공합니다. UPI/카드 결제 기반 INR 청구입니다."
+                data-tt-example="Cursor Start">Cursor Start(₹649/월, 인도향) Grok 4.5·Composer·Cloud Agent 제공 (2026-07-28)</li>
+              <li class="cl-tip" data-tt-title="Cursor Router 지능형 모델 라우팅 (2026-07-22)"
+                data-tt-desc="Auto mode가 요청을 분석해 적합한 모델로 자동 라우팅합니다. Intelligence/Balance/Cost 세 가지 최적화 모드를 제공하며 Teams 플랜은 기본 활성화됩니다."
+                data-tt-example="Auto mode > Router">Cursor Router로 Auto mode 지능형 모델 라우팅(Intelligence/Balance/Cost) (2026-07-22)</li>
+              <li class="cl-tip" data-tt-title="Cursor in Slack 실행 전 플랜 미리보기 (2026-07-17)"
+                data-tt-desc="Cursor in Slack이 작업을 시작하기 전 계획을 먼저 제시해 사용자가 조기에 방향을 조정할 수 있습니다. 멀티 레포 환경 타겟팅도 지원합니다."
+                data-tt-example="Slack > /cursor">Cursor in Slack 실행 전 플랜 미리보기 및 멀티 레포 환경 타겟팅 지원 (2026-07-17)</li>
+              <li class="cl-tip" data-tt-title="사이드 대화(Side Chats) 지원 (v3.11)"
+                data-tt-desc="/side 또는 /btw 명령으로 메인 대화와 별개로 진행되는 병렬 사이드 대화를 시작할 수 있습니다."
+                data-tt-example="/side 이 함수 설명해줘"><code>/side</code>·<code>/btw</code> 병렬 사이드 대화(Side Chats) 지원 (v3.11)</li>
+              <li class="cl-tip" data-tt-title="에이전트 트랜스크립트 검색 (v3.11)"
+                data-tt-desc="커맨드 팔레트에서 에이전트 대화 트랜스크립트를 검색할 수 있으며, 대규모 환경에서도 빠르도록 로컬 인덱싱을 사용합니다."
+                data-tt-example="Cmd+K > Search transcripts">커맨드 팔레트에서 에이전트 트랜스크립트 검색 지원 (v3.11)</li>
+              <li class="cl-tip" data-tt-title="레포/프로젝트 선택기 재설계 (v3.11)"
+                data-tt-desc="This Computer, Cloud, Remote Machines 범위로 검색 범위를 좁힐 수 있도록 레포·프로젝트 선택기가 재설계되었습니다."
+                data-tt-example="">레포/프로젝트 선택기 재설계, 범위별(This Computer/Cloud/Remote) 검색 지원 (v3.11)</li>
+              <li class="cl-tip" data-tt-title="클라우드 에이전트 훅(Cloud Agent Hooks) (v3.11)"
+                data-tt-desc="prompt, response, thinking, 서브에이전트 관리를 포함해 에이전트 대화를 관찰하고 제어할 수 있는 신규 훅입니다."
+                data-tt-example="">클라우드 에이전트 대화 관찰/제어용 신규 훅(Cloud Agent Hooks) 추가 (v3.11)</li>
+              <li class="cl-tip" data-tt-title="팀 마켓플레이스 MCP·조직 그룹 지원 (v3.10)"
+                data-tt-desc="관리자가 팀 MCP 서버를 한 번 구성해 여러 플랫폼에 배포할 수 있고, SCIM 디렉터리 그룹 외에 조직 그룹 기반 접근 제어도 지원합니다."
+                data-tt-example="Dashboard > Integrations & MCP">팀 MCP 서버 멀티플랫폼 배포 및 조직 그룹 기반 접근 제어 (v3.10)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.9</summary>
@@ -326,7 +353,7 @@ const cursorContent = `
               <div class="group-label">agent CLI (독립 에이전트)</div>
               <div class="row">
                 <div class="row-key"><code>agent</code></div>
-                <div class="row-desc">터미널 대화형 코딩 에이전트 실행 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">터미널 대화형 코딩 에이전트 실행</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>agent --mode=plan</code></div>
@@ -334,7 +361,7 @@ const cursorContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>agent -p "Prompt"</code></div>
-                <div class="row-desc">비대화형 print 모드로 프롬프트 실행 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">비대화형 print 모드로 프롬프트 실행</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>agent ls</code></div>
@@ -346,7 +373,7 @@ const cursorContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>&amp; prompt</code></div>
-                <div class="row-desc">현재 대화를 Cloud Agent로 넘겨 백그라운드 실행 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">현재 대화를 Cloud Agent로 넘겨 백그라운드 실행</div>
               </div>
             </div>
           </div>

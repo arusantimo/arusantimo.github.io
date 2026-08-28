@@ -10,53 +10,86 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.4.3</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-07-28</span>
+        <span class="meta-version">v2.11.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-08-26</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.4.3)</span>
+        <span>📋 최근 변경사항 (v2.11.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="미리보기 탭(Preview Tabs) 추가 (v2.4.3)"
-            data-tt-desc="보조 패널에서 파일을 임시로 여는 미리보기 탭이 추가되어, 클릭한 파일이 영구 탭 없이 임시 슬롯으로 열립니다."
-            data-tt-example="">보조 패널 미리보기 탭(Preview Tabs) 지원 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="JSON/MD/CSV 첨부 지원 (v2.4.3)"
-            data-tt-desc="JSON, Markdown, CSV 파일을 시각적 배지와 함께 첨부할 수 있도록 지원이 확장되었습니다."
-            data-tt-example="">JSON/Markdown/CSV 파일 첨부 지원 확장 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="MCP 서버 연결/도구 호출 타임아웃 방지 (v2.4.3)"
-            data-tt-desc="MCP 서버 연결과 도구 호출이 무한 대기하지 않도록 타임아웃 처리가 추가되었습니다."
-            data-tt-example="">MCP 서버 연결/도구 호출 무한 대기 방지 타임아웃 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="선택 텍스트 인용 단축키 (v2.4.3)"
-            data-tt-desc="Cmd+L(macOS) / Ctrl+L(Windows)로 선택한 텍스트를 채팅에 바로 인용할 수 있습니다."
-            data-tt-example="Cmd+L"><code>Cmd+L</code>/<code>Ctrl+L</code>로 선택 텍스트 채팅 인용 단축키 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Conversation History 안 읽음 필터 (v2.4.3)"
-            data-tt-desc="Conversation History에서 읽지 않은 대화만 걸러보는 'Only Unread' 필터가 추가되었습니다."
-            data-tt-example="Conversation History">Conversation History에 "Only Unread" 필터 옵션 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Download Diagnostics 명령 추가 (v2.4.3)"
-            data-tt-desc="문제 해결을 위한 진단 정보를 내려받는 Download Diagnostics 명령이 추가되었습니다."
-            data-tt-example="Download Diagnostics">문제 해결용 <code>Download Diagnostics</code> 명령 추가 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="명령 승인 규칙 개선 (v2.4.3)"
-            data-tt-desc="중복되는 명령 승인 프롬프트를 줄이도록 명령 승인 규칙이 정교화되었습니다."
-            data-tt-example="">명령 승인 규칙 정교화로 중복 승인 프롬프트 감소 (v2.4.3) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="큐잉된 메시지 실행 옵션 (v2.3.0)"
-            data-tt-desc="에이전트 작업 중 보낸 메시지를 큐에 쌓고 실행 방식을 설정할 수 있으며, 'Send Now'로 즉시 실행도 가능합니다."
-            data-tt-example="Send Now">큐잉된 메시지 실행 옵션 및 "Send Now" 즉시 실행 지원 (v2.3.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="일반 텍스트(.txt) 첨부 지원 (v2.3.0)"
-            data-tt-desc="일반 텍스트(.txt) 파일 첨부가 지원됩니다."
-            data-tt-example="">일반 텍스트(<code>.txt</code>) 파일 첨부 지원 추가 (v2.3.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="백엔드 과부하 시 자동 재시도 (v2.3.0)"
-            data-tt-desc="백엔드 과부하가 발생하면 자동으로 재시도하도록 개선되었습니다."
-            data-tt-example="">백엔드 과부하 발생 시 자동 재시도 지원 (v2.3.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Generative UI 도입 및 차트 지원 (v2.11.0)"
+            data-tt-desc="채팅창 내에서 HTML 아티팩트를 인라인으로 렌더링하며 KaTeX 수식, Chart.js, Plotly 인터랙티브 차트를 직접 시각화합니다."
+            data-tt-example="">Generative UI 도입: HTML 아티팩트 인라인 렌더링, KaTeX 수식, Chart.js/Plotly 지원 (v2.11.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="외부 파일 인라인 참조 (@path/to/) 지원 (v2.11.0)"
+            data-tt-desc="AGENTS.md 및 커스텀 규칙 파일에서 @path/to/file 문법으로 외부 파일 내용을 손쉽게 인라인 참조할 수 있습니다."
+            data-tt-example="@docs/rules.md"><code>@path/to/file</code> 문법으로 <code>AGENTS.md</code>/규칙 내 외부 파일 인라인 참조 지원 (v2.11.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="YAML Frontmatter 메타데이터 카드 렌더링 (v2.11.0)"
+            data-tt-desc="마크다운 파일의 YAML 프론트매터를 시각적인 메타데이터 카드로 자동 렌더링합니다."
+            data-tt-example="">마크다운 YAML Frontmatter 서식 메타데이터 카드 렌더링 지원 (v2.11.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="사이드바 내장 터미널(Embedded Terminal) (v2.10.0)"
+            data-tt-desc="Ctrl/Cmd + \` 단축키로 사이드바 내장 터미널을 열어 앱을 벗어나지 않고 빌드 및 테스트 스크립트를 실행할 수 있습니다."
+            data-tt-example="Ctrl + \`">사이드바 내장 터미널(<code>Ctrl/Cmd + \`</code>) 추가로 앱 내 빌드/테스트 실행 지원 (v2.10.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Review 창 Git 네이티브 버전 관리 (v2.10.0)"
+            data-tt-desc="Review 패널에서 워킹 트리 diff를 검사하고 변경된 파일들의 스테이징/언스테이징을 직접 제어할 수 있습니다."
+            data-tt-example="Review Pane">Review 패널 내 Git 네이티브 버전 관리(워킹 트리 diff, 스테이징 제어) 추가 (v2.10.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="대화형 이미지 코멘트 & 풍부한 MCP 도구 미리보기 (v2.10.0)"
+            data-tt-desc="이미지 첨부 파일에 인터랙티브 코멘트를 작성하고 MCP 도구 실행 결과를 풍부한 미리보기로 확인합니다."
+            data-tt-example="">대화형 이미지 코멘트 및 풍부한 MCP 도구 실행 미리보기 지원 (v2.10.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="사이드바 폴더 확장/축소 상태 기억 (v2.8.0)"
+            data-tt-desc="사이드바 폴더의 확장/축소 상태가 지속 저장되며 아티팩트 미리보기의 신뢰성이 향상되었습니다."
+            data-tt-example="">사이드바 폴더 확장/축소 상태 기억 및 아티팩트 미리보기 안정화 (v2.8.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="이미지 diff 좌우 비교(Side-by-side) 뷰 (v2.7.1)"
+            data-tt-desc="이미지 변경점을 좌우 비교 뷰로 시각화하고 스크린 리더 및 키보드 접근성을 크게 개선했습니다."
+            data-tt-example="">이미지 diff 좌우 비교(Side-by-side) 뷰 및 접근성(a11y) 강화 (v2.7.1) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Gemini Enterprise & Workforce Identity SSO 지원 (v2.5.0)"
+            data-tt-desc="Gemini Enterprise 계정 및 Workforce Identity Federation 기반의 Advanced SSO 로그인을 지원합니다."
+            data-tt-example="Enterprise SSO">Gemini Enterprise 및 Workforce Identity Federation(Advanced SSO) 로그인 지원 (v2.5.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.4.2~v2.4.3</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="미리보기 탭(Preview Tabs) 추가 (v2.4.3)"
+                data-tt-desc="보조 패널에서 파일을 임시로 여는 미리보기 탭이 추가되어, 클릭한 파일이 영구 탭 없이 임시 슬롯으로 열립니다."
+                data-tt-example="">보조 패널 미리보기 탭(Preview Tabs) 지원 추가 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="JSON/MD/CSV 첨부 지원 (v2.4.3)"
+                data-tt-desc="JSON, Markdown, CSV 파일을 시각적 배지와 함께 첨부할 수 있도록 지원이 확장되었습니다."
+                data-tt-example="">JSON/Markdown/CSV 파일 첨부 지원 확장 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="MCP 서버 연결/도구 호출 타임아웃 방지 (v2.4.3)"
+                data-tt-desc="MCP 서버 연결과 도구 호출이 무한 대기하지 않도록 타임아웃 처리가 추가되었습니다."
+                data-tt-example="">MCP 서버 연결/도구 호출 무한 대기 방지 타임아웃 추가 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="선택 텍스트 인용 단축키 (v2.4.3)"
+                data-tt-desc="Cmd+L(macOS) / Ctrl+L(Windows)로 선택한 텍스트를 채팅에 바로 인용할 수 있습니다."
+                data-tt-example="Cmd+L"><code>Cmd+L</code>/<code>Ctrl+L</code>로 선택 텍스트 채팅 인용 단축키 추가 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="Conversation History 안 읽음 필터 (v2.4.3)"
+                data-tt-desc="Conversation History에서 읽지 않은 대화만 걸러보는 'Only Unread' 필터가 추가되었습니다."
+                data-tt-example="Conversation History">Conversation History에 "Only Unread" 필터 옵션 추가 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="Download Diagnostics 명령 추가 (v2.4.3)"
+                data-tt-desc="문제 해결을 위한 진단 정보를 내려받는 Download Diagnostics 명령이 추가되었습니다."
+                data-tt-example="Download Diagnostics">문제 해결용 <code>Download Diagnostics</code> 명령 추가 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="명령 승인 규칙 개선 (v2.4.3)"
+                data-tt-desc="중복되는 명령 승인 프롬프트를 줄이도록 명령 승인 규칙이 정교화되었습니다."
+                data-tt-example="">명령 승인 규칙 정교화로 중복 승인 프롬프트 감소 (v2.4.3)</li>
+              <li class="cl-tip" data-tt-title="큐잉된 메시지 실행 옵션 (v2.3.0)"
+                data-tt-desc="에이전트 작업 중 보낸 메시지를 큐에 쌓고 실행 방식을 설정할 수 있으며, 'Send Now'로 즉시 실행도 가능합니다."
+                data-tt-example="Send Now">큐잉된 메시지 실행 옵션 및 "Send Now" 즉시 실행 지원 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="일반 텍스트(.txt) 첨부 지원 (v2.3.0)"
+                data-tt-desc="일반 텍스트(.txt) 파일 첨부가 지원됩니다."
+                data-tt-example="">일반 텍스트(<code>.txt</code>) 파일 첨부 지원 추가 (v2.3.0)</li>
+              <li class="cl-tip" data-tt-title="백엔드 과부하 시 자동 재시도 (v2.3.0)"
+                data-tt-desc="백엔드 과부하가 발생하면 자동으로 재시도하도록 개선되었습니다."
+                data-tt-example="">백엔드 과부하 발생 시 자동 재시도 지원 (v2.3.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.3.0~v2.3.1 (기타 변경사항)</summary>
@@ -362,15 +395,15 @@ const antigravityContent = `
               </div>
               <div class="row">
                 <div class="row-key"><code>agy changelog</code></div>
-                <div class="row-desc">CLI 변경 내역과 릴리스 노트 출력 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">CLI 변경 내역과 릴리스 노트 출력</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>agy plugin</code></div>
-                <div class="row-desc">플러그인 install/list/enable/disable 관리 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">플러그인 install/list/enable/disable 관리</div>
               </div>
               <div class="row">
                 <div class="row-key"><code>agy update</code></div>
-                <div class="row-desc">CLI 최신 버전 업데이트 <span class="badge-new">NEW</span></div>
+                <div class="row-desc">CLI 최신 버전 업데이트</div>
               </div>
             </div>
           </div>

@@ -1,4 +1,39 @@
 window.CLAUDE_TIPS = {
+  "--restricted": {
+    "title": "--restricted — 제한 실행 모드",
+    "desc": "코드 및 명령어 실행 도구와 WebFetch를 제외하고, 파일 도구를 작업 디렉터리 내로 제한하며 bypassPermissions 설정을 무시합니다.",
+    "example": "claude --restricted"
+  },
+  "CLAUDE_CODE_RESTRICTED": {
+    "title": "CLAUDE_CODE_RESTRICTED — 제한 실행 환경변수",
+    "desc": "1로 설정 시 CI/코드 리뷰 등 읽기 전용 환경을 위해 명령어 실행 도구를 일괄 비활성화하고 작업 디렉터리를 격리합니다.",
+    "example": "export CLAUDE_CODE_RESTRICTED=1"
+  },
+  "SendFeedback": {
+    "title": "SendFeedback — 피드백 보고서 초안 생성 도구",
+    "desc": "세션 중 오류나 문제가 발생했을 때 Claude가 자동으로 피드백 리포트 초안을 작성하여 /feedback에서 검토 후 전송할 수 있게 합니다.",
+    "example": "/feedback"
+  },
+  "modelPicker": {
+    "title": "modelPicker — 맞춤형 모델 선택기 목록",
+    "desc": "/model 선택기 메뉴에 표시될 모델 목록을 정렬 및 라벨과 함께 직접 구성하거나 교체할 수 있습니다.",
+    "example": "\"modelPicker\": [\"claude-3-7-sonnet-latest\", \"claude-opus-5\"]"
+  },
+  "promptCacheTtl": {
+    "title": "promptCacheTtl — 메인 대화 프롬프트 캐시 TTL",
+    "desc": "메인 대화 세션의 프롬프트 캐시 유지 시간(예: '1h')을 설정합니다.",
+    "example": "\"promptCacheTtl\": \"1h\""
+  },
+  "subagentPromptCacheTtl": {
+    "title": "subagentPromptCacheTtl — 서브에이전트 캐시 TTL",
+    "desc": "서브에이전트 세션의 프롬프트 캐시 유지 시간(기본 5분)을 독립적으로 설정합니다.",
+    "example": "\"subagentPromptCacheTtl\": \"5m\""
+  },
+  "modelPricing": {
+    "title": "modelPricing — 조직 맞춤형 모델 단가 관리 설정",
+    "desc": "조직의 계약 단가 및 할인율을 /cost, 상태줄, 텔레메트리 비용 집계에 반영합니다.",
+    "example": "\"modelPricing\": { \"discountMultiplier\": 0.8 }"
+  },
   "wheelScrollAccelerationEnabled": {
     "title": "wheelScrollAccelerationEnabled — 터미널 스크롤 가속 활성화",
     "desc": "WSL2 터미널 등에서 마우스 휠 스크롤 감도를 가속화하여 긴 터미널 출력 기록을 더욱 빠르게 휠 스크롤 할 수 있도록 지원합니다.",

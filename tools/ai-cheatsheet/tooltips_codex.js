@@ -1,4 +1,39 @@
 window.CODEX_TIPS = {
+  "codex agents": {
+    "title": "codex agents — 대화형 작업 관리 대시보드",
+    "desc": "터미널에서 여러 에이전트 작업을 인터랙티브하게 검색, 시작, 열기, 이름 변경, 중단할 수 있는 TUI 대시보드입니다.",
+    "example": "codex agents"
+  },
+  "codex queue": {
+    "title": "codex queue — 백그라운드 세션 큐 관리",
+    "desc": "터미널 창을 직접 열지 않고도 백그라운드 세션에 작업을 전달하고 실행 큐를 관리합니다.",
+    "example": "codex queue"
+  },
+  "codex exec fork": {
+    "title": "codex exec fork — 세션 포크(분기)",
+    "desc": "기존 대화 맥락을 유지한 채 새로운 세션으로 포크하여 독립적인 실험 및 작업을 진행합니다.",
+    "example": "codex exec fork <session-id>"
+  },
+  "/copy": {
+    "title": "/copy — 대화/코드블록 복사 선택기",
+    "desc": "선택기(Picker)를 통해 전체 응답, 개별 코드 블록, 인용구를 선택하여 클립보드에 복사합니다.",
+    "example": "/copy"
+  },
+  "/export": {
+    "title": "/export — 대화 Markdown 내보내기",
+    "desc": "전체 TUI 대화 기록을 클립보드에 복사하거나 Markdown 파일로 저장합니다.",
+    "example": "/export\n/export session-log.md"
+  },
+  "/cd": {
+    "title": "/cd — 세션 작업 디렉터리 변경",
+    "desc": "세션을 종료하지 않고 현재 작업 디렉터리를 새로운 경로로 변경합니다.",
+    "example": "/cd /path/to/project"
+  },
+  "/pwd": {
+    "title": "/pwd — 현재 작업 디렉터리 확인",
+    "desc": "현재 세션이 위치한 작업 디렉터리의 절대 경로를 출력합니다.",
+    "example": "/pwd"
+  },
   "/delete": {
     "title": "/delete — 세션 영구 삭제",
     "desc": "보안 승인 절차를 거쳐 현재 세션 데이터 및 히스토리를 데이터베이스에서 영구적으로 완전히 삭제합니다.",
