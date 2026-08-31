@@ -1878,5 +1878,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-08-25T15:00:00+09:00",
     "activeUntil": "2026-08-25T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260824|stable|accumulation|278470-swing_touch",
+    "runId": "replay-20260825-060543-cb89e58a",
+    "date": "2026-08-24",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "278470",
+    "name": "에이피알",
+    "side": "SELL",
+    "orderType": "LIMIT",
+    "requestedAt": "2026-08-28T15:00:00+09:00",
+    "requestedPrice": 453435.0,
+    "quantityPct": 35.0,
+    "reason": "스윙 목표가 도달",
+    "sourceEntryKey": "20260824|stable|accumulation|278470",
+    "stageKey": "swing",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-28T15:00:00+09:00",
+    "activeUntil": "2026-08-28T15:00:00+09:00"
   }
 ]

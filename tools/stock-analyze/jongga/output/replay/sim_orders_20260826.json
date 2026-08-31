@@ -1518,5 +1518,25 @@
     "activeFrom": "2026-08-27T15:00:00+09:00",
     "activeUntil": "2026-08-27T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260826|stable|accumulation|402340-stop_touch",
+    "runId": "replay-20260827-060554-d3e352bc",
+    "date": "2026-08-26",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-28T15:00:00+09:00",
+    "requestedPrice": 1034000.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260826|stable|accumulation|402340",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-28T15:00:00+09:00",
+    "activeUntil": "2026-08-28T15:00:00+09:00"
   }
 ]

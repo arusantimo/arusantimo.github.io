@@ -922,5 +922,26 @@
     "barLow": 83400.0,
     "barClose": 86300.0,
     "fillRule": "third_day_cutoff_market"
+  },
+  {
+    "orderId": "20260826|stable|accumulation|402340-stop_touch",
+    "sourceEntryKey": "20260826|stable|accumulation|402340",
+    "strategy": "accumulation",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-28T15:00:00+09:00",
+    "fillPrice": 1034000.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-28T15:00:00+09:00",
+    "barOpen": 1063000.0,
+    "barHigh": 1075000.0,
+    "barLow": 1026000.0,
+    "barClose": 1028000.0,
+    "fillRule": "stop_touch"
   }
 ]

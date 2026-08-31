@@ -796,5 +796,26 @@
     "barLow": 406000.0,
     "barClose": 421000.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260824|stable|accumulation|278470-swing_touch",
+    "sourceEntryKey": "20260824|stable|accumulation|278470",
+    "strategy": "accumulation",
+    "code": "278470",
+    "name": "에이피알",
+    "side": "SELL",
+    "stageKey": "swing",
+    "reason": "스윙 목표가 도달",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-28T15:00:00+09:00",
+    "fillPrice": 453435.0,
+    "filledQuantityPct": 35.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-28T15:00:00+09:00",
+    "barOpen": 437000.0,
+    "barHigh": 464500.0,
+    "barLow": 435500.0,
+    "barClose": 461500.0,
+    "fillRule": "swing_touch"
   }
 ]

@@ -12,18 +12,6 @@
     "sourceEntryKey": "20260821|stable|accumulation|012450"
   },
   {
-    "runId": "replay-20260825-060543-cb89e58a",
-    "entryDate": "2026-08-24",
-    "code": "278470",
-    "name": "에이피알",
-    "strategy": "accumulation",
-    "entryPrice": 408908.5,
-    "swingTargetPrice": 453435.0,
-    "stopPrice": 394202.0,
-    "qtyPct": 35.0,
-    "sourceEntryKey": "20260824|stable|accumulation|278470"
-  },
-  {
     "runId": "replay-20260826-060605-792bda76",
     "entryDate": "2026-08-25",
     "code": "278470",
@@ -34,18 +22,6 @@
     "stopPrice": 424375.0,
     "qtyPct": 60.0,
     "sourceEntryKey": "20260825|stable|accumulation|278470"
-  },
-  {
-    "runId": "replay-20260827-060554-d3e352bc",
-    "entryDate": "2026-08-26",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 1059058.0,
-    "swingTargetPrice": 1174380.0,
-    "stopPrice": 1034000.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260826|stable|accumulation|402340"
   },
   {
     "runId": "replay-20260828-060539-bfa26b43",
@@ -70,5 +46,29 @@
     "stopPrice": 83420.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260827|stable|accumulation|034020"
+  },
+  {
+    "runId": "replay-20260831-060613-d2be3200",
+    "entryDate": "2026-08-28",
+    "code": "006400",
+    "name": "삼성SDI",
+    "strategy": "accumulation",
+    "entryPrice": 571571.0,
+    "swingTargetPrice": 633810.0,
+    "stopPrice": 553870.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260828|stable|accumulation|006400"
+  },
+  {
+    "runId": "replay-20260831-060613-d2be3200",
+    "entryDate": "2026-08-28",
+    "code": "009150",
+    "name": "삼성전기",
+    "strategy": "accumulation",
+    "entryPrice": 1419418.0,
+    "swingTargetPrice": 1573980.0,
+    "stopPrice": 1398000.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260828|stable|accumulation|009150"
   }
 ]
