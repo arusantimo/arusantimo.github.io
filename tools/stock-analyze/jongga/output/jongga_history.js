@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-08-31T06:05:57+00:00",
+    "generatedAt": "2026-08-31T08:35:02+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.8,
         "statusLabel": "매수추천",
         "entryEligible": true,
-        "currentPrice": 581000
+        "currentPrice": 577000
       },
       {
         "strategy": "pullback",
@@ -41,39 +41,54 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, G13)",
         "entryEligible": false,
-        "currentPrice": 125200
+        "currentPrice": 125500
       },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
-        "name": "LG이노텍",
-        "code": "011070",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "name": "KB금융",
+        "code": "105560",
+        "score": 10.5,
+        "signalScore": 10.5,
+        "strictScore": 10.5,
         "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2)",
+        "grade": "A",
+        "gradeScore": 8.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, Q1, G13)",
         "entryEligible": false,
-        "currentPrice": 640000
+        "currentPrice": 173300
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "LG이노텍",
-        "code": "011070",
+        "name": "알테오젠",
+        "code": "196170",
         "score": 8.2,
         "signalScore": 8.2,
         "strictScore": 8.2,
         "scoreMax": 14.0,
         "grade": "B",
         "gradeScore": 5.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 640000
+        "currentPrice": 307500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
+        "entryEligible": false,
+        "currentPrice": 642000
       },
       {
         "strategy": "accumulation",
@@ -103,7 +118,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.9,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 216000
+        "currentPrice": 216500
       },
       {
         "strategy": "reversal",
@@ -123,8 +138,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "RISE 200",
-        "code": "148020",
+        "name": "LG이노텍",
+        "code": "011070",
         "score": 8.1,
         "signalScore": 8.1,
         "strictScore": 8.1,
@@ -133,22 +148,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 107395
+        "currentPrice": 642000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "LG전자",
         "code": "066570",
-        "score": 7.2,
-        "signalScore": 7.2,
-        "strictScore": 7.2,
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 7.2,
+        "gradeScore": 8.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 216000
+        "currentPrice": 216500
       }
     ],
     "blacklist": [
