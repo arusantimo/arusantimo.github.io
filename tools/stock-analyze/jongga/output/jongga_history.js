@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-01T06:05:59+00:00",
+    "generatedAt": "2026-09-01T08:35:09+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, G13)",
         "entryEligible": false,
-        "currentPrice": 135600
+        "currentPrice": 135300
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 10.0,
+        "signalScore": 10.0,
+        "strictScore": 10.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
+        "entryEligible": false,
+        "currentPrice": 171200
       },
       {
         "strategy": "pullback",
@@ -46,19 +61,34 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 574000
       },
       {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 9.5,
+        "signalScore": 9.5,
+        "strictScore": 9.5,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 390500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "KB금융",
         "code": "105560",
-        "score": 10.0,
-        "signalScore": 10.0,
-        "strictScore": 10.0,
-        "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "제외",
         "entryEligible": false,
-        "currentPrice": 171350
+        "currentPrice": 171200
       },
       {
         "strategy": "accumulation",
@@ -78,53 +108,38 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "비에이치",
-        "code": "090460",
-        "score": 5.1,
-        "signalScore": 5.1,
-        "strictScore": 5.1,
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
+        "gradeScore": 4.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 22000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "비에이치",
-        "code": "090460",
-        "score": 9.2,
-        "signalScore": 9.2,
-        "strictScore": 9.2,
-        "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 9.2,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 22000
+        "currentPrice": 135300
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 8.3,
-        "signalScore": 8.3,
-        "strictScore": 8.3,
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 8.3,
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1068000
+        "currentPrice": 1067000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "SK하이닉스",
-        "code": "000660",
+        "name": "비에이치",
+        "code": "090460",
         "score": 6.5,
         "signalScore": 6.5,
         "strictScore": 6.5,
@@ -133,21 +148,25 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.5,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1697500
+        "currentPrice": 22000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.5,
+        "signalScore": 5.5,
+        "strictScore": 5.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1693000
       }
     ],
     "blacklist": [
-      {
-        "code": "373220",
-        "name": "LG에너지솔루션",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "009150",
         "name": "삼성전기",
