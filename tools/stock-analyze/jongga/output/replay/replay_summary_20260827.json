@@ -7,25 +7,25 @@
   "eligibleCount": 0,
   "includedCount": 0,
   "tradeCount": 10,
-  "winRate": 0.3,
-  "avgNetReturnPct": -1.0268,
-  "cumNetReturnPct": -1.0268,
-  "maxDrawdownPct": 1.0268,
+  "winRate": 0.2,
+  "avgNetReturnPct": -1.5132,
+  "cumNetReturnPct": -1.5132,
+  "maxDrawdownPct": 1.5132,
   "degradedCount": 10,
   "ambiguousCount": 0,
-  "unfilledRate": 0.2143,
+  "unfilledRate": 0.2069,
   "overall": {
     "candidateCount": 10,
     "eligibleCount": 0,
     "includedCount": 0,
     "tradeCount": 10,
-    "winRate": 0.3,
-    "avgNetReturnPct": -1.0268,
-    "cumNetReturnPct": -1.0268,
-    "maxDrawdownPct": 1.0268,
+    "winRate": 0.2,
+    "avgNetReturnPct": -1.5132,
+    "cumNetReturnPct": -1.5132,
+    "maxDrawdownPct": 1.5132,
     "degradedCount": 10,
     "ambiguousCount": 0,
-    "unfilledRate": 0.2143
+    "unfilledRate": 0.2069
   },
   "comparisonByCase": {
     "all": {
@@ -35,13 +35,13 @@
       "eligibleCount": 0,
       "includedCount": 0,
       "tradeCount": 10,
-      "winRate": 0.3,
-      "avgNetReturnPct": -1.0268,
-      "cumNetReturnPct": -1.0268,
-      "maxDrawdownPct": 1.0268,
+      "winRate": 0.2,
+      "avgNetReturnPct": -1.5132,
+      "cumNetReturnPct": -1.5132,
+      "maxDrawdownPct": 1.5132,
       "degradedCount": 10,
       "ambiguousCount": 0,
-      "unfilledRate": 0.2143
+      "unfilledRate": 0.2069
     },
     "a7plus": {
       "caseKey": "a7plus",
@@ -140,13 +140,13 @@
       "eligibleCount": 0,
       "includedCount": 0,
       "tradeCount": 3,
-      "winRate": 0.3333,
-      "avgNetReturnPct": -1.0036,
-      "cumNetReturnPct": -1.0036,
-      "maxDrawdownPct": 1.0036,
+      "winRate": 0.0,
+      "avgNetReturnPct": -2.6251,
+      "cumNetReturnPct": -2.6251,
+      "maxDrawdownPct": 2.6251,
       "degradedCount": 3,
       "ambiguousCount": 0,
-      "unfilledRate": 0.5238,
+      "unfilledRate": 0.4783,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -155,13 +155,13 @@
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 3,
-          "winRate": 0.3333,
-          "avgNetReturnPct": -1.0036,
-          "cumNetReturnPct": -1.0036,
-          "maxDrawdownPct": 1.0036,
+          "winRate": 0.0,
+          "avgNetReturnPct": -2.6251,
+          "cumNetReturnPct": -2.6251,
+          "maxDrawdownPct": 2.6251,
           "degradedCount": 3,
           "ambiguousCount": 0,
-          "unfilledRate": 0.5238
+          "unfilledRate": 0.4783
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -357,25 +357,6 @@
     },
     {
       "strategy": "accumulation",
-      "code": "034020",
-      "name": "두산에너빌리티",
-      "grade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.6,
-      "tradeCount": 1,
-      "winRate": 1.0,
-      "avgNetReturnPct": 1.8928,
-      "cumNetReturnPct": 1.8928,
-      "lastReplayDate": "2026-08-27",
-      "lastEntryFilledAt": "2026-08-27T15:30:00+09:00",
-      "lastEntryFillPrice": 86086.0,
-      "lastExitFilledAt": "2026-08-28T10:00:00+09:00",
-      "lastExitAvgFillPrice": 86700.0,
-      "lastExitFillPrice": 86700.0,
-      "lastTradeStatus": "open"
-    },
-    {
-      "strategy": "accumulation",
       "code": "010120",
       "name": "LS ELECTRIC",
       "grade": "B",
@@ -383,15 +364,34 @@
       "gradeScore": 6.2,
       "tradeCount": 1,
       "winRate": 0.0,
-      "avgNetReturnPct": -1.1272,
-      "cumNetReturnPct": -1.1272,
+      "avgNetReturnPct": -1.5591,
+      "cumNetReturnPct": -1.5591,
       "lastReplayDate": "2026-08-27",
       "lastEntryFilledAt": "2026-08-27T15:30:00+09:00",
       "lastEntryFillPrice": 219719.5,
-      "lastExitFilledAt": "2026-08-28T10:00:00+09:00",
-      "lastExitAvgFillPrice": 222500.0,
-      "lastExitFillPrice": 224000.0,
-      "lastTradeStatus": "open"
+      "lastExitFilledAt": "2026-08-31T15:00:00+09:00",
+      "lastExitAvgFillPrice": 216749.0,
+      "lastExitFillPrice": 212915.0,
+      "lastTradeStatus": "closed"
+    },
+    {
+      "strategy": "accumulation",
+      "code": "034020",
+      "name": "두산에너빌리티",
+      "grade": "B",
+      "replayGrade": "B",
+      "gradeScore": 5.6,
+      "tradeCount": 1,
+      "winRate": 0.0,
+      "avgNetReturnPct": -2.5399,
+      "cumNetReturnPct": -2.5399,
+      "lastReplayDate": "2026-08-27",
+      "lastEntryFilledAt": "2026-08-27T15:30:00+09:00",
+      "lastEntryFillPrice": 86086.0,
+      "lastExitFilledAt": "2026-08-31T15:00:00+09:00",
+      "lastExitAvgFillPrice": 84076.0,
+      "lastExitFillPrice": 83420.0,
+      "lastTradeStatus": "closed"
     },
     {
       "strategy": "accumulation",
@@ -574,13 +574,13 @@
       "eligibleCount": 0,
       "includedCount": 0,
       "tradeCount": 3,
-      "winRate": 0.3333,
-      "avgNetReturnPct": -1.0036,
-      "cumNetReturnPct": -1.0036,
-      "maxDrawdownPct": 1.0036,
+      "winRate": 0.0,
+      "avgNetReturnPct": -2.6251,
+      "cumNetReturnPct": -2.6251,
+      "maxDrawdownPct": 2.6251,
       "degradedCount": 3,
       "ambiguousCount": 0,
-      "unfilledRate": 0.5238,
+      "unfilledRate": 0.4783,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -589,13 +589,13 @@
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 3,
-          "winRate": 0.3333,
-          "avgNetReturnPct": -1.0036,
-          "cumNetReturnPct": -1.0036,
-          "maxDrawdownPct": 1.0036,
+          "winRate": 0.0,
+          "avgNetReturnPct": -2.6251,
+          "cumNetReturnPct": -2.6251,
+          "maxDrawdownPct": 2.6251,
           "degradedCount": 3,
           "ambiguousCount": 0,
-          "unfilledRate": 0.5238
+          "unfilledRate": 0.4783
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -851,9 +851,9 @@
     "accumulation|conservative": {
       "tradeCount": 3,
       "sampleCount": 3,
-      "winRate": 0.3333,
-      "avgNetReturnPct": -1.0036,
-      "cumNetReturnPct": -1.0036
+      "winRate": 0.0,
+      "avgNetReturnPct": -2.6251,
+      "cumNetReturnPct": -2.6251
     },
     "breakout|conservative": {
       "tradeCount": 1,
@@ -881,9 +881,9 @@
     "accumulation|box|weak|G-A|conservative": {
       "tradeCount": 3,
       "sampleCount": 3,
-      "winRate": 0.3333,
-      "avgNetReturnPct": -1.0036,
-      "cumNetReturnPct": -1.0036
+      "winRate": 0.0,
+      "avgNetReturnPct": -2.6251,
+      "cumNetReturnPct": -2.6251
     },
     "breakout|box|weak|G-A|conservative": {
       "tradeCount": 1,
@@ -900,8 +900,8 @@
       "cumNetReturnPct": 0.2176
     }
   },
-  "orderCount": 66,
-  "fillCount": 24,
+  "orderCount": 68,
+  "fillCount": 26,
   "candidates": [
     {
       "strategy": "pullback",
@@ -1676,12 +1676,12 @@
       "gradeScore": 6.2,
       "entryFilledAt": "2026-08-27T15:30:00+09:00",
       "entryFillPrice": 219719.5,
-      "exitFilledAt": "2026-08-28T10:00:00+09:00",
-      "exitAvgFillPrice": 222500.0,
-      "exitLastFillPrice": 224000.0,
-      "tradeStatus": "open",
-      "closedReason": "swing_hold",
-      "netReturnPct": -1.1272,
+      "exitFilledAt": "2026-08-31T15:00:00+09:00",
+      "exitAvgFillPrice": 216749.0,
+      "exitLastFillPrice": 212915.0,
+      "tradeStatus": "closed",
+      "closedReason": "stop_touch",
+      "netReturnPct": -1.5591,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-accumulation",
@@ -1705,7 +1705,7 @@
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
       },
-      "remainingQuantityPct": 60.0
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "accumulation",
@@ -1716,12 +1716,12 @@
       "gradeScore": 5.6,
       "entryFilledAt": "2026-08-27T15:30:00+09:00",
       "entryFillPrice": 86086.0,
-      "exitFilledAt": "2026-08-28T10:00:00+09:00",
-      "exitAvgFillPrice": 86700.0,
-      "exitLastFillPrice": 86700.0,
-      "tradeStatus": "open",
-      "closedReason": "swing_hold",
-      "netReturnPct": 1.8928,
+      "exitFilledAt": "2026-08-31T15:00:00+09:00",
+      "exitAvgFillPrice": 84076.0,
+      "exitLastFillPrice": 83420.0,
+      "tradeStatus": "closed",
+      "closedReason": "stop_touch",
+      "netReturnPct": -2.5399,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-accumulation",
@@ -1745,7 +1745,7 @@
         },
         "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
       },
-      "remainingQuantityPct": 80.0
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "breakout",
@@ -2238,16 +2238,16 @@
       "entryMode": "close",
       "entryFilledAt": "2026-08-27T15:30:00+09:00",
       "entryFillPrice": 219719.5,
-      "exitFilledAt": "2026-08-28T10:00:00+09:00",
-      "exitAvgFillPrice": 222500.0,
-      "exitLastFillPrice": 224000.0,
-      "netReturnPct": -1.1272,
-      "tradeStatus": "open",
+      "exitFilledAt": "2026-08-31T15:00:00+09:00",
+      "exitAvgFillPrice": 216749.0,
+      "exitLastFillPrice": 212915.0,
+      "netReturnPct": -1.5591,
+      "tradeStatus": "closed",
       "ambiguousCount": 0,
-      "remainingQuantityPct": 60.0,
-      "closedReason": "swing_hold",
-      "exitFillCount": 2,
-      "filledExitQuantityPct": 40.0,
+      "remainingQuantityPct": 0.0,
+      "closedReason": "stop_touch",
+      "exitFillCount": 3,
+      "filledExitQuantityPct": 100.0,
       "regimeBucket": "box",
       "vkospiTier": "weak",
       "gapGrade": "G-A",
@@ -2302,7 +2302,17 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-08-31T15:00:00+09:00",
+          "quantityPct": 60.0,
+          "price": 212915.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "stop_touch"
+        }
+      ]
     },
     {
       "runId": "replay-20260828-060539-bfa26b43",
@@ -2315,16 +2325,16 @@
       "entryMode": "close",
       "entryFilledAt": "2026-08-27T15:30:00+09:00",
       "entryFillPrice": 86086.0,
-      "exitFilledAt": "2026-08-28T10:00:00+09:00",
-      "exitAvgFillPrice": 86700.0,
-      "exitLastFillPrice": 86700.0,
-      "netReturnPct": 1.8928,
-      "tradeStatus": "open",
+      "exitFilledAt": "2026-08-31T15:00:00+09:00",
+      "exitAvgFillPrice": 84076.0,
+      "exitLastFillPrice": 83420.0,
+      "netReturnPct": -2.5399,
+      "tradeStatus": "closed",
       "ambiguousCount": 0,
-      "remainingQuantityPct": 80.0,
-      "closedReason": "swing_hold",
-      "exitFillCount": 1,
-      "filledExitQuantityPct": 20.0,
+      "remainingQuantityPct": 0.0,
+      "closedReason": "stop_touch",
+      "exitFillCount": 2,
+      "filledExitQuantityPct": 100.0,
       "regimeBucket": "box",
       "vkospiTier": "weak",
       "gapGrade": "G-A",
@@ -2379,7 +2389,17 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-08-31T15:00:00+09:00",
+          "quantityPct": 80.0,
+          "price": 83420.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "stop_touch"
+        }
+      ]
     },
     {
       "runId": "replay-20260828-060539-bfa26b43",
@@ -3318,6 +3338,48 @@
       "barLow": 213000.0,
       "barClose": 214000.0,
       "fillRule": "stop_close"
+    },
+    {
+      "orderId": "20260827|stable|accumulation|010120-stop_touch",
+      "sourceEntryKey": "20260827|stable|accumulation|010120",
+      "strategy": "accumulation",
+      "code": "010120",
+      "name": "LS ELECTRIC",
+      "side": "SELL",
+      "stageKey": "stop",
+      "reason": "스윙 손절가 이탈",
+      "fillStatus": "filled",
+      "filledAt": "2026-08-31T15:00:00+09:00",
+      "fillPrice": 212915.0,
+      "filledQuantityPct": 60.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-08-31T15:00:00+09:00",
+      "barOpen": 208000.0,
+      "barHigh": 208000.0,
+      "barLow": 199800.0,
+      "barClose": 207500.0,
+      "fillRule": "stop_touch"
+    },
+    {
+      "orderId": "20260827|stable|accumulation|034020-stop_touch",
+      "sourceEntryKey": "20260827|stable|accumulation|034020",
+      "strategy": "accumulation",
+      "code": "034020",
+      "name": "두산에너빌리티",
+      "side": "SELL",
+      "stageKey": "stop",
+      "reason": "스윙 손절가 이탈",
+      "fillStatus": "filled",
+      "filledAt": "2026-08-31T15:00:00+09:00",
+      "fillPrice": 83420.0,
+      "filledQuantityPct": 80.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-08-31T15:00:00+09:00",
+      "barOpen": 86400.0,
+      "barHigh": 86400.0,
+      "barLow": 81700.0,
+      "barClose": 82500.0,
+      "fillRule": "stop_touch"
     }
   ]
 }

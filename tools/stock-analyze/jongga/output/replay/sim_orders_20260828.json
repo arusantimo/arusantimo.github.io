@@ -1498,5 +1498,25 @@
     "activeFrom": "2026-08-31T15:00:00+09:00",
     "activeUntil": "2026-08-31T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260828|stable|accumulation|009150-stop_touch",
+    "runId": "replay-20260831-060613-d2be3200",
+    "date": "2026-08-28",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "009150",
+    "name": "삼성전기",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-08-31T15:00:00+09:00",
+    "requestedPrice": 1398000.0,
+    "quantityPct": 60.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260828|stable|accumulation|009150",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-08-31T15:00:00+09:00",
+    "activeUntil": "2026-08-31T15:00:00+09:00"
   }
 ]

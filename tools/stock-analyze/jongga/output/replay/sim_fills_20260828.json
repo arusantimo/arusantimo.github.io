@@ -565,5 +565,26 @@
     "barLow": 49100.0,
     "barClose": 50000.0,
     "fillRule": "time_stop_0915_market"
+  },
+  {
+    "orderId": "20260828|stable|accumulation|009150-stop_touch",
+    "sourceEntryKey": "20260828|stable|accumulation|009150",
+    "strategy": "accumulation",
+    "code": "009150",
+    "name": "삼성전기",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-08-31T15:00:00+09:00",
+    "fillPrice": 1398000.0,
+    "filledQuantityPct": 60.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-08-31T15:00:00+09:00",
+    "barOpen": 1370000.0,
+    "barHigh": 1461000.0,
+    "barLow": 1331000.0,
+    "barClose": 1458000.0,
+    "fillRule": "stop_touch"
   }
 ]

@@ -24,30 +24,6 @@
     "sourceEntryKey": "20260825|stable|accumulation|278470"
   },
   {
-    "runId": "replay-20260828-060539-bfa26b43",
-    "entryDate": "2026-08-27",
-    "code": "010120",
-    "name": "LS ELECTRIC",
-    "strategy": "accumulation",
-    "entryPrice": 219719.5,
-    "swingTargetPrice": 243645.0,
-    "stopPrice": 212915.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260827|stable|accumulation|010120"
-  },
-  {
-    "runId": "replay-20260828-060539-bfa26b43",
-    "entryDate": "2026-08-27",
-    "code": "034020",
-    "name": "두산에너빌리티",
-    "strategy": "accumulation",
-    "entryPrice": 86086.0,
-    "swingTargetPrice": 95460.0,
-    "stopPrice": 83420.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260827|stable|accumulation|034020"
-  },
-  {
     "runId": "replay-20260831-060613-d2be3200",
     "entryDate": "2026-08-28",
     "code": "006400",
@@ -58,17 +34,5 @@
     "stopPrice": 553870.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260828|stable|accumulation|006400"
-  },
-  {
-    "runId": "replay-20260831-060613-d2be3200",
-    "entryDate": "2026-08-28",
-    "code": "009150",
-    "name": "삼성전기",
-    "strategy": "accumulation",
-    "entryPrice": 1419418.0,
-    "swingTargetPrice": 1573980.0,
-    "stopPrice": 1398000.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260828|stable|accumulation|009150"
   }
 ]

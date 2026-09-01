@@ -1,5 +1,167 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-01",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260901.js",
+    "jsonFile": "jongga/output/202609/latest_20260901.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260901.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-01T06:05:59+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 11.5,
+        "signalScore": 11.5,
+        "strictScore": 11.5,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
+        "entryEligible": false,
+        "currentPrice": 135600
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 10.0,
+        "signalScore": 10.0,
+        "strictScore": 10.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+        "entryEligible": false,
+        "currentPrice": 574000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 10.0,
+        "signalScore": 10.0,
+        "strictScore": 10.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
+        "entryEligible": false,
+        "currentPrice": 171350
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 207500
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "비에이치",
+        "code": "090460",
+        "score": 5.1,
+        "signalScore": 5.1,
+        "strictScore": 5.1,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
+        "entryEligible": false,
+        "currentPrice": 22000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "비에이치",
+        "code": "090460",
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 22000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1068000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1697500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "373220",
+        "name": "LG에너지솔루션",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-08-31",
     "variant": "stable",
     "variantLabel": "현재 버전",
