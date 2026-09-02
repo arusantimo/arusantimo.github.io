@@ -34,5 +34,17 @@
     "stopPrice": 553870.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260828|stable|accumulation|006400"
+  },
+  {
+    "runId": "replay-20260902-061315-5615b361",
+    "entryDate": "2026-09-01",
+    "code": "066570",
+    "name": "LG전자",
+    "strategy": "accumulation",
+    "entryPrice": 207707.5,
+    "swingTargetPrice": 230325.0,
+    "stopPrice": 200238.0,
+    "qtyPct": 100.0,
+    "sourceEntryKey": "20260901|stable|accumulation|066570"
   }
 ]
