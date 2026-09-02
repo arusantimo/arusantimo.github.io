@@ -9,71 +9,41 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-02T06:13:12+00:00",
+    "generatedAt": "2026-09-02T08:35:20+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "SK이노베이션",
         "code": "096770",
-        "score": 8.4,
-        "signalScore": 8.4,
-        "strictScore": 8.4,
+        "score": 10.8,
+        "signalScore": 10.8,
+        "strictScore": 10.8,
         "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G12, G13)",
         "entryEligible": false,
-        "currentPrice": 131900
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "삼화콘덴서",
-        "code": "001820",
-        "score": 7.6,
-        "signalScore": 7.6,
-        "strictScore": 7.6,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
-        "entryEligible": false,
-        "currentPrice": 113100
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "레메디",
-        "code": "387690",
-        "score": 7.6,
-        "signalScore": 7.6,
-        "strictScore": 7.6,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G6, Q1)",
-        "entryEligible": false,
-        "currentPrice": 16860
+        "currentPrice": 131500
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "SK이노베이션",
         "code": "096770",
-        "score": 8.0,
-        "signalScore": 8.0,
-        "strictScore": 8.0,
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.2,
+        "grade": "A",
+        "gradeScore": 7.6,
         "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 131900
+        "currentPrice": 131500
       },
       {
         "strategy": "accumulation",
@@ -85,55 +55,40 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 6.6,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 5.1,
+        "gradeScore": 4.9,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 989000
+        "currentPrice": 982000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "삼성전기",
-        "code": "009150",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
         "scoreMax": 14.0,
         "grade": "C",
         "gradeScore": 4.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 1412000
+        "currentPrice": 1613000
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "SK이노베이션",
-        "code": "096770",
-        "score": 3.2,
-        "signalScore": 3.2,
-        "strictScore": 3.2,
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 4.5,
+        "signalScore": 4.5,
+        "strictScore": 4.5,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 2.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "gradeScore": 4.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G4)",
         "entryEligible": false,
-        "currentPrice": 131900
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "레메디",
-        "code": "387690",
-        "score": 8.3,
-        "signalScore": 8.3,
-        "strictScore": 8.3,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 8.3,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 16860
+        "currentPrice": 982000
       },
       {
         "strategy": "reversal",
@@ -164,9 +119,58 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 3090
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.1,
+        "signalScore": 5.1,
+        "strictScore": 5.1,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1613000
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "001820",
+        "name": "삼화콘덴서",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "387690",
+        "name": "레메디",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-09-01",
