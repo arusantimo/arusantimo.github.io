@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-03T06:05:11+00:00",
+    "generatedAt": "2026-09-03T08:34:55+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -41,9 +41,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G12, G13)",
         "entryEligible": false,
-        "currentPrice": 130900
+        "currentPrice": 130800
       },
       {
         "strategy": "accumulation",
@@ -61,19 +61,49 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 34650
       },
       {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "현대약품",
+        "code": "004310",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 7590
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 4.7,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 981000
+      },
+      {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "우리금융지주",
-        "code": "316140",
-        "score": 4.1,
-        "signalScore": 4.1,
-        "strictScore": 4.1,
+        "name": "삼성중공업",
+        "code": "010140",
+        "score": 3.9,
+        "signalScore": 3.9,
+        "strictScore": 3.9,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 3.3,
+        "gradeScore": 3.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
         "entryEligible": false,
-        "currentPrice": 34650
+        "currentPrice": 21650
       },
       {
         "strategy": "reversal",
@@ -89,6 +119,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 178000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "JW신약",
+        "code": "067290",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 3375
       },
       {
         "strategy": "reversal",
@@ -121,29 +166,6 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "code": "079650",
         "name": "서산",
-        "reasons": [
-          "투자 주의",
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "004310",
-        "name": "현대약품",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "067290",
-        "name": "JW신약",
         "reasons": [
           "투자 주의",
           "공매도 과열"
