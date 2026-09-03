@@ -775,5 +775,26 @@
     "barLow": 210000.0,
     "barClose": 220500.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260821|stable|accumulation|012450-stop_touch",
+    "sourceEntryKey": "20260821|stable|accumulation|012450",
+    "strategy": "accumulation",
+    "code": "012450",
+    "name": "한화에어로스페이스",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-09-02T15:00:00+09:00",
+    "fillPrice": 1047025.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-09-02T15:00:00+09:00",
+    "barOpen": 1048000.0,
+    "barHigh": 1053000.0,
+    "barLow": 1010000.0,
+    "barClose": 1025000.0,
+    "fillRule": "stop_touch"
   }
 ]

@@ -586,5 +586,26 @@
     "barLow": 1331000.0,
     "barClose": 1458000.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260828|stable|accumulation|006400-stop_touch",
+    "sourceEntryKey": "20260828|stable|accumulation|006400",
+    "strategy": "accumulation",
+    "code": "006400",
+    "name": "삼성SDI",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-09-02T15:00:00+09:00",
+    "fillPrice": 553870.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-09-02T15:00:00+09:00",
+    "barOpen": 553000.0,
+    "barHigh": 569000.0,
+    "barLow": 536000.0,
+    "barClose": 538000.0,
+    "fillRule": "stop_touch"
   }
 ]

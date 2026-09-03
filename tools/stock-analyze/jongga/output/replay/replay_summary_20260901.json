@@ -8,24 +8,24 @@
   "includedCount": 0,
   "tradeCount": 12,
   "winRate": 0.0,
-  "avgNetReturnPct": -3.6448,
-  "cumNetReturnPct": -3.6448,
-  "maxDrawdownPct": 3.6448,
+  "avgNetReturnPct": -3.7154,
+  "cumNetReturnPct": -3.7154,
+  "maxDrawdownPct": 3.7154,
   "degradedCount": 12,
   "ambiguousCount": 0,
-  "unfilledRate": 0.0986,
+  "unfilledRate": 0.0972,
   "overall": {
     "candidateCount": 12,
     "eligibleCount": 0,
     "includedCount": 0,
     "tradeCount": 12,
     "winRate": 0.0,
-    "avgNetReturnPct": -3.6448,
-    "cumNetReturnPct": -3.6448,
-    "maxDrawdownPct": 3.6448,
+    "avgNetReturnPct": -3.7154,
+    "cumNetReturnPct": -3.7154,
+    "maxDrawdownPct": 3.7154,
     "degradedCount": 12,
     "ambiguousCount": 0,
-    "unfilledRate": 0.0986
+    "unfilledRate": 0.0972
   },
   "comparisonByCase": {
     "all": {
@@ -36,12 +36,12 @@
       "includedCount": 0,
       "tradeCount": 12,
       "winRate": 0.0,
-      "avgNetReturnPct": -3.6448,
-      "cumNetReturnPct": -3.6448,
-      "maxDrawdownPct": 3.6448,
+      "avgNetReturnPct": -3.7154,
+      "cumNetReturnPct": -3.7154,
+      "maxDrawdownPct": 3.7154,
       "degradedCount": 12,
       "ambiguousCount": 0,
-      "unfilledRate": 0.0986
+      "unfilledRate": 0.0972
     },
     "a7plus": {
       "caseKey": "a7plus",
@@ -141,12 +141,12 @@
       "includedCount": 0,
       "tradeCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -3.484,
-      "cumNetReturnPct": -3.484,
-      "maxDrawdownPct": 3.484,
+      "avgNetReturnPct": -3.6956,
+      "cumNetReturnPct": -3.6956,
+      "maxDrawdownPct": 3.6956,
       "degradedCount": 4,
       "ambiguousCount": 0,
-      "unfilledRate": 0.25,
+      "unfilledRate": 0.2414,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -156,12 +156,12 @@
           "includedCount": 0,
           "tradeCount": 4,
           "winRate": 0.0,
-          "avgNetReturnPct": -3.484,
-          "cumNetReturnPct": -3.484,
-          "maxDrawdownPct": 3.484,
+          "avgNetReturnPct": -3.6956,
+          "cumNetReturnPct": -3.6956,
+          "maxDrawdownPct": 3.6956,
           "degradedCount": 4,
           "ambiguousCount": 0,
-          "unfilledRate": 0.25
+          "unfilledRate": 0.2414
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -414,25 +414,6 @@
     },
     {
       "strategy": "accumulation",
-      "code": "066570",
-      "name": "LG전자",
-      "grade": "B",
-      "replayGrade": "B",
-      "gradeScore": 5.6,
-      "tradeCount": 1,
-      "winRate": 0.0,
-      "avgNetReturnPct": -2.9521,
-      "cumNetReturnPct": -2.9521,
-      "lastReplayDate": "2026-09-01",
-      "lastEntryFilledAt": "2026-09-01T15:30:00+09:00",
-      "lastEntryFillPrice": 207707.5,
-      "lastExitFilledAt": null,
-      "lastExitAvgFillPrice": null,
-      "lastExitFillPrice": null,
-      "lastTradeStatus": "open"
-    },
-    {
-      "strategy": "accumulation",
       "code": "028260",
       "name": "삼성물산",
       "grade": "B",
@@ -448,6 +429,25 @@
       "lastExitFilledAt": "2026-09-02T15:00:00+09:00",
       "lastExitAvgFillPrice": 378000.0,
       "lastExitFillPrice": 374500.0,
+      "lastTradeStatus": "closed"
+    },
+    {
+      "strategy": "accumulation",
+      "code": "066570",
+      "name": "LG전자",
+      "grade": "B",
+      "replayGrade": "B",
+      "gradeScore": 5.6,
+      "tradeCount": 1,
+      "winRate": 0.0,
+      "avgNetReturnPct": -3.7986,
+      "cumNetReturnPct": -3.7986,
+      "lastReplayDate": "2026-09-01",
+      "lastEntryFilledAt": "2026-09-01T15:30:00+09:00",
+      "lastEntryFillPrice": 207707.5,
+      "lastExitFilledAt": "2026-09-02T15:00:00+09:00",
+      "lastExitAvgFillPrice": 200238.0,
+      "lastExitFillPrice": 200238.0,
       "lastTradeStatus": "closed"
     },
     {
@@ -613,12 +613,12 @@
       "includedCount": 0,
       "tradeCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -3.484,
-      "cumNetReturnPct": -3.484,
-      "maxDrawdownPct": 3.484,
+      "avgNetReturnPct": -3.6956,
+      "cumNetReturnPct": -3.6956,
+      "maxDrawdownPct": 3.6956,
       "degradedCount": 4,
       "ambiguousCount": 0,
-      "unfilledRate": 0.25,
+      "unfilledRate": 0.2414,
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
@@ -628,12 +628,12 @@
           "includedCount": 0,
           "tradeCount": 4,
           "winRate": 0.0,
-          "avgNetReturnPct": -3.484,
-          "cumNetReturnPct": -3.484,
-          "maxDrawdownPct": 3.484,
+          "avgNetReturnPct": -3.6956,
+          "cumNetReturnPct": -3.6956,
+          "maxDrawdownPct": 3.6956,
           "degradedCount": 4,
           "ambiguousCount": 0,
-          "unfilledRate": 0.25
+          "unfilledRate": 0.2414
         },
         "a7plus": {
           "caseKey": "a7plus",
@@ -890,8 +890,8 @@
       "tradeCount": 4,
       "sampleCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -3.484,
-      "cumNetReturnPct": -3.484
+      "avgNetReturnPct": -3.6956,
+      "cumNetReturnPct": -3.6956
     },
     "breakout|conservative": {
       "tradeCount": 1,
@@ -920,8 +920,8 @@
       "tradeCount": 4,
       "sampleCount": 4,
       "winRate": 0.0,
-      "avgNetReturnPct": -3.484,
-      "cumNetReturnPct": -3.484
+      "avgNetReturnPct": -3.6956,
+      "cumNetReturnPct": -3.6956
     },
     "breakout|box|weak|G-C|conservative": {
       "tradeCount": 1,
@@ -938,8 +938,8 @@
       "cumNetReturnPct": -4.3694
     }
   },
-  "orderCount": 83,
-  "fillCount": 27,
+  "orderCount": 84,
+  "fillCount": 28,
   "candidates": [
     {
       "strategy": "pullback",
@@ -1866,12 +1866,12 @@
       "gradeScore": 5.6,
       "entryFilledAt": "2026-09-01T15:30:00+09:00",
       "entryFillPrice": 207707.5,
-      "exitFilledAt": null,
-      "exitAvgFillPrice": null,
-      "exitLastFillPrice": null,
-      "tradeStatus": "open",
-      "closedReason": "swing_hold",
-      "netReturnPct": -2.9521,
+      "exitFilledAt": "2026-09-02T15:00:00+09:00",
+      "exitAvgFillPrice": 200238.0,
+      "exitLastFillPrice": 200238.0,
+      "tradeStatus": "closed",
+      "closedReason": "stop_touch",
+      "netReturnPct": -3.7986,
       "mixedExitPolicy": {
         "version": "mixed-exit-v1-balanced",
         "policyKey": "observe-accumulation",
@@ -1895,7 +1895,7 @@
         },
         "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
       },
-      "remainingQuantityPct": 100.0
+      "remainingQuantityPct": 0.0
     },
     {
       "strategy": "accumulation",
@@ -2612,16 +2612,16 @@
       "entryMode": "close",
       "entryFilledAt": "2026-09-01T15:30:00+09:00",
       "entryFillPrice": 207707.5,
-      "exitFilledAt": null,
-      "exitAvgFillPrice": null,
-      "exitLastFillPrice": null,
-      "netReturnPct": -2.9521,
-      "tradeStatus": "open",
+      "exitFilledAt": "2026-09-02T15:00:00+09:00",
+      "exitAvgFillPrice": 200238.0,
+      "exitLastFillPrice": 200238.0,
+      "netReturnPct": -3.7986,
+      "tradeStatus": "closed",
       "ambiguousCount": 0,
-      "remainingQuantityPct": 100.0,
-      "closedReason": "swing_hold",
-      "exitFillCount": 0,
-      "filledExitQuantityPct": 0,
+      "remainingQuantityPct": 0.0,
+      "closedReason": "stop_touch",
+      "exitFillCount": 1,
+      "filledExitQuantityPct": 100.0,
       "regimeBucket": "box",
       "vkospiTier": "weak",
       "gapGrade": "G-C",
@@ -2676,7 +2676,17 @@
       "inputArchiveVersion": "jongga_inputs.v1",
       "rebuildable": true,
       "pointInTime": true,
-      "pointInTimeStatus": "confirmed"
+      "pointInTimeStatus": "confirmed",
+      "positionEvents": [
+        {
+          "eventType": "exit",
+          "timestamp": "2026-09-02T15:00:00+09:00",
+          "quantityPct": 100.0,
+          "price": 200238.0,
+          "remainingQuantityPct": 0.0,
+          "fillRule": "stop_touch"
+        }
+      ]
     },
     {
       "runId": "replay-20260902-061315-5615b361",
@@ -3631,6 +3641,27 @@
       "barLow": 1612000.0,
       "barClose": 1630000.0,
       "fillRule": "time_stop_0915_market"
+    },
+    {
+      "orderId": "20260901|stable|accumulation|066570-stop_touch",
+      "sourceEntryKey": "20260901|stable|accumulation|066570",
+      "strategy": "accumulation",
+      "code": "066570",
+      "name": "LG전자",
+      "side": "SELL",
+      "stageKey": "stop",
+      "reason": "스윙 손절가 이탈",
+      "fillStatus": "filled",
+      "filledAt": "2026-09-02T15:00:00+09:00",
+      "fillPrice": 200238.0,
+      "filledQuantityPct": 100.0,
+      "slippagePct": 0.0,
+      "barTimestamp": "2026-09-02T15:00:00+09:00",
+      "barOpen": 199900.0,
+      "barHigh": 204500.0,
+      "barLow": 197500.0,
+      "barClose": 200500.0,
+      "fillRule": "stop_touch"
     }
   ]
 }

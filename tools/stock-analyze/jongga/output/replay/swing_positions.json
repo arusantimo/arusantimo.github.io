@@ -1,50 +1,38 @@
 [
   {
-    "runId": "replay-20260824-060547-f4aad4a4",
-    "entryDate": "2026-08-21",
-    "code": "012450",
-    "name": "한화에어로스페이스",
+    "runId": "replay-20260903-060525-9fd4aafe",
+    "entryDate": "2026-09-02",
+    "code": "096770",
+    "name": "SK이노베이션",
     "strategy": "accumulation",
-    "entryPrice": 1086085.0,
-    "swingTargetPrice": 1204350.0,
-    "stopPrice": 1047025.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260821|stable|accumulation|012450"
-  },
-  {
-    "runId": "replay-20260826-060605-792bda76",
-    "entryDate": "2026-08-25",
-    "code": "278470",
-    "name": "에이피알",
-    "strategy": "accumulation",
-    "entryPrice": 437937.5,
-    "swingTargetPrice": 485625.0,
-    "stopPrice": 424375.0,
+    "entryPrice": 131631.5,
+    "swingTargetPrice": 145965.0,
+    "stopPrice": 126900.0,
     "qtyPct": 60.0,
-    "sourceEntryKey": "20260825|stable|accumulation|278470"
+    "sourceEntryKey": "20260902|stable|accumulation|096770"
   },
   {
-    "runId": "replay-20260831-060613-d2be3200",
-    "entryDate": "2026-08-28",
-    "code": "006400",
-    "name": "삼성SDI",
+    "runId": "replay-20260903-060525-9fd4aafe",
+    "entryDate": "2026-09-02",
+    "code": "000660",
+    "name": "SK하이닉스",
     "strategy": "accumulation",
-    "entryPrice": 571571.0,
-    "swingTargetPrice": 633810.0,
-    "stopPrice": 553870.0,
+    "entryPrice": 1614613.0,
+    "swingTargetPrice": 1790430.0,
+    "stopPrice": 1548480.0,
     "qtyPct": 80.0,
-    "sourceEntryKey": "20260828|stable|accumulation|006400"
+    "sourceEntryKey": "20260902|stable|accumulation|000660"
   },
   {
-    "runId": "replay-20260902-061315-5615b361",
-    "entryDate": "2026-09-01",
-    "code": "066570",
-    "name": "LG전자",
-    "strategy": "accumulation",
-    "entryPrice": 207707.5,
-    "swingTargetPrice": 230325.0,
-    "stopPrice": 200238.0,
-    "qtyPct": 100.0,
-    "sourceEntryKey": "20260901|stable|accumulation|066570"
+    "runId": "replay-20260903-060525-9fd4aafe",
+    "entryDate": "2026-09-02",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "breakout",
+    "entryPrice": 982982.0,
+    "swingTargetPrice": 1109660.0,
+    "stopPrice": 977000.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260902|stable|breakout|402340"
   }
 ]

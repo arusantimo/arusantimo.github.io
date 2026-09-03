@@ -1658,5 +1658,25 @@
     "activeFrom": "2026-09-02T15:00:00+09:00",
     "activeUntil": "2026-09-02T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260901|stable|accumulation|066570-stop_touch",
+    "runId": "replay-20260902-061315-5615b361",
+    "date": "2026-09-01",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "066570",
+    "name": "LG전자",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-09-02T15:00:00+09:00",
+    "requestedPrice": 200238.0,
+    "quantityPct": 100.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260901|stable|accumulation|066570",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-09-02T15:00:00+09:00",
+    "activeUntil": "2026-09-02T15:00:00+09:00"
   }
 ]

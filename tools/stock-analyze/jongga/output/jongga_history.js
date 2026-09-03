@@ -1,5 +1,161 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-03",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260903.js",
+    "jsonFile": "jongga/output/202609/latest_20260903.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260903.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-03T06:05:11+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "success",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "우리금융지주",
+        "code": "316140",
+        "score": 11.7,
+        "signalScore": 11.7,
+        "strictScore": 11.7,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G13)",
+        "entryEligible": false,
+        "currentPrice": 34650
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
+        "entryEligible": false,
+        "currentPrice": 130900
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "우리금융지주",
+        "code": "316140",
+        "score": 10.4,
+        "signalScore": 10.4,
+        "strictScore": 10.4,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 34650
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "우리금융지주",
+        "code": "316140",
+        "score": 4.1,
+        "signalScore": 4.1,
+        "strictScore": 4.1,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 34650
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 8.4,
+        "signalScore": 8.4,
+        "strictScore": 8.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 178000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "우리금융지주",
+        "code": "316140",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 34650
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "088350",
+        "name": "한화생명",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "079650",
+        "name": "서산",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "004310",
+        "name": "현대약품",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "067290",
+        "name": "JW신약",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-02",
     "variant": "stable",
     "variantLabel": "현재 버전",

@@ -1618,5 +1618,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-08-26T15:00:00+09:00",
     "activeUntil": "2026-08-26T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260825|stable|accumulation|278470-stop_touch",
+    "runId": "replay-20260826-060605-792bda76",
+    "date": "2026-08-25",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "278470",
+    "name": "에이피알",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-09-02T15:00:00+09:00",
+    "requestedPrice": 424375.0,
+    "quantityPct": 60.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260825|stable|accumulation|278470",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-09-02T15:00:00+09:00",
+    "activeUntil": "2026-09-02T15:00:00+09:00"
   }
 ]

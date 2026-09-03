@@ -1518,5 +1518,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-08-31T15:00:00+09:00",
     "activeUntil": "2026-08-31T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260828|stable|accumulation|006400-stop_touch",
+    "runId": "replay-20260831-060613-d2be3200",
+    "date": "2026-08-28",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "006400",
+    "name": "삼성SDI",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-09-02T15:00:00+09:00",
+    "requestedPrice": 553870.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260828|stable|accumulation|006400",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-09-02T15:00:00+09:00",
+    "activeUntil": "2026-09-02T15:00:00+09:00"
   }
 ]
