@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-04T06:05:01+00:00",
+    "generatedAt": "2026-09-04T08:35:08+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 9.3,
         "statusLabel": "매매금지(핵심 Gate 미충족: G13)",
         "entryEligible": false,
-        "currentPrice": 138400
+        "currentPrice": 138300
       },
       {
         "strategy": "pullback",
@@ -41,24 +41,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 156700
+        "currentPrice": 157300
       },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
-        "name": "KB금융",
-        "code": "105560",
-        "score": 9.7,
-        "signalScore": 9.7,
-        "strictScore": 9.7,
+        "name": "하나금융지주",
+        "code": "086790",
+        "score": 10.3,
+        "signalScore": 10.3,
+        "strictScore": 10.3,
         "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.5,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G12, G13)",
+        "gradeScore": 7.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, Q1, G12)",
         "entryEligible": false,
-        "currentPrice": 172200
+        "currentPrice": 134300
       },
       {
         "strategy": "accumulation",
@@ -73,22 +73,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 138400
+        "currentPrice": 138300
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "대한항공",
-        "code": "003490",
-        "score": 8.7,
-        "signalScore": 8.7,
-        "strictScore": 8.7,
+        "name": "하나금융지주",
+        "code": "086790",
+        "score": 8.8,
+        "signalScore": 8.8,
+        "strictScore": 8.8,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 6.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "gradeScore": 6.3,
+        "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 30250
+        "currentPrice": 134300
       },
       {
         "strategy": "accumulation",
@@ -118,22 +118,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.8,
         "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 138400
+        "currentPrice": 138300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1041000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "SK이노베이션",
         "code": "096770",
-        "score": 8.6,
-        "signalScore": 8.6,
-        "strictScore": 8.6,
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.6,
+        "grade": "A",
+        "gradeScore": 7.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 138400
+        "currentPrice": 138300
       },
       {
         "strategy": "reversal",
