@@ -10,44 +10,65 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.17.21</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-08-19</span>
+        <span class="meta-version">v3.19.13</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-04</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.17.21)</span>
+        <span>📋 최근 변경사항 (v3.19.13)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Cloud Agents & Cursor Harness 대규모 강화 (2026-08-19)"
-            data-tt-desc="Cloud Agent가 이벤트에 반응하고, 목표 달성까지 상태를 유지하는 지속성(Goal Persistence)을 갖추어 장시간 자율 운영 체계로 진화했습니다."
-            data-tt-example="Cloud Agents">Cloud Agents &amp; Cursor Harness 대규모 강화: 이벤트 기반 자동화 및 목표 지속성 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cloud Agents 이벤트 구독(Subscriptions) (2026-08-19)"
-            data-tt-desc="PR 생성/업데이트, Slack 스레드, 정기 스케줄 등 이벤트 소스를 구독하여 새 활동 발생 시 에이전트가 자동 기동됩니다."
-            data-tt-example="Subscriptions">Cloud Agents 이벤트 소스(PR/Slack/스케줄) 구독 및 자동 기동 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Cloud Agents용 Builds 도입 (2026-08-13)"
-            data-tt-desc="개발 환경의 사전 빌드 복사본(Builds)을 활용해 Cloud Agent 부팅 시간을 10배 단축하고 의존성 설치 없이 즉시 작업을 시작합니다."
-            data-tt-example="Cloud Agents > Builds">Cloud Agents용 Builds(개발 환경 스냅샷) 도입으로 부팅 속도 10배 단축 (2026-08-13) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Google Workspace 플러그인 지원 (2026-08-03)"
-            data-tt-desc="에디터 내 코딩 에이전트가 Gmail, Google Drive, Google Calendar와 직접 연동하여 작업할 수 있는 플러그인이 추가되었습니다."
-            data-tt-example="Google Workspace Plugin">Google Workspace 플러그인(Gmail, Drive, Calendar) 직접 연동 지원 (2026-08-03) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="독립 Origin 저장소 자동 생성 (2026-08-19)"
-            data-tt-desc="외부 SCM 연결 없이도 레포 선택기에서 처음부터 작업을 시작하면 Cursor가 독립 Origin 저장소를 자동 생성합니다."
-            data-tt-example="Repo Picker > New">외부 SCM 연결 없는 독립 Origin 저장소 자동 생성 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="라이브 미리보기 및 Vercel 원클릭 배포 (2026-08-19)"
-            data-tt-desc="Cloud Agent 환경을 브라우저로 포트 포워딩하여 실시간 미리보기를 제공하며, 연결된 Vercel 계정으로 즉시 배포할 수 있습니다."
-            data-tt-example="Live Preview > Deploy">Cloud Agent 라이브 포트 포워딩 미리보기 및 Vercel 연동 배포 지원 (2026-08-19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Self-Hosted Cloud Agents 지원"
-            data-tt-desc="코드와 빌드 출력, 시크릿을 자체 인프라 내에 격리 유지하면서 Cursor 클라우드 에이전트 경험을 활용할 수 있습니다."
-            data-tt-example="Self-hosted Agents">자체 인프라 보안 유지를 위한 Self-Hosted Cloud Agents 지원 <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Self-Hosted Machines 정식 지원 (v3.19)"
+            data-tt-desc="도구 실행, 코드베이스 파일, 빌드 결과물, 시크릿을 자체 인프라 내에 격리 유지하면서 Cursor 오케스트레이션 루프를 활용합니다."
+            data-tt-example="Self-hosted Machines">Self-Hosted Machines 정식 지원: 사내 인프라 내 완벽한 코드/시크릿 격리 실행 (v3.19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Team Pools 동적 스케줄링 (v3.19)"
+            data-tt-desc="수요에 맞춰 동적으로 확장되고 유휴 시 절전(휴면)되는 워커 큐를 구성해 비용을 최적화합니다."
+            data-tt-example="Team Pools">Team Pools 동적 스케줄링 및 유휴 시 자동 절전/휴면 비용 최적화 (v3.19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="샌드박스 인프라 공급자 대폭 확장 (v3.19)"
+            data-tt-desc="AWS Lambda, Coder, Cloudflare, Daytona, Modal, Namespace, Vercel, E2B 등 다양한 인프라에서 Cloud Agent를 실행할 수 있습니다."
+            data-tt-example="">샌드박스 인프라 확장(AWS Lambda, Cloudflare, Daytona, Modal, E2B 등) (v3.19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Computer Use (컴퓨터 직접 조작) 지원 (v3.19)"
+            data-tt-desc="Linux 및 Mac Self-hosted 워커에서 에이전트가 클릭, 타이핑, 스크린샷, 브라우저 조작을 직접 수행합니다."
+            data-tt-example="Computer Use">Linux/Mac Self-hosted 워커 Computer Use(클릭/타이핑/스크린샷/브라우저 조작) 지원 (v3.19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="워크스페이스 세션 지속성 및 대화 마이그레이션 개선 (v3.19)"
+            data-tt-desc="대규모 세션의 로컬 데이터 저장소 및 워크스페이스 간 대화 기록 마이그레이션 안정성을 개선했습니다."
+            data-tt-example="">워크스페이스 세션 지속성 및 대화 기록 마이그레이션 안정화 (v3.19) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.17~v3.17.21</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Cloud Agents & Cursor Harness 대규모 강화 (2026-08-19)"
+                data-tt-desc="Cloud Agent가 이벤트에 반응하고, 목표 달성까지 상태를 유지하는 지속성(Goal Persistence)을 갖추어 장시간 자율 운영 체계로 진화했습니다."
+                data-tt-example="Cloud Agents">Cloud Agents &amp; Cursor Harness 대규모 강화: 이벤트 기반 자동화 및 목표 지속성 지원 (2026-08-19)</li>
+              <li class="cl-tip" data-tt-title="Cloud Agents 이벤트 구독(Subscriptions) (2026-08-19)"
+                data-tt-desc="PR 생성/업데이트, Slack 스레드, 정기 스케줄 등 이벤트 소스를 구독하여 새 활동 발생 시 에이전트가 자동 기동됩니다."
+                data-tt-example="Subscriptions">Cloud Agents 이벤트 소스(PR/Slack/스케줄) 구독 및 자동 기동 지원 (2026-08-19)</li>
+              <li class="cl-tip" data-tt-title="Cloud Agents용 Builds 도입 (2026-08-13)"
+                data-tt-desc="개발 환경의 사전 빌드 복사본(Builds)을 활용해 Cloud Agent 부팅 시간을 10배 단축하고 의존성 설치 없이 즉시 작업을 시작합니다."
+                data-tt-example="Cloud Agents > Builds">Cloud Agents용 Builds(개발 환경 스냅샷) 도입으로 부팅 속도 10배 단축 (2026-08-13)</li>
+              <li class="cl-tip" data-tt-title="Google Workspace 플러그인 지원 (2026-08-03)"
+                data-tt-desc="에디터 내 코딩 에이전트가 Gmail, Google Drive, Google Calendar와 직접 연동하여 작업할 수 있는 플러그인이 추가되었습니다."
+                data-tt-example="Google Workspace Plugin">Google Workspace 플러그인(Gmail, Drive, Calendar) 직접 연동 지원 (2026-08-03)</li>
+              <li class="cl-tip" data-tt-title="독립 Origin 저장소 자동 생성 (2026-08-19)"
+                data-tt-desc="외부 SCM 연결 없이도 레포 선택기에서 처음부터 작업을 시작하면 Cursor가 독립 Origin 저장소를 자동 생성합니다."
+                data-tt-example="Repo Picker > New">외부 SCM 연결 없는 독립 Origin 저장소 자동 생성 지원 (2026-08-19)</li>
+              <li class="cl-tip" data-tt-title="라이브 미리보기 및 Vercel 원클릭 배포 (2026-08-19)"
+                data-tt-desc="Cloud Agent 환경을 브라우저로 포트 포워딩하여 실시간 미리보기를 제공하며, 연결된 Vercel 계정으로 즉시 배포할 수 있습니다."
+                data-tt-example="Live Preview > Deploy">Cloud Agent 라이브 포트 포워딩 미리보기 및 Vercel 연동 배포 지원 (2026-08-19)</li>
+              <li class="cl-tip" data-tt-title="Self-Hosted Cloud Agents 지원"
+                data-tt-desc="코드와 빌드 출력, 시크릿을 자체 인프라 내에 격리 유지하면서 Cursor 클라우드 에이전트 경험을 활용할 수 있습니다."
+                data-tt-example="Self-hosted Agents">자체 인프라 보안 유지를 위한 Self-Hosted Cloud Agents 지원</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.10~v3.11</summary>

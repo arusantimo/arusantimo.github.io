@@ -10,50 +10,68 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.11.0</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-08-26</span>
+        <span class="meta-version">v2.12.2</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-03</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.11.0)</span>
+        <span>📋 최근 변경사항 (v2.12.2)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Generative UI 도입 및 차트 지원 (v2.11.0)"
-            data-tt-desc="채팅창 내에서 HTML 아티팩트를 인라인으로 렌더링하며 KaTeX 수식, Chart.js, Plotly 인터랙티브 차트를 직접 시각화합니다."
-            data-tt-example="">Generative UI 도입: HTML 아티팩트 인라인 렌더링, KaTeX 수식, Chart.js/Plotly 지원 (v2.11.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="외부 파일 인라인 참조 (@path/to/) 지원 (v2.11.0)"
-            data-tt-desc="AGENTS.md 및 커스텀 규칙 파일에서 @path/to/file 문법으로 외부 파일 내용을 손쉽게 인라인 참조할 수 있습니다."
-            data-tt-example="@docs/rules.md"><code>@path/to/file</code> 문법으로 <code>AGENTS.md</code>/규칙 내 외부 파일 인라인 참조 지원 (v2.11.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="YAML Frontmatter 메타데이터 카드 렌더링 (v2.11.0)"
-            data-tt-desc="마크다운 파일의 YAML 프론트매터를 시각적인 메타데이터 카드로 자동 렌더링합니다."
-            data-tt-example="">마크다운 YAML Frontmatter 서식 메타데이터 카드 렌더링 지원 (v2.11.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="사이드바 내장 터미널(Embedded Terminal) (v2.10.0)"
-            data-tt-desc="Ctrl/Cmd + \` 단축키로 사이드바 내장 터미널을 열어 앱을 벗어나지 않고 빌드 및 테스트 스크립트를 실행할 수 있습니다."
-            data-tt-example="Ctrl + \`">사이드바 내장 터미널(<code>Ctrl/Cmd + \`</code>) 추가로 앱 내 빌드/테스트 실행 지원 (v2.10.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Review 창 Git 네이티브 버전 관리 (v2.10.0)"
-            data-tt-desc="Review 패널에서 워킹 트리 diff를 검사하고 변경된 파일들의 스테이징/언스테이징을 직접 제어할 수 있습니다."
-            data-tt-example="Review Pane">Review 패널 내 Git 네이티브 버전 관리(워킹 트리 diff, 스테이징 제어) 추가 (v2.10.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="대화형 이미지 코멘트 & 풍부한 MCP 도구 미리보기 (v2.10.0)"
-            data-tt-desc="이미지 첨부 파일에 인터랙티브 코멘트를 작성하고 MCP 도구 실행 결과를 풍부한 미리보기로 확인합니다."
-            data-tt-example="">대화형 이미지 코멘트 및 풍부한 MCP 도구 실행 미리보기 지원 (v2.10.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="사이드바 폴더 확장/축소 상태 기억 (v2.8.0)"
-            data-tt-desc="사이드바 폴더의 확장/축소 상태가 지속 저장되며 아티팩트 미리보기의 신뢰성이 향상되었습니다."
-            data-tt-example="">사이드바 폴더 확장/축소 상태 기억 및 아티팩트 미리보기 안정화 (v2.8.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="이미지 diff 좌우 비교(Side-by-side) 뷰 (v2.7.1)"
-            data-tt-desc="이미지 변경점을 좌우 비교 뷰로 시각화하고 스크린 리더 및 키보드 접근성을 크게 개선했습니다."
-            data-tt-example="">이미지 diff 좌우 비교(Side-by-side) 뷰 및 접근성(a11y) 강화 (v2.7.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Gemini Enterprise & Workforce Identity SSO 지원 (v2.5.0)"
-            data-tt-desc="Gemini Enterprise 계정 및 Workforce Identity Federation 기반의 Advanced SSO 로그인을 지원합니다."
-            data-tt-example="Enterprise SSO">Gemini Enterprise 및 Workforce Identity Federation(Advanced SSO) 로그인 지원 (v2.5.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Gemini 3.8 Flash 추론 모델 ADC 지원 (v2.12.2)"
+            data-tt-desc="엔터프라이즈 환경에서 Application Default Credentials(ADC)를 통해 Google의 최신 Gemini 3.8 Flash 추론 모델을 에이전트 태스크에 활용할 수 있습니다."
+            data-tt-example="">Gemini 3.8 Flash 추론 모델 ADC(Application Default Credentials) 기업 지원 (v2.12.2) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="텍스트 하이라이트 인용(Quoting) (v2.12.0)"
+            data-tt-desc="이전 응답의 특정 텍스트를 드래그하여 후속 프롬프트의 컨텍스트로 즉시 인용할 수 있습니다."
+            data-tt-example="">이전 응답 텍스트 하이라이트 인용(Quoting) 기능 추가 (v2.12.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/boost 멀티 에이전트 추론 가속 (v2.12.0)"
+            data-tt-desc="멀티 에이전트 추론 파이프라인을 구동하여 복잡한 설계 및 코딩 작업 시 사고(thinking) 깊이와 해결 품질을 극대화합니다."
+            data-tt-example="/boost"><code>/boost</code> 멀티 에이전트 추론 파이프라인 및 사고(Thinking) 강화 지원 (v2.12.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="설정 내 프로젝트 오버라이드 시각화 (v2.12.0)"
+            data-tt-desc="General Settings에서 프로젝트별 설정 오버라이드 항목을 명확히 표시하고 해당 프로젝트 설정으로 바로 이동하는 링크를 제공합니다."
+            data-tt-example="Settings">일반 설정 내 프로젝트별 오버라이드 상태 시각화 및 바로가기 링크 제공 (v2.12.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.5.0~v2.11.0</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Generative UI 도입 및 차트 지원 (v2.11.0)"
+                data-tt-desc="채팅창 내에서 HTML 아티팩트를 인라인으로 렌더링하며 KaTeX 수식, Chart.js, Plotly 인터랙티브 차트를 직접 시각화합니다."
+                data-tt-example="">Generative UI 도입: HTML 아티팩트 인라인 렌더링, KaTeX 수식, Chart.js/Plotly 지원 (v2.11.0)</li>
+              <li class="cl-tip" data-tt-title="외부 파일 인라인 참조 (@path/to/) 지원 (v2.11.0)"
+                data-tt-desc="AGENTS.md 및 커스텀 규칙 파일에서 @path/to/file 문법으로 외부 파일 내용을 손쉽게 인라인 참조할 수 있습니다."
+                data-tt-example="@docs/rules.md"><code>@path/to/file</code> 문법으로 <code>AGENTS.md</code>/규칙 내 외부 파일 인라인 참조 지원 (v2.11.0)</li>
+              <li class="cl-tip" data-tt-title="YAML Frontmatter 메타데이터 카드 렌더링 (v2.11.0)"
+                data-tt-desc="마크다운 파일의 YAML 프론트매터를 시각적인 메타데이터 카드로 자동 렌더링합니다."
+                data-tt-example="">마크다운 YAML Frontmatter 서식 메타데이터 카드 렌더링 지원 (v2.11.0)</li>
+              <li class="cl-tip" data-tt-title="사이드바 내장 터미널(Embedded Terminal) (v2.10.0)"
+                data-tt-desc="Ctrl/Cmd + \` 단축키로 사이드바 내장 터미널을 열어 앱을 벗어나지 않고 빌드 및 테스트 스크립트를 실행할 수 있습니다."
+                data-tt-example="Ctrl + \`">사이드바 내장 터미널(<code>Ctrl/Cmd + \`</code>) 추가로 앱 내 빌드/테스트 실행 지원 (v2.10.0)</li>
+              <li class="cl-tip" data-tt-title="Review 창 Git 네이티브 버전 관리 (v2.10.0)"
+                data-tt-desc="Review 패널에서 워킹 트리 diff를 검사하고 변경된 파일들의 스테이징/언스테이징을 직접 제어할 수 있습니다."
+                data-tt-example="Review Pane">Review 패널 내 Git 네이티브 버전 관리(워킹 트리 diff, 스테이징 제어) 추가 (v2.10.0)</li>
+              <li class="cl-tip" data-tt-title="대화형 이미지 코멘트 & 풍부한 MCP 도구 미리보기 (v2.10.0)"
+                data-tt-desc="이미지 첨부 파일에 인터랙티브 코멘트를 작성하고 MCP 도구 실행 결과를 풍부한 미리보기로 확인합니다."
+                data-tt-example="">대화형 이미지 코멘트 및 풍부한 MCP 도구 실행 미리보기 지원 (v2.10.0)</li>
+              <li class="cl-tip" data-tt-title="사이드바 폴더 확장/축소 상태 기억 (v2.8.0)"
+                data-tt-desc="사이드바 폴더의 확장/축소 상태가 지속 저장되며 아티팩트 미리보기의 신뢰성이 향상되었습니다."
+                data-tt-example="">사이드바 폴더 확장/축소 상태 기억 및 아티팩트 미리보기 안정화 (v2.8.0)</li>
+              <li class="cl-tip" data-tt-title="이미지 diff 좌우 비교(Side-by-side) 뷰 (v2.7.1)"
+                data-tt-desc="이미지 변경점을 좌우 비교 뷰로 시각화하고 스크린 리더 및 키보드 접근성을 크게 개선했습니다."
+                data-tt-example="">이미지 diff 좌우 비교(Side-by-side) 뷰 및 접근성(a11y) 강화 (v2.7.1)</li>
+              <li class="cl-tip" data-tt-title="Gemini Enterprise & Workforce Identity SSO 지원 (v2.5.0)"
+                data-tt-desc="Gemini Enterprise 계정 및 Workforce Identity Federation 기반의 Advanced SSO 로그인을 지원합니다."
+                data-tt-example="Enterprise SSO">Gemini Enterprise 및 Workforce Identity Federation(Advanced SSO) 로그인 지원 (v2.5.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.4.2~v2.4.3</summary>

@@ -1,4 +1,9 @@
 window.ANTIGRAVITY_TIPS = {
+  "/boost": {
+    "title": "/boost — 멀티 에이전트 추론 가속",
+    "desc": "멀티 에이전트 추론 파이프라인을 작동시켜 복잡한 문제 해결 시 에이전트의 사고(thinking) 깊이와 답변 품질을 대폭 강화합니다.",
+    "example": "/boost"
+  },
   "agy changelog": {
     "title": "agy changelog — CLI 릴리스 노트 출력",
     "desc": "Antigravity CLI의 버전별 릴리스 노트와 변경 내역을 터미널에 출력합니다.",

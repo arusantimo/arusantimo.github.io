@@ -10,62 +10,83 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.150.1</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-08-27</span>
+        <span class="meta-version">v0.153.4</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-04</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.150.1)</span>
+        <span>📋 최근 변경사항 (v0.153.4)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="원격 압축 이미지 토큰 버짓 최적화 (v0.150.1)"
-            data-tt-desc="원격 압축 시 보존된 이미지를 토큰 예산에 기본 포함하여 오래된 이미지를 정리하고 긴 세션의 토큰 소비를 예측 가능하게 유지합니다."
-            data-tt-example="">원격 압축 이미지 토큰 버짓 최적화 및 장기 세션 예측성 개선 (v0.150.1) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="@ 멘션으로 다른 Codex 작업 참조·메시지 (v0.150.0)"
-            data-tt-desc="@ 멘션으로 다른 Codex 태스크를 참조하고, 터미널에서 작업을 생성하거나 직접 메시지를 주고받을 수 있습니다."
-            data-tt-example="@task-123"><code>@</code> 멘션 기반 작업(Task) 참조, 생성 및 터미널 간 직접 메시징 지원 (v0.150.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/copy 선택기 도입 (v0.150.0)"
-            data-tt-desc="/copy 명령에 선택기가 추가되어 전체 응답, 개별 코드 블록, 인용구를 선택해 클립보드에 복사할 수 있습니다."
-            data-tt-example="/copy"><code>/copy</code> 명령에 응답/코드블록/인용구 복사 선택기(Picker) 추가 (v0.150.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="터미널 작업 자동 명명 및 /rename 제안 (v0.150.0)"
-            data-tt-desc="이름 없는 터미널 작업에 대화 맥락에 기반한 제목이 자동 부여되며, /rename 실행 시 적절한 이름을 제안합니다."
-            data-tt-example="/rename">터미널 태스크 자동 명명 및 <code>/rename</code> 대화 맥락 기반 이름 제안 (v0.150.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="인터럽트 훅(Interrupt hooks) 추가 (v0.150.0)"
-            data-tt-desc="최상위 턴이 중단(Interrupt)될 때 지정된 명령어나 MCP 핸들러를 자동으로 실행할 수 있는 신규 훅입니다."
-            data-tt-example="">턴 중단 시 명령어/MCP 핸들러를 실행하는 인터럽트 훅(Interrupt hooks) 추가 (v0.150.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Vim 모드 dot-repeat(.) 지원 (v0.150.0)"
-            data-tt-desc="Vim 모드에서 '.' 키를 눌러 마지막 편집 작업을 즉시 반복 실행할 수 있습니다."
-            data-tt-example=".">Vim 모드 마지막 편집 작업 반복(<code>.</code> dot-repeat) 지원 (v0.150.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="codex agents 대시보드 도입 (v0.149.0)"
-            data-tt-desc="터미널에서 태스크를 인터랙티브하게 검색, 시작, 열기, 이름 변경, 중단할 수 있는 통합 TUI 대시보드입니다."
-            data-tt-example="codex agents"><code>codex agents</code> 대화형 작업 관리 대시보드(검색/시작/중단) 추가 (v0.149.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/cd, /pwd, /cwd 디렉터리 관리 명령 (v0.149.0)"
-            data-tt-desc="세션 내에서 현재 작업 디렉터리를 확인하고 변경할 수 있는 디렉터리 관리 명령어가 추가되었습니다."
-            data-tt-example="/cd /path/to/dir"><code>/cd</code>·<code>/pwd</code>·<code>/cwd</code> 세션 내 작업 디렉터리 관리 슬래시 커맨드 추가 (v0.149.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="codex queue 백그라운드 세션 큐 (v0.149.0)"
-            data-tt-desc="개별 터미널 창을 직접 열지 않고도 세션에 작업을 전달하고 큐를 관리할 수 있습니다."
-            data-tt-example="codex queue"><code>codex queue</code> 백그라운드 세션 작업 전달 및 큐 관리 지원 (v0.149.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="codex exec fork 및 세션 아카이브 제어 (v0.148.0)"
-            data-tt-desc="세션을 포크(fork)하여 다른 방향으로 분기할 수 있으며, TUI resume 선택기에서 아카이브 및 복원을 제어합니다."
-            data-tt-example="codex exec fork"><code>codex exec fork</code> 세션 분기 및 TUI 세션 아카이브/복원 제어 추가 (v0.148.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/export 마크다운 대화 내보내기 (v0.148.0)"
-            data-tt-desc="전체 TUI 대화 기록을 클립보드 또는 마크다운(.md) 파일로 즉시 내보낼 수 있습니다."
-            data-tt-example="/export my-log.md"><code>/export</code> 전체 TUI 대화 기록 Markdown(클립보드/파일) 내보내기 (v0.148.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Amazon Bedrock Runtime 빌트인 공급자 정식 통합 (v0.148.0)"
-            data-tt-desc="Amazon Bedrock Runtime이 기본 제공 프로바이더로 정식 탑재되었습니다."
-            data-tt-example="">Amazon Bedrock Runtime 빌트인 프로바이더 정식 통합 (v0.148.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="이동식 Agent Plugins 카탈로그 지원 (v0.147.0)"
-            data-tt-desc="로컬, 개인, 원격 카탈로그 전반에서 이동식 Agent Plugin을 검색하고 간편하게 설치할 수 있습니다."
-            data-tt-example="codex plugin install <name>">이동식 Agent Plugins 카탈로그 검색 및 설치 지원 (v0.147.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="GPT-6-Astra 모델 공식 탑재 (v0.153.4)"
+            data-tt-desc="모델 선택기에 GPT-6-Astra가 공식 노출되며, 신규 미구성 설치 환경에서 기본 모델로 자동 지정됩니다."
+            data-tt-example="--model gpt-6-astra"><code>GPT-6-Astra</code> 모델 공식 탑재 및 신규 설치 환경 기본 모델 지정 (v0.153.4) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Vim 모드 Undo(u) / Redo(Ctrl+R) 완벽 지원 (v0.153.0)"
+            data-tt-desc="Vim 모드에서 u와 Ctrl+R로 붙여넣은 코드와 파일 첨부를 포함한 전체 드래프트 상태를 손실 없이 복원할 수 있습니다."
+            data-tt-example="u / Ctrl+R">Vim 모드 완벽한 <code>u</code>(실행 취소) 및 <code>Ctrl+R</code>(다시 실행) 드래프트 복원 지원 (v0.153.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 마켓플레이스 플러그인 CLI 관리 (v0.153.0)"
+            data-tt-desc="codex plugin 명령으로 원격 마켓플레이스에서 플러그인을 직접 검색, 설치, 제거할 수 있습니다."
+            data-tt-example="codex plugin install <name>">원격 마켓플레이스 플러그인 CLI 검색·설치·제거 지원 (v0.153.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="자동 요약 토글(tui.auto_recap) 지원 (v0.153.0)"
+            data-tt-desc="tui.auto_recap 설정을 false로 지정하여 긴 대화 세션에서의 자동 요약(recap) 생성을 비활성화할 수 있습니다."
+            data-tt-example="tui.auto_recap = false"><code>tui.auto_recap = false</code> 설정으로 자동 요약(Recap) 비활성화 지원 (v0.153.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Astra 모델 비동기 질문 안정성 개선 (v0.153.4)"
+            data-tt-desc="GPT-6-Astra 모델과의 비동기 질의응답 처리 및 모델 선택기 가시성 안정성을 개선했습니다."
+            data-tt-example="">Astra 모델 비동기 질의응답 및 모델 선택기 가시성 개선 (v0.153.4) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.147.0~v0.150.1</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="원격 압축 이미지 토큰 버짓 최적화 (v0.150.1)"
+                data-tt-desc="원격 압축 시 보존된 이미지를 토큰 예산에 기본 포함하여 오래된 이미지를 정리하고 긴 세션의 토큰 소비를 예측 가능하게 유지합니다."
+                data-tt-example="">원격 압축 이미지 토큰 버짓 최적화 및 장기 세션 예측성 개선 (v0.150.1)</li>
+              <li class="cl-tip" data-tt-title="@ 멘션으로 다른 Codex 작업 참조·메시지 (v0.150.0)"
+                data-tt-desc="@ 멘션으로 다른 Codex 태스크를 참조하고, 터미널에서 작업을 생성하거나 직접 메시지를 주고받을 수 있습니다."
+                data-tt-example="@task-123"><code>@</code> 멘션 기반 작업(Task) 참조, 생성 및 터미널 간 직접 메시징 지원 (v0.150.0)</li>
+              <li class="cl-tip" data-tt-title="/copy 선택기 도입 (v0.150.0)"
+                data-tt-desc="/copy 명령에 선택기가 추가되어 전체 응답, 개별 코드 블록, 인용구를 선택해 클립보드에 복사할 수 있습니다."
+                data-tt-example="/copy"><code>/copy</code> 명령에 응답/코드블록/인용구 복사 선택기(Picker) 추가 (v0.150.0)</li>
+              <li class="cl-tip" data-tt-title="터미널 작업 자동 명명 및 /rename 제안 (v0.150.0)"
+                data-tt-desc="이름 없는 터미널 작업에 대화 맥락에 기반한 제목이 자동 부여되며, /rename 실행 시 적절한 이름을 제안합니다."
+                data-tt-example="/rename">터미널 태스크 자동 명명 및 <code>/rename</code> 대화 맥락 기반 이름 제안 (v0.150.0)</li>
+              <li class="cl-tip" data-tt-title="인터럽트 훅(Interrupt hooks) 추가 (v0.150.0)"
+                data-tt-desc="최상위 턴이 중단(Interrupt)될 때 지정된 명령어나 MCP 핸들러를 자동으로 실행할 수 있는 신규 훅입니다."
+                data-tt-example="">턴 중단 시 명령어/MCP 핸들러를 실행하는 인터럽트 훅(Interrupt hooks) 추가 (v0.150.0)</li>
+              <li class="cl-tip" data-tt-title="Vim 모드 dot-repeat(.) 지원 (v0.150.0)"
+                data-tt-desc="Vim 모드에서 '.' 키를 눌러 마지막 편집 작업을 즉시 반복 실행할 수 있습니다."
+                data-tt-example=".">Vim 모드 마지막 편집 작업 반복(<code>.</code> dot-repeat) 지원 (v0.150.0)</li>
+              <li class="cl-tip" data-tt-title="codex agents 대시보드 도입 (v0.149.0)"
+                data-tt-desc="터미널에서 태스크를 인터랙티브하게 검색, 시작, 열기, 이름 변경, 중단할 수 있는 통합 TUI 대시보드입니다."
+                data-tt-example="codex agents"><code>codex agents</code> 대화형 작업 관리 대시보드(검색/시작/중단) 추가 (v0.149.0)</li>
+              <li class="cl-tip" data-tt-title="/cd, /pwd, /cwd 디렉터리 관리 명령 (v0.149.0)"
+                data-tt-desc="세션 내에서 현재 작업 디렉터리를 확인하고 변경할 수 있는 디렉터리 관리 명령어가 추가되었습니다."
+                data-tt-example="/cd /path/to/dir"><code>/cd</code>·<code>/pwd</code>·<code>/cwd</code> 세션 내 작업 디렉터리 관리 슬래시 커맨드 추가 (v0.149.0)</li>
+              <li class="cl-tip" data-tt-title="codex queue 백그라운드 세션 큐 (v0.149.0)"
+                data-tt-desc="개별 터미널 창을 직접 열지 않고도 세션에 작업을 전달하고 큐를 관리할 수 있습니다."
+                data-tt-example="codex queue"><code>codex queue</code> 백그라운드 세션 작업 전달 및 큐 관리 지원 (v0.149.0)</li>
+              <li class="cl-tip" data-tt-title="codex exec fork 및 세션 아카이브 제어 (v0.148.0)"
+                data-tt-desc="세션을 포크(fork)하여 다른 방향으로 분기할 수 있으며, TUI resume 선택기에서 아카이브 및 복원을 제어합니다."
+                data-tt-example="codex exec fork"><code>codex exec fork</code> 세션 분기 및 TUI 세션 아카이브/복원 제어 추가 (v0.148.0)</li>
+              <li class="cl-tip" data-tt-title="/export 마크다운 대화 내보내기 (v0.148.0)"
+                data-tt-desc="전체 TUI 대화 기록을 클립보드 또는 마크다운(.md) 파일로 즉시 내보낼 수 있습니다."
+                data-tt-example="/export my-log.md"><code>/export</code> 전체 TUI 대화 기록 Markdown(클립보드/파일) 내보내기 (v0.148.0)</li>
+              <li class="cl-tip" data-tt-title="Amazon Bedrock Runtime 빌트인 공급자 정식 통합 (v0.148.0)"
+                data-tt-desc="Amazon Bedrock Runtime이 기본 제공 프로바이더로 정식 탑재되었습니다."
+                data-tt-example="">Amazon Bedrock Runtime 빌트인 프로바이더 정식 통합 (v0.148.0)</li>
+              <li class="cl-tip" data-tt-title="이동식 Agent Plugins 카탈로그 지원 (v0.147.0)"
+                data-tt-desc="로컬, 개인, 원격 카탈로그 전반에서 이동식 Agent Plugin을 검색하고 간편하게 설치할 수 있습니다."
+                data-tt-example="codex plugin install <name>">이동식 Agent Plugins 카탈로그 검색 및 설치 지원 (v0.147.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.145.0~v0.146.0</summary>

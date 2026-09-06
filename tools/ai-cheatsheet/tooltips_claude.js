@@ -1,4 +1,24 @@
 window.CLAUDE_TIPS = {
+  "/diff": {
+    "title": "/diff — 실시간 diff 패널 토글",
+    "desc": "대화창 옆에 전체화면 diff 패널을 열어 Claude가 편집 중인 파일들의 커밋되지 않은 변경사항을 실시간으로 확인합니다.",
+    "example": "/diff"
+  },
+  "/skill-doctor": {
+    "title": "/skill-doctor — 미사용 스킬 및 토큰 비용 진단",
+    "desc": "로드된 스킬 목록 중 사용 빈도가 낮거나 미사용 상태인 스킬과 이들이 차지하는 컨텍스트(토큰) 비용을 분석합니다.",
+    "example": "/skill-doctor"
+  },
+  "/reload-plugins": {
+    "title": "/reload-plugins — 플러그인 핫 리로드",
+    "desc": "세션을 재시작하지 않고 로드된 플러그인과 설정 구성을 즉시 다시 읽어옵니다.",
+    "example": "/reload-plugins"
+  },
+  "bashOutputMaxChars": {
+    "title": "bashOutputMaxChars — Bash 출력 인라인 수신 상한",
+    "desc": "Bash 명령어의 터미널 출력이 파일로 분리 저장되기 전 인라인으로 수신할 최대 문자 수(최대 128K)를 지정합니다.",
+    "example": "\"bashOutputMaxChars\": 65536"
+  },
   "--restricted": {
     "title": "--restricted — 제한 실행 모드",
     "desc": "코드 및 명령어 실행 도구와 WebFetch를 제외하고, 파일 도구를 작업 디렉터리 내로 제한하며 bypassPermissions 설정을 무시합니다.",

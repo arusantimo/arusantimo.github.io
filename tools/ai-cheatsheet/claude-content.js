@@ -10,59 +10,92 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.250</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-08-28</span>
+        <span class="meta-version">v2.1.263</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-06</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.250)</span>
+        <span>📋 최근 변경사항 (v2.1.263)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="--restricted 제한 실행 모드 추가 (v2.1.248)"
-            data-tt-desc="코드/명령 실행 도구 및 WebFetch를 제외하고 작업 디렉터리 외부 접근 및 bypassPermissions를 차단하는 엄격한 제한 모드입니다."
-            data-tt-example="claude --restricted"><code>--restricted</code> 플래그(<code>CLAUDE_CODE_RESTRICTED=1</code>) 제한 실행 모드 추가 (v2.1.248) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="experimental.cacheTtl 에이전트 캐시 TTL (v2.1.248)"
-            data-tt-desc="에이전트 프론트매터에 에이전트별 프롬프트 캐시 TTL(5m 또는 1h)을 설정할 수 있습니다."
-            data-tt-example="experimental.cacheTtl: 1h"><code>experimental.cacheTtl</code> 에이전트별 프롬프트 캐시 TTL(5m/1h) 설정 지원 (v2.1.248) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="self-hosted-runner 클라이언트 레이블 지정 (v2.1.248)"
-            data-tt-desc="self-hosted-runner 등록 시 호스트명 대신 사용할 커스텀 클라이언트 레이블을 지정할 수 있습니다."
-            data-tt-example="claude self-hosted-runner --client-label my-runner"><code>claude self-hosted-runner --client-label</code> 클라이언트 레이블 지정 지원 (v2.1.248) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Bedrock/Vertex/Foundry 세션 간 메시지 전송 (v2.1.248)"
-            data-tt-desc="동일 머신 내 Bedrock, Vertex AI, Foundry 및 텔레메트리 비활성 세션 간 SendMessage/ListAgents 통신을 지원합니다."
-            data-tt-example="SendMessage">Bedrock/Vertex/Foundry 동일 머신 세션 간 <code>SendMessage</code>/<code>ListAgents</code> 지원 (v2.1.248) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="SendFeedback 도구 및 /feedback 연동 (v2.1.247)"
-            data-tt-desc="세션 중 문제 발생 시 피드백 보고서 초안을 자동 작성하고 /feedback에서 검토 후 제출할 수 있습니다."
-            data-tt-example="/feedback"><code>SendFeedback</code> 도구 및 <code>/feedback</code> 피드백 보고서 초안 자동 작성 지원 (v2.1.247) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/claude-api cost-optimize 비용 최적화 (v2.1.247)"
-            data-tt-desc="프로젝트의 Claude API 비용을 프로파일링하고 캐싱, 토큰 위생, 배치, 모델 선택 등 최적화 레버를 안내합니다."
-            data-tt-example="/claude-api cost-optimize"><code>/claude-api cost-optimize</code> API 비용 프로파일링 및 최적화 가이드 추가 (v2.1.247) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/permissions Auto mode 규칙 편집 탭 (v2.1.246)"
-            data-tt-desc="/permissions에 Auto mode 탭이 추가되어 자동 모드 분류 규칙을 직접 확인하고 편집할 수 있습니다."
-            data-tt-example="/permissions"><code>/permissions</code>에 Auto mode 분류 규칙 조회/편집 탭 추가 (v2.1.246) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/usage Loops 상세 분석 추가 (v2.1.243)"
-            data-tt-desc="/usage에서 루프별 실행 횟수, 총 토큰, 실행당 토큰, 마지막 실행 시점을 분석해 폭주 루프를 감지할 수 있습니다."
-            data-tt-example="/usage"><code>/usage</code>에 Loops 분석(실행 횟수, 토큰량, 폭주 감지) 추가 (v2.1.243) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="modelPicker 커스텀 모델 목록 구성 (v2.1.243)"
-            data-tt-desc="/model 선택기 목록을 사용자/조직 맞춤형 모델 목록(Bedrock/Vertex ID 포함)으로 구성하거나 교체할 수 있습니다."
-            data-tt-example="modelPicker: [...]"><code>modelPicker</code> 설정으로 <code>/model</code> 선택기 모델 목록 맞춤 구성 지원 (v2.1.243) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="promptCacheTtl & subagentPromptCacheTtl 분리 (v2.1.243)"
-            data-tt-desc="메인 대화의 프롬프트 캐시를 1시간으로 유지하면서 서브에이전트는 5분으로 분리 지정할 수 있습니다."
-            data-tt-example="promptCacheTtl: 1h"><code>promptCacheTtl</code> 및 <code>subagentPromptCacheTtl</code> 캐시 분리 설정 지원 (v2.1.243) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="modelPricing 조직 맞춤 단가 반영 (v2.1.243)"
-            data-tt-desc="조직 계약 단가 및 할인 배율을 /cost, 상태줄, 텔레메트리 비용 계산에 적용합니다."
-            data-tt-example="modelPricing: { ... }"><code>modelPricing</code> 관리 설정으로 조직 계약 단가/할인율 반영 지원 (v2.1.243) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="네이티브 설치/업데이트 zstd 압축 도입 (v2.1.243)"
-            data-tt-desc="바이너리 zstd 압축을 적용하여 다운로드 크기를 약 75MB로 대폭 축소(기존 ~340MB)했습니다."
-            data-tt-example="">네이티브 바이너리 zstd 압축 도입으로 다운로드 크기 대폭 축소 (v2.1.243) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/diff 실시간 변경사항 패널 (v2.1.260)"
+            data-tt-desc="대화창 옆에 전체화면 diff 패널을 열어 Claude가 편집 중인 파일의 커밋되지 않은 변경사항을 실시간으로 확인하고 토글할 수 있습니다."
+            data-tt-example="/diff"><code>/diff</code> 실시간 전체화면 diff 패널 열기 및 변경사항 모니터링 (v2.1.260) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/skill-doctor 미사용 스킬 진단 (v2.1.261)"
+            data-tt-desc="로드된 스킬 중 실제로 사용되지 않는 스킬과 컨텍스트(토큰) 비용을 분석하여 불필요한 스킬을 정리할 수 있도록 돕습니다."
+            data-tt-example="/skill-doctor"><code>/skill-doctor</code> 미사용 스킬 및 컨텍스트 비용 진단 도구 추가 (v2.1.261) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="bashOutputMaxChars & taskOutputMaxChars (v2.1.261)"
+            data-tt-desc="명령어 및 백그라운드 태스크의 인라인 출력 수신 한도를 최대 128K 문자까지 상향 조절할 수 있습니다."
+            data-tt-example="bashOutputMaxChars: 65536"><code>bashOutputMaxChars</code> 및 <code>taskOutputMaxChars</code> 인라인 출력 상한(최대 128K) 설정 지원 (v2.1.261) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="--append-subagent-system-prompt-file (v2.1.261)"
+            data-tt-desc="CLI 인자로 전달하기에 너무 긴 서브에이전트 시스템 프롬프트를 파일로부터 직접 읽어옵니다."
+            data-tt-example="claude --append-subagent-system-prompt-file prompt.txt"><code>--append-subagent-system-prompt-file</code> 파일 기반 서브에이전트 프롬프트 지정 (v2.1.261) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Bash 호환 단어 편집 단축키 지원 (v2.1.261)"
+            data-tt-desc="Ctrl+W(공백 단위 삭제), Alt+F/Alt+D(단어 끝 이동/삭제) 등 표준 Bash 단어 편집 단축키를 기본 지원합니다."
+            data-tt-example="Ctrl+W">Bash 호환 단어 편집 단축키(<code>Ctrl+W</code>, <code>Alt+F</code>, <code>Alt+D</code>) 지원 (v2.1.261) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/cost 프롬프트 캐시 미스 원인 분석 (v2.1.260)"
+            data-tt-desc="/cost 및 상태줄에 도구 정의/시스템 프롬프트 변경, TTL 만료 등 캐시 미스 발생 원인을 상세히 표시합니다."
+            data-tt-example="/cost"><code>/cost</code> 및 상태줄에 프롬프트 캐시 미스 원인 진단 추가 (v2.1.260) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="헤드리스 세션 지원 확장 (v2.1.260)"
+            data-tt-desc="Desktop/SDK 등 헤드리스 환경을 위한 /reload-plugins 및 텍스트 모드 /advisor를 지원합니다."
+            data-tt-example="/reload-plugins">헤드리스 세션용 <code>/reload-plugins</code> 및 텍스트 모드 <code>/advisor</code> 지원 (v2.1.260) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="전체화면 뷰 클리어 단축키 (v2.1.260)"
+            data-tt-desc="전체화면 모드에서 Ctrl+L / Cmd+K로 터미널 clear와 같이 화면을 정리할 수 있습니다 (스크롤로 이전 내역 조회 가능)."
+            data-tt-example="Ctrl+L"><code>Ctrl+L</code> / <code>Cmd+K</code> 전체화면 터미널 뷰 클리어 단축키 지원 (v2.1.260) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="서브에이전트 백그라운드 명령 제한 해제 (v2.1.260)"
+            data-tt-desc="서브에이전트가 실행한 백그라운드 명령어의 기존 1시간 시간제한을 해제하여 종료될 때까지 지속합니다."
+            data-tt-example="">서브에이전트 백그라운드 명령어 1시간 시간제한 해제 (v2.1.260) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.243~v2.1.250</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="--restricted 제한 실행 모드 추가 (v2.1.248)"
+                data-tt-desc="코드/명령 실행 도구 및 WebFetch를 제외하고 작업 디렉터리 외부 접근 및 bypassPermissions를 차단하는 엄격한 제한 모드입니다."
+                data-tt-example="claude --restricted"><code>--restricted</code> 플래그(<code>CLAUDE_CODE_RESTRICTED=1</code>) 제한 실행 모드 추가 (v2.1.248)</li>
+              <li class="cl-tip" data-tt-title="experimental.cacheTtl 에이전트 캐시 TTL (v2.1.248)"
+                data-tt-desc="에이전트 프론트매터에 에이전트별 프롬프트 캐시 TTL(5m 또는 1h)을 설정할 수 있습니다."
+                data-tt-example="experimental.cacheTtl: 1h"><code>experimental.cacheTtl</code> 에이전트별 프롬프트 캐시 TTL(5m/1h) 설정 지원 (v2.1.248)</li>
+              <li class="cl-tip" data-tt-title="self-hosted-runner 클라이언트 레이블 지정 (v2.1.248)"
+                data-tt-desc="self-hosted-runner 등록 시 호스트명 대신 사용할 커스텀 클라이언트 레이블을 지정할 수 있습니다."
+                data-tt-example="claude self-hosted-runner --client-label my-runner"><code>claude self-hosted-runner --client-label</code> 클라이언트 레이블 지정 지원 (v2.1.248)</li>
+              <li class="cl-tip" data-tt-title="Bedrock/Vertex/Foundry 세션 간 메시지 전송 (v2.1.248)"
+                data-tt-desc="동일 머신 내 Bedrock, Vertex AI, Foundry 및 텔레메트리 비활성 세션 간 SendMessage/ListAgents 통신을 지원합니다."
+                data-tt-example="SendMessage">Bedrock/Vertex/Foundry 동일 머신 세션 간 <code>SendMessage</code>/<code>ListAgents</code> 지원 (v2.1.248)</li>
+              <li class="cl-tip" data-tt-title="SendFeedback 도구 및 /feedback 연동 (v2.1.247)"
+                data-tt-desc="세션 중 문제 발생 시 피드백 보고서 초안을 자동 작성하고 /feedback에서 검토 후 제출할 수 있습니다."
+                data-tt-example="/feedback"><code>SendFeedback</code> 도구 및 <code>/feedback</code> 피드백 보고서 초안 자동 작성 지원 (v2.1.247)</li>
+              <li class="cl-tip" data-tt-title="/claude-api cost-optimize 비용 최적화 (v2.1.247)"
+                data-tt-desc="프로젝트의 Claude API 비용을 프로파일링하고 캐싱, 토큰 위생, 배치, 모델 선택 등 최적화 레버를 안내합니다."
+                data-tt-example="/claude-api cost-optimize"><code>/claude-api cost-optimize</code> API 비용 프로파일링 및 최적화 가이드 추가 (v2.1.247)</li>
+              <li class="cl-tip" data-tt-title="/permissions Auto mode 규칙 편집 탭 (v2.1.246)"
+                data-tt-desc="/permissions에 Auto mode 탭이 추가되어 자동 모드 분류 규칙을 직접 확인하고 편집할 수 있습니다."
+                data-tt-example="/permissions"><code>/permissions</code>에 Auto mode 분류 규칙 조회/편집 탭 추가 (v2.1.246)</li>
+              <li class="cl-tip" data-tt-title="/usage Loops 상세 분석 추가 (v2.1.243)"
+                data-tt-desc="/usage에서 루프별 실행 횟수, 총 토큰, 실행당 토큰, 마지막 실행 시점을 분석해 폭주 루프를 감지할 수 있습니다."
+                data-tt-example="/usage"><code>/usage</code>에 Loops 분석(실행 횟수, 토큰량, 폭주 감지) 추가 (v2.1.243)</li>
+              <li class="cl-tip" data-tt-title="modelPicker 커스텀 모델 목록 구성 (v2.1.243)"
+                data-tt-desc="/model 선택기 목록을 사용자/조직 맞춤형 모델 목록(Bedrock/Vertex ID 포함)으로 구성하거나 교체할 수 있습니다."
+                data-tt-example="modelPicker: [...]"><code>modelPicker</code> 설정으로 <code>/model</code> 선택기 모델 목록 맞춤 구성 지원 (v2.1.243)</li>
+              <li class="cl-tip" data-tt-title="promptCacheTtl & subagentPromptCacheTtl 분리 (v2.1.243)"
+                data-tt-desc="메인 대화의 프롬프트 캐시를 1시간으로 유지하면서 서브에이전트는 5분으로 분리 지정할 수 있습니다."
+                data-tt-example="promptCacheTtl: 1h"><code>promptCacheTtl</code> 및 <code>subagentPromptCacheTtl</code> 캐시 분리 설정 지원 (v2.1.243)</li>
+              <li class="cl-tip" data-tt-title="modelPricing 조직 맞춤 단가 반영 (v2.1.243)"
+                data-tt-desc="조직 계약 단가 및 할인 배율을 /cost, 상태줄, 텔레메트리 비용 계산에 적용합니다."
+                data-tt-example="modelPricing: { ... }"><code>modelPricing</code> 관리 설정으로 조직 계약 단가/할인율 반영 지원 (v2.1.243)</li>
+              <li class="cl-tip" data-tt-title="네이티브 설치/업데이트 zstd 압축 도입 (v2.1.243)"
+                data-tt-desc="바이너리 zstd 압축을 적용하여 다운로드 크기를 약 75MB로 대폭 축소(기존 ~340MB)했습니다."
+                data-tt-example="">네이티브 바이너리 zstd 압축 도입으로 다운로드 크기 대폭 축소 (v2.1.243)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.219~v2.1.220</summary>

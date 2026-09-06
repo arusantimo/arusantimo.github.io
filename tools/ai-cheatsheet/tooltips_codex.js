@@ -1,4 +1,14 @@
 window.CODEX_TIPS = {
+  "gpt-6-astra": {
+    "title": "GPT-6-Astra 모델",
+    "desc": "Codex CLI에 정식 탑재된 OpenAI의 차세대 추론 및 에이전트 코딩 특화 모델입니다.",
+    "example": "--model gpt-6-astra"
+  },
+  "tui.auto_recap": {
+    "title": "tui.auto_recap — 자동 요약 토글",
+    "desc": "긴 대화 세션에서 자동으로 컨텍스트 요약을 생성할지 여부(true/false)를 지정합니다.",
+    "example": "tui.auto_recap = false"
+  },
   "codex agents": {
     "title": "codex agents — 대화형 작업 관리 대시보드",
     "desc": "터미널에서 여러 에이전트 작업을 인터랙티브하게 검색, 시작, 열기, 이름 변경, 중단할 수 있는 TUI 대시보드입니다.",
