@@ -1,5 +1,149 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-07",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260907.js",
+    "jsonFile": "jongga/output/202609/latest_20260907.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260907.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-07T06:05:10+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 9.3,
+        "signalScore": 9.3,
+        "strictScore": 9.3,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 240000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "HPSP",
+        "code": "403870",
+        "score": 8.9,
+        "signalScore": 8.9,
+        "strictScore": 8.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.8,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 53300
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한미반도체",
+        "code": "042700",
+        "score": 7.3,
+        "signalScore": 7.3,
+        "strictScore": 7.3,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 240000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 5.6,
+        "signalScore": 5.6,
+        "strictScore": 5.6,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 88500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "효성중공업",
+        "code": "298040",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 2960000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 8.4,
+        "signalScore": 8.4,
+        "strictScore": 8.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 187500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "336260",
+        "name": "두산퓨얼셀",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "108490",
+        "name": "로보티즈",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "067290",
+        "name": "JW신약",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-04",
     "variant": "stable",
     "variantLabel": "현재 버전",

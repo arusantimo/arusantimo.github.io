@@ -22,5 +22,65 @@
     "stopPrice": 946665.0,
     "qtyPct": 35.0,
     "sourceEntryKey": "20260903|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260907-060523-8d8049f9",
+    "entryDate": "2026-09-04",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "strategy": "accumulation",
+    "entryPrice": 138438.3,
+    "swingTargetPrice": 153513.0,
+    "stopPrice": 133460.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260904|stable|accumulation|096770"
+  },
+  {
+    "runId": "replay-20260907-060523-8d8049f9",
+    "entryDate": "2026-09-04",
+    "code": "086790",
+    "name": "하나금융지주",
+    "strategy": "accumulation",
+    "entryPrice": 134434.3,
+    "swingTargetPrice": 149073.0,
+    "stopPrice": 136100.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260904|stable|accumulation|086790"
+  },
+  {
+    "runId": "replay-20260907-060523-8d8049f9",
+    "entryDate": "2026-09-04",
+    "code": "003490",
+    "name": "대한항공",
+    "strategy": "accumulation",
+    "entryPrice": 30230.2,
+    "swingTargetPrice": 33522.0,
+    "stopPrice": 29143.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260904|stable|accumulation|003490"
+  },
+  {
+    "runId": "replay-20260907-060523-8d8049f9",
+    "entryDate": "2026-09-04",
+    "code": "035420",
+    "name": "NAVER",
+    "strategy": "accumulation",
+    "entryPrice": 214714.5,
+    "swingTargetPrice": 241000.0,
+    "stopPrice": 206992.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260904|stable|accumulation|035420"
+  },
+  {
+    "runId": "replay-20260907-060523-8d8049f9",
+    "entryDate": "2026-09-04",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "strategy": "breakout",
+    "entryPrice": 138438.3,
+    "swingTargetPrice": 156970.0,
+    "stopPrice": 137200.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260904|stable|breakout|096770"
   }
 ]
