@@ -9,41 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-07T06:05:10+00:00",
+    "generatedAt": "2026-09-07T08:35:17+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "한미반도체",
         "code": "042700",
-        "score": 9.3,
-        "signalScore": 9.3,
-        "strictScore": 9.3,
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
         "scoreMax": 13.0,
         "grade": "A",
-        "gradeScore": 7.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G12, G13)",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G13)",
         "entryEligible": false,
-        "currentPrice": 240000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "HPSP",
-        "code": "403870",
-        "score": 8.9,
-        "signalScore": 8.9,
-        "strictScore": 8.9,
-        "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.8,
-        "statusLabel": "관심후보",
-        "entryEligible": false,
-        "currentPrice": 53300
+        "currentPrice": 240500
       },
       {
         "strategy": "accumulation",
@@ -55,25 +40,55 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 7.3,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 5.2,
+        "gradeScore": 5.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 240000
+        "currentPrice": 240500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "HPSP",
+        "code": "403870",
+        "score": 7.3,
+        "signalScore": 7.3,
+        "strictScore": 7.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 53300
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "두산에너빌리티",
-        "code": "034020",
-        "score": 5.6,
-        "signalScore": 5.6,
-        "strictScore": 5.6,
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.5,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "gradeScore": 4.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
         "entryEligible": false,
-        "currentPrice": 88500
+        "currentPrice": 187200
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "JW신약",
+        "code": "067290",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 3550
       },
       {
         "strategy": "reversal",
@@ -93,8 +108,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "주성엔지니어링",
-        "code": "036930",
+        "name": "SK스퀘어",
+        "code": "402340",
         "score": 8.4,
         "signalScore": 8.4,
         "strictScore": 8.4,
@@ -103,21 +118,10 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 187500
+        "currentPrice": 1125000
       }
     ],
     "blacklist": [
-      {
-        "code": "336260",
-        "name": "두산퓨얼셀",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "108490",
         "name": "로보티즈",
@@ -130,14 +134,36 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "067290",
-        "name": "JW신약",
+        "code": "336260",
+        "name": "두산퓨얼셀",
         "reasons": [
-          "투자 주의",
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "030530",
+        "name": "원익홀딩스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss"
         ],
         "status": "confirmed"
       }
