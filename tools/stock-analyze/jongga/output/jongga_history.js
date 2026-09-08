@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-08T06:05:32+00:00",
+    "generatedAt": "2026-09-08T08:34:48+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
-    "status": "success",
-    "buyCount": 10,
+    "status": "partial",
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 194600
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G12)",
         "entryEligible": false,
-        "currentPrice": 197800
+        "currentPrice": 1793000
       },
       {
         "strategy": "pullback",
@@ -41,69 +56,54 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "B",
         "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G12)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 20350
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "한미반도체",
-        "code": "042700",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G3, G12, G13)",
-        "entryEligible": false,
-        "currentPrice": 246500
+        "currentPrice": 19970
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "SK하이닉스",
-        "code": "000660",
+        "name": "한미반도체",
+        "code": "042700",
         "score": 8.6,
         "signalScore": 8.6,
         "strictScore": 8.6,
         "scoreMax": 14.0,
         "grade": "B",
         "gradeScore": 6.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 1812500
+        "currentPrice": 244500
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
-        "name": "한미반도체",
-        "code": "042700",
-        "score": 7.1,
-        "signalScore": 7.1,
-        "strictScore": 7.1,
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
         "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 5.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "grade": "B",
+        "gradeScore": 5.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 246500
+        "currentPrice": 1379000
       },
       {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "SK하이닉스",
         "code": "000660",
-        "score": 5.4,
-        "signalScore": 5.4,
-        "strictScore": 5.4,
-        "scoreMax": 12.5,
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
+        "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "gradeScore": 5.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 1812500
+        "currentPrice": 1793000
       },
       {
         "strategy": "reversal",
@@ -114,25 +114,29 @@ window.JONGGA_HISTORY_INDEX = [
         "signalScore": 7.1,
         "strictScore": 7.1,
         "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.9,
+        "statusLabel": "최우선 진입",
+        "entryEligible": true,
+        "currentPrice": 19970
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "현대약품",
+        "code": "004310",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
+        "scoreMax": 10.0,
         "grade": "A",
         "gradeScore": 7.1,
-        "statusLabel": "진입 가능",
-        "entryEligible": true,
-        "currentPrice": 20350
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 10070
       }
     ],
     "blacklist": [
-      {
-        "code": "009150",
-        "name": "삼성전기",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "052690",
         "name": "한전기술",
@@ -145,8 +149,8 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "004310",
-        "name": "현대약품",
+        "code": "010170",
+        "name": "대한광통신",
         "reasons": [
           "투자 주의"
         ],
