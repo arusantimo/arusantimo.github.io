@@ -12,18 +12,6 @@
     "sourceEntryKey": "20260902|stable|accumulation|000660"
   },
   {
-    "runId": "replay-20260904-060515-37d7519a",
-    "entryDate": "2026-09-03",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 981981.0,
-    "swingTargetPrice": 1088910.0,
-    "stopPrice": 946665.0,
-    "qtyPct": 35.0,
-    "sourceEntryKey": "20260903|stable|accumulation|402340"
-  },
-  {
     "runId": "replay-20260907-060523-8d8049f9",
     "entryDate": "2026-09-04",
     "code": "096770",
@@ -34,18 +22,6 @@
     "stopPrice": 133460.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260904|stable|accumulation|096770"
-  },
-  {
-    "runId": "replay-20260907-060523-8d8049f9",
-    "entryDate": "2026-09-04",
-    "code": "086790",
-    "name": "하나금융지주",
-    "strategy": "accumulation",
-    "entryPrice": 134434.3,
-    "swingTargetPrice": 149073.0,
-    "stopPrice": 136100.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260904|stable|accumulation|086790"
   },
   {
     "runId": "replay-20260907-060523-8d8049f9",
@@ -72,15 +48,39 @@
     "sourceEntryKey": "20260904|stable|accumulation|035420"
   },
   {
-    "runId": "replay-20260907-060523-8d8049f9",
-    "entryDate": "2026-09-04",
-    "code": "096770",
-    "name": "SK이노베이션",
-    "strategy": "breakout",
-    "entryPrice": 138438.3,
-    "swingTargetPrice": 156970.0,
-    "stopPrice": 137200.0,
+    "runId": "replay-20260908-060549-3382e9d0",
+    "entryDate": "2026-09-07",
+    "code": "042700",
+    "name": "한미반도체",
+    "strategy": "accumulation",
+    "entryPrice": 240740.5,
+    "swingTargetPrice": 266955.0,
+    "stopPrice": 233285.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260907|stable|accumulation|042700"
+  },
+  {
+    "runId": "replay-20260908-060549-3382e9d0",
+    "entryDate": "2026-09-07",
+    "code": "403870",
+    "name": "HPSP",
+    "strategy": "accumulation",
+    "entryPrice": 53353.3,
+    "swingTargetPrice": 59163.0,
+    "stopPrice": 51701.0,
     "qtyPct": 80.0,
-    "sourceEntryKey": "20260904|stable|breakout|096770"
+    "sourceEntryKey": "20260907|stable|accumulation|403870"
+  },
+  {
+    "runId": "replay-20260908-060549-3382e9d0",
+    "entryDate": "2026-09-07",
+    "code": "036930",
+    "name": "주성엔지니어링",
+    "strategy": "breakout",
+    "entryPrice": 187387.2,
+    "swingTargetPrice": 213408.0,
+    "stopPrice": 185000.0,
+    "qtyPct": 15.0,
+    "sourceEntryKey": "20260907|stable|breakout|036930"
   }
 ]
