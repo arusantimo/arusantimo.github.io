@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-09T06:06:26+00:00",
+    "generatedAt": "2026-09-09T08:37:06+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.8,
         "statusLabel": "매수추천",
         "entryEligible": true,
-        "currentPrice": 205000
+        "currentPrice": 206500
       },
       {
         "strategy": "pullback",
@@ -43,22 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.3,
         "statusLabel": "진입 가능(B·조건부)",
         "entryEligible": true,
-        "currentPrice": 19480
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 9.8,
-        "signalScore": 9.8,
-        "strictScore": 9.8,
-        "scoreMax": 14.0,
-        "grade": "A",
-        "gradeScore": 7.0,
-        "statusLabel": "관심후보",
-        "entryEligible": false,
-        "currentPrice": 1139000
+        "currentPrice": 19450
       },
       {
         "strategy": "accumulation",
@@ -78,6 +63,21 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1138000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
         "name": "대우건설",
         "code": "047040",
         "score": 8.6,
@@ -93,17 +93,32 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
-        "name": "HPSP",
-        "code": "403870",
-        "score": 5.0,
-        "signalScore": 5.0,
-        "strictScore": 5.0,
+        "name": "가온전선",
+        "code": "000500",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "gradeScore": 5.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
         "entryEligible": false,
-        "currentPrice": 55900
+        "currentPrice": 265500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 153500
       }
     ],
     "blacklist": [
@@ -119,15 +134,24 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "032820",
-        "name": "우리기술",
+        "code": "336260",
+        "name": "두산퓨얼셀",
         "reasons": [
-          "공매도 과열",
           "투자 주의"
         ],
         "sources": [
-          "kind",
-          "entry"
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "012210",
+        "name": "삼미금속",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
         ],
         "status": "confirmed"
       },
@@ -139,6 +163,17 @@ window.JONGGA_HISTORY_INDEX = [
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "032820",
+        "name": "우리기술",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "entry"
         ],
         "status": "confirmed"
       }
