@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-10T06:07:12+00:00",
+    "generatedAt": "2026-09-10T08:36:40+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 14,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,24 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G8)",
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 221000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
         "entryEligible": false,
-        "currentPrice": 227000
+        "currentPrice": 1853000
       },
       {
         "strategy": "pullback",
@@ -50,30 +65,30 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "accumulation",
         "name": "SK하이닉스",
         "code": "000660",
-        "score": 10.9,
-        "signalScore": 10.9,
-        "strictScore": 10.9,
-        "scoreMax": 14.0,
-        "grade": "A",
-        "gradeScore": 7.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
-        "entryEligible": false,
-        "currentPrice": 1861000
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "원익IPS",
-        "code": "240810",
         "score": 10.2,
         "signalScore": 10.2,
         "strictScore": 10.2,
         "scoreMax": 14.0,
         "grade": "A",
         "gradeScore": 7.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
         "entryEligible": false,
-        "currentPrice": 120500
+        "currentPrice": 1853000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 118800
       },
       {
         "strategy": "reversal",
@@ -103,21 +118,10 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.0,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1861000
+        "currentPrice": 1853000
       }
     ],
     "blacklist": [
-      {
-        "code": "108490",
-        "name": "로보티즈",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "032820",
         "name": "우리기술",
@@ -127,7 +131,6 @@ window.JONGGA_HISTORY_INDEX = [
         ],
         "sources": [
           "kind",
-          "toss",
           "entry"
         ],
         "status": "confirmed"
@@ -135,6 +138,28 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "code": "009150",
         "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "005380",
+        "name": "현대차",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "024060",
+        "name": "흥구석유",
         "reasons": [
           "투자 주의"
         ],
