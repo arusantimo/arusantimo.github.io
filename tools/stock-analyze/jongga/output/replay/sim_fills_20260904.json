@@ -670,5 +670,26 @@
     "barLow": 135700.0,
     "barClose": 137900.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260904|stable|accumulation|096770-swing_touch",
+    "sourceEntryKey": "20260904|stable|accumulation|096770",
+    "strategy": "accumulation",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "side": "SELL",
+    "stageKey": "swing",
+    "reason": "스윙 목표가 도달",
+    "fillStatus": "filled",
+    "filledAt": "2026-09-09T15:00:00+09:00",
+    "fillPrice": 153513.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-09-09T15:00:00+09:00",
+    "barOpen": 137400.0,
+    "barHigh": 154500.0,
+    "barLow": 135500.0,
+    "barClose": 153500.0,
+    "fillRule": "swing_touch"
   }
 ]

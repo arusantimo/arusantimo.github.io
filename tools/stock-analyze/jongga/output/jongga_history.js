@@ -1,5 +1,151 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-10",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260910.js",
+    "jsonFile": "jongga/output/202609/latest_20260910.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260910.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-10T06:07:12+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G8)",
+        "entryEligible": false,
+        "currentPrice": 227000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 120500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 1861000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 10.2,
+        "signalScore": 10.2,
+        "strictScore": 10.2,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 120500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "원익IPS",
+        "code": "240810",
+        "score": 8.4,
+        "signalScore": 8.4,
+        "strictScore": 8.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 120500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 8.0,
+        "signalScore": 8.0,
+        "strictScore": 8.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1861000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "108490",
+        "name": "로보티즈",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "032820",
+        "name": "우리기술",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-09",
     "variant": "stable",
     "variantLabel": "현재 버전",

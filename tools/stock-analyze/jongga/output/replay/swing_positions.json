@@ -2,18 +2,6 @@
   {
     "runId": "replay-20260907-060523-8d8049f9",
     "entryDate": "2026-09-04",
-    "code": "096770",
-    "name": "SK이노베이션",
-    "strategy": "accumulation",
-    "entryPrice": 138438.3,
-    "swingTargetPrice": 153513.0,
-    "stopPrice": 133460.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260904|stable|accumulation|096770"
-  },
-  {
-    "runId": "replay-20260907-060523-8d8049f9",
-    "entryDate": "2026-09-04",
     "code": "003490",
     "name": "대한항공",
     "strategy": "accumulation",
@@ -106,5 +94,29 @@
     "stopPrice": 1105000.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260908|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260910-060800-1e6578cc",
+    "entryDate": "2026-09-09",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 1139138.0,
+    "swingTargetPrice": 1263180.0,
+    "stopPrice": 1129000.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260909|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260910-060800-1e6578cc",
+    "entryDate": "2026-09-09",
+    "code": "047040",
+    "name": "대우건설",
+    "strategy": "accumulation",
+    "entryPrice": 19499.48,
+    "swingTargetPrice": 21623.0,
+    "stopPrice": 18896.0,
+    "qtyPct": 80.0,
+    "sourceEntryKey": "20260909|stable|accumulation|047040"
   }
 ]
