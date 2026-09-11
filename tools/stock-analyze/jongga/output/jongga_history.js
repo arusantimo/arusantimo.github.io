@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-11",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260911.js",
+    "jsonFile": "jongga/output/202609/latest_20260911.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260911.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-11T06:05:51+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 370000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 6.3,
+        "signalScore": 6.3,
+        "strictScore": 6.3,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1092000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "001820",
+        "name": "삼화콘덴서",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-10",
     "variant": "stable",
     "variantLabel": "현재 버전",

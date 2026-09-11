@@ -1,29 +1,5 @@
 [
   {
-    "runId": "replay-20260907-060523-8d8049f9",
-    "entryDate": "2026-09-04",
-    "code": "003490",
-    "name": "대한항공",
-    "strategy": "accumulation",
-    "entryPrice": 30230.2,
-    "swingTargetPrice": 33522.0,
-    "stopPrice": 29143.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260904|stable|accumulation|003490"
-  },
-  {
-    "runId": "replay-20260907-060523-8d8049f9",
-    "entryDate": "2026-09-04",
-    "code": "035420",
-    "name": "NAVER",
-    "strategy": "accumulation",
-    "entryPrice": 214714.5,
-    "swingTargetPrice": 241000.0,
-    "stopPrice": 206992.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260904|stable|accumulation|035420"
-  },
-  {
     "runId": "replay-20260908-060549-3382e9d0",
     "entryDate": "2026-09-07",
     "code": "042700",
@@ -34,30 +10,6 @@
     "stopPrice": 233285.0,
     "qtyPct": 35.0,
     "sourceEntryKey": "20260907|stable|accumulation|042700"
-  },
-  {
-    "runId": "replay-20260908-060549-3382e9d0",
-    "entryDate": "2026-09-07",
-    "code": "403870",
-    "name": "HPSP",
-    "strategy": "accumulation",
-    "entryPrice": 53353.3,
-    "swingTargetPrice": 59163.0,
-    "stopPrice": 51701.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260907|stable|accumulation|403870"
-  },
-  {
-    "runId": "replay-20260908-060549-3382e9d0",
-    "entryDate": "2026-09-07",
-    "code": "036930",
-    "name": "주성엔지니어링",
-    "strategy": "breakout",
-    "entryPrice": 187387.2,
-    "swingTargetPrice": 213408.0,
-    "stopPrice": 185000.0,
-    "qtyPct": 15.0,
-    "sourceEntryKey": "20260907|stable|breakout|036930"
   },
   {
     "runId": "replay-20260909-060701-dcc22456",
@@ -84,39 +36,15 @@
     "sourceEntryKey": "20260908|stable|accumulation|000660"
   },
   {
-    "runId": "replay-20260909-060701-dcc22456",
-    "entryDate": "2026-09-08",
-    "code": "402340",
-    "name": "SK스퀘어",
+    "runId": "replay-20260911-060552-7a446cf3",
+    "entryDate": "2026-09-10",
+    "code": "000660",
+    "name": "SK하이닉스",
     "strategy": "accumulation",
-    "entryPrice": 1132131.0,
-    "swingTargetPrice": 1255410.0,
-    "stopPrice": 1105000.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260908|stable|accumulation|402340"
-  },
-  {
-    "runId": "replay-20260910-060800-1e6578cc",
-    "entryDate": "2026-09-09",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 1139138.0,
-    "swingTargetPrice": 1263180.0,
-    "stopPrice": 1129000.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260909|stable|accumulation|402340"
-  },
-  {
-    "runId": "replay-20260910-060800-1e6578cc",
-    "entryDate": "2026-09-09",
-    "code": "047040",
-    "name": "대우건설",
-    "strategy": "accumulation",
-    "entryPrice": 19499.48,
-    "swingTargetPrice": 21623.0,
-    "stopPrice": 18896.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260909|stable|accumulation|047040"
+    "entryPrice": 1854853.0,
+    "swingTargetPrice": 2056830.0,
+    "stopPrice": 1797410.0,
+    "qtyPct": 100.0,
+    "sourceEntryKey": "20260910|stable|accumulation|000660"
   }
 ]
