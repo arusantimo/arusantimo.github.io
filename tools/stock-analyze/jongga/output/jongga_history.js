@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-11T06:05:51+00:00",
+    "generatedAt": "2026-09-11T08:35:23+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,6 +33,21 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 137700
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
         "name": "SK스퀘어",
         "code": "402340",
         "score": 6.3,
@@ -43,14 +58,26 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1092000
+        "currentPrice": 1089000
       }
     ],
     "blacklist": [
       {
-        "code": "001820",
-        "name": "삼화콘덴서",
+        "code": "052690",
+        "name": "한전기술",
         "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "356680",
+        "name": "엑스게이트",
+        "reasons": [
+          "공매도 과열",
           "투자 주의"
         ],
         "sources": [
