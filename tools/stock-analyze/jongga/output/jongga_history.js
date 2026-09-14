@@ -1,5 +1,63 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-14",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260914.js",
+    "jsonFile": "jongga/output/202609/latest_20260914.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260914.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-14T06:05:13+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1131000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "014950",
+        "name": "삼익제약",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "001820",
+        "name": "삼화콘덴서",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-11",
     "variant": "stable",
     "variantLabel": "현재 버전",

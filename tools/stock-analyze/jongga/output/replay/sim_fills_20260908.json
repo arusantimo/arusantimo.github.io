@@ -775,5 +775,26 @@
     "barLow": 1095000.0,
     "barClose": 1135000.0,
     "fillRule": "stop_touch"
+  },
+  {
+    "orderId": "20260908|stable|accumulation|042700-stop_touch",
+    "sourceEntryKey": "20260908|stable|accumulation|042700",
+    "strategy": "accumulation",
+    "code": "042700",
+    "name": "한미반도체",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-09-11T15:00:00+09:00",
+    "fillPrice": 241500.0,
+    "filledQuantityPct": 60.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-09-11T15:00:00+09:00",
+    "barOpen": 241000.0,
+    "barHigh": 241000.0,
+    "barLow": 231000.0,
+    "barClose": 231000.0,
+    "fillRule": "stop_touch"
   }
 ]

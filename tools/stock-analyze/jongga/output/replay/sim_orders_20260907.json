@@ -1058,5 +1058,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-09-10T15:00:00+09:00",
     "activeUntil": "2026-09-10T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260907|stable|accumulation|042700-stop_touch",
+    "runId": "replay-20260908-060549-3382e9d0",
+    "date": "2026-09-07",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "042700",
+    "name": "한미반도체",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-09-11T15:00:00+09:00",
+    "requestedPrice": 233285.0,
+    "quantityPct": 35.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260907|stable|accumulation|042700",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-09-11T15:00:00+09:00",
+    "activeUntil": "2026-09-11T15:00:00+09:00"
   }
 ]
