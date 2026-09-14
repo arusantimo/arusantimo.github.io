@@ -9,17 +9,32 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-14T06:05:13+00:00",
+    "generatedAt": "2026-09-14T08:35:35+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "한화에어로스페이스",
         "code": "012450",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1126000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "KB금융",
+        "code": "105560",
         "score": 7.2,
         "signalScore": 7.2,
         "strictScore": 7.2,
@@ -28,7 +43,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1131000
+        "currentPrice": 180500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 139200
       }
     ],
     "blacklist": [
@@ -38,17 +68,6 @@ window.JONGGA_HISTORY_INDEX = [
         "reasons": [
           "투자 주의",
           "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "001820",
-        "name": "삼화콘덴서",
-        "reasons": [
-          "투자 주의"
         ],
         "sources": [
           "kind"
