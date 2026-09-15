@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-15T06:05:21+00:00",
+    "generatedAt": "2026-09-15T08:34:44+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -43,16 +43,42 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 8520
+        "currentPrice": 8590
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "JW신약",
+        "code": "067290",
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 3635
       }
     ],
     "blacklist": [
       {
-        "code": "067290",
-        "name": "JW신약",
+        "code": "042510",
+        "name": "라온시큐어",
         "reasons": [
-          "투자 주의",
-          "공매도 과열"
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "030530",
+        "name": "원익홀딩스",
+        "reasons": [
+          "투자 주의"
         ],
         "sources": [
           "kind"
