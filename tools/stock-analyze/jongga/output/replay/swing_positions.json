@@ -1,14 +1,1 @@
-[
-  {
-    "runId": "replay-20260909-060701-dcc22456",
-    "entryDate": "2026-09-08",
-    "code": "000660",
-    "name": "SK하이닉스",
-    "strategy": "accumulation",
-    "entryPrice": 1794793.0,
-    "swingTargetPrice": 1990230.0,
-    "stopPrice": 1739210.0,
-    "qtyPct": 80.0,
-    "sourceEntryKey": "20260908|stable|accumulation|000660"
-  }
-]
+[]

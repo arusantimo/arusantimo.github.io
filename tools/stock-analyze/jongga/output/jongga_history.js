@@ -1,5 +1,67 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-15",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260915.js",
+    "jsonFile": "jongga/output/202609/latest_20260915.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260915.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-15T06:05:21+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "후성",
+        "code": "093370",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 14760
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SFA반도체",
+        "code": "036540",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 8520
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "067290",
+        "name": "JW신약",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-14",
     "variant": "stable",
     "variantLabel": "현재 버전",
