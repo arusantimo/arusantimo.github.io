@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-16",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260916.js",
+    "jsonFile": "jongga/output/202609/latest_20260916.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260916.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-16T06:06:02+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산",
+        "code": "000150",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1379000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "072950",
+        "name": "빛샘전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "010170",
+        "name": "대한광통신",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-15",
     "variant": "stable",
     "variantLabel": "현재 버전",
