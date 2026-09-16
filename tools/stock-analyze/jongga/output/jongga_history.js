@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-16T06:06:02+00:00",
+    "generatedAt": "2026-09-16T08:35:30+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,8 +33,8 @@ window.JONGGA_HISTORY_INDEX = [
     ],
     "blacklist": [
       {
-        "code": "072950",
-        "name": "빛샘전자",
+        "code": "010170",
+        "name": "대한광통신",
         "reasons": [
           "투자 주의"
         ],
@@ -44,8 +44,19 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "010170",
-        "name": "대한광통신",
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "072950",
+        "name": "빛샘전자",
         "reasons": [
           "투자 주의"
         ],
