@@ -10,38 +10,59 @@ const codexContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · CLI 중심</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v0.153.4</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-09-04</span>
+        <span class="meta-version">v0.154.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-10</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v0.153.4)</span>
+        <span>📋 최근 변경사항 (v0.154.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="GPT-6-Astra 모델 공식 탑재 (v0.153.4)"
-            data-tt-desc="모델 선택기에 GPT-6-Astra가 공식 노출되며, 신규 미구성 설치 환경에서 기본 모델로 자동 지정됩니다."
-            data-tt-example="--model gpt-6-astra"><code>GPT-6-Astra</code> 모델 공식 탑재 및 신규 설치 환경 기본 모델 지정 (v0.153.4) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Vim 모드 Undo(u) / Redo(Ctrl+R) 완벽 지원 (v0.153.0)"
-            data-tt-desc="Vim 모드에서 u와 Ctrl+R로 붙여넣은 코드와 파일 첨부를 포함한 전체 드래프트 상태를 손실 없이 복원할 수 있습니다."
-            data-tt-example="u / Ctrl+R">Vim 모드 완벽한 <code>u</code>(실행 취소) 및 <code>Ctrl+R</code>(다시 실행) 드래프트 복원 지원 (v0.153.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="원격 마켓플레이스 플러그인 CLI 관리 (v0.153.0)"
-            data-tt-desc="codex plugin 명령으로 원격 마켓플레이스에서 플러그인을 직접 검색, 설치, 제거할 수 있습니다."
-            data-tt-example="codex plugin install <name>">원격 마켓플레이스 플러그인 CLI 검색·설치·제거 지원 (v0.153.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="자동 요약 토글(tui.auto_recap) 지원 (v0.153.0)"
-            data-tt-desc="tui.auto_recap 설정을 false로 지정하여 긴 대화 세션에서의 자동 요약(recap) 생성을 비활성화할 수 있습니다."
-            data-tt-example="tui.auto_recap = false"><code>tui.auto_recap = false</code> 설정으로 자동 요약(Recap) 비활성화 지원 (v0.153.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Astra 모델 비동기 질문 안정성 개선 (v0.153.4)"
-            data-tt-desc="GPT-6-Astra 모델과의 비동기 질의응답 처리 및 모델 선택기 가시성 안정성을 개선했습니다."
-            data-tt-example="">Astra 모델 비동기 질의응답 및 모델 선택기 가시성 개선 (v0.153.4) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="--worktree 격리 세션 Git 워크트리 (v0.154.0)"
+            data-tt-desc="--worktree 플래그 또는 /worktree 명령으로 세션별 독립 Git 체크아웃을 생성하여 메인 브랜치 오염 없이 여러 작업을 동시 실행합니다."
+            data-tt-example="codex --worktree feature-branch"><code>--worktree</code> / <code>/worktree</code> 세션별 격리 Git 체크아웃 및 동시 다중 작업 지원 (v0.154.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="추론 강도 max / ultra 옵션 지원 (v0.154.0)"
+            data-tt-desc="고난도 알고리즘 설계 및 아키텍처 리팩토링 시 모델의 사고 강도를 최고 단계(max, ultra)로 지정할 수 있습니다."
+            data-tt-example="reasoning-effort: ultra">추론 강도(reasoning-effort) <code>max</code> 및 <code>ultra</code> 옵션 추가 (v0.154.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Windows 백그라운드 서버 모드 지원 (v0.154.0)"
+            data-tt-desc="Windows 환경에서 백그라운드 Codex 상주 서버를 구동하여 터미널 분리 및 장시간 에이전트 작업을 끊김 없이 유지합니다."
+            data-tt-example="codex server start">Windows 백그라운드 Codex 상주 서버 공식 지원 (v0.154.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="외부 시스템 연계 에이전트 턴 제어 (v0.154.0)"
+            data-tt-desc="외부 스크립트나 CI/CD 파이프라인이 도구 수준의 권한으로 Codex 에이전트 세션의 턴을 직접 시작하거나 참여할 수 있습니다."
+            data-tt-example="">외부 시스템의 도구 수준 권한 에이전트 턴 시작 및 참여 지원 (v0.154.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="GPT-6-Astra Bedrock 및 모델 선택기 지원 (v0.154.0)"
+            data-tt-desc="Amazon Bedrock 환경 및 상위 배포 환경에서 GPT-6-Astra 모델을 모델 선택기를 통해 원활히 선택하고 구동할 수 있습니다."
+            data-tt-example="--model bedrock/gpt-6-astra">모델 선택기 및 Amazon Bedrock 연동 GPT-6-Astra 지원 확장 (v0.154.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('codex')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-codex" class="history-container">
+
+          <details class="ver-group">
+            <summary>v0.153.0~v0.153.4</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="GPT-6-Astra 모델 공식 탑재 (v0.153.4)"
+                data-tt-desc="모델 선택기에 GPT-6-Astra가 공식 노출되며, 신규 미구성 설치 환경에서 기본 모델로 자동 지정됩니다."
+                data-tt-example="--model gpt-6-astra"><code>GPT-6-Astra</code> 모델 공식 탑재 및 신규 설치 환경 기본 모델 지정 (v0.153.4)</li>
+              <li class="cl-tip" data-tt-title="Vim 모드 Undo(u) / Redo(Ctrl+R) 완벽 지원 (v0.153.0)"
+                data-tt-desc="Vim 모드에서 u와 Ctrl+R로 붙여넣은 코드와 파일 첨부를 포함한 전체 드래프트 상태를 손실 없이 복원할 수 있습니다."
+                data-tt-example="u / Ctrl+R">Vim 모드 완벽한 <code>u</code>(실행 취소) 및 <code>Ctrl+R</code>(다시 실행) 드래프트 복원 지원 (v0.153.0)</li>
+              <li class="cl-tip" data-tt-title="원격 마켓플레이스 플러그인 CLI 관리 (v0.153.0)"
+                data-tt-desc="codex plugin 명령으로 원격 마켓플레이스에서 플러그인을 직접 검색, 설치, 제거할 수 있습니다."
+                data-tt-example="codex plugin install <name>">원격 마켓플레이스 플러그인 CLI 검색·설치·제거 지원 (v0.153.0)</li>
+              <li class="cl-tip" data-tt-title="자동 요약 토글(tui.auto_recap) 지원 (v0.153.0)"
+                data-tt-desc="tui.auto_recap 설정을 false로 지정하여 긴 대화 세션에서의 자동 요약(recap) 생성을 비활성화할 수 있습니다."
+                data-tt-example="tui.auto_recap = false"><code>tui.auto_recap = false</code> 설정으로 자동 요약(Recap) 비활성화 지원 (v0.153.0)</li>
+              <li class="cl-tip" data-tt-title="Astra 모델 비동기 질문 안정성 개선 (v0.153.4)"
+                data-tt-desc="GPT-6-Astra 모델과의 비동기 질의응답 처리 및 모델 선택기 가시성 안정성을 개선했습니다."
+                data-tt-example="">Astra 모델 비동기 질의응답 및 모델 선택기 가시성 개선 (v0.153.4)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v0.147.0~v0.150.1</summary>

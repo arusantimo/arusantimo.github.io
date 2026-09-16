@@ -1,4 +1,24 @@
 window.CODEX_TIPS = {
+  "--worktree": {
+    "title": "--worktree — 격리 Git 워크트리 세션 실행",
+    "desc": "현재 브랜치와 분리된 임시/독립 Git worktree를 생성하여 충돌 없이 병렬 에이전트 작업을 수행합니다.",
+    "example": "codex --worktree feature-branch"
+  },
+  "/worktree": {
+    "title": "/worktree — 세션 내 Git 워크트리 관리",
+    "desc": "대화형 TUI 내에서 새로운 워크트리를 생성하거나 기존 워크트리 세션으로 전환합니다.",
+    "example": "/worktree new task-login"
+  },
+  "reasoning-effort": {
+    "title": "reasoning-effort — 추론 강도 설정 (max / ultra)",
+    "desc": "복잡한 아키텍처 분석이나 대규모 리팩토링 시 모델의 추론 예산 및 사고 강도를 상향(max 또는 ultra) 지정합니다.",
+    "example": "codex --reasoning-effort ultra"
+  },
+  "codex server": {
+    "title": "codex server — Windows/Linux 백그라운드 상주 서버",
+    "desc": "터미널을 닫아도 백그라운드에서 에이전트 루프를 유지하고 외부 도구 연결을 수신하는 상주 서버를 구동합니다.",
+    "example": "codex server start"
+  },
   "gpt-6-astra": {
     "title": "GPT-6-Astra 모델",
     "desc": "Codex CLI에 정식 탑재된 OpenAI의 차세대 추론 및 에이전트 코딩 특화 모델입니다.",

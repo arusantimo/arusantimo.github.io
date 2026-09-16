@@ -10,38 +10,56 @@ const cursorContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows/macOS 공용 · AI 에디터</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v3.19.13</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-09-04</span>
+        <span class="meta-version">v3.20.21</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-13</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v3.19.13)</span>
+        <span>📋 최근 변경사항 (v3.20.21)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Self-Hosted Machines 정식 지원 (v3.19)"
-            data-tt-desc="도구 실행, 코드베이스 파일, 빌드 결과물, 시크릿을 자체 인프라 내에 격리 유지하면서 Cursor 오케스트레이션 루프를 활용합니다."
-            data-tt-example="Self-hosted Machines">Self-Hosted Machines 정식 지원: 사내 인프라 내 완벽한 코드/시크릿 격리 실행 (v3.19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Team Pools 동적 스케줄링 (v3.19)"
-            data-tt-desc="수요에 맞춰 동적으로 확장되고 유휴 시 절전(휴면)되는 워커 큐를 구성해 비용을 최적화합니다."
-            data-tt-example="Team Pools">Team Pools 동적 스케줄링 및 유휴 시 자동 절전/휴면 비용 최적화 (v3.19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="샌드박스 인프라 공급자 대폭 확장 (v3.19)"
-            data-tt-desc="AWS Lambda, Coder, Cloudflare, Daytona, Modal, Namespace, Vercel, E2B 등 다양한 인프라에서 Cloud Agent를 실행할 수 있습니다."
-            data-tt-example="">샌드박스 인프라 확장(AWS Lambda, Cloudflare, Daytona, Modal, E2B 등) (v3.19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Computer Use (컴퓨터 직접 조작) 지원 (v3.19)"
-            data-tt-desc="Linux 및 Mac Self-hosted 워커에서 에이전트가 클릭, 타이핑, 스크린샷, 브라우저 조작을 직접 수행합니다."
-            data-tt-example="Computer Use">Linux/Mac Self-hosted 워커 Computer Use(클릭/타이핑/스크린샷/브라우저 조작) 지원 (v3.19) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="워크스페이스 세션 지속성 및 대화 마이그레이션 개선 (v3.19)"
-            data-tt-desc="대규모 세션의 로컬 데이터 저장소 및 워크스페이스 간 대화 기록 마이그레이션 안정성을 개선했습니다."
-            data-tt-example="">워크스페이스 세션 지속성 및 대화 기록 마이그레이션 안정화 (v3.19) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Cursor Projects 대규모 태스크 오케스트레이션 (v3.20)"
+            data-tt-desc="풀 앱 빌드 및 대규모 마이그레이션을 총괄하는 코디네이터 에이전트가 서브에이전트들에게 작업을 분할 위임하고 상태를 추적합니다."
+            data-tt-example="Cursor Projects"><code>Cursor Projects</code> 공식 도입: 코디네이터 에이전트 기반 대규모 풀 앱 빌드·서브에이전트 위임 (v3.20) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Projects 공유 컨텍스트 노트 및 클라우드-로컬 연계 (v3.20)"
+            data-tt-desc="로컬 에디터와 클라우드 환경 간에 지속되는 공용 컨텍스트 노트를 통해 프로젝트 전반의 의사결정과 진행 상황을 동기화합니다."
+            data-tt-example="">Projects 공유 컨텍스트 노트 및 클라우드-로컬 환경 연계 (v3.20) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Agents Window 터미널 어태치 및 워크플로우 UI 개선 (v3.20)"
+            data-tt-desc="Agents Window에서 실행 중인 백그라운드 터미널 프로세스를 바로 연결(Attach)하고 태스크 흐름을 탐색할 수 있습니다."
+            data-tt-example="Agents Window">Agents Window 내 터미널 어태치(Attach) 및 워크플로우 탐색 UI 개편 (v3.20) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="cursor-agent 세션 복원 및 WSL 연동 안정화 (v3.20.21)"
+            data-tt-desc="cursor-agent의 네트워크 단절 시 자동 재시도 로직 및 WSL 환경에서의 터미널 통신 안정성을 대폭 향상했습니다."
+            data-tt-example="cursor-agent"><code>cursor-agent</code> 세션 재시도(Retry) 로직 및 WSL 터미널 연동 안정화 (v3.20.21) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('cursor')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-cursor" class="history-container">
+
+          <details class="ver-group">
+            <summary>v3.19~v3.19.13</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Self-Hosted Machines 정식 지원 (v3.19)"
+                data-tt-desc="도구 실행, 코드베이스 파일, 빌드 결과물, 시크릿을 자체 인프라 내에 격리 유지하면서 Cursor 오케스트레이션 루프를 활용합니다."
+                data-tt-example="Self-hosted Machines">Self-Hosted Machines 정식 지원: 사내 인프라 내 완벽한 코드/시크릿 격리 실행 (v3.19)</li>
+              <li class="cl-tip" data-tt-title="Team Pools 동적 스케줄링 (v3.19)"
+                data-tt-desc="수요에 맞춰 동적으로 확장되고 유휴 시 절전(휴면)되는 워커 큐를 구성해 비용을 최적화합니다."
+                data-tt-example="Team Pools">Team Pools 동적 스케줄링 및 유휴 시 자동 절전/휴면 비용 최적화 (v3.19)</li>
+              <li class="cl-tip" data-tt-title="샌드박스 인프라 공급자 대폭 확장 (v3.19)"
+                data-tt-desc="AWS Lambda, Coder, Cloudflare, Daytona, Modal, Namespace, Vercel, E2B 등 다양한 인프라에서 Cloud Agent를 실행할 수 있습니다."
+                data-tt-example="">샌드박스 인프라 확장(AWS Lambda, Cloudflare, Daytona, Modal, E2B 등) (v3.19)</li>
+              <li class="cl-tip" data-tt-title="Computer Use (컴퓨터 직접 조작) 지원 (v3.19)"
+                data-tt-desc="Linux 및 Mac Self-hosted 워커에서 에이전트가 클릭, 타이핑, 스크린샷, 브라우저 조작을 직접 수행합니다."
+                data-tt-example="Computer Use">Linux/Mac Self-hosted 워커 Computer Use(클릭/타이핑/스크린샷/브라우저 조작) 지원 (v3.19)</li>
+              <li class="cl-tip" data-tt-title="워크스페이스 세션 지속성 및 대화 마이그레이션 개선 (v3.19)"
+                data-tt-desc="대규모 세션의 로컬 데이터 저장소 및 워크스페이스 간 대화 기록 마이그레이션 안정성을 개선했습니다."
+                data-tt-example="">워크스페이스 세션 지속성 및 대화 기록 마이그레이션 안정화 (v3.19)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v3.17~v3.17.21</summary>

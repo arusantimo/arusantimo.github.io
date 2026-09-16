@@ -1,4 +1,14 @@
 window.CURSOR_TIPS = {
+  "Cursor Projects": {
+    "title": "Cursor Projects — 대규모 태스크 오케스트레이션",
+    "desc": "코디네이터 에이전트가 서브에이전트들에게 하위 작업을 분할 위임하고 공유 컨텍스트 노트를 관리하여 대규모 프로젝트를 자율 수행합니다.",
+    "example": "Cursor Projects"
+  },
+  "cursor-agent": {
+    "title": "cursor-agent — Cursor 코딩 에이전트 CLI & 엔진",
+    "desc": "터미널 및 에디터 내부에서 파일 수정, 명령 실행, 플랜 수립을 수행하는 핵심 에이전트 CLI 실행 엔진입니다.",
+    "example": "cursor-agent --help"
+  },
   "agent": {
     "title": "agent — 터미널 대화형 코딩 에이전트",
     "desc": "터미널에서 직접 실행할 수 있는 독립형 대화형 코딩 에이전트 CLI입니다.",

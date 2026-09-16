@@ -10,35 +10,56 @@ const antigravityContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 기준 · Agent-first 플랫폼</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.12.2</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-09-03</span>
+        <span class="meta-version">v2.13.0</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-09</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.12.2)</span>
+        <span>📋 최근 변경사항 (v2.13.0)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="Gemini 3.8 Flash 추론 모델 ADC 지원 (v2.12.2)"
-            data-tt-desc="엔터프라이즈 환경에서 Application Default Credentials(ADC)를 통해 Google의 최신 Gemini 3.8 Flash 추론 모델을 에이전트 태스크에 활용할 수 있습니다."
-            data-tt-example="">Gemini 3.8 Flash 추론 모델 ADC(Application Default Credentials) 기업 지원 (v2.12.2) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="텍스트 하이라이트 인용(Quoting) (v2.12.0)"
-            data-tt-desc="이전 응답의 특정 텍스트를 드래그하여 후속 프롬프트의 컨텍스트로 즉시 인용할 수 있습니다."
-            data-tt-example="">이전 응답 텍스트 하이라이트 인용(Quoting) 기능 추가 (v2.12.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/boost 멀티 에이전트 추론 가속 (v2.12.0)"
-            data-tt-desc="멀티 에이전트 추론 파이프라인을 구동하여 복잡한 설계 및 코딩 작업 시 사고(thinking) 깊이와 해결 품질을 극대화합니다."
-            data-tt-example="/boost"><code>/boost</code> 멀티 에이전트 추론 파이프라인 및 사고(Thinking) 강화 지원 (v2.12.0) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="설정 내 프로젝트 오버라이드 시각화 (v2.12.0)"
-            data-tt-desc="General Settings에서 프로젝트별 설정 오버라이드 항목을 명확히 표시하고 해당 프로젝트 설정으로 바로 이동하는 링크를 제공합니다."
-            data-tt-example="Settings">일반 설정 내 프로젝트별 오버라이드 상태 시각화 및 바로가기 링크 제공 (v2.12.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="사이드바 Documents 전용 섹션 신설 (v2.13.0)"
+            data-tt-desc="Google Drive 링크, PDF, Office 문서를 Artifacts 상단의 전용 Documents 섹션에서 체계적으로 관리합니다."
+            data-tt-example="Documents">사이드바 Documents 전용 섹션 도입: Google Drive, PDF, 문서 통합 관리 (v2.13.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="공백 변경 숨김(Hide Whitespace Changes) (v2.13.0)"
+            data-tt-desc="Diff 뷰어 및 Review Changes 메뉴에서 줄바꿈/들여쓰기 등 비기능적 공백 변경을 필터링하여 실제 코드 변화에 집중합니다."
+            data-tt-example="">Diff 뷰어 및 Review 메뉴 "공백 변경 숨김(Hide Whitespace Changes)" 옵션 추가 (v2.13.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="대용량 아티팩트 가상화 뷰어(Virtualized Viewer) (v2.13.0)"
+            data-tt-desc="대규모 SQL, JSONL 등 대용량 데이터/코드 아티팩트를 가상화 뷰어로 고속 렌더링하고 인라인 코멘트를 지원합니다."
+            data-tt-example="">대용량 코드/데이터 아티팩트 가상화 뷰어 및 인라인 코멘트 지원 (v2.13.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="인터랙티브 에이전트 취소 제어 (v2.13.0)"
+            data-tt-desc="프롬프트 대기 시 빈 응답 제출 없이 즉시 취소할 수 있는 취소 버튼 및 단축키(macOS: Ctrl+C, Win/Linux: Ctrl+D)를 제공합니다."
+            data-tt-example="Ctrl+C / Ctrl+D">에이전트 대화형 취소 버튼 및 단축키(<code>Ctrl+C</code> / <code>Ctrl+D</code>) 지원 (v2.13.0) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="Side Question 최소화 및 텍스트 인용 단축키 (v2.13.0)"
+            data-tt-desc="Side Question 닫기 시 컴포저 툴바에 최소화 버튼으로 보관하며, Cmd/Ctrl+L 및 Cmd/Ctrl+I로 텍스트를 인용할 수 있습니다."
+            data-tt-example="Cmd/Ctrl+L">Side Question 최소화 보관 및 텍스트 인용 단축키(<code>Cmd/Ctrl+L</code>) 추가 (v2.13.0) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('antigravity')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-antigravity" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.12.0~v2.12.2</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="Gemini 3.8 Flash 추론 모델 ADC 지원 (v2.12.2)"
+                data-tt-desc="엔터프라이즈 환경에서 Application Default Credentials(ADC)를 통해 Google의 최신 Gemini 3.8 Flash 추론 모델을 에이전트 태스크에 활용할 수 있습니다."
+                data-tt-example="">Gemini 3.8 Flash 추론 모델 ADC(Application Default Credentials) 기업 지원 (v2.12.2)</li>
+              <li class="cl-tip" data-tt-title="텍스트 하이라이트 인용(Quoting) (v2.12.0)"
+                data-tt-desc="이전 응답의 특정 텍스트를 드래그하여 후속 프롬프트의 컨텍스트로 즉시 인용할 수 있습니다."
+                data-tt-example="">이전 응답 텍스트 하이라이트 인용(Quoting) 기능 추가 (v2.12.0)</li>
+              <li class="cl-tip" data-tt-title="/boost 멀티 에이전트 추론 가속 (v2.12.0)"
+                data-tt-desc="멀티 에이전트 추론 파이프라인을 구동하여 복잡한 설계 및 코딩 작업 시 사고(thinking) 깊이와 해결 품질을 극대화합니다."
+                data-tt-example="/boost"><code>/boost</code> 멀티 에이전트 추론 파이프라인 및 사고(Thinking) 강화 지원 (v2.12.0)</li>
+              <li class="cl-tip" data-tt-title="설정 내 프로젝트 오버라이드 시각화 (v2.12.0)"
+                data-tt-desc="General Settings에서 프로젝트별 설정 오버라이드 항목을 명확히 표시하고 해당 프로젝트 설정으로 바로 이동하는 링크를 제공합니다."
+                data-tt-example="Settings">일반 설정 내 프로젝트별 오버라이드 상태 시각화 및 바로가기 링크 제공 (v2.12.0)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.5.0~v2.11.0</summary>

@@ -1,4 +1,19 @@
 window.ANTIGRAVITY_TIPS = {
+  "Documents": {
+    "title": "사이드바 Documents 전용 섹션",
+    "desc": "Google Drive 링크, PDF, 오피스 문서 등 프로젝트 외부 참조 문서를 Artifacts 상단 전용 영역에서 통합 관리합니다.",
+    "example": "Documents"
+  },
+  "Hide Whitespace Changes": {
+    "title": "공백 변경 숨김(Hide Whitespace Changes)",
+    "desc": "Diff 뷰어 및 변경사항 검토 메뉴에서 공백/줄바꿈 차이를 제외하고 실질적인 코드 변경 내용만 필터링합니다.",
+    "example": "Hide Whitespace Changes"
+  },
+  "Virtualized Viewer": {
+    "title": "대용량 아티팩트 가상화 뷰어",
+    "desc": "대용량 SQL 덤프, JSONL 로그 등 거대한 파일도 끊김 없이 렌더링하며 구문 강조 및 인라인 코멘트를 지원합니다.",
+    "example": "Virtualized Viewer"
+  },
   "/boost": {
     "title": "/boost — 멀티 에이전트 추론 가속",
     "desc": "멀티 에이전트 추론 파이프라인을 작동시켜 복잡한 문제 해결 시 에이전트의 사고(thinking) 깊이와 답변 품질을 대폭 강화합니다.",

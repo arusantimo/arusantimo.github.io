@@ -1,4 +1,34 @@
 window.CLAUDE_TIPS = {
+  "/fast": {
+    "title": "/fast — 빠른 추론 모드 토글",
+    "desc": "원격/클라우드 세션 및 로컬 세션에서 지원되는 빠른 추론(Fast mode)을 토글합니다. 조직 설정에 따라 활성화 가능합니다.",
+    "example": "/fast"
+  },
+  "/output-style": {
+    "title": "/output-style — 출력 스타일 목록 및 전환",
+    "desc": "헤드리스/원격/일반 세션에서 지원되는 출력 스타일 목록을 조회하고 실시간으로 스타일을 변경합니다.",
+    "example": "/output-style"
+  },
+  "claude plugin eval": {
+    "title": "claude plugin eval — 플러그인 평가 스위트 실행",
+    "desc": "플러그인에 정의된 eval 스위트를 Claude Code 상에서 실행하고 점수화된 JSON/HTML 리포트를 생성합니다.",
+    "example": "claude plugin eval --help"
+  },
+  "bashEditDiffEnabled": {
+    "title": "bashEditDiffEnabled — Bash 파일 편집 diff 반환",
+    "desc": "Bash 도구로 파일 수정 시 변경된 파일의 diff 내용을 터미널 및 모델 컨텍스트에 즉시 반환하도록 설정합니다.",
+    "example": "\"bashEditDiffEnabled\": true"
+  },
+  "maxEffortLevel": {
+    "title": "maxEffortLevel — 추론 노력 수준 상한 설정",
+    "desc": "모든 프로바이더(Bedrock, Vertex, Foundry 포함)에서 모델의 최대 추론 강도(effort)를 제한하는 설정입니다.",
+    "example": "\"maxEffortLevel\": \"high\""
+  },
+  "omitClaudeMd": {
+    "title": "omitClaudeMd — CLAUDE.md 제외 프론트매터",
+    "desc": "사용자 및 프로젝트 루트의 CLAUDE.md 지침을 건너뛰고 독립된 프롬프트로 서브에이전트를 실행할 때 지정합니다.",
+    "example": "omitClaudeMd: true"
+  },
   "/diff": {
     "title": "/diff — 실시간 diff 패널 토글",
     "desc": "대화창 옆에 전체화면 diff 패널을 열어 Claude가 편집 중인 파일들의 커밋되지 않은 변경사항을 실시간으로 확인합니다.",

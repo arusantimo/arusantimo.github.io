@@ -10,50 +10,83 @@ const claudeContent = `
         <span style="font-size:10px;color:var(--muted);">⊞ Windows 단축키 기준</span>
       </div>
       <div class="meta">
-        <span class="meta-version">v2.1.263</span>
-        <span style="font-size:10px;color:var(--muted2);">2026-09-06</span>
+        <span class="meta-version">v2.1.272</span>
+        <span style="font-size:10px;color:var(--muted2);">2026-09-15</span>
       </div>
     </div>
 
     <div class="changelog-wrap">
       <div class="changelog-toggle" onclick="toggleCL(this)">
         <span class="arrow">▶</span>
-        <span>📋 최근 변경사항 (v2.1.263)</span>
+        <span>📋 최근 변경사항 (v2.1.272)</span>
       </div>
       <div class="changelog-body">
         <ul>
-          <li class="cl-tip" data-tt-title="/diff 실시간 변경사항 패널 (v2.1.260)"
-            data-tt-desc="대화창 옆에 전체화면 diff 패널을 열어 Claude가 편집 중인 파일의 커밋되지 않은 변경사항을 실시간으로 확인하고 토글할 수 있습니다."
-            data-tt-example="/diff"><code>/diff</code> 실시간 전체화면 diff 패널 열기 및 변경사항 모니터링 (v2.1.260) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/skill-doctor 미사용 스킬 진단 (v2.1.261)"
-            data-tt-desc="로드된 스킬 중 실제로 사용되지 않는 스킬과 컨텍스트(토큰) 비용을 분석하여 불필요한 스킬을 정리할 수 있도록 돕습니다."
-            data-tt-example="/skill-doctor"><code>/skill-doctor</code> 미사용 스킬 및 컨텍스트 비용 진단 도구 추가 (v2.1.261) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="bashOutputMaxChars & taskOutputMaxChars (v2.1.261)"
-            data-tt-desc="명령어 및 백그라운드 태스크의 인라인 출력 수신 한도를 최대 128K 문자까지 상향 조절할 수 있습니다."
-            data-tt-example="bashOutputMaxChars: 65536"><code>bashOutputMaxChars</code> 및 <code>taskOutputMaxChars</code> 인라인 출력 상한(최대 128K) 설정 지원 (v2.1.261) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="--append-subagent-system-prompt-file (v2.1.261)"
-            data-tt-desc="CLI 인자로 전달하기에 너무 긴 서브에이전트 시스템 프롬프트를 파일로부터 직접 읽어옵니다."
-            data-tt-example="claude --append-subagent-system-prompt-file prompt.txt"><code>--append-subagent-system-prompt-file</code> 파일 기반 서브에이전트 프롬프트 지정 (v2.1.261) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="Bash 호환 단어 편집 단축키 지원 (v2.1.261)"
-            data-tt-desc="Ctrl+W(공백 단위 삭제), Alt+F/Alt+D(단어 끝 이동/삭제) 등 표준 Bash 단어 편집 단축키를 기본 지원합니다."
-            data-tt-example="Ctrl+W">Bash 호환 단어 편집 단축키(<code>Ctrl+W</code>, <code>Alt+F</code>, <code>Alt+D</code>) 지원 (v2.1.261) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="/cost 프롬프트 캐시 미스 원인 분석 (v2.1.260)"
-            data-tt-desc="/cost 및 상태줄에 도구 정의/시스템 프롬프트 변경, TTL 만료 등 캐시 미스 발생 원인을 상세히 표시합니다."
-            data-tt-example="/cost"><code>/cost</code> 및 상태줄에 프롬프트 캐시 미스 원인 진단 추가 (v2.1.260) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="헤드리스 세션 지원 확장 (v2.1.260)"
-            data-tt-desc="Desktop/SDK 등 헤드리스 환경을 위한 /reload-plugins 및 텍스트 모드 /advisor를 지원합니다."
-            data-tt-example="/reload-plugins">헤드리스 세션용 <code>/reload-plugins</code> 및 텍스트 모드 <code>/advisor</code> 지원 (v2.1.260) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="전체화면 뷰 클리어 단축키 (v2.1.260)"
-            data-tt-desc="전체화면 모드에서 Ctrl+L / Cmd+K로 터미널 clear와 같이 화면을 정리할 수 있습니다 (스크롤로 이전 내역 조회 가능)."
-            data-tt-example="Ctrl+L"><code>Ctrl+L</code> / <code>Cmd+K</code> 전체화면 터미널 뷰 클리어 단축키 지원 (v2.1.260) <span class="badge-new">NEW</span></li>
-          <li class="cl-tip" data-tt-title="서브에이전트 백그라운드 명령 제한 해제 (v2.1.260)"
-            data-tt-desc="서브에이전트가 실행한 백그라운드 명령어의 기존 1시간 시간제한을 해제하여 종료될 때까지 지속합니다."
-            data-tt-example="">서브에이전트 백그라운드 명령어 1시간 시간제한 해제 (v2.1.260) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="원격 세션 Fast 모드 지원 (v2.1.271)"
+            data-tt-desc="Claude Code Remote 세션(클라우드 및 자체 호스팅 러너)에서 /fast 명령을 통해 빠른 추론 모드를 활성화할 수 있습니다."
+            data-tt-example="/fast"><code>/fast</code> 원격 세션(Cloud 및 Self-hosted) 빠른 추론(Fast) 모드 지원 (v2.1.271) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/config 패널 마우스 인터랙션 지원 (v2.1.271)"
+            data-tt-desc="전체화면 모드의 /config 패널에서 마우스 휠로 목록을 스크롤하고 클릭하여 설정 값을 즉시 변경할 수 있습니다."
+            data-tt-example="/config"><code>/config</code> 전체화면 마우스 휠 스크롤 및 클릭 토글 지원 (v2.1.271) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="명령어별 allowed_domains 네트워크 격리 (v2.1.271)"
+            data-tt-desc="자동(Auto) 모드 샌드박스에서 Bash, PowerShell, Monitor 명령 실행 시 각 명령에 필요한 호스트 도메인만 검토하여 개별적으로 접근을 허용합니다."
+            data-tt-example="allowed_domains: [&quot;api.github.com&quot;]">자동 모드 sandboxing 시 명령어별 <code>allowed_domains</code> 네트워크 도메인 격리 (v2.1.271) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="omitClaudeMd 서브에이전트 CLAUDE.md 제외 옵션 (v2.1.271)"
+            data-tt-desc="에이전트 프론트매터 및 --agents JSON에 omitClaudeMd를 지정하여 사용자/프로젝트 CLAUDE.md를 로드하지 않고 순수 프롬프트로 실행할 수 있습니다."
+            data-tt-example="omitClaudeMd: true">서브에이전트 <code>omitClaudeMd</code> 프론트매터 및 <code>--agents</code> JSON 지원 (v2.1.271) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="claude plugin eval 플러그인 평가 스위트 (v2.1.269)"
+            data-tt-desc="플러그인의 평가(eval) 스위트를 Claude Code에 실행하여 점수화된 재현 가능한 결과(JSON 및 HTML 리포트)를 출력합니다."
+            data-tt-example="claude plugin eval"><code>claude plugin eval</code> 플러그인 평가 스위트 실행 및 점수화 보고서 출력 (v2.1.269) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="/output-style 출력 스타일 목록 및 전환 (v2.1.269)"
+            data-tt-desc="원격 제어, 클라우드 및 헤드리스 세션을 포함한 모든 환경에서 출력 스타일 목록을 확인하고 동적으로 전환할 수 있습니다."
+            data-tt-example="/output-style"><code>/output-style</code> 출력 스타일 조회 및 동적 전환 지원 (v2.1.269) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="bashEditDiffEnabled Bash 파일 편집 diff 반환 (v2.1.269)"
+            data-tt-desc="Bash 도구가 파일 편집을 수행할 때 변경된 파일들의 diff를 결과에 직접 포함하여 모델과 사용자에게 표시합니다."
+            data-tt-example="&quot;bashEditDiffEnabled&quot;: true"><code>bashEditDiffEnabled</code> Bash 도구 파일 편집 diff 결과 반환 설정 (v2.1.269) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="maxEffortLevel 프로바이더별 추론 강도 상한 설정 (v2.1.267)"
+            data-tt-desc="Bedrock, Vertex, Foundry를 포함한 모든 프로바이더에서 최대 추론 노력(effort) 수준을 제한하는 설정을 지원합니다."
+            data-tt-example="&quot;maxEffortLevel&quot;: &quot;high&quot;"><code>maxEffortLevel</code> 모델/프로바이더별 추론 강도 상한 설정 지원 (v2.1.267) <span class="badge-new">NEW</span></li>
+          <li class="cl-tip" data-tt-title="동시 아티팩트 감시 용량 10개로 확장 (v2.1.272)"
+            data-tt-desc="외부에서 재발행되는 아티팩트를 단일 세션에서 최대 10개(기존 5개)까지 동시에 모니터링할 수 있습니다."
+            data-tt-example="">아티팩트(Artifact) 감시 최대 10개 동시 추적 확장 (v2.1.272) <span class="badge-new">NEW</span></li>
         </ul>
 
         <div class="hist-divider" onclick="toggleHist('claude')">🕰️ 이전 버전 히스토리 보기 <span class="hist-arrow">▼</span>
         </div>
         <div id="hist-claude" class="history-container">
+
+          <details class="ver-group">
+            <summary>v2.1.260~v2.1.263</summary>
+            <ul>
+              <li class="cl-tip" data-tt-title="/diff 실시간 변경사항 패널 (v2.1.260)"
+                data-tt-desc="대화창 옆에 전체화면 diff 패널을 열어 Claude가 편집 중인 파일의 커밋되지 않은 변경사항을 실시간으로 확인하고 토글할 수 있습니다."
+                data-tt-example="/diff"><code>/diff</code> 실시간 전체화면 diff 패널 열기 및 변경사항 모니터링 (v2.1.260)</li>
+              <li class="cl-tip" data-tt-title="/skill-doctor 미사용 스킬 진단 (v2.1.261)"
+                data-tt-desc="로드된 스킬 중 실제로 사용되지 않는 스킬과 컨텍스트(토큰) 비용을 분석하여 불필요한 스킬을 정리할 수 있도록 돕습니다."
+                data-tt-example="/skill-doctor"><code>/skill-doctor</code> 미사용 스킬 및 컨텍스트 비용 진단 도구 추가 (v2.1.261)</li>
+              <li class="cl-tip" data-tt-title="bashOutputMaxChars & taskOutputMaxChars (v2.1.261)"
+                data-tt-desc="명령어 및 백그라운드 태스크의 인라인 출력 수신 한도를 최대 128K 문자까지 상향 조절할 수 있습니다."
+                data-tt-example="bashOutputMaxChars: 65536"><code>bashOutputMaxChars</code> 및 <code>taskOutputMaxChars</code> 인라인 출력 상한(최대 128K) 설정 지원 (v2.1.261)</li>
+              <li class="cl-tip" data-tt-title="--append-subagent-system-prompt-file (v2.1.261)"
+                data-tt-desc="CLI 인자로 전달하기에 너무 긴 서브에이전트 시스템 프롬프트를 파일로부터 직접 읽어옵니다."
+                data-tt-example="claude --append-subagent-system-prompt-file prompt.txt"><code>--append-subagent-system-prompt-file</code> 파일 기반 서브에이전트 프롬프트 지정 (v2.1.261)</li>
+              <li class="cl-tip" data-tt-title="Bash 호환 단어 편집 단축키 지원 (v2.1.261)"
+                data-tt-desc="Ctrl+W(공백 단위 삭제), Alt+F/Alt+D(단어 끝 이동/삭제) 등 표준 Bash 단어 편집 단축키를 기본 지원합니다."
+                data-tt-example="Ctrl+W">Bash 호환 단어 편집 단축키(<code>Ctrl+W</code>, <code>Alt+F</code>, <code>Alt+D</code>) 지원 (v2.1.261)</li>
+              <li class="cl-tip" data-tt-title="/cost 프롬프트 캐시 미스 원인 분석 (v2.1.260)"
+                data-tt-desc="/cost 및 상태줄에 도구 정의/시스템 프롬프트 변경, TTL 만료 등 캐시 미스 발생 원인을 상세히 표시합니다."
+                data-tt-example="/cost"><code>/cost</code> 및 상태줄에 프롬프트 캐시 미스 원인 진단 추가 (v2.1.260)</li>
+              <li class="cl-tip" data-tt-title="헤드리스 세션 지원 확장 (v2.1.260)"
+                data-tt-desc="Desktop/SDK 등 헤드리스 환경을 위한 /reload-plugins 및 텍스트 모드 /advisor를 지원합니다."
+                data-tt-example="/reload-plugins">헤드리스 세션용 <code>/reload-plugins</code> 및 텍스트 모드 <code>/advisor</code> 지원 (v2.1.260)</li>
+              <li class="cl-tip" data-tt-title="전체화면 뷰 클리어 단축키 (v2.1.260)"
+                data-tt-desc="전체화면 모드에서 Ctrl+L / Cmd+K로 터미널 clear와 같이 화면을 정리할 수 있습니다 (스크롤로 이전 내역 조회 가능)."
+                data-tt-example="Ctrl+L"><code>Ctrl+L</code> / <code>Cmd+K</code> 전체화면 터미널 뷰 클리어 단축키 지원 (v2.1.260)</li>
+              <li class="cl-tip" data-tt-title="서브에이전트 백그라운드 명령 제한 해제 (v2.1.260)"
+                data-tt-desc="서브에이전트가 실행한 백그라운드 명령어의 기존 1시간 시간제한을 해제하여 종료될 때까지 지속합니다."
+                data-tt-example="">서브에이전트 백그라운드 명령어 1시간 시간제한 해제 (v2.1.260)</li>
+            </ul>
+          </details>
 
           <details class="ver-group">
             <summary>v2.1.243~v2.1.250</summary>
