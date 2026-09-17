@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-17T06:06:08+00:00",
+    "generatedAt": "2026-09-17T08:35:29+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -29,12 +29,27 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 4660
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한켐",
+        "code": "457370",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 12390
       }
     ],
     "blacklist": [
       {
-        "code": "043260",
-        "name": "성호전자",
+        "code": "347700",
+        "name": "스피어",
         "reasons": [
           "투자 주의"
         ],
@@ -44,8 +59,8 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "347700",
-        "name": "스피어",
+        "code": "043260",
+        "name": "성호전자",
         "reasons": [
           "투자 주의"
         ],
