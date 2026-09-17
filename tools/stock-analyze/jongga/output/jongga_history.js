@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-17",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260917.js",
+    "jsonFile": "jongga/output/202609/latest_20260917.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260917.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-17T06:06:08+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "미투온",
+        "code": "201490",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 4660
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "043260",
+        "name": "성호전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "347700",
+        "name": "스피어",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-16",
     "variant": "stable",
     "variantLabel": "현재 버전",
