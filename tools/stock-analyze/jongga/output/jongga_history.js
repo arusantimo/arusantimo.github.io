@@ -9,26 +9,41 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-18T06:05:39+00:00",
+    "generatedAt": "2026-09-18T08:36:40+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "가온전선",
+        "code": "000500",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 332500
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "대원전선",
         "code": "006340",
-        "score": 9.2,
-        "signalScore": 9.2,
-        "strictScore": 9.2,
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 9.2,
+        "grade": "A",
+        "gradeScore": 8.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 13870
+        "currentPrice": 14050
       },
       {
         "strategy": "reversal",
@@ -44,21 +59,6 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 31350
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "가온전선",
-        "code": "000500",
-        "score": 7.4,
-        "signalScore": 7.4,
-        "strictScore": 7.4,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.4,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 326500
       }
     ],
     "blacklist": []
