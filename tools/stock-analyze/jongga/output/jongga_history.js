@@ -9,41 +9,116 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-21T06:06:54+00:00",
+    "generatedAt": "2026-09-21T08:35:42+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 10.9,
-        "signalScore": 10.9,
-        "strictScore": 10.9,
+        "score": 11.6,
+        "signalScore": 11.6,
+        "strictScore": 11.6,
         "scoreMax": 13.0,
         "grade": "S",
-        "gradeScore": 8.7,
+        "gradeScore": 9.3,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
         "entryEligible": false,
-        "currentPrice": 1128000
+        "currentPrice": 1127000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1877000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 8.5,
-        "signalScore": 8.5,
-        "strictScore": 8.5,
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
         "scoreMax": 14.0,
         "grade": "B",
         "gradeScore": 6.1,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 1128000
+        "currentPrice": 1127000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "와이씨",
+        "code": "232140",
+        "score": 5.5,
+        "signalScore": 5.5,
+        "strictScore": 5.5,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
+        "entryEligible": false,
+        "currentPrice": 14480
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.4,
+        "signalScore": 8.4,
+        "strictScore": 8.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1127000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전기",
+        "code": "009150",
+        "score": 8.4,
+        "signalScore": 8.4,
+        "strictScore": 8.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1429000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1877000
       }
     ],
     "blacklist": [
@@ -54,7 +129,8 @@ window.JONGGA_HISTORY_INDEX = [
           "투자 주의"
         ],
         "sources": [
-          "kind"
+          "kind",
+          "toss"
         ],
         "status": "confirmed"
       },
@@ -66,18 +142,6 @@ window.JONGGA_HISTORY_INDEX = [
         ],
         "sources": [
           "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "240810",
-        "name": "원익IPS",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind",
-          "entry"
         ],
         "status": "confirmed"
       },
@@ -94,13 +158,13 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "009150",
-        "name": "삼성전기",
+        "code": "240810",
+        "name": "원익IPS",
         "reasons": [
-          "투자 주의"
+          "공매도 과열"
         ],
         "sources": [
-          "kind"
+          "entry"
         ],
         "status": "confirmed"
       }
