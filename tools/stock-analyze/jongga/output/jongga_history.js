@@ -1,5 +1,112 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-21",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260921.js",
+    "jsonFile": "jongga/output/202609/latest_20260921.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260921.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-21T06:06:54+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
+        "entryEligible": false,
+        "currentPrice": 1128000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.5,
+        "signalScore": 8.5,
+        "strictScore": 8.5,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1128000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "010170",
+        "name": "대한광통신",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "001820",
+        "name": "삼화콘덴서",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "240810",
+        "name": "원익IPS",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "437730",
+        "name": "삼현",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-18",
     "variant": "stable",
     "variantLabel": "현재 버전",
