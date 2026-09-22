@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-22T06:07:07+00:00",
+    "generatedAt": "2026-09-22T08:36:13+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G12)",
+        "entryEligible": false,
+        "currentPrice": 272000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -26,9 +41,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2, G12)",
         "entryEligible": false,
-        "currentPrice": 1144000
+        "currentPrice": 1114000
       },
       {
         "strategy": "pullback",
@@ -41,54 +56,54 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.3,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G4)",
         "entryEligible": false,
-        "currentPrice": 215500
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 10.4,
-        "signalScore": 10.4,
-        "strictScore": 10.4,
-        "scoreMax": 14.0,
-        "grade": "A",
-        "gradeScore": 7.4,
-        "statusLabel": "관심후보",
-        "entryEligible": false,
-        "currentPrice": 1144000
+        "currentPrice": 212500
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "삼성전자",
         "code": "005930",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
         "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 6.4,
+        "gradeScore": 6.7,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 277000
+        "currentPrice": 272000
       },
       {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "심텍",
-        "code": "222800",
-        "score": 4.9,
-        "signalScore": 4.9,
-        "strictScore": 4.9,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 3.9,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.7,
+        "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 148100
+        "currentPrice": 1114000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "하나마이크론",
+        "code": "067310",
+        "score": 8.9,
+        "signalScore": 8.9,
+        "strictScore": 8.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 45500
       },
       {
         "strategy": "reversal",
@@ -110,30 +125,30 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "LG전자",
         "code": "066570",
-        "score": 9.3,
-        "signalScore": 9.3,
-        "strictScore": 9.3,
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 9.3,
+        "grade": "A",
+        "gradeScore": 7.9,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 215500
+        "currentPrice": 212500
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "한전기술",
         "code": "052690",
-        "score": 8.4,
-        "signalScore": 8.4,
-        "strictScore": 8.4,
+        "score": 7.5,
+        "signalScore": 7.5,
+        "strictScore": 7.5,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 8.4,
+        "gradeScore": 7.5,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 137400
+        "currentPrice": 135200
       }
     ],
     "blacklist": [
@@ -149,10 +164,9 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "067310",
-        "name": "하나마이크론",
+        "code": "012210",
+        "name": "삼미금속",
         "reasons": [
-          "공매도 과열",
           "투자 주의"
         ],
         "sources": [
