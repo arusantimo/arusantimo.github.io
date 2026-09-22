@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "runId": "replay-20260922-060800-5e234c93",
+    "entryDate": "2026-09-21",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 1128127.0,
+    "swingTargetPrice": 1250970.0,
+    "stopPrice": 1093190.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260921|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260922-060800-5e234c93",
+    "entryDate": "2026-09-21",
+    "code": "232140",
+    "name": "와이씨",
+    "strategy": "breakout",
+    "entryPrice": 14494.48,
+    "swingTargetPrice": 16507.0,
+    "stopPrice": 14310.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260921|stable|breakout|232140"
+  }
+]

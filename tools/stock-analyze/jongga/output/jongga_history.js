@@ -1,5 +1,168 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-22",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260922.js",
+    "jsonFile": "jongga/output/202609/latest_20260922.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260922.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-22T06:07:07+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1, G2)",
+        "entryEligible": false,
+        "currentPrice": 1144000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 10.4,
+        "signalScore": 10.4,
+        "strictScore": 10.4,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 215500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 10.4,
+        "signalScore": 10.4,
+        "strictScore": 10.4,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1144000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 277000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "심텍",
+        "code": "222800",
+        "score": 4.9,
+        "signalScore": 4.9,
+        "strictScore": 4.9,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G6)",
+        "entryEligible": false,
+        "currentPrice": 148100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "심텍",
+        "code": "222800",
+        "score": 10.0,
+        "signalScore": 10.0,
+        "strictScore": 10.0,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 10.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 148100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 9.3,
+        "signalScore": 9.3,
+        "strictScore": 9.3,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 215500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한전기술",
+        "code": "052690",
+        "score": 8.4,
+        "signalScore": 8.4,
+        "strictScore": 8.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 137400
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "067310",
+        "name": "하나마이크론",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-21",
     "variant": "stable",
     "variantLabel": "현재 버전",
