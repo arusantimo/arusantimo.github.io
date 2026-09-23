@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-23T06:07:09+00:00",
+    "generatedAt": "2026-09-23T08:37:55+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 11.6,
+        "signalScore": 11.6,
+        "strictScore": 11.6,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G12)",
+        "entryEligible": false,
+        "currentPrice": 284500
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -28,37 +43,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 9.3,
         "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
         "entryEligible": false,
-        "currentPrice": 1175000
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 10.9,
-        "signalScore": 10.9,
-        "strictScore": 10.9,
-        "scoreMax": 13.0,
-        "grade": "S",
-        "gradeScore": 8.7,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
-        "entryEligible": false,
-        "currentPrice": 284000
+        "currentPrice": 1180000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "삼성전자",
         "code": "005930",
-        "score": 10.4,
-        "signalScore": 10.4,
-        "strictScore": 10.4,
+        "score": 9.6,
+        "signalScore": 9.6,
+        "strictScore": 9.6,
         "scoreMax": 14.0,
-        "grade": "A",
-        "gradeScore": 7.4,
+        "grade": "B",
+        "gradeScore": 6.9,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 284000
+        "currentPrice": 284500
       },
       {
         "strategy": "accumulation",
@@ -76,6 +76,36 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 1175000
       },
       {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 7.7,
+        "signalScore": 7.7,
+        "strictScore": 7.7,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.5,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 31350
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 4.9,
+        "signalScore": 4.9,
+        "strictScore": 4.9,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 3.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2)",
+        "entryEligible": false,
+        "currentPrice": 195600
+      },
+      {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "SK이노베이션",
@@ -88,7 +118,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 149400
+        "currentPrice": 149200
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대덕전자",
+        "code": "353200",
+        "score": 6.5,
+        "signalScore": 6.5,
+        "strictScore": 6.5,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 119600
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 31350
       }
     ],
     "blacklist": [
@@ -105,30 +165,8 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "387690",
-        "name": "레메디",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
         "code": "009150",
         "name": "삼성전기",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "353200",
-        "name": "대덕전자",
         "reasons": [
           "투자 주의"
         ],
@@ -144,7 +182,6 @@ window.JONGGA_HISTORY_INDEX = [
           "공매도 과열"
         ],
         "sources": [
-          "kind",
           "entry"
         ],
         "status": "confirmed"
