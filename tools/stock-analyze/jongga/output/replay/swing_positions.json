@@ -12,15 +12,39 @@
     "sourceEntryKey": "20260921|stable|accumulation|402340"
   },
   {
-    "runId": "replay-20260922-060800-5e234c93",
-    "entryDate": "2026-09-21",
-    "code": "232140",
-    "name": "와이씨",
-    "strategy": "breakout",
-    "entryPrice": 14494.48,
-    "swingTargetPrice": 16507.0,
-    "stopPrice": 14310.0,
+    "runId": "replay-20260923-060752-53441f6b",
+    "entryDate": "2026-09-22",
+    "code": "005930",
+    "name": "삼성전자",
+    "strategy": "accumulation",
+    "entryPrice": 272272.0,
+    "swingTargetPrice": 301920.0,
+    "stopPrice": 264000.0,
     "qtyPct": 60.0,
-    "sourceEntryKey": "20260921|stable|breakout|232140"
+    "sourceEntryKey": "20260922|stable|accumulation|005930"
+  },
+  {
+    "runId": "replay-20260923-060752-53441f6b",
+    "entryDate": "2026-09-22",
+    "code": "402340",
+    "name": "SK스퀘어",
+    "strategy": "accumulation",
+    "entryPrice": 1115114.0,
+    "swingTargetPrice": 1236540.0,
+    "stopPrice": 1087000.0,
+    "qtyPct": 35.0,
+    "sourceEntryKey": "20260922|stable|accumulation|402340"
+  },
+  {
+    "runId": "replay-20260923-060752-53441f6b",
+    "entryDate": "2026-09-22",
+    "code": "067310",
+    "name": "하나마이크론",
+    "strategy": "accumulation",
+    "entryPrice": 45545.5,
+    "swingTargetPrice": 50505.0,
+    "stopPrice": 44135.0,
+    "qtyPct": 100.0,
+    "sourceEntryKey": "20260922|stable|accumulation|067310"
   }
 ]

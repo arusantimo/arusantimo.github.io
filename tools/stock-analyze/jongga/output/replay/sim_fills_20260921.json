@@ -523,5 +523,26 @@
     "barLow": 1464000.0,
     "barClose": 1491000.0,
     "fillRule": "openPhase_touch"
+  },
+  {
+    "orderId": "20260921|stable|breakout|232140-stop_touch",
+    "sourceEntryKey": "20260921|stable|breakout|232140",
+    "strategy": "breakout",
+    "code": "232140",
+    "name": "와이씨",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-09-22T15:00:00+09:00",
+    "fillPrice": 14310.0,
+    "filledQuantityPct": 60.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-09-22T15:00:00+09:00",
+    "barOpen": 14310.0,
+    "barHigh": 15550.0,
+    "barLow": 13920.0,
+    "barClose": 14300.0,
+    "fillRule": "stop_touch"
   }
 ]

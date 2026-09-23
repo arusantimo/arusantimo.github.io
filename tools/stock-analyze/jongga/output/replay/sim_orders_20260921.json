@@ -918,5 +918,25 @@
     "activeFrom": "2026-09-22T15:00:00+09:00",
     "activeUntil": "2026-09-22T15:00:00+09:00",
     "finalStatus": "cancelled"
+  },
+  {
+    "orderId": "20260921|stable|breakout|232140-stop_touch",
+    "runId": "replay-20260922-060800-5e234c93",
+    "date": "2026-09-21",
+    "variant": "stable",
+    "strategy": "breakout",
+    "code": "232140",
+    "name": "와이씨",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-09-22T15:00:00+09:00",
+    "requestedPrice": 14310.0,
+    "quantityPct": 60.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260921|stable|breakout|232140",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-09-22T15:00:00+09:00",
+    "activeUntil": "2026-09-22T15:00:00+09:00"
   }
 ]

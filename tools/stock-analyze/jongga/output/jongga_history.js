@@ -1,5 +1,157 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-23",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260923.js",
+    "jsonFile": "jongga/output/202609/latest_20260923.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260923.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-23T06:07:09+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 11.6,
+        "signalScore": 11.6,
+        "strictScore": 11.6,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
+        "entryEligible": false,
+        "currentPrice": 1175000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 10.9,
+        "signalScore": 10.9,
+        "strictScore": 10.9,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
+        "entryEligible": false,
+        "currentPrice": 284000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 10.4,
+        "signalScore": 10.4,
+        "strictScore": 10.4,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 284000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1175000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 149400
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "240810",
+        "name": "원익IPS",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "387690",
+        "name": "레메디",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "353200",
+        "name": "대덕전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-22",
     "variant": "stable",
     "variantLabel": "현재 버전",
