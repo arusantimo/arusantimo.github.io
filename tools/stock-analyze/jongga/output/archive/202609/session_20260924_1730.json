@@ -415,13 +415,13 @@
             "rank": 1,
             "name": "삼성전자",
             "code": "005930",
-            "strictScore": 11.6,
-            "signalScore": 11.6,
-            "score": 11.6,
+            "strictScore": 10.3,
+            "signalScore": 10.3,
+            "score": 10.3,
             "scoreMax": 13.0,
             "effectiveScoreMax": 12.5,
-            "gradeScore": 9.3,
-            "grade": "S",
+            "gradeScore": 8.2,
+            "grade": "A",
             "overnightGapPenalty": 0.0,
             "scoreBreakdown": [
               {
@@ -594,8 +594,18 @@
             ],
             "matchedRules": [
               {
+                "code": "S1",
+                "note": "당일 거래대금 순위 1위 (TOP 30 이내 시 충족)",
+                "evalStatus": "met"
+              },
+              {
                 "code": "S2",
                 "note": "외인 4,513,767주 / 기관 1,346,883주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S3",
+                "note": "당일 평균 159.0% / 마지막 1시간 288.2% / 마지막 30분 비율 2.88:1 / 마지막 30분 평균 288.2% · 장후반 흡수 확인",
                 "evalStatus": "met"
               },
               {
@@ -606,6 +616,11 @@
               {
                 "code": "C1",
                 "note": "양봉 (시가 284,500 ≤ 종가 286,500)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 +2.81% / KOSPI +0.90% outperform",
                 "evalStatus": "met"
               },
               {
@@ -630,6 +645,26 @@
               }
             ],
             "unmatchedRules": [
+              {
+                "code": "P1",
+                "note": "저가 281,000 · 이평선 터치: 없음",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "P3",
+                "note": "앵커 중심값 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "C2",
+                "note": "당일 거래량 / 5일 평균 119% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C4",
+                "note": "앵커 거래량 데이터 부족",
+                "evalStatus": "data_missing"
+              },
               {
                 "code": "C5",
                 "note": "뉴스 수집 실패: HTTP Error 410: 410",
@@ -1687,8 +1722,18 @@
             ],
             "matchedRules": [
               {
+                "code": "S1",
+                "note": "당일 거래대금 순위 8위 (TOP 30 이내 시 충족)",
+                "evalStatus": "met"
+              },
+              {
                 "code": "S2",
                 "note": "외인 31,268주 / 기관 61,115주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S3",
+                "note": "당일 평균 143.0% / 마지막 1시간 300.0% / 마지막 30분 비율 9.94:1 / 마지막 30분 평균 300.0% · 장후반 흡수 확인",
                 "evalStatus": "met"
               },
               {
@@ -1699,6 +1744,11 @@
               {
                 "code": "C1",
                 "note": "양봉 (시가 1,179,000 ≤ 종가 1,181,000)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 +2.71% / KOSPI +0.90% outperform",
                 "evalStatus": "met"
               },
               {
@@ -1718,6 +1768,26 @@
               }
             ],
             "unmatchedRules": [
+              {
+                "code": "P1",
+                "note": "저가 1,161,000 · 이평선 터치: 없음",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "P3",
+                "note": "앵커 중심값 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "C2",
+                "note": "당일 거래량 / 5일 평균 135% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C4",
+                "note": "앵커 거래량 데이터 부족",
+                "evalStatus": "data_missing"
+              },
               {
                 "code": "C5",
                 "note": "뉴스 수집 실패: HTTP Error 410: 410",
@@ -2884,8 +2954,18 @@
             ],
             "matchedRules": [
               {
+                "code": "S1",
+                "note": "당일 거래대금 순위 29위 (TOP 30 이내 시 충족)",
+                "evalStatus": "met"
+              },
+              {
                 "code": "S2",
                 "note": "외인 -100,292주 / 기관 267,039주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S3",
+                "note": "당일 평균 119.9% / 마지막 1시간 242.1% / 마지막 30분 비율 4.48:1 / 마지막 30분 평균 242.1% · 장후반 흡수 확인",
                 "evalStatus": "met"
               },
               {
@@ -2896,6 +2976,11 @@
               {
                 "code": "C1",
                 "note": "양봉 (시가 113,600 ≤ 종가 119,200)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 +1.17% / KOSPI +0.90% outperform",
                 "evalStatus": "met"
               },
               {
@@ -2915,6 +3000,26 @@
               }
             ],
             "unmatchedRules": [
+              {
+                "code": "P1",
+                "note": "저가 111,000 · 이평선 터치: 없음",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "P3",
+                "note": "앵커 중심값 데이터 부족",
+                "evalStatus": "data_missing"
+              },
+              {
+                "code": "C2",
+                "note": "당일 거래량 / 5일 평균 153% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C4",
+                "note": "앵커 거래량 데이터 부족",
+                "evalStatus": "data_missing"
+              },
               {
                 "code": "C5",
                 "note": "뉴스 수집 실패: HTTP Error 410: 410",
@@ -3832,12 +3937,12 @@
             "rank": 1,
             "name": "대한항공",
             "code": "003490",
-            "strictScore": 5.7,
-            "signalScore": 5.7,
-            "score": 5.7,
+            "strictScore": 4.8,
+            "signalScore": 4.8,
+            "score": 4.8,
             "scoreMax": 12.5,
             "effectiveScoreMax": 12.5,
-            "gradeScore": 4.6,
+            "gradeScore": 3.8,
             "grade": "C",
             "overnightGapPenalty": 0.0,
             "scoreBreakdown": [
@@ -4504,13 +4609,13 @@
             "rank": 1,
             "name": "삼성전자",
             "code": "005930",
-            "strictScore": 10.4,
-            "signalScore": 10.4,
-            "score": 10.4,
+            "strictScore": 9.6,
+            "signalScore": 9.6,
+            "score": 9.6,
             "scoreMax": 14.0,
             "effectiveScoreMax": 14.0,
-            "gradeScore": 7.4,
-            "grade": "A",
+            "gradeScore": 6.9,
+            "grade": "B",
             "overnightGapPenalty": 0.0,
             "scoreBreakdown": [
               {
@@ -8456,127 +8561,6 @@
   "analysisSession": "1730",
   "analysisSessionLabel": "5시반 분석",
   "sessionSources": [
-    "1500",
     "1730"
-  ],
-  "rescoreMeta": {
-    "rescoredRules": {
-      "pullback": [
-        "D4"
-      ],
-      "accumulation": [
-        "L1"
-      ],
-      "breakout": [
-        "L1"
-      ]
-    },
-    "shortBalanceCodes": [
-      "003490",
-      "005930",
-      "096770",
-      "353200",
-      "402340"
-    ],
-    "changedEntries": [
-      {
-        "strategy": "pullback",
-        "code": "005930",
-        "name": "삼성전자",
-        "changedFields": [
-          "strictScore",
-          "signalScore",
-          "score",
-          "gradeScore",
-          "grade"
-        ],
-        "before": {
-          "strictScore": 10.3,
-          "signalScore": 10.3,
-          "score": 10.3,
-          "scoreMax": 13.0,
-          "effectiveScoreMax": 12.5,
-          "gradeScore": 8.2,
-          "grade": "A"
-        },
-        "after": {
-          "strictScore": 11.6,
-          "signalScore": 11.6,
-          "score": 11.6,
-          "scoreMax": 13.0,
-          "effectiveScoreMax": 12.5,
-          "gradeScore": 9.3,
-          "grade": "S"
-        }
-      },
-      {
-        "strategy": "accumulation",
-        "code": "005930",
-        "name": "삼성전자",
-        "changedFields": [
-          "strictScore",
-          "signalScore",
-          "score",
-          "gradeScore",
-          "grade"
-        ],
-        "before": {
-          "strictScore": 9.6,
-          "signalScore": 9.6,
-          "score": 9.6,
-          "scoreMax": 14.0,
-          "effectiveScoreMax": 14.0,
-          "gradeScore": 6.9,
-          "grade": "B"
-        },
-        "after": {
-          "strictScore": 10.4,
-          "signalScore": 10.4,
-          "score": 10.4,
-          "scoreMax": 14.0,
-          "effectiveScoreMax": 14.0,
-          "gradeScore": 7.4,
-          "grade": "A"
-        }
-      },
-      {
-        "strategy": "breakout",
-        "code": "003490",
-        "name": "대한항공",
-        "changedFields": [
-          "strictScore",
-          "signalScore",
-          "score",
-          "gradeScore"
-        ],
-        "before": {
-          "strictScore": 4.8,
-          "signalScore": 4.8,
-          "score": 4.8,
-          "scoreMax": 12.5,
-          "effectiveScoreMax": 12.5,
-          "gradeScore": 3.8,
-          "grade": "C"
-        },
-        "after": {
-          "strictScore": 5.7,
-          "signalScore": 5.7,
-          "score": 5.7,
-          "scoreMax": 12.5,
-          "effectiveScoreMax": 12.5,
-          "gradeScore": 4.6,
-          "grade": "C"
-        }
-      }
-    ],
-    "providerHealth": {
-      "krx_pykrx_short_balance": {
-        "data_missing": 5
-      },
-      "krx_short_balance_direct_post": {
-        "ok": 5
-      }
-    },
-    "sourcePointInTimeStatus": "confirmed"
-  }
+  ]
 }
