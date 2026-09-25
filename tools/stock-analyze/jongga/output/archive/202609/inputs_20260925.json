@@ -2,7 +2,7 @@
   "schemaVersion": "jongga_inputs.v1",
   "analysisDate": "2026-09-25",
   "variant": "stable",
-  "generatedAt": "2026-09-25T06:07:07+00:00",
+  "generatedAt": "2026-09-25T08:37:16+00:00",
   "payloadSourceMode": "live",
   "rebuildable": true,
   "topLimit": 40,
@@ -11,7 +11,7 @@
       "step": "vkospi_quote",
       "label": "VKOSPI 수집",
       "status": "ok",
-      "durationMs": 664.1,
+      "durationMs": 1759.4,
       "detail": "VKOSPI",
       "count": 1
     },
@@ -19,7 +19,7 @@
       "step": "macro_quotes",
       "label": "글로벌 매크로 지표 수집",
       "status": "ok",
-      "durationMs": 198.9,
+      "durationMs": 291.2,
       "detail": "Yahoo chart 5종",
       "count": 5
     },
@@ -34,28 +34,36 @@
       "step": "kospi_history",
       "label": "KOSPI 히스토리 수집",
       "status": "ok",
-      "durationMs": 1700.7,
+      "durationMs": 2100.6,
       "count": 90
     },
     {
       "step": "market_context",
       "label": "시장 레짐 계산",
       "status": "ok",
-      "durationMs": 528.0,
+      "durationMs": 527.8,
       "detail": "박스권 ⚠️"
     },
     {
       "step": "top_trading",
       "label": "거래대금 상위 종목 수집",
       "status": "ok",
-      "durationMs": 60432.3,
+      "durationMs": 55283.9,
       "count": 22
+    },
+    {
+      "step": "overtime_price",
+      "label": "시간외 단일가 종가 보강",
+      "status": "fallback",
+      "durationMs": 1070.4,
+      "detail": "정규장 종가로 대체",
+      "count": 0
     },
     {
       "step": "short_balance_trend",
       "label": "대차잔고(공매도) 추이 보강 (대형주)",
       "status": "partial",
-      "durationMs": 111637.5,
+      "durationMs": 115334.7,
       "detail": "후보 16종목 중 16건 수집 · fallback 16건 (krx_short_balance_direct_post)",
       "count": 16
     },
@@ -63,7 +71,7 @@
       "step": "stock_snapshots",
       "label": "종목 상세 스냅샷 수집",
       "status": "ok",
-      "durationMs": 9300.4,
+      "durationMs": 9514.7,
       "detail": "성공 22 / 실패 0",
       "count": 22
     },
@@ -71,7 +79,7 @@
       "step": "http_enrichment",
       "label": "토스 API 보강 수집",
       "status": "ok",
-      "durationMs": 12442.1,
+      "durationMs": 12165.7,
       "detail": "direct-http · 체결강도 22 / 호가 22 / 틱프록시 22",
       "count": 22
     },
@@ -79,7 +87,7 @@
       "step": "entry_scoring",
       "label": "전략별 후보 계산",
       "status": "ok",
-      "durationMs": 55636.7,
+      "durationMs": 66496.6,
       "detail": "pullback 3, breakout 1, accumulation 3, reversal 3",
       "count": 10
     },
@@ -87,7 +95,7 @@
       "step": "browser_enrichment",
       "label": "KIND 브라우저 보강",
       "status": "ok",
-      "durationMs": 13273.5,
+      "durationMs": 12556.2,
       "detail": "playwright-chromium · KIND 2",
       "count": 2
     },
@@ -103,7 +111,7 @@
       "step": "blacklist_check",
       "label": "공매도 과열·투자 주의 검증",
       "status": "ok",
-      "durationMs": 56783.1,
+      "durationMs": 57768.1,
       "detail": "확정 2 · 미확인 0",
       "count": 10
     }
@@ -129,41 +137,41 @@
         "fullExchangeName": "CME",
         "instrumentType": "FUTURE",
         "firstTradeDate": 969249600,
-        "regularMarketTime": 1790315499,
+        "regularMarketTime": 1790324494,
         "hasPrePostMarketData": false,
         "gmtoffset": -14400,
         "timezone": "EDT",
         "exchangeTimezoneName": "America/New_York",
-        "regularMarketPrice": 30859.25,
-        "regularMarketChangePercent": 0.301,
-        "fulldayPrice": 30859.25,
-        "fulldayChange": 92.5,
-        "fulldayChangePercent": 0.301,
+        "regularMarketPrice": 30890.0,
+        "regularMarketChangePercent": 0.401,
+        "fulldayPrice": 30890.0,
+        "fulldayChange": 123.25,
+        "fulldayChangePercent": 0.401,
         "fiftyTwoWeekHigh": 31094.75,
         "fiftyTwoWeekLow": 22961.5,
-        "regularMarketDayHigh": 30868.75,
+        "regularMarketDayHigh": 30906.0,
         "regularMarketDayLow": 30679.0,
-        "regularMarketVolume": 39558,
+        "regularMarketVolume": 57403,
         "shortName": "Nasdaq 100 Dec 26",
         "chartPreviousClose": 30784.75,
         "priceHint": 2,
         "currentTradingPeriod": {
           "pre": {
             "timezone": "EDT",
-            "end": 1790308800,
             "start": 1790308800,
+            "end": 1790308800,
             "gmtoffset": -14400
           },
           "regular": {
             "timezone": "EDT",
-            "end": 1790395140,
             "start": 1790308800,
+            "end": 1790395140,
             "gmtoffset": -14400
           },
           "post": {
             "timezone": "EDT",
-            "end": 1790395140,
             "start": 1790395140,
+            "end": 1790395140,
             "gmtoffset": -14400
           }
         },
@@ -191,42 +199,42 @@
         "fullExchangeName": "Cboe Indices",
         "instrumentType": "INDEX",
         "firstTradeDate": 631267200,
-        "regularMarketTime": 1790280901,
+        "regularMarketTime": 1790324191,
         "hasPrePostMarketData": false,
         "gmtoffset": -18000,
         "timezone": "CDT",
         "exchangeTimezoneName": "America/Chicago",
-        "regularMarketPrice": 15.67,
-        "regularMarketChangePercent": 3.228,
-        "fulldayPrice": 15.67,
-        "fulldayChange": 0.49,
-        "fulldayChangePercent": 3.228,
+        "regularMarketPrice": 15.56,
+        "regularMarketChangePercent": -0.702,
+        "fulldayPrice": 15.56,
+        "fulldayChange": -0.11,
+        "fulldayChangePercent": -0.702,
         "fiftyTwoWeekHigh": 35.3,
-        "fiftyTwoWeekLow": 0.0,
-        "regularMarketDayHigh": 0.0,
-        "regularMarketDayLow": 0.0,
+        "fiftyTwoWeekLow": 13.38,
+        "regularMarketDayHigh": 15.64,
+        "regularMarketDayLow": 15.54,
         "regularMarketVolume": 0,
         "longName": "CBOE Volatility Index",
         "shortName": "CBOE Volatility Index",
-        "chartPreviousClose": 14.81,
+        "chartPreviousClose": 14.87,
         "priceHint": 2,
         "currentTradingPeriod": {
           "pre": {
             "timezone": "CDT",
-            "end": 1790319600,
             "start": 1790319600,
+            "end": 1790319600,
             "gmtoffset": -18000
           },
           "regular": {
             "timezone": "CDT",
-            "end": 1790367300,
             "start": 1790319600,
+            "end": 1790367300,
             "gmtoffset": -18000
           },
           "post": {
             "timezone": "CDT",
-            "end": 1790367300,
             "start": 1790367300,
+            "end": 1790367300,
             "gmtoffset": -18000
           }
         },
@@ -260,10 +268,10 @@
         "timezone": "CDT",
         "exchangeTimezoneName": "America/Chicago",
         "regularMarketPrice": 5.162,
-        "regularMarketChangePercent": -49.766,
+        "regularMarketChangePercent": 0.939,
         "fulldayPrice": 5.162,
-        "fulldayChange": -5.114,
-        "fulldayChangePercent": -49.766,
+        "fulldayChange": 0.048,
+        "fulldayChangePercent": 0.939,
         "fiftyTwoWeekHigh": 5.181,
         "fiftyTwoWeekLow": 0.0,
         "regularMarketDayHigh": 0.0,
@@ -276,20 +284,20 @@
         "currentTradingPeriod": {
           "pre": {
             "timezone": "CDT",
-            "start": 1790338800,
             "end": 1790338800,
+            "start": 1790338800,
             "gmtoffset": -18000
           },
           "regular": {
             "timezone": "CDT",
-            "start": 1790338800,
             "end": 1790362800,
+            "start": 1790338800,
             "gmtoffset": -18000
           },
           "post": {
             "timezone": "CDT",
-            "start": 1790362800,
             "end": 1790362800,
+            "start": 1790362800,
             "gmtoffset": -18000
           }
         },
@@ -317,20 +325,20 @@
         "fullExchangeName": "CCY",
         "instrumentType": "CURRENCY",
         "firstTradeDate": 1070236800,
-        "regularMarketTime": 1790316093,
+        "regularMarketTime": 1790325098,
         "hasPrePostMarketData": false,
         "gmtoffset": 3600,
         "timezone": "BST",
         "exchangeTimezoneName": "Europe/London",
-        "regularMarketPrice": 1359.41,
-        "regularMarketChangePercent": -0.4525,
-        "fulldayPrice": 1359.41,
-        "fulldayChange": -6.1799,
-        "fulldayChangePercent": -0.4525,
+        "regularMarketPrice": 1356.16,
+        "regularMarketChangePercent": -0.6905,
+        "fulldayPrice": 1356.16,
+        "fulldayChange": -9.4299,
+        "fulldayChangePercent": -0.6905,
         "fiftyTwoWeekHigh": 1587.7,
         "fiftyTwoWeekLow": 1322.42,
         "regularMarketDayHigh": 1368.96,
-        "regularMarketDayLow": 1358.05,
+        "regularMarketDayLow": 1354.82,
         "regularMarketVolume": 0,
         "longName": "USD/KRW",
         "shortName": "USD/KRW",
@@ -339,20 +347,20 @@
         "currentTradingPeriod": {
           "pre": {
             "timezone": "BST",
-            "start": 1790290800,
             "end": 1790290800,
+            "start": 1790290800,
             "gmtoffset": 3600
           },
           "regular": {
             "timezone": "BST",
-            "start": 1790290800,
             "end": 1790377140,
+            "start": 1790290800,
             "gmtoffset": 3600
           },
           "post": {
             "timezone": "BST",
-            "start": 1790377140,
             "end": 1790377140,
+            "start": 1790377140,
             "gmtoffset": 3600
           }
         },
@@ -402,20 +410,20 @@
         "currentTradingPeriod": {
           "pre": {
             "timezone": "EDT",
-            "start": 1790323200,
             "end": 1790343000,
+            "start": 1790323200,
             "gmtoffset": -14400
           },
           "regular": {
             "timezone": "EDT",
-            "start": 1790343000,
             "end": 1790366400,
+            "start": 1790343000,
             "gmtoffset": -14400
           },
           "post": {
             "timezone": "EDT",
-            "start": 1790366400,
             "end": 1790380800,
+            "start": 1790366400,
             "gmtoffset": -14400
           }
         },
@@ -439,9 +447,9 @@
     },
     "liveMetrics": {
       "nq": {
-        "current": 30859.25,
+        "current": 30890.0,
         "previousClose": 30784.75,
-        "changePct": 0.24200293976725487,
+        "changePct": 0.3418900592013903,
         "asOf": "2026-09-26T03:59:00+00:00",
         "freshnessStatus": "fresh",
         "stale": false,
@@ -457,8 +465,8 @@
         "confidence": 0.85
       },
       "vix": {
-        "current": 15.67,
-        "previousClose": 14.81,
+        "current": 15.56,
+        "previousClose": 14.87,
         "asOf": "2026-09-25T20:15:00+00:00",
         "freshnessStatus": "fresh",
         "stale": false,
@@ -474,9 +482,9 @@
         "freshnessLagDays": -1
       },
       "krw": {
-        "current": 1359.41,
+        "current": 1356.16,
         "previousClose": 1384.86,
-        "changeWon": -25.449999999999818,
+        "changeWon": -28.699999999999818,
         "asOf": "2026-09-25T22:59:00+00:00",
         "freshnessStatus": "fresh",
         "stale": false,
@@ -509,7 +517,7 @@
       "rows": [
         {
           "indicator": "NQ 선물 변화율",
-          "actualValue": "+0.24%",
+          "actualValue": "+0.34%",
           "baseScore": "+0점",
           "weight": "×2.5",
           "formula": "+0 × 2.5 = +0.0점",
@@ -517,7 +525,7 @@
         },
         {
           "indicator": "VIX 수준",
-          "actualValue": "+15.67",
+          "actualValue": "+15.56",
           "baseScore": "+1점",
           "weight": "×2.0",
           "formula": "+1 × 2.0 = +2.0점",
@@ -533,7 +541,7 @@
         },
         {
           "indicator": "원달러 환율 변화",
-          "actualValue": "-25.45원",
+          "actualValue": "-28.70원",
           "baseScore": "+2점",
           "weight": "×1.5",
           "formula": "+2 × 1.5 = +3.0점",
@@ -148337,11 +148345,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/476310_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "9205",
         "compareToPreviousClosePriceRaw": "-10",
         "accumulatedTradingVolumeRaw": "515",
         "accumulatedTradingValueRaw": "4000000",
-        "marketValueRaw": "5062750000",
-        "closePriceRaw": "9205"
+        "marketValueRaw": "5062750000"
       },
       {
         "stockType": "domestic",
@@ -148395,11 +148403,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0154H0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKoAct.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKoAct.png",
+        "closePriceRaw": "9040",
         "compareToPreviousClosePriceRaw": "5",
         "accumulatedTradingVolumeRaw": "222",
         "accumulatedTradingValueRaw": "2000000",
-        "marketValueRaw": "4972000000",
-        "closePriceRaw": "9040"
+        "marketValueRaw": "4972000000"
       },
       {
         "stockType": "domestic",
@@ -148453,11 +148461,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0132D0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKoAct.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKoAct.png",
+        "closePriceRaw": "9030",
         "compareToPreviousClosePriceRaw": "-30",
         "accumulatedTradingVolumeRaw": "528",
         "accumulatedTradingValueRaw": "4000000",
-        "marketValueRaw": "4966500000",
-        "closePriceRaw": "9030"
+        "marketValueRaw": "4966500000"
       },
       {
         "stockType": "domestic",
@@ -148511,11 +148519,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/002995_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock002995.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock002995.png",
+        "closePriceRaw": "16790",
         "compareToPreviousClosePriceRaw": "-210",
         "accumulatedTradingVolumeRaw": "2406",
         "accumulatedTradingValueRaw": "40000000",
-        "marketValueRaw": "4907146140",
-        "closePriceRaw": "16790"
+        "marketValueRaw": "4907146140"
       },
       {
         "stockType": "domestic",
@@ -148569,11 +148577,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/411860_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "16285",
         "compareToPreviousClosePriceRaw": "5",
         "accumulatedTradingVolumeRaw": "1122",
         "accumulatedTradingValueRaw": "18000000",
-        "marketValueRaw": "4885500000",
-        "closePriceRaw": "16285"
+        "marketValueRaw": "4885500000"
       },
       {
         "stockType": "domestic",
@@ -148627,11 +148635,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0073X0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFFOCUS.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFFOCUS.png",
+        "closePriceRaw": "8805",
         "compareToPreviousClosePriceRaw": "5",
         "accumulatedTradingVolumeRaw": "98",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "4842750000",
-        "closePriceRaw": "8805"
+        "marketValueRaw": "4842750000"
       },
       {
         "stockType": "domestic",
@@ -148685,11 +148693,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/760014_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDKIWOOM.png",
+        "closePriceRaw": "6895",
         "compareToPreviousClosePriceRaw": "35",
         "accumulatedTradingVolumeRaw": "210",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "4826500000",
-        "closePriceRaw": "6895"
+        "marketValueRaw": "4826500000"
       },
       {
         "stockType": "domestic",
@@ -148743,11 +148751,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0015K0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFTIGER.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFTIGER.png",
+        "closePriceRaw": "6880",
         "compareToPreviousClosePriceRaw": "-55",
         "accumulatedTradingVolumeRaw": "64",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "4816000000",
-        "closePriceRaw": "6880"
+        "marketValueRaw": "4816000000"
       },
       {
         "stockType": "domestic",
@@ -148801,11 +148809,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/490330_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKoAct.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKoAct.png",
+        "closePriceRaw": "13740",
         "compareToPreviousClosePriceRaw": "155",
         "accumulatedTradingVolumeRaw": "4547",
         "accumulatedTradingValueRaw": "62000000",
-        "marketValueRaw": "4809000000",
-        "closePriceRaw": "13740"
+        "marketValueRaw": "4809000000"
       },
       {
         "stockType": "domestic",
@@ -148859,11 +148867,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/267440_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "8000",
         "compareToPreviousClosePriceRaw": "5",
         "accumulatedTradingVolumeRaw": "1177",
         "accumulatedTradingValueRaw": "9000000",
-        "marketValueRaw": "4800000000",
-        "closePriceRaw": "8000"
+        "marketValueRaw": "4800000000"
       },
       {
         "stockType": "domestic",
@@ -148917,11 +148925,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/227560_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFTIGER.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFTIGER.png",
+        "closePriceRaw": "12445",
         "compareToPreviousClosePriceRaw": "-75",
         "accumulatedTradingVolumeRaw": "19802",
         "accumulatedTradingValueRaw": "245000000",
-        "marketValueRaw": "4729100000",
-        "closePriceRaw": "12445"
+        "marketValueRaw": "4729100000"
       },
       {
         "stockType": "domestic",
@@ -148975,11 +148983,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/498610_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "7790",
         "compareToPreviousClosePriceRaw": "-20",
         "accumulatedTradingVolumeRaw": "947",
         "accumulatedTradingValueRaw": "7000000",
-        "marketValueRaw": "4674000000",
-        "closePriceRaw": "7790"
+        "marketValueRaw": "4674000000"
       },
       {
         "stockType": "domestic",
@@ -149033,11 +149041,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/474390_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFSOL.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFSOL.png",
+        "closePriceRaw": "40765",
         "compareToPreviousClosePriceRaw": "300",
         "accumulatedTradingVolumeRaw": "76",
         "accumulatedTradingValueRaw": "3000000",
-        "marketValueRaw": "4647210000",
-        "closePriceRaw": "40765"
+        "marketValueRaw": "4647210000"
       },
       {
         "stockType": "domestic",
@@ -149091,11 +149099,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/610029_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDMERITZ.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDMERITZ.png",
+        "closePriceRaw": "4560",
         "compareToPreviousClosePriceRaw": "15",
         "accumulatedTradingVolumeRaw": "20027",
         "accumulatedTradingValueRaw": "91000000",
-        "marketValueRaw": "4560000000",
-        "closePriceRaw": "4560"
+        "marketValueRaw": "4560000000"
       },
       {
         "stockType": "domestic",
@@ -149149,11 +149157,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/391600_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "10130",
         "compareToPreviousClosePriceRaw": "15",
         "accumulatedTradingVolumeRaw": "139",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "4558500000",
-        "closePriceRaw": "10130"
+        "marketValueRaw": "4558500000"
       },
       {
         "stockType": "domestic",
@@ -149207,11 +149215,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0128D0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFPLUS.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFPLUS.png",
+        "closePriceRaw": "6500",
         "compareToPreviousClosePriceRaw": "-85",
         "accumulatedTradingVolumeRaw": "2923",
         "accumulatedTradingValueRaw": "19000000",
-        "marketValueRaw": "4550000000",
-        "closePriceRaw": "6500"
+        "marketValueRaw": "4550000000"
       },
       {
         "stockType": "domestic",
@@ -149265,11 +149273,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0078V0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFPLUS.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFPLUS.png",
+        "closePriceRaw": "9100",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "141",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "4550000000",
-        "closePriceRaw": "9100"
+        "marketValueRaw": "4550000000"
       },
       {
         "stockType": "domestic",
@@ -149323,11 +149331,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/266550_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFPLUS.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFPLUS.png",
+        "closePriceRaw": "18150",
         "compareToPreviousClosePriceRaw": "-260",
         "accumulatedTradingVolumeRaw": "11",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "4537500000",
-        "closePriceRaw": "18150"
+        "marketValueRaw": "4537500000"
       },
       {
         "stockType": "domestic",
@@ -149381,11 +149389,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/550070_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDNH.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDNH.png",
+        "closePriceRaw": "4410",
         "compareToPreviousClosePriceRaw": "-125",
         "accumulatedTradingVolumeRaw": "2",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "4410000000",
-        "closePriceRaw": "4410"
+        "marketValueRaw": "4410000000"
       },
       {
         "stockType": "domestic",
@@ -149439,11 +149447,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/488200_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "12550",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "0",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "4392500000",
-        "closePriceRaw": "12550"
+        "marketValueRaw": "4392500000"
       },
       {
         "stockType": "domestic",
@@ -149497,11 +149505,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/000545_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock000545.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock000545.png",
+        "closePriceRaw": "5700",
         "compareToPreviousClosePriceRaw": "-90",
         "accumulatedTradingVolumeRaw": "27",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "4377600000",
-        "closePriceRaw": "5700"
+        "marketValueRaw": "4377600000"
       },
       {
         "stockType": "domestic",
@@ -149555,11 +149563,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/205720_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "1442",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "882",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "4326000000",
-        "closePriceRaw": "1442"
+        "marketValueRaw": "4326000000"
       },
       {
         "stockType": "domestic",
@@ -149613,11 +149621,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/000145_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock000145.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock000145.png",
+        "closePriceRaw": "9130",
         "compareToPreviousClosePriceRaw": "-60",
         "accumulatedTradingVolumeRaw": "215",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "4298495300",
-        "closePriceRaw": "9130"
+        "marketValueRaw": "4298495300"
       },
       {
         "stockType": "domestic",
@@ -149671,11 +149679,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/277650_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFTIGER.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFTIGER.png",
+        "closePriceRaw": "20935",
         "compareToPreviousClosePriceRaw": "-125",
         "accumulatedTradingVolumeRaw": "115",
         "accumulatedTradingValueRaw": "2000000",
-        "marketValueRaw": "4187000000",
-        "closePriceRaw": "20935"
+        "marketValueRaw": "4187000000"
       },
       {
         "stockType": "domestic",
@@ -149729,11 +149737,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/530125_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDSAMSUNGSECURIITES.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDSAMSUNGSECURIITES.png",
+        "closePriceRaw": "4155",
         "compareToPreviousClosePriceRaw": "-70",
         "accumulatedTradingVolumeRaw": "609",
         "accumulatedTradingValueRaw": "2000000",
-        "marketValueRaw": "4155000000",
-        "closePriceRaw": "4155"
+        "marketValueRaw": "4155000000"
       },
       {
         "stockType": "domestic",
@@ -149787,11 +149795,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/373790_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "14780",
         "compareToPreviousClosePriceRaw": "-165",
         "accumulatedTradingVolumeRaw": "530",
         "accumulatedTradingValueRaw": "7000000",
-        "marketValueRaw": "4138400000",
-        "closePriceRaw": "14780"
+        "marketValueRaw": "4138400000"
       },
       {
         "stockType": "domestic",
@@ -149845,11 +149853,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0050E0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFPLUS.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFPLUS.png",
+        "closePriceRaw": "8180",
         "compareToPreviousClosePriceRaw": "-55",
         "accumulatedTradingVolumeRaw": "4070",
         "accumulatedTradingValueRaw": "33000000",
-        "marketValueRaw": "4090000000",
-        "closePriceRaw": "8180"
+        "marketValueRaw": "4090000000"
       },
       {
         "stockType": "domestic",
@@ -149903,11 +149911,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/334690_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "5840",
         "compareToPreviousClosePriceRaw": "5",
         "accumulatedTradingVolumeRaw": "4629",
         "accumulatedTradingValueRaw": "27000000",
-        "marketValueRaw": "4088000000",
-        "closePriceRaw": "5840"
+        "marketValueRaw": "4088000000"
       },
       {
         "stockType": "domestic",
@@ -149961,11 +149969,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/009415_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock009415.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock009415.png",
+        "closePriceRaw": "6250",
         "compareToPreviousClosePriceRaw": "-20",
         "accumulatedTradingVolumeRaw": "1156",
         "accumulatedTradingValueRaw": "7000000",
-        "marketValueRaw": "4062337500",
-        "closePriceRaw": "6250"
+        "marketValueRaw": "4062337500"
       },
       {
         "stockType": "domestic",
@@ -150019,11 +150027,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/226380_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "5635",
         "compareToPreviousClosePriceRaw": "-25",
         "accumulatedTradingVolumeRaw": "265",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "3944500000",
-        "closePriceRaw": "5635"
+        "marketValueRaw": "3944500000"
       },
       {
         "stockType": "domestic",
@@ -150077,11 +150085,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0131A0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFSOL.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFSOL.png",
+        "closePriceRaw": "7165",
         "compareToPreviousClosePriceRaw": "-45",
         "accumulatedTradingVolumeRaw": "58232",
         "accumulatedTradingValueRaw": "412000000",
-        "marketValueRaw": "3940750000",
-        "closePriceRaw": "7165"
+        "marketValueRaw": "3940750000"
       },
       {
         "stockType": "domestic",
@@ -150135,11 +150143,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/005965_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock005965.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock005965.png",
+        "closePriceRaw": "17390",
         "compareToPreviousClosePriceRaw": "90",
         "accumulatedTradingVolumeRaw": "370",
         "accumulatedTradingValueRaw": "6000000",
-        "marketValueRaw": "3925479480",
-        "closePriceRaw": "17390"
+        "marketValueRaw": "3925479480"
       },
       {
         "stockType": "domestic",
@@ -150193,11 +150201,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/291680_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "7840",
         "compareToPreviousClosePriceRaw": "55",
         "accumulatedTradingVolumeRaw": "94",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3920000000",
-        "closePriceRaw": "7840"
+        "marketValueRaw": "3920000000"
       },
       {
         "stockType": "domestic",
@@ -150251,11 +150259,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/243890_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFTIGER.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFTIGER.png",
+        "closePriceRaw": "8380",
         "compareToPreviousClosePriceRaw": "300",
         "accumulatedTradingVolumeRaw": "19362",
         "accumulatedTradingValueRaw": "162000000",
-        "marketValueRaw": "3771000000",
-        "closePriceRaw": "8380"
+        "marketValueRaw": "3771000000"
       },
       {
         "stockType": "domestic",
@@ -150309,11 +150317,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/225030_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFTIGER.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFTIGER.png",
+        "closePriceRaw": "2240",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "3378",
         "accumulatedTradingValueRaw": "7000000",
-        "marketValueRaw": "3696000000",
-        "closePriceRaw": "2240"
+        "marketValueRaw": "3696000000"
       },
       {
         "stockType": "domestic",
@@ -150367,11 +150375,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/244660_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKODEX.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKODEX.png",
+        "closePriceRaw": "9185",
         "compareToPreviousClosePriceRaw": "-75",
         "accumulatedTradingVolumeRaw": "2198",
         "accumulatedTradingValueRaw": "20000000",
-        "marketValueRaw": "3674000000",
-        "closePriceRaw": "9185"
+        "marketValueRaw": "3674000000"
       },
       {
         "stockType": "domestic",
@@ -150425,11 +150433,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/014825_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock014825.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock014825.png",
+        "closePriceRaw": "13700",
         "compareToPreviousClosePriceRaw": "390",
         "accumulatedTradingVolumeRaw": "81",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "3618320700",
-        "closePriceRaw": "13700"
+        "marketValueRaw": "3618320700"
       },
       {
         "stockType": "domestic",
@@ -150483,11 +150491,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/252420_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "72",
         "compareToPreviousClosePriceRaw": "-1",
         "accumulatedTradingVolumeRaw": "671968",
         "accumulatedTradingValueRaw": "48000000",
-        "marketValueRaw": "3614400000",
-        "closePriceRaw": "72"
+        "marketValueRaw": "3614400000"
       },
       {
         "stockType": "domestic",
@@ -150541,11 +150549,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/427120_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "5155",
         "compareToPreviousClosePriceRaw": "35",
         "accumulatedTradingVolumeRaw": "12034",
         "accumulatedTradingValueRaw": "62000000",
-        "marketValueRaw": "3505400000",
-        "closePriceRaw": "5155"
+        "marketValueRaw": "3505400000"
       },
       {
         "stockType": "domestic",
@@ -150599,11 +150607,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/500041_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDSHINHAN.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDSHINHAN.png",
+        "closePriceRaw": "696",
         "compareToPreviousClosePriceRaw": "-4",
         "accumulatedTradingVolumeRaw": "1576",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "3480000000",
-        "closePriceRaw": "696"
+        "marketValueRaw": "3480000000"
       },
       {
         "stockType": "domestic",
@@ -150657,11 +150665,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/267490_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "4930",
         "compareToPreviousClosePriceRaw": "20",
         "accumulatedTradingVolumeRaw": "6",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3451000000",
-        "closePriceRaw": "4930"
+        "marketValueRaw": "3451000000"
       },
       {
         "stockType": "domestic",
@@ -150715,11 +150723,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/007575_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock007575.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock007575.png",
+        "closePriceRaw": "7700",
         "compareToPreviousClosePriceRaw": "50",
         "accumulatedTradingVolumeRaw": "1",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3427116000",
-        "closePriceRaw": "7700"
+        "marketValueRaw": "3427116000"
       },
       {
         "stockType": "domestic",
@@ -150773,11 +150781,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/570023_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDKOREA.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDKOREA.png",
+        "closePriceRaw": "663",
         "compareToPreviousClosePriceRaw": "-1",
         "accumulatedTradingVolumeRaw": "266",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3315000000",
-        "closePriceRaw": "663"
+        "marketValueRaw": "3315000000"
       },
       {
         "stockType": "domestic",
@@ -150831,11 +150839,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/36328K_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock36328K.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock36328K.png",
+        "closePriceRaw": "2795",
         "compareToPreviousClosePriceRaw": "-5",
         "accumulatedTradingVolumeRaw": "4247",
         "accumulatedTradingValueRaw": "11000000",
-        "marketValueRaw": "3283982455",
-        "closePriceRaw": "2795"
+        "marketValueRaw": "3283982455"
       },
       {
         "stockType": "domestic",
@@ -150889,11 +150897,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/0079X0_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "9335",
         "compareToPreviousClosePriceRaw": "-95",
         "accumulatedTradingVolumeRaw": "4214",
         "accumulatedTradingValueRaw": "39000000",
-        "marketValueRaw": "3267250000",
-        "closePriceRaw": "9335"
+        "marketValueRaw": "3267250000"
       },
       {
         "stockType": "domestic",
@@ -150947,11 +150955,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/570110_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDKOREA.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDKOREA.png",
+        "closePriceRaw": "16245",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "0",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3249000000",
-        "closePriceRaw": "16245"
+        "marketValueRaw": "3249000000"
       },
       {
         "stockType": "domestic",
@@ -151005,11 +151013,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/005745_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock005745.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock005745.png",
+        "closePriceRaw": "5350",
         "compareToPreviousClosePriceRaw": "100",
         "accumulatedTradingVolumeRaw": "85",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3213884100",
-        "closePriceRaw": "5350"
+        "marketValueRaw": "3213884100"
       },
       {
         "stockType": "domestic",
@@ -151063,11 +151071,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/321410_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKODEX.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKODEX.png",
+        "closePriceRaw": "10560",
         "compareToPreviousClosePriceRaw": "25",
         "accumulatedTradingVolumeRaw": "13",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "3168000000",
-        "closePriceRaw": "10560"
+        "marketValueRaw": "3168000000"
       },
       {
         "stockType": "domestic",
@@ -151121,11 +151129,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/014915_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock014915.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock014915.png",
+        "closePriceRaw": "5200",
         "compareToPreviousClosePriceRaw": "350",
         "accumulatedTradingVolumeRaw": "760",
         "accumulatedTradingValueRaw": "3000000",
-        "marketValueRaw": "3120000000",
-        "closePriceRaw": "5200"
+        "marketValueRaw": "3120000000"
       },
       {
         "stockType": "domestic",
@@ -151179,11 +151187,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/306530_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFHANARO.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFHANARO.png",
+        "closePriceRaw": "7035",
         "compareToPreviousClosePriceRaw": "195",
         "accumulatedTradingVolumeRaw": "11448",
         "accumulatedTradingValueRaw": "79000000",
-        "marketValueRaw": "3095400000",
-        "closePriceRaw": "7035"
+        "marketValueRaw": "3095400000"
       },
       {
         "stockType": "domestic",
@@ -151237,11 +151245,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/014285_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock014285.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock014285.png",
+        "closePriceRaw": "5230",
         "compareToPreviousClosePriceRaw": "-260",
         "accumulatedTradingVolumeRaw": "271",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "3085046250",
-        "closePriceRaw": "5230"
+        "marketValueRaw": "3085046250"
       },
       {
         "stockType": "domestic",
@@ -151295,11 +151303,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/476000_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFUNICORN.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFUNICORN.png",
+        "closePriceRaw": "5105",
         "compareToPreviousClosePriceRaw": "10",
         "accumulatedTradingVolumeRaw": "120",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "2807750000",
-        "closePriceRaw": "5105"
+        "marketValueRaw": "2807750000"
       },
       {
         "stockType": "domestic",
@@ -151353,11 +151361,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/491630_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "4860",
         "compareToPreviousClosePriceRaw": "-115",
         "accumulatedTradingVolumeRaw": "1363",
         "accumulatedTradingValueRaw": "6000000",
-        "marketValueRaw": "2794500000",
-        "closePriceRaw": "4860"
+        "marketValueRaw": "2794500000"
       },
       {
         "stockType": "domestic",
@@ -151411,11 +151419,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/280940_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKODEX.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKODEX.png",
+        "closePriceRaw": "3470",
         "compareToPreviousClosePriceRaw": "15",
         "accumulatedTradingVolumeRaw": "2376",
         "accumulatedTradingValueRaw": "8000000",
-        "marketValueRaw": "2776000000",
-        "closePriceRaw": "3470"
+        "marketValueRaw": "2776000000"
       },
       {
         "stockType": "domestic",
@@ -151469,11 +151477,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/145670_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "1231",
         "compareToPreviousClosePriceRaw": "-14",
         "accumulatedTradingVolumeRaw": "120368",
         "accumulatedTradingValueRaw": "148000000",
-        "marketValueRaw": "2708200000",
-        "closePriceRaw": "1231"
+        "marketValueRaw": "2708200000"
       },
       {
         "stockType": "domestic",
@@ -151527,11 +151535,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/252410_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "1254",
         "compareToPreviousClosePriceRaw": "-11",
         "accumulatedTradingVolumeRaw": "10535",
         "accumulatedTradingValueRaw": "13000000",
-        "marketValueRaw": "2633400000",
-        "closePriceRaw": "1254"
+        "marketValueRaw": "2633400000"
       },
       {
         "stockType": "domestic",
@@ -151585,11 +151593,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/488210_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "25860",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "0",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "2586000000",
-        "closePriceRaw": "25860"
+        "marketValueRaw": "2586000000"
       },
       {
         "stockType": "domestic",
@@ -151643,11 +151651,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/000227_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock000227.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock000227.png",
+        "closePriceRaw": "7750",
         "compareToPreviousClosePriceRaw": "60",
         "accumulatedTradingVolumeRaw": "1363",
         "accumulatedTradingValueRaw": "10000000",
-        "marketValueRaw": "2502940000",
-        "closePriceRaw": "7750"
+        "marketValueRaw": "2502940000"
       },
       {
         "stockType": "domestic",
@@ -151701,11 +151709,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/275750_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "2425",
         "compareToPreviousClosePriceRaw": "-35",
         "accumulatedTradingVolumeRaw": "2419",
         "accumulatedTradingValueRaw": "5000000",
-        "marketValueRaw": "2303750000",
-        "closePriceRaw": "2425"
+        "marketValueRaw": "2303750000"
       },
       {
         "stockType": "domestic",
@@ -151759,11 +151767,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/253230_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "68",
         "compareToPreviousClosePriceRaw": "-2",
         "accumulatedTradingVolumeRaw": "1520112",
         "accumulatedTradingValueRaw": "103000000",
-        "marketValueRaw": "2250800000",
-        "closePriceRaw": "68"
+        "marketValueRaw": "2250800000"
       },
       {
         "stockType": "domestic",
@@ -151817,11 +151825,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/500051_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDSHINHAN.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDSHINHAN.png",
+        "closePriceRaw": "1121",
         "compareToPreviousClosePriceRaw": "-17",
         "accumulatedTradingVolumeRaw": "277",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "2242000000",
-        "closePriceRaw": "1121"
+        "marketValueRaw": "2242000000"
       },
       {
         "stockType": "domestic",
@@ -151875,11 +151883,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/580033_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDKB.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDKB.png",
+        "closePriceRaw": "4465",
         "compareToPreviousClosePriceRaw": "-120",
         "accumulatedTradingVolumeRaw": "3720",
         "accumulatedTradingValueRaw": "16000000",
-        "marketValueRaw": "2232500000",
-        "closePriceRaw": "4465"
+        "marketValueRaw": "2232500000"
       },
       {
         "stockType": "domestic",
@@ -151933,11 +151941,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/008355_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock008355.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock008355.png",
+        "closePriceRaw": "7180",
         "compareToPreviousClosePriceRaw": "80",
         "accumulatedTradingVolumeRaw": "595",
         "accumulatedTradingValueRaw": "4000000",
-        "marketValueRaw": "2210650200",
-        "closePriceRaw": "7180"
+        "marketValueRaw": "2210650200"
       },
       {
         "stockType": "domestic",
@@ -151991,11 +151999,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/280320_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "21740",
         "compareToPreviousClosePriceRaw": "-370",
         "accumulatedTradingVolumeRaw": "106",
         "accumulatedTradingValueRaw": "2000000",
-        "marketValueRaw": "2174000000",
-        "closePriceRaw": "21740"
+        "marketValueRaw": "2174000000"
       },
       {
         "stockType": "domestic",
@@ -152049,11 +152057,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/334700_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFRISE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFRISE.png",
+        "closePriceRaw": "3335",
         "compareToPreviousClosePriceRaw": "-5",
         "accumulatedTradingVolumeRaw": "18",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "2167750000",
-        "closePriceRaw": "3335"
+        "marketValueRaw": "2167750000"
       },
       {
         "stockType": "domestic",
@@ -152107,11 +152115,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/001525_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock001525.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock001525.png",
+        "closePriceRaw": "8220",
         "compareToPreviousClosePriceRaw": "-210",
         "accumulatedTradingVolumeRaw": "3469",
         "accumulatedTradingValueRaw": "28000000",
-        "marketValueRaw": "2158695300",
-        "closePriceRaw": "8220"
+        "marketValueRaw": "2158695300"
       },
       {
         "stockType": "domestic",
@@ -152165,11 +152173,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/291620_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "4275",
         "compareToPreviousClosePriceRaw": "-40",
         "accumulatedTradingVolumeRaw": "1542",
         "accumulatedTradingValueRaw": "6000000",
-        "marketValueRaw": "2009250000",
-        "closePriceRaw": "4275"
+        "marketValueRaw": "2009250000"
       },
       {
         "stockType": "domestic",
@@ -152223,11 +152231,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/500030_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDSHINHAN.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDSHINHAN.png",
+        "closePriceRaw": "55",
         "compareToPreviousClosePriceRaw": "-2",
         "accumulatedTradingVolumeRaw": "16427",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "1870000000",
-        "closePriceRaw": "55"
+        "marketValueRaw": "1870000000"
       },
       {
         "stockType": "domestic",
@@ -152281,11 +152289,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/454180_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "7330",
         "compareToPreviousClosePriceRaw": "0",
         "accumulatedTradingVolumeRaw": "0",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "1832500000",
-        "closePriceRaw": "7330"
+        "marketValueRaw": "1832500000"
       },
       {
         "stockType": "domestic",
@@ -152339,11 +152347,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/700018_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDHANA.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDHANA.png",
+        "closePriceRaw": "1745",
         "compareToPreviousClosePriceRaw": "-49",
         "accumulatedTradingVolumeRaw": "6017",
         "accumulatedTradingValueRaw": "10000000",
-        "marketValueRaw": "1745000000",
-        "closePriceRaw": "1745"
+        "marketValueRaw": "1745000000"
       },
       {
         "stockType": "domestic",
@@ -152397,11 +152405,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/570070_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDKOREA.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDKOREA.png",
+        "closePriceRaw": "1608",
         "compareToPreviousClosePriceRaw": "-44",
         "accumulatedTradingVolumeRaw": "12",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "1608000000",
-        "closePriceRaw": "1608"
+        "marketValueRaw": "1608000000"
       },
       {
         "stockType": "domestic",
@@ -152455,11 +152463,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/253240_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFKIWOOM.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFKIWOOM.png",
+        "closePriceRaw": "1250",
         "compareToPreviousClosePriceRaw": "-10",
         "accumulatedTradingVolumeRaw": "6088",
         "accumulatedTradingValueRaw": "7000000",
-        "marketValueRaw": "1525000000",
-        "closePriceRaw": "1250"
+        "marketValueRaw": "1525000000"
       },
       {
         "stockType": "domestic",
@@ -152513,11 +152521,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/306520_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFHANARO.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFHANARO.png",
+        "closePriceRaw": "2275",
         "compareToPreviousClosePriceRaw": "-15",
         "accumulatedTradingVolumeRaw": "382",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "1365000000",
-        "closePriceRaw": "2275"
+        "marketValueRaw": "1365000000"
       },
       {
         "stockType": "domestic",
@@ -152571,11 +152579,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/004545_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock004545.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock004545.png",
+        "closePriceRaw": "3575",
         "compareToPreviousClosePriceRaw": "270",
         "accumulatedTradingVolumeRaw": "1053",
         "accumulatedTradingValueRaw": "3000000",
-        "marketValueRaw": "1309022000",
-        "closePriceRaw": "3575"
+        "marketValueRaw": "1309022000"
       },
       {
         "stockType": "domestic",
@@ -152629,11 +152637,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/253160_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFPLUS.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFPLUS.png",
+        "closePriceRaw": "140",
         "compareToPreviousClosePriceRaw": "-2",
         "accumulatedTradingVolumeRaw": "276335",
         "accumulatedTradingValueRaw": "38000000",
-        "marketValueRaw": "1288000000",
-        "closePriceRaw": "140"
+        "marketValueRaw": "1288000000"
       },
       {
         "stockType": "domestic",
@@ -152687,11 +152695,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/011155_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock011155.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock011155.png",
+        "closePriceRaw": "5880",
         "compareToPreviousClosePriceRaw": "-10",
         "accumulatedTradingVolumeRaw": "629",
         "accumulatedTradingValueRaw": "3000000",
-        "marketValueRaw": "1176000000",
-        "closePriceRaw": "5880"
+        "marketValueRaw": "1176000000"
       },
       {
         "stockType": "domestic",
@@ -152745,11 +152753,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/261920_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "11515",
         "compareToPreviousClosePriceRaw": "-35",
         "accumulatedTradingVolumeRaw": "379",
         "accumulatedTradingValueRaw": "4000000",
-        "marketValueRaw": "1151500000",
-        "closePriceRaw": "11515"
+        "marketValueRaw": "1151500000"
       },
       {
         "stockType": "domestic",
@@ -152803,11 +152811,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/500038_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/brand/domestic/StockBRANDSHINHAN.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/brand/domestic/StockBRANDSHINHAN.png",
+        "closePriceRaw": "1100",
         "compareToPreviousClosePriceRaw": "2",
         "accumulatedTradingVolumeRaw": "6",
         "accumulatedTradingValueRaw": "0",
-        "marketValueRaw": "1100000000",
-        "closePriceRaw": "1100"
+        "marketValueRaw": "1100000000"
       },
       {
         "stockType": "domestic",
@@ -152861,11 +152869,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/001527_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock001527.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock001527.png",
+        "closePriceRaw": "5030",
         "compareToPreviousClosePriceRaw": "-150",
         "accumulatedTradingVolumeRaw": "2343",
         "accumulatedTradingValueRaw": "11000000",
-        "marketValueRaw": "1034696150",
-        "closePriceRaw": "5030"
+        "marketValueRaw": "1034696150"
       },
       {
         "stockType": "domestic",
@@ -152919,11 +152927,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/412560_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFTIGER.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFTIGER.png",
+        "closePriceRaw": "1517",
         "compareToPreviousClosePriceRaw": "-36",
         "accumulatedTradingVolumeRaw": "13508",
         "accumulatedTradingValueRaw": "20000000",
-        "marketValueRaw": "986050000",
-        "closePriceRaw": "1517"
+        "marketValueRaw": "986050000"
       },
       {
         "stockType": "domestic",
@@ -152977,11 +152985,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/004415_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock004415.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock004415.png",
+        "closePriceRaw": "4320",
         "compareToPreviousClosePriceRaw": "15",
         "accumulatedTradingVolumeRaw": "455",
         "accumulatedTradingValueRaw": "1000000",
-        "marketValueRaw": "960984000",
-        "closePriceRaw": "4320"
+        "marketValueRaw": "960984000"
       },
       {
         "stockType": "domestic",
@@ -153035,11 +153043,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/002785_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock002785.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock002785.png",
+        "closePriceRaw": "10110",
         "compareToPreviousClosePriceRaw": "-280",
         "accumulatedTradingVolumeRaw": "356",
         "accumulatedTradingValueRaw": "3000000",
-        "marketValueRaw": "866639310",
-        "closePriceRaw": "10110"
+        "marketValueRaw": "866639310"
       },
       {
         "stockType": "domestic",
@@ -153093,11 +153101,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/465620_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/etf/StockKRETFACE.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/etf/StockKRETFACE.png",
+        "closePriceRaw": "6390",
         "compareToPreviousClosePriceRaw": "-5",
         "accumulatedTradingVolumeRaw": "526",
         "accumulatedTradingValueRaw": "3000000",
-        "marketValueRaw": "639000000",
-        "closePriceRaw": "6390"
+        "marketValueRaw": "639000000"
       },
       {
         "stockType": "domestic",
@@ -153151,11 +153159,11 @@
         "stockMiniImageChart": "https://financial-vn.pstatic.net/chart/mobile/mini/krx/002787_interest.png",
         "itemLogoUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/stock/Stock002787.svg",
         "itemLogoPngUrl": "https://ssl.pstatic.net/imgstock/fn/real/logo/png/stock/Stock002787.png",
+        "closePriceRaw": "13370",
         "compareToPreviousClosePriceRaw": "-750",
         "accumulatedTradingVolumeRaw": "1066",
         "accumulatedTradingValueRaw": "14000000",
-        "marketValueRaw": "394147600",
-        "closePriceRaw": "13370"
+        "marketValueRaw": "394147600"
       },
       {
         "stockType": "domestic",
@@ -289143,7 +289151,7 @@
       }
     },
     "replayProfileRollup": {
-      "candidateCount": 655,
+      "candidateCount": 663,
       "eligibleCount": 15,
       "includedCount": 29,
       "tradeCount": 603,
@@ -289155,7 +289163,7 @@
       "ambiguousCount": 0,
       "unfilledRate": 0.2513,
       "overall": {
-        "candidateCount": 655,
+        "candidateCount": 663,
         "eligibleCount": 15,
         "includedCount": 29,
         "tradeCount": 603,
@@ -289171,7 +289179,7 @@
         "all": {
           "caseKey": "all",
           "label": "전체 후보",
-          "candidateCount": 655,
+          "candidateCount": 663,
           "eligibleCount": 15,
           "includedCount": 29,
           "tradeCount": 603,
@@ -289186,7 +289194,7 @@
         "a7plus": {
           "caseKey": "a7plus",
           "label": "7&A",
-          "candidateCount": 252,
+          "candidateCount": 257,
           "eligibleCount": 12,
           "includedCount": 29,
           "tradeCount": 230,
@@ -289216,7 +289224,7 @@
       },
       "byStrategy": {
         "pullback": {
-          "candidateCount": 144,
+          "candidateCount": 146,
           "eligibleCount": 10,
           "includedCount": 4,
           "tradeCount": 131,
@@ -289231,7 +289239,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 144,
+              "candidateCount": 146,
               "eligibleCount": 10,
               "includedCount": 4,
               "tradeCount": 131,
@@ -289246,7 +289254,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 89,
+              "candidateCount": 91,
               "eligibleCount": 7,
               "includedCount": 4,
               "tradeCount": 80,
@@ -289276,7 +289284,7 @@
           }
         },
         "accumulation": {
-          "candidateCount": 179,
+          "candidateCount": 182,
           "eligibleCount": 3,
           "includedCount": 0,
           "tradeCount": 163,
@@ -289291,7 +289299,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 179,
+              "candidateCount": 182,
               "eligibleCount": 3,
               "includedCount": 0,
               "tradeCount": 163,
@@ -289306,7 +289314,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 20,
+              "candidateCount": 21,
               "eligibleCount": 3,
               "includedCount": 0,
               "tradeCount": 16,
@@ -289336,7 +289344,7 @@
           }
         },
         "breakout": {
-          "candidateCount": 66,
+          "candidateCount": 67,
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 63,
@@ -289351,7 +289359,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 66,
+              "candidateCount": 67,
               "eligibleCount": 0,
               "includedCount": 0,
               "tradeCount": 63,
@@ -289396,7 +289404,7 @@
           }
         },
         "reversal": {
-          "candidateCount": 266,
+          "candidateCount": 268,
           "eligibleCount": 2,
           "includedCount": 25,
           "tradeCount": 246,
@@ -289411,7 +289419,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 266,
+              "candidateCount": 268,
               "eligibleCount": 2,
               "includedCount": 25,
               "tradeCount": 246,
@@ -289426,7 +289434,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 143,
+              "candidateCount": 145,
               "eligibleCount": 2,
               "includedCount": 25,
               "tradeCount": 134,
@@ -293412,7 +293420,7 @@
       ],
       "strategyStats": {
         "pullback": {
-          "candidateCount": 144,
+          "candidateCount": 146,
           "eligibleCount": 10,
           "includedCount": 4,
           "tradeCount": 131,
@@ -293427,7 +293435,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 144,
+              "candidateCount": 146,
               "eligibleCount": 10,
               "includedCount": 4,
               "tradeCount": 131,
@@ -293442,7 +293450,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 89,
+              "candidateCount": 91,
               "eligibleCount": 7,
               "includedCount": 4,
               "tradeCount": 80,
@@ -293472,7 +293480,7 @@
           }
         },
         "accumulation": {
-          "candidateCount": 179,
+          "candidateCount": 182,
           "eligibleCount": 3,
           "includedCount": 0,
           "tradeCount": 163,
@@ -293487,7 +293495,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 179,
+              "candidateCount": 182,
               "eligibleCount": 3,
               "includedCount": 0,
               "tradeCount": 163,
@@ -293502,7 +293510,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 20,
+              "candidateCount": 21,
               "eligibleCount": 3,
               "includedCount": 0,
               "tradeCount": 16,
@@ -293532,7 +293540,7 @@
           }
         },
         "breakout": {
-          "candidateCount": 66,
+          "candidateCount": 67,
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 63,
@@ -293547,7 +293555,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 66,
+              "candidateCount": 67,
               "eligibleCount": 0,
               "includedCount": 0,
               "tradeCount": 63,
@@ -293592,7 +293600,7 @@
           }
         },
         "reversal": {
-          "candidateCount": 266,
+          "candidateCount": 268,
           "eligibleCount": 2,
           "includedCount": 25,
           "tradeCount": 246,
@@ -293607,7 +293615,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 266,
+              "candidateCount": 268,
               "eligibleCount": 2,
               "includedCount": 25,
               "tradeCount": 246,
@@ -293622,7 +293630,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 143,
+              "candidateCount": 145,
               "eligibleCount": 2,
               "includedCount": 25,
               "tradeCount": 134,
@@ -294265,7 +294273,7 @@
         }
       },
       "pointInTimeStatusCounts": {
-        "confirmed": 78,
+        "confirmed": 79,
         "historical_regen": 0,
         "legacy_unknown": 0
       },
