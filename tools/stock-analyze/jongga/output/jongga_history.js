@@ -1,5 +1,168 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-25",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260925.js",
+    "jsonFile": "jongga/output/202609/latest_20260925.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260925.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-25T06:07:07+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 11.6,
+        "signalScore": 11.6,
+        "strictScore": 11.6,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.3,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
+        "entryEligible": false,
+        "currentPrice": 286500
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 9.2,
+        "signalScore": 9.2,
+        "strictScore": 9.2,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
+        "entryEligible": false,
+        "currentPrice": 1181000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 10.4,
+        "signalScore": 10.4,
+        "strictScore": 10.4,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 286500
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.8,
+        "signalScore": 8.8,
+        "strictScore": 8.8,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.3,
+        "statusLabel": "관심후보",
+        "entryEligible": false,
+        "currentPrice": 1181000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 8.0,
+        "signalScore": 8.0,
+        "strictScore": 8.0,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 148700
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 31500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1181000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 148700
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "353200",
+        "name": "대덕전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-24",
     "variant": "stable",
     "variantLabel": "현재 버전",
