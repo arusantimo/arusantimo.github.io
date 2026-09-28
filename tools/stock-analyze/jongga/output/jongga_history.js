@@ -9,12 +9,42 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-28T06:07:17+00:00",
+    "generatedAt": "2026-09-28T08:37:51+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 10.7,
+        "signalScore": 10.7,
+        "strictScore": 10.7,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
+        "entryEligible": false,
+        "currentPrice": 271000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 9.0,
+        "signalScore": 9.0,
+        "strictScore": 9.0,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.2,
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 214000
+      },
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
@@ -28,22 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.2,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
         "entryEligible": false,
-        "currentPrice": 579000
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "LG전자",
-        "code": "066570",
-        "score": 8.3,
-        "signalScore": 8.3,
-        "strictScore": 8.3,
-        "scoreMax": 13.0,
-        "grade": "B",
-        "gradeScore": 6.6,
-        "statusLabel": "진입 가능(B·조건부)",
-        "entryEligible": true,
-        "currentPrice": 214000
+        "currentPrice": 574000
       },
       {
         "strategy": "accumulation",
@@ -58,7 +73,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.2,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 271500
+        "currentPrice": 271000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "삼성물산",
+        "code": "028260",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.9,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 346500
       },
       {
         "strategy": "accumulation",
@@ -73,22 +103,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
         "entryEligible": false,
-        "currentPrice": 158100
+        "currentPrice": 157900
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "SK이노베이션",
         "code": "096770",
-        "score": 6.9,
-        "signalScore": 6.9,
-        "strictScore": 6.9,
+        "score": 5.5,
+        "signalScore": 5.5,
+        "strictScore": 5.5,
         "scoreMax": 12.5,
-        "grade": "B",
-        "gradeScore": 5.5,
+        "grade": "C",
+        "gradeScore": 4.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 158100
+        "currentPrice": 157900
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 7.3,
+        "signalScore": 7.3,
+        "strictScore": 7.3,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 157900
       },
       {
         "strategy": "reversal",
@@ -104,47 +149,9 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 33450
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "SK이노베이션",
-        "code": "096770",
-        "score": 7.3,
-        "signalScore": 7.3,
-        "strictScore": 7.3,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.3,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 158100
       }
     ],
     "blacklist": [
-      {
-        "code": "353200",
-        "name": "대덕전자",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "356680",
-        "name": "엑스게이트",
-        "reasons": [
-          "공매도 과열",
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "387690",
         "name": "레메디",
@@ -153,6 +160,18 @@ window.JONGGA_HISTORY_INDEX = [
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
         ],
         "status": "confirmed"
       }
