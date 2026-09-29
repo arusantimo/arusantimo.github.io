@@ -1,5 +1,163 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-09-29",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202609/jongga_data_20260929.js",
+    "jsonFile": "jongga/output/202609/latest_20260929.json",
+    "inputArchiveFile": "jongga/output/archive/202609/inputs_20260929.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-09-29T06:07:44+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화솔루션",
+        "code": "009830",
+        "score": 11.5,
+        "signalScore": 11.5,
+        "strictScore": 11.5,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.2,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G11)",
+        "entryEligible": false,
+        "currentPrice": 32300
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 10.8,
+        "signalScore": 10.8,
+        "strictScore": 10.8,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 8.6,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 584000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "DB하이텍",
+        "code": "000990",
+        "score": 7.6,
+        "signalScore": 7.6,
+        "strictScore": 7.6,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "진입 가능(B·조건부)",
+        "entryEligible": true,
+        "currentPrice": 138700
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 9.5,
+        "signalScore": 9.5,
+        "strictScore": 9.5,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 584000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 8.5,
+        "signalScore": 8.5,
+        "strictScore": 8.5,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "entryEligible": false,
+        "currentPrice": 1761000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "DB하이텍",
+        "code": "000990",
+        "score": 6.0,
+        "signalScore": 6.0,
+        "strictScore": 6.0,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "entryEligible": false,
+        "currentPrice": 138700
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG이노텍",
+        "code": "011070",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 584000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "042700",
+        "name": "한미반도체",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "490470",
+        "name": "세미파이브",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "452190",
+        "name": "한빛레이저",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-09-28",
     "variant": "stable",
     "variantLabel": "현재 버전",
