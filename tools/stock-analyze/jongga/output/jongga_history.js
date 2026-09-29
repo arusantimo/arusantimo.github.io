@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-29T06:07:44+00:00",
+    "generatedAt": "2026-09-29T08:39:34+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -41,9 +41,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 8.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G13)",
         "entryEligible": false,
-        "currentPrice": 584000
+        "currentPrice": 587000
       },
       {
         "strategy": "pullback",
@@ -65,15 +65,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "accumulation",
         "name": "LG이노텍",
         "code": "011070",
-        "score": 9.5,
-        "signalScore": 9.5,
-        "strictScore": 9.5,
+        "score": 10.3,
+        "signalScore": 10.3,
+        "strictScore": 10.3,
         "scoreMax": 14.0,
-        "grade": "B",
-        "gradeScore": 6.8,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 584000
+        "currentPrice": 587000
       },
       {
         "strategy": "accumulation",
@@ -86,47 +86,62 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 14.0,
         "grade": "B",
         "gradeScore": 6.1,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1)",
+        "statusLabel": "제외",
         "entryEligible": false,
-        "currentPrice": 1761000
+        "currentPrice": 1786000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "한화솔루션",
+        "code": "009830",
+        "score": 8.1,
+        "signalScore": 8.1,
+        "strictScore": 8.1,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4, Q1)",
+        "entryEligible": false,
+        "currentPrice": 32300
       },
       {
         "strategy": "breakout",
         "scoreScope": "breakout",
         "name": "DB하이텍",
         "code": "000990",
-        "score": 6.0,
-        "signalScore": 6.0,
-        "strictScore": 6.0,
+        "score": 5.0,
+        "signalScore": 5.0,
+        "strictScore": 5.0,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G4)",
+        "gradeScore": 4.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2, G6)",
         "entryEligible": false,
-        "currentPrice": 138700
+        "currentPrice": 141300
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "LG이노텍",
         "code": "011070",
-        "score": 8.3,
-        "signalScore": 8.3,
-        "strictScore": 8.3,
+        "score": 7.4,
+        "signalScore": 7.4,
+        "strictScore": 7.4,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 8.3,
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 584000
+        "currentPrice": 587000
       }
     ],
     "blacklist": [
       {
-        "code": "042700",
-        "name": "한미반도체",
+        "code": "001820",
+        "name": "삼화콘덴서",
         "reasons": [
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
