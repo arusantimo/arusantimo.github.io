@@ -14,18 +14,6 @@
   {
     "runId": "replay-20260923-060752-53441f6b",
     "entryDate": "2026-09-22",
-    "code": "402340",
-    "name": "SK스퀘어",
-    "strategy": "accumulation",
-    "entryPrice": 1115114.0,
-    "swingTargetPrice": 1236540.0,
-    "stopPrice": 1087000.0,
-    "qtyPct": 35.0,
-    "sourceEntryKey": "20260922|stable|accumulation|402340"
-  },
-  {
-    "runId": "replay-20260923-060752-53441f6b",
-    "entryDate": "2026-09-22",
     "code": "067310",
     "name": "하나마이크론",
     "strategy": "accumulation",
@@ -46,5 +34,53 @@
     "stopPrice": 334372.0,
     "qtyPct": 80.0,
     "sourceEntryKey": "20260928|stable|accumulation|028260"
+  },
+  {
+    "runId": "replay-20260930-060609-654cb316",
+    "entryDate": "2026-09-29",
+    "code": "000660",
+    "name": "SK하이닉스",
+    "strategy": "accumulation",
+    "entryPrice": 1787786.0,
+    "swingTargetPrice": 1982460.0,
+    "stopPrice": 1723490.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260929|stable|accumulation|000660"
+  },
+  {
+    "runId": "replay-20260930-060609-654cb316",
+    "entryDate": "2026-09-29",
+    "code": "009830",
+    "name": "한화솔루션",
+    "strategy": "accumulation",
+    "entryPrice": 32332.3,
+    "swingTargetPrice": 35853.0,
+    "stopPrice": 31170.0,
+    "qtyPct": 15.0,
+    "sourceEntryKey": "20260929|stable|accumulation|009830"
+  },
+  {
+    "runId": "replay-20260930-060609-654cb316",
+    "entryDate": "2026-09-29",
+    "code": "042700",
+    "name": "한미반도체",
+    "strategy": "accumulation",
+    "entryPrice": 250250.0,
+    "swingTargetPrice": 277500.0,
+    "stopPrice": 240000.0,
+    "qtyPct": 60.0,
+    "sourceEntryKey": "20260929|stable|accumulation|042700"
+  },
+  {
+    "runId": "replay-20260930-060609-654cb316",
+    "entryDate": "2026-09-29",
+    "code": "000990",
+    "name": "DB하이텍",
+    "strategy": "breakout",
+    "entryPrice": 141441.3,
+    "swingTargetPrice": 160376.0,
+    "stopPrice": 134942.0,
+    "qtyPct": 100.0,
+    "sourceEntryKey": "20260929|stable|breakout|000990"
   }
 ]
