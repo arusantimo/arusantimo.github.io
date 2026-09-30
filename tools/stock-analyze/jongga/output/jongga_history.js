@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-09-30T06:06:07+00:00",
+    "generatedAt": "2026-09-30T08:35:38+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -29,12 +29,42 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 14990
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1784000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 269000
       }
     ],
     "blacklist": [
       {
-        "code": "036930",
-        "name": "주성엔지니어링",
+        "code": "403870",
+        "name": "HPSP",
         "reasons": [
           "공매도 과열"
         ],
@@ -45,13 +75,12 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "403870",
-        "name": "HPSP",
+        "code": "036930",
+        "name": "주성엔지니어링",
         "reasons": [
           "공매도 과열"
         ],
         "sources": [
-          "kind",
           "entry"
         ],
         "status": "confirmed"
