@@ -607,5 +607,26 @@
     "barLow": 552000.0,
     "barClose": 566000.0,
     "fillRule": "stop_close"
+  },
+  {
+    "orderId": "20260929|stable|breakout|000990-stop_touch",
+    "sourceEntryKey": "20260929|stable|breakout|000990",
+    "strategy": "breakout",
+    "code": "000990",
+    "name": "DB하이텍",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-09-30T15:00:00+09:00",
+    "fillPrice": 134942.0,
+    "filledQuantityPct": 100.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-09-30T15:00:00+09:00",
+    "barOpen": 138900.0,
+    "barHigh": 141100.0,
+    "barLow": 134200.0,
+    "barClose": 137700.0,
+    "fillRule": "stop_touch"
   }
 ]

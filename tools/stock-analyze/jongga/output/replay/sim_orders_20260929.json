@@ -1318,5 +1318,25 @@
     "activeFrom": "2026-09-30T15:00:00+09:00",
     "activeUntil": "2026-09-30T15:00:00+09:00",
     "finalStatus": "cancelled"
+  },
+  {
+    "orderId": "20260929|stable|breakout|000990-stop_touch",
+    "runId": "replay-20260930-060609-654cb316",
+    "date": "2026-09-29",
+    "variant": "stable",
+    "strategy": "breakout",
+    "code": "000990",
+    "name": "DB하이텍",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-09-30T15:00:00+09:00",
+    "requestedPrice": 134942.0,
+    "quantityPct": 100.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260929|stable|breakout|000990",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-09-30T15:00:00+09:00",
+    "activeUntil": "2026-09-30T15:00:00+09:00"
   }
 ]

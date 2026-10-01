@@ -70,17 +70,5 @@
     "stopPrice": 240000.0,
     "qtyPct": 60.0,
     "sourceEntryKey": "20260929|stable|accumulation|042700"
-  },
-  {
-    "runId": "replay-20260930-060609-654cb316",
-    "entryDate": "2026-09-29",
-    "code": "000990",
-    "name": "DB하이텍",
-    "strategy": "breakout",
-    "entryPrice": 141441.3,
-    "swingTargetPrice": 160376.0,
-    "stopPrice": 134942.0,
-    "qtyPct": 100.0,
-    "sourceEntryKey": "20260929|stable|breakout|000990"
   }
 ]
