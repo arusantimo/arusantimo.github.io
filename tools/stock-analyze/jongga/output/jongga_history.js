@@ -9,12 +9,42 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-01T06:07:50+00:00",
+    "generatedAt": "2026-10-01T08:37:18+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 13,
     "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "삼화콘덴서",
+        "code": "001820",
+        "score": 6.2,
+        "signalScore": 6.2,
+        "strictScore": 6.2,
+        "scoreMax": 13.0,
+        "grade": "B",
+        "gradeScore": 5.6,
+        "statusLabel": "진입 가능(B·조건부)",
+        "entryEligible": true,
+        "currentPrice": 159400
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 7.0,
+        "signalScore": 7.0,
+        "strictScore": 7.0,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 140600
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -32,17 +62,6 @@ window.JONGGA_HISTORY_INDEX = [
       }
     ],
     "blacklist": [
-      {
-        "code": "001820",
-        "name": "삼화콘덴서",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
       {
         "code": "036930",
         "name": "주성엔지니어링",
@@ -68,17 +87,6 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "042700",
-        "name": "한미반도체",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
         "code": "080220",
         "name": "제주반도체",
         "reasons": [
@@ -91,8 +99,30 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
+        "code": "042700",
+        "name": "한미반도체",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
         "code": "439960",
         "name": "코스모로보틱스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
