@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-02T06:07:56+00:00",
+    "generatedAt": "2026-10-02T08:38:09+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -26,9 +26,9 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreMax": 13.0,
         "grade": "S",
         "gradeScore": 9.4,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12, G13)",
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G13)",
         "entryEligible": false,
-        "currentPrice": 36225
+        "currentPrice": 36050
       },
       {
         "strategy": "accumulation",
@@ -50,15 +50,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "breakout",
         "name": "심텍",
         "code": "222800",
-        "score": 6.0,
-        "signalScore": 6.0,
-        "strictScore": 6.0,
+        "score": 6.2,
+        "signalScore": 6.2,
+        "strictScore": 6.2,
         "scoreMax": 12.5,
         "grade": "C",
-        "gradeScore": 4.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "gradeScore": 5.0,
+        "statusLabel": "제외",
         "entryEligible": false,
-        "currentPrice": 166300
+        "currentPrice": 168300
       },
       {
         "strategy": "reversal",
@@ -74,6 +74,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 166300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 7.6,
+        "signalScore": 7.6,
+        "strictScore": 7.6,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 275500
       }
     ],
     "blacklist": [
@@ -101,10 +116,10 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "009150",
-        "name": "삼성전기",
+        "code": "240810",
+        "name": "원익IPS",
         "reasons": [
-          "투자 주의"
+          "공매도 과열"
         ],
         "sources": [
           "kind"
@@ -112,10 +127,10 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "240810",
-        "name": "원익IPS",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
