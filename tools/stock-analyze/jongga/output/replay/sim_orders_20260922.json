@@ -1218,5 +1218,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-09-29T15:00:00+09:00",
     "activeUntil": "2026-09-29T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260922|stable|accumulation|067310-swing_touch",
+    "runId": "replay-20260923-060752-53441f6b",
+    "date": "2026-09-22",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "067310",
+    "name": "하나마이크론",
+    "side": "SELL",
+    "orderType": "LIMIT",
+    "requestedAt": "2026-10-01T15:00:00+09:00",
+    "requestedPrice": 50505.0,
+    "quantityPct": 100.0,
+    "reason": "스윙 목표가 도달",
+    "sourceEntryKey": "20260922|stable|accumulation|067310",
+    "stageKey": "swing",
+    "finalStatus": "filled",
+    "activeFrom": "2026-10-01T15:00:00+09:00",
+    "activeUntil": "2026-10-01T15:00:00+09:00"
   }
 ]

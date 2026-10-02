@@ -1,5 +1,141 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-02",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261002.js",
+    "jsonFile": "jongga/output/202610/latest_20261002.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261002.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-02T06:07:56+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "한화솔루션",
+        "code": "009830",
+        "score": 11.8,
+        "signalScore": 11.8,
+        "strictScore": 11.8,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.4,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G12, G13)",
+        "entryEligible": false,
+        "currentPrice": 36225
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "심텍",
+        "code": "222800",
+        "score": 9.1,
+        "signalScore": 9.1,
+        "strictScore": 9.1,
+        "scoreMax": 14.0,
+        "grade": "B",
+        "gradeScore": 6.5,
+        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
+        "entryEligible": false,
+        "currentPrice": 166300
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "심텍",
+        "code": "222800",
+        "score": 6.0,
+        "signalScore": 6.0,
+        "strictScore": 6.0,
+        "scoreMax": 12.5,
+        "grade": "C",
+        "gradeScore": 4.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 166300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "심텍",
+        "code": "222800",
+        "score": 8.5,
+        "signalScore": 8.5,
+        "strictScore": 8.5,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 166300
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "080220",
+        "name": "제주반도체",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "043260",
+        "name": "성호전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "240810",
+        "name": "원익IPS",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "478340",
+        "name": "나라스페이스테크놀로지",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-01",
     "variant": "stable",
     "variantLabel": "현재 버전",
