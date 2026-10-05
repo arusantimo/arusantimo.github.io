@@ -606,8 +606,23 @@
             ],
             "matchedRules": [
               {
+                "code": "S1",
+                "note": "당일 거래대금 순위 24위 (TOP 30 이내 시 충족)",
+                "evalStatus": "met"
+              },
+              {
                 "code": "S2",
                 "note": "외인 502,949주 / 기관 -55,580주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S3",
+                "note": "당일 평균 108.1% / 마지막 1시간 113.3% / 마지막 30분 비율 1.13:1 / 마지막 30분 평균 113.3% · 장후반 흡수 확인",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P1",
+                "note": "저가 17,320 · 이평선 터치: 5MA, 10MA",
                 "evalStatus": "met"
               },
               {
@@ -616,8 +631,23 @@
                 "evalStatus": "met"
               },
               {
+                "code": "P3",
+                "note": "앵커 중심값 15,325 / 저가 17,320 / 종가 17,860 · 종가 회복",
+                "evalStatus": "met"
+              },
+              {
                 "code": "C1",
                 "note": "양봉 (시가 17,580 ≤ 종가 17,860)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 +4.54% / KOSPI +0.46% outperform",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C4",
+                "note": "당일 거래량 / 앵커 거래량 33% · 거래량 급감",
                 "evalStatus": "met"
               },
               {
@@ -632,6 +662,11 @@
               }
             ],
             "unmatchedRules": [
+              {
+                "code": "C2",
+                "note": "당일 거래량 / 5일 평균 206% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
               {
                 "code": "C5",
                 "note": "뉴스 수집 실패: HTTP Error 410: 410",
@@ -1734,13 +1769,13 @@
             "rank": 2,
             "name": "한화솔루션",
             "code": "009830",
-            "strictScore": 11.8,
-            "signalScore": 11.8,
-            "score": 11.8,
+            "strictScore": 10.5,
+            "signalScore": 10.5,
+            "score": 10.5,
             "scoreMax": 13.0,
             "effectiveScoreMax": 12.5,
-            "gradeScore": 9.4,
-            "grade": "S",
+            "gradeScore": 8.4,
+            "grade": "A",
             "overnightGapPenalty": 0.0,
             "scoreBreakdown": [
               {
@@ -1913,8 +1948,23 @@
             ],
             "matchedRules": [
               {
+                "code": "S1",
+                "note": "당일 거래대금 순위 29위 (TOP 30 이내 시 충족)",
+                "evalStatus": "met"
+              },
+              {
                 "code": "S2",
                 "note": "외인 486,200주 / 기관 549,899주 · 당일 순매수",
+                "evalStatus": "met"
+              },
+              {
+                "code": "S3",
+                "note": "당일 평균 148.2% / 마지막 1시간 201.6% / 마지막 30분 비율 2.02:1 / 마지막 30분 평균 201.6% · 장후반 흡수 확인",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P1",
+                "note": "저가 33,700 · 이평선 터치: 5MA",
                 "evalStatus": "met"
               },
               {
@@ -1923,8 +1973,18 @@
                 "evalStatus": "met"
               },
               {
+                "code": "P3",
+                "note": "앵커 중심값 32,325 / 저가 33,700 / 종가 36,100 · 종가 회복",
+                "evalStatus": "met"
+              },
+              {
                 "code": "C1",
                 "note": "양봉 (시가 34,250 ≤ 종가 36,100)",
+                "evalStatus": "met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 +1.48% / KOSPI +0.46% outperform",
                 "evalStatus": "met"
               },
               {
@@ -1949,6 +2009,16 @@
               }
             ],
             "unmatchedRules": [
+              {
+                "code": "C2",
+                "note": "당일 거래량 / 5일 평균 89% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C4",
+                "note": "당일 거래량 / 앵커 거래량 48% · 거래량 축소",
+                "evalStatus": "met"
+              },
               {
                 "code": "C5",
                 "note": "뉴스 수집 실패: HTTP Error 410: 410",
@@ -3127,13 +3197,28 @@
             ],
             "matchedRules": [
               {
+                "code": "S1",
+                "note": "당일 거래대금 순위 18위 (TOP 30 이내 시 충족)",
+                "evalStatus": "met"
+              },
+              {
                 "code": "S2",
                 "note": "외인 148,500주 / 기관 138,201주 · 당일 순매수",
                 "evalStatus": "met"
               },
               {
+                "code": "S3",
+                "note": "당일 평균 104.5% / 마지막 1시간 115.1% / 마지막 30분 비율 1.15:1 / 마지막 30분 평균 115.1% · 장후반 흡수 확인",
+                "evalStatus": "met"
+              },
+              {
                 "code": "P2",
                 "note": "종가 92,800 · 5MA·10MA·20MA 중 5MA, 10MA, 20MA 위",
+                "evalStatus": "met"
+              },
+              {
+                "code": "P3",
+                "note": "앵커 중심값 83,550 / 저가 87,300 / 종가 92,800 · 종가 회복",
                 "evalStatus": "met"
               },
               {
@@ -3158,6 +3243,26 @@
               }
             ],
             "unmatchedRules": [
+              {
+                "code": "P1",
+                "note": "저가 87,300 · 이평선 터치: 없음",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C2",
+                "note": "당일 거래량 / 5일 평균 301% (필요 ≤ 80%)",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C3",
+                "note": "동종업종 평균 +0.02% / KOSPI +0.46% underperform",
+                "evalStatus": "not_met"
+              },
+              {
+                "code": "C4",
+                "note": "당일 거래량 / 앵커 거래량 116% · 거래량 수축 약함",
+                "evalStatus": "not_met"
+              },
               {
                 "code": "C5",
                 "note": "뉴스 수집 실패: HTTP Error 410: 410",
@@ -4798,12 +4903,12 @@
             "rank": 1,
             "name": "한화솔루션",
             "code": "009830",
-            "strictScore": 10.7,
-            "signalScore": 10.7,
-            "score": 10.7,
+            "strictScore": 9.8,
+            "signalScore": 9.8,
+            "score": 9.8,
             "scoreMax": 14.0,
             "effectiveScoreMax": 14.0,
-            "gradeScore": 7.6,
+            "gradeScore": 7.0,
             "grade": "A",
             "overnightGapPenalty": 0.0,
             "scoreBreakdown": [
@@ -8757,94 +8862,6 @@
   "analysisSession": "1730",
   "analysisSessionLabel": "5시반 분석",
   "sessionSources": [
-    "1500",
     "1730"
-  ],
-  "rescoreMeta": {
-    "rescoredRules": {
-      "pullback": [
-        "D4"
-      ],
-      "accumulation": [
-        "L1"
-      ],
-      "breakout": [
-        "L1"
-      ]
-    },
-    "shortBalanceCodes": [
-      "009150",
-      "009830"
-    ],
-    "changedEntries": [
-      {
-        "strategy": "pullback",
-        "code": "009830",
-        "name": "한화솔루션",
-        "changedFields": [
-          "strictScore",
-          "signalScore",
-          "score",
-          "gradeScore",
-          "grade"
-        ],
-        "before": {
-          "strictScore": 10.5,
-          "signalScore": 10.5,
-          "score": 10.5,
-          "scoreMax": 13.0,
-          "effectiveScoreMax": 12.5,
-          "gradeScore": 8.4,
-          "grade": "A"
-        },
-        "after": {
-          "strictScore": 11.8,
-          "signalScore": 11.8,
-          "score": 11.8,
-          "scoreMax": 13.0,
-          "effectiveScoreMax": 12.5,
-          "gradeScore": 9.4,
-          "grade": "S"
-        }
-      },
-      {
-        "strategy": "accumulation",
-        "code": "009830",
-        "name": "한화솔루션",
-        "changedFields": [
-          "strictScore",
-          "signalScore",
-          "score",
-          "gradeScore"
-        ],
-        "before": {
-          "strictScore": 9.8,
-          "signalScore": 9.8,
-          "score": 9.8,
-          "scoreMax": 14.0,
-          "effectiveScoreMax": 14.0,
-          "gradeScore": 7.0,
-          "grade": "A"
-        },
-        "after": {
-          "strictScore": 10.7,
-          "signalScore": 10.7,
-          "score": 10.7,
-          "scoreMax": 14.0,
-          "effectiveScoreMax": 14.0,
-          "gradeScore": 7.6,
-          "grade": "A"
-        }
-      }
-    ],
-    "providerHealth": {
-      "krx_pykrx_short_balance": {
-        "data_missing": 2
-      },
-      "krx_short_balance_direct_post": {
-        "ok": 2
-      }
-    },
-    "sourcePointInTimeStatus": "confirmed"
-  }
+  ]
 }

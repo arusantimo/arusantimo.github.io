@@ -2,7 +2,7 @@
   "schemaVersion": "jongga_inputs.v1",
   "analysisDate": "2026-10-05",
   "variant": "stable",
-  "generatedAt": "2026-10-05T06:06:29+00:00",
+  "generatedAt": "2026-10-05T08:36:23+00:00",
   "payloadSourceMode": "live",
   "rebuildable": true,
   "topLimit": 40,
@@ -11,7 +11,7 @@
       "step": "vkospi_quote",
       "label": "VKOSPI 수집",
       "status": "ok",
-      "durationMs": 2434.8,
+      "durationMs": 1146.1,
       "detail": "VKOSPI",
       "count": 1
     },
@@ -19,7 +19,7 @@
       "step": "macro_quotes",
       "label": "글로벌 매크로 지표 수집",
       "status": "ok",
-      "durationMs": 684.4,
+      "durationMs": 417.6,
       "detail": "Yahoo chart 5종",
       "count": 5
     },
@@ -34,28 +34,36 @@
       "step": "kospi_history",
       "label": "KOSPI 히스토리 수집",
       "status": "ok",
-      "durationMs": 1639.6,
+      "durationMs": 1475.2,
       "count": 90
     },
     {
       "step": "market_context",
       "label": "시장 레짐 계산",
       "status": "ok",
-      "durationMs": 371.5,
+      "durationMs": 372.4,
       "detail": "박스권 ⚠️"
     },
     {
       "step": "top_trading",
       "label": "거래대금 상위 종목 수집",
       "status": "ok",
-      "durationMs": 49738.4,
+      "durationMs": 50066.2,
       "count": 21
+    },
+    {
+      "step": "overtime_price",
+      "label": "시간외 단일가 종가 보강",
+      "status": "fallback",
+      "durationMs": 972.3,
+      "detail": "정규장 종가로 대체",
+      "count": 0
     },
     {
       "step": "short_balance_trend",
       "label": "대차잔고(공매도) 추이 보강 (대형주)",
       "status": "partial",
-      "durationMs": 101003.2,
+      "durationMs": 104434.2,
       "detail": "후보 14종목 중 14건 수집 · fallback 14건 (krx_short_balance_direct_post)",
       "count": 14
     },
@@ -63,7 +71,7 @@
       "step": "stock_snapshots",
       "label": "종목 상세 스냅샷 수집",
       "status": "ok",
-      "durationMs": 8190.1,
+      "durationMs": 7952.9,
       "detail": "성공 21 / 실패 0",
       "count": 21
     },
@@ -71,7 +79,7 @@
       "step": "http_enrichment",
       "label": "토스 API 보강 수집",
       "status": "ok",
-      "durationMs": 10839.8,
+      "durationMs": 11127.1,
       "detail": "direct-http · 체결강도 21 / 호가 21 / 틱프록시 21",
       "count": 21
     },
@@ -79,7 +87,7 @@
       "step": "entry_scoring",
       "label": "전략별 후보 계산",
       "status": "ok",
-      "durationMs": 57324.9,
+      "durationMs": 53348.6,
       "detail": "pullback 3, breakout 1, accumulation 3, reversal 3",
       "count": 10
     },
@@ -87,7 +95,7 @@
       "step": "browser_enrichment",
       "label": "KIND 브라우저 보강",
       "status": "ok",
-      "durationMs": 6958.1,
+      "durationMs": 6427.1,
       "detail": "playwright-chromium · KIND 1",
       "count": 1
     },
@@ -103,7 +111,7 @@
       "step": "blacklist_check",
       "label": "공매도 과열·투자 주의 검증",
       "status": "ok",
-      "durationMs": 47267.2,
+      "durationMs": 40174.4,
       "detail": "확정 3 · 미확인 0",
       "count": 10
     }
@@ -129,41 +137,41 @@
         "fullExchangeName": "CME",
         "instrumentType": "FUTURE",
         "firstTradeDate": 969249600,
-        "regularMarketTime": 1791179504,
+        "regularMarketTime": 1791188505,
         "hasPrePostMarketData": false,
         "gmtoffset": -14400,
         "timezone": "EDT",
         "exchangeTimezoneName": "America/New_York",
-        "regularMarketPrice": 31050.5,
-        "regularMarketChangePercent": -0.036,
-        "fulldayPrice": 31050.5,
-        "fulldayChange": -11.25,
-        "fulldayChangePercent": -0.036,
+        "regularMarketPrice": 31075.0,
+        "regularMarketChangePercent": 0.043,
+        "fulldayPrice": 31075.0,
+        "fulldayChange": 13.25,
+        "fulldayChangePercent": 0.043,
         "fiftyTwoWeekHigh": 31282.5,
         "fiftyTwoWeekLow": 22961.5,
         "regularMarketDayHigh": 31221.25,
-        "regularMarketDayLow": 31021.0,
-        "regularMarketVolume": 55440,
+        "regularMarketDayLow": 31003.75,
+        "regularMarketVolume": 74211,
         "shortName": "Nasdaq 100 Dec 26",
         "chartPreviousClose": 30698.75,
         "priceHint": 2,
         "currentTradingPeriod": {
           "pre": {
             "timezone": "EDT",
-            "start": 1791172800,
             "end": 1791172800,
+            "start": 1791172800,
             "gmtoffset": -14400
           },
           "regular": {
             "timezone": "EDT",
-            "start": 1791172800,
             "end": 1791259140,
+            "start": 1791172800,
             "gmtoffset": -14400
           },
           "post": {
             "timezone": "EDT",
-            "start": 1791259140,
             "end": 1791259140,
+            "start": 1791259140,
             "gmtoffset": -14400
           }
         },
@@ -191,24 +199,24 @@
         "fullExchangeName": "Cboe Indices",
         "instrumentType": "INDEX",
         "firstTradeDate": 631267200,
-        "regularMarketTime": 1790972101,
+        "regularMarketTime": 1791188191,
         "hasPrePostMarketData": false,
         "gmtoffset": -18000,
         "timezone": "CDT",
         "exchangeTimezoneName": "America/Chicago",
-        "regularMarketPrice": 15.31,
-        "regularMarketChangePercent": -6.589,
-        "fulldayPrice": 15.31,
-        "fulldayChange": -1.08,
-        "fulldayChangePercent": -6.589,
+        "regularMarketPrice": 16.15,
+        "regularMarketChangePercent": 5.483,
+        "fulldayPrice": 16.15,
+        "fulldayChange": 0.84,
+        "fulldayChangePercent": 5.483,
         "fiftyTwoWeekHigh": 35.3,
-        "fiftyTwoWeekLow": 0.0,
-        "regularMarketDayHigh": 0.0,
-        "regularMarketDayLow": 0.0,
+        "fiftyTwoWeekLow": 13.38,
+        "regularMarketDayHigh": 16.34,
+        "regularMarketDayLow": 16.15,
         "regularMarketVolume": 0,
         "longName": "CBOE Volatility Index",
         "shortName": "CBOE Volatility Index",
-        "chartPreviousClose": 16.07,
+        "chartPreviousClose": 16.04,
         "priceHint": 2,
         "currentTradingPeriod": {
           "pre": {
@@ -260,10 +268,10 @@
         "timezone": "CDT",
         "exchangeTimezoneName": "America/Chicago",
         "regularMarketPrice": 5.277,
-        "regularMarketChangePercent": -49.81,
+        "regularMarketChangePercent": 0.764,
         "fulldayPrice": 5.277,
-        "fulldayChange": -5.237,
-        "fulldayChangePercent": -49.81,
+        "fulldayChange": 0.04,
+        "fulldayChangePercent": 0.764,
         "fiftyTwoWeekHigh": 5.342,
         "fiftyTwoWeekLow": 0.0,
         "regularMarketDayHigh": 0.0,
@@ -276,20 +284,20 @@
         "currentTradingPeriod": {
           "pre": {
             "timezone": "CDT",
-            "end": 1791202800,
             "start": 1791202800,
+            "end": 1791202800,
             "gmtoffset": -18000
           },
           "regular": {
             "timezone": "CDT",
-            "end": 1791226800,
             "start": 1791202800,
+            "end": 1791226800,
             "gmtoffset": -18000
           },
           "post": {
             "timezone": "CDT",
-            "end": 1791226800,
             "start": 1791226800,
+            "end": 1791226800,
             "gmtoffset": -18000
           }
         },
@@ -317,16 +325,16 @@
         "fullExchangeName": "CCY",
         "instrumentType": "CURRENCY",
         "firstTradeDate": 1070236800,
-        "regularMarketTime": 1791180103,
+        "regularMarketTime": 1791189097,
         "hasPrePostMarketData": false,
         "gmtoffset": 3600,
         "timezone": "BST",
         "exchangeTimezoneName": "Europe/London",
-        "regularMarketPrice": 1343.73,
-        "regularMarketChangePercent": 0.0909,
-        "fulldayPrice": 1343.73,
-        "fulldayChange": 1.22,
-        "fulldayChangePercent": 0.0909,
+        "regularMarketPrice": 1343.6,
+        "regularMarketChangePercent": 0.0812,
+        "fulldayPrice": 1343.6,
+        "fulldayChange": 1.09,
+        "fulldayChangePercent": 0.0812,
         "fiftyTwoWeekHigh": 1587.7,
         "fiftyTwoWeekLow": 1322.42,
         "regularMarketDayHigh": 1347.09,
@@ -339,20 +347,20 @@
         "currentTradingPeriod": {
           "pre": {
             "timezone": "BST",
-            "end": 1791154800,
             "start": 1791154800,
+            "end": 1791154800,
             "gmtoffset": 3600
           },
           "regular": {
             "timezone": "BST",
-            "end": 1791241140,
             "start": 1791154800,
+            "end": 1791241140,
             "gmtoffset": 3600
           },
           "post": {
             "timezone": "BST",
-            "end": 1791241140,
             "start": 1791241140,
+            "end": 1791241140,
             "gmtoffset": 3600
           }
         },
@@ -439,9 +447,9 @@
     },
     "liveMetrics": {
       "nq": {
-        "current": 31050.5,
+        "current": 31075.0,
         "previousClose": 30698.75,
-        "changePct": 1.1458121259008918,
+        "changePct": 1.225619935665133,
         "asOf": "2026-10-06T03:59:00+00:00",
         "freshnessStatus": "fresh",
         "stale": false,
@@ -457,8 +465,8 @@
         "confidence": 0.85
       },
       "vix": {
-        "current": 15.31,
-        "previousClose": 16.07,
+        "current": 16.15,
+        "previousClose": 16.04,
         "asOf": "2026-10-05T20:15:00+00:00",
         "freshnessStatus": "fresh",
         "stale": false,
@@ -474,9 +482,9 @@
         "freshnessLagDays": -1
       },
       "krw": {
-        "current": 1343.73,
+        "current": 1343.6,
         "previousClose": 1359.56,
-        "changeWon": -15.829999999999927,
+        "changeWon": -15.960000000000036,
         "asOf": "2026-10-05T22:59:00+00:00",
         "freshnessStatus": "fresh",
         "stale": false,
@@ -509,7 +517,7 @@
       "rows": [
         {
           "indicator": "NQ 선물 변화율",
-          "actualValue": "+1.15%",
+          "actualValue": "+1.23%",
           "baseScore": "+1점",
           "weight": "×2.5",
           "formula": "+1 × 2.5 = +2.5점",
@@ -517,7 +525,7 @@
         },
         {
           "indicator": "VIX 수준",
-          "actualValue": "+15.31",
+          "actualValue": "+16.15",
           "baseScore": "+1점",
           "weight": "×2.0",
           "formula": "+1 × 2.0 = +2.0점",
@@ -533,7 +541,7 @@
         },
         {
           "indicator": "원달러 환율 변화",
-          "actualValue": "-15.83원",
+          "actualValue": "-15.96원",
           "baseScore": "+2점",
           "weight": "×1.5",
           "formula": "+2 × 1.5 = +3.0점",
@@ -288048,25 +288056,25 @@
       }
     },
     "replayProfileRollup": {
-      "candidateCount": 697,
+      "candidateCount": 702,
       "eligibleCount": 18,
       "includedCount": 31,
       "tradeCount": 629,
       "winRate": 0.4579,
-      "avgNetReturnPct": -0.8484,
-      "cumNetReturnPct": -35.4258,
+      "avgNetReturnPct": -0.8419,
+      "cumNetReturnPct": -35.174,
       "maxDrawdownPct": 39.3713,
       "degradedCount": 629,
       "ambiguousCount": 0,
       "unfilledRate": 0.2529,
       "overall": {
-        "candidateCount": 697,
+        "candidateCount": 702,
         "eligibleCount": 18,
         "includedCount": 31,
         "tradeCount": 629,
         "winRate": 0.4579,
-        "avgNetReturnPct": -0.8484,
-        "cumNetReturnPct": -35.4258,
+        "avgNetReturnPct": -0.8419,
+        "cumNetReturnPct": -35.174,
         "maxDrawdownPct": 39.3713,
         "degradedCount": 629,
         "ambiguousCount": 0,
@@ -288076,13 +288084,13 @@
         "all": {
           "caseKey": "all",
           "label": "전체 후보",
-          "candidateCount": 697,
+          "candidateCount": 702,
           "eligibleCount": 18,
           "includedCount": 31,
           "tradeCount": 629,
           "winRate": 0.4579,
-          "avgNetReturnPct": -0.8484,
-          "cumNetReturnPct": -35.4258,
+          "avgNetReturnPct": -0.8419,
+          "cumNetReturnPct": -35.174,
           "maxDrawdownPct": 39.3713,
           "degradedCount": 629,
           "ambiguousCount": 0,
@@ -288091,7 +288099,7 @@
         "a7plus": {
           "caseKey": "a7plus",
           "label": "7&A",
-          "candidateCount": 276,
+          "candidateCount": 279,
           "eligibleCount": 13,
           "includedCount": 31,
           "tradeCount": 244,
@@ -288121,7 +288129,7 @@
       },
       "byStrategy": {
         "pullback": {
-          "candidateCount": 156,
+          "candidateCount": 157,
           "eligibleCount": 13,
           "includedCount": 4,
           "tradeCount": 139,
@@ -288136,7 +288144,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 156,
+              "candidateCount": 157,
               "eligibleCount": 13,
               "includedCount": 4,
               "tradeCount": 139,
@@ -288151,7 +288159,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 99,
+              "candidateCount": 100,
               "eligibleCount": 8,
               "includedCount": 4,
               "tradeCount": 86,
@@ -288181,13 +288189,13 @@
           }
         },
         "accumulation": {
-          "candidateCount": 194,
+          "candidateCount": 195,
           "eligibleCount": 3,
           "includedCount": 0,
           "tradeCount": 172,
           "winRate": 0.3372,
-          "avgNetReturnPct": -1.2064,
-          "cumNetReturnPct": -46.8925,
+          "avgNetReturnPct": -1.1827,
+          "cumNetReturnPct": -46.4361,
           "maxDrawdownPct": 57.0719,
           "degradedCount": 172,
           "ambiguousCount": 0,
@@ -288196,13 +288204,13 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 194,
+              "candidateCount": 195,
               "eligibleCount": 3,
               "includedCount": 0,
               "tradeCount": 172,
               "winRate": 0.3372,
-              "avgNetReturnPct": -1.2064,
-              "cumNetReturnPct": -46.8925,
+              "avgNetReturnPct": -1.1827,
+              "cumNetReturnPct": -46.4361,
               "maxDrawdownPct": 57.0719,
               "degradedCount": 172,
               "ambiguousCount": 0,
@@ -288241,7 +288249,7 @@
           }
         },
         "breakout": {
-          "candidateCount": 70,
+          "candidateCount": 71,
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 65,
@@ -288256,7 +288264,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 70,
+              "candidateCount": 71,
               "eligibleCount": 0,
               "includedCount": 0,
               "tradeCount": 65,
@@ -288301,7 +288309,7 @@
           }
         },
         "reversal": {
-          "candidateCount": 277,
+          "candidateCount": 279,
           "eligibleCount": 2,
           "includedCount": 27,
           "tradeCount": 253,
@@ -288316,7 +288324,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 277,
+              "candidateCount": 279,
               "eligibleCount": 2,
               "includedCount": 27,
               "tradeCount": 253,
@@ -288331,7 +288339,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 154,
+              "candidateCount": 156,
               "eligibleCount": 2,
               "includedCount": 27,
               "tradeCount": 141,
@@ -289264,8 +289272,8 @@
           "gradeScore": 6.1,
           "tradeCount": 9,
           "winRate": 0.4444,
-          "avgNetReturnPct": 2.2311,
-          "cumNetReturnPct": 20.7719,
+          "avgNetReturnPct": 2.2832,
+          "cumNetReturnPct": 21.3298,
           "lastReplayDate": "2026-09-29",
           "lastEntryFilledAt": "2026-09-29T15:30:00+09:00",
           "lastEntryFillPrice": 1787786.0,
@@ -289390,6 +289398,25 @@
         },
         {
           "strategy": "accumulation",
+          "code": "009830",
+          "name": "한화솔루션",
+          "grade": "B",
+          "replayGrade": "B",
+          "gradeScore": 5.8,
+          "tradeCount": 1,
+          "winRate": 1.0,
+          "avgNetReturnPct": 4.7019,
+          "cumNetReturnPct": 4.7019,
+          "lastReplayDate": "2026-09-29",
+          "lastEntryFilledAt": "2026-09-29T15:30:00+09:00",
+          "lastEntryFillPrice": 32332.3,
+          "lastExitFilledAt": "2026-10-02T15:00:00+09:00",
+          "lastExitAvgFillPrice": 33923.75,
+          "lastExitFillPrice": 35853.0,
+          "lastTradeStatus": "closed"
+        },
+        {
+          "strategy": "accumulation",
           "code": "278470",
           "name": "에이피알",
           "grade": "C",
@@ -289406,25 +289433,6 @@
           "lastExitAvgFillPrice": 433187.4,
           "lastExitFillPrice": 424375.0,
           "lastTradeStatus": "closed"
-        },
-        {
-          "strategy": "accumulation",
-          "code": "009830",
-          "name": "한화솔루션",
-          "grade": "B",
-          "replayGrade": "B",
-          "gradeScore": 5.8,
-          "tradeCount": 1,
-          "winRate": 1.0,
-          "avgNetReturnPct": 3.9134,
-          "cumNetReturnPct": 3.9134,
-          "lastReplayDate": "2026-09-29",
-          "lastEntryFilledAt": "2026-09-29T15:30:00+09:00",
-          "lastEntryFillPrice": 32332.3,
-          "lastExitFilledAt": "2026-09-30T10:00:00+09:00",
-          "lastExitAvgFillPrice": 33583.2941,
-          "lastExitFillPrice": 34884.0,
-          "lastTradeStatus": "open"
         },
         {
           "strategy": "accumulation",
@@ -289568,8 +289576,8 @@
           "gradeScore": 6.2,
           "tradeCount": 12,
           "winRate": 0.3333,
-          "avgNetReturnPct": -0.109,
-          "cumNetReturnPct": -2.3903,
+          "avgNetReturnPct": -0.0815,
+          "cumNetReturnPct": -2.0709,
           "lastReplayDate": "2026-09-28",
           "lastEntryFilledAt": "2026-09-28T15:30:00+09:00",
           "lastEntryFillPrice": 271271.0,
@@ -289675,6 +289683,25 @@
         },
         {
           "strategy": "accumulation",
+          "code": "028260",
+          "name": "삼성물산",
+          "grade": "B",
+          "replayGrade": "B",
+          "gradeScore": 5.9,
+          "tradeCount": 2,
+          "winRate": 0.0,
+          "avgNetReturnPct": -1.8333,
+          "cumNetReturnPct": -3.6608,
+          "lastReplayDate": "2026-09-28",
+          "lastEntryFilledAt": "2026-09-28T15:30:00+09:00",
+          "lastEntryFillPrice": 346846.5,
+          "lastExitFilledAt": "2026-09-29T10:00:00+09:00",
+          "lastExitAvgFillPrice": 347000.0,
+          "lastExitFillPrice": 347000.0,
+          "lastTradeStatus": "open"
+        },
+        {
+          "strategy": "accumulation",
           "code": "055550",
           "name": "신한지주",
           "grade": "A",
@@ -289691,25 +289718,6 @@
           "lastExitAvgFillPrice": 106300.0,
           "lastExitFillPrice": 106300.0,
           "lastTradeStatus": "closed"
-        },
-        {
-          "strategy": "accumulation",
-          "code": "028260",
-          "name": "삼성물산",
-          "grade": "B",
-          "replayGrade": "B",
-          "gradeScore": 5.9,
-          "tradeCount": 2,
-          "winRate": 0.0,
-          "avgNetReturnPct": -2.0635,
-          "cumNetReturnPct": -4.105,
-          "lastReplayDate": "2026-09-28",
-          "lastEntryFilledAt": "2026-09-28T15:30:00+09:00",
-          "lastEntryFillPrice": 346846.5,
-          "lastExitFilledAt": "2026-09-29T10:00:00+09:00",
-          "lastExitAvgFillPrice": 347000.0,
-          "lastExitFillPrice": 347000.0,
-          "lastTradeStatus": "open"
         },
         {
           "strategy": "accumulation",
@@ -289865,6 +289873,25 @@
         },
         {
           "strategy": "accumulation",
+          "code": "042700",
+          "name": "한미반도체",
+          "grade": "B",
+          "replayGrade": "B",
+          "gradeScore": 5.7,
+          "tradeCount": 4,
+          "winRate": 0.5,
+          "avgNetReturnPct": -1.5217,
+          "cumNetReturnPct": -6.9905,
+          "lastReplayDate": "2026-09-29",
+          "lastEntryFilledAt": "2026-09-29T15:30:00+09:00",
+          "lastEntryFillPrice": 250250.0,
+          "lastExitFilledAt": "2026-10-02T15:00:00+09:00",
+          "lastExitAvgFillPrice": 267900.0,
+          "lastExitFillPrice": 277500.0,
+          "lastTradeStatus": "closed"
+        },
+        {
+          "strategy": "accumulation",
           "code": "298040",
           "name": "효성중공업",
           "grade": "B",
@@ -289922,25 +289949,6 @@
         },
         {
           "strategy": "accumulation",
-          "code": "042700",
-          "name": "한미반도체",
-          "grade": "B",
-          "replayGrade": "B",
-          "gradeScore": 5.7,
-          "tradeCount": 4,
-          "winRate": 0.5,
-          "avgNetReturnPct": -2.0899,
-          "cumNetReturnPct": -8.9695,
-          "lastReplayDate": "2026-09-29",
-          "lastEntryFilledAt": "2026-09-29T15:30:00+09:00",
-          "lastEntryFillPrice": 250250.0,
-          "lastExitFilledAt": "2026-09-30T10:00:00+09:00",
-          "lastExitAvgFillPrice": 253500.0,
-          "lastExitFillPrice": 255000.0,
-          "lastTradeStatus": "open"
-        },
-        {
-          "strategy": "accumulation",
           "code": "034730",
           "name": "SK",
           "grade": "C",
@@ -289986,8 +289994,8 @@
           "gradeScore": 5.0,
           "tradeCount": 6,
           "winRate": 0.3333,
-          "avgNetReturnPct": -1.5029,
-          "cumNetReturnPct": -9.9865,
+          "avgNetReturnPct": -1.5437,
+          "cumNetReturnPct": -10.1947,
           "lastReplayDate": "2026-10-01",
           "lastEntryFilledAt": "2026-10-01T15:30:00+09:00",
           "lastEntryFillPrice": 140740.6,
@@ -292431,7 +292439,7 @@
       ],
       "strategyStats": {
         "pullback": {
-          "candidateCount": 156,
+          "candidateCount": 157,
           "eligibleCount": 13,
           "includedCount": 4,
           "tradeCount": 139,
@@ -292446,7 +292454,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 156,
+              "candidateCount": 157,
               "eligibleCount": 13,
               "includedCount": 4,
               "tradeCount": 139,
@@ -292461,7 +292469,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 99,
+              "candidateCount": 100,
               "eligibleCount": 8,
               "includedCount": 4,
               "tradeCount": 86,
@@ -292491,13 +292499,13 @@
           }
         },
         "accumulation": {
-          "candidateCount": 194,
+          "candidateCount": 195,
           "eligibleCount": 3,
           "includedCount": 0,
           "tradeCount": 172,
           "winRate": 0.3372,
-          "avgNetReturnPct": -1.2064,
-          "cumNetReturnPct": -46.8925,
+          "avgNetReturnPct": -1.1827,
+          "cumNetReturnPct": -46.4361,
           "maxDrawdownPct": 57.0719,
           "degradedCount": 172,
           "ambiguousCount": 0,
@@ -292506,13 +292514,13 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 194,
+              "candidateCount": 195,
               "eligibleCount": 3,
               "includedCount": 0,
               "tradeCount": 172,
               "winRate": 0.3372,
-              "avgNetReturnPct": -1.2064,
-              "cumNetReturnPct": -46.8925,
+              "avgNetReturnPct": -1.1827,
+              "cumNetReturnPct": -46.4361,
               "maxDrawdownPct": 57.0719,
               "degradedCount": 172,
               "ambiguousCount": 0,
@@ -292551,7 +292559,7 @@
           }
         },
         "breakout": {
-          "candidateCount": 70,
+          "candidateCount": 71,
           "eligibleCount": 0,
           "includedCount": 0,
           "tradeCount": 65,
@@ -292566,7 +292574,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 70,
+              "candidateCount": 71,
               "eligibleCount": 0,
               "includedCount": 0,
               "tradeCount": 65,
@@ -292611,7 +292619,7 @@
           }
         },
         "reversal": {
-          "candidateCount": 277,
+          "candidateCount": 279,
           "eligibleCount": 2,
           "includedCount": 27,
           "tradeCount": 253,
@@ -292626,7 +292634,7 @@
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 277,
+              "candidateCount": 279,
               "eligibleCount": 2,
               "includedCount": 27,
               "tradeCount": 253,
@@ -292641,7 +292649,7 @@
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 154,
+              "candidateCount": 156,
               "eligibleCount": 2,
               "includedCount": 27,
               "tradeCount": 141,
@@ -292780,8 +292788,8 @@
           "tradeCount": 172,
           "sampleCount": 172,
           "winRate": 0.3372,
-          "avgNetReturnPct": -1.2064,
-          "cumNetReturnPct": -46.8925
+          "avgNetReturnPct": -1.1827,
+          "cumNetReturnPct": -46.4361
         },
         "breakout|conservative": {
           "tradeCount": 65,
@@ -293244,8 +293252,8 @@
           "tradeCount": 3,
           "sampleCount": 3,
           "winRate": 0.6667,
-          "avgNetReturnPct": 2.0648,
-          "cumNetReturnPct": 5.9911
+          "avgNetReturnPct": 1.9833,
+          "cumNetReturnPct": 5.746
         },
         "breakout|box|strong|G-B|conservative": {
           "tradeCount": 1,
@@ -293272,8 +293280,8 @@
           "tradeCount": 3,
           "sampleCount": 3,
           "winRate": 1.0,
-          "avgNetReturnPct": 4.4343,
-          "cumNetReturnPct": 4.4343
+          "avgNetReturnPct": 4.5443,
+          "cumNetReturnPct": 4.5443
         },
         "reversal|box|strong|G-A|conservative": {
           "tradeCount": 3,
@@ -293293,8 +293301,8 @@
           "tradeCount": 4,
           "sampleCount": 4,
           "winRate": 0.0,
-          "avgNetReturnPct": -2.6918,
-          "cumNetReturnPct": -2.6918
+          "avgNetReturnPct": -2.5768,
+          "cumNetReturnPct": -2.5768
         },
         "breakout|box|maintain|G-C|conservative": {
           "tradeCount": 1,
@@ -293321,8 +293329,8 @@
           "tradeCount": 4,
           "sampleCount": 4,
           "winRate": 0.75,
-          "avgNetReturnPct": 1.7379,
-          "cumNetReturnPct": 1.7379
+          "avgNetReturnPct": 2.6205,
+          "cumNetReturnPct": 2.6205
         },
         "breakout|box|strong|G-C|conservative": {
           "tradeCount": 1,
@@ -293340,7 +293348,7 @@
         }
       },
       "pointInTimeStatusCounts": {
-        "confirmed": 84,
+        "confirmed": 85,
         "historical_regen": 0,
         "legacy_unknown": 0
       },
