@@ -36,30 +36,6 @@
     "sourceEntryKey": "20260929|stable|accumulation|000660"
   },
   {
-    "runId": "replay-20260930-060609-654cb316",
-    "entryDate": "2026-09-29",
-    "code": "009830",
-    "name": "한화솔루션",
-    "strategy": "accumulation",
-    "entryPrice": 32332.3,
-    "swingTargetPrice": 35853.0,
-    "stopPrice": 31170.0,
-    "qtyPct": 15.0,
-    "sourceEntryKey": "20260929|stable|accumulation|009830"
-  },
-  {
-    "runId": "replay-20260930-060609-654cb316",
-    "entryDate": "2026-09-29",
-    "code": "042700",
-    "name": "한미반도체",
-    "strategy": "accumulation",
-    "entryPrice": 250250.0,
-    "swingTargetPrice": 277500.0,
-    "stopPrice": 240000.0,
-    "qtyPct": 60.0,
-    "sourceEntryKey": "20260929|stable|accumulation|042700"
-  },
-  {
     "runId": "replay-20261002-060838-3d91aaf6",
     "entryDate": "2026-10-01",
     "code": "096770",
