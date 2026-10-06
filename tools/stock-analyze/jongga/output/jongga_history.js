@@ -1,5 +1,159 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-06",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261006.js",
+    "jsonFile": "jongga/output/202610/latest_20261006.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261006.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-06T06:08:42+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 10,
+    "topRecommendations": [
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 11.9,
+        "signalScore": 11.9,
+        "strictScore": 11.9,
+        "scoreMax": 13.0,
+        "grade": "S",
+        "gradeScore": 9.5,
+        "statusLabel": "강력매수",
+        "entryEligible": true,
+        "currentPrice": 231000
+      },
+      {
+        "strategy": "pullback",
+        "scoreScope": "pullback",
+        "name": "이수페타시스",
+        "code": "007660",
+        "score": 9.4,
+        "signalScore": 9.4,
+        "strictScore": 9.4,
+        "scoreMax": 13.0,
+        "grade": "A",
+        "gradeScore": 7.5,
+        "statusLabel": "매수추천",
+        "entryEligible": true,
+        "currentPrice": 131800
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "LG전자",
+        "code": "066570",
+        "score": 9.9,
+        "signalScore": 9.9,
+        "strictScore": 9.9,
+        "scoreMax": 14.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
+        "entryEligible": false,
+        "currentPrice": 231000
+      },
+      {
+        "strategy": "breakout",
+        "scoreScope": "breakout",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 7.2,
+        "signalScore": 7.2,
+        "strictScore": 7.2,
+        "scoreMax": 12.5,
+        "grade": "B",
+        "gradeScore": 5.8,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "entryEligible": false,
+        "currentPrice": 574000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 9.5,
+        "signalScore": 9.5,
+        "strictScore": 9.5,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 9.5,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 574000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산",
+        "code": "000150",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "진입 가능",
+        "entryEligible": true,
+        "currentPrice": 1458000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "010170",
+        "name": "대한광통신",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "217590",
+        "name": "티엠씨",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "373220",
+        "name": "LG에너지솔루션",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-05",
     "variant": "stable",
     "variantLabel": "현재 버전",
