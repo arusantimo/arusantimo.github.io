@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-06T06:08:42+00:00",
+    "generatedAt": "2026-10-06T08:37:48+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 15,
     "topRecommendations": [
       {
         "strategy": "pullback",
@@ -28,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 9.5,
         "statusLabel": "강력매수",
         "entryEligible": true,
-        "currentPrice": 231000
+        "currentPrice": 231500
       },
       {
         "strategy": "pullback",
@@ -58,52 +58,67 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
         "entryEligible": false,
-        "currentPrice": 231000
+        "currentPrice": 231500
       },
       {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 7.2,
-        "signalScore": 7.2,
-        "strictScore": 7.2,
-        "scoreMax": 12.5,
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 8.3,
+        "signalScore": 8.3,
+        "strictScore": 8.3,
+        "scoreMax": 14.0,
         "grade": "B",
-        "gradeScore": 5.8,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
+        "gradeScore": 5.9,
+        "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 574000
+        "currentPrice": 1161000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "삼성SDI",
         "code": "006400",
-        "score": 9.5,
-        "signalScore": 9.5,
-        "strictScore": 9.5,
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
         "scoreMax": 10.0,
         "grade": "S",
-        "gradeScore": 9.5,
+        "gradeScore": 8.6,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 574000
+        "currentPrice": 573000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "두산",
-        "code": "000150",
-        "score": 7.1,
-        "signalScore": 7.1,
-        "strictScore": 7.1,
+        "name": "LG전자",
+        "code": "066570",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.1,
-        "statusLabel": "진입 가능",
-        "entryEligible": true,
-        "currentPrice": 1458000
+        "grade": "S",
+        "gradeScore": 8.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 231500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG에너지솔루션",
+        "code": "373220",
+        "score": 8.6,
+        "signalScore": 8.6,
+        "strictScore": 8.6,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 389000
       }
     ],
     "blacklist": [
@@ -141,13 +156,26 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "373220",
-        "name": "LG에너지솔루션",
+        "code": "080220",
+        "name": "제주반도체",
         "reasons": [
+          "투자 주의",
           "공매도 과열"
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "069540",
+        "name": "빛과전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "toss"
         ],
         "status": "confirmed"
       }
