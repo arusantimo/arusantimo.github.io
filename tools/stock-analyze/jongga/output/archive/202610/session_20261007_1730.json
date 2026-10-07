@@ -1,5 +1,4 @@
-window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
-window.JONGGA_DAILY_DATA["2026-10-07"] = {
+{
   "schemaVersion": "jongga_result.v1",
   "generatedAt": "2026-10-07T08:35:47+00:00",
   "variant": "stable",
@@ -2102,7 +2101,6 @@ window.JONGGA_DAILY_DATA["2026-10-07"] = {
   "analysisSession": "1730",
   "analysisSessionLabel": "5시반 분석",
   "sessionSources": [
-    "1500",
     "1730"
   ]
-};
+}
