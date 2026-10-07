@@ -1,5 +1,58 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-07",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261007.js",
+    "jsonFile": "jongga/output/202610/latest_20261007.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261007.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-07T06:06:12+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [],
+    "blacklist": [
+      {
+        "code": "042510",
+        "name": "라온시큐어",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "012210",
+        "name": "삼미금속",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "069540",
+        "name": "빛과전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-06",
     "variant": "stable",
     "variantLabel": "현재 버전",

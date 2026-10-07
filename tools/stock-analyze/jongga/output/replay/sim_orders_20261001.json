@@ -398,5 +398,25 @@
     "activeFrom": "2026-10-02T15:00:00+09:00",
     "activeUntil": "2026-10-02T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20261001|stable|accumulation|096770-swing_touch",
+    "runId": "replay-20261002-060838-3d91aaf6",
+    "date": "2026-10-01",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "096770",
+    "name": "SK이노베이션",
+    "side": "SELL",
+    "orderType": "LIMIT",
+    "requestedAt": "2026-10-06T15:00:00+09:00",
+    "requestedPrice": 156066.0,
+    "quantityPct": 15.0,
+    "reason": "스윙 목표가 도달",
+    "sourceEntryKey": "20261001|stable|accumulation|096770",
+    "stageKey": "swing",
+    "finalStatus": "filled",
+    "activeFrom": "2026-10-06T15:00:00+09:00",
+    "activeUntil": "2026-10-06T15:00:00+09:00"
   }
 ]

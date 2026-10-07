@@ -34,17 +34,5 @@
     "stopPrice": 1723490.0,
     "qtyPct": 60.0,
     "sourceEntryKey": "20260929|stable|accumulation|000660"
-  },
-  {
-    "runId": "replay-20261002-060838-3d91aaf6",
-    "entryDate": "2026-10-01",
-    "code": "096770",
-    "name": "SK이노베이션",
-    "strategy": "accumulation",
-    "entryPrice": 140740.6,
-    "swingTargetPrice": 156066.0,
-    "stopPrice": 136382.0,
-    "qtyPct": 15.0,
-    "sourceEntryKey": "20261001|stable|accumulation|096770"
   }
 ]
