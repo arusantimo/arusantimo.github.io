@@ -1,5 +1,63 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-08",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261008.js",
+    "jsonFile": "jongga/output/202610/latest_20261008.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261008.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-08T06:06:09+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "이수페타시스",
+        "code": "007660",
+        "score": 6.9,
+        "signalScore": 6.9,
+        "strictScore": 6.9,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 126900
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "373220",
+        "name": "LG에너지솔루션",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "042700",
+        "name": "한미반도체",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-07",
     "variant": "stable",
     "variantLabel": "현재 버전",
