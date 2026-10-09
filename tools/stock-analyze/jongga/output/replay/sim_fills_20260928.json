@@ -649,5 +649,26 @@
     "barLow": 31500.0,
     "barClose": 32800.0,
     "fillRule": "time_stop_0915_market"
+  },
+  {
+    "orderId": "20260928|stable|accumulation|028260-stop_touch",
+    "sourceEntryKey": "20260928|stable|accumulation|028260",
+    "strategy": "accumulation",
+    "code": "028260",
+    "name": "삼성물산",
+    "side": "SELL",
+    "stageKey": "stop",
+    "reason": "스윙 손절가 이탈",
+    "fillStatus": "filled",
+    "filledAt": "2026-10-08T15:00:00+09:00",
+    "fillPrice": 334372.0,
+    "filledQuantityPct": 80.0,
+    "slippagePct": 0.0,
+    "barTimestamp": "2026-10-08T15:00:00+09:00",
+    "barOpen": 332000.0,
+    "barHigh": 333500.0,
+    "barLow": 317500.0,
+    "barClose": 320000.0,
+    "fillRule": "stop_touch"
   }
 ]

@@ -1238,5 +1238,25 @@
     "finalStatus": "filled",
     "activeFrom": "2026-10-01T15:00:00+09:00",
     "activeUntil": "2026-10-01T15:00:00+09:00"
+  },
+  {
+    "orderId": "20260922|stable|accumulation|005930-stop_touch",
+    "runId": "replay-20260923-060752-53441f6b",
+    "date": "2026-09-22",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "005930",
+    "name": "삼성전자",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-10-08T15:00:00+09:00",
+    "requestedPrice": 264000.0,
+    "quantityPct": 60.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260922|stable|accumulation|005930",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-10-08T15:00:00+09:00",
+    "activeUntil": "2026-10-08T15:00:00+09:00"
   }
 ]

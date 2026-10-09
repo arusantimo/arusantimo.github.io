@@ -1558,5 +1558,25 @@
     "activeFrom": "2026-09-29T15:00:00+09:00",
     "activeUntil": "2026-09-29T15:00:00+09:00",
     "finalStatus": "filled"
+  },
+  {
+    "orderId": "20260928|stable|accumulation|028260-stop_touch",
+    "runId": "replay-20260929-060839-a1e531f1",
+    "date": "2026-09-28",
+    "variant": "stable",
+    "strategy": "accumulation",
+    "code": "028260",
+    "name": "삼성물산",
+    "side": "SELL",
+    "orderType": "STOP",
+    "requestedAt": "2026-10-08T15:00:00+09:00",
+    "requestedPrice": 334372.0,
+    "quantityPct": 80.0,
+    "reason": "스윙 손절가 이탈",
+    "sourceEntryKey": "20260928|stable|accumulation|028260",
+    "stageKey": "stop",
+    "finalStatus": "filled",
+    "activeFrom": "2026-10-08T15:00:00+09:00",
+    "activeUntil": "2026-10-08T15:00:00+09:00"
   }
 ]
