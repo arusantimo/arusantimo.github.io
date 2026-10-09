@@ -1,5 +1,33 @@
 window.JONGGA_OUTCOMES_INDEX = [
   {
+    "date": "2026-10-09",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "007660",
+    "name": "이수페타시스",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 125000.0,
+    "outcomeStatus": "no_data"
+  },
+  {
+    "date": "2026-10-09",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "006400",
+    "name": "삼성SDI",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 567000.0,
+    "outcomeStatus": "no_data"
+  },
+  {
     "date": "2026-10-06",
     "variant": "stable",
     "strategy": "reversal",

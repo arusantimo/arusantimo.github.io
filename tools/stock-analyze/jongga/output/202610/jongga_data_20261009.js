@@ -1,7 +1,7 @@
 window.JONGGA_DAILY_DATA = window.JONGGA_DAILY_DATA || {};
 window.JONGGA_DAILY_DATA["2026-10-09"] = {
   "schemaVersion": "jongga_result.v1",
-  "generatedAt": "2026-10-09T06:05:23+00:00",
+  "generatedAt": "2026-10-09T08:36:07+00:00",
   "variant": "stable",
   "payloadSourceMode": "live",
   "rebuildable": true,
@@ -26,13 +26,14 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
       "failed": 0,
       "stale": 0,
       "manual": 0,
-      "fallback": 1,
+      "fallback": 2,
       "slots": 1
     },
     "failedKeys": [],
     "staleKeys": [],
     "manualKeys": [],
     "fallbackKeys": [
+      "overtime_price",
       "short_balance_trend"
     ],
     "providerHealth": {
@@ -70,6 +71,9 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
       "cnbc_quote": {
         "ok": 1
       },
+      "naver_overtime_board": {
+        "fallback": 1
+      },
       "krx_pykrx_short_balance": {
         "data_missing": 19
       },
@@ -78,6 +82,14 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
       }
     },
     "fallbackUsage": [
+      {
+        "key": "overtime_price",
+        "provider": "naver_overtime_board",
+        "layer": "session_close",
+        "fallbackLevel": 1,
+        "confidence": 0.4,
+        "stale": false
+      },
       {
         "key": "short_balance_trend",
         "provider": "krx_short_balance_direct_post",
@@ -93,7 +105,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "vkospi_quote",
         "label": "VKOSPI 수집",
         "status": "ok",
-        "durationMs": 851.8,
+        "durationMs": 1121.1,
         "detail": "VKOSPI",
         "count": 1
       },
@@ -101,7 +113,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "macro_quotes",
         "label": "글로벌 매크로 지표 수집",
         "status": "ok",
-        "durationMs": 301.8,
+        "durationMs": 363.5,
         "detail": "Yahoo chart 5종",
         "count": 5
       },
@@ -116,28 +128,36 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "kospi_history",
         "label": "KOSPI 히스토리 수집",
         "status": "ok",
-        "durationMs": 1447.8,
+        "durationMs": 1827.9,
         "count": 90
       },
       {
         "step": "market_context",
         "label": "시장 레짐 계산",
         "status": "ok",
-        "durationMs": 550.1,
+        "durationMs": 537.2,
         "detail": "약세장 ⛔"
       },
       {
         "step": "top_trading",
         "label": "거래대금 상위 종목 수집",
         "status": "ok",
-        "durationMs": 39858.8,
+        "durationMs": 54836.1,
         "count": 20
+      },
+      {
+        "step": "overtime_price",
+        "label": "시간외 단일가 종가 보강",
+        "status": "fallback",
+        "durationMs": 909.3,
+        "detail": "정규장 종가로 대체",
+        "count": 0
       },
       {
         "step": "short_balance_trend",
         "label": "대차잔고(공매도) 추이 보강 (대형주)",
         "status": "partial",
-        "durationMs": 124408.0,
+        "durationMs": 136032.7,
         "detail": "후보 19종목 중 19건 수집 · fallback 19건 (krx_short_balance_direct_post)",
         "count": 19
       },
@@ -145,7 +165,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "stock_snapshots",
         "label": "종목 상세 스냅샷 수집",
         "status": "ok",
-        "durationMs": 6600.7,
+        "durationMs": 9109.8,
         "detail": "성공 20 / 실패 0",
         "count": 20
       },
@@ -153,7 +173,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "http_enrichment",
         "label": "토스 API 보강 수집",
         "status": "ok",
-        "durationMs": 8819.3,
+        "durationMs": 10394.3,
         "detail": "direct-http · 체결강도 20 / 호가 20 / 틱프록시 20",
         "count": 20
       },
@@ -161,7 +181,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "entry_scoring",
         "label": "전략별 후보 계산",
         "status": "ok",
-        "durationMs": 99.5,
+        "durationMs": 96.6,
         "detail": "pullback 0, breakout 0, accumulation 0, reversal 3",
         "count": 3
       },
@@ -169,7 +189,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "browser_enrichment",
         "label": "KIND 브라우저 보강",
         "status": "ok",
-        "durationMs": 16971.5,
+        "durationMs": 21597.2,
         "detail": "playwright-chromium · KIND 3",
         "count": 3
       },
@@ -177,7 +197,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "step": "blacklist_check",
         "label": "공매도 과열·투자 주의 검증",
         "status": "ok",
-        "durationMs": 25561.2,
+        "durationMs": 29365.8,
         "detail": "확정 1 · 미확인 0",
         "count": 3
       }
@@ -232,7 +252,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
           },
           {
             "item": "갭 스코어",
-            "value": "G-C 🟡 (-1.0점)"
+            "value": "G-C 🟡 (+1.5점)"
           },
           {
             "item": "갭 조정",
@@ -304,15 +324,15 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
         "rows": [
           {
             "indicator": "NQ 선물 변화율",
-            "actualValue": "-0.53%",
-            "baseScore": "-1점",
+            "actualValue": "-0.24%",
+            "baseScore": "+0점",
             "weight": "×2.5",
-            "formula": "-1 × 2.5 = -2.5점",
-            "weightedScore": "-2.5점"
+            "formula": "+0 × 2.5 = +0.0점",
+            "weightedScore": "+0.0점"
           },
           {
             "indicator": "VIX 수준",
-            "actualValue": "+15.41",
+            "actualValue": "+15.24",
             "baseScore": "+1점",
             "weight": "×2.0",
             "formula": "+1 × 2.0 = +2.0점",
@@ -343,7 +363,7 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
             "weightedScore": "-2.0점"
           }
         ],
-        "totalScore": "-1.0점",
+        "totalScore": "+1.5점",
         "grade": "G-C 🟡",
         "code": "G-C",
         "entryAdjustment": "✅ 70% 진입 / ⚠️ 50% 진입",
@@ -916,12 +936,12 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
                 "supplyTrendScore": -2.0,
                 "shortBalanceChangePct": -21.550253308014007
               },
-              "evaluatedAt": "2026-10-09T15:04:40+09:00",
+              "evaluatedAt": "2026-10-09T17:35:16+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           },
           {
             "rank": 2,
@@ -1472,12 +1492,12 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
                 "supplyTrendScore": -2.0,
                 "shortBalanceChangePct": -35.009539064228036
               },
-              "evaluatedAt": "2026-10-09T15:04:40+09:00",
+              "evaluatedAt": "2026-10-09T17:35:16+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSDAQ",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           },
           {
             "rank": 3,
@@ -2031,12 +2051,12 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
                 "supplyTrendScore": 2.0,
                 "shortBalanceChangePct": -33.71756394252476
               },
-              "evaluatedAt": "2026-10-09T15:04:40+09:00",
+              "evaluatedAt": "2026-10-09T17:35:16+09:00",
               "source": "jongga_analysis"
             },
             "stockExchangeName": "KOSPI",
-            "analysisSession": "1500",
-            "analysisSessionLabel": "3시 분석"
+            "analysisSession": "1730",
+            "analysisSessionLabel": "5시반 분석"
           }
         ],
         "swing": []
@@ -2054,9 +2074,10 @@ window.JONGGA_DAILY_DATA["2026-10-09"] = {
   "analysisDate": "2026-10-09",
   "pointInTime": true,
   "pointInTimeStatus": "confirmed",
-  "analysisSession": "1500",
-  "analysisSessionLabel": "3시 분석",
+  "analysisSession": "1730",
+  "analysisSessionLabel": "5시반 분석",
   "sessionSources": [
-    "1500"
+    "1500",
+    "1730"
   ]
 };
