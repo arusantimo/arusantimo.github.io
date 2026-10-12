@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-12T06:06:53+00:00",
+    "generatedAt": "2026-10-12T08:36:15+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -28,15 +28,29 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 861000
+        "currentPrice": 858000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "금호건설",
+        "code": "002990",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 13550
       }
     ],
     "blacklist": [
       {
-        "code": "002990",
-        "name": "금호건설",
+        "code": "240810",
+        "name": "원익IPS",
         "reasons": [
-          "투자 주의",
           "공매도 과열"
         ],
         "sources": [
