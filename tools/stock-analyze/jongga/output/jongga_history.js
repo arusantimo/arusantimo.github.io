@@ -1,5 +1,63 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-12",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261012.js",
+    "jsonFile": "jongga/output/202610/latest_20261012.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261012.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-12T06:06:53+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 861000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "002990",
+        "name": "금호건설",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-09",
     "variant": "stable",
     "variantLabel": "현재 버전",
