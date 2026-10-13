@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-13T06:06:01+00:00",
+    "generatedAt": "2026-10-13T08:35:42+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -29,12 +29,38 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "관심후보(약세·소액)",
         "entryEligible": false,
         "currentPrice": 149500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "score": 6.2,
+        "signalScore": 6.2,
+        "strictScore": 6.2,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 258500
       }
     ],
     "blacklist": [
       {
-        "code": "036930",
-        "name": "주성엔지니어링",
+        "code": "373220",
+        "name": "LG에너지솔루션",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "005380",
+        "name": "현대차",
         "reasons": [
           "공매도 과열"
         ],
