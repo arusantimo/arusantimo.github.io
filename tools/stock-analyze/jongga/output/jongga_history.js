@@ -9,34 +9,49 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-14T06:05:58+00:00",
+    "generatedAt": "2026-10-14T08:35:37+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "삼성SDI",
         "code": "006400",
-        "score": 4.6,
-        "signalScore": 4.6,
-        "strictScore": 4.6,
+        "score": 6.4,
+        "signalScore": 6.4,
+        "strictScore": 6.4,
         "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 4.6,
+        "grade": "B",
+        "gradeScore": 6.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 586000
+        "currentPrice": 590000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대덕전자",
+        "code": "353200",
+        "score": 5.1,
+        "signalScore": 5.1,
+        "strictScore": 5.1,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 141600
       }
     ],
     "blacklist": [
       {
-        "code": "353200",
-        "name": "대덕전자",
+        "code": "373220",
+        "name": "LG에너지솔루션",
         "reasons": [
-          "투자 주의"
+          "공매도 과열"
         ],
         "sources": [
           "kind"
@@ -44,10 +59,10 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "373220",
-        "name": "LG에너지솔루션",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
-          "공매도 과열"
+          "투자 주의"
         ],
         "sources": [
           "kind"
