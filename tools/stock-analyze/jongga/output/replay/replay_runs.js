@@ -1,17 +1,18 @@
 window.JONGGA_REPLAY_RUNS = {
-  "generatedAt": "2026-10-13T08:35:43",
+  "generatedAt": "2026-10-14T06:06:00",
   "latestAttempt": {
-    "status": "skipped",
-    "message": "17:30 세션에서는 자동 replay를 생략합니다.",
-    "generatedAt": "2026-10-13T08:35:42",
+    "status": "complete",
+    "message": "",
+    "generatedAt": "2026-10-14T06:06:00",
+    "runId": "replay-20261014-060600-4c004663",
     "variant": "stable",
     "thresholdProfile": "current"
   },
   "latestRun": {
-    "runId": "replay-20261013-060603-1d26ab44",
-    "generatedAt": "2026-10-13T06:06:03",
+    "runId": "replay-20261014-060600-4c004663",
+    "generatedAt": "2026-10-14T06:06:00",
     "from": "2026-06-08",
-    "to": "2026-10-12",
+    "to": "2026-10-13",
     "variant": "stable",
     "bar": "1m",
     "thresholdProfile": "current",
@@ -132,7 +133,8 @@ window.JONGGA_REPLAY_RUNS = {
       "2026-10-07",
       "2026-10-08",
       "2026-10-09",
-      "2026-10-12"
+      "2026-10-12",
+      "2026-10-13"
     ],
     "days": [
       {
@@ -262486,63 +262488,923 @@ window.JONGGA_REPLAY_RUNS = {
             "fillRule": "openPhase_touch"
           }
         ]
+      },
+      {
+        "date": "2026-10-13",
+        "summaryFile": "replay_summary_20261013.json",
+        "ordersFile": "sim_orders_20261013.json",
+        "fillsFile": "sim_fills_20261013.json",
+        "candidateCount": 2,
+        "eligibleCount": 0,
+        "includedCount": 0,
+        "tradeCount": 2,
+        "degradedCount": 2,
+        "ambiguousCount": 0,
+        "byStrategy": {
+          "reversal": {
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0,
+            "comparisonByCase": {
+              "all": {
+                "caseKey": "all",
+                "label": "전체 후보",
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "a7plus": {
+                "caseKey": "a7plus",
+                "label": "7&A",
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "recommendation": {
+                "caseKey": "recommendation",
+                "label": "추천 전용",
+                "candidateCount": 0,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 0,
+                "winRate": null,
+                "avgNetReturnPct": null,
+                "cumNetReturnPct": null,
+                "maxDrawdownPct": null,
+                "degradedCount": 0,
+                "ambiguousCount": 0,
+                "unfilledRate": null
+              }
+            }
+          }
+        },
+        "pointInTime": true,
+        "pointInTimeStatus": "confirmed",
+        "skippedReason": "",
+        "candidates": [
+          {
+            "strategy": "reversal",
+            "name": "심텍",
+            "code": "222800",
+            "takeProfitProfileKey": "conservative",
+            "takeProfitProfileLabel": "보수형",
+            "originalGrade": "A",
+            "replayGrade": "A",
+            "gradeScore": 7.0,
+            "strictScore": 7.0,
+            "signalScore": 7.0,
+            "entryPrice": 149500.0,
+            "entryPriceAvailable": true,
+            "statusLabel": "관심후보(약세·소액)",
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "reversal-a7plus-balanced",
+              "active": true,
+              "stopExecution": "close",
+              "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+              "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+              "positionWeightMultiplier": 0.5,
+              "intradayRiskRule": {
+                "active": true,
+                "triggerPct": -5.0,
+                "action": "50% 축소",
+                "timing": "10:00 또는 14:00 확인",
+                "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+              },
+              "volatilityOverlay": {
+                "active": true,
+                "mode": "high-volatility",
+                "label": "고변동성 방어",
+                "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                "triggerMetrics": {
+                  "blendedState": "volatile",
+                  "marketState": "volatile",
+                  "stockState": "volatile",
+                  "atrPct10": 7.28,
+                  "todayRangePct": 9.63,
+                  "returnStd20": 4.93,
+                  "vkospi": 48.76
+                },
+                "originalTakeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 50.0
+                  },
+                  {
+                    "targetPct": 10.0,
+                    "quantityPct": 50.0
+                  }
+                ],
+                "adjustedTakeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 60.0
+                  },
+                  {
+                    "targetPct": 8.0,
+                    "quantityPct": 40.0
+                  }
+                ],
+                "positionWeightMultiplier": 0.5
+              },
+              "label": "반등 × 7&A",
+              "priority": 1,
+              "strategyCase": "reversal",
+              "recommendationCase": "a7plus",
+              "stopPct": -2.0,
+              "takeProfitStages": [
+                {
+                  "targetPct": 2.0,
+                  "quantityPct": 60.0
+                },
+                {
+                  "targetPct": 8.0,
+                  "quantityPct": 40.0
+                }
+              ],
+              "positionWeightHint": "half",
+              "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+            },
+            "entryEligibleOriginal": false,
+            "historyRecommendation": false,
+            "replayIncluded": false,
+            "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+            "replayA7Plus": true,
+            "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+            "pullbackReplayGateOk": true,
+            "qualityGateOk": true,
+            "entryEligible": false,
+            "entryWatch": false,
+            "entryBlockers": [],
+            "setupQuality": "setup_weak",
+            "payloadSourceMode": "live",
+            "inputArchiveVersion": "jongga_inputs.v1",
+            "rebuildable": true,
+            "historyRecommendationSourceMode": "",
+            "pointInTime": true,
+            "pointInTimeStatus": "confirmed"
+          },
+          {
+            "strategy": "reversal",
+            "name": "주성엔지니어링",
+            "code": "036930",
+            "takeProfitProfileKey": "conservative",
+            "takeProfitProfileLabel": "보수형",
+            "originalGrade": "B",
+            "replayGrade": "B",
+            "gradeScore": 6.2,
+            "strictScore": 6.2,
+            "signalScore": 6.2,
+            "entryPrice": 258500.0,
+            "entryPriceAvailable": true,
+            "statusLabel": "매매금지",
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-reversal",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "entryEligibleOriginal": false,
+            "historyRecommendation": false,
+            "replayIncluded": false,
+            "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+            "replayA7Plus": false,
+            "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+            "pullbackReplayGateOk": true,
+            "qualityGateOk": true,
+            "entryEligible": false,
+            "entryWatch": false,
+            "entryBlockers": [
+              "매매금지"
+            ],
+            "setupQuality": "setup_weak",
+            "payloadSourceMode": "live",
+            "inputArchiveVersion": "jongga_inputs.v1",
+            "rebuildable": true,
+            "historyRecommendationSourceMode": "",
+            "pointInTime": true,
+            "pointInTimeStatus": "confirmed"
+          }
+        ],
+        "trades": [
+          {
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "grade": "B",
+            "replayGrade": "B",
+            "gradeScore": 6.2,
+            "entryFilledAt": "2026-10-13T15:30:00+09:00",
+            "entryFillPrice": 258758.5,
+            "exitFilledAt": "2026-10-14T15:00:00+09:00",
+            "exitAvgFillPrice": 237500.0,
+            "exitLastFillPrice": 237500.0,
+            "tradeStatus": "closed",
+            "closedReason": "stop_close",
+            "netReturnPct": -8.4083,
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-reversal",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "remainingQuantityPct": 0.0
+          },
+          {
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "grade": "A",
+            "replayGrade": "A",
+            "gradeScore": 7.0,
+            "entryFilledAt": "2026-10-13T15:30:00+09:00",
+            "entryFillPrice": 149649.5,
+            "exitFilledAt": "2026-10-14T15:00:00+09:00",
+            "exitAvgFillPrice": 138000.0,
+            "exitLastFillPrice": 138000.0,
+            "tradeStatus": "closed",
+            "closedReason": "stop_close",
+            "netReturnPct": -7.9781,
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "reversal-a7plus-balanced",
+              "active": true,
+              "stopExecution": "close",
+              "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+              "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+              "positionWeightMultiplier": 0.5,
+              "intradayRiskRule": {
+                "active": true,
+                "triggerPct": -5.0,
+                "action": "50% 축소",
+                "timing": "10:00 또는 14:00 확인",
+                "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+              },
+              "volatilityOverlay": {
+                "active": true,
+                "mode": "high-volatility",
+                "label": "고변동성 방어",
+                "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                "triggerMetrics": {
+                  "blendedState": "volatile",
+                  "marketState": "volatile",
+                  "stockState": "volatile",
+                  "atrPct10": 7.28,
+                  "todayRangePct": 9.63,
+                  "returnStd20": 4.93,
+                  "vkospi": 48.76
+                },
+                "originalTakeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 50.0
+                  },
+                  {
+                    "targetPct": 10.0,
+                    "quantityPct": 50.0
+                  }
+                ],
+                "adjustedTakeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 60.0
+                  },
+                  {
+                    "targetPct": 8.0,
+                    "quantityPct": 40.0
+                  }
+                ],
+                "positionWeightMultiplier": 0.5
+              },
+              "label": "반등 × 7&A",
+              "priority": 1,
+              "strategyCase": "reversal",
+              "recommendationCase": "a7plus",
+              "stopPct": -2.0,
+              "takeProfitStages": [
+                {
+                  "targetPct": 2.0,
+                  "quantityPct": 60.0
+                },
+                {
+                  "targetPct": 8.0,
+                  "quantityPct": 40.0
+                }
+              ],
+              "positionWeightHint": "half",
+              "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+            },
+            "remainingQuantityPct": 0.0
+          }
+        ],
+        "results": [
+          {
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "entryMode": "close",
+            "entryFilledAt": "2026-10-13T15:30:00+09:00",
+            "entryFillPrice": 149649.5,
+            "exitFilledAt": "2026-10-14T15:00:00+09:00",
+            "exitAvgFillPrice": 138000.0,
+            "exitLastFillPrice": 138000.0,
+            "netReturnPct": -7.9781,
+            "tradeStatus": "closed",
+            "ambiguousCount": 0,
+            "remainingQuantityPct": 0.0,
+            "closedReason": "stop_close",
+            "exitFillCount": 1,
+            "filledExitQuantityPct": 100.0,
+            "regimeBucket": "weak",
+            "vkospiTier": "weak",
+            "gapGrade": "G-C",
+            "dataQualityStatus": "degraded",
+            "dataQuality": {
+              "status": "degraded",
+              "barUnit": "1m",
+              "sources": [
+                "daily_ohlc_fallback"
+              ],
+              "reason": "synthetic one-day replay derived from daily OHLC"
+            },
+            "nextTradingDate": "20261014",
+            "proxyOutcomeStatus": "resolved",
+            "proxyRealizedReturnPct": -2.0,
+            "replayGrade": "A",
+            "gradeScore": 7.0,
+            "replayIncluded": false,
+            "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+            "historyRecommendation": false,
+            "historyRecommendationSourceMode": "",
+            "entryEligible": false,
+            "entryEligibleOriginal": false,
+            "setupQuality": "setup_weak",
+            "statusLabel": "관심후보(약세·소액)",
+            "takeProfitProfileKey": "conservative",
+            "takeProfitProfileLabel": "보수형",
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "reversal-a7plus-balanced",
+              "active": true,
+              "stopExecution": "close",
+              "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+              "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+              "positionWeightMultiplier": 0.5,
+              "intradayRiskRule": {
+                "active": true,
+                "triggerPct": -5.0,
+                "action": "50% 축소",
+                "timing": "10:00 또는 14:00 확인",
+                "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+              },
+              "volatilityOverlay": {
+                "active": true,
+                "mode": "high-volatility",
+                "label": "고변동성 방어",
+                "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                "triggerMetrics": {
+                  "blendedState": "volatile",
+                  "marketState": "volatile",
+                  "stockState": "volatile",
+                  "atrPct10": 7.28,
+                  "todayRangePct": 9.63,
+                  "returnStd20": 4.93,
+                  "vkospi": 48.76
+                },
+                "originalTakeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 50.0
+                  },
+                  {
+                    "targetPct": 10.0,
+                    "quantityPct": 50.0
+                  }
+                ],
+                "adjustedTakeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 60.0
+                  },
+                  {
+                    "targetPct": 8.0,
+                    "quantityPct": 40.0
+                  }
+                ],
+                "positionWeightMultiplier": 0.5
+              },
+              "label": "반등 × 7&A",
+              "priority": 1,
+              "strategyCase": "reversal",
+              "recommendationCase": "a7plus",
+              "stopPct": -2.0,
+              "takeProfitStages": [
+                {
+                  "targetPct": 2.0,
+                  "quantityPct": 60.0
+                },
+                {
+                  "targetPct": 8.0,
+                  "quantityPct": 40.0
+                }
+              ],
+              "positionWeightHint": "half",
+              "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+            },
+            "payloadSourceMode": "live",
+            "inputArchiveVersion": "jongga_inputs.v1",
+            "rebuildable": true,
+            "pointInTime": true,
+            "pointInTimeStatus": "confirmed"
+          },
+          {
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "entryMode": "close",
+            "entryFilledAt": "2026-10-13T15:30:00+09:00",
+            "entryFillPrice": 258758.5,
+            "exitFilledAt": "2026-10-14T15:00:00+09:00",
+            "exitAvgFillPrice": 237500.0,
+            "exitLastFillPrice": 237500.0,
+            "netReturnPct": -8.4083,
+            "tradeStatus": "closed",
+            "ambiguousCount": 0,
+            "remainingQuantityPct": 0.0,
+            "closedReason": "stop_close",
+            "exitFillCount": 1,
+            "filledExitQuantityPct": 100.0,
+            "regimeBucket": "weak",
+            "vkospiTier": "weak",
+            "gapGrade": "G-C",
+            "dataQualityStatus": "degraded",
+            "dataQuality": {
+              "status": "degraded",
+              "barUnit": "1m",
+              "sources": [
+                "daily_ohlc_fallback"
+              ],
+              "reason": "synthetic one-day replay derived from daily OHLC"
+            },
+            "nextTradingDate": "20261014",
+            "proxyOutcomeStatus": "resolved",
+            "proxyRealizedReturnPct": -2.0,
+            "replayGrade": "B",
+            "gradeScore": 6.2,
+            "replayIncluded": false,
+            "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+            "historyRecommendation": false,
+            "historyRecommendationSourceMode": "",
+            "entryEligible": false,
+            "entryEligibleOriginal": false,
+            "setupQuality": "setup_weak",
+            "statusLabel": "매매금지",
+            "takeProfitProfileKey": "conservative",
+            "takeProfitProfileLabel": "보수형",
+            "mixedExitPolicy": {
+              "version": "mixed-exit-v1-balanced",
+              "policyKey": "observe-reversal",
+              "label": "관찰 전용",
+              "active": false,
+              "priority": null,
+              "strategyCase": "",
+              "recommendationCase": "",
+              "stopPct": null,
+              "stopExecution": "close",
+              "stopCondition": "",
+              "stopTiming": "자동 진입 제외",
+              "takeProfitStages": [],
+              "positionWeightHint": "observe",
+              "positionWeightMultiplier": 0.0,
+              "intradayRiskRule": {
+                "active": false
+              },
+              "volatilityOverlay": {
+                "active": false
+              },
+              "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+            },
+            "payloadSourceMode": "live",
+            "inputArchiveVersion": "jongga_inputs.v1",
+            "rebuildable": true,
+            "pointInTime": true,
+            "pointInTimeStatus": "confirmed"
+          }
+        ],
+        "orders": [
+          {
+            "orderId": "20261013|stable|reversal|222800-entry",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "BUY",
+            "orderType": "MOC",
+            "requestedAt": "2026-10-13T15:30:00+09:00",
+            "requestedPrice": 149500.0,
+            "quantityPct": 100.0,
+            "reason": "close_entry",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "stageKey": "entry",
+            "activeFrom": "",
+            "activeUntil": "",
+            "finalStatus": "filled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-premarket",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "SELL",
+            "orderType": "LIMIT",
+            "requestedAt": "2026-10-14T09:00:00+09:00",
+            "requestedPrice": 152500.0,
+            "quantityPct": 60.0,
+            "reason": "🌅 프리마켓",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "stageKey": "premarket",
+            "activeFrom": "2026-10-14T09:00:00+09:00",
+            "activeUntil": "2026-10-14T10:00:00+09:00",
+            "finalStatus": "cancelled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-openPhase",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "SELL",
+            "orderType": "LIMIT",
+            "requestedAt": "2026-10-14T09:00:00+09:00",
+            "requestedPrice": 156600.0,
+            "quantityPct": 40.0,
+            "reason": "🔔 장초반",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "stageKey": "openPhase",
+            "activeFrom": "2026-10-14T09:00:00+09:00",
+            "activeUntil": "2026-10-14T10:00:00+09:00",
+            "finalStatus": "cancelled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-stop",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "SELL",
+            "orderType": "STOP",
+            "requestedAt": "2026-10-14T09:00:00+09:00",
+            "requestedPrice": 146510.0,
+            "quantityPct": 100.0,
+            "reason": "🛑 손절",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "stageKey": "stop",
+            "activeFrom": "",
+            "activeUntil": "",
+            "finalStatus": "filled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-finalCutoff",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "SELL",
+            "orderType": "MKT",
+            "requestedAt": "2026-10-14T15:00:00+09:00",
+            "requestedPrice": 138000.0,
+            "quantityPct": 100.0,
+            "reason": "3일차 종가 컷오프 청산",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "stageKey": "finalCutoff",
+            "activeFrom": "2026-10-14T15:00:00+09:00",
+            "activeUntil": "2026-10-14T15:00:00+09:00",
+            "finalStatus": "cancelled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-entry",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "BUY",
+            "orderType": "MOC",
+            "requestedAt": "2026-10-13T15:30:00+09:00",
+            "requestedPrice": 258500.0,
+            "quantityPct": 100.0,
+            "reason": "close_entry",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "stageKey": "entry",
+            "activeFrom": "",
+            "activeUntil": "",
+            "finalStatus": "filled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-premarket",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "SELL",
+            "orderType": "LIMIT",
+            "requestedAt": "2026-10-14T09:00:00+09:00",
+            "requestedPrice": 266255.0,
+            "quantityPct": 60.0,
+            "reason": "🌅 프리마켓",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "stageKey": "premarket",
+            "activeFrom": "2026-10-14T09:00:00+09:00",
+            "activeUntil": "2026-10-14T10:00:00+09:00",
+            "finalStatus": "cancelled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-openPhase",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "SELL",
+            "orderType": "LIMIT",
+            "requestedAt": "2026-10-14T09:00:00+09:00",
+            "requestedPrice": 271250.0,
+            "quantityPct": 40.0,
+            "reason": "🔔 장초반",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "stageKey": "openPhase",
+            "activeFrom": "2026-10-14T09:00:00+09:00",
+            "activeUntil": "2026-10-14T10:00:00+09:00",
+            "finalStatus": "cancelled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-stop",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "SELL",
+            "orderType": "STOP",
+            "requestedAt": "2026-10-14T09:00:00+09:00",
+            "requestedPrice": 253330.0,
+            "quantityPct": 100.0,
+            "reason": "🛑 손절",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "stageKey": "stop",
+            "activeFrom": "",
+            "activeUntil": "",
+            "finalStatus": "filled"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-finalCutoff",
+            "runId": "replay-20261014-060600-4c004663",
+            "date": "2026-10-13",
+            "variant": "stable",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "SELL",
+            "orderType": "MKT",
+            "requestedAt": "2026-10-14T15:00:00+09:00",
+            "requestedPrice": 237500.0,
+            "quantityPct": 100.0,
+            "reason": "3일차 종가 컷오프 청산",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "stageKey": "finalCutoff",
+            "activeFrom": "2026-10-14T15:00:00+09:00",
+            "activeUntil": "2026-10-14T15:00:00+09:00",
+            "finalStatus": "cancelled"
+          }
+        ],
+        "fills": [
+          {
+            "orderId": "20261013|stable|reversal|222800-entry",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "BUY",
+            "stageKey": "entry",
+            "reason": "close_entry",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-13T15:30:00+09:00",
+            "fillPrice": 149649.5,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.1,
+            "barTimestamp": "2026-10-13T15:30:00+09:00",
+            "barOpen": 149500.0,
+            "barHigh": 149500.0,
+            "barLow": 149500.0,
+            "barClose": 149500.0,
+            "fillRule": "close_slippage"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-stop",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "SELL",
+            "stageKey": "stop",
+            "reason": "🛑 손절",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-14T15:00:00+09:00",
+            "fillPrice": 138000.0,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.0,
+            "barTimestamp": "2026-10-14T15:00:00+09:00",
+            "barOpen": 150300.0,
+            "barHigh": 151600.0,
+            "barLow": 137900.0,
+            "barClose": 138000.0,
+            "fillRule": "stop_close"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-entry",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "BUY",
+            "stageKey": "entry",
+            "reason": "close_entry",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-13T15:30:00+09:00",
+            "fillPrice": 258758.5,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.1,
+            "barTimestamp": "2026-10-13T15:30:00+09:00",
+            "barOpen": 258500.0,
+            "barHigh": 258500.0,
+            "barLow": 258500.0,
+            "barClose": 258500.0,
+            "fillRule": "close_slippage"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-stop",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "SELL",
+            "stageKey": "stop",
+            "reason": "🛑 손절",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-14T15:00:00+09:00",
+            "fillPrice": 237500.0,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.0,
+            "barTimestamp": "2026-10-14T15:00:00+09:00",
+            "barOpen": 262500.0,
+            "barHigh": 263000.0,
+            "barLow": 236500.0,
+            "barClose": 237500.0,
+            "fillRule": "stop_close"
+          }
+        ]
       }
     ],
     "summary": {
-      "candidateCount": 720,
+      "candidateCount": 722,
       "eligibleCount": 21,
       "includedCount": 36,
-      "tradeCount": 639,
-      "winRate": 0.4523,
-      "avgNetReturnPct": -0.8942,
-      "cumNetReturnPct": -38.4585,
-      "maxDrawdownPct": 39.9327,
-      "degradedCount": 639,
+      "tradeCount": 641,
+      "winRate": 0.4509,
+      "avgNetReturnPct": -0.917,
+      "cumNetReturnPct": -43.5007,
+      "maxDrawdownPct": 44.8541,
+      "degradedCount": 641,
       "ambiguousCount": 0,
-      "unfilledRate": 0.2505,
+      "unfilledRate": 0.2499,
       "overall": {
-        "candidateCount": 720,
+        "candidateCount": 722,
         "eligibleCount": 21,
         "includedCount": 36,
-        "tradeCount": 639,
-        "winRate": 0.4523,
-        "avgNetReturnPct": -0.8942,
-        "cumNetReturnPct": -38.4585,
-        "maxDrawdownPct": 39.9327,
-        "degradedCount": 639,
+        "tradeCount": 641,
+        "winRate": 0.4509,
+        "avgNetReturnPct": -0.917,
+        "cumNetReturnPct": -43.5007,
+        "maxDrawdownPct": 44.8541,
+        "degradedCount": 641,
         "ambiguousCount": 0,
-        "unfilledRate": 0.2505
+        "unfilledRate": 0.2499
       },
       "comparisonByCase": {
         "all": {
           "caseKey": "all",
           "label": "전체 후보",
-          "candidateCount": 720,
+          "candidateCount": 722,
           "eligibleCount": 21,
           "includedCount": 36,
-          "tradeCount": 639,
-          "winRate": 0.4523,
-          "avgNetReturnPct": -0.8942,
-          "cumNetReturnPct": -38.4585,
-          "maxDrawdownPct": 39.9327,
-          "degradedCount": 639,
+          "tradeCount": 641,
+          "winRate": 0.4509,
+          "avgNetReturnPct": -0.917,
+          "cumNetReturnPct": -43.5007,
+          "maxDrawdownPct": 44.8541,
+          "degradedCount": 641,
           "ambiguousCount": 0,
-          "unfilledRate": 0.2505
+          "unfilledRate": 0.2499
         },
         "a7plus": {
           "caseKey": "a7plus",
           "label": "7&A",
-          "candidateCount": 291,
+          "candidateCount": 292,
           "eligibleCount": 16,
           "includedCount": 36,
-          "tradeCount": 251,
-          "winRate": 0.506,
-          "avgNetReturnPct": -0.7016,
-          "cumNetReturnPct": -26.2123,
-          "maxDrawdownPct": 35.4392,
-          "degradedCount": 251,
+          "tradeCount": 252,
+          "winRate": 0.504,
+          "avgNetReturnPct": -0.7305,
+          "cumNetReturnPct": -32.0991,
+          "maxDrawdownPct": 39.6719,
+          "degradedCount": 252,
           "ambiguousCount": 0,
-          "unfilledRate": 0.1863
+          "unfilledRate": 0.1857
         },
         "recommendation": {
           "caseKey": "recommendation",
@@ -262742,47 +263604,47 @@ window.JONGGA_REPLAY_RUNS = {
           }
         },
         "reversal": {
-          "candidateCount": 290,
+          "candidateCount": 292,
           "eligibleCount": 3,
           "includedCount": 31,
-          "tradeCount": 259,
-          "winRate": 0.5753,
-          "avgNetReturnPct": -0.0697,
-          "cumNetReturnPct": -7.2515,
-          "maxDrawdownPct": 17.2651,
-          "degradedCount": 259,
+          "tradeCount": 261,
+          "winRate": 0.5709,
+          "avgNetReturnPct": -0.132,
+          "cumNetReturnPct": -14.8506,
+          "maxDrawdownPct": 24.0438,
+          "degradedCount": 261,
           "ambiguousCount": 0,
-          "unfilledRate": 0.1699,
+          "unfilledRate": 0.1686,
           "comparisonByCase": {
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 290,
+              "candidateCount": 292,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 259,
-              "winRate": 0.5753,
-              "avgNetReturnPct": -0.0697,
-              "cumNetReturnPct": -7.2515,
-              "maxDrawdownPct": 17.2651,
-              "degradedCount": 259,
+              "tradeCount": 261,
+              "winRate": 0.5709,
+              "avgNetReturnPct": -0.132,
+              "cumNetReturnPct": -14.8506,
+              "maxDrawdownPct": 24.0438,
+              "degradedCount": 261,
               "ambiguousCount": 0,
-              "unfilledRate": 0.1699
+              "unfilledRate": 0.1686
             },
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 163,
+              "candidateCount": 164,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 145,
-              "winRate": 0.5241,
-              "avgNetReturnPct": -0.3583,
-              "cumNetReturnPct": -17.3027,
-              "maxDrawdownPct": 20.7649,
-              "degradedCount": 145,
+              "tradeCount": 146,
+              "winRate": 0.5205,
+              "avgNetReturnPct": -0.4105,
+              "cumNetReturnPct": -23.9003,
+              "maxDrawdownPct": 27.0864,
+              "degradedCount": 146,
               "ambiguousCount": 0,
-              "unfilledRate": 0.169
+              "unfilledRate": 0.1678
             },
             "recommendation": {
               "caseKey": "recommendation",
@@ -265389,25 +266251,6 @@ window.JONGGA_REPLAY_RUNS = {
         },
         {
           "strategy": "reversal",
-          "code": "036930",
-          "name": "주성엔지니어링",
-          "grade": "A",
-          "replayGrade": "A",
-          "gradeScore": 8.4,
-          "tradeCount": 10,
-          "winRate": 0.8,
-          "avgNetReturnPct": 1.4237,
-          "cumNetReturnPct": 14.3562,
-          "lastReplayDate": "2026-09-07",
-          "lastEntryFilledAt": "2026-09-07T15:30:00+09:00",
-          "lastEntryFillPrice": 187687.5,
-          "lastExitFilledAt": "2026-09-08T10:00:00+09:00",
-          "lastExitAvgFillPrice": 194508.75,
-          "lastExitFillPrice": 196200.0,
-          "lastTradeStatus": "closed"
-        },
-        {
-          "strategy": "reversal",
           "code": "017670",
           "name": "SK텔레콤",
           "grade": "B",
@@ -265556,6 +266399,25 @@ window.JONGGA_REPLAY_RUNS = {
           "lastExitFilledAt": "2026-08-07T15:00:00+09:00",
           "lastExitAvgFillPrice": 199000.0,
           "lastExitFillPrice": 199000.0,
+          "lastTradeStatus": "closed"
+        },
+        {
+          "strategy": "reversal",
+          "code": "036930",
+          "name": "주성엔지니어링",
+          "grade": "B",
+          "replayGrade": "B",
+          "gradeScore": 6.2,
+          "tradeCount": 11,
+          "winRate": 0.7273,
+          "avgNetReturnPct": 0.5299,
+          "cumNetReturnPct": 4.7408,
+          "lastReplayDate": "2026-10-13",
+          "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+          "lastEntryFillPrice": 258758.5,
+          "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+          "lastExitAvgFillPrice": 237500.0,
+          "lastExitFillPrice": 237500.0,
           "lastTradeStatus": "closed"
         },
         {
@@ -266050,25 +266912,6 @@ window.JONGGA_REPLAY_RUNS = {
           "lastExitFilledAt": "2026-08-24T10:00:00+09:00",
           "lastExitAvgFillPrice": 321500.0,
           "lastExitFillPrice": 321500.0,
-          "lastTradeStatus": "closed"
-        },
-        {
-          "strategy": "reversal",
-          "code": "222800",
-          "name": "심텍",
-          "grade": "S",
-          "replayGrade": "S",
-          "gradeScore": 10.0,
-          "tradeCount": 1,
-          "winRate": 1.0,
-          "avgNetReturnPct": 0.7591,
-          "cumNetReturnPct": 0.7591,
-          "lastReplayDate": "2026-09-22",
-          "lastEntryFilledAt": "2026-09-22T15:30:00+09:00",
-          "lastEntryFillPrice": 148248.1,
-          "lastExitFilledAt": "2026-09-23T10:00:00+09:00",
-          "lastExitAvgFillPrice": 149687.75,
-          "lastExitFillPrice": 148200.0,
           "lastTradeStatus": "closed"
         },
         {
@@ -266795,6 +267638,25 @@ window.JONGGA_REPLAY_RUNS = {
         },
         {
           "strategy": "reversal",
+          "code": "222800",
+          "name": "심텍",
+          "grade": "A",
+          "replayGrade": "A",
+          "gradeScore": 7.0,
+          "tradeCount": 2,
+          "winRate": 0.5,
+          "avgNetReturnPct": -3.6095,
+          "cumNetReturnPct": -7.2796,
+          "lastReplayDate": "2026-10-13",
+          "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+          "lastEntryFillPrice": 149649.5,
+          "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+          "lastExitAvgFillPrice": 138000.0,
+          "lastExitFillPrice": 138000.0,
+          "lastTradeStatus": "closed"
+        },
+        {
+          "strategy": "reversal",
           "code": "128940",
           "name": "한미약품",
           "grade": "B",
@@ -267090,47 +267952,47 @@ window.JONGGA_REPLAY_RUNS = {
           }
         },
         "reversal": {
-          "candidateCount": 290,
+          "candidateCount": 292,
           "eligibleCount": 3,
           "includedCount": 31,
-          "tradeCount": 259,
-          "winRate": 0.5753,
-          "avgNetReturnPct": -0.0697,
-          "cumNetReturnPct": -7.2515,
-          "maxDrawdownPct": 17.2651,
-          "degradedCount": 259,
+          "tradeCount": 261,
+          "winRate": 0.5709,
+          "avgNetReturnPct": -0.132,
+          "cumNetReturnPct": -14.8506,
+          "maxDrawdownPct": 24.0438,
+          "degradedCount": 261,
           "ambiguousCount": 0,
-          "unfilledRate": 0.1699,
+          "unfilledRate": 0.1686,
           "comparisonByCase": {
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 290,
+              "candidateCount": 292,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 259,
-              "winRate": 0.5753,
-              "avgNetReturnPct": -0.0697,
-              "cumNetReturnPct": -7.2515,
-              "maxDrawdownPct": 17.2651,
-              "degradedCount": 259,
+              "tradeCount": 261,
+              "winRate": 0.5709,
+              "avgNetReturnPct": -0.132,
+              "cumNetReturnPct": -14.8506,
+              "maxDrawdownPct": 24.0438,
+              "degradedCount": 261,
               "ambiguousCount": 0,
-              "unfilledRate": 0.1699
+              "unfilledRate": 0.1686
             },
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 163,
+              "candidateCount": 164,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 145,
-              "winRate": 0.5241,
-              "avgNetReturnPct": -0.3583,
-              "cumNetReturnPct": -17.3027,
-              "maxDrawdownPct": 20.7649,
-              "degradedCount": 145,
+              "tradeCount": 146,
+              "winRate": 0.5205,
+              "avgNetReturnPct": -0.4105,
+              "cumNetReturnPct": -23.9003,
+              "maxDrawdownPct": 27.0864,
+              "degradedCount": 146,
               "ambiguousCount": 0,
-              "unfilledRate": 0.169
+              "unfilledRate": 0.1678
             },
             "recommendation": {
               "caseKey": "recommendation",
@@ -267220,12 +268082,12 @@ window.JONGGA_REPLAY_RUNS = {
         "reversal|a7plus": {
           "strategy": "reversal",
           "recommendationCase": "a7plus",
-          "sampleCount": 145,
-          "tradeCount": 145,
-          "winRate": 0.5241,
-          "avgNetReturnPct": -0.3583,
-          "cumNetReturnPct": -17.3027,
-          "maxDrawdownPct": 20.7649,
+          "sampleCount": 146,
+          "tradeCount": 146,
+          "winRate": 0.5205,
+          "avgNetReturnPct": -0.4105,
+          "cumNetReturnPct": -23.9003,
+          "maxDrawdownPct": 27.0864,
           "recommendedExitPolicyKey": "reversal-a7plus-balanced"
         },
         "reversal|recommendation": {
@@ -267270,11 +268132,11 @@ window.JONGGA_REPLAY_RUNS = {
           "cumNetReturnPct": -62.4329
         },
         "reversal|conservative": {
-          "tradeCount": 259,
-          "sampleCount": 259,
-          "winRate": 0.5753,
-          "avgNetReturnPct": -0.0697,
-          "cumNetReturnPct": -7.2515
+          "tradeCount": 261,
+          "sampleCount": 261,
+          "winRate": 0.5709,
+          "avgNetReturnPct": -0.132,
+          "cumNetReturnPct": -14.8506
         },
         "pullback|aggressive": {
           "tradeCount": 2,
@@ -267594,11 +268456,11 @@ window.JONGGA_REPLAY_RUNS = {
           "cumNetReturnPct": -8.289
         },
         "reversal|weak|weak|G-C|conservative": {
-          "tradeCount": 39,
-          "sampleCount": 39,
-          "winRate": 0.7692,
-          "avgNetReturnPct": 1.4653,
-          "cumNetReturnPct": 7.1005
+          "tradeCount": 41,
+          "sampleCount": 41,
+          "winRate": 0.7317,
+          "avgNetReturnPct": 0.9941,
+          "cumNetReturnPct": -1.6745
         },
         "reversal|weak|weak|G-B|conservative": {
           "tradeCount": 23,
@@ -267819,7 +268681,7 @@ window.JONGGA_REPLAY_RUNS = {
         }
       },
       "pointInTimeStatusCounts": {
-        "confirmed": 91,
+        "confirmed": 92,
         "historical_regen": 0,
         "legacy_unknown": 0
       },
@@ -518202,47 +519064,47 @@ window.JONGGA_REPLAY_RUNS = {
       },
       "reversal": {
         "summary": {
-          "candidateCount": 290,
+          "candidateCount": 292,
           "eligibleCount": 3,
           "includedCount": 31,
-          "tradeCount": 259,
-          "winRate": 0.5753,
-          "avgNetReturnPct": -0.0697,
-          "cumNetReturnPct": -7.2515,
-          "maxDrawdownPct": 17.2651,
-          "degradedCount": 259,
+          "tradeCount": 261,
+          "winRate": 0.5709,
+          "avgNetReturnPct": -0.132,
+          "cumNetReturnPct": -14.8506,
+          "maxDrawdownPct": 24.0438,
+          "degradedCount": 261,
           "ambiguousCount": 0,
-          "unfilledRate": 0.1699,
+          "unfilledRate": 0.1686,
           "comparisonByCase": {
             "all": {
               "caseKey": "all",
               "label": "전체 후보",
-              "candidateCount": 290,
+              "candidateCount": 292,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 259,
-              "winRate": 0.5753,
-              "avgNetReturnPct": -0.0697,
-              "cumNetReturnPct": -7.2515,
-              "maxDrawdownPct": 17.2651,
-              "degradedCount": 259,
+              "tradeCount": 261,
+              "winRate": 0.5709,
+              "avgNetReturnPct": -0.132,
+              "cumNetReturnPct": -14.8506,
+              "maxDrawdownPct": 24.0438,
+              "degradedCount": 261,
               "ambiguousCount": 0,
-              "unfilledRate": 0.1699
+              "unfilledRate": 0.1686
             },
             "a7plus": {
               "caseKey": "a7plus",
               "label": "7&A",
-              "candidateCount": 163,
+              "candidateCount": 164,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 145,
-              "winRate": 0.5241,
-              "avgNetReturnPct": -0.3583,
-              "cumNetReturnPct": -17.3027,
-              "maxDrawdownPct": 20.7649,
-              "degradedCount": 145,
+              "tradeCount": 146,
+              "winRate": 0.5205,
+              "avgNetReturnPct": -0.4105,
+              "cumNetReturnPct": -23.9003,
+              "maxDrawdownPct": 27.0864,
+              "degradedCount": 146,
               "ambiguousCount": 0,
-              "unfilledRate": 0.169
+              "unfilledRate": 0.1678
             },
             "recommendation": {
               "caseKey": "recommendation",
@@ -518262,25 +519124,6 @@ window.JONGGA_REPLAY_RUNS = {
           }
         },
         "stocks": [
-          {
-            "strategy": "reversal",
-            "code": "036930",
-            "name": "주성엔지니어링",
-            "grade": "A",
-            "replayGrade": "A",
-            "gradeScore": 8.4,
-            "tradeCount": 10,
-            "winRate": 0.8,
-            "avgNetReturnPct": 1.4237,
-            "cumNetReturnPct": 14.3562,
-            "lastReplayDate": "2026-09-07",
-            "lastEntryFilledAt": "2026-09-07T15:30:00+09:00",
-            "lastEntryFillPrice": 187687.5,
-            "lastExitFilledAt": "2026-09-08T10:00:00+09:00",
-            "lastExitAvgFillPrice": 194508.75,
-            "lastExitFillPrice": 196200.0,
-            "lastTradeStatus": "closed"
-          },
           {
             "strategy": "reversal",
             "code": "017670",
@@ -518431,6 +519274,25 @@ window.JONGGA_REPLAY_RUNS = {
             "lastExitFilledAt": "2026-08-07T15:00:00+09:00",
             "lastExitAvgFillPrice": 199000.0,
             "lastExitFillPrice": 199000.0,
+            "lastTradeStatus": "closed"
+          },
+          {
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "grade": "B",
+            "replayGrade": "B",
+            "gradeScore": 6.2,
+            "tradeCount": 11,
+            "winRate": 0.7273,
+            "avgNetReturnPct": 0.5299,
+            "cumNetReturnPct": 4.7408,
+            "lastReplayDate": "2026-10-13",
+            "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+            "lastEntryFillPrice": 258758.5,
+            "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+            "lastExitAvgFillPrice": 237500.0,
+            "lastExitFillPrice": 237500.0,
             "lastTradeStatus": "closed"
           },
           {
@@ -518925,25 +519787,6 @@ window.JONGGA_REPLAY_RUNS = {
             "lastExitFilledAt": "2026-08-24T10:00:00+09:00",
             "lastExitAvgFillPrice": 321500.0,
             "lastExitFillPrice": 321500.0,
-            "lastTradeStatus": "closed"
-          },
-          {
-            "strategy": "reversal",
-            "code": "222800",
-            "name": "심텍",
-            "grade": "S",
-            "replayGrade": "S",
-            "gradeScore": 10.0,
-            "tradeCount": 1,
-            "winRate": 1.0,
-            "avgNetReturnPct": 0.7591,
-            "cumNetReturnPct": 0.7591,
-            "lastReplayDate": "2026-09-22",
-            "lastEntryFilledAt": "2026-09-22T15:30:00+09:00",
-            "lastEntryFillPrice": 148248.1,
-            "lastExitFilledAt": "2026-09-23T10:00:00+09:00",
-            "lastExitAvgFillPrice": 149687.75,
-            "lastExitFillPrice": 148200.0,
             "lastTradeStatus": "closed"
           },
           {
@@ -519666,6 +520509,25 @@ window.JONGGA_REPLAY_RUNS = {
             "lastExitFilledAt": "2026-08-25T10:00:00+09:00",
             "lastExitAvgFillPrice": 52500.0,
             "lastExitFillPrice": 52500.0,
+            "lastTradeStatus": "closed"
+          },
+          {
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "grade": "A",
+            "replayGrade": "A",
+            "gradeScore": 7.0,
+            "tradeCount": 2,
+            "winRate": 0.5,
+            "avgNetReturnPct": -3.6095,
+            "cumNetReturnPct": -7.2796,
+            "lastReplayDate": "2026-10-13",
+            "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+            "lastEntryFillPrice": 149649.5,
+            "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+            "lastExitAvgFillPrice": 138000.0,
+            "lastExitFillPrice": 138000.0,
             "lastTradeStatus": "closed"
           },
           {
@@ -609813,6 +610675,816 @@ window.JONGGA_REPLAY_RUNS = {
                 "unfilledRate": null
               }
             }
+          },
+          {
+            "date": "2026-10-13",
+            "summaryFile": "replay_summary_20261013.json",
+            "ordersFile": "sim_orders_20261013.json",
+            "fillsFile": "sim_fills_20261013.json",
+            "pointInTime": true,
+            "pointInTimeStatus": "confirmed",
+            "skippedReason": "",
+            "trades": [
+              {
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "grade": "B",
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 258758.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 237500.0,
+                "exitLastFillPrice": 237500.0,
+                "tradeStatus": "closed",
+                "closedReason": "stop_close",
+                "netReturnPct": -8.4083,
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "observe-reversal",
+                  "label": "관찰 전용",
+                  "active": false,
+                  "priority": null,
+                  "strategyCase": "",
+                  "recommendationCase": "",
+                  "stopPct": null,
+                  "stopExecution": "close",
+                  "stopCondition": "",
+                  "stopTiming": "자동 진입 제외",
+                  "takeProfitStages": [],
+                  "positionWeightHint": "observe",
+                  "positionWeightMultiplier": 0.0,
+                  "intradayRiskRule": {
+                    "active": false
+                  },
+                  "volatilityOverlay": {
+                    "active": false
+                  },
+                  "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                },
+                "remainingQuantityPct": 0.0
+              },
+              {
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "grade": "A",
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 149649.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 138000.0,
+                "exitLastFillPrice": 138000.0,
+                "tradeStatus": "closed",
+                "closedReason": "stop_close",
+                "netReturnPct": -7.9781,
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "reversal-a7plus-balanced",
+                  "active": true,
+                  "stopExecution": "close",
+                  "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                  "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                  "positionWeightMultiplier": 0.5,
+                  "intradayRiskRule": {
+                    "active": true,
+                    "triggerPct": -5.0,
+                    "action": "50% 축소",
+                    "timing": "10:00 또는 14:00 확인",
+                    "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                    "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                  },
+                  "volatilityOverlay": {
+                    "active": true,
+                    "mode": "high-volatility",
+                    "label": "고변동성 방어",
+                    "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                    "triggerMetrics": {
+                      "blendedState": "volatile",
+                      "marketState": "volatile",
+                      "stockState": "volatile",
+                      "atrPct10": 7.28,
+                      "todayRangePct": 9.63,
+                      "returnStd20": 4.93,
+                      "vkospi": 48.76
+                    },
+                    "originalTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 50.0
+                      },
+                      {
+                        "targetPct": 10.0,
+                        "quantityPct": 50.0
+                      }
+                    ],
+                    "adjustedTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightMultiplier": 0.5
+                  },
+                  "label": "반등 × 7&A",
+                  "priority": 1,
+                  "strategyCase": "reversal",
+                  "recommendationCase": "a7plus",
+                  "stopPct": -2.0,
+                  "takeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightHint": "half",
+                  "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                },
+                "remainingQuantityPct": 0.0
+              }
+            ],
+            "candidates": [
+              {
+                "strategy": "reversal",
+                "name": "심텍",
+                "code": "222800",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "originalGrade": "A",
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "strictScore": 7.0,
+                "signalScore": 7.0,
+                "entryPrice": 149500.0,
+                "entryPriceAvailable": true,
+                "statusLabel": "관심후보(약세·소액)",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "reversal-a7plus-balanced",
+                  "active": true,
+                  "stopExecution": "close",
+                  "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                  "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                  "positionWeightMultiplier": 0.5,
+                  "intradayRiskRule": {
+                    "active": true,
+                    "triggerPct": -5.0,
+                    "action": "50% 축소",
+                    "timing": "10:00 또는 14:00 확인",
+                    "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                    "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                  },
+                  "volatilityOverlay": {
+                    "active": true,
+                    "mode": "high-volatility",
+                    "label": "고변동성 방어",
+                    "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                    "triggerMetrics": {
+                      "blendedState": "volatile",
+                      "marketState": "volatile",
+                      "stockState": "volatile",
+                      "atrPct10": 7.28,
+                      "todayRangePct": 9.63,
+                      "returnStd20": 4.93,
+                      "vkospi": 48.76
+                    },
+                    "originalTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 50.0
+                      },
+                      {
+                        "targetPct": 10.0,
+                        "quantityPct": 50.0
+                      }
+                    ],
+                    "adjustedTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightMultiplier": 0.5
+                  },
+                  "label": "반등 × 7&A",
+                  "priority": 1,
+                  "strategyCase": "reversal",
+                  "recommendationCase": "a7plus",
+                  "stopPct": -2.0,
+                  "takeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightHint": "half",
+                  "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                },
+                "entryEligibleOriginal": false,
+                "historyRecommendation": false,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "replayA7Plus": true,
+                "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                "pullbackReplayGateOk": true,
+                "qualityGateOk": true,
+                "entryEligible": false,
+                "entryWatch": false,
+                "entryBlockers": [],
+                "setupQuality": "setup_weak",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "historyRecommendationSourceMode": "",
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              },
+              {
+                "strategy": "reversal",
+                "name": "주성엔지니어링",
+                "code": "036930",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "originalGrade": "B",
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "strictScore": 6.2,
+                "signalScore": 6.2,
+                "entryPrice": 258500.0,
+                "entryPriceAvailable": true,
+                "statusLabel": "매매금지",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "observe-reversal",
+                  "label": "관찰 전용",
+                  "active": false,
+                  "priority": null,
+                  "strategyCase": "",
+                  "recommendationCase": "",
+                  "stopPct": null,
+                  "stopExecution": "close",
+                  "stopCondition": "",
+                  "stopTiming": "자동 진입 제외",
+                  "takeProfitStages": [],
+                  "positionWeightHint": "observe",
+                  "positionWeightMultiplier": 0.0,
+                  "intradayRiskRule": {
+                    "active": false
+                  },
+                  "volatilityOverlay": {
+                    "active": false
+                  },
+                  "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                },
+                "entryEligibleOriginal": false,
+                "historyRecommendation": false,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "replayA7Plus": false,
+                "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                "pullbackReplayGateOk": true,
+                "qualityGateOk": true,
+                "entryEligible": false,
+                "entryWatch": false,
+                "entryBlockers": [
+                  "매매금지"
+                ],
+                "setupQuality": "setup_weak",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "historyRecommendationSourceMode": "",
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              }
+            ],
+            "results": [
+              {
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "entryMode": "close",
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 149649.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 138000.0,
+                "exitLastFillPrice": 138000.0,
+                "netReturnPct": -7.9781,
+                "tradeStatus": "closed",
+                "ambiguousCount": 0,
+                "remainingQuantityPct": 0.0,
+                "closedReason": "stop_close",
+                "exitFillCount": 1,
+                "filledExitQuantityPct": 100.0,
+                "regimeBucket": "weak",
+                "vkospiTier": "weak",
+                "gapGrade": "G-C",
+                "dataQualityStatus": "degraded",
+                "dataQuality": {
+                  "status": "degraded",
+                  "barUnit": "1m",
+                  "sources": [
+                    "daily_ohlc_fallback"
+                  ],
+                  "reason": "synthetic one-day replay derived from daily OHLC"
+                },
+                "nextTradingDate": "20261014",
+                "proxyOutcomeStatus": "resolved",
+                "proxyRealizedReturnPct": -2.0,
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "historyRecommendation": false,
+                "historyRecommendationSourceMode": "",
+                "entryEligible": false,
+                "entryEligibleOriginal": false,
+                "setupQuality": "setup_weak",
+                "statusLabel": "관심후보(약세·소액)",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "reversal-a7plus-balanced",
+                  "active": true,
+                  "stopExecution": "close",
+                  "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                  "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                  "positionWeightMultiplier": 0.5,
+                  "intradayRiskRule": {
+                    "active": true,
+                    "triggerPct": -5.0,
+                    "action": "50% 축소",
+                    "timing": "10:00 또는 14:00 확인",
+                    "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                    "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                  },
+                  "volatilityOverlay": {
+                    "active": true,
+                    "mode": "high-volatility",
+                    "label": "고변동성 방어",
+                    "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                    "triggerMetrics": {
+                      "blendedState": "volatile",
+                      "marketState": "volatile",
+                      "stockState": "volatile",
+                      "atrPct10": 7.28,
+                      "todayRangePct": 9.63,
+                      "returnStd20": 4.93,
+                      "vkospi": 48.76
+                    },
+                    "originalTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 50.0
+                      },
+                      {
+                        "targetPct": 10.0,
+                        "quantityPct": 50.0
+                      }
+                    ],
+                    "adjustedTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightMultiplier": 0.5
+                  },
+                  "label": "반등 × 7&A",
+                  "priority": 1,
+                  "strategyCase": "reversal",
+                  "recommendationCase": "a7plus",
+                  "stopPct": -2.0,
+                  "takeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightHint": "half",
+                  "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                },
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              },
+              {
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "entryMode": "close",
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 258758.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 237500.0,
+                "exitLastFillPrice": 237500.0,
+                "netReturnPct": -8.4083,
+                "tradeStatus": "closed",
+                "ambiguousCount": 0,
+                "remainingQuantityPct": 0.0,
+                "closedReason": "stop_close",
+                "exitFillCount": 1,
+                "filledExitQuantityPct": 100.0,
+                "regimeBucket": "weak",
+                "vkospiTier": "weak",
+                "gapGrade": "G-C",
+                "dataQualityStatus": "degraded",
+                "dataQuality": {
+                  "status": "degraded",
+                  "barUnit": "1m",
+                  "sources": [
+                    "daily_ohlc_fallback"
+                  ],
+                  "reason": "synthetic one-day replay derived from daily OHLC"
+                },
+                "nextTradingDate": "20261014",
+                "proxyOutcomeStatus": "resolved",
+                "proxyRealizedReturnPct": -2.0,
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "historyRecommendation": false,
+                "historyRecommendationSourceMode": "",
+                "entryEligible": false,
+                "entryEligibleOriginal": false,
+                "setupQuality": "setup_weak",
+                "statusLabel": "매매금지",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "observe-reversal",
+                  "label": "관찰 전용",
+                  "active": false,
+                  "priority": null,
+                  "strategyCase": "",
+                  "recommendationCase": "",
+                  "stopPct": null,
+                  "stopExecution": "close",
+                  "stopCondition": "",
+                  "stopTiming": "자동 진입 제외",
+                  "takeProfitStages": [],
+                  "positionWeightHint": "observe",
+                  "positionWeightMultiplier": 0.0,
+                  "intradayRiskRule": {
+                    "active": false
+                  },
+                  "volatilityOverlay": {
+                    "active": false
+                  },
+                  "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                },
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              }
+            ],
+            "orders": [
+              {
+                "orderId": "20261013|stable|reversal|222800-premarket",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 152500.0,
+                "quantityPct": 60.0,
+                "reason": "🌅 프리마켓",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "premarket",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-openPhase",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 156600.0,
+                "quantityPct": 40.0,
+                "reason": "🔔 장초반",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "openPhase",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-stop",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "STOP",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 146510.0,
+                "quantityPct": 100.0,
+                "reason": "🛑 손절",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "stop",
+                "activeFrom": "",
+                "activeUntil": "",
+                "finalStatus": "filled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "MKT",
+                "requestedAt": "2026-10-14T15:00:00+09:00",
+                "requestedPrice": 138000.0,
+                "quantityPct": 100.0,
+                "reason": "3일차 종가 컷오프 청산",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "finalCutoff",
+                "activeFrom": "2026-10-14T15:00:00+09:00",
+                "activeUntil": "2026-10-14T15:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-premarket",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 266255.0,
+                "quantityPct": 60.0,
+                "reason": "🌅 프리마켓",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "premarket",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-openPhase",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 271250.0,
+                "quantityPct": 40.0,
+                "reason": "🔔 장초반",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "openPhase",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-stop",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "STOP",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 253330.0,
+                "quantityPct": 100.0,
+                "reason": "🛑 손절",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "stop",
+                "activeFrom": "",
+                "activeUntil": "",
+                "finalStatus": "filled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-finalCutoff",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "MKT",
+                "requestedAt": "2026-10-14T15:00:00+09:00",
+                "requestedPrice": 237500.0,
+                "quantityPct": 100.0,
+                "reason": "3일차 종가 컷오프 청산",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "finalCutoff",
+                "activeFrom": "2026-10-14T15:00:00+09:00",
+                "activeUntil": "2026-10-14T15:00:00+09:00",
+                "finalStatus": "cancelled"
+              }
+            ],
+            "fills": [
+              {
+                "orderId": "20261013|stable|reversal|222800-entry",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 149649.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 149500.0,
+                "barHigh": 149500.0,
+                "barLow": 149500.0,
+                "barClose": 149500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-stop",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 138000.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 150300.0,
+                "barHigh": 151600.0,
+                "barLow": 137900.0,
+                "barClose": 138000.0,
+                "fillRule": "stop_close"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-entry",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 258758.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 258500.0,
+                "barHigh": 258500.0,
+                "barLow": 258500.0,
+                "barClose": 258500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-stop",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 237500.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 262500.0,
+                "barHigh": 263000.0,
+                "barLow": 236500.0,
+                "barClose": 237500.0,
+                "fillRule": "stop_close"
+              }
+            ],
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0,
+            "comparisonByCase": {
+              "all": {
+                "caseKey": "all",
+                "label": "전체 후보",
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "a7plus": {
+                "caseKey": "a7plus",
+                "label": "7&A",
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "recommendation": {
+                "caseKey": "recommendation",
+                "label": "추천 전용",
+                "candidateCount": 0,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 0,
+                "winRate": null,
+                "avgNetReturnPct": null,
+                "cumNetReturnPct": null,
+                "maxDrawdownPct": null,
+                "degradedCount": 0,
+                "ambiguousCount": 0,
+                "unfilledRate": null
+              }
+            }
           }
         ],
         "fills": [
@@ -623675,6 +625347,90 @@ window.JONGGA_REPLAY_RUNS = {
             "barLow": 11980.0,
             "barClose": 13750.0,
             "fillRule": "openPhase_touch"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-entry",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "BUY",
+            "stageKey": "entry",
+            "reason": "close_entry",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-13T15:30:00+09:00",
+            "fillPrice": 149649.5,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.1,
+            "barTimestamp": "2026-10-13T15:30:00+09:00",
+            "barOpen": 149500.0,
+            "barHigh": 149500.0,
+            "barLow": 149500.0,
+            "barClose": 149500.0,
+            "fillRule": "close_slippage"
+          },
+          {
+            "orderId": "20261013|stable|reversal|222800-stop",
+            "sourceEntryKey": "20261013|stable|reversal|222800",
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "side": "SELL",
+            "stageKey": "stop",
+            "reason": "🛑 손절",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-14T15:00:00+09:00",
+            "fillPrice": 138000.0,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.0,
+            "barTimestamp": "2026-10-14T15:00:00+09:00",
+            "barOpen": 150300.0,
+            "barHigh": 151600.0,
+            "barLow": 137900.0,
+            "barClose": 138000.0,
+            "fillRule": "stop_close"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-entry",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "BUY",
+            "stageKey": "entry",
+            "reason": "close_entry",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-13T15:30:00+09:00",
+            "fillPrice": 258758.5,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.1,
+            "barTimestamp": "2026-10-13T15:30:00+09:00",
+            "barOpen": 258500.0,
+            "barHigh": 258500.0,
+            "barLow": 258500.0,
+            "barClose": 258500.0,
+            "fillRule": "close_slippage"
+          },
+          {
+            "orderId": "20261013|stable|reversal|036930-stop",
+            "sourceEntryKey": "20261013|stable|reversal|036930",
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "side": "SELL",
+            "stageKey": "stop",
+            "reason": "🛑 손절",
+            "fillStatus": "filled",
+            "filledAt": "2026-10-14T15:00:00+09:00",
+            "fillPrice": 237500.0,
+            "filledQuantityPct": 100.0,
+            "slippagePct": 0.0,
+            "barTimestamp": "2026-10-14T15:00:00+09:00",
+            "barOpen": 262500.0,
+            "barHigh": 263000.0,
+            "barLow": 236500.0,
+            "barClose": 237500.0,
+            "fillRule": "stop_close"
           }
         ],
         "caseViews": {
@@ -625896,17 +627652,17 @@ window.JONGGA_REPLAY_RUNS = {
           },
           "a7plus": {
             "summary": {
-              "candidateCount": 163,
+              "candidateCount": 164,
               "eligibleCount": 3,
               "includedCount": 31,
-              "tradeCount": 145,
-              "winRate": 0.5241,
-              "avgNetReturnPct": -0.3583,
-              "cumNetReturnPct": -17.3027,
-              "maxDrawdownPct": 20.7649,
-              "degradedCount": 145,
+              "tradeCount": 146,
+              "winRate": 0.5205,
+              "avgNetReturnPct": -0.4105,
+              "cumNetReturnPct": -23.9003,
+              "maxDrawdownPct": 27.0864,
+              "degradedCount": 146,
               "ambiguousCount": 0,
-              "unfilledRate": 0.169
+              "unfilledRate": 0.1678
             },
             "stocks": [
               {
@@ -626363,25 +628119,6 @@ window.JONGGA_REPLAY_RUNS = {
                 "lastExitFilledAt": "2026-07-28T10:00:00+09:00",
                 "lastExitAvgFillPrice": 1562940.0,
                 "lastExitFillPrice": 1575000.0,
-                "lastTradeStatus": "closed"
-              },
-              {
-                "strategy": "reversal",
-                "code": "222800",
-                "name": "심텍",
-                "grade": "S",
-                "replayGrade": "S",
-                "gradeScore": 10.0,
-                "tradeCount": 1,
-                "winRate": 1.0,
-                "avgNetReturnPct": 0.7591,
-                "cumNetReturnPct": 0.7591,
-                "lastReplayDate": "2026-09-22",
-                "lastEntryFilledAt": "2026-09-22T15:30:00+09:00",
-                "lastEntryFillPrice": 148248.1,
-                "lastExitFilledAt": "2026-09-23T10:00:00+09:00",
-                "lastExitAvgFillPrice": 149687.75,
-                "lastExitFillPrice": 148200.0,
                 "lastTradeStatus": "closed"
               },
               {
@@ -627123,6 +628860,25 @@ window.JONGGA_REPLAY_RUNS = {
                 "lastExitFilledAt": "2026-08-31T10:00:00+09:00",
                 "lastExitAvgFillPrice": 311000.0,
                 "lastExitFillPrice": 311000.0,
+                "lastTradeStatus": "closed"
+              },
+              {
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "grade": "A",
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "tradeCount": 2,
+                "winRate": 0.5,
+                "avgNetReturnPct": -3.6095,
+                "cumNetReturnPct": -7.2796,
+                "lastReplayDate": "2026-10-13",
+                "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+                "lastEntryFillPrice": 149649.5,
+                "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+                "lastExitAvgFillPrice": 138000.0,
+                "lastExitFillPrice": 138000.0,
                 "lastTradeStatus": "closed"
               },
               {
@@ -674441,6 +676197,472 @@ window.JONGGA_REPLAY_RUNS = {
                 "degradedCount": 4,
                 "ambiguousCount": 0,
                 "unfilledRate": 0.1875
+              },
+              {
+                "date": "2026-10-13",
+                "summaryFile": "replay_summary_20261013.json",
+                "ordersFile": "sim_orders_20261013.json",
+                "fillsFile": "sim_fills_20261013.json",
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed",
+                "skippedReason": "",
+                "trades": [
+                  {
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "grade": "A",
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "entryFillPrice": 149649.5,
+                    "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "exitAvgFillPrice": 138000.0,
+                    "exitLastFillPrice": 138000.0,
+                    "tradeStatus": "closed",
+                    "closedReason": "stop_close",
+                    "netReturnPct": -7.9781,
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "reversal-a7plus-balanced",
+                      "active": true,
+                      "stopExecution": "close",
+                      "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                      "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                      "positionWeightMultiplier": 0.5,
+                      "intradayRiskRule": {
+                        "active": true,
+                        "triggerPct": -5.0,
+                        "action": "50% 축소",
+                        "timing": "10:00 또는 14:00 확인",
+                        "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                        "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                      },
+                      "volatilityOverlay": {
+                        "active": true,
+                        "mode": "high-volatility",
+                        "label": "고변동성 방어",
+                        "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                        "triggerMetrics": {
+                          "blendedState": "volatile",
+                          "marketState": "volatile",
+                          "stockState": "volatile",
+                          "atrPct10": 7.28,
+                          "todayRangePct": 9.63,
+                          "returnStd20": 4.93,
+                          "vkospi": 48.76
+                        },
+                        "originalTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 50.0
+                          },
+                          {
+                            "targetPct": 10.0,
+                            "quantityPct": 50.0
+                          }
+                        ],
+                        "adjustedTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightMultiplier": 0.5
+                      },
+                      "label": "반등 × 7&A",
+                      "priority": 1,
+                      "strategyCase": "reversal",
+                      "recommendationCase": "a7plus",
+                      "stopPct": -2.0,
+                      "takeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightHint": "half",
+                      "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                    },
+                    "remainingQuantityPct": 0.0
+                  }
+                ],
+                "candidates": [
+                  {
+                    "strategy": "reversal",
+                    "name": "심텍",
+                    "code": "222800",
+                    "takeProfitProfileKey": "conservative",
+                    "takeProfitProfileLabel": "보수형",
+                    "originalGrade": "A",
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "strictScore": 7.0,
+                    "signalScore": 7.0,
+                    "entryPrice": 149500.0,
+                    "entryPriceAvailable": true,
+                    "statusLabel": "관심후보(약세·소액)",
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "reversal-a7plus-balanced",
+                      "active": true,
+                      "stopExecution": "close",
+                      "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                      "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                      "positionWeightMultiplier": 0.5,
+                      "intradayRiskRule": {
+                        "active": true,
+                        "triggerPct": -5.0,
+                        "action": "50% 축소",
+                        "timing": "10:00 또는 14:00 확인",
+                        "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                        "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                      },
+                      "volatilityOverlay": {
+                        "active": true,
+                        "mode": "high-volatility",
+                        "label": "고변동성 방어",
+                        "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                        "triggerMetrics": {
+                          "blendedState": "volatile",
+                          "marketState": "volatile",
+                          "stockState": "volatile",
+                          "atrPct10": 7.28,
+                          "todayRangePct": 9.63,
+                          "returnStd20": 4.93,
+                          "vkospi": 48.76
+                        },
+                        "originalTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 50.0
+                          },
+                          {
+                            "targetPct": 10.0,
+                            "quantityPct": 50.0
+                          }
+                        ],
+                        "adjustedTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightMultiplier": 0.5
+                      },
+                      "label": "반등 × 7&A",
+                      "priority": 1,
+                      "strategyCase": "reversal",
+                      "recommendationCase": "a7plus",
+                      "stopPct": -2.0,
+                      "takeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightHint": "half",
+                      "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                    },
+                    "entryEligibleOriginal": false,
+                    "historyRecommendation": false,
+                    "replayIncluded": false,
+                    "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                    "replayA7Plus": true,
+                    "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                    "pullbackReplayGateOk": true,
+                    "qualityGateOk": true,
+                    "entryEligible": false,
+                    "entryWatch": false,
+                    "entryBlockers": [],
+                    "setupQuality": "setup_weak",
+                    "payloadSourceMode": "live",
+                    "inputArchiveVersion": "jongga_inputs.v1",
+                    "rebuildable": true,
+                    "historyRecommendationSourceMode": "",
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed"
+                  }
+                ],
+                "results": [
+                  {
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "entryMode": "close",
+                    "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "entryFillPrice": 149649.5,
+                    "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "exitAvgFillPrice": 138000.0,
+                    "exitLastFillPrice": 138000.0,
+                    "netReturnPct": -7.9781,
+                    "tradeStatus": "closed",
+                    "ambiguousCount": 0,
+                    "remainingQuantityPct": 0.0,
+                    "closedReason": "stop_close",
+                    "exitFillCount": 1,
+                    "filledExitQuantityPct": 100.0,
+                    "regimeBucket": "weak",
+                    "vkospiTier": "weak",
+                    "gapGrade": "G-C",
+                    "dataQualityStatus": "degraded",
+                    "dataQuality": {
+                      "status": "degraded",
+                      "barUnit": "1m",
+                      "sources": [
+                        "daily_ohlc_fallback"
+                      ],
+                      "reason": "synthetic one-day replay derived from daily OHLC"
+                    },
+                    "nextTradingDate": "20261014",
+                    "proxyOutcomeStatus": "resolved",
+                    "proxyRealizedReturnPct": -2.0,
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "replayIncluded": false,
+                    "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                    "historyRecommendation": false,
+                    "historyRecommendationSourceMode": "",
+                    "entryEligible": false,
+                    "entryEligibleOriginal": false,
+                    "setupQuality": "setup_weak",
+                    "statusLabel": "관심후보(약세·소액)",
+                    "takeProfitProfileKey": "conservative",
+                    "takeProfitProfileLabel": "보수형",
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "reversal-a7plus-balanced",
+                      "active": true,
+                      "stopExecution": "close",
+                      "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                      "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                      "positionWeightMultiplier": 0.5,
+                      "intradayRiskRule": {
+                        "active": true,
+                        "triggerPct": -5.0,
+                        "action": "50% 축소",
+                        "timing": "10:00 또는 14:00 확인",
+                        "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                        "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                      },
+                      "volatilityOverlay": {
+                        "active": true,
+                        "mode": "high-volatility",
+                        "label": "고변동성 방어",
+                        "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                        "triggerMetrics": {
+                          "blendedState": "volatile",
+                          "marketState": "volatile",
+                          "stockState": "volatile",
+                          "atrPct10": 7.28,
+                          "todayRangePct": 9.63,
+                          "returnStd20": 4.93,
+                          "vkospi": 48.76
+                        },
+                        "originalTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 50.0
+                          },
+                          {
+                            "targetPct": 10.0,
+                            "quantityPct": 50.0
+                          }
+                        ],
+                        "adjustedTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightMultiplier": 0.5
+                      },
+                      "label": "반등 × 7&A",
+                      "priority": 1,
+                      "strategyCase": "reversal",
+                      "recommendationCase": "a7plus",
+                      "stopPct": -2.0,
+                      "takeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightHint": "half",
+                      "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                    },
+                    "payloadSourceMode": "live",
+                    "inputArchiveVersion": "jongga_inputs.v1",
+                    "rebuildable": true,
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed"
+                  }
+                ],
+                "orders": [
+                  {
+                    "orderId": "20261013|stable|reversal|222800-premarket",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "LIMIT",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 152500.0,
+                    "quantityPct": 60.0,
+                    "reason": "🌅 프리마켓",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "premarket",
+                    "activeFrom": "2026-10-14T09:00:00+09:00",
+                    "activeUntil": "2026-10-14T10:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-openPhase",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "LIMIT",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 156600.0,
+                    "quantityPct": 40.0,
+                    "reason": "🔔 장초반",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "openPhase",
+                    "activeFrom": "2026-10-14T09:00:00+09:00",
+                    "activeUntil": "2026-10-14T10:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-stop",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "STOP",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 146510.0,
+                    "quantityPct": 100.0,
+                    "reason": "🛑 손절",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "stop",
+                    "activeFrom": "",
+                    "activeUntil": "",
+                    "finalStatus": "filled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "MKT",
+                    "requestedAt": "2026-10-14T15:00:00+09:00",
+                    "requestedPrice": 138000.0,
+                    "quantityPct": 100.0,
+                    "reason": "3일차 종가 컷오프 청산",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "finalCutoff",
+                    "activeFrom": "2026-10-14T15:00:00+09:00",
+                    "activeUntil": "2026-10-14T15:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  }
+                ],
+                "fills": [
+                  {
+                    "orderId": "20261013|stable|reversal|222800-entry",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "BUY",
+                    "stageKey": "entry",
+                    "reason": "close_entry",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-13T15:30:00+09:00",
+                    "fillPrice": 149649.5,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.1,
+                    "barTimestamp": "2026-10-13T15:30:00+09:00",
+                    "barOpen": 149500.0,
+                    "barHigh": 149500.0,
+                    "barLow": 149500.0,
+                    "barClose": 149500.0,
+                    "fillRule": "close_slippage"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-stop",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "stageKey": "stop",
+                    "reason": "🛑 손절",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-14T15:00:00+09:00",
+                    "fillPrice": 138000.0,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.0,
+                    "barTimestamp": "2026-10-14T15:00:00+09:00",
+                    "barOpen": 150300.0,
+                    "barHigh": 151600.0,
+                    "barLow": 137900.0,
+                    "barClose": 138000.0,
+                    "fillRule": "stop_close"
+                  }
+                ],
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
               }
             ],
             "fills": [
@@ -681940,13 +684162,55 @@ window.JONGGA_REPLAY_RUNS = {
                 "barLow": 378000.0,
                 "barClose": 392000.0,
                 "fillRule": "third_day_cutoff_market"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-entry",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 149649.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 149500.0,
+                "barHigh": 149500.0,
+                "barLow": 149500.0,
+                "barClose": 149500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-stop",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 138000.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 150300.0,
+                "barHigh": 151600.0,
+                "barLow": 137900.0,
+                "barClose": 138000.0,
+                "fillRule": "stop_close"
               }
             ]
           }
         }
       }
     },
-    "runCount": 84,
+    "runCount": 85,
     "runHistory": [
       {
         "runId": "replay-20260618-203055-ab1213d7",
@@ -1452417,66 +1454681,2824 @@ window.JONGGA_REPLAY_RUNS = {
             }
           }
         }
+      },
+      {
+        "runId": "replay-20261014-060600-4c004663",
+        "generatedAt": "2026-10-14T06:06:00",
+        "from": "2026-10-13",
+        "to": "2026-10-13",
+        "variant": "stable",
+        "bar": "1m",
+        "thresholdProfile": "current",
+        "entryMode": "close",
+        "replayPolicy": {
+          "mode": "relaxed",
+          "label": "완화 모드",
+          "summary": "D+1만 있어도 replay 포함",
+          "detail": "D+2가 있으면 3일차까지 연장",
+          "minFollowupDays": 1,
+          "maxFollowupDays": 2
+        },
+        "replayRule": {
+          "ruleVersion": "2026-06-11-mixed-volatility-v1",
+          "variant": "stable",
+          "thresholdProfile": "current",
+          "bar": "1m",
+          "includeGradeScoreMin": 8.0,
+          "includeGradeMin": "A",
+          "validationPolicy": {
+            "mode": "relaxed",
+            "label": "완화 모드",
+            "summary": "D+1만 있어도 replay 포함",
+            "detail": "D+2가 있으면 3일차까지 연장",
+            "minFollowupDays": 1,
+            "maxFollowupDays": 2
+          }
+        },
+        "replayRuleSignature": "c7ca3185f6266b503b3b4c9e5c5c078089a5b9d7",
+        "analysisDates": [
+          "2026-10-13"
+        ],
+        "latestBuiltDate": "2026-10-13",
+        "days": [
+          {
+            "date": "2026-10-13",
+            "summaryFile": "replay_summary_20261013.json",
+            "ordersFile": "sim_orders_20261013.json",
+            "fillsFile": "sim_fills_20261013.json",
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "byStrategy": {
+              "reversal": {
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0,
+                "comparisonByCase": {
+                  "all": {
+                    "caseKey": "all",
+                    "label": "전체 후보",
+                    "candidateCount": 2,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 2,
+                    "winRate": 0.0,
+                    "avgNetReturnPct": -8.1932,
+                    "cumNetReturnPct": -8.1932,
+                    "maxDrawdownPct": 8.1932,
+                    "degradedCount": 2,
+                    "ambiguousCount": 0,
+                    "unfilledRate": 0.0
+                  },
+                  "a7plus": {
+                    "caseKey": "a7plus",
+                    "label": "7&A",
+                    "candidateCount": 1,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 1,
+                    "winRate": 0.0,
+                    "avgNetReturnPct": -7.9781,
+                    "cumNetReturnPct": -7.9781,
+                    "maxDrawdownPct": 7.9781,
+                    "degradedCount": 1,
+                    "ambiguousCount": 0,
+                    "unfilledRate": 0.0
+                  },
+                  "recommendation": {
+                    "caseKey": "recommendation",
+                    "label": "추천 전용",
+                    "candidateCount": 0,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 0,
+                    "winRate": null,
+                    "avgNetReturnPct": null,
+                    "cumNetReturnPct": null,
+                    "maxDrawdownPct": null,
+                    "degradedCount": 0,
+                    "ambiguousCount": 0,
+                    "unfilledRate": null
+                  }
+                }
+              }
+            },
+            "pointInTime": true,
+            "pointInTimeStatus": "confirmed",
+            "skippedReason": "",
+            "candidates": [
+              {
+                "strategy": "reversal",
+                "name": "심텍",
+                "code": "222800",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "originalGrade": "A",
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "strictScore": 7.0,
+                "signalScore": 7.0,
+                "entryPrice": 149500.0,
+                "entryPriceAvailable": true,
+                "statusLabel": "관심후보(약세·소액)",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "reversal-a7plus-balanced",
+                  "active": true,
+                  "stopExecution": "close",
+                  "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                  "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                  "positionWeightMultiplier": 0.5,
+                  "intradayRiskRule": {
+                    "active": true,
+                    "triggerPct": -5.0,
+                    "action": "50% 축소",
+                    "timing": "10:00 또는 14:00 확인",
+                    "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                    "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                  },
+                  "volatilityOverlay": {
+                    "active": true,
+                    "mode": "high-volatility",
+                    "label": "고변동성 방어",
+                    "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                    "triggerMetrics": {
+                      "blendedState": "volatile",
+                      "marketState": "volatile",
+                      "stockState": "volatile",
+                      "atrPct10": 7.28,
+                      "todayRangePct": 9.63,
+                      "returnStd20": 4.93,
+                      "vkospi": 48.76
+                    },
+                    "originalTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 50.0
+                      },
+                      {
+                        "targetPct": 10.0,
+                        "quantityPct": 50.0
+                      }
+                    ],
+                    "adjustedTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightMultiplier": 0.5
+                  },
+                  "label": "반등 × 7&A",
+                  "priority": 1,
+                  "strategyCase": "reversal",
+                  "recommendationCase": "a7plus",
+                  "stopPct": -2.0,
+                  "takeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightHint": "half",
+                  "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                },
+                "entryEligibleOriginal": false,
+                "historyRecommendation": false,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "replayA7Plus": true,
+                "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                "pullbackReplayGateOk": true,
+                "qualityGateOk": true,
+                "entryEligible": false,
+                "entryWatch": false,
+                "entryBlockers": [],
+                "setupQuality": "setup_weak",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "historyRecommendationSourceMode": "",
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              },
+              {
+                "strategy": "reversal",
+                "name": "주성엔지니어링",
+                "code": "036930",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "originalGrade": "B",
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "strictScore": 6.2,
+                "signalScore": 6.2,
+                "entryPrice": 258500.0,
+                "entryPriceAvailable": true,
+                "statusLabel": "매매금지",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "observe-reversal",
+                  "label": "관찰 전용",
+                  "active": false,
+                  "priority": null,
+                  "strategyCase": "",
+                  "recommendationCase": "",
+                  "stopPct": null,
+                  "stopExecution": "close",
+                  "stopCondition": "",
+                  "stopTiming": "자동 진입 제외",
+                  "takeProfitStages": [],
+                  "positionWeightHint": "observe",
+                  "positionWeightMultiplier": 0.0,
+                  "intradayRiskRule": {
+                    "active": false
+                  },
+                  "volatilityOverlay": {
+                    "active": false
+                  },
+                  "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                },
+                "entryEligibleOriginal": false,
+                "historyRecommendation": false,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "replayA7Plus": false,
+                "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                "pullbackReplayGateOk": true,
+                "qualityGateOk": true,
+                "entryEligible": false,
+                "entryWatch": false,
+                "entryBlockers": [
+                  "매매금지"
+                ],
+                "setupQuality": "setup_weak",
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "historyRecommendationSourceMode": "",
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              }
+            ],
+            "trades": [
+              {
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "grade": "B",
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 258758.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 237500.0,
+                "exitLastFillPrice": 237500.0,
+                "tradeStatus": "closed",
+                "closedReason": "stop_close",
+                "netReturnPct": -8.4083,
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "observe-reversal",
+                  "label": "관찰 전용",
+                  "active": false,
+                  "priority": null,
+                  "strategyCase": "",
+                  "recommendationCase": "",
+                  "stopPct": null,
+                  "stopExecution": "close",
+                  "stopCondition": "",
+                  "stopTiming": "자동 진입 제외",
+                  "takeProfitStages": [],
+                  "positionWeightHint": "observe",
+                  "positionWeightMultiplier": 0.0,
+                  "intradayRiskRule": {
+                    "active": false
+                  },
+                  "volatilityOverlay": {
+                    "active": false
+                  },
+                  "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                },
+                "remainingQuantityPct": 0.0
+              },
+              {
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "grade": "A",
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 149649.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 138000.0,
+                "exitLastFillPrice": 138000.0,
+                "tradeStatus": "closed",
+                "closedReason": "stop_close",
+                "netReturnPct": -7.9781,
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "reversal-a7plus-balanced",
+                  "active": true,
+                  "stopExecution": "close",
+                  "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                  "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                  "positionWeightMultiplier": 0.5,
+                  "intradayRiskRule": {
+                    "active": true,
+                    "triggerPct": -5.0,
+                    "action": "50% 축소",
+                    "timing": "10:00 또는 14:00 확인",
+                    "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                    "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                  },
+                  "volatilityOverlay": {
+                    "active": true,
+                    "mode": "high-volatility",
+                    "label": "고변동성 방어",
+                    "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                    "triggerMetrics": {
+                      "blendedState": "volatile",
+                      "marketState": "volatile",
+                      "stockState": "volatile",
+                      "atrPct10": 7.28,
+                      "todayRangePct": 9.63,
+                      "returnStd20": 4.93,
+                      "vkospi": 48.76
+                    },
+                    "originalTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 50.0
+                      },
+                      {
+                        "targetPct": 10.0,
+                        "quantityPct": 50.0
+                      }
+                    ],
+                    "adjustedTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightMultiplier": 0.5
+                  },
+                  "label": "반등 × 7&A",
+                  "priority": 1,
+                  "strategyCase": "reversal",
+                  "recommendationCase": "a7plus",
+                  "stopPct": -2.0,
+                  "takeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightHint": "half",
+                  "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                },
+                "remainingQuantityPct": 0.0
+              }
+            ],
+            "results": [
+              {
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "entryMode": "close",
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 149649.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 138000.0,
+                "exitLastFillPrice": 138000.0,
+                "netReturnPct": -7.9781,
+                "tradeStatus": "closed",
+                "ambiguousCount": 0,
+                "remainingQuantityPct": 0.0,
+                "closedReason": "stop_close",
+                "exitFillCount": 1,
+                "filledExitQuantityPct": 100.0,
+                "regimeBucket": "weak",
+                "vkospiTier": "weak",
+                "gapGrade": "G-C",
+                "dataQualityStatus": "degraded",
+                "dataQuality": {
+                  "status": "degraded",
+                  "barUnit": "1m",
+                  "sources": [
+                    "daily_ohlc_fallback"
+                  ],
+                  "reason": "synthetic one-day replay derived from daily OHLC"
+                },
+                "nextTradingDate": "20261014",
+                "proxyOutcomeStatus": "resolved",
+                "proxyRealizedReturnPct": -2.0,
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "historyRecommendation": false,
+                "historyRecommendationSourceMode": "",
+                "entryEligible": false,
+                "entryEligibleOriginal": false,
+                "setupQuality": "setup_weak",
+                "statusLabel": "관심후보(약세·소액)",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "reversal-a7plus-balanced",
+                  "active": true,
+                  "stopExecution": "close",
+                  "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                  "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                  "positionWeightMultiplier": 0.5,
+                  "intradayRiskRule": {
+                    "active": true,
+                    "triggerPct": -5.0,
+                    "action": "50% 축소",
+                    "timing": "10:00 또는 14:00 확인",
+                    "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                    "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                  },
+                  "volatilityOverlay": {
+                    "active": true,
+                    "mode": "high-volatility",
+                    "label": "고변동성 방어",
+                    "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                    "triggerMetrics": {
+                      "blendedState": "volatile",
+                      "marketState": "volatile",
+                      "stockState": "volatile",
+                      "atrPct10": 7.28,
+                      "todayRangePct": 9.63,
+                      "returnStd20": 4.93,
+                      "vkospi": 48.76
+                    },
+                    "originalTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 50.0
+                      },
+                      {
+                        "targetPct": 10.0,
+                        "quantityPct": 50.0
+                      }
+                    ],
+                    "adjustedTakeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightMultiplier": 0.5
+                  },
+                  "label": "반등 × 7&A",
+                  "priority": 1,
+                  "strategyCase": "reversal",
+                  "recommendationCase": "a7plus",
+                  "stopPct": -2.0,
+                  "takeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightHint": "half",
+                  "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                },
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              },
+              {
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "entryMode": "close",
+                "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                "entryFillPrice": 258758.5,
+                "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                "exitAvgFillPrice": 237500.0,
+                "exitLastFillPrice": 237500.0,
+                "netReturnPct": -8.4083,
+                "tradeStatus": "closed",
+                "ambiguousCount": 0,
+                "remainingQuantityPct": 0.0,
+                "closedReason": "stop_close",
+                "exitFillCount": 1,
+                "filledExitQuantityPct": 100.0,
+                "regimeBucket": "weak",
+                "vkospiTier": "weak",
+                "gapGrade": "G-C",
+                "dataQualityStatus": "degraded",
+                "dataQuality": {
+                  "status": "degraded",
+                  "barUnit": "1m",
+                  "sources": [
+                    "daily_ohlc_fallback"
+                  ],
+                  "reason": "synthetic one-day replay derived from daily OHLC"
+                },
+                "nextTradingDate": "20261014",
+                "proxyOutcomeStatus": "resolved",
+                "proxyRealizedReturnPct": -2.0,
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "replayIncluded": false,
+                "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                "historyRecommendation": false,
+                "historyRecommendationSourceMode": "",
+                "entryEligible": false,
+                "entryEligibleOriginal": false,
+                "setupQuality": "setup_weak",
+                "statusLabel": "매매금지",
+                "takeProfitProfileKey": "conservative",
+                "takeProfitProfileLabel": "보수형",
+                "mixedExitPolicy": {
+                  "version": "mixed-exit-v1-balanced",
+                  "policyKey": "observe-reversal",
+                  "label": "관찰 전용",
+                  "active": false,
+                  "priority": null,
+                  "strategyCase": "",
+                  "recommendationCase": "",
+                  "stopPct": null,
+                  "stopExecution": "close",
+                  "stopCondition": "",
+                  "stopTiming": "자동 진입 제외",
+                  "takeProfitStages": [],
+                  "positionWeightHint": "observe",
+                  "positionWeightMultiplier": 0.0,
+                  "intradayRiskRule": {
+                    "active": false
+                  },
+                  "volatilityOverlay": {
+                    "active": false
+                  },
+                  "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                },
+                "payloadSourceMode": "live",
+                "inputArchiveVersion": "jongga_inputs.v1",
+                "rebuildable": true,
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed"
+              }
+            ],
+            "orders": [
+              {
+                "orderId": "20261013|stable|reversal|222800-entry",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "BUY",
+                "orderType": "MOC",
+                "requestedAt": "2026-10-13T15:30:00+09:00",
+                "requestedPrice": 149500.0,
+                "quantityPct": 100.0,
+                "reason": "close_entry",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "entry",
+                "activeFrom": "",
+                "activeUntil": "",
+                "finalStatus": "filled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-premarket",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 152500.0,
+                "quantityPct": 60.0,
+                "reason": "🌅 프리마켓",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "premarket",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-openPhase",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 156600.0,
+                "quantityPct": 40.0,
+                "reason": "🔔 장초반",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "openPhase",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-stop",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "STOP",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 146510.0,
+                "quantityPct": 100.0,
+                "reason": "🛑 손절",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "stop",
+                "activeFrom": "",
+                "activeUntil": "",
+                "finalStatus": "filled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "orderType": "MKT",
+                "requestedAt": "2026-10-14T15:00:00+09:00",
+                "requestedPrice": 138000.0,
+                "quantityPct": 100.0,
+                "reason": "3일차 종가 컷오프 청산",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "stageKey": "finalCutoff",
+                "activeFrom": "2026-10-14T15:00:00+09:00",
+                "activeUntil": "2026-10-14T15:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-entry",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "BUY",
+                "orderType": "MOC",
+                "requestedAt": "2026-10-13T15:30:00+09:00",
+                "requestedPrice": 258500.0,
+                "quantityPct": 100.0,
+                "reason": "close_entry",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "entry",
+                "activeFrom": "",
+                "activeUntil": "",
+                "finalStatus": "filled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-premarket",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 266255.0,
+                "quantityPct": 60.0,
+                "reason": "🌅 프리마켓",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "premarket",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-openPhase",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "LIMIT",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 271250.0,
+                "quantityPct": 40.0,
+                "reason": "🔔 장초반",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "openPhase",
+                "activeFrom": "2026-10-14T09:00:00+09:00",
+                "activeUntil": "2026-10-14T10:00:00+09:00",
+                "finalStatus": "cancelled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-stop",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "STOP",
+                "requestedAt": "2026-10-14T09:00:00+09:00",
+                "requestedPrice": 253330.0,
+                "quantityPct": 100.0,
+                "reason": "🛑 손절",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "stop",
+                "activeFrom": "",
+                "activeUntil": "",
+                "finalStatus": "filled"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-finalCutoff",
+                "runId": "replay-20261014-060600-4c004663",
+                "date": "2026-10-13",
+                "variant": "stable",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "orderType": "MKT",
+                "requestedAt": "2026-10-14T15:00:00+09:00",
+                "requestedPrice": 237500.0,
+                "quantityPct": 100.0,
+                "reason": "3일차 종가 컷오프 청산",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "stageKey": "finalCutoff",
+                "activeFrom": "2026-10-14T15:00:00+09:00",
+                "activeUntil": "2026-10-14T15:00:00+09:00",
+                "finalStatus": "cancelled"
+              }
+            ],
+            "fills": [
+              {
+                "orderId": "20261013|stable|reversal|222800-entry",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 149649.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 149500.0,
+                "barHigh": 149500.0,
+                "barLow": 149500.0,
+                "barClose": 149500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-stop",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 138000.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 150300.0,
+                "barHigh": 151600.0,
+                "barLow": 137900.0,
+                "barClose": 138000.0,
+                "fillRule": "stop_close"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-entry",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 258758.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 258500.0,
+                "barHigh": 258500.0,
+                "barLow": 258500.0,
+                "barClose": 258500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-stop",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 237500.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 262500.0,
+                "barHigh": 263000.0,
+                "barLow": 236500.0,
+                "barClose": 237500.0,
+                "fillRule": "stop_close"
+              }
+            ]
+          }
+        ],
+        "summary": {
+          "candidateCount": 2,
+          "eligibleCount": 0,
+          "includedCount": 0,
+          "tradeCount": 2,
+          "winRate": 0.0,
+          "avgNetReturnPct": -8.1932,
+          "cumNetReturnPct": -8.1932,
+          "maxDrawdownPct": 8.1932,
+          "degradedCount": 2,
+          "ambiguousCount": 0,
+          "unfilledRate": 0.0,
+          "overall": {
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0
+          },
+          "comparisonByCase": {
+            "all": {
+              "caseKey": "all",
+              "label": "전체 후보",
+              "candidateCount": 2,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932,
+              "maxDrawdownPct": 8.1932,
+              "degradedCount": 2,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0
+            },
+            "a7plus": {
+              "caseKey": "a7plus",
+              "label": "7&A",
+              "candidateCount": 1,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 1,
+              "winRate": 0.0,
+              "avgNetReturnPct": -7.9781,
+              "cumNetReturnPct": -7.9781,
+              "maxDrawdownPct": 7.9781,
+              "degradedCount": 1,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0
+            },
+            "recommendation": {
+              "caseKey": "recommendation",
+              "label": "추천 전용",
+              "candidateCount": 0,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 0,
+              "winRate": null,
+              "avgNetReturnPct": null,
+              "cumNetReturnPct": null,
+              "maxDrawdownPct": null,
+              "degradedCount": 0,
+              "ambiguousCount": 0,
+              "unfilledRate": null
+            }
+          },
+          "byStrategy": {
+            "reversal": {
+              "candidateCount": 2,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932,
+              "maxDrawdownPct": 8.1932,
+              "degradedCount": 2,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0,
+              "comparisonByCase": {
+                "all": {
+                  "caseKey": "all",
+                  "label": "전체 후보",
+                  "candidateCount": 2,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 2,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -8.1932,
+                  "cumNetReturnPct": -8.1932,
+                  "maxDrawdownPct": 8.1932,
+                  "degradedCount": 2,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "a7plus": {
+                  "caseKey": "a7plus",
+                  "label": "7&A",
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "recommendation": {
+                  "caseKey": "recommendation",
+                  "label": "추천 전용",
+                  "candidateCount": 0,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 0,
+                  "winRate": null,
+                  "avgNetReturnPct": null,
+                  "cumNetReturnPct": null,
+                  "maxDrawdownPct": null,
+                  "degradedCount": 0,
+                  "ambiguousCount": 0,
+                  "unfilledRate": null
+                }
+              }
+            }
+          },
+          "byStock": [
+            {
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "grade": "A",
+              "replayGrade": "A",
+              "gradeScore": 7.0,
+              "tradeCount": 1,
+              "winRate": 0.0,
+              "avgNetReturnPct": -7.9781,
+              "cumNetReturnPct": -7.9781,
+              "lastReplayDate": "2026-10-13",
+              "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+              "lastEntryFillPrice": 149649.5,
+              "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+              "lastExitAvgFillPrice": 138000.0,
+              "lastExitFillPrice": 138000.0,
+              "lastTradeStatus": "closed"
+            },
+            {
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "grade": "B",
+              "replayGrade": "B",
+              "gradeScore": 6.2,
+              "tradeCount": 1,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.4083,
+              "cumNetReturnPct": -8.4083,
+              "lastReplayDate": "2026-10-13",
+              "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+              "lastEntryFillPrice": 258758.5,
+              "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+              "lastExitAvgFillPrice": 237500.0,
+              "lastExitFillPrice": 237500.0,
+              "lastTradeStatus": "closed"
+            }
+          ],
+          "strategyStats": {
+            "reversal": {
+              "candidateCount": 2,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932,
+              "maxDrawdownPct": 8.1932,
+              "degradedCount": 2,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0,
+              "comparisonByCase": {
+                "all": {
+                  "caseKey": "all",
+                  "label": "전체 후보",
+                  "candidateCount": 2,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 2,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -8.1932,
+                  "cumNetReturnPct": -8.1932,
+                  "maxDrawdownPct": 8.1932,
+                  "degradedCount": 2,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "a7plus": {
+                  "caseKey": "a7plus",
+                  "label": "7&A",
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "recommendation": {
+                  "caseKey": "recommendation",
+                  "label": "추천 전용",
+                  "candidateCount": 0,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 0,
+                  "winRate": null,
+                  "avgNetReturnPct": null,
+                  "cumNetReturnPct": null,
+                  "maxDrawdownPct": null,
+                  "degradedCount": 0,
+                  "ambiguousCount": 0,
+                  "unfilledRate": null
+                }
+              }
+            }
+          },
+          "strategyRecommendationMatrix": {
+            "reversal|a7plus": {
+              "strategy": "reversal",
+              "recommendationCase": "a7plus",
+              "sampleCount": 1,
+              "tradeCount": 1,
+              "winRate": 0.0,
+              "avgNetReturnPct": -7.9781,
+              "cumNetReturnPct": -7.9781,
+              "maxDrawdownPct": 7.9781,
+              "recommendedExitPolicyKey": "reversal-a7plus-balanced"
+            },
+            "reversal|recommendation": {
+              "strategy": "reversal",
+              "recommendationCase": "recommendation",
+              "sampleCount": 0,
+              "tradeCount": 0,
+              "winRate": null,
+              "avgNetReturnPct": null,
+              "cumNetReturnPct": null,
+              "maxDrawdownPct": null,
+              "recommendedExitPolicyKey": "observe-unmatched"
+            }
+          },
+          "byTakeProfitProfile": {
+            "reversal|conservative": {
+              "tradeCount": 2,
+              "sampleCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932
+            }
+          },
+          "byTakeProfitProfileCell": {
+            "reversal|weak|weak|G-C|conservative": {
+              "tradeCount": 2,
+              "sampleCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932
+            }
+          },
+          "pointInTimeStatusCounts": {
+            "confirmed": 1,
+            "historical_regen": 0,
+            "legacy_unknown": 0
+          },
+          "historicalRegenExcludedDays": 0,
+          "legacyUnknownIncludedDays": 0,
+          "pointInTimeWarnings": []
+        },
+        "strategyViews": {
+          "reversal": {
+            "summary": {
+              "candidateCount": 2,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932,
+              "maxDrawdownPct": 8.1932,
+              "degradedCount": 2,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0,
+              "comparisonByCase": {
+                "all": {
+                  "caseKey": "all",
+                  "label": "전체 후보",
+                  "candidateCount": 2,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 2,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -8.1932,
+                  "cumNetReturnPct": -8.1932,
+                  "maxDrawdownPct": 8.1932,
+                  "degradedCount": 2,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "a7plus": {
+                  "caseKey": "a7plus",
+                  "label": "7&A",
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "recommendation": {
+                  "caseKey": "recommendation",
+                  "label": "추천 전용",
+                  "candidateCount": 0,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 0,
+                  "winRate": null,
+                  "avgNetReturnPct": null,
+                  "cumNetReturnPct": null,
+                  "maxDrawdownPct": null,
+                  "degradedCount": 0,
+                  "ambiguousCount": 0,
+                  "unfilledRate": null
+                }
+              }
+            },
+            "stocks": [
+              {
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "grade": "A",
+                "replayGrade": "A",
+                "gradeScore": 7.0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "lastReplayDate": "2026-10-13",
+                "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+                "lastEntryFillPrice": 149649.5,
+                "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+                "lastExitAvgFillPrice": 138000.0,
+                "lastExitFillPrice": 138000.0,
+                "lastTradeStatus": "closed"
+              },
+              {
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "grade": "B",
+                "replayGrade": "B",
+                "gradeScore": 6.2,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.4083,
+                "cumNetReturnPct": -8.4083,
+                "lastReplayDate": "2026-10-13",
+                "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+                "lastEntryFillPrice": 258758.5,
+                "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+                "lastExitAvgFillPrice": 237500.0,
+                "lastExitFillPrice": 237500.0,
+                "lastTradeStatus": "closed"
+              }
+            ],
+            "days": [
+              {
+                "date": "2026-10-13",
+                "summaryFile": "replay_summary_20261013.json",
+                "ordersFile": "sim_orders_20261013.json",
+                "fillsFile": "sim_fills_20261013.json",
+                "pointInTime": true,
+                "pointInTimeStatus": "confirmed",
+                "skippedReason": "",
+                "trades": [
+                  {
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "grade": "B",
+                    "replayGrade": "B",
+                    "gradeScore": 6.2,
+                    "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "entryFillPrice": 258758.5,
+                    "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "exitAvgFillPrice": 237500.0,
+                    "exitLastFillPrice": 237500.0,
+                    "tradeStatus": "closed",
+                    "closedReason": "stop_close",
+                    "netReturnPct": -8.4083,
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "observe-reversal",
+                      "label": "관찰 전용",
+                      "active": false,
+                      "priority": null,
+                      "strategyCase": "",
+                      "recommendationCase": "",
+                      "stopPct": null,
+                      "stopExecution": "close",
+                      "stopCondition": "",
+                      "stopTiming": "자동 진입 제외",
+                      "takeProfitStages": [],
+                      "positionWeightHint": "observe",
+                      "positionWeightMultiplier": 0.0,
+                      "intradayRiskRule": {
+                        "active": false
+                      },
+                      "volatilityOverlay": {
+                        "active": false
+                      },
+                      "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                    },
+                    "remainingQuantityPct": 0.0
+                  },
+                  {
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "grade": "A",
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "entryFillPrice": 149649.5,
+                    "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "exitAvgFillPrice": 138000.0,
+                    "exitLastFillPrice": 138000.0,
+                    "tradeStatus": "closed",
+                    "closedReason": "stop_close",
+                    "netReturnPct": -7.9781,
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "reversal-a7plus-balanced",
+                      "active": true,
+                      "stopExecution": "close",
+                      "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                      "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                      "positionWeightMultiplier": 0.5,
+                      "intradayRiskRule": {
+                        "active": true,
+                        "triggerPct": -5.0,
+                        "action": "50% 축소",
+                        "timing": "10:00 또는 14:00 확인",
+                        "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                        "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                      },
+                      "volatilityOverlay": {
+                        "active": true,
+                        "mode": "high-volatility",
+                        "label": "고변동성 방어",
+                        "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                        "triggerMetrics": {
+                          "blendedState": "volatile",
+                          "marketState": "volatile",
+                          "stockState": "volatile",
+                          "atrPct10": 7.28,
+                          "todayRangePct": 9.63,
+                          "returnStd20": 4.93,
+                          "vkospi": 48.76
+                        },
+                        "originalTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 50.0
+                          },
+                          {
+                            "targetPct": 10.0,
+                            "quantityPct": 50.0
+                          }
+                        ],
+                        "adjustedTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightMultiplier": 0.5
+                      },
+                      "label": "반등 × 7&A",
+                      "priority": 1,
+                      "strategyCase": "reversal",
+                      "recommendationCase": "a7plus",
+                      "stopPct": -2.0,
+                      "takeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightHint": "half",
+                      "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                    },
+                    "remainingQuantityPct": 0.0
+                  }
+                ],
+                "candidates": [
+                  {
+                    "strategy": "reversal",
+                    "name": "심텍",
+                    "code": "222800",
+                    "takeProfitProfileKey": "conservative",
+                    "takeProfitProfileLabel": "보수형",
+                    "originalGrade": "A",
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "strictScore": 7.0,
+                    "signalScore": 7.0,
+                    "entryPrice": 149500.0,
+                    "entryPriceAvailable": true,
+                    "statusLabel": "관심후보(약세·소액)",
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "reversal-a7plus-balanced",
+                      "active": true,
+                      "stopExecution": "close",
+                      "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                      "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                      "positionWeightMultiplier": 0.5,
+                      "intradayRiskRule": {
+                        "active": true,
+                        "triggerPct": -5.0,
+                        "action": "50% 축소",
+                        "timing": "10:00 또는 14:00 확인",
+                        "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                        "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                      },
+                      "volatilityOverlay": {
+                        "active": true,
+                        "mode": "high-volatility",
+                        "label": "고변동성 방어",
+                        "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                        "triggerMetrics": {
+                          "blendedState": "volatile",
+                          "marketState": "volatile",
+                          "stockState": "volatile",
+                          "atrPct10": 7.28,
+                          "todayRangePct": 9.63,
+                          "returnStd20": 4.93,
+                          "vkospi": 48.76
+                        },
+                        "originalTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 50.0
+                          },
+                          {
+                            "targetPct": 10.0,
+                            "quantityPct": 50.0
+                          }
+                        ],
+                        "adjustedTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightMultiplier": 0.5
+                      },
+                      "label": "반등 × 7&A",
+                      "priority": 1,
+                      "strategyCase": "reversal",
+                      "recommendationCase": "a7plus",
+                      "stopPct": -2.0,
+                      "takeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightHint": "half",
+                      "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                    },
+                    "entryEligibleOriginal": false,
+                    "historyRecommendation": false,
+                    "replayIncluded": false,
+                    "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                    "replayA7Plus": true,
+                    "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                    "pullbackReplayGateOk": true,
+                    "qualityGateOk": true,
+                    "entryEligible": false,
+                    "entryWatch": false,
+                    "entryBlockers": [],
+                    "setupQuality": "setup_weak",
+                    "payloadSourceMode": "live",
+                    "inputArchiveVersion": "jongga_inputs.v1",
+                    "rebuildable": true,
+                    "historyRecommendationSourceMode": "",
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed"
+                  },
+                  {
+                    "strategy": "reversal",
+                    "name": "주성엔지니어링",
+                    "code": "036930",
+                    "takeProfitProfileKey": "conservative",
+                    "takeProfitProfileLabel": "보수형",
+                    "originalGrade": "B",
+                    "replayGrade": "B",
+                    "gradeScore": 6.2,
+                    "strictScore": 6.2,
+                    "signalScore": 6.2,
+                    "entryPrice": 258500.0,
+                    "entryPriceAvailable": true,
+                    "statusLabel": "매매금지",
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "observe-reversal",
+                      "label": "관찰 전용",
+                      "active": false,
+                      "priority": null,
+                      "strategyCase": "",
+                      "recommendationCase": "",
+                      "stopPct": null,
+                      "stopExecution": "close",
+                      "stopCondition": "",
+                      "stopTiming": "자동 진입 제외",
+                      "takeProfitStages": [],
+                      "positionWeightHint": "observe",
+                      "positionWeightMultiplier": 0.0,
+                      "intradayRiskRule": {
+                        "active": false
+                      },
+                      "volatilityOverlay": {
+                        "active": false
+                      },
+                      "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                    },
+                    "entryEligibleOriginal": false,
+                    "historyRecommendation": false,
+                    "replayIncluded": false,
+                    "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                    "replayA7Plus": false,
+                    "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                    "pullbackReplayGateOk": true,
+                    "qualityGateOk": true,
+                    "entryEligible": false,
+                    "entryWatch": false,
+                    "entryBlockers": [
+                      "매매금지"
+                    ],
+                    "setupQuality": "setup_weak",
+                    "payloadSourceMode": "live",
+                    "inputArchiveVersion": "jongga_inputs.v1",
+                    "rebuildable": true,
+                    "historyRecommendationSourceMode": "",
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed"
+                  }
+                ],
+                "results": [
+                  {
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "entryMode": "close",
+                    "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "entryFillPrice": 149649.5,
+                    "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "exitAvgFillPrice": 138000.0,
+                    "exitLastFillPrice": 138000.0,
+                    "netReturnPct": -7.9781,
+                    "tradeStatus": "closed",
+                    "ambiguousCount": 0,
+                    "remainingQuantityPct": 0.0,
+                    "closedReason": "stop_close",
+                    "exitFillCount": 1,
+                    "filledExitQuantityPct": 100.0,
+                    "regimeBucket": "weak",
+                    "vkospiTier": "weak",
+                    "gapGrade": "G-C",
+                    "dataQualityStatus": "degraded",
+                    "dataQuality": {
+                      "status": "degraded",
+                      "barUnit": "1m",
+                      "sources": [
+                        "daily_ohlc_fallback"
+                      ],
+                      "reason": "synthetic one-day replay derived from daily OHLC"
+                    },
+                    "nextTradingDate": "20261014",
+                    "proxyOutcomeStatus": "resolved",
+                    "proxyRealizedReturnPct": -2.0,
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "replayIncluded": false,
+                    "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                    "historyRecommendation": false,
+                    "historyRecommendationSourceMode": "",
+                    "entryEligible": false,
+                    "entryEligibleOriginal": false,
+                    "setupQuality": "setup_weak",
+                    "statusLabel": "관심후보(약세·소액)",
+                    "takeProfitProfileKey": "conservative",
+                    "takeProfitProfileLabel": "보수형",
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "reversal-a7plus-balanced",
+                      "active": true,
+                      "stopExecution": "close",
+                      "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                      "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                      "positionWeightMultiplier": 0.5,
+                      "intradayRiskRule": {
+                        "active": true,
+                        "triggerPct": -5.0,
+                        "action": "50% 축소",
+                        "timing": "10:00 또는 14:00 확인",
+                        "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                        "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                      },
+                      "volatilityOverlay": {
+                        "active": true,
+                        "mode": "high-volatility",
+                        "label": "고변동성 방어",
+                        "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                        "triggerMetrics": {
+                          "blendedState": "volatile",
+                          "marketState": "volatile",
+                          "stockState": "volatile",
+                          "atrPct10": 7.28,
+                          "todayRangePct": 9.63,
+                          "returnStd20": 4.93,
+                          "vkospi": 48.76
+                        },
+                        "originalTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 50.0
+                          },
+                          {
+                            "targetPct": 10.0,
+                            "quantityPct": 50.0
+                          }
+                        ],
+                        "adjustedTakeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightMultiplier": 0.5
+                      },
+                      "label": "반등 × 7&A",
+                      "priority": 1,
+                      "strategyCase": "reversal",
+                      "recommendationCase": "a7plus",
+                      "stopPct": -2.0,
+                      "takeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightHint": "half",
+                      "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                    },
+                    "payloadSourceMode": "live",
+                    "inputArchiveVersion": "jongga_inputs.v1",
+                    "rebuildable": true,
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed"
+                  },
+                  {
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "entryMode": "close",
+                    "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "entryFillPrice": 258758.5,
+                    "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "exitAvgFillPrice": 237500.0,
+                    "exitLastFillPrice": 237500.0,
+                    "netReturnPct": -8.4083,
+                    "tradeStatus": "closed",
+                    "ambiguousCount": 0,
+                    "remainingQuantityPct": 0.0,
+                    "closedReason": "stop_close",
+                    "exitFillCount": 1,
+                    "filledExitQuantityPct": 100.0,
+                    "regimeBucket": "weak",
+                    "vkospiTier": "weak",
+                    "gapGrade": "G-C",
+                    "dataQualityStatus": "degraded",
+                    "dataQuality": {
+                      "status": "degraded",
+                      "barUnit": "1m",
+                      "sources": [
+                        "daily_ohlc_fallback"
+                      ],
+                      "reason": "synthetic one-day replay derived from daily OHLC"
+                    },
+                    "nextTradingDate": "20261014",
+                    "proxyOutcomeStatus": "resolved",
+                    "proxyRealizedReturnPct": -2.0,
+                    "replayGrade": "B",
+                    "gradeScore": 6.2,
+                    "replayIncluded": false,
+                    "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                    "historyRecommendation": false,
+                    "historyRecommendationSourceMode": "",
+                    "entryEligible": false,
+                    "entryEligibleOriginal": false,
+                    "setupQuality": "setup_weak",
+                    "statusLabel": "매매금지",
+                    "takeProfitProfileKey": "conservative",
+                    "takeProfitProfileLabel": "보수형",
+                    "mixedExitPolicy": {
+                      "version": "mixed-exit-v1-balanced",
+                      "policyKey": "observe-reversal",
+                      "label": "관찰 전용",
+                      "active": false,
+                      "priority": null,
+                      "strategyCase": "",
+                      "recommendationCase": "",
+                      "stopPct": null,
+                      "stopExecution": "close",
+                      "stopCondition": "",
+                      "stopTiming": "자동 진입 제외",
+                      "takeProfitStages": [],
+                      "positionWeightHint": "observe",
+                      "positionWeightMultiplier": 0.0,
+                      "intradayRiskRule": {
+                        "active": false
+                      },
+                      "volatilityOverlay": {
+                        "active": false
+                      },
+                      "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                    },
+                    "payloadSourceMode": "live",
+                    "inputArchiveVersion": "jongga_inputs.v1",
+                    "rebuildable": true,
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed"
+                  }
+                ],
+                "orders": [
+                  {
+                    "orderId": "20261013|stable|reversal|222800-premarket",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "LIMIT",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 152500.0,
+                    "quantityPct": 60.0,
+                    "reason": "🌅 프리마켓",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "premarket",
+                    "activeFrom": "2026-10-14T09:00:00+09:00",
+                    "activeUntil": "2026-10-14T10:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-openPhase",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "LIMIT",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 156600.0,
+                    "quantityPct": 40.0,
+                    "reason": "🔔 장초반",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "openPhase",
+                    "activeFrom": "2026-10-14T09:00:00+09:00",
+                    "activeUntil": "2026-10-14T10:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-stop",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "STOP",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 146510.0,
+                    "quantityPct": 100.0,
+                    "reason": "🛑 손절",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "stop",
+                    "activeFrom": "",
+                    "activeUntil": "",
+                    "finalStatus": "filled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "orderType": "MKT",
+                    "requestedAt": "2026-10-14T15:00:00+09:00",
+                    "requestedPrice": 138000.0,
+                    "quantityPct": 100.0,
+                    "reason": "3일차 종가 컷오프 청산",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "stageKey": "finalCutoff",
+                    "activeFrom": "2026-10-14T15:00:00+09:00",
+                    "activeUntil": "2026-10-14T15:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|036930-premarket",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "side": "SELL",
+                    "orderType": "LIMIT",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 266255.0,
+                    "quantityPct": 60.0,
+                    "reason": "🌅 프리마켓",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "stageKey": "premarket",
+                    "activeFrom": "2026-10-14T09:00:00+09:00",
+                    "activeUntil": "2026-10-14T10:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|036930-openPhase",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "side": "SELL",
+                    "orderType": "LIMIT",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 271250.0,
+                    "quantityPct": 40.0,
+                    "reason": "🔔 장초반",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "stageKey": "openPhase",
+                    "activeFrom": "2026-10-14T09:00:00+09:00",
+                    "activeUntil": "2026-10-14T10:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|036930-stop",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "side": "SELL",
+                    "orderType": "STOP",
+                    "requestedAt": "2026-10-14T09:00:00+09:00",
+                    "requestedPrice": 253330.0,
+                    "quantityPct": 100.0,
+                    "reason": "🛑 손절",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "stageKey": "stop",
+                    "activeFrom": "",
+                    "activeUntil": "",
+                    "finalStatus": "filled"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|036930-finalCutoff",
+                    "runId": "replay-20261014-060600-4c004663",
+                    "date": "2026-10-13",
+                    "variant": "stable",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "side": "SELL",
+                    "orderType": "MKT",
+                    "requestedAt": "2026-10-14T15:00:00+09:00",
+                    "requestedPrice": 237500.0,
+                    "quantityPct": 100.0,
+                    "reason": "3일차 종가 컷오프 청산",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "stageKey": "finalCutoff",
+                    "activeFrom": "2026-10-14T15:00:00+09:00",
+                    "activeUntil": "2026-10-14T15:00:00+09:00",
+                    "finalStatus": "cancelled"
+                  }
+                ],
+                "fills": [
+                  {
+                    "orderId": "20261013|stable|reversal|222800-entry",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "BUY",
+                    "stageKey": "entry",
+                    "reason": "close_entry",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-13T15:30:00+09:00",
+                    "fillPrice": 149649.5,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.1,
+                    "barTimestamp": "2026-10-13T15:30:00+09:00",
+                    "barOpen": 149500.0,
+                    "barHigh": 149500.0,
+                    "barLow": 149500.0,
+                    "barClose": 149500.0,
+                    "fillRule": "close_slippage"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-stop",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "stageKey": "stop",
+                    "reason": "🛑 손절",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-14T15:00:00+09:00",
+                    "fillPrice": 138000.0,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.0,
+                    "barTimestamp": "2026-10-14T15:00:00+09:00",
+                    "barOpen": 150300.0,
+                    "barHigh": 151600.0,
+                    "barLow": 137900.0,
+                    "barClose": 138000.0,
+                    "fillRule": "stop_close"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|036930-entry",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "side": "BUY",
+                    "stageKey": "entry",
+                    "reason": "close_entry",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-13T15:30:00+09:00",
+                    "fillPrice": 258758.5,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.1,
+                    "barTimestamp": "2026-10-13T15:30:00+09:00",
+                    "barOpen": 258500.0,
+                    "barHigh": 258500.0,
+                    "barLow": 258500.0,
+                    "barClose": 258500.0,
+                    "fillRule": "close_slippage"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|036930-stop",
+                    "sourceEntryKey": "20261013|stable|reversal|036930",
+                    "strategy": "reversal",
+                    "code": "036930",
+                    "name": "주성엔지니어링",
+                    "side": "SELL",
+                    "stageKey": "stop",
+                    "reason": "🛑 손절",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-14T15:00:00+09:00",
+                    "fillPrice": 237500.0,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.0,
+                    "barTimestamp": "2026-10-14T15:00:00+09:00",
+                    "barOpen": 262500.0,
+                    "barHigh": 263000.0,
+                    "barLow": 236500.0,
+                    "barClose": 237500.0,
+                    "fillRule": "stop_close"
+                  }
+                ],
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0,
+                "comparisonByCase": {
+                  "all": {
+                    "caseKey": "all",
+                    "label": "전체 후보",
+                    "candidateCount": 2,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 2,
+                    "winRate": 0.0,
+                    "avgNetReturnPct": -8.1932,
+                    "cumNetReturnPct": -8.1932,
+                    "maxDrawdownPct": 8.1932,
+                    "degradedCount": 2,
+                    "ambiguousCount": 0,
+                    "unfilledRate": 0.0
+                  },
+                  "a7plus": {
+                    "caseKey": "a7plus",
+                    "label": "7&A",
+                    "candidateCount": 1,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 1,
+                    "winRate": 0.0,
+                    "avgNetReturnPct": -7.9781,
+                    "cumNetReturnPct": -7.9781,
+                    "maxDrawdownPct": 7.9781,
+                    "degradedCount": 1,
+                    "ambiguousCount": 0,
+                    "unfilledRate": 0.0
+                  },
+                  "recommendation": {
+                    "caseKey": "recommendation",
+                    "label": "추천 전용",
+                    "candidateCount": 0,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 0,
+                    "winRate": null,
+                    "avgNetReturnPct": null,
+                    "cumNetReturnPct": null,
+                    "maxDrawdownPct": null,
+                    "degradedCount": 0,
+                    "ambiguousCount": 0,
+                    "unfilledRate": null
+                  }
+                }
+              }
+            ],
+            "fills": [
+              {
+                "orderId": "20261013|stable|reversal|222800-entry",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 149649.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 149500.0,
+                "barHigh": 149500.0,
+                "barLow": 149500.0,
+                "barClose": 149500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|222800-stop",
+                "sourceEntryKey": "20261013|stable|reversal|222800",
+                "strategy": "reversal",
+                "code": "222800",
+                "name": "심텍",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 138000.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 150300.0,
+                "barHigh": 151600.0,
+                "barLow": 137900.0,
+                "barClose": 138000.0,
+                "fillRule": "stop_close"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-entry",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "BUY",
+                "stageKey": "entry",
+                "reason": "close_entry",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-13T15:30:00+09:00",
+                "fillPrice": 258758.5,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.1,
+                "barTimestamp": "2026-10-13T15:30:00+09:00",
+                "barOpen": 258500.0,
+                "barHigh": 258500.0,
+                "barLow": 258500.0,
+                "barClose": 258500.0,
+                "fillRule": "close_slippage"
+              },
+              {
+                "orderId": "20261013|stable|reversal|036930-stop",
+                "sourceEntryKey": "20261013|stable|reversal|036930",
+                "strategy": "reversal",
+                "code": "036930",
+                "name": "주성엔지니어링",
+                "side": "SELL",
+                "stageKey": "stop",
+                "reason": "🛑 손절",
+                "fillStatus": "filled",
+                "filledAt": "2026-10-14T15:00:00+09:00",
+                "fillPrice": 237500.0,
+                "filledQuantityPct": 100.0,
+                "slippagePct": 0.0,
+                "barTimestamp": "2026-10-14T15:00:00+09:00",
+                "barOpen": 262500.0,
+                "barHigh": 263000.0,
+                "barLow": 236500.0,
+                "barClose": 237500.0,
+                "fillRule": "stop_close"
+              }
+            ],
+            "caseViews": {
+              "recommendation": {
+                "summary": {
+                  "candidateCount": 0,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 0,
+                  "winRate": null,
+                  "avgNetReturnPct": null,
+                  "cumNetReturnPct": null,
+                  "maxDrawdownPct": null,
+                  "degradedCount": 0,
+                  "ambiguousCount": 0,
+                  "unfilledRate": null
+                },
+                "stocks": [],
+                "days": [],
+                "fills": []
+              },
+              "a7plus": {
+                "summary": {
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "stocks": [
+                  {
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "grade": "A",
+                    "replayGrade": "A",
+                    "gradeScore": 7.0,
+                    "tradeCount": 1,
+                    "winRate": 0.0,
+                    "avgNetReturnPct": -7.9781,
+                    "cumNetReturnPct": -7.9781,
+                    "lastReplayDate": "2026-10-13",
+                    "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+                    "lastEntryFillPrice": 149649.5,
+                    "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+                    "lastExitAvgFillPrice": 138000.0,
+                    "lastExitFillPrice": 138000.0,
+                    "lastTradeStatus": "closed"
+                  }
+                ],
+                "days": [
+                  {
+                    "date": "2026-10-13",
+                    "summaryFile": "replay_summary_20261013.json",
+                    "ordersFile": "sim_orders_20261013.json",
+                    "fillsFile": "sim_fills_20261013.json",
+                    "pointInTime": true,
+                    "pointInTimeStatus": "confirmed",
+                    "skippedReason": "",
+                    "trades": [
+                      {
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "grade": "A",
+                        "replayGrade": "A",
+                        "gradeScore": 7.0,
+                        "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                        "entryFillPrice": 149649.5,
+                        "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                        "exitAvgFillPrice": 138000.0,
+                        "exitLastFillPrice": 138000.0,
+                        "tradeStatus": "closed",
+                        "closedReason": "stop_close",
+                        "netReturnPct": -7.9781,
+                        "mixedExitPolicy": {
+                          "version": "mixed-exit-v1-balanced",
+                          "policyKey": "reversal-a7plus-balanced",
+                          "active": true,
+                          "stopExecution": "close",
+                          "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                          "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                          "positionWeightMultiplier": 0.5,
+                          "intradayRiskRule": {
+                            "active": true,
+                            "triggerPct": -5.0,
+                            "action": "50% 축소",
+                            "timing": "10:00 또는 14:00 확인",
+                            "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                            "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                          },
+                          "volatilityOverlay": {
+                            "active": true,
+                            "mode": "high-volatility",
+                            "label": "고변동성 방어",
+                            "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                            "triggerMetrics": {
+                              "blendedState": "volatile",
+                              "marketState": "volatile",
+                              "stockState": "volatile",
+                              "atrPct10": 7.28,
+                              "todayRangePct": 9.63,
+                              "returnStd20": 4.93,
+                              "vkospi": 48.76
+                            },
+                            "originalTakeProfitStages": [
+                              {
+                                "targetPct": 2.0,
+                                "quantityPct": 50.0
+                              },
+                              {
+                                "targetPct": 10.0,
+                                "quantityPct": 50.0
+                              }
+                            ],
+                            "adjustedTakeProfitStages": [
+                              {
+                                "targetPct": 2.0,
+                                "quantityPct": 60.0
+                              },
+                              {
+                                "targetPct": 8.0,
+                                "quantityPct": 40.0
+                              }
+                            ],
+                            "positionWeightMultiplier": 0.5
+                          },
+                          "label": "반등 × 7&A",
+                          "priority": 1,
+                          "strategyCase": "reversal",
+                          "recommendationCase": "a7plus",
+                          "stopPct": -2.0,
+                          "takeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 60.0
+                            },
+                            {
+                              "targetPct": 8.0,
+                              "quantityPct": 40.0
+                            }
+                          ],
+                          "positionWeightHint": "half",
+                          "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                        },
+                        "remainingQuantityPct": 0.0
+                      }
+                    ],
+                    "candidates": [
+                      {
+                        "strategy": "reversal",
+                        "name": "심텍",
+                        "code": "222800",
+                        "takeProfitProfileKey": "conservative",
+                        "takeProfitProfileLabel": "보수형",
+                        "originalGrade": "A",
+                        "replayGrade": "A",
+                        "gradeScore": 7.0,
+                        "strictScore": 7.0,
+                        "signalScore": 7.0,
+                        "entryPrice": 149500.0,
+                        "entryPriceAvailable": true,
+                        "statusLabel": "관심후보(약세·소액)",
+                        "mixedExitPolicy": {
+                          "version": "mixed-exit-v1-balanced",
+                          "policyKey": "reversal-a7plus-balanced",
+                          "active": true,
+                          "stopExecution": "close",
+                          "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                          "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                          "positionWeightMultiplier": 0.5,
+                          "intradayRiskRule": {
+                            "active": true,
+                            "triggerPct": -5.0,
+                            "action": "50% 축소",
+                            "timing": "10:00 또는 14:00 확인",
+                            "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                            "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                          },
+                          "volatilityOverlay": {
+                            "active": true,
+                            "mode": "high-volatility",
+                            "label": "고변동성 방어",
+                            "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                            "triggerMetrics": {
+                              "blendedState": "volatile",
+                              "marketState": "volatile",
+                              "stockState": "volatile",
+                              "atrPct10": 7.28,
+                              "todayRangePct": 9.63,
+                              "returnStd20": 4.93,
+                              "vkospi": 48.76
+                            },
+                            "originalTakeProfitStages": [
+                              {
+                                "targetPct": 2.0,
+                                "quantityPct": 50.0
+                              },
+                              {
+                                "targetPct": 10.0,
+                                "quantityPct": 50.0
+                              }
+                            ],
+                            "adjustedTakeProfitStages": [
+                              {
+                                "targetPct": 2.0,
+                                "quantityPct": 60.0
+                              },
+                              {
+                                "targetPct": 8.0,
+                                "quantityPct": 40.0
+                              }
+                            ],
+                            "positionWeightMultiplier": 0.5
+                          },
+                          "label": "반등 × 7&A",
+                          "priority": 1,
+                          "strategyCase": "reversal",
+                          "recommendationCase": "a7plus",
+                          "stopPct": -2.0,
+                          "takeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 60.0
+                            },
+                            {
+                              "targetPct": 8.0,
+                              "quantityPct": 40.0
+                            }
+                          ],
+                          "positionWeightHint": "half",
+                          "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                        },
+                        "entryEligibleOriginal": false,
+                        "historyRecommendation": false,
+                        "replayIncluded": false,
+                        "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                        "replayA7Plus": true,
+                        "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                        "pullbackReplayGateOk": true,
+                        "qualityGateOk": true,
+                        "entryEligible": false,
+                        "entryWatch": false,
+                        "entryBlockers": [],
+                        "setupQuality": "setup_weak",
+                        "payloadSourceMode": "live",
+                        "inputArchiveVersion": "jongga_inputs.v1",
+                        "rebuildable": true,
+                        "historyRecommendationSourceMode": "",
+                        "pointInTime": true,
+                        "pointInTimeStatus": "confirmed"
+                      }
+                    ],
+                    "results": [
+                      {
+                        "runId": "replay-20261014-060600-4c004663",
+                        "date": "2026-10-13",
+                        "variant": "stable",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "entryMode": "close",
+                        "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                        "entryFillPrice": 149649.5,
+                        "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                        "exitAvgFillPrice": 138000.0,
+                        "exitLastFillPrice": 138000.0,
+                        "netReturnPct": -7.9781,
+                        "tradeStatus": "closed",
+                        "ambiguousCount": 0,
+                        "remainingQuantityPct": 0.0,
+                        "closedReason": "stop_close",
+                        "exitFillCount": 1,
+                        "filledExitQuantityPct": 100.0,
+                        "regimeBucket": "weak",
+                        "vkospiTier": "weak",
+                        "gapGrade": "G-C",
+                        "dataQualityStatus": "degraded",
+                        "dataQuality": {
+                          "status": "degraded",
+                          "barUnit": "1m",
+                          "sources": [
+                            "daily_ohlc_fallback"
+                          ],
+                          "reason": "synthetic one-day replay derived from daily OHLC"
+                        },
+                        "nextTradingDate": "20261014",
+                        "proxyOutcomeStatus": "resolved",
+                        "proxyRealizedReturnPct": -2.0,
+                        "replayGrade": "A",
+                        "gradeScore": 7.0,
+                        "replayIncluded": false,
+                        "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                        "historyRecommendation": false,
+                        "historyRecommendationSourceMode": "",
+                        "entryEligible": false,
+                        "entryEligibleOriginal": false,
+                        "setupQuality": "setup_weak",
+                        "statusLabel": "관심후보(약세·소액)",
+                        "takeProfitProfileKey": "conservative",
+                        "takeProfitProfileLabel": "보수형",
+                        "mixedExitPolicy": {
+                          "version": "mixed-exit-v1-balanced",
+                          "policyKey": "reversal-a7plus-balanced",
+                          "active": true,
+                          "stopExecution": "close",
+                          "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                          "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                          "positionWeightMultiplier": 0.5,
+                          "intradayRiskRule": {
+                            "active": true,
+                            "triggerPct": -5.0,
+                            "action": "50% 축소",
+                            "timing": "10:00 또는 14:00 확인",
+                            "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                            "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                          },
+                          "volatilityOverlay": {
+                            "active": true,
+                            "mode": "high-volatility",
+                            "label": "고변동성 방어",
+                            "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                            "triggerMetrics": {
+                              "blendedState": "volatile",
+                              "marketState": "volatile",
+                              "stockState": "volatile",
+                              "atrPct10": 7.28,
+                              "todayRangePct": 9.63,
+                              "returnStd20": 4.93,
+                              "vkospi": 48.76
+                            },
+                            "originalTakeProfitStages": [
+                              {
+                                "targetPct": 2.0,
+                                "quantityPct": 50.0
+                              },
+                              {
+                                "targetPct": 10.0,
+                                "quantityPct": 50.0
+                              }
+                            ],
+                            "adjustedTakeProfitStages": [
+                              {
+                                "targetPct": 2.0,
+                                "quantityPct": 60.0
+                              },
+                              {
+                                "targetPct": 8.0,
+                                "quantityPct": 40.0
+                              }
+                            ],
+                            "positionWeightMultiplier": 0.5
+                          },
+                          "label": "반등 × 7&A",
+                          "priority": 1,
+                          "strategyCase": "reversal",
+                          "recommendationCase": "a7plus",
+                          "stopPct": -2.0,
+                          "takeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 60.0
+                            },
+                            {
+                              "targetPct": 8.0,
+                              "quantityPct": 40.0
+                            }
+                          ],
+                          "positionWeightHint": "half",
+                          "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                        },
+                        "payloadSourceMode": "live",
+                        "inputArchiveVersion": "jongga_inputs.v1",
+                        "rebuildable": true,
+                        "pointInTime": true,
+                        "pointInTimeStatus": "confirmed"
+                      }
+                    ],
+                    "orders": [
+                      {
+                        "orderId": "20261013|stable|reversal|222800-premarket",
+                        "runId": "replay-20261014-060600-4c004663",
+                        "date": "2026-10-13",
+                        "variant": "stable",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "side": "SELL",
+                        "orderType": "LIMIT",
+                        "requestedAt": "2026-10-14T09:00:00+09:00",
+                        "requestedPrice": 152500.0,
+                        "quantityPct": 60.0,
+                        "reason": "🌅 프리마켓",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "stageKey": "premarket",
+                        "activeFrom": "2026-10-14T09:00:00+09:00",
+                        "activeUntil": "2026-10-14T10:00:00+09:00",
+                        "finalStatus": "cancelled"
+                      },
+                      {
+                        "orderId": "20261013|stable|reversal|222800-openPhase",
+                        "runId": "replay-20261014-060600-4c004663",
+                        "date": "2026-10-13",
+                        "variant": "stable",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "side": "SELL",
+                        "orderType": "LIMIT",
+                        "requestedAt": "2026-10-14T09:00:00+09:00",
+                        "requestedPrice": 156600.0,
+                        "quantityPct": 40.0,
+                        "reason": "🔔 장초반",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "stageKey": "openPhase",
+                        "activeFrom": "2026-10-14T09:00:00+09:00",
+                        "activeUntil": "2026-10-14T10:00:00+09:00",
+                        "finalStatus": "cancelled"
+                      },
+                      {
+                        "orderId": "20261013|stable|reversal|222800-stop",
+                        "runId": "replay-20261014-060600-4c004663",
+                        "date": "2026-10-13",
+                        "variant": "stable",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "side": "SELL",
+                        "orderType": "STOP",
+                        "requestedAt": "2026-10-14T09:00:00+09:00",
+                        "requestedPrice": 146510.0,
+                        "quantityPct": 100.0,
+                        "reason": "🛑 손절",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "stageKey": "stop",
+                        "activeFrom": "",
+                        "activeUntil": "",
+                        "finalStatus": "filled"
+                      },
+                      {
+                        "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                        "runId": "replay-20261014-060600-4c004663",
+                        "date": "2026-10-13",
+                        "variant": "stable",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "side": "SELL",
+                        "orderType": "MKT",
+                        "requestedAt": "2026-10-14T15:00:00+09:00",
+                        "requestedPrice": 138000.0,
+                        "quantityPct": 100.0,
+                        "reason": "3일차 종가 컷오프 청산",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "stageKey": "finalCutoff",
+                        "activeFrom": "2026-10-14T15:00:00+09:00",
+                        "activeUntil": "2026-10-14T15:00:00+09:00",
+                        "finalStatus": "cancelled"
+                      }
+                    ],
+                    "fills": [
+                      {
+                        "orderId": "20261013|stable|reversal|222800-entry",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "side": "BUY",
+                        "stageKey": "entry",
+                        "reason": "close_entry",
+                        "fillStatus": "filled",
+                        "filledAt": "2026-10-13T15:30:00+09:00",
+                        "fillPrice": 149649.5,
+                        "filledQuantityPct": 100.0,
+                        "slippagePct": 0.1,
+                        "barTimestamp": "2026-10-13T15:30:00+09:00",
+                        "barOpen": 149500.0,
+                        "barHigh": 149500.0,
+                        "barLow": 149500.0,
+                        "barClose": 149500.0,
+                        "fillRule": "close_slippage"
+                      },
+                      {
+                        "orderId": "20261013|stable|reversal|222800-stop",
+                        "sourceEntryKey": "20261013|stable|reversal|222800",
+                        "strategy": "reversal",
+                        "code": "222800",
+                        "name": "심텍",
+                        "side": "SELL",
+                        "stageKey": "stop",
+                        "reason": "🛑 손절",
+                        "fillStatus": "filled",
+                        "filledAt": "2026-10-14T15:00:00+09:00",
+                        "fillPrice": 138000.0,
+                        "filledQuantityPct": 100.0,
+                        "slippagePct": 0.0,
+                        "barTimestamp": "2026-10-14T15:00:00+09:00",
+                        "barOpen": 150300.0,
+                        "barHigh": 151600.0,
+                        "barLow": 137900.0,
+                        "barClose": 138000.0,
+                        "fillRule": "stop_close"
+                      }
+                    ],
+                    "candidateCount": 1,
+                    "eligibleCount": 0,
+                    "includedCount": 0,
+                    "tradeCount": 1,
+                    "winRate": 0.0,
+                    "avgNetReturnPct": -7.9781,
+                    "cumNetReturnPct": -7.9781,
+                    "maxDrawdownPct": 7.9781,
+                    "degradedCount": 1,
+                    "ambiguousCount": 0,
+                    "unfilledRate": 0.0
+                  }
+                ],
+                "fills": [
+                  {
+                    "orderId": "20261013|stable|reversal|222800-entry",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "BUY",
+                    "stageKey": "entry",
+                    "reason": "close_entry",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-13T15:30:00+09:00",
+                    "fillPrice": 149649.5,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.1,
+                    "barTimestamp": "2026-10-13T15:30:00+09:00",
+                    "barOpen": 149500.0,
+                    "barHigh": 149500.0,
+                    "barLow": 149500.0,
+                    "barClose": 149500.0,
+                    "fillRule": "close_slippage"
+                  },
+                  {
+                    "orderId": "20261013|stable|reversal|222800-stop",
+                    "sourceEntryKey": "20261013|stable|reversal|222800",
+                    "strategy": "reversal",
+                    "code": "222800",
+                    "name": "심텍",
+                    "side": "SELL",
+                    "stageKey": "stop",
+                    "reason": "🛑 손절",
+                    "fillStatus": "filled",
+                    "filledAt": "2026-10-14T15:00:00+09:00",
+                    "fillPrice": 138000.0,
+                    "filledQuantityPct": 100.0,
+                    "slippagePct": 0.0,
+                    "barTimestamp": "2026-10-14T15:00:00+09:00",
+                    "barOpen": 150300.0,
+                    "barHigh": 151600.0,
+                    "barLow": 137900.0,
+                    "barClose": 138000.0,
+                    "fillRule": "stop_close"
+                  }
+                ]
+              }
+            }
+          }
+        }
       }
     ],
-    "latestRunId": "replay-20261013-060603-1d26ab44",
-    "latestBuiltDate": "2026-10-12"
+    "latestRunId": "replay-20261014-060600-4c004663",
+    "latestBuiltDate": "2026-10-13"
   },
   "latestSummary": {
-    "candidateCount": 720,
+    "candidateCount": 722,
     "eligibleCount": 21,
     "includedCount": 36,
-    "tradeCount": 639,
-    "winRate": 0.4523,
-    "avgNetReturnPct": -0.8942,
-    "cumNetReturnPct": -38.4585,
-    "maxDrawdownPct": 39.9327,
-    "degradedCount": 639,
+    "tradeCount": 641,
+    "winRate": 0.4509,
+    "avgNetReturnPct": -0.917,
+    "cumNetReturnPct": -43.5007,
+    "maxDrawdownPct": 44.8541,
+    "degradedCount": 641,
     "ambiguousCount": 0,
-    "unfilledRate": 0.2505,
+    "unfilledRate": 0.2499,
     "overall": {
-      "candidateCount": 720,
+      "candidateCount": 722,
       "eligibleCount": 21,
       "includedCount": 36,
-      "tradeCount": 639,
-      "winRate": 0.4523,
-      "avgNetReturnPct": -0.8942,
-      "cumNetReturnPct": -38.4585,
-      "maxDrawdownPct": 39.9327,
-      "degradedCount": 639,
+      "tradeCount": 641,
+      "winRate": 0.4509,
+      "avgNetReturnPct": -0.917,
+      "cumNetReturnPct": -43.5007,
+      "maxDrawdownPct": 44.8541,
+      "degradedCount": 641,
       "ambiguousCount": 0,
-      "unfilledRate": 0.2505
+      "unfilledRate": 0.2499
     },
     "comparisonByCase": {
       "all": {
         "caseKey": "all",
         "label": "전체 후보",
-        "candidateCount": 720,
+        "candidateCount": 722,
         "eligibleCount": 21,
         "includedCount": 36,
-        "tradeCount": 639,
-        "winRate": 0.4523,
-        "avgNetReturnPct": -0.8942,
-        "cumNetReturnPct": -38.4585,
-        "maxDrawdownPct": 39.9327,
-        "degradedCount": 639,
+        "tradeCount": 641,
+        "winRate": 0.4509,
+        "avgNetReturnPct": -0.917,
+        "cumNetReturnPct": -43.5007,
+        "maxDrawdownPct": 44.8541,
+        "degradedCount": 641,
         "ambiguousCount": 0,
-        "unfilledRate": 0.2505
+        "unfilledRate": 0.2499
       },
       "a7plus": {
         "caseKey": "a7plus",
         "label": "7&A",
-        "candidateCount": 291,
+        "candidateCount": 292,
         "eligibleCount": 16,
         "includedCount": 36,
-        "tradeCount": 251,
-        "winRate": 0.506,
-        "avgNetReturnPct": -0.7016,
-        "cumNetReturnPct": -26.2123,
-        "maxDrawdownPct": 35.4392,
-        "degradedCount": 251,
+        "tradeCount": 252,
+        "winRate": 0.504,
+        "avgNetReturnPct": -0.7305,
+        "cumNetReturnPct": -32.0991,
+        "maxDrawdownPct": 39.6719,
+        "degradedCount": 252,
         "ambiguousCount": 0,
-        "unfilledRate": 0.1863
+        "unfilledRate": 0.1857
       },
       "recommendation": {
         "caseKey": "recommendation",
@@ -1452676,47 +1457698,47 @@ window.JONGGA_REPLAY_RUNS = {
         }
       },
       "reversal": {
-        "candidateCount": 290,
+        "candidateCount": 292,
         "eligibleCount": 3,
         "includedCount": 31,
-        "tradeCount": 259,
-        "winRate": 0.5753,
-        "avgNetReturnPct": -0.0697,
-        "cumNetReturnPct": -7.2515,
-        "maxDrawdownPct": 17.2651,
-        "degradedCount": 259,
+        "tradeCount": 261,
+        "winRate": 0.5709,
+        "avgNetReturnPct": -0.132,
+        "cumNetReturnPct": -14.8506,
+        "maxDrawdownPct": 24.0438,
+        "degradedCount": 261,
         "ambiguousCount": 0,
-        "unfilledRate": 0.1699,
+        "unfilledRate": 0.1686,
         "comparisonByCase": {
           "all": {
             "caseKey": "all",
             "label": "전체 후보",
-            "candidateCount": 290,
+            "candidateCount": 292,
             "eligibleCount": 3,
             "includedCount": 31,
-            "tradeCount": 259,
-            "winRate": 0.5753,
-            "avgNetReturnPct": -0.0697,
-            "cumNetReturnPct": -7.2515,
-            "maxDrawdownPct": 17.2651,
-            "degradedCount": 259,
+            "tradeCount": 261,
+            "winRate": 0.5709,
+            "avgNetReturnPct": -0.132,
+            "cumNetReturnPct": -14.8506,
+            "maxDrawdownPct": 24.0438,
+            "degradedCount": 261,
             "ambiguousCount": 0,
-            "unfilledRate": 0.1699
+            "unfilledRate": 0.1686
           },
           "a7plus": {
             "caseKey": "a7plus",
             "label": "7&A",
-            "candidateCount": 163,
+            "candidateCount": 164,
             "eligibleCount": 3,
             "includedCount": 31,
-            "tradeCount": 145,
-            "winRate": 0.5241,
-            "avgNetReturnPct": -0.3583,
-            "cumNetReturnPct": -17.3027,
-            "maxDrawdownPct": 20.7649,
-            "degradedCount": 145,
+            "tradeCount": 146,
+            "winRate": 0.5205,
+            "avgNetReturnPct": -0.4105,
+            "cumNetReturnPct": -23.9003,
+            "maxDrawdownPct": 27.0864,
+            "degradedCount": 146,
             "ambiguousCount": 0,
-            "unfilledRate": 0.169
+            "unfilledRate": 0.1678
           },
           "recommendation": {
             "caseKey": "recommendation",
@@ -1455323,25 +1460345,6 @@ window.JONGGA_REPLAY_RUNS = {
       },
       {
         "strategy": "reversal",
-        "code": "036930",
-        "name": "주성엔지니어링",
-        "grade": "A",
-        "replayGrade": "A",
-        "gradeScore": 8.4,
-        "tradeCount": 10,
-        "winRate": 0.8,
-        "avgNetReturnPct": 1.4237,
-        "cumNetReturnPct": 14.3562,
-        "lastReplayDate": "2026-09-07",
-        "lastEntryFilledAt": "2026-09-07T15:30:00+09:00",
-        "lastEntryFillPrice": 187687.5,
-        "lastExitFilledAt": "2026-09-08T10:00:00+09:00",
-        "lastExitAvgFillPrice": 194508.75,
-        "lastExitFillPrice": 196200.0,
-        "lastTradeStatus": "closed"
-      },
-      {
-        "strategy": "reversal",
         "code": "017670",
         "name": "SK텔레콤",
         "grade": "B",
@@ -1455490,6 +1460493,25 @@ window.JONGGA_REPLAY_RUNS = {
         "lastExitFilledAt": "2026-08-07T15:00:00+09:00",
         "lastExitAvgFillPrice": 199000.0,
         "lastExitFillPrice": 199000.0,
+        "lastTradeStatus": "closed"
+      },
+      {
+        "strategy": "reversal",
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "grade": "B",
+        "replayGrade": "B",
+        "gradeScore": 6.2,
+        "tradeCount": 11,
+        "winRate": 0.7273,
+        "avgNetReturnPct": 0.5299,
+        "cumNetReturnPct": 4.7408,
+        "lastReplayDate": "2026-10-13",
+        "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+        "lastEntryFillPrice": 258758.5,
+        "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+        "lastExitAvgFillPrice": 237500.0,
+        "lastExitFillPrice": 237500.0,
         "lastTradeStatus": "closed"
       },
       {
@@ -1455984,25 +1461006,6 @@ window.JONGGA_REPLAY_RUNS = {
         "lastExitFilledAt": "2026-08-24T10:00:00+09:00",
         "lastExitAvgFillPrice": 321500.0,
         "lastExitFillPrice": 321500.0,
-        "lastTradeStatus": "closed"
-      },
-      {
-        "strategy": "reversal",
-        "code": "222800",
-        "name": "심텍",
-        "grade": "S",
-        "replayGrade": "S",
-        "gradeScore": 10.0,
-        "tradeCount": 1,
-        "winRate": 1.0,
-        "avgNetReturnPct": 0.7591,
-        "cumNetReturnPct": 0.7591,
-        "lastReplayDate": "2026-09-22",
-        "lastEntryFilledAt": "2026-09-22T15:30:00+09:00",
-        "lastEntryFillPrice": 148248.1,
-        "lastExitFilledAt": "2026-09-23T10:00:00+09:00",
-        "lastExitAvgFillPrice": 149687.75,
-        "lastExitFillPrice": 148200.0,
         "lastTradeStatus": "closed"
       },
       {
@@ -1456729,6 +1461732,25 @@ window.JONGGA_REPLAY_RUNS = {
       },
       {
         "strategy": "reversal",
+        "code": "222800",
+        "name": "심텍",
+        "grade": "A",
+        "replayGrade": "A",
+        "gradeScore": 7.0,
+        "tradeCount": 2,
+        "winRate": 0.5,
+        "avgNetReturnPct": -3.6095,
+        "cumNetReturnPct": -7.2796,
+        "lastReplayDate": "2026-10-13",
+        "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+        "lastEntryFillPrice": 149649.5,
+        "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+        "lastExitAvgFillPrice": 138000.0,
+        "lastExitFillPrice": 138000.0,
+        "lastTradeStatus": "closed"
+      },
+      {
+        "strategy": "reversal",
         "code": "128940",
         "name": "한미약품",
         "grade": "B",
@@ -1457024,47 +1462046,47 @@ window.JONGGA_REPLAY_RUNS = {
         }
       },
       "reversal": {
-        "candidateCount": 290,
+        "candidateCount": 292,
         "eligibleCount": 3,
         "includedCount": 31,
-        "tradeCount": 259,
-        "winRate": 0.5753,
-        "avgNetReturnPct": -0.0697,
-        "cumNetReturnPct": -7.2515,
-        "maxDrawdownPct": 17.2651,
-        "degradedCount": 259,
+        "tradeCount": 261,
+        "winRate": 0.5709,
+        "avgNetReturnPct": -0.132,
+        "cumNetReturnPct": -14.8506,
+        "maxDrawdownPct": 24.0438,
+        "degradedCount": 261,
         "ambiguousCount": 0,
-        "unfilledRate": 0.1699,
+        "unfilledRate": 0.1686,
         "comparisonByCase": {
           "all": {
             "caseKey": "all",
             "label": "전체 후보",
-            "candidateCount": 290,
+            "candidateCount": 292,
             "eligibleCount": 3,
             "includedCount": 31,
-            "tradeCount": 259,
-            "winRate": 0.5753,
-            "avgNetReturnPct": -0.0697,
-            "cumNetReturnPct": -7.2515,
-            "maxDrawdownPct": 17.2651,
-            "degradedCount": 259,
+            "tradeCount": 261,
+            "winRate": 0.5709,
+            "avgNetReturnPct": -0.132,
+            "cumNetReturnPct": -14.8506,
+            "maxDrawdownPct": 24.0438,
+            "degradedCount": 261,
             "ambiguousCount": 0,
-            "unfilledRate": 0.1699
+            "unfilledRate": 0.1686
           },
           "a7plus": {
             "caseKey": "a7plus",
             "label": "7&A",
-            "candidateCount": 163,
+            "candidateCount": 164,
             "eligibleCount": 3,
             "includedCount": 31,
-            "tradeCount": 145,
-            "winRate": 0.5241,
-            "avgNetReturnPct": -0.3583,
-            "cumNetReturnPct": -17.3027,
-            "maxDrawdownPct": 20.7649,
-            "degradedCount": 145,
+            "tradeCount": 146,
+            "winRate": 0.5205,
+            "avgNetReturnPct": -0.4105,
+            "cumNetReturnPct": -23.9003,
+            "maxDrawdownPct": 27.0864,
+            "degradedCount": 146,
             "ambiguousCount": 0,
-            "unfilledRate": 0.169
+            "unfilledRate": 0.1678
           },
           "recommendation": {
             "caseKey": "recommendation",
@@ -1457154,12 +1462176,12 @@ window.JONGGA_REPLAY_RUNS = {
       "reversal|a7plus": {
         "strategy": "reversal",
         "recommendationCase": "a7plus",
-        "sampleCount": 145,
-        "tradeCount": 145,
-        "winRate": 0.5241,
-        "avgNetReturnPct": -0.3583,
-        "cumNetReturnPct": -17.3027,
-        "maxDrawdownPct": 20.7649,
+        "sampleCount": 146,
+        "tradeCount": 146,
+        "winRate": 0.5205,
+        "avgNetReturnPct": -0.4105,
+        "cumNetReturnPct": -23.9003,
+        "maxDrawdownPct": 27.0864,
         "recommendedExitPolicyKey": "reversal-a7plus-balanced"
       },
       "reversal|recommendation": {
@@ -1457204,11 +1462226,11 @@ window.JONGGA_REPLAY_RUNS = {
         "cumNetReturnPct": -62.4329
       },
       "reversal|conservative": {
-        "tradeCount": 259,
-        "sampleCount": 259,
-        "winRate": 0.5753,
-        "avgNetReturnPct": -0.0697,
-        "cumNetReturnPct": -7.2515
+        "tradeCount": 261,
+        "sampleCount": 261,
+        "winRate": 0.5709,
+        "avgNetReturnPct": -0.132,
+        "cumNetReturnPct": -14.8506
       },
       "pullback|aggressive": {
         "tradeCount": 2,
@@ -1457528,11 +1462550,11 @@ window.JONGGA_REPLAY_RUNS = {
         "cumNetReturnPct": -8.289
       },
       "reversal|weak|weak|G-C|conservative": {
-        "tradeCount": 39,
-        "sampleCount": 39,
-        "winRate": 0.7692,
-        "avgNetReturnPct": 1.4653,
-        "cumNetReturnPct": 7.1005
+        "tradeCount": 41,
+        "sampleCount": 41,
+        "winRate": 0.7317,
+        "avgNetReturnPct": 0.9941,
+        "cumNetReturnPct": -1.6745
       },
       "reversal|weak|weak|G-B|conservative": {
         "tradeCount": 23,
@@ -1457753,7 +1462775,7 @@ window.JONGGA_REPLAY_RUNS = {
       }
     },
     "pointInTimeStatusCounts": {
-      "confirmed": 91,
+      "confirmed": 92,
       "historical_regen": 0,
       "legacy_unknown": 0
     },
@@ -1457761,2531 +1462783,8 @@ window.JONGGA_REPLAY_RUNS = {
     "legacyUnknownIncludedDays": 0,
     "pointInTimeWarnings": []
   },
-  "runCount": 84,
+  "runCount": 85,
   "runs": [
-    {
-      "runId": "replay-20260928-060803-bada2908",
-      "generatedAt": "2026-09-28T06:08:03",
-      "from": "2026-09-25",
-      "to": "2026-09-25",
-      "variant": "stable",
-      "bar": "1m",
-      "thresholdProfile": "current",
-      "entryMode": "close",
-      "replayPolicy": {
-        "mode": "relaxed",
-        "label": "완화 모드",
-        "summary": "D+1만 있어도 replay 포함",
-        "detail": "D+2가 있으면 3일차까지 연장",
-        "minFollowupDays": 1,
-        "maxFollowupDays": 2
-      },
-      "replayRule": {
-        "ruleVersion": "2026-06-11-mixed-volatility-v1",
-        "variant": "stable",
-        "thresholdProfile": "current",
-        "bar": "1m",
-        "includeGradeScoreMin": 8.0,
-        "includeGradeMin": "A",
-        "validationPolicy": {
-          "mode": "relaxed",
-          "label": "완화 모드",
-          "summary": "D+1만 있어도 replay 포함",
-          "detail": "D+2가 있으면 3일차까지 연장",
-          "minFollowupDays": 1,
-          "maxFollowupDays": 2
-        }
-      },
-      "replayRuleSignature": "c7ca3185f6266b503b3b4c9e5c5c078089a5b9d7",
-      "analysisDates": [
-        "2026-09-25"
-      ],
-      "latestBuiltDate": "2026-09-25",
-      "days": [
-        {
-          "date": "2026-09-25",
-          "summaryFile": "replay_summary_20260925.json",
-          "ordersFile": "sim_orders_20260925.json",
-          "fillsFile": "sim_fills_20260925.json",
-          "candidateCount": 8,
-          "eligibleCount": 0,
-          "includedCount": 0,
-          "tradeCount": 0,
-          "degradedCount": 0,
-          "ambiguousCount": 0,
-          "byStrategy": {
-            "pullback": {
-              "candidateCount": 2,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            },
-            "accumulation": {
-              "candidateCount": 3,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 3,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 1,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            },
-            "breakout": {
-              "candidateCount": 1,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 1,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            },
-            "reversal": {
-              "candidateCount": 2,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            }
-          },
-          "pointInTime": true,
-          "pointInTimeStatus": "confirmed",
-          "skippedReason": "",
-          "candidates": [
-            {
-              "strategy": "pullback",
-              "name": "삼성전자",
-              "code": "005930",
-              "takeProfitProfileKey": "balanced",
-              "takeProfitProfileLabel": "1차 저항 반영형",
-              "originalGrade": "S",
-              "replayGrade": "S",
-              "gradeScore": 9.3,
-              "strictScore": 11.6,
-              "signalScore": 11.6,
-              "entryPrice": 286500.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-pullback",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": true,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": false,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [
-                "핵심 Gate 미충족: G0",
-                "매매금지(핵심 Gate 미충족: G0)"
-              ],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "pullback",
-              "name": "SK스퀘어",
-              "code": "402340",
-              "takeProfitProfileKey": "balanced",
-              "takeProfitProfileLabel": "1차 저항 반영형",
-              "originalGrade": "A",
-              "replayGrade": "A",
-              "gradeScore": 7.4,
-              "strictScore": 9.2,
-              "signalScore": 9.2,
-              "entryPrice": 1181000.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-pullback",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": true,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": false,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [
-                "핵심 Gate 미충족: G0",
-                "핵심 Gate 미충족: G1",
-                "매매금지(핵심 Gate 미충족: G0, G1)"
-              ],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "accumulation",
-              "name": "삼성전자",
-              "code": "005930",
-              "takeProfitProfileKey": "conservative",
-              "takeProfitProfileLabel": "저항 우선형",
-              "originalGrade": "A",
-              "replayGrade": "A",
-              "gradeScore": 7.4,
-              "strictScore": 10.4,
-              "signalScore": 10.4,
-              "entryPrice": 286500.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "관심후보",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-accumulation",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": true,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": true,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "accumulation",
-              "name": "SK스퀘어",
-              "code": "402340",
-              "takeProfitProfileKey": "conservative",
-              "takeProfitProfileLabel": "저항 우선형",
-              "originalGrade": "B",
-              "replayGrade": "B",
-              "gradeScore": 6.3,
-              "strictScore": 8.8,
-              "signalScore": 8.8,
-              "entryPrice": 1181000.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "관심후보",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-accumulation",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": false,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": true,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": true,
-              "entryBlockers": [],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "accumulation",
-              "name": "SK이노베이션",
-              "code": "096770",
-              "takeProfitProfileKey": "conservative",
-              "takeProfitProfileLabel": "저항 우선형",
-              "originalGrade": "B",
-              "replayGrade": "B",
-              "gradeScore": 5.7,
-              "strictScore": 8.0,
-              "signalScore": 8.0,
-              "entryPrice": 148700.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-accumulation",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": false,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": true,
-              "qualityGateOk": false,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [
-                "핵심 Gate 미충족: Q1",
-                "매매금지(핵심 Gate 미충족: Q1)"
-              ],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "breakout",
-              "name": "대한항공",
-              "code": "003490",
-              "takeProfitProfileKey": "conservative",
-              "takeProfitProfileLabel": "저항 우선형",
-              "originalGrade": "C",
-              "replayGrade": "C",
-              "gradeScore": 4.6,
-              "strictScore": 5.7,
-              "signalScore": 5.7,
-              "entryPrice": 31500.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-breakout",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": false,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": true,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [
-                "핵심 Gate 미충족: G4",
-                "매매금지(핵심 Gate 미충족: G4)",
-                "등급 C — 진입 최소 A, B, S"
-              ],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "reversal",
-              "name": "SK스퀘어",
-              "code": "402340",
-              "takeProfitProfileKey": "conservative",
-              "takeProfitProfileLabel": "보수형",
-              "originalGrade": "A",
-              "replayGrade": "A",
-              "gradeScore": 7.4,
-              "strictScore": 7.4,
-              "signalScore": 7.4,
-              "entryPrice": 1181000.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "매매금지",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-reversal",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": true,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": true,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [
-                "핵심 Gate 미충족: G1",
-                "핵심 Gate 미충족: G2",
-                "핵심 Gate 미충족: G4",
-                "매매금지"
-              ],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            },
-            {
-              "strategy": "reversal",
-              "name": "SK이노베이션",
-              "code": "096770",
-              "takeProfitProfileKey": "conservative",
-              "takeProfitProfileLabel": "보수형",
-              "originalGrade": "A",
-              "replayGrade": "A",
-              "gradeScore": 7.4,
-              "strictScore": 7.4,
-              "signalScore": 7.4,
-              "entryPrice": 148700.0,
-              "entryPriceAvailable": true,
-              "statusLabel": "매매금지",
-              "mixedExitPolicy": {
-                "version": "mixed-exit-v1-balanced",
-                "policyKey": "observe-reversal",
-                "label": "관찰 전용",
-                "active": false,
-                "priority": null,
-                "strategyCase": "",
-                "recommendationCase": "",
-                "stopPct": null,
-                "stopExecution": "close",
-                "stopCondition": "",
-                "stopTiming": "자동 진입 제외",
-                "takeProfitStages": [],
-                "positionWeightHint": "observe",
-                "positionWeightMultiplier": 0.0,
-                "intradayRiskRule": {
-                  "active": false
-                },
-                "volatilityOverlay": {
-                  "active": false
-                },
-                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-              },
-              "entryEligibleOriginal": false,
-              "historyRecommendation": false,
-              "replayIncluded": false,
-              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-              "replayA7Plus": true,
-              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-              "pullbackReplayGateOk": true,
-              "qualityGateOk": true,
-              "entryEligible": false,
-              "entryWatch": false,
-              "entryBlockers": [
-                "핵심 Gate 미충족: G4",
-                "매매금지"
-              ],
-              "setupQuality": "setup_weak",
-              "payloadSourceMode": "live",
-              "inputArchiveVersion": "jongga_inputs.v1",
-              "rebuildable": true,
-              "historyRecommendationSourceMode": "",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed"
-            }
-          ],
-          "trades": [],
-          "results": [],
-          "orders": [],
-          "fills": []
-        }
-      ],
-      "summary": {
-        "candidateCount": 8,
-        "eligibleCount": 0,
-        "includedCount": 0,
-        "tradeCount": 0,
-        "winRate": null,
-        "avgNetReturnPct": null,
-        "cumNetReturnPct": null,
-        "maxDrawdownPct": null,
-        "degradedCount": 0,
-        "ambiguousCount": 0,
-        "unfilledRate": null,
-        "overall": {
-          "candidateCount": 8,
-          "eligibleCount": 0,
-          "includedCount": 0,
-          "tradeCount": 0,
-          "winRate": null,
-          "avgNetReturnPct": null,
-          "cumNetReturnPct": null,
-          "maxDrawdownPct": null,
-          "degradedCount": 0,
-          "ambiguousCount": 0,
-          "unfilledRate": null
-        },
-        "comparisonByCase": {
-          "all": {
-            "caseKey": "all",
-            "label": "전체 후보",
-            "candidateCount": 8,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null
-          },
-          "a7plus": {
-            "caseKey": "a7plus",
-            "label": "7&A",
-            "candidateCount": 5,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null
-          },
-          "recommendation": {
-            "caseKey": "recommendation",
-            "label": "추천 전용",
-            "candidateCount": 0,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null
-          }
-        },
-        "byStrategy": {
-          "pullback": {
-            "candidateCount": 2,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "accumulation": {
-            "candidateCount": 3,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 3,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "breakout": {
-            "candidateCount": 1,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "reversal": {
-            "candidateCount": 2,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          }
-        },
-        "byStock": [],
-        "strategyStats": {
-          "pullback": {
-            "candidateCount": 2,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "accumulation": {
-            "candidateCount": 3,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 3,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "breakout": {
-            "candidateCount": 1,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "reversal": {
-            "candidateCount": 2,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          }
-        },
-        "strategyRecommendationMatrix": {},
-        "byTakeProfitProfile": {},
-        "byTakeProfitProfileCell": {},
-        "pointInTimeStatusCounts": {
-          "confirmed": 1,
-          "historical_regen": 0,
-          "legacy_unknown": 0
-        },
-        "historicalRegenExcludedDays": 0,
-        "legacyUnknownIncludedDays": 0,
-        "pointInTimeWarnings": []
-      },
-      "strategyViews": {
-        "pullback": {
-          "summary": {
-            "candidateCount": 2,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "stocks": [],
-          "days": [
-            {
-              "date": "2026-09-25",
-              "summaryFile": "replay_summary_20260925.json",
-              "ordersFile": "sim_orders_20260925.json",
-              "fillsFile": "sim_fills_20260925.json",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed",
-              "skippedReason": "",
-              "trades": [],
-              "candidates": [
-                {
-                  "strategy": "pullback",
-                  "name": "삼성전자",
-                  "code": "005930",
-                  "takeProfitProfileKey": "balanced",
-                  "takeProfitProfileLabel": "1차 저항 반영형",
-                  "originalGrade": "S",
-                  "replayGrade": "S",
-                  "gradeScore": 9.3,
-                  "strictScore": 11.6,
-                  "signalScore": 11.6,
-                  "entryPrice": 286500.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "매매금지(핵심 Gate 미충족: G0)",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-pullback",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": true,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": false,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [
-                    "핵심 Gate 미충족: G0",
-                    "매매금지(핵심 Gate 미충족: G0)"
-                  ],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                },
-                {
-                  "strategy": "pullback",
-                  "name": "SK스퀘어",
-                  "code": "402340",
-                  "takeProfitProfileKey": "balanced",
-                  "takeProfitProfileLabel": "1차 저항 반영형",
-                  "originalGrade": "A",
-                  "replayGrade": "A",
-                  "gradeScore": 7.4,
-                  "strictScore": 9.2,
-                  "signalScore": 9.2,
-                  "entryPrice": 1181000.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "매매금지(핵심 Gate 미충족: G0, G1)",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-pullback",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": true,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": false,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [
-                    "핵심 Gate 미충족: G0",
-                    "핵심 Gate 미충족: G1",
-                    "매매금지(핵심 Gate 미충족: G0, G1)"
-                  ],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                }
-              ],
-              "results": [],
-              "orders": [],
-              "fills": [],
-              "candidateCount": 2,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            }
-          ],
-          "fills": [],
-          "caseViews": {
-            "recommendation": {
-              "summary": {
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            },
-            "a7plus": {
-              "summary": {
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            }
-          }
-        },
-        "accumulation": {
-          "summary": {
-            "candidateCount": 3,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 3,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "stocks": [],
-          "days": [
-            {
-              "date": "2026-09-25",
-              "summaryFile": "replay_summary_20260925.json",
-              "ordersFile": "sim_orders_20260925.json",
-              "fillsFile": "sim_fills_20260925.json",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed",
-              "skippedReason": "",
-              "trades": [],
-              "candidates": [
-                {
-                  "strategy": "accumulation",
-                  "name": "삼성전자",
-                  "code": "005930",
-                  "takeProfitProfileKey": "conservative",
-                  "takeProfitProfileLabel": "저항 우선형",
-                  "originalGrade": "A",
-                  "replayGrade": "A",
-                  "gradeScore": 7.4,
-                  "strictScore": 10.4,
-                  "signalScore": 10.4,
-                  "entryPrice": 286500.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "관심후보",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-accumulation",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": true,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": true,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                },
-                {
-                  "strategy": "accumulation",
-                  "name": "SK스퀘어",
-                  "code": "402340",
-                  "takeProfitProfileKey": "conservative",
-                  "takeProfitProfileLabel": "저항 우선형",
-                  "originalGrade": "B",
-                  "replayGrade": "B",
-                  "gradeScore": 6.3,
-                  "strictScore": 8.8,
-                  "signalScore": 8.8,
-                  "entryPrice": 1181000.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "관심후보",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-accumulation",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "현재 혼합 전략 기준에서는 자동 진입 대상이 아닙니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": false,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": true,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": true,
-                  "entryBlockers": [],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                },
-                {
-                  "strategy": "accumulation",
-                  "name": "SK이노베이션",
-                  "code": "096770",
-                  "takeProfitProfileKey": "conservative",
-                  "takeProfitProfileLabel": "저항 우선형",
-                  "originalGrade": "B",
-                  "replayGrade": "B",
-                  "gradeScore": 5.7,
-                  "strictScore": 8.0,
-                  "signalScore": 8.0,
-                  "entryPrice": 148700.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-accumulation",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": false,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": true,
-                  "qualityGateOk": false,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [
-                    "핵심 Gate 미충족: Q1",
-                    "매매금지(핵심 Gate 미충족: Q1)"
-                  ],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                }
-              ],
-              "results": [],
-              "orders": [],
-              "fills": [],
-              "candidateCount": 3,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 3,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 1,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            }
-          ],
-          "fills": [],
-          "caseViews": {
-            "recommendation": {
-              "summary": {
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            },
-            "a7plus": {
-              "summary": {
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            }
-          }
-        },
-        "breakout": {
-          "summary": {
-            "candidateCount": 1,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 1,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "stocks": [],
-          "days": [
-            {
-              "date": "2026-09-25",
-              "summaryFile": "replay_summary_20260925.json",
-              "ordersFile": "sim_orders_20260925.json",
-              "fillsFile": "sim_fills_20260925.json",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed",
-              "skippedReason": "",
-              "trades": [],
-              "candidates": [
-                {
-                  "strategy": "breakout",
-                  "name": "대한항공",
-                  "code": "003490",
-                  "takeProfitProfileKey": "conservative",
-                  "takeProfitProfileLabel": "저항 우선형",
-                  "originalGrade": "C",
-                  "replayGrade": "C",
-                  "gradeScore": 4.6,
-                  "strictScore": 5.7,
-                  "signalScore": 5.7,
-                  "entryPrice": 31500.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "매매금지(핵심 Gate 미충족: G4)",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-breakout",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": false,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": true,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [
-                    "핵심 Gate 미충족: G4",
-                    "매매금지(핵심 Gate 미충족: G4)",
-                    "등급 C — 진입 최소 A, B, S"
-                  ],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                }
-              ],
-              "results": [],
-              "orders": [],
-              "fills": [],
-              "candidateCount": 1,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 1,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            }
-          ],
-          "fills": [],
-          "caseViews": {
-            "recommendation": {
-              "summary": {
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            },
-            "a7plus": {
-              "summary": {
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            }
-          }
-        },
-        "reversal": {
-          "summary": {
-            "candidateCount": 2,
-            "eligibleCount": 0,
-            "includedCount": 0,
-            "tradeCount": 0,
-            "winRate": null,
-            "avgNetReturnPct": null,
-            "cumNetReturnPct": null,
-            "maxDrawdownPct": null,
-            "degradedCount": 0,
-            "ambiguousCount": 0,
-            "unfilledRate": null,
-            "comparisonByCase": {
-              "all": {
-                "caseKey": "all",
-                "label": "전체 후보",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "a7plus": {
-                "caseKey": "a7plus",
-                "label": "7&A",
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "recommendation": {
-                "caseKey": "recommendation",
-                "label": "추천 전용",
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              }
-            }
-          },
-          "stocks": [],
-          "days": [
-            {
-              "date": "2026-09-25",
-              "summaryFile": "replay_summary_20260925.json",
-              "ordersFile": "sim_orders_20260925.json",
-              "fillsFile": "sim_fills_20260925.json",
-              "pointInTime": true,
-              "pointInTimeStatus": "confirmed",
-              "skippedReason": "",
-              "trades": [],
-              "candidates": [
-                {
-                  "strategy": "reversal",
-                  "name": "SK스퀘어",
-                  "code": "402340",
-                  "takeProfitProfileKey": "conservative",
-                  "takeProfitProfileLabel": "보수형",
-                  "originalGrade": "A",
-                  "replayGrade": "A",
-                  "gradeScore": 7.4,
-                  "strictScore": 7.4,
-                  "signalScore": 7.4,
-                  "entryPrice": 1181000.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "매매금지",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-reversal",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": true,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": true,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [
-                    "핵심 Gate 미충족: G1",
-                    "핵심 Gate 미충족: G2",
-                    "핵심 Gate 미충족: G4",
-                    "매매금지"
-                  ],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                },
-                {
-                  "strategy": "reversal",
-                  "name": "SK이노베이션",
-                  "code": "096770",
-                  "takeProfitProfileKey": "conservative",
-                  "takeProfitProfileLabel": "보수형",
-                  "originalGrade": "A",
-                  "replayGrade": "A",
-                  "gradeScore": 7.4,
-                  "strictScore": 7.4,
-                  "signalScore": 7.4,
-                  "entryPrice": 148700.0,
-                  "entryPriceAvailable": true,
-                  "statusLabel": "매매금지",
-                  "mixedExitPolicy": {
-                    "version": "mixed-exit-v1-balanced",
-                    "policyKey": "observe-reversal",
-                    "label": "관찰 전용",
-                    "active": false,
-                    "priority": null,
-                    "strategyCase": "",
-                    "recommendationCase": "",
-                    "stopPct": null,
-                    "stopExecution": "close",
-                    "stopCondition": "",
-                    "stopTiming": "자동 진입 제외",
-                    "takeProfitStages": [],
-                    "positionWeightHint": "observe",
-                    "positionWeightMultiplier": 0.0,
-                    "intradayRiskRule": {
-                      "active": false
-                    },
-                    "volatilityOverlay": {
-                      "active": false
-                    },
-                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
-                  },
-                  "entryEligibleOriginal": false,
-                  "historyRecommendation": false,
-                  "replayIncluded": false,
-                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
-                  "replayA7Plus": true,
-                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
-                  "pullbackReplayGateOk": true,
-                  "qualityGateOk": true,
-                  "entryEligible": false,
-                  "entryWatch": false,
-                  "entryBlockers": [
-                    "핵심 Gate 미충족: G4",
-                    "매매금지"
-                  ],
-                  "setupQuality": "setup_weak",
-                  "payloadSourceMode": "live",
-                  "inputArchiveVersion": "jongga_inputs.v1",
-                  "rebuildable": true,
-                  "historyRecommendationSourceMode": "",
-                  "pointInTime": true,
-                  "pointInTimeStatus": "confirmed"
-                }
-              ],
-              "results": [],
-              "orders": [],
-              "fills": [],
-              "candidateCount": 2,
-              "eligibleCount": 0,
-              "includedCount": 0,
-              "tradeCount": 0,
-              "winRate": null,
-              "avgNetReturnPct": null,
-              "cumNetReturnPct": null,
-              "maxDrawdownPct": null,
-              "degradedCount": 0,
-              "ambiguousCount": 0,
-              "unfilledRate": null,
-              "comparisonByCase": {
-                "all": {
-                  "caseKey": "all",
-                  "label": "전체 후보",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "a7plus": {
-                  "caseKey": "a7plus",
-                  "label": "7&A",
-                  "candidateCount": 2,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                },
-                "recommendation": {
-                  "caseKey": "recommendation",
-                  "label": "추천 전용",
-                  "candidateCount": 0,
-                  "eligibleCount": 0,
-                  "includedCount": 0,
-                  "tradeCount": 0,
-                  "winRate": null,
-                  "avgNetReturnPct": null,
-                  "cumNetReturnPct": null,
-                  "maxDrawdownPct": null,
-                  "degradedCount": 0,
-                  "ambiguousCount": 0,
-                  "unfilledRate": null
-                }
-              }
-            }
-          ],
-          "fills": [],
-          "caseViews": {
-            "recommendation": {
-              "summary": {
-                "candidateCount": 0,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            },
-            "a7plus": {
-              "summary": {
-                "candidateCount": 2,
-                "eligibleCount": 0,
-                "includedCount": 0,
-                "tradeCount": 0,
-                "winRate": null,
-                "avgNetReturnPct": null,
-                "cumNetReturnPct": null,
-                "maxDrawdownPct": null,
-                "degradedCount": 0,
-                "ambiguousCount": 0,
-                "unfilledRate": null
-              },
-              "stocks": [],
-              "days": [],
-              "fills": []
-            }
-          }
-        }
-      }
-    },
     {
       "runId": "replay-20260929-060839-a1e531f1",
       "generatedAt": "2026-09-29T06:08:39",
@@ -1517544,6 +1520043,2764 @@ window.JONGGA_REPLAY_RUNS = {
               "stocks": [],
               "days": [],
               "fills": []
+            }
+          }
+        }
+      }
+    },
+    {
+      "runId": "replay-20261014-060600-4c004663",
+      "generatedAt": "2026-10-14T06:06:00",
+      "from": "2026-10-13",
+      "to": "2026-10-13",
+      "variant": "stable",
+      "bar": "1m",
+      "thresholdProfile": "current",
+      "entryMode": "close",
+      "replayPolicy": {
+        "mode": "relaxed",
+        "label": "완화 모드",
+        "summary": "D+1만 있어도 replay 포함",
+        "detail": "D+2가 있으면 3일차까지 연장",
+        "minFollowupDays": 1,
+        "maxFollowupDays": 2
+      },
+      "replayRule": {
+        "ruleVersion": "2026-06-11-mixed-volatility-v1",
+        "variant": "stable",
+        "thresholdProfile": "current",
+        "bar": "1m",
+        "includeGradeScoreMin": 8.0,
+        "includeGradeMin": "A",
+        "validationPolicy": {
+          "mode": "relaxed",
+          "label": "완화 모드",
+          "summary": "D+1만 있어도 replay 포함",
+          "detail": "D+2가 있으면 3일차까지 연장",
+          "minFollowupDays": 1,
+          "maxFollowupDays": 2
+        }
+      },
+      "replayRuleSignature": "c7ca3185f6266b503b3b4c9e5c5c078089a5b9d7",
+      "analysisDates": [
+        "2026-10-13"
+      ],
+      "latestBuiltDate": "2026-10-13",
+      "days": [
+        {
+          "date": "2026-10-13",
+          "summaryFile": "replay_summary_20261013.json",
+          "ordersFile": "sim_orders_20261013.json",
+          "fillsFile": "sim_fills_20261013.json",
+          "candidateCount": 2,
+          "eligibleCount": 0,
+          "includedCount": 0,
+          "tradeCount": 2,
+          "degradedCount": 2,
+          "ambiguousCount": 0,
+          "byStrategy": {
+            "reversal": {
+              "candidateCount": 2,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932,
+              "maxDrawdownPct": 8.1932,
+              "degradedCount": 2,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0,
+              "comparisonByCase": {
+                "all": {
+                  "caseKey": "all",
+                  "label": "전체 후보",
+                  "candidateCount": 2,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 2,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -8.1932,
+                  "cumNetReturnPct": -8.1932,
+                  "maxDrawdownPct": 8.1932,
+                  "degradedCount": 2,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "a7plus": {
+                  "caseKey": "a7plus",
+                  "label": "7&A",
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "recommendation": {
+                  "caseKey": "recommendation",
+                  "label": "추천 전용",
+                  "candidateCount": 0,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 0,
+                  "winRate": null,
+                  "avgNetReturnPct": null,
+                  "cumNetReturnPct": null,
+                  "maxDrawdownPct": null,
+                  "degradedCount": 0,
+                  "ambiguousCount": 0,
+                  "unfilledRate": null
+                }
+              }
+            }
+          },
+          "pointInTime": true,
+          "pointInTimeStatus": "confirmed",
+          "skippedReason": "",
+          "candidates": [
+            {
+              "strategy": "reversal",
+              "name": "심텍",
+              "code": "222800",
+              "takeProfitProfileKey": "conservative",
+              "takeProfitProfileLabel": "보수형",
+              "originalGrade": "A",
+              "replayGrade": "A",
+              "gradeScore": 7.0,
+              "strictScore": 7.0,
+              "signalScore": 7.0,
+              "entryPrice": 149500.0,
+              "entryPriceAvailable": true,
+              "statusLabel": "관심후보(약세·소액)",
+              "mixedExitPolicy": {
+                "version": "mixed-exit-v1-balanced",
+                "policyKey": "reversal-a7plus-balanced",
+                "active": true,
+                "stopExecution": "close",
+                "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                "positionWeightMultiplier": 0.5,
+                "intradayRiskRule": {
+                  "active": true,
+                  "triggerPct": -5.0,
+                  "action": "50% 축소",
+                  "timing": "10:00 또는 14:00 확인",
+                  "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                  "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                },
+                "volatilityOverlay": {
+                  "active": true,
+                  "mode": "high-volatility",
+                  "label": "고변동성 방어",
+                  "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                  "triggerMetrics": {
+                    "blendedState": "volatile",
+                    "marketState": "volatile",
+                    "stockState": "volatile",
+                    "atrPct10": 7.28,
+                    "todayRangePct": 9.63,
+                    "returnStd20": 4.93,
+                    "vkospi": 48.76
+                  },
+                  "originalTakeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 50.0
+                    },
+                    {
+                      "targetPct": 10.0,
+                      "quantityPct": 50.0
+                    }
+                  ],
+                  "adjustedTakeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightMultiplier": 0.5
+                },
+                "label": "반등 × 7&A",
+                "priority": 1,
+                "strategyCase": "reversal",
+                "recommendationCase": "a7plus",
+                "stopPct": -2.0,
+                "takeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 60.0
+                  },
+                  {
+                    "targetPct": 8.0,
+                    "quantityPct": 40.0
+                  }
+                ],
+                "positionWeightHint": "half",
+                "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+              },
+              "entryEligibleOriginal": false,
+              "historyRecommendation": false,
+              "replayIncluded": false,
+              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+              "replayA7Plus": true,
+              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+              "pullbackReplayGateOk": true,
+              "qualityGateOk": true,
+              "entryEligible": false,
+              "entryWatch": false,
+              "entryBlockers": [],
+              "setupQuality": "setup_weak",
+              "payloadSourceMode": "live",
+              "inputArchiveVersion": "jongga_inputs.v1",
+              "rebuildable": true,
+              "historyRecommendationSourceMode": "",
+              "pointInTime": true,
+              "pointInTimeStatus": "confirmed"
+            },
+            {
+              "strategy": "reversal",
+              "name": "주성엔지니어링",
+              "code": "036930",
+              "takeProfitProfileKey": "conservative",
+              "takeProfitProfileLabel": "보수형",
+              "originalGrade": "B",
+              "replayGrade": "B",
+              "gradeScore": 6.2,
+              "strictScore": 6.2,
+              "signalScore": 6.2,
+              "entryPrice": 258500.0,
+              "entryPriceAvailable": true,
+              "statusLabel": "매매금지",
+              "mixedExitPolicy": {
+                "version": "mixed-exit-v1-balanced",
+                "policyKey": "observe-reversal",
+                "label": "관찰 전용",
+                "active": false,
+                "priority": null,
+                "strategyCase": "",
+                "recommendationCase": "",
+                "stopPct": null,
+                "stopExecution": "close",
+                "stopCondition": "",
+                "stopTiming": "자동 진입 제외",
+                "takeProfitStages": [],
+                "positionWeightHint": "observe",
+                "positionWeightMultiplier": 0.0,
+                "intradayRiskRule": {
+                  "active": false
+                },
+                "volatilityOverlay": {
+                  "active": false
+                },
+                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+              },
+              "entryEligibleOriginal": false,
+              "historyRecommendation": false,
+              "replayIncluded": false,
+              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+              "replayA7Plus": false,
+              "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+              "pullbackReplayGateOk": true,
+              "qualityGateOk": true,
+              "entryEligible": false,
+              "entryWatch": false,
+              "entryBlockers": [
+                "매매금지"
+              ],
+              "setupQuality": "setup_weak",
+              "payloadSourceMode": "live",
+              "inputArchiveVersion": "jongga_inputs.v1",
+              "rebuildable": true,
+              "historyRecommendationSourceMode": "",
+              "pointInTime": true,
+              "pointInTimeStatus": "confirmed"
+            }
+          ],
+          "trades": [
+            {
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "grade": "B",
+              "replayGrade": "B",
+              "gradeScore": 6.2,
+              "entryFilledAt": "2026-10-13T15:30:00+09:00",
+              "entryFillPrice": 258758.5,
+              "exitFilledAt": "2026-10-14T15:00:00+09:00",
+              "exitAvgFillPrice": 237500.0,
+              "exitLastFillPrice": 237500.0,
+              "tradeStatus": "closed",
+              "closedReason": "stop_close",
+              "netReturnPct": -8.4083,
+              "mixedExitPolicy": {
+                "version": "mixed-exit-v1-balanced",
+                "policyKey": "observe-reversal",
+                "label": "관찰 전용",
+                "active": false,
+                "priority": null,
+                "strategyCase": "",
+                "recommendationCase": "",
+                "stopPct": null,
+                "stopExecution": "close",
+                "stopCondition": "",
+                "stopTiming": "자동 진입 제외",
+                "takeProfitStages": [],
+                "positionWeightHint": "observe",
+                "positionWeightMultiplier": 0.0,
+                "intradayRiskRule": {
+                  "active": false
+                },
+                "volatilityOverlay": {
+                  "active": false
+                },
+                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+              },
+              "remainingQuantityPct": 0.0
+            },
+            {
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "grade": "A",
+              "replayGrade": "A",
+              "gradeScore": 7.0,
+              "entryFilledAt": "2026-10-13T15:30:00+09:00",
+              "entryFillPrice": 149649.5,
+              "exitFilledAt": "2026-10-14T15:00:00+09:00",
+              "exitAvgFillPrice": 138000.0,
+              "exitLastFillPrice": 138000.0,
+              "tradeStatus": "closed",
+              "closedReason": "stop_close",
+              "netReturnPct": -7.9781,
+              "mixedExitPolicy": {
+                "version": "mixed-exit-v1-balanced",
+                "policyKey": "reversal-a7plus-balanced",
+                "active": true,
+                "stopExecution": "close",
+                "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                "positionWeightMultiplier": 0.5,
+                "intradayRiskRule": {
+                  "active": true,
+                  "triggerPct": -5.0,
+                  "action": "50% 축소",
+                  "timing": "10:00 또는 14:00 확인",
+                  "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                  "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                },
+                "volatilityOverlay": {
+                  "active": true,
+                  "mode": "high-volatility",
+                  "label": "고변동성 방어",
+                  "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                  "triggerMetrics": {
+                    "blendedState": "volatile",
+                    "marketState": "volatile",
+                    "stockState": "volatile",
+                    "atrPct10": 7.28,
+                    "todayRangePct": 9.63,
+                    "returnStd20": 4.93,
+                    "vkospi": 48.76
+                  },
+                  "originalTakeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 50.0
+                    },
+                    {
+                      "targetPct": 10.0,
+                      "quantityPct": 50.0
+                    }
+                  ],
+                  "adjustedTakeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightMultiplier": 0.5
+                },
+                "label": "반등 × 7&A",
+                "priority": 1,
+                "strategyCase": "reversal",
+                "recommendationCase": "a7plus",
+                "stopPct": -2.0,
+                "takeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 60.0
+                  },
+                  {
+                    "targetPct": 8.0,
+                    "quantityPct": 40.0
+                  }
+                ],
+                "positionWeightHint": "half",
+                "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+              },
+              "remainingQuantityPct": 0.0
+            }
+          ],
+          "results": [
+            {
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "entryMode": "close",
+              "entryFilledAt": "2026-10-13T15:30:00+09:00",
+              "entryFillPrice": 149649.5,
+              "exitFilledAt": "2026-10-14T15:00:00+09:00",
+              "exitAvgFillPrice": 138000.0,
+              "exitLastFillPrice": 138000.0,
+              "netReturnPct": -7.9781,
+              "tradeStatus": "closed",
+              "ambiguousCount": 0,
+              "remainingQuantityPct": 0.0,
+              "closedReason": "stop_close",
+              "exitFillCount": 1,
+              "filledExitQuantityPct": 100.0,
+              "regimeBucket": "weak",
+              "vkospiTier": "weak",
+              "gapGrade": "G-C",
+              "dataQualityStatus": "degraded",
+              "dataQuality": {
+                "status": "degraded",
+                "barUnit": "1m",
+                "sources": [
+                  "daily_ohlc_fallback"
+                ],
+                "reason": "synthetic one-day replay derived from daily OHLC"
+              },
+              "nextTradingDate": "20261014",
+              "proxyOutcomeStatus": "resolved",
+              "proxyRealizedReturnPct": -2.0,
+              "replayGrade": "A",
+              "gradeScore": 7.0,
+              "replayIncluded": false,
+              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+              "historyRecommendation": false,
+              "historyRecommendationSourceMode": "",
+              "entryEligible": false,
+              "entryEligibleOriginal": false,
+              "setupQuality": "setup_weak",
+              "statusLabel": "관심후보(약세·소액)",
+              "takeProfitProfileKey": "conservative",
+              "takeProfitProfileLabel": "보수형",
+              "mixedExitPolicy": {
+                "version": "mixed-exit-v1-balanced",
+                "policyKey": "reversal-a7plus-balanced",
+                "active": true,
+                "stopExecution": "close",
+                "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                "positionWeightMultiplier": 0.5,
+                "intradayRiskRule": {
+                  "active": true,
+                  "triggerPct": -5.0,
+                  "action": "50% 축소",
+                  "timing": "10:00 또는 14:00 확인",
+                  "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                  "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                },
+                "volatilityOverlay": {
+                  "active": true,
+                  "mode": "high-volatility",
+                  "label": "고변동성 방어",
+                  "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                  "triggerMetrics": {
+                    "blendedState": "volatile",
+                    "marketState": "volatile",
+                    "stockState": "volatile",
+                    "atrPct10": 7.28,
+                    "todayRangePct": 9.63,
+                    "returnStd20": 4.93,
+                    "vkospi": 48.76
+                  },
+                  "originalTakeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 50.0
+                    },
+                    {
+                      "targetPct": 10.0,
+                      "quantityPct": 50.0
+                    }
+                  ],
+                  "adjustedTakeProfitStages": [
+                    {
+                      "targetPct": 2.0,
+                      "quantityPct": 60.0
+                    },
+                    {
+                      "targetPct": 8.0,
+                      "quantityPct": 40.0
+                    }
+                  ],
+                  "positionWeightMultiplier": 0.5
+                },
+                "label": "반등 × 7&A",
+                "priority": 1,
+                "strategyCase": "reversal",
+                "recommendationCase": "a7plus",
+                "stopPct": -2.0,
+                "takeProfitStages": [
+                  {
+                    "targetPct": 2.0,
+                    "quantityPct": 60.0
+                  },
+                  {
+                    "targetPct": 8.0,
+                    "quantityPct": 40.0
+                  }
+                ],
+                "positionWeightHint": "half",
+                "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+              },
+              "payloadSourceMode": "live",
+              "inputArchiveVersion": "jongga_inputs.v1",
+              "rebuildable": true,
+              "pointInTime": true,
+              "pointInTimeStatus": "confirmed"
+            },
+            {
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "entryMode": "close",
+              "entryFilledAt": "2026-10-13T15:30:00+09:00",
+              "entryFillPrice": 258758.5,
+              "exitFilledAt": "2026-10-14T15:00:00+09:00",
+              "exitAvgFillPrice": 237500.0,
+              "exitLastFillPrice": 237500.0,
+              "netReturnPct": -8.4083,
+              "tradeStatus": "closed",
+              "ambiguousCount": 0,
+              "remainingQuantityPct": 0.0,
+              "closedReason": "stop_close",
+              "exitFillCount": 1,
+              "filledExitQuantityPct": 100.0,
+              "regimeBucket": "weak",
+              "vkospiTier": "weak",
+              "gapGrade": "G-C",
+              "dataQualityStatus": "degraded",
+              "dataQuality": {
+                "status": "degraded",
+                "barUnit": "1m",
+                "sources": [
+                  "daily_ohlc_fallback"
+                ],
+                "reason": "synthetic one-day replay derived from daily OHLC"
+              },
+              "nextTradingDate": "20261014",
+              "proxyOutcomeStatus": "resolved",
+              "proxyRealizedReturnPct": -2.0,
+              "replayGrade": "B",
+              "gradeScore": 6.2,
+              "replayIncluded": false,
+              "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+              "historyRecommendation": false,
+              "historyRecommendationSourceMode": "",
+              "entryEligible": false,
+              "entryEligibleOriginal": false,
+              "setupQuality": "setup_weak",
+              "statusLabel": "매매금지",
+              "takeProfitProfileKey": "conservative",
+              "takeProfitProfileLabel": "보수형",
+              "mixedExitPolicy": {
+                "version": "mixed-exit-v1-balanced",
+                "policyKey": "observe-reversal",
+                "label": "관찰 전용",
+                "active": false,
+                "priority": null,
+                "strategyCase": "",
+                "recommendationCase": "",
+                "stopPct": null,
+                "stopExecution": "close",
+                "stopCondition": "",
+                "stopTiming": "자동 진입 제외",
+                "takeProfitStages": [],
+                "positionWeightHint": "observe",
+                "positionWeightMultiplier": 0.0,
+                "intradayRiskRule": {
+                  "active": false
+                },
+                "volatilityOverlay": {
+                  "active": false
+                },
+                "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+              },
+              "payloadSourceMode": "live",
+              "inputArchiveVersion": "jongga_inputs.v1",
+              "rebuildable": true,
+              "pointInTime": true,
+              "pointInTimeStatus": "confirmed"
+            }
+          ],
+          "orders": [
+            {
+              "orderId": "20261013|stable|reversal|222800-entry",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "BUY",
+              "orderType": "MOC",
+              "requestedAt": "2026-10-13T15:30:00+09:00",
+              "requestedPrice": 149500.0,
+              "quantityPct": 100.0,
+              "reason": "close_entry",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "stageKey": "entry",
+              "activeFrom": "",
+              "activeUntil": "",
+              "finalStatus": "filled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|222800-premarket",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "SELL",
+              "orderType": "LIMIT",
+              "requestedAt": "2026-10-14T09:00:00+09:00",
+              "requestedPrice": 152500.0,
+              "quantityPct": 60.0,
+              "reason": "🌅 프리마켓",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "stageKey": "premarket",
+              "activeFrom": "2026-10-14T09:00:00+09:00",
+              "activeUntil": "2026-10-14T10:00:00+09:00",
+              "finalStatus": "cancelled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|222800-openPhase",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "SELL",
+              "orderType": "LIMIT",
+              "requestedAt": "2026-10-14T09:00:00+09:00",
+              "requestedPrice": 156600.0,
+              "quantityPct": 40.0,
+              "reason": "🔔 장초반",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "stageKey": "openPhase",
+              "activeFrom": "2026-10-14T09:00:00+09:00",
+              "activeUntil": "2026-10-14T10:00:00+09:00",
+              "finalStatus": "cancelled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|222800-stop",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "SELL",
+              "orderType": "STOP",
+              "requestedAt": "2026-10-14T09:00:00+09:00",
+              "requestedPrice": 146510.0,
+              "quantityPct": 100.0,
+              "reason": "🛑 손절",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "stageKey": "stop",
+              "activeFrom": "",
+              "activeUntil": "",
+              "finalStatus": "filled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|222800-finalCutoff",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "SELL",
+              "orderType": "MKT",
+              "requestedAt": "2026-10-14T15:00:00+09:00",
+              "requestedPrice": 138000.0,
+              "quantityPct": 100.0,
+              "reason": "3일차 종가 컷오프 청산",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "stageKey": "finalCutoff",
+              "activeFrom": "2026-10-14T15:00:00+09:00",
+              "activeUntil": "2026-10-14T15:00:00+09:00",
+              "finalStatus": "cancelled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-entry",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "BUY",
+              "orderType": "MOC",
+              "requestedAt": "2026-10-13T15:30:00+09:00",
+              "requestedPrice": 258500.0,
+              "quantityPct": 100.0,
+              "reason": "close_entry",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "stageKey": "entry",
+              "activeFrom": "",
+              "activeUntil": "",
+              "finalStatus": "filled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-premarket",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "SELL",
+              "orderType": "LIMIT",
+              "requestedAt": "2026-10-14T09:00:00+09:00",
+              "requestedPrice": 266255.0,
+              "quantityPct": 60.0,
+              "reason": "🌅 프리마켓",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "stageKey": "premarket",
+              "activeFrom": "2026-10-14T09:00:00+09:00",
+              "activeUntil": "2026-10-14T10:00:00+09:00",
+              "finalStatus": "cancelled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-openPhase",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "SELL",
+              "orderType": "LIMIT",
+              "requestedAt": "2026-10-14T09:00:00+09:00",
+              "requestedPrice": 271250.0,
+              "quantityPct": 40.0,
+              "reason": "🔔 장초반",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "stageKey": "openPhase",
+              "activeFrom": "2026-10-14T09:00:00+09:00",
+              "activeUntil": "2026-10-14T10:00:00+09:00",
+              "finalStatus": "cancelled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-stop",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "SELL",
+              "orderType": "STOP",
+              "requestedAt": "2026-10-14T09:00:00+09:00",
+              "requestedPrice": 253330.0,
+              "quantityPct": 100.0,
+              "reason": "🛑 손절",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "stageKey": "stop",
+              "activeFrom": "",
+              "activeUntil": "",
+              "finalStatus": "filled"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-finalCutoff",
+              "runId": "replay-20261014-060600-4c004663",
+              "date": "2026-10-13",
+              "variant": "stable",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "SELL",
+              "orderType": "MKT",
+              "requestedAt": "2026-10-14T15:00:00+09:00",
+              "requestedPrice": 237500.0,
+              "quantityPct": 100.0,
+              "reason": "3일차 종가 컷오프 청산",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "stageKey": "finalCutoff",
+              "activeFrom": "2026-10-14T15:00:00+09:00",
+              "activeUntil": "2026-10-14T15:00:00+09:00",
+              "finalStatus": "cancelled"
+            }
+          ],
+          "fills": [
+            {
+              "orderId": "20261013|stable|reversal|222800-entry",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "BUY",
+              "stageKey": "entry",
+              "reason": "close_entry",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-13T15:30:00+09:00",
+              "fillPrice": 149649.5,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.1,
+              "barTimestamp": "2026-10-13T15:30:00+09:00",
+              "barOpen": 149500.0,
+              "barHigh": 149500.0,
+              "barLow": 149500.0,
+              "barClose": 149500.0,
+              "fillRule": "close_slippage"
+            },
+            {
+              "orderId": "20261013|stable|reversal|222800-stop",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "SELL",
+              "stageKey": "stop",
+              "reason": "🛑 손절",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-14T15:00:00+09:00",
+              "fillPrice": 138000.0,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.0,
+              "barTimestamp": "2026-10-14T15:00:00+09:00",
+              "barOpen": 150300.0,
+              "barHigh": 151600.0,
+              "barLow": 137900.0,
+              "barClose": 138000.0,
+              "fillRule": "stop_close"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-entry",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "BUY",
+              "stageKey": "entry",
+              "reason": "close_entry",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-13T15:30:00+09:00",
+              "fillPrice": 258758.5,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.1,
+              "barTimestamp": "2026-10-13T15:30:00+09:00",
+              "barOpen": 258500.0,
+              "barHigh": 258500.0,
+              "barLow": 258500.0,
+              "barClose": 258500.0,
+              "fillRule": "close_slippage"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-stop",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "SELL",
+              "stageKey": "stop",
+              "reason": "🛑 손절",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-14T15:00:00+09:00",
+              "fillPrice": 237500.0,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.0,
+              "barTimestamp": "2026-10-14T15:00:00+09:00",
+              "barOpen": 262500.0,
+              "barHigh": 263000.0,
+              "barLow": 236500.0,
+              "barClose": 237500.0,
+              "fillRule": "stop_close"
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "candidateCount": 2,
+        "eligibleCount": 0,
+        "includedCount": 0,
+        "tradeCount": 2,
+        "winRate": 0.0,
+        "avgNetReturnPct": -8.1932,
+        "cumNetReturnPct": -8.1932,
+        "maxDrawdownPct": 8.1932,
+        "degradedCount": 2,
+        "ambiguousCount": 0,
+        "unfilledRate": 0.0,
+        "overall": {
+          "candidateCount": 2,
+          "eligibleCount": 0,
+          "includedCount": 0,
+          "tradeCount": 2,
+          "winRate": 0.0,
+          "avgNetReturnPct": -8.1932,
+          "cumNetReturnPct": -8.1932,
+          "maxDrawdownPct": 8.1932,
+          "degradedCount": 2,
+          "ambiguousCount": 0,
+          "unfilledRate": 0.0
+        },
+        "comparisonByCase": {
+          "all": {
+            "caseKey": "all",
+            "label": "전체 후보",
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0
+          },
+          "a7plus": {
+            "caseKey": "a7plus",
+            "label": "7&A",
+            "candidateCount": 1,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 1,
+            "winRate": 0.0,
+            "avgNetReturnPct": -7.9781,
+            "cumNetReturnPct": -7.9781,
+            "maxDrawdownPct": 7.9781,
+            "degradedCount": 1,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0
+          },
+          "recommendation": {
+            "caseKey": "recommendation",
+            "label": "추천 전용",
+            "candidateCount": 0,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 0,
+            "winRate": null,
+            "avgNetReturnPct": null,
+            "cumNetReturnPct": null,
+            "maxDrawdownPct": null,
+            "degradedCount": 0,
+            "ambiguousCount": 0,
+            "unfilledRate": null
+          }
+        },
+        "byStrategy": {
+          "reversal": {
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0,
+            "comparisonByCase": {
+              "all": {
+                "caseKey": "all",
+                "label": "전체 후보",
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "a7plus": {
+                "caseKey": "a7plus",
+                "label": "7&A",
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "recommendation": {
+                "caseKey": "recommendation",
+                "label": "추천 전용",
+                "candidateCount": 0,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 0,
+                "winRate": null,
+                "avgNetReturnPct": null,
+                "cumNetReturnPct": null,
+                "maxDrawdownPct": null,
+                "degradedCount": 0,
+                "ambiguousCount": 0,
+                "unfilledRate": null
+              }
+            }
+          }
+        },
+        "byStock": [
+          {
+            "strategy": "reversal",
+            "code": "222800",
+            "name": "심텍",
+            "grade": "A",
+            "replayGrade": "A",
+            "gradeScore": 7.0,
+            "tradeCount": 1,
+            "winRate": 0.0,
+            "avgNetReturnPct": -7.9781,
+            "cumNetReturnPct": -7.9781,
+            "lastReplayDate": "2026-10-13",
+            "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+            "lastEntryFillPrice": 149649.5,
+            "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+            "lastExitAvgFillPrice": 138000.0,
+            "lastExitFillPrice": 138000.0,
+            "lastTradeStatus": "closed"
+          },
+          {
+            "strategy": "reversal",
+            "code": "036930",
+            "name": "주성엔지니어링",
+            "grade": "B",
+            "replayGrade": "B",
+            "gradeScore": 6.2,
+            "tradeCount": 1,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.4083,
+            "cumNetReturnPct": -8.4083,
+            "lastReplayDate": "2026-10-13",
+            "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+            "lastEntryFillPrice": 258758.5,
+            "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+            "lastExitAvgFillPrice": 237500.0,
+            "lastExitFillPrice": 237500.0,
+            "lastTradeStatus": "closed"
+          }
+        ],
+        "strategyStats": {
+          "reversal": {
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0,
+            "comparisonByCase": {
+              "all": {
+                "caseKey": "all",
+                "label": "전체 후보",
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "a7plus": {
+                "caseKey": "a7plus",
+                "label": "7&A",
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "recommendation": {
+                "caseKey": "recommendation",
+                "label": "추천 전용",
+                "candidateCount": 0,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 0,
+                "winRate": null,
+                "avgNetReturnPct": null,
+                "cumNetReturnPct": null,
+                "maxDrawdownPct": null,
+                "degradedCount": 0,
+                "ambiguousCount": 0,
+                "unfilledRate": null
+              }
+            }
+          }
+        },
+        "strategyRecommendationMatrix": {
+          "reversal|a7plus": {
+            "strategy": "reversal",
+            "recommendationCase": "a7plus",
+            "sampleCount": 1,
+            "tradeCount": 1,
+            "winRate": 0.0,
+            "avgNetReturnPct": -7.9781,
+            "cumNetReturnPct": -7.9781,
+            "maxDrawdownPct": 7.9781,
+            "recommendedExitPolicyKey": "reversal-a7plus-balanced"
+          },
+          "reversal|recommendation": {
+            "strategy": "reversal",
+            "recommendationCase": "recommendation",
+            "sampleCount": 0,
+            "tradeCount": 0,
+            "winRate": null,
+            "avgNetReturnPct": null,
+            "cumNetReturnPct": null,
+            "maxDrawdownPct": null,
+            "recommendedExitPolicyKey": "observe-unmatched"
+          }
+        },
+        "byTakeProfitProfile": {
+          "reversal|conservative": {
+            "tradeCount": 2,
+            "sampleCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932
+          }
+        },
+        "byTakeProfitProfileCell": {
+          "reversal|weak|weak|G-C|conservative": {
+            "tradeCount": 2,
+            "sampleCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932
+          }
+        },
+        "pointInTimeStatusCounts": {
+          "confirmed": 1,
+          "historical_regen": 0,
+          "legacy_unknown": 0
+        },
+        "historicalRegenExcludedDays": 0,
+        "legacyUnknownIncludedDays": 0,
+        "pointInTimeWarnings": []
+      },
+      "strategyViews": {
+        "reversal": {
+          "summary": {
+            "candidateCount": 2,
+            "eligibleCount": 0,
+            "includedCount": 0,
+            "tradeCount": 2,
+            "winRate": 0.0,
+            "avgNetReturnPct": -8.1932,
+            "cumNetReturnPct": -8.1932,
+            "maxDrawdownPct": 8.1932,
+            "degradedCount": 2,
+            "ambiguousCount": 0,
+            "unfilledRate": 0.0,
+            "comparisonByCase": {
+              "all": {
+                "caseKey": "all",
+                "label": "전체 후보",
+                "candidateCount": 2,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 2,
+                "winRate": 0.0,
+                "avgNetReturnPct": -8.1932,
+                "cumNetReturnPct": -8.1932,
+                "maxDrawdownPct": 8.1932,
+                "degradedCount": 2,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "a7plus": {
+                "caseKey": "a7plus",
+                "label": "7&A",
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "recommendation": {
+                "caseKey": "recommendation",
+                "label": "추천 전용",
+                "candidateCount": 0,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 0,
+                "winRate": null,
+                "avgNetReturnPct": null,
+                "cumNetReturnPct": null,
+                "maxDrawdownPct": null,
+                "degradedCount": 0,
+                "ambiguousCount": 0,
+                "unfilledRate": null
+              }
+            }
+          },
+          "stocks": [
+            {
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "grade": "A",
+              "replayGrade": "A",
+              "gradeScore": 7.0,
+              "tradeCount": 1,
+              "winRate": 0.0,
+              "avgNetReturnPct": -7.9781,
+              "cumNetReturnPct": -7.9781,
+              "lastReplayDate": "2026-10-13",
+              "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+              "lastEntryFillPrice": 149649.5,
+              "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+              "lastExitAvgFillPrice": 138000.0,
+              "lastExitFillPrice": 138000.0,
+              "lastTradeStatus": "closed"
+            },
+            {
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "grade": "B",
+              "replayGrade": "B",
+              "gradeScore": 6.2,
+              "tradeCount": 1,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.4083,
+              "cumNetReturnPct": -8.4083,
+              "lastReplayDate": "2026-10-13",
+              "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+              "lastEntryFillPrice": 258758.5,
+              "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+              "lastExitAvgFillPrice": 237500.0,
+              "lastExitFillPrice": 237500.0,
+              "lastTradeStatus": "closed"
+            }
+          ],
+          "days": [
+            {
+              "date": "2026-10-13",
+              "summaryFile": "replay_summary_20261013.json",
+              "ordersFile": "sim_orders_20261013.json",
+              "fillsFile": "sim_fills_20261013.json",
+              "pointInTime": true,
+              "pointInTimeStatus": "confirmed",
+              "skippedReason": "",
+              "trades": [
+                {
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "grade": "B",
+                  "replayGrade": "B",
+                  "gradeScore": 6.2,
+                  "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                  "entryFillPrice": 258758.5,
+                  "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                  "exitAvgFillPrice": 237500.0,
+                  "exitLastFillPrice": 237500.0,
+                  "tradeStatus": "closed",
+                  "closedReason": "stop_close",
+                  "netReturnPct": -8.4083,
+                  "mixedExitPolicy": {
+                    "version": "mixed-exit-v1-balanced",
+                    "policyKey": "observe-reversal",
+                    "label": "관찰 전용",
+                    "active": false,
+                    "priority": null,
+                    "strategyCase": "",
+                    "recommendationCase": "",
+                    "stopPct": null,
+                    "stopExecution": "close",
+                    "stopCondition": "",
+                    "stopTiming": "자동 진입 제외",
+                    "takeProfitStages": [],
+                    "positionWeightHint": "observe",
+                    "positionWeightMultiplier": 0.0,
+                    "intradayRiskRule": {
+                      "active": false
+                    },
+                    "volatilityOverlay": {
+                      "active": false
+                    },
+                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                  },
+                  "remainingQuantityPct": 0.0
+                },
+                {
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "grade": "A",
+                  "replayGrade": "A",
+                  "gradeScore": 7.0,
+                  "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                  "entryFillPrice": 149649.5,
+                  "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                  "exitAvgFillPrice": 138000.0,
+                  "exitLastFillPrice": 138000.0,
+                  "tradeStatus": "closed",
+                  "closedReason": "stop_close",
+                  "netReturnPct": -7.9781,
+                  "mixedExitPolicy": {
+                    "version": "mixed-exit-v1-balanced",
+                    "policyKey": "reversal-a7plus-balanced",
+                    "active": true,
+                    "stopExecution": "close",
+                    "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                    "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                    "positionWeightMultiplier": 0.5,
+                    "intradayRiskRule": {
+                      "active": true,
+                      "triggerPct": -5.0,
+                      "action": "50% 축소",
+                      "timing": "10:00 또는 14:00 확인",
+                      "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                      "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                    },
+                    "volatilityOverlay": {
+                      "active": true,
+                      "mode": "high-volatility",
+                      "label": "고변동성 방어",
+                      "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                      "triggerMetrics": {
+                        "blendedState": "volatile",
+                        "marketState": "volatile",
+                        "stockState": "volatile",
+                        "atrPct10": 7.28,
+                        "todayRangePct": 9.63,
+                        "returnStd20": 4.93,
+                        "vkospi": 48.76
+                      },
+                      "originalTakeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 50.0
+                        },
+                        {
+                          "targetPct": 10.0,
+                          "quantityPct": 50.0
+                        }
+                      ],
+                      "adjustedTakeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightMultiplier": 0.5
+                    },
+                    "label": "반등 × 7&A",
+                    "priority": 1,
+                    "strategyCase": "reversal",
+                    "recommendationCase": "a7plus",
+                    "stopPct": -2.0,
+                    "takeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightHint": "half",
+                    "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                  },
+                  "remainingQuantityPct": 0.0
+                }
+              ],
+              "candidates": [
+                {
+                  "strategy": "reversal",
+                  "name": "심텍",
+                  "code": "222800",
+                  "takeProfitProfileKey": "conservative",
+                  "takeProfitProfileLabel": "보수형",
+                  "originalGrade": "A",
+                  "replayGrade": "A",
+                  "gradeScore": 7.0,
+                  "strictScore": 7.0,
+                  "signalScore": 7.0,
+                  "entryPrice": 149500.0,
+                  "entryPriceAvailable": true,
+                  "statusLabel": "관심후보(약세·소액)",
+                  "mixedExitPolicy": {
+                    "version": "mixed-exit-v1-balanced",
+                    "policyKey": "reversal-a7plus-balanced",
+                    "active": true,
+                    "stopExecution": "close",
+                    "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                    "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                    "positionWeightMultiplier": 0.5,
+                    "intradayRiskRule": {
+                      "active": true,
+                      "triggerPct": -5.0,
+                      "action": "50% 축소",
+                      "timing": "10:00 또는 14:00 확인",
+                      "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                      "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                    },
+                    "volatilityOverlay": {
+                      "active": true,
+                      "mode": "high-volatility",
+                      "label": "고변동성 방어",
+                      "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                      "triggerMetrics": {
+                        "blendedState": "volatile",
+                        "marketState": "volatile",
+                        "stockState": "volatile",
+                        "atrPct10": 7.28,
+                        "todayRangePct": 9.63,
+                        "returnStd20": 4.93,
+                        "vkospi": 48.76
+                      },
+                      "originalTakeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 50.0
+                        },
+                        {
+                          "targetPct": 10.0,
+                          "quantityPct": 50.0
+                        }
+                      ],
+                      "adjustedTakeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightMultiplier": 0.5
+                    },
+                    "label": "반등 × 7&A",
+                    "priority": 1,
+                    "strategyCase": "reversal",
+                    "recommendationCase": "a7plus",
+                    "stopPct": -2.0,
+                    "takeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightHint": "half",
+                    "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                  },
+                  "entryEligibleOriginal": false,
+                  "historyRecommendation": false,
+                  "replayIncluded": false,
+                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                  "replayA7Plus": true,
+                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                  "pullbackReplayGateOk": true,
+                  "qualityGateOk": true,
+                  "entryEligible": false,
+                  "entryWatch": false,
+                  "entryBlockers": [],
+                  "setupQuality": "setup_weak",
+                  "payloadSourceMode": "live",
+                  "inputArchiveVersion": "jongga_inputs.v1",
+                  "rebuildable": true,
+                  "historyRecommendationSourceMode": "",
+                  "pointInTime": true,
+                  "pointInTimeStatus": "confirmed"
+                },
+                {
+                  "strategy": "reversal",
+                  "name": "주성엔지니어링",
+                  "code": "036930",
+                  "takeProfitProfileKey": "conservative",
+                  "takeProfitProfileLabel": "보수형",
+                  "originalGrade": "B",
+                  "replayGrade": "B",
+                  "gradeScore": 6.2,
+                  "strictScore": 6.2,
+                  "signalScore": 6.2,
+                  "entryPrice": 258500.0,
+                  "entryPriceAvailable": true,
+                  "statusLabel": "매매금지",
+                  "mixedExitPolicy": {
+                    "version": "mixed-exit-v1-balanced",
+                    "policyKey": "observe-reversal",
+                    "label": "관찰 전용",
+                    "active": false,
+                    "priority": null,
+                    "strategyCase": "",
+                    "recommendationCase": "",
+                    "stopPct": null,
+                    "stopExecution": "close",
+                    "stopCondition": "",
+                    "stopTiming": "자동 진입 제외",
+                    "takeProfitStages": [],
+                    "positionWeightHint": "observe",
+                    "positionWeightMultiplier": 0.0,
+                    "intradayRiskRule": {
+                      "active": false
+                    },
+                    "volatilityOverlay": {
+                      "active": false
+                    },
+                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                  },
+                  "entryEligibleOriginal": false,
+                  "historyRecommendation": false,
+                  "replayIncluded": false,
+                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                  "replayA7Plus": false,
+                  "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                  "pullbackReplayGateOk": true,
+                  "qualityGateOk": true,
+                  "entryEligible": false,
+                  "entryWatch": false,
+                  "entryBlockers": [
+                    "매매금지"
+                  ],
+                  "setupQuality": "setup_weak",
+                  "payloadSourceMode": "live",
+                  "inputArchiveVersion": "jongga_inputs.v1",
+                  "rebuildable": true,
+                  "historyRecommendationSourceMode": "",
+                  "pointInTime": true,
+                  "pointInTimeStatus": "confirmed"
+                }
+              ],
+              "results": [
+                {
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "entryMode": "close",
+                  "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                  "entryFillPrice": 149649.5,
+                  "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                  "exitAvgFillPrice": 138000.0,
+                  "exitLastFillPrice": 138000.0,
+                  "netReturnPct": -7.9781,
+                  "tradeStatus": "closed",
+                  "ambiguousCount": 0,
+                  "remainingQuantityPct": 0.0,
+                  "closedReason": "stop_close",
+                  "exitFillCount": 1,
+                  "filledExitQuantityPct": 100.0,
+                  "regimeBucket": "weak",
+                  "vkospiTier": "weak",
+                  "gapGrade": "G-C",
+                  "dataQualityStatus": "degraded",
+                  "dataQuality": {
+                    "status": "degraded",
+                    "barUnit": "1m",
+                    "sources": [
+                      "daily_ohlc_fallback"
+                    ],
+                    "reason": "synthetic one-day replay derived from daily OHLC"
+                  },
+                  "nextTradingDate": "20261014",
+                  "proxyOutcomeStatus": "resolved",
+                  "proxyRealizedReturnPct": -2.0,
+                  "replayGrade": "A",
+                  "gradeScore": 7.0,
+                  "replayIncluded": false,
+                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                  "historyRecommendation": false,
+                  "historyRecommendationSourceMode": "",
+                  "entryEligible": false,
+                  "entryEligibleOriginal": false,
+                  "setupQuality": "setup_weak",
+                  "statusLabel": "관심후보(약세·소액)",
+                  "takeProfitProfileKey": "conservative",
+                  "takeProfitProfileLabel": "보수형",
+                  "mixedExitPolicy": {
+                    "version": "mixed-exit-v1-balanced",
+                    "policyKey": "reversal-a7plus-balanced",
+                    "active": true,
+                    "stopExecution": "close",
+                    "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                    "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                    "positionWeightMultiplier": 0.5,
+                    "intradayRiskRule": {
+                      "active": true,
+                      "triggerPct": -5.0,
+                      "action": "50% 축소",
+                      "timing": "10:00 또는 14:00 확인",
+                      "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                      "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                    },
+                    "volatilityOverlay": {
+                      "active": true,
+                      "mode": "high-volatility",
+                      "label": "고변동성 방어",
+                      "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                      "triggerMetrics": {
+                        "blendedState": "volatile",
+                        "marketState": "volatile",
+                        "stockState": "volatile",
+                        "atrPct10": 7.28,
+                        "todayRangePct": 9.63,
+                        "returnStd20": 4.93,
+                        "vkospi": 48.76
+                      },
+                      "originalTakeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 50.0
+                        },
+                        {
+                          "targetPct": 10.0,
+                          "quantityPct": 50.0
+                        }
+                      ],
+                      "adjustedTakeProfitStages": [
+                        {
+                          "targetPct": 2.0,
+                          "quantityPct": 60.0
+                        },
+                        {
+                          "targetPct": 8.0,
+                          "quantityPct": 40.0
+                        }
+                      ],
+                      "positionWeightMultiplier": 0.5
+                    },
+                    "label": "반등 × 7&A",
+                    "priority": 1,
+                    "strategyCase": "reversal",
+                    "recommendationCase": "a7plus",
+                    "stopPct": -2.0,
+                    "takeProfitStages": [
+                      {
+                        "targetPct": 2.0,
+                        "quantityPct": 60.0
+                      },
+                      {
+                        "targetPct": 8.0,
+                        "quantityPct": 40.0
+                      }
+                    ],
+                    "positionWeightHint": "half",
+                    "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                  },
+                  "payloadSourceMode": "live",
+                  "inputArchiveVersion": "jongga_inputs.v1",
+                  "rebuildable": true,
+                  "pointInTime": true,
+                  "pointInTimeStatus": "confirmed"
+                },
+                {
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "entryMode": "close",
+                  "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                  "entryFillPrice": 258758.5,
+                  "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                  "exitAvgFillPrice": 237500.0,
+                  "exitLastFillPrice": 237500.0,
+                  "netReturnPct": -8.4083,
+                  "tradeStatus": "closed",
+                  "ambiguousCount": 0,
+                  "remainingQuantityPct": 0.0,
+                  "closedReason": "stop_close",
+                  "exitFillCount": 1,
+                  "filledExitQuantityPct": 100.0,
+                  "regimeBucket": "weak",
+                  "vkospiTier": "weak",
+                  "gapGrade": "G-C",
+                  "dataQualityStatus": "degraded",
+                  "dataQuality": {
+                    "status": "degraded",
+                    "barUnit": "1m",
+                    "sources": [
+                      "daily_ohlc_fallback"
+                    ],
+                    "reason": "synthetic one-day replay derived from daily OHLC"
+                  },
+                  "nextTradingDate": "20261014",
+                  "proxyOutcomeStatus": "resolved",
+                  "proxyRealizedReturnPct": -2.0,
+                  "replayGrade": "B",
+                  "gradeScore": 6.2,
+                  "replayIncluded": false,
+                  "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                  "historyRecommendation": false,
+                  "historyRecommendationSourceMode": "",
+                  "entryEligible": false,
+                  "entryEligibleOriginal": false,
+                  "setupQuality": "setup_weak",
+                  "statusLabel": "매매금지",
+                  "takeProfitProfileKey": "conservative",
+                  "takeProfitProfileLabel": "보수형",
+                  "mixedExitPolicy": {
+                    "version": "mixed-exit-v1-balanced",
+                    "policyKey": "observe-reversal",
+                    "label": "관찰 전용",
+                    "active": false,
+                    "priority": null,
+                    "strategyCase": "",
+                    "recommendationCase": "",
+                    "stopPct": null,
+                    "stopExecution": "close",
+                    "stopCondition": "",
+                    "stopTiming": "자동 진입 제외",
+                    "takeProfitStages": [],
+                    "positionWeightHint": "observe",
+                    "positionWeightMultiplier": 0.0,
+                    "intradayRiskRule": {
+                      "active": false
+                    },
+                    "volatilityOverlay": {
+                      "active": false
+                    },
+                    "reason": "매매금지 또는 시장 차단 상태라 혼합 전략도 관찰 전용으로 둡니다."
+                  },
+                  "payloadSourceMode": "live",
+                  "inputArchiveVersion": "jongga_inputs.v1",
+                  "rebuildable": true,
+                  "pointInTime": true,
+                  "pointInTimeStatus": "confirmed"
+                }
+              ],
+              "orders": [
+                {
+                  "orderId": "20261013|stable|reversal|222800-premarket",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "SELL",
+                  "orderType": "LIMIT",
+                  "requestedAt": "2026-10-14T09:00:00+09:00",
+                  "requestedPrice": 152500.0,
+                  "quantityPct": 60.0,
+                  "reason": "🌅 프리마켓",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "stageKey": "premarket",
+                  "activeFrom": "2026-10-14T09:00:00+09:00",
+                  "activeUntil": "2026-10-14T10:00:00+09:00",
+                  "finalStatus": "cancelled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|222800-openPhase",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "SELL",
+                  "orderType": "LIMIT",
+                  "requestedAt": "2026-10-14T09:00:00+09:00",
+                  "requestedPrice": 156600.0,
+                  "quantityPct": 40.0,
+                  "reason": "🔔 장초반",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "stageKey": "openPhase",
+                  "activeFrom": "2026-10-14T09:00:00+09:00",
+                  "activeUntil": "2026-10-14T10:00:00+09:00",
+                  "finalStatus": "cancelled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|222800-stop",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "SELL",
+                  "orderType": "STOP",
+                  "requestedAt": "2026-10-14T09:00:00+09:00",
+                  "requestedPrice": 146510.0,
+                  "quantityPct": 100.0,
+                  "reason": "🛑 손절",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "stageKey": "stop",
+                  "activeFrom": "",
+                  "activeUntil": "",
+                  "finalStatus": "filled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "SELL",
+                  "orderType": "MKT",
+                  "requestedAt": "2026-10-14T15:00:00+09:00",
+                  "requestedPrice": 138000.0,
+                  "quantityPct": 100.0,
+                  "reason": "3일차 종가 컷오프 청산",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "stageKey": "finalCutoff",
+                  "activeFrom": "2026-10-14T15:00:00+09:00",
+                  "activeUntil": "2026-10-14T15:00:00+09:00",
+                  "finalStatus": "cancelled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|036930-premarket",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "side": "SELL",
+                  "orderType": "LIMIT",
+                  "requestedAt": "2026-10-14T09:00:00+09:00",
+                  "requestedPrice": 266255.0,
+                  "quantityPct": 60.0,
+                  "reason": "🌅 프리마켓",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "stageKey": "premarket",
+                  "activeFrom": "2026-10-14T09:00:00+09:00",
+                  "activeUntil": "2026-10-14T10:00:00+09:00",
+                  "finalStatus": "cancelled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|036930-openPhase",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "side": "SELL",
+                  "orderType": "LIMIT",
+                  "requestedAt": "2026-10-14T09:00:00+09:00",
+                  "requestedPrice": 271250.0,
+                  "quantityPct": 40.0,
+                  "reason": "🔔 장초반",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "stageKey": "openPhase",
+                  "activeFrom": "2026-10-14T09:00:00+09:00",
+                  "activeUntil": "2026-10-14T10:00:00+09:00",
+                  "finalStatus": "cancelled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|036930-stop",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "side": "SELL",
+                  "orderType": "STOP",
+                  "requestedAt": "2026-10-14T09:00:00+09:00",
+                  "requestedPrice": 253330.0,
+                  "quantityPct": 100.0,
+                  "reason": "🛑 손절",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "stageKey": "stop",
+                  "activeFrom": "",
+                  "activeUntil": "",
+                  "finalStatus": "filled"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|036930-finalCutoff",
+                  "runId": "replay-20261014-060600-4c004663",
+                  "date": "2026-10-13",
+                  "variant": "stable",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "side": "SELL",
+                  "orderType": "MKT",
+                  "requestedAt": "2026-10-14T15:00:00+09:00",
+                  "requestedPrice": 237500.0,
+                  "quantityPct": 100.0,
+                  "reason": "3일차 종가 컷오프 청산",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "stageKey": "finalCutoff",
+                  "activeFrom": "2026-10-14T15:00:00+09:00",
+                  "activeUntil": "2026-10-14T15:00:00+09:00",
+                  "finalStatus": "cancelled"
+                }
+              ],
+              "fills": [
+                {
+                  "orderId": "20261013|stable|reversal|222800-entry",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "BUY",
+                  "stageKey": "entry",
+                  "reason": "close_entry",
+                  "fillStatus": "filled",
+                  "filledAt": "2026-10-13T15:30:00+09:00",
+                  "fillPrice": 149649.5,
+                  "filledQuantityPct": 100.0,
+                  "slippagePct": 0.1,
+                  "barTimestamp": "2026-10-13T15:30:00+09:00",
+                  "barOpen": 149500.0,
+                  "barHigh": 149500.0,
+                  "barLow": 149500.0,
+                  "barClose": 149500.0,
+                  "fillRule": "close_slippage"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|222800-stop",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "SELL",
+                  "stageKey": "stop",
+                  "reason": "🛑 손절",
+                  "fillStatus": "filled",
+                  "filledAt": "2026-10-14T15:00:00+09:00",
+                  "fillPrice": 138000.0,
+                  "filledQuantityPct": 100.0,
+                  "slippagePct": 0.0,
+                  "barTimestamp": "2026-10-14T15:00:00+09:00",
+                  "barOpen": 150300.0,
+                  "barHigh": 151600.0,
+                  "barLow": 137900.0,
+                  "barClose": 138000.0,
+                  "fillRule": "stop_close"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|036930-entry",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "side": "BUY",
+                  "stageKey": "entry",
+                  "reason": "close_entry",
+                  "fillStatus": "filled",
+                  "filledAt": "2026-10-13T15:30:00+09:00",
+                  "fillPrice": 258758.5,
+                  "filledQuantityPct": 100.0,
+                  "slippagePct": 0.1,
+                  "barTimestamp": "2026-10-13T15:30:00+09:00",
+                  "barOpen": 258500.0,
+                  "barHigh": 258500.0,
+                  "barLow": 258500.0,
+                  "barClose": 258500.0,
+                  "fillRule": "close_slippage"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|036930-stop",
+                  "sourceEntryKey": "20261013|stable|reversal|036930",
+                  "strategy": "reversal",
+                  "code": "036930",
+                  "name": "주성엔지니어링",
+                  "side": "SELL",
+                  "stageKey": "stop",
+                  "reason": "🛑 손절",
+                  "fillStatus": "filled",
+                  "filledAt": "2026-10-14T15:00:00+09:00",
+                  "fillPrice": 237500.0,
+                  "filledQuantityPct": 100.0,
+                  "slippagePct": 0.0,
+                  "barTimestamp": "2026-10-14T15:00:00+09:00",
+                  "barOpen": 262500.0,
+                  "barHigh": 263000.0,
+                  "barLow": 236500.0,
+                  "barClose": 237500.0,
+                  "fillRule": "stop_close"
+                }
+              ],
+              "candidateCount": 2,
+              "eligibleCount": 0,
+              "includedCount": 0,
+              "tradeCount": 2,
+              "winRate": 0.0,
+              "avgNetReturnPct": -8.1932,
+              "cumNetReturnPct": -8.1932,
+              "maxDrawdownPct": 8.1932,
+              "degradedCount": 2,
+              "ambiguousCount": 0,
+              "unfilledRate": 0.0,
+              "comparisonByCase": {
+                "all": {
+                  "caseKey": "all",
+                  "label": "전체 후보",
+                  "candidateCount": 2,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 2,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -8.1932,
+                  "cumNetReturnPct": -8.1932,
+                  "maxDrawdownPct": 8.1932,
+                  "degradedCount": 2,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "a7plus": {
+                  "caseKey": "a7plus",
+                  "label": "7&A",
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                },
+                "recommendation": {
+                  "caseKey": "recommendation",
+                  "label": "추천 전용",
+                  "candidateCount": 0,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 0,
+                  "winRate": null,
+                  "avgNetReturnPct": null,
+                  "cumNetReturnPct": null,
+                  "maxDrawdownPct": null,
+                  "degradedCount": 0,
+                  "ambiguousCount": 0,
+                  "unfilledRate": null
+                }
+              }
+            }
+          ],
+          "fills": [
+            {
+              "orderId": "20261013|stable|reversal|222800-entry",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "BUY",
+              "stageKey": "entry",
+              "reason": "close_entry",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-13T15:30:00+09:00",
+              "fillPrice": 149649.5,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.1,
+              "barTimestamp": "2026-10-13T15:30:00+09:00",
+              "barOpen": 149500.0,
+              "barHigh": 149500.0,
+              "barLow": 149500.0,
+              "barClose": 149500.0,
+              "fillRule": "close_slippage"
+            },
+            {
+              "orderId": "20261013|stable|reversal|222800-stop",
+              "sourceEntryKey": "20261013|stable|reversal|222800",
+              "strategy": "reversal",
+              "code": "222800",
+              "name": "심텍",
+              "side": "SELL",
+              "stageKey": "stop",
+              "reason": "🛑 손절",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-14T15:00:00+09:00",
+              "fillPrice": 138000.0,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.0,
+              "barTimestamp": "2026-10-14T15:00:00+09:00",
+              "barOpen": 150300.0,
+              "barHigh": 151600.0,
+              "barLow": 137900.0,
+              "barClose": 138000.0,
+              "fillRule": "stop_close"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-entry",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "BUY",
+              "stageKey": "entry",
+              "reason": "close_entry",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-13T15:30:00+09:00",
+              "fillPrice": 258758.5,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.1,
+              "barTimestamp": "2026-10-13T15:30:00+09:00",
+              "barOpen": 258500.0,
+              "barHigh": 258500.0,
+              "barLow": 258500.0,
+              "barClose": 258500.0,
+              "fillRule": "close_slippage"
+            },
+            {
+              "orderId": "20261013|stable|reversal|036930-stop",
+              "sourceEntryKey": "20261013|stable|reversal|036930",
+              "strategy": "reversal",
+              "code": "036930",
+              "name": "주성엔지니어링",
+              "side": "SELL",
+              "stageKey": "stop",
+              "reason": "🛑 손절",
+              "fillStatus": "filled",
+              "filledAt": "2026-10-14T15:00:00+09:00",
+              "fillPrice": 237500.0,
+              "filledQuantityPct": 100.0,
+              "slippagePct": 0.0,
+              "barTimestamp": "2026-10-14T15:00:00+09:00",
+              "barOpen": 262500.0,
+              "barHigh": 263000.0,
+              "barLow": 236500.0,
+              "barClose": 237500.0,
+              "fillRule": "stop_close"
+            }
+          ],
+          "caseViews": {
+            "recommendation": {
+              "summary": {
+                "candidateCount": 0,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 0,
+                "winRate": null,
+                "avgNetReturnPct": null,
+                "cumNetReturnPct": null,
+                "maxDrawdownPct": null,
+                "degradedCount": 0,
+                "ambiguousCount": 0,
+                "unfilledRate": null
+              },
+              "stocks": [],
+              "days": [],
+              "fills": []
+            },
+            "a7plus": {
+              "summary": {
+                "candidateCount": 1,
+                "eligibleCount": 0,
+                "includedCount": 0,
+                "tradeCount": 1,
+                "winRate": 0.0,
+                "avgNetReturnPct": -7.9781,
+                "cumNetReturnPct": -7.9781,
+                "maxDrawdownPct": 7.9781,
+                "degradedCount": 1,
+                "ambiguousCount": 0,
+                "unfilledRate": 0.0
+              },
+              "stocks": [
+                {
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "grade": "A",
+                  "replayGrade": "A",
+                  "gradeScore": 7.0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "lastReplayDate": "2026-10-13",
+                  "lastEntryFilledAt": "2026-10-13T15:30:00+09:00",
+                  "lastEntryFillPrice": 149649.5,
+                  "lastExitFilledAt": "2026-10-14T15:00:00+09:00",
+                  "lastExitAvgFillPrice": 138000.0,
+                  "lastExitFillPrice": 138000.0,
+                  "lastTradeStatus": "closed"
+                }
+              ],
+              "days": [
+                {
+                  "date": "2026-10-13",
+                  "summaryFile": "replay_summary_20261013.json",
+                  "ordersFile": "sim_orders_20261013.json",
+                  "fillsFile": "sim_fills_20261013.json",
+                  "pointInTime": true,
+                  "pointInTimeStatus": "confirmed",
+                  "skippedReason": "",
+                  "trades": [
+                    {
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "grade": "A",
+                      "replayGrade": "A",
+                      "gradeScore": 7.0,
+                      "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                      "entryFillPrice": 149649.5,
+                      "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                      "exitAvgFillPrice": 138000.0,
+                      "exitLastFillPrice": 138000.0,
+                      "tradeStatus": "closed",
+                      "closedReason": "stop_close",
+                      "netReturnPct": -7.9781,
+                      "mixedExitPolicy": {
+                        "version": "mixed-exit-v1-balanced",
+                        "policyKey": "reversal-a7plus-balanced",
+                        "active": true,
+                        "stopExecution": "close",
+                        "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                        "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                        "positionWeightMultiplier": 0.5,
+                        "intradayRiskRule": {
+                          "active": true,
+                          "triggerPct": -5.0,
+                          "action": "50% 축소",
+                          "timing": "10:00 또는 14:00 확인",
+                          "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                          "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                        },
+                        "volatilityOverlay": {
+                          "active": true,
+                          "mode": "high-volatility",
+                          "label": "고변동성 방어",
+                          "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                          "triggerMetrics": {
+                            "blendedState": "volatile",
+                            "marketState": "volatile",
+                            "stockState": "volatile",
+                            "atrPct10": 7.28,
+                            "todayRangePct": 9.63,
+                            "returnStd20": 4.93,
+                            "vkospi": 48.76
+                          },
+                          "originalTakeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 50.0
+                            },
+                            {
+                              "targetPct": 10.0,
+                              "quantityPct": 50.0
+                            }
+                          ],
+                          "adjustedTakeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 60.0
+                            },
+                            {
+                              "targetPct": 8.0,
+                              "quantityPct": 40.0
+                            }
+                          ],
+                          "positionWeightMultiplier": 0.5
+                        },
+                        "label": "반등 × 7&A",
+                        "priority": 1,
+                        "strategyCase": "reversal",
+                        "recommendationCase": "a7plus",
+                        "stopPct": -2.0,
+                        "takeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightHint": "half",
+                        "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                      },
+                      "remainingQuantityPct": 0.0
+                    }
+                  ],
+                  "candidates": [
+                    {
+                      "strategy": "reversal",
+                      "name": "심텍",
+                      "code": "222800",
+                      "takeProfitProfileKey": "conservative",
+                      "takeProfitProfileLabel": "보수형",
+                      "originalGrade": "A",
+                      "replayGrade": "A",
+                      "gradeScore": 7.0,
+                      "strictScore": 7.0,
+                      "signalScore": 7.0,
+                      "entryPrice": 149500.0,
+                      "entryPriceAvailable": true,
+                      "statusLabel": "관심후보(약세·소액)",
+                      "mixedExitPolicy": {
+                        "version": "mixed-exit-v1-balanced",
+                        "policyKey": "reversal-a7plus-balanced",
+                        "active": true,
+                        "stopExecution": "close",
+                        "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                        "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                        "positionWeightMultiplier": 0.5,
+                        "intradayRiskRule": {
+                          "active": true,
+                          "triggerPct": -5.0,
+                          "action": "50% 축소",
+                          "timing": "10:00 또는 14:00 확인",
+                          "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                          "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                        },
+                        "volatilityOverlay": {
+                          "active": true,
+                          "mode": "high-volatility",
+                          "label": "고변동성 방어",
+                          "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                          "triggerMetrics": {
+                            "blendedState": "volatile",
+                            "marketState": "volatile",
+                            "stockState": "volatile",
+                            "atrPct10": 7.28,
+                            "todayRangePct": 9.63,
+                            "returnStd20": 4.93,
+                            "vkospi": 48.76
+                          },
+                          "originalTakeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 50.0
+                            },
+                            {
+                              "targetPct": 10.0,
+                              "quantityPct": 50.0
+                            }
+                          ],
+                          "adjustedTakeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 60.0
+                            },
+                            {
+                              "targetPct": 8.0,
+                              "quantityPct": 40.0
+                            }
+                          ],
+                          "positionWeightMultiplier": 0.5
+                        },
+                        "label": "반등 × 7&A",
+                        "priority": 1,
+                        "strategyCase": "reversal",
+                        "recommendationCase": "a7plus",
+                        "stopPct": -2.0,
+                        "takeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightHint": "half",
+                        "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                      },
+                      "entryEligibleOriginal": false,
+                      "historyRecommendation": false,
+                      "replayIncluded": false,
+                      "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                      "replayA7Plus": true,
+                      "replayA7PlusRule": "gradeScore>=7.0 AND replayGrade in {A,S}",
+                      "pullbackReplayGateOk": true,
+                      "qualityGateOk": true,
+                      "entryEligible": false,
+                      "entryWatch": false,
+                      "entryBlockers": [],
+                      "setupQuality": "setup_weak",
+                      "payloadSourceMode": "live",
+                      "inputArchiveVersion": "jongga_inputs.v1",
+                      "rebuildable": true,
+                      "historyRecommendationSourceMode": "",
+                      "pointInTime": true,
+                      "pointInTimeStatus": "confirmed"
+                    }
+                  ],
+                  "results": [
+                    {
+                      "runId": "replay-20261014-060600-4c004663",
+                      "date": "2026-10-13",
+                      "variant": "stable",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "entryMode": "close",
+                      "entryFilledAt": "2026-10-13T15:30:00+09:00",
+                      "entryFillPrice": 149649.5,
+                      "exitFilledAt": "2026-10-14T15:00:00+09:00",
+                      "exitAvgFillPrice": 138000.0,
+                      "exitLastFillPrice": 138000.0,
+                      "netReturnPct": -7.9781,
+                      "tradeStatus": "closed",
+                      "ambiguousCount": 0,
+                      "remainingQuantityPct": 0.0,
+                      "closedReason": "stop_close",
+                      "exitFillCount": 1,
+                      "filledExitQuantityPct": 100.0,
+                      "regimeBucket": "weak",
+                      "vkospiTier": "weak",
+                      "gapGrade": "G-C",
+                      "dataQualityStatus": "degraded",
+                      "dataQuality": {
+                        "status": "degraded",
+                        "barUnit": "1m",
+                        "sources": [
+                          "daily_ohlc_fallback"
+                        ],
+                        "reason": "synthetic one-day replay derived from daily OHLC"
+                      },
+                      "nextTradingDate": "20261014",
+                      "proxyOutcomeStatus": "resolved",
+                      "proxyRealizedReturnPct": -2.0,
+                      "replayGrade": "A",
+                      "gradeScore": 7.0,
+                      "replayIncluded": false,
+                      "replayIncludeRule": "gradeScore>=8.0 AND replayGrade>=A",
+                      "historyRecommendation": false,
+                      "historyRecommendationSourceMode": "",
+                      "entryEligible": false,
+                      "entryEligibleOriginal": false,
+                      "setupQuality": "setup_weak",
+                      "statusLabel": "관심후보(약세·소액)",
+                      "takeProfitProfileKey": "conservative",
+                      "takeProfitProfileLabel": "보수형",
+                      "mixedExitPolicy": {
+                        "version": "mixed-exit-v1-balanced",
+                        "policyKey": "reversal-a7plus-balanced",
+                        "active": true,
+                        "stopExecution": "close",
+                        "stopCondition": "종가 -2% 이탈 시 전량 정리, 장중 -5% 이상 훼손 후 회복 실패 시 50% 축소",
+                        "stopTiming": "장중 조건은 10:00/14:00 확인 후 부분 축소, 최종 손절은 종가 확인 후",
+                        "positionWeightMultiplier": 0.5,
+                        "intradayRiskRule": {
+                          "active": true,
+                          "triggerPct": -5.0,
+                          "action": "50% 축소",
+                          "timing": "10:00 또는 14:00 확인",
+                          "recoveryRule": "진입가 대비 -3% 안쪽으로 회복하지 못하면 부분 축소",
+                          "finalStopRule": "종가 기준 -2% 이탈 시 남은 물량 전량 정리"
+                        },
+                        "volatilityOverlay": {
+                          "active": true,
+                          "mode": "high-volatility",
+                          "label": "고변동성 방어",
+                          "reason": "시장 또는 종목 변동성이 커서 비중을 줄이고 1차 익절을 앞당깁니다.",
+                          "triggerMetrics": {
+                            "blendedState": "volatile",
+                            "marketState": "volatile",
+                            "stockState": "volatile",
+                            "atrPct10": 7.28,
+                            "todayRangePct": 9.63,
+                            "returnStd20": 4.93,
+                            "vkospi": 48.76
+                          },
+                          "originalTakeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 50.0
+                            },
+                            {
+                              "targetPct": 10.0,
+                              "quantityPct": 50.0
+                            }
+                          ],
+                          "adjustedTakeProfitStages": [
+                            {
+                              "targetPct": 2.0,
+                              "quantityPct": 60.0
+                            },
+                            {
+                              "targetPct": 8.0,
+                              "quantityPct": 40.0
+                            }
+                          ],
+                          "positionWeightMultiplier": 0.5
+                        },
+                        "label": "반등 × 7&A",
+                        "priority": 1,
+                        "strategyCase": "reversal",
+                        "recommendationCase": "a7plus",
+                        "stopPct": -2.0,
+                        "takeProfitStages": [
+                          {
+                            "targetPct": 2.0,
+                            "quantityPct": 60.0
+                          },
+                          {
+                            "targetPct": 8.0,
+                            "quantityPct": 40.0
+                          }
+                        ],
+                        "positionWeightHint": "half",
+                        "reason": "반등 주력 후보는 빠른 수익 확보와 2차 반등 목표를 같이 사용합니다. 고변동성 방어로 비중을 50%로 낮추고 1차 익절을 앞당깁니다."
+                      },
+                      "payloadSourceMode": "live",
+                      "inputArchiveVersion": "jongga_inputs.v1",
+                      "rebuildable": true,
+                      "pointInTime": true,
+                      "pointInTimeStatus": "confirmed"
+                    }
+                  ],
+                  "orders": [
+                    {
+                      "orderId": "20261013|stable|reversal|222800-premarket",
+                      "runId": "replay-20261014-060600-4c004663",
+                      "date": "2026-10-13",
+                      "variant": "stable",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "side": "SELL",
+                      "orderType": "LIMIT",
+                      "requestedAt": "2026-10-14T09:00:00+09:00",
+                      "requestedPrice": 152500.0,
+                      "quantityPct": 60.0,
+                      "reason": "🌅 프리마켓",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "stageKey": "premarket",
+                      "activeFrom": "2026-10-14T09:00:00+09:00",
+                      "activeUntil": "2026-10-14T10:00:00+09:00",
+                      "finalStatus": "cancelled"
+                    },
+                    {
+                      "orderId": "20261013|stable|reversal|222800-openPhase",
+                      "runId": "replay-20261014-060600-4c004663",
+                      "date": "2026-10-13",
+                      "variant": "stable",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "side": "SELL",
+                      "orderType": "LIMIT",
+                      "requestedAt": "2026-10-14T09:00:00+09:00",
+                      "requestedPrice": 156600.0,
+                      "quantityPct": 40.0,
+                      "reason": "🔔 장초반",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "stageKey": "openPhase",
+                      "activeFrom": "2026-10-14T09:00:00+09:00",
+                      "activeUntil": "2026-10-14T10:00:00+09:00",
+                      "finalStatus": "cancelled"
+                    },
+                    {
+                      "orderId": "20261013|stable|reversal|222800-stop",
+                      "runId": "replay-20261014-060600-4c004663",
+                      "date": "2026-10-13",
+                      "variant": "stable",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "side": "SELL",
+                      "orderType": "STOP",
+                      "requestedAt": "2026-10-14T09:00:00+09:00",
+                      "requestedPrice": 146510.0,
+                      "quantityPct": 100.0,
+                      "reason": "🛑 손절",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "stageKey": "stop",
+                      "activeFrom": "",
+                      "activeUntil": "",
+                      "finalStatus": "filled"
+                    },
+                    {
+                      "orderId": "20261013|stable|reversal|222800-finalCutoff",
+                      "runId": "replay-20261014-060600-4c004663",
+                      "date": "2026-10-13",
+                      "variant": "stable",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "side": "SELL",
+                      "orderType": "MKT",
+                      "requestedAt": "2026-10-14T15:00:00+09:00",
+                      "requestedPrice": 138000.0,
+                      "quantityPct": 100.0,
+                      "reason": "3일차 종가 컷오프 청산",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "stageKey": "finalCutoff",
+                      "activeFrom": "2026-10-14T15:00:00+09:00",
+                      "activeUntil": "2026-10-14T15:00:00+09:00",
+                      "finalStatus": "cancelled"
+                    }
+                  ],
+                  "fills": [
+                    {
+                      "orderId": "20261013|stable|reversal|222800-entry",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "side": "BUY",
+                      "stageKey": "entry",
+                      "reason": "close_entry",
+                      "fillStatus": "filled",
+                      "filledAt": "2026-10-13T15:30:00+09:00",
+                      "fillPrice": 149649.5,
+                      "filledQuantityPct": 100.0,
+                      "slippagePct": 0.1,
+                      "barTimestamp": "2026-10-13T15:30:00+09:00",
+                      "barOpen": 149500.0,
+                      "barHigh": 149500.0,
+                      "barLow": 149500.0,
+                      "barClose": 149500.0,
+                      "fillRule": "close_slippage"
+                    },
+                    {
+                      "orderId": "20261013|stable|reversal|222800-stop",
+                      "sourceEntryKey": "20261013|stable|reversal|222800",
+                      "strategy": "reversal",
+                      "code": "222800",
+                      "name": "심텍",
+                      "side": "SELL",
+                      "stageKey": "stop",
+                      "reason": "🛑 손절",
+                      "fillStatus": "filled",
+                      "filledAt": "2026-10-14T15:00:00+09:00",
+                      "fillPrice": 138000.0,
+                      "filledQuantityPct": 100.0,
+                      "slippagePct": 0.0,
+                      "barTimestamp": "2026-10-14T15:00:00+09:00",
+                      "barOpen": 150300.0,
+                      "barHigh": 151600.0,
+                      "barLow": 137900.0,
+                      "barClose": 138000.0,
+                      "fillRule": "stop_close"
+                    }
+                  ],
+                  "candidateCount": 1,
+                  "eligibleCount": 0,
+                  "includedCount": 0,
+                  "tradeCount": 1,
+                  "winRate": 0.0,
+                  "avgNetReturnPct": -7.9781,
+                  "cumNetReturnPct": -7.9781,
+                  "maxDrawdownPct": 7.9781,
+                  "degradedCount": 1,
+                  "ambiguousCount": 0,
+                  "unfilledRate": 0.0
+                }
+              ],
+              "fills": [
+                {
+                  "orderId": "20261013|stable|reversal|222800-entry",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "BUY",
+                  "stageKey": "entry",
+                  "reason": "close_entry",
+                  "fillStatus": "filled",
+                  "filledAt": "2026-10-13T15:30:00+09:00",
+                  "fillPrice": 149649.5,
+                  "filledQuantityPct": 100.0,
+                  "slippagePct": 0.1,
+                  "barTimestamp": "2026-10-13T15:30:00+09:00",
+                  "barOpen": 149500.0,
+                  "barHigh": 149500.0,
+                  "barLow": 149500.0,
+                  "barClose": 149500.0,
+                  "fillRule": "close_slippage"
+                },
+                {
+                  "orderId": "20261013|stable|reversal|222800-stop",
+                  "sourceEntryKey": "20261013|stable|reversal|222800",
+                  "strategy": "reversal",
+                  "code": "222800",
+                  "name": "심텍",
+                  "side": "SELL",
+                  "stageKey": "stop",
+                  "reason": "🛑 손절",
+                  "fillStatus": "filled",
+                  "filledAt": "2026-10-14T15:00:00+09:00",
+                  "fillPrice": 138000.0,
+                  "filledQuantityPct": 100.0,
+                  "slippagePct": 0.0,
+                  "barTimestamp": "2026-10-14T15:00:00+09:00",
+                  "barOpen": 150300.0,
+                  "barHigh": 151600.0,
+                  "barLow": 137900.0,
+                  "barClose": 138000.0,
+                  "fillRule": "stop_close"
+                }
+              ]
             }
           }
         }

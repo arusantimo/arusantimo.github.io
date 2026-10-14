@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-14",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261014.js",
+    "jsonFile": "jongga/output/202610/latest_20261014.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261014.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-14T06:05:58+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 4.6,
+        "signalScore": 4.6,
+        "strictScore": 4.6,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 586000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "353200",
+        "name": "대덕전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "373220",
+        "name": "LG에너지솔루션",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-13",
     "variant": "stable",
     "variantLabel": "현재 버전",
