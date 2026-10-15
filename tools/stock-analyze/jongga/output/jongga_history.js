@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-15T06:06:19+00:00",
+    "generatedAt": "2026-10-15T08:36:19+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "RISE 200",
+        "code": "148020",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 87640
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -33,8 +48,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성SDI",
-        "code": "006400",
+        "name": "LG에너지솔루션",
+        "code": "373220",
         "score": 4.8,
         "signalScore": 4.8,
         "strictScore": 4.8,
@@ -43,7 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 4.8,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 537000
+        "currentPrice": 391500
       }
     ],
     "blacklist": [
