@@ -9,32 +9,32 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-16T06:06:16+00:00",
+    "generatedAt": "2026-10-16T08:35:59+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "셀트리온",
         "code": "068270",
-        "score": 7.1,
-        "signalScore": 7.1,
-        "strictScore": 7.1,
+        "score": 8.7,
+        "signalScore": 8.7,
+        "strictScore": 8.7,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.1,
+        "grade": "S",
+        "gradeScore": 8.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 194100
+        "currentPrice": 193700
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "한화에어로스페이스",
-        "code": "012450",
+        "name": "주성엔지니어링",
+        "code": "036930",
         "score": 6.7,
         "signalScore": 6.7,
         "strictScore": 6.7,
@@ -43,22 +43,25 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 889000
+        "currentPrice": 212000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성바이오로직스",
+        "code": "207940",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1284000
       }
     ],
-    "blacklist": [
-      {
-        "code": "036930",
-        "name": "주성엔지니어링",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      }
-    ]
+    "blacklist": []
   },
   {
     "date": "2026-10-15",
