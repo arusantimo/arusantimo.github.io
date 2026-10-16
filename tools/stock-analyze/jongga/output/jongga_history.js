@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-16",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261016.js",
+    "jsonFile": "jongga/output/202610/latest_20261016.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261016.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-16T06:06:16+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 194100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "score": 6.7,
+        "signalScore": 6.7,
+        "strictScore": 6.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 889000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-15",
     "variant": "stable",
     "variantLabel": "현재 버전",
