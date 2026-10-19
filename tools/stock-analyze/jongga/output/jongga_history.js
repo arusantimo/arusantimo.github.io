@@ -9,26 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-19T06:06:02+00:00",
+    "generatedAt": "2026-10-19T08:35:13+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "LG에너지솔루션",
         "code": "373220",
-        "score": 7.8,
-        "signalScore": 7.8,
-        "strictScore": 7.8,
+        "score": 7.9,
+        "signalScore": 7.9,
+        "strictScore": 7.9,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 7.8,
+        "gradeScore": 7.9,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 432000
+        "currentPrice": 425500
       },
       {
         "strategy": "reversal",
@@ -48,20 +48,32 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "HT로보틱스",
-        "code": "396300",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 7.1,
+        "signalScore": 7.1,
+        "strictScore": 7.1,
         "scoreMax": 10.0,
         "grade": "A",
-        "gradeScore": 7.0,
+        "gradeScore": 7.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 9070
+        "currentPrice": 161100
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "419050",
+        "name": "삼기에너지솔루션즈",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-10-16",
