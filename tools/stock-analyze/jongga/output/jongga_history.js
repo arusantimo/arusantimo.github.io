@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-20T06:05:38+00:00",
+    "generatedAt": "2026-10-20T08:35:12+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,17 +33,32 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
+        "name": "KB금융",
+        "code": "105560",
+        "score": 5.3,
+        "signalScore": 5.3,
+        "strictScore": 5.3,
         "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 5.7,
+        "grade": "C",
+        "gradeScore": 5.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 559000
+        "currentPrice": 160500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 4.9,
+        "signalScore": 4.9,
+        "strictScore": 4.9,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 4.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 554000
       }
     ],
     "blacklist": [
