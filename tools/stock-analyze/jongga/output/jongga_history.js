@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-20",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261020.js",
+    "jsonFile": "jongga/output/202610/latest_20261020.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261020.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-20T06:05:38+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "RISE 200",
+        "code": "148020",
+        "score": 6.2,
+        "signalScore": 6.2,
+        "strictScore": 6.2,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 87050
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 559000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "007810",
+        "name": "코리아써키트",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-19",
     "variant": "stable",
     "variantLabel": "현재 버전",
