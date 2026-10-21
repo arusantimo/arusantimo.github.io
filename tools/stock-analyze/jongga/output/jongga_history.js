@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-21T06:05:56+00:00",
+    "generatedAt": "2026-10-21T08:35:55+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대한광통신",
+        "code": "010170",
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.6,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 14310
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -28,33 +43,25 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.2,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 11020
-      }
-    ],
-    "blacklist": [
-      {
-        "code": "010170",
-        "name": "대한광통신",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "currentPrice": 11160
       },
       {
-        "code": "036930",
-        "name": "주성엔지니어링",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK이노베이션",
+        "code": "096770",
+        "score": 6.2,
+        "signalScore": 6.2,
+        "strictScore": 6.2,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 153900
       }
-    ]
+    ],
+    "blacklist": []
   },
   {
     "date": "2026-10-20",
