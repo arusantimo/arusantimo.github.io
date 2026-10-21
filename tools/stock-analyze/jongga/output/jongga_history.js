@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-21",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261021.js",
+    "jsonFile": "jongga/output/202610/latest_20261021.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261021.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-21T06:05:56+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "HT로보틱스",
+        "code": "396300",
+        "score": 6.2,
+        "signalScore": 6.2,
+        "strictScore": 6.2,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.2,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 11020
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "010170",
+        "name": "대한광통신",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-20",
     "variant": "stable",
     "variantLabel": "현재 버전",
