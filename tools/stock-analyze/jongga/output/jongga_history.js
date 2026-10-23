@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-23T06:04:23+00:00",
+    "generatedAt": "2026-10-23T08:43:36+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,21 +20,6 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "빅텍",
         "code": "065450",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 8.1,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 3785
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "SK스퀘어",
-        "code": "402340",
         "score": 4.8,
         "signalScore": 4.8,
         "strictScore": 4.8,
@@ -43,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 766000
+        "currentPrice": 3895
       },
       {
         "strategy": "reversal",
@@ -59,6 +44,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 59300
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 772000
       }
     ],
     "blacklist": []
