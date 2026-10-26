@@ -9,27 +9,12 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-26T06:04:02+00:00",
+    "generatedAt": "2026-10-26T08:33:57+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "SK스퀘어",
-        "code": "402340",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 779000
-      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -43,7 +28,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.9,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 251500
+        "currentPrice": 245500
       },
       {
         "strategy": "reversal",
@@ -59,6 +44,21 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 74100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 767000
       }
     ],
     "blacklist": []
