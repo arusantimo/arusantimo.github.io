@@ -9,26 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-27T06:04:07+00:00",
+    "generatedAt": "2026-10-27T08:33:52+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성바이오로직스",
-        "code": "207940",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
+        "name": "NAVER",
+        "code": "035420",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.9,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 1370000
+        "currentPrice": 182000
       },
       {
         "strategy": "reversal",
@@ -43,22 +43,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 508000
+        "currentPrice": 509000
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성E&A",
-        "code": "028050",
-        "score": 3.5,
-        "signalScore": 3.5,
-        "strictScore": 3.5,
+        "name": "삼성바이오로직스",
+        "code": "207940",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
         "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 5.0,
+        "grade": "B",
+        "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 62200
+        "currentPrice": 1368000
       }
     ],
     "blacklist": []
