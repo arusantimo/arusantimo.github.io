@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-28",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261028.js",
+    "jsonFile": "jongga/output/202610/latest_20261028.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261028.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-28T06:04:25+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 241250
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "053800",
+        "name": "안랩",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "179880",
+        "name": "멜콘",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-27",
     "variant": "stable",
     "variantLabel": "현재 버전",
