@@ -9,12 +9,42 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-28T06:04:25+00:00",
+    "generatedAt": "2026-10-28T08:34:38+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "안랩",
+        "code": "053800",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 110000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "멜콘",
+        "code": "179880",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 10.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 19820
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -28,24 +58,13 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 241250
+        "currentPrice": 243500
       }
     ],
     "blacklist": [
       {
-        "code": "053800",
-        "name": "안랩",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "179880",
-        "name": "멜콘",
+        "code": "010170",
+        "name": "대한광통신",
         "reasons": [
           "투자 주의"
         ],
