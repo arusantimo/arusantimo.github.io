@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-29",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261029.js",
+    "jsonFile": "jongga/output/202610/latest_20261029.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261029.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-29T06:04:11+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1541000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "RISE 200",
+        "code": "148020",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 94995
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "069540",
+        "name": "빛과전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-28",
     "variant": "stable",
     "variantLabel": "현재 버전",
