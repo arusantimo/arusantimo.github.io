@@ -9,27 +9,12 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-29T06:04:11+00:00",
+    "generatedAt": "2026-10-29T08:35:10+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "SK하이닉스",
-        "code": "000660",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.4,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 1541000
-      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -44,9 +29,35 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 94995
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK하이닉스",
+        "code": "000660",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1507000
       }
     ],
     "blacklist": [
+      {
+        "code": "017900",
+        "name": "광전자",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
       {
         "code": "069540",
         "name": "빛과전자",
