@@ -1,5 +1,63 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-10-30",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202610/jongga_data_20261030.js",
+    "jsonFile": "jongga/output/202610/latest_20261030.json",
+    "inputArchiveFile": "jongga/output/archive/202610/inputs_20261030.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-10-30T06:04:22+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "기아",
+        "code": "000270",
+        "score": 3.5,
+        "signalScore": 3.5,
+        "strictScore": 3.5,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 93500
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "042510",
+        "name": "라온시큐어",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "030530",
+        "name": "원익홀딩스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-10-29",
     "variant": "stable",
     "variantLabel": "현재 버전",
