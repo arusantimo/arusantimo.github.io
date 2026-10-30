@@ -9,26 +9,56 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-10-30T06:04:22+00:00",
+    "generatedAt": "2026-10-30T08:33:55+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "기아",
-        "code": "000270",
-        "score": 3.5,
-        "signalScore": 3.5,
-        "strictScore": 3.5,
+        "name": "원익홀딩스",
+        "code": "030530",
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
         "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 5.0,
+        "grade": "B",
+        "gradeScore": 6.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 93500
+        "currentPrice": 29150
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "RISE 200",
+        "code": "148020",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 91090
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "LG에너지솔루션",
+        "code": "373220",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 356500
       }
     ],
     "blacklist": [
@@ -37,17 +67,6 @@ window.JONGGA_HISTORY_INDEX = [
         "name": "라온시큐어",
         "reasons": [
           "공매도 과열",
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
-      },
-      {
-        "code": "030530",
-        "name": "원익홀딩스",
-        "reasons": [
           "투자 주의"
         ],
         "sources": [
