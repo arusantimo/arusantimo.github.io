@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-02T06:04:43+00:00",
+    "generatedAt": "2026-11-02T08:35:00+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,17 +33,17 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "두산에너빌리티",
-        "code": "034020",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
+        "name": "HD현대중공업",
+        "code": "329180",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
         "scoreMax": 10.0,
         "grade": "B",
-        "gradeScore": 6.9,
+        "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 56000
+        "currentPrice": 287500
       }
     ],
     "blacklist": [
@@ -55,6 +55,17 @@ window.JONGGA_HISTORY_INDEX = [
         ],
         "sources": [
           "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "034020",
+        "name": "두산에너빌리티",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "toss"
         ],
         "status": "confirmed"
       }
