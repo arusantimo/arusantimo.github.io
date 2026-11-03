@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-03",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261103.js",
+    "jsonFile": "jongga/output/202611/latest_20261103.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261103.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-03T06:03:50+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "한진칼",
+        "code": "180640",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 175200
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 29150
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "263860",
+        "name": "지니언스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-02",
     "variant": "stable",
     "variantLabel": "현재 버전",
