@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-03T06:03:50+00:00",
+    "generatedAt": "2026-11-03T08:34:06+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,8 +33,8 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "대한항공",
-        "code": "003490",
+        "name": "지니언스",
+        "code": "263860",
         "score": 5.7,
         "signalScore": 5.7,
         "strictScore": 5.7,
@@ -43,13 +43,28 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.1,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 29150
+        "currentPrice": 28700
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "대한항공",
+        "code": "003490",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 28950
       }
     ],
     "blacklist": [
       {
-        "code": "263860",
-        "name": "지니언스",
+        "code": "030530",
+        "name": "원익홀딩스",
         "reasons": [
           "투자 주의"
         ],
