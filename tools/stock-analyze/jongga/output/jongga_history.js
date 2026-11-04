@@ -9,26 +9,26 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-04T06:04:28+00:00",
+    "generatedAt": "2026-11-04T08:33:48+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "삼성E&A",
         "code": "028050",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.7,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 65200
+        "currentPrice": 65400
       },
       {
         "strategy": "reversal",
@@ -50,15 +50,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "셀트리온",
         "code": "068270",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.4,
+        "grade": "B",
+        "gradeScore": 6.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 199600
+        "currentPrice": 201000
       }
     ],
     "blacklist": []
