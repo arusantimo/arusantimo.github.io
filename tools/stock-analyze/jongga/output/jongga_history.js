@@ -9,42 +9,12 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-05T06:03:58+00:00",
+    "generatedAt": "2026-11-05T08:34:11+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
     "buyCount": 3,
     "topRecommendations": [
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "NAVER",
-        "code": "035420",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.4,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 184200
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "카카오",
-        "code": "035720",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
-        "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.4,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 32050
-      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -58,7 +28,37 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 6.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 214500
+        "currentPrice": 214000
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "NAVER",
+        "code": "035420",
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 183500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "카카오",
+        "code": "035720",
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 32150
       }
     ],
     "blacklist": []
