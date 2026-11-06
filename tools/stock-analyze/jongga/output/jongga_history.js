@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-06T06:03:52+00:00",
+    "generatedAt": "2026-11-06T08:34:58+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,21 +20,6 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "NAVER",
         "code": "035420",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
-        "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 10.0,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 191700
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "셀트리온",
-        "code": "068270",
         "score": 6.1,
         "signalScore": 6.1,
         "strictScore": 6.1,
@@ -43,7 +28,22 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 8.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 212000
+        "currentPrice": 189100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 208500
       }
     ],
     "blacklist": [
