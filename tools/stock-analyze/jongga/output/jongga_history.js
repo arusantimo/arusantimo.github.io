@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-09",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261109.js",
+    "jsonFile": "jongga/output/202611/latest_20261109.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261109.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-09T06:04:03+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK스퀘어",
+        "code": "402340",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 723000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "180640",
+        "name": "한진칼",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-06",
     "variant": "stable",
     "variantLabel": "현재 버전",
