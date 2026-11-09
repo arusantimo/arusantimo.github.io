@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-09T06:04:03+00:00",
+    "generatedAt": "2026-11-09T08:34:30+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -33,6 +33,17 @@ window.JONGGA_HISTORY_INDEX = [
     ],
     "blacklist": [
       {
+        "code": "180640",
+        "name": "한진칼",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
         "code": "036930",
         "name": "주성엔지니어링",
         "reasons": [
@@ -44,8 +55,8 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "180640",
-        "name": "한진칼",
+        "code": "009150",
+        "name": "삼성전기",
         "reasons": [
           "투자 주의"
         ],
