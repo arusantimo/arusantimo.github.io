@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-10T06:04:21+00:00",
+    "generatedAt": "2026-11-10T08:35:24+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 5,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "SK텔레콤",
+        "code": "017670",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 81700
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -44,21 +59,6 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 1229000
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 199800
       }
     ],
     "blacklist": []
