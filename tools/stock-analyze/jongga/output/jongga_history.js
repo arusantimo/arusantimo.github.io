@@ -9,27 +9,12 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-11T06:04:11+00:00",
+    "generatedAt": "2026-11-11T08:34:22+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "삼성SDI",
-        "code": "006400",
-        "score": 4.8,
-        "signalScore": 4.8,
-        "strictScore": 4.8,
-        "scoreMax": 10.0,
-        "grade": "B",
-        "gradeScore": 6.9,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 478500
-      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -44,6 +29,36 @@ window.JONGGA_HISTORY_INDEX = [
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 47100
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 206500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 477000
       }
     ],
     "blacklist": [
