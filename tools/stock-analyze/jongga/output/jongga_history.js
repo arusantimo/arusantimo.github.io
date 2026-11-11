@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-11",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261111.js",
+    "jsonFile": "jongga/output/202611/latest_20261111.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261111.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-11T06:04:11+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성SDI",
+        "code": "006400",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 478500
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "두산에너빌리티",
+        "code": "034020",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 47100
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "009150",
+        "name": "삼성전기",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-10",
     "variant": "stable",
     "variantLabel": "현재 버전",
