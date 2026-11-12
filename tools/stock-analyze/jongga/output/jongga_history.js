@@ -9,11 +9,11 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-12T06:04:20+00:00",
+    "generatedAt": "2026-11-12T08:35:04+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
@@ -48,6 +48,17 @@ window.JONGGA_HISTORY_INDEX = [
         "name": "지니언스",
         "reasons": [
           "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "036930",
+        "name": "주성엔지니어링",
+        "reasons": [
+          "공매도 과열"
         ],
         "sources": [
           "kind"
