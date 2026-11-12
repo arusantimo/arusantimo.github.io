@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-12",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261112.js",
+    "jsonFile": "jongga/output/202611/latest_20261112.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261112.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-12T06:04:20+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼양식품",
+        "code": "003230",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 1249000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "180640",
+        "name": "한진칼",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "263860",
+        "name": "지니언스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-11",
     "variant": "stable",
     "variantLabel": "현재 버전",
