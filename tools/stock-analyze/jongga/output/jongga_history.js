@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-13",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261113.js",
+    "jsonFile": "jongga/output/202611/latest_20261113.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261113.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-13T06:03:42+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "원익홀딩스",
+        "code": "030530",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 31400
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성E&A",
+        "code": "028050",
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.3,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 68800
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "263860",
+        "name": "지니언스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-12",
     "variant": "stable",
     "variantLabel": "현재 버전",
