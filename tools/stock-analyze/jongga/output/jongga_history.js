@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-16T06:04:22+00:00",
+    "generatedAt": "2026-11-16T08:35:45+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,27 +20,27 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "미래에셋벤처투자",
         "code": "100790",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
-        "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 10.0,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 14920
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "KB금융",
-        "code": "105560",
         "score": 6.1,
         "signalScore": 6.1,
         "strictScore": 6.1,
         "scoreMax": 10.0,
         "grade": "S",
         "gradeScore": 8.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 14810
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "KB금융",
+        "code": "105560",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
         "currentPrice": 160600
@@ -58,7 +58,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 76900
+        "currentPrice": 77300
       }
     ],
     "blacklist": []
