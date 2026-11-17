@@ -9,52 +9,59 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-17T06:03:27+00:00",
+    "generatedAt": "2026-11-17T08:36:26+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
+    "buyCount": 4,
     "topRecommendations": [
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
-        "name": "삼성전자",
-        "code": "005930",
-        "score": 2.7,
-        "signalScore": 2.7,
-        "strictScore": 2.7,
+        "name": "코리아써키트",
+        "code": "007810",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "C",
-        "gradeScore": 3.9,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 190200
-      }
-    ],
-    "blacklist": [
-      {
-        "code": "263860",
-        "name": "지니언스",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "currentPrice": 91500
       },
       {
-        "code": "007810",
-        "name": "코리아써키트",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "지니언스",
+        "code": "263860",
+        "score": 3.5,
+        "signalScore": 3.5,
+        "strictScore": 3.5,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 36600
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "이수페타시스",
+        "code": "007660",
+        "score": 3.5,
+        "signalScore": 3.5,
+        "strictScore": 3.5,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 5.0,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 84600
       }
-    ]
+    ],
+    "blacklist": []
   },
   {
     "date": "2026-11-16",
