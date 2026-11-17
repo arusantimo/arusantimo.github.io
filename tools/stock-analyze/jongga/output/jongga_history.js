@@ -1,5 +1,62 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-17",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261117.js",
+    "jsonFile": "jongga/output/202611/latest_20261117.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261117.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-17T06:03:27+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "삼성전자",
+        "code": "005930",
+        "score": 2.7,
+        "signalScore": 2.7,
+        "strictScore": 2.7,
+        "scoreMax": 10.0,
+        "grade": "C",
+        "gradeScore": 3.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 190200
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "263860",
+        "name": "지니언스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "007810",
+        "name": "코리아써키트",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-16",
     "variant": "stable",
     "variantLabel": "현재 버전",
