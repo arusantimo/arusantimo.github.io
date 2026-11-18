@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-18T06:03:46+00:00",
+    "generatedAt": "2026-11-18T08:33:20+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,15 +20,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "원익홀딩스",
         "code": "030530",
-        "score": 5.2,
-        "signalScore": 5.2,
-        "strictScore": 5.2,
+        "score": 4.4,
+        "signalScore": 4.4,
+        "strictScore": 4.4,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 7.4,
+        "grade": "B",
+        "gradeScore": 6.3,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 35200
+        "currentPrice": 35450
       }
     ],
     "blacklist": [
