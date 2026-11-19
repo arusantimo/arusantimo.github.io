@@ -9,12 +9,27 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-19T06:03:32+00:00",
+    "generatedAt": "2026-11-19T08:39:02+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
     "buyCount": 3,
     "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "하이브",
+        "code": "352820",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 10.0,
+        "grade": "S",
+        "gradeScore": 8.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 186800
+      },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
@@ -28,33 +43,25 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 34050
-      }
-    ],
-    "blacklist": [
-      {
-        "code": "352820",
-        "name": "하이브",
-        "reasons": [
-          "공매도 과열"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "currentPrice": 34900
       },
       {
-        "code": "010170",
+        "strategy": "reversal",
+        "scoreScope": "reversal",
         "name": "대한광통신",
-        "reasons": [
-          "투자 주의"
-        ],
-        "sources": [
-          "kind"
-        ],
-        "status": "confirmed"
+        "code": "010170",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 14270
       }
-    ]
+    ],
+    "blacklist": []
   },
   {
     "date": "2026-11-18",
