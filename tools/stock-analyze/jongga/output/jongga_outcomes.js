@@ -1,5 +1,50 @@
 window.JONGGA_OUTCOMES_INDEX = [
   {
+    "date": "2026-11-18",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "030530",
+    "name": "원익홀딩스",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-E",
+    "entryPrice": 35450.0,
+    "nextTradingDate": "20261119",
+    "nextDayOHLC": {
+      "open": 35400.0,
+      "high": 35500.0,
+      "low": 32500.0,
+      "close": 33950.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 36514.0,
+        "targetRate": 3.0,
+        "qty": 60,
+        "hit": false,
+        "stageRealizedReturn": -0.015
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 36750.0,
+        "targetRate": 3.7,
+        "qty": 40,
+        "hit": false,
+        "stageRealizedReturn": -0.015
+      }
+    ],
+    "stopPrice": 34918.0,
+    "stopRate": -1.5,
+    "stopHit": true,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": null,
+    "realizedReturnProxy": -0.015,
+    "outcomeStatus": "resolved"
+  },
+  {
     "date": "2026-11-17",
     "variant": "stable",
     "strategy": "reversal",
@@ -76546,16 +76591,16 @@ window.JONGGA_OUTCOMES_INDEX = [
 window.JONGGA_OUTCOMES_ROLLUP = {
   "byCell": {
     "reversal|weak|weak|G-E|premarket": {
-      "hitRate": 0.875,
-      "sampleCount": 8,
-      "avgRealizedReturn": 0.02709,
-      "avgStageReturn": 0.01578
+      "hitRate": 0.7778,
+      "sampleCount": 9,
+      "avgRealizedReturn": 0.02183,
+      "avgStageReturn": 0.01236
     },
     "reversal|weak|weak|G-E|openPhase": {
-      "hitRate": 0.875,
-      "sampleCount": 8,
-      "avgRealizedReturn": 0.02709,
-      "avgStageReturn": 0.027
+      "hitRate": 0.7778,
+      "sampleCount": 9,
+      "avgRealizedReturn": 0.02183,
+      "avgStageReturn": 0.02233
     },
     "reversal|weak|weak|G-D|premarket": {
       "hitRate": 0.6444,
@@ -78588,16 +78633,16 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   },
   "byStrategyStage": {
     "reversal|premarket": {
-      "hitRate": 0.5761,
-      "sampleCount": 486,
-      "avgRealizedReturn": 0.00683,
-      "avgStageReturn": 0.00859
+      "hitRate": 0.5749,
+      "sampleCount": 487,
+      "avgRealizedReturn": 0.00678,
+      "avgStageReturn": 0.00854
     },
     "reversal|openPhase": {
-      "hitRate": 0.4465,
-      "sampleCount": 486,
-      "avgRealizedReturn": 0.00683,
-      "avgStageReturn": 0.00721
+      "hitRate": 0.4456,
+      "sampleCount": 487,
+      "avgRealizedReturn": 0.00678,
+      "avgStageReturn": 0.00716
     },
     "pullback|premarket": {
       "hitRate": 0.5907,
@@ -78699,8 +78744,8 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfileCell": {
     "reversal|weak|weak|G-E|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 8,
-      "avgRealizedReturn": 0.02709,
+      "sampleCount": 9,
+      "avgRealizedReturn": 0.02183,
       "avgStageReturn": null
     },
     "reversal|weak|weak|G-D|conservative": {
@@ -79235,8 +79280,8 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfile": {
     "reversal|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 423,
-      "avgRealizedReturn": 0.0065,
+      "sampleCount": 424,
+      "avgRealizedReturn": 0.00644,
       "avgStageReturn": null
     },
     "pullback|balanced": {
