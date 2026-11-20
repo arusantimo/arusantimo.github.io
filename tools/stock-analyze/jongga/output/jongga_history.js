@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-20T06:05:16+00:00",
+    "generatedAt": "2026-11-20T08:33:25+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,15 +20,15 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "노랑풍선",
         "code": "104620",
-        "score": 5.7,
-        "signalScore": 5.7,
-        "strictScore": 5.7,
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
         "scoreMax": 10.0,
-        "grade": "A",
-        "gradeScore": 8.1,
+        "grade": "B",
+        "gradeScore": 6.9,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 4625
+        "currentPrice": 4445
       },
       {
         "strategy": "reversal",
@@ -43,7 +43,7 @@ window.JONGGA_HISTORY_INDEX = [
         "gradeScore": 5.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 213000
+        "currentPrice": 212500
       }
     ],
     "blacklist": [
