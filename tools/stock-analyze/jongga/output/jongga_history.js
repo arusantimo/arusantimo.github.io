@@ -1,5 +1,66 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-20",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261120.js",
+    "jsonFile": "jongga/output/202611/latest_20261120.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261120.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-20T06:05:16+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "노랑풍선",
+        "code": "104620",
+        "score": 5.7,
+        "signalScore": 5.7,
+        "strictScore": 5.7,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 8.1,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 4625
+      },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 4.0,
+        "signalScore": 4.0,
+        "strictScore": 4.0,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 5.7,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 213000
+      }
+    ],
+    "blacklist": [
+      {
+        "code": "180640",
+        "name": "한진칼",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-19",
     "variant": "stable",
     "variantLabel": "현재 버전",
