@@ -9,7 +9,7 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-24T06:09:02+00:00",
+    "generatedAt": "2026-11-24T08:33:31+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
@@ -20,48 +20,46 @@ window.JONGGA_HISTORY_INDEX = [
         "scoreScope": "reversal",
         "name": "로보티즈",
         "code": "108490",
-        "score": 7.0,
-        "signalScore": 7.0,
-        "strictScore": 7.0,
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
         "scoreMax": 10.0,
         "grade": "S",
-        "gradeScore": 10.0,
+        "gradeScore": 8.7,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 291500
+        "currentPrice": 289500
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "현대차",
         "code": "005380",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.7,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 275500
-      },
-      {
-        "strategy": "reversal",
-        "scoreScope": "reversal",
-        "name": "휴림로봇",
-        "code": "090710",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
-        "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.7,
-        "statusLabel": "매매금지",
-        "entryEligible": false,
-        "currentPrice": 7430
+        "currentPrice": 272000
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "090710",
+        "name": "휴림로봇",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-11-23",
