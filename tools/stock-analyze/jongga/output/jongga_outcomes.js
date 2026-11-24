@@ -1,5 +1,185 @@
 window.JONGGA_OUTCOMES_INDEX = [
   {
+    "date": "2026-11-23",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "278470",
+    "name": "에이피알",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-E",
+    "entryPrice": 255000.0,
+    "nextTradingDate": "20261124",
+    "nextDayOHLC": {
+      "open": 254500.0,
+      "high": 266000.0,
+      "low": 252500.0,
+      "close": 263750.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 262650.0,
+        "targetRate": 3.0,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.03173
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 266000.0,
+        "targetRate": 4.3,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.0352
+      }
+    ],
+    "stopPrice": 251175.0,
+    "stopRate": -1.5,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.0352,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-11-23",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "222800",
+    "name": "심텍",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-E",
+    "entryPrice": 103200.0,
+    "nextTradingDate": "20261124",
+    "nextDayOHLC": {
+      "open": 116900.0,
+      "high": 116900.0,
+      "low": 108600.0,
+      "close": 109600.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 104900.0,
+        "targetRate": 1.6,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.03441
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 108360.0,
+        "targetRate": 5.0,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.0296
+      }
+    ],
+    "stopPrice": 101652.0,
+    "stopRate": -1.5,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.0296,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-11-23",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "042700",
+    "name": "한미반도체",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-E",
+    "entryPrice": 152700.0,
+    "nextTradingDate": "20261124",
+    "nextDayOHLC": {
+      "open": 165100.0,
+      "high": 167000.0,
+      "low": 162600.0,
+      "close": 163900.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 157200.0,
+        "targetRate": 2.9,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.04674
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 160335.0,
+        "targetRate": 5.0,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.0374
+      }
+    ],
+    "stopPrice": 150410.0,
+    "stopRate": -1.5,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.0374,
+    "outcomeStatus": "resolved"
+  },
+  {
+    "date": "2026-11-23",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "006400",
+    "name": "삼성SDI",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-E",
+    "entryPrice": 397000.0,
+    "nextTradingDate": "20261124",
+    "nextDayOHLC": {
+      "open": 412000.0,
+      "high": 458000.0,
+      "low": 407500.0,
+      "close": 452000.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 404500.0,
+        "targetRate": 1.9,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.06682
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 411000.0,
+        "targetRate": 3.5,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.0254
+      }
+    ],
+    "stopPrice": 391045.0,
+    "stopRate": -1.5,
+    "stopHit": false,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.0254,
+    "outcomeStatus": "resolved"
+  },
+  {
     "date": "2026-11-20",
     "variant": "stable",
     "strategy": "reversal",
@@ -76816,16 +76996,16 @@ window.JONGGA_OUTCOMES_INDEX = [
 window.JONGGA_OUTCOMES_ROLLUP = {
   "byCell": {
     "reversal|weak|weak|G-E|premarket": {
-      "hitRate": 0.7273,
-      "sampleCount": 11,
-      "avgRealizedReturn": 0.02056,
-      "avgStageReturn": 0.01275
+      "hitRate": 0.8,
+      "sampleCount": 15,
+      "avgRealizedReturn": 0.0238,
+      "avgStageReturn": 0.02133
     },
     "reversal|weak|weak|G-E|openPhase": {
-      "hitRate": 0.7273,
-      "sampleCount": 11,
-      "avgRealizedReturn": 0.02056,
-      "avgStageReturn": 0.02109
+      "hitRate": 0.8,
+      "sampleCount": 15,
+      "avgRealizedReturn": 0.0238,
+      "avgStageReturn": 0.02397
     },
     "reversal|weak|weak|G-B|premarket": {
       "hitRate": 0.4054,
@@ -78858,16 +79038,16 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   },
   "byStrategyStage": {
     "reversal|premarket": {
-      "hitRate": 0.5711,
-      "sampleCount": 492,
-      "avgRealizedReturn": 0.00667,
-      "avgStageReturn": 0.00841
+      "hitRate": 0.5746,
+      "sampleCount": 496,
+      "avgRealizedReturn": 0.00691,
+      "avgStageReturn": 0.00874
     },
     "reversal|openPhase": {
-      "hitRate": 0.4431,
-      "sampleCount": 492,
-      "avgRealizedReturn": 0.00667,
-      "avgStageReturn": 0.00705
+      "hitRate": 0.4476,
+      "sampleCount": 496,
+      "avgRealizedReturn": 0.00691,
+      "avgStageReturn": 0.00727
     },
     "pullback|premarket": {
       "hitRate": 0.5907,
@@ -78969,8 +79149,8 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfileCell": {
     "reversal|weak|weak|G-E|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 11,
-      "avgRealizedReturn": 0.02056,
+      "sampleCount": 15,
+      "avgRealizedReturn": 0.0238,
       "avgStageReturn": null
     },
     "reversal|weak|weak|G-B|conservative": {
@@ -79505,8 +79685,8 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfile": {
     "reversal|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 429,
-      "avgRealizedReturn": 0.00632,
+      "sampleCount": 433,
+      "avgRealizedReturn": 0.0066,
       "avgStageReturn": null
     },
     "pullback|balanced": {
