@@ -9,26 +9,44 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-25T06:03:41+00:00",
+    "generatedAt": "2026-11-25T08:33:49+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 3,
-    "topRecommendations": [],
-    "blacklist": [
+    "buyCount": 4,
+    "topRecommendations": [
       {
-        "code": "090710",
-        "name": "휴림로봇",
-        "reasons": [
-          "공매도 과열",
-          "투자 주의"
-        ],
-        "sources": [
-          "kind",
-          "entry"
-        ],
-        "status": "confirmed"
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "지니언스",
+        "code": "263860",
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
+        "scoreMax": 10.0,
+        "grade": "A",
+        "gradeScore": 7.4,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 41450
       },
+      {
+        "strategy": "reversal",
+        "scoreScope": "reversal",
+        "name": "현대오토에버",
+        "code": "307950",
+        "score": 4.8,
+        "signalScore": 4.8,
+        "strictScore": 4.8,
+        "scoreMax": 10.0,
+        "grade": "B",
+        "gradeScore": 6.9,
+        "statusLabel": "매매금지",
+        "entryEligible": false,
+        "currentPrice": 362000
+      }
+    ],
+    "blacklist": [
       {
         "code": "060720",
         "name": "KH바텍",
@@ -42,13 +60,16 @@ window.JONGGA_HISTORY_INDEX = [
         "status": "confirmed"
       },
       {
-        "code": "263860",
-        "name": "지니언스",
+        "code": "090710",
+        "name": "휴림로봇",
         "reasons": [
+          "공매도 과열",
           "투자 주의"
         ],
         "sources": [
-          "kind"
+          "kind",
+          "toss",
+          "entry"
         ],
         "status": "confirmed"
       }
