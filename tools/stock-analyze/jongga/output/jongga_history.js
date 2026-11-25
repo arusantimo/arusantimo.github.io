@@ -1,5 +1,60 @@
 window.JONGGA_HISTORY_INDEX = [
   {
+    "date": "2026-11-25",
+    "variant": "stable",
+    "variantLabel": "현재 버전",
+    "jsFile": "jongga/output/202611/jongga_data_20261125.js",
+    "jsonFile": "jongga/output/202611/latest_20261125.json",
+    "inputArchiveFile": "jongga/output/archive/202611/inputs_20261125.json",
+    "inputArchiveVersion": "jongga_inputs.v1",
+    "payloadSourceMode": "live",
+    "rebuildable": true,
+    "generatedAt": "2026-11-25T06:03:41+00:00",
+    "pointInTime": true,
+    "pointInTimeStatus": "confirmed",
+    "status": "partial",
+    "buyCount": 3,
+    "topRecommendations": [],
+    "blacklist": [
+      {
+        "code": "090710",
+        "name": "휴림로봇",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "060720",
+        "name": "KH바텍",
+        "reasons": [
+          "투자 주의",
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "263860",
+        "name": "지니언스",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
+  },
+  {
     "date": "2026-11-24",
     "variant": "stable",
     "variantLabel": "현재 버전",
