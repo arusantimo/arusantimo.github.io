@@ -1,5 +1,95 @@
 window.JONGGA_OUTCOMES_INDEX = [
   {
+    "date": "2026-11-25",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "307950",
+    "name": "현대오토에버",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 362000.0,
+    "nextTradingDate": "20261126",
+    "nextDayOHLC": {
+      "open": 364500.0,
+      "high": 378500.0,
+      "low": 351000.0,
+      "close": 352000.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 370085.0,
+        "targetRate": 2.2,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.00215
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 374250.0,
+        "targetRate": 3.4,
+        "qty": 40,
+        "hit": true,
+        "stageRealizedReturn": 0.0268
+      }
+    ],
+    "stopPrice": 354760.0,
+    "stopRate": -2.0,
+    "stopHit": true,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "openPhase",
+    "realizedReturnProxy": 0.0268,
+    "outcomeStatus": "stop_first_ambiguous"
+  },
+  {
+    "date": "2026-11-25",
+    "variant": "stable",
+    "strategy": "reversal",
+    "code": "263860",
+    "name": "지니언스",
+    "takeProfitProfileKey": "conservative",
+    "takeProfitProfileLabel": "보수형",
+    "regimeBucket": "weak",
+    "vkospiTier": "weak",
+    "gapGrade": "G-C",
+    "entryPrice": 41450.0,
+    "nextTradingDate": "20261126",
+    "nextDayOHLC": {
+      "open": 40300.0,
+      "high": 42700.0,
+      "low": 39350.0,
+      "close": 40150.0
+    },
+    "stages": [
+      {
+        "stageKey": "premarket",
+        "targetPrice": 42694.0,
+        "targetRate": 3.0,
+        "qty": 60,
+        "hit": true,
+        "stageRealizedReturn": 0.00545
+      },
+      {
+        "stageKey": "openPhase",
+        "targetPrice": 43425.0,
+        "targetRate": 4.8,
+        "qty": 40,
+        "hit": false,
+        "stageRealizedReturn": 0.00545
+      }
+    ],
+    "stopPrice": 40828.0,
+    "stopRate": -1.5,
+    "stopHit": true,
+    "stopExecutionMode": "close_only",
+    "bestStageHit": "premarket",
+    "realizedReturnProxy": 0.00545,
+    "outcomeStatus": "stop_first_ambiguous"
+  },
+  {
     "date": "2026-11-24",
     "variant": "stable",
     "strategy": "reversal",
@@ -77086,16 +77176,16 @@ window.JONGGA_OUTCOMES_INDEX = [
 window.JONGGA_OUTCOMES_ROLLUP = {
   "byCell": {
     "reversal|weak|weak|G-C|premarket": {
-      "hitRate": 0.6471,
-      "sampleCount": 68,
+      "hitRate": 0.6571,
+      "sampleCount": 70,
       "avgRealizedReturn": 0.01455,
-      "avgStageReturn": 0.01845
+      "avgStageReturn": 0.01803
     },
     "reversal|weak|weak|G-C|openPhase": {
       "hitRate": 0.5,
-      "sampleCount": 68,
+      "sampleCount": 70,
       "avgRealizedReturn": 0.01455,
-      "avgStageReturn": 0.01434
+      "avgStageReturn": 0.01439
     },
     "reversal|weak|weak|G-E|premarket": {
       "hitRate": 0.8,
@@ -79128,16 +79218,16 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   },
   "byStrategyStage": {
     "reversal|premarket": {
-      "hitRate": 0.5743,
-      "sampleCount": 498,
+      "hitRate": 0.576,
+      "sampleCount": 500,
       "avgRealizedReturn": 0.00686,
-      "avgStageReturn": 0.00869
+      "avgStageReturn": 0.00867
     },
     "reversal|openPhase": {
-      "hitRate": 0.4458,
-      "sampleCount": 498,
+      "hitRate": 0.446,
+      "sampleCount": 500,
       "avgRealizedReturn": 0.00686,
-      "avgStageReturn": 0.00723
+      "avgStageReturn": 0.00727
     },
     "pullback|premarket": {
       "hitRate": 0.5907,
@@ -79239,7 +79329,7 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfileCell": {
     "reversal|weak|weak|G-C|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 68,
+      "sampleCount": 70,
       "avgRealizedReturn": 0.01455,
       "avgStageReturn": null
     },
@@ -79775,7 +79865,7 @@ window.JONGGA_OUTCOMES_ROLLUP = {
   "byTakeProfitProfile": {
     "reversal|conservative": {
       "hitRate": 0.0,
-      "sampleCount": 435,
+      "sampleCount": 437,
       "avgRealizedReturn": 0.00655,
       "avgStageReturn": null
     },
