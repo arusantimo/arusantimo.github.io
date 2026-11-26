@@ -1,10 +1,9 @@
 window.JONGGA_REPLAY_RUNS = {
-  "generatedAt": "2026-11-26T06:06:26",
+  "generatedAt": "2026-11-26T08:39:09",
   "latestAttempt": {
-    "status": "complete",
-    "message": "",
-    "generatedAt": "2026-11-26T06:06:26",
-    "runId": "replay-20261126-060626-d35d4a98",
+    "status": "skipped",
+    "message": "17:30 세션에서는 자동 replay를 생략합니다.",
+    "generatedAt": "2026-11-26T08:39:08",
     "variant": "stable",
     "thresholdProfile": "current"
   },
