@@ -9,23 +9,23 @@ window.JONGGA_HISTORY_INDEX = [
     "inputArchiveVersion": "jongga_inputs.v1",
     "payloadSourceMode": "live",
     "rebuildable": true,
-    "generatedAt": "2026-11-27T06:15:00+00:00",
+    "generatedAt": "2026-11-27T08:35:15+00:00",
     "pointInTime": true,
     "pointInTimeStatus": "confirmed",
     "status": "partial",
-    "buyCount": 10,
+    "buyCount": 12,
     "topRecommendations": [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
         "name": "알테오젠",
         "code": "196170",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "score": 11.4,
+        "signalScore": 11.4,
+        "strictScore": 11.4,
         "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 8.2,
+        "grade": "S",
+        "gradeScore": 9.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, G2, G3)",
         "entryEligible": false,
         "currentPrice": 186900
@@ -33,47 +33,47 @@ window.JONGGA_HISTORY_INDEX = [
       {
         "strategy": "pullback",
         "scoreScope": "pullback",
-        "name": "휴림로봇",
-        "code": "090710",
-        "score": 9.0,
-        "signalScore": 9.0,
-        "strictScore": 9.0,
+        "name": "셀트리온",
+        "code": "068270",
+        "score": 10.2,
+        "signalScore": 10.2,
+        "strictScore": 10.2,
         "scoreMax": 13.0,
         "grade": "A",
         "gradeScore": 8.2,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G1, G3, G8)",
-        "entryEligible": false,
-        "currentPrice": 7370
-      },
-      {
-        "strategy": "pullback",
-        "scoreScope": "pullback",
-        "name": "셀트리온",
-        "code": "068270",
-        "score": 8.2,
-        "signalScore": 8.2,
-        "strictScore": 8.2,
-        "scoreMax": 13.0,
-        "grade": "A",
-        "gradeScore": 7.5,
         "statusLabel": "매수추천",
         "entryEligible": true,
-        "currentPrice": 221500
+        "currentPrice": 221000
       },
       {
         "strategy": "accumulation",
         "scoreScope": "accumulation",
         "name": "SK스퀘어",
         "code": "402340",
-        "score": 6.0,
-        "signalScore": 6.0,
-        "strictScore": 6.0,
+        "score": 6.6,
+        "signalScore": 6.6,
+        "strictScore": 6.6,
         "scoreMax": 14.0,
         "grade": "B",
         "gradeScore": 5.5,
         "statusLabel": "관심후보",
         "entryEligible": false,
-        "currentPrice": 682000
+        "currentPrice": 684000
+      },
+      {
+        "strategy": "accumulation",
+        "scoreScope": "accumulation",
+        "name": "알테오젠",
+        "code": "196170",
+        "score": 6.1,
+        "signalScore": 6.1,
+        "strictScore": 6.1,
+        "scoreMax": 14.0,
+        "grade": "C",
+        "gradeScore": 5.1,
+        "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
+        "entryEligible": false,
+        "currentPrice": 186900
       },
       {
         "strategy": "accumulation",
@@ -85,70 +85,40 @@ window.JONGGA_HISTORY_INDEX = [
         "strictScore": 4.9,
         "scoreMax": 14.0,
         "grade": "C",
-        "gradeScore": 4.5,
+        "gradeScore": 4.1,
         "statusLabel": "매매금지(핵심 Gate 미충족: G1, Q1)",
         "entryEligible": false,
-        "currentPrice": 156200
-      },
-      {
-        "strategy": "accumulation",
-        "scoreScope": "accumulation",
-        "name": "지니언스",
-        "code": "263860",
-        "score": 4.9,
-        "signalScore": 4.9,
-        "strictScore": 4.9,
-        "scoreMax": 14.0,
-        "grade": "C",
-        "gradeScore": 4.5,
-        "statusLabel": "매매금지(핵심 Gate 미충족: Q1)",
-        "entryEligible": false,
-        "currentPrice": 40725
-      },
-      {
-        "strategy": "breakout",
-        "scoreScope": "breakout",
-        "name": "레인보우로보틱스",
-        "code": "277810",
-        "score": 3.9,
-        "signalScore": 3.9,
-        "strictScore": 3.9,
-        "scoreMax": 12.5,
-        "grade": "C",
-        "gradeScore": 4.6,
-        "statusLabel": "매매금지(핵심 Gate 미충족: G2)",
-        "entryEligible": false,
-        "currentPrice": 529000
+        "currentPrice": 155900
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "주성엔지니어링",
         "code": "036930",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.7,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 156200
+        "currentPrice": 155900
       },
       {
         "strategy": "reversal",
         "scoreScope": "reversal",
         "name": "삼성SDI",
         "code": "006400",
-        "score": 6.1,
-        "signalScore": 6.1,
-        "strictScore": 6.1,
+        "score": 5.2,
+        "signalScore": 5.2,
+        "strictScore": 5.2,
         "scoreMax": 10.0,
-        "grade": "S",
-        "gradeScore": 8.7,
+        "grade": "A",
+        "gradeScore": 7.4,
         "statusLabel": "매매금지",
         "entryEligible": false,
-        "currentPrice": 452000
+        "currentPrice": 451000
       },
       {
         "strategy": "reversal",
@@ -166,7 +136,43 @@ window.JONGGA_HISTORY_INDEX = [
         "currentPrice": 1099000
       }
     ],
-    "blacklist": []
+    "blacklist": [
+      {
+        "code": "090710",
+        "name": "휴림로봇",
+        "reasons": [
+          "공매도 과열",
+          "투자 주의"
+        ],
+        "sources": [
+          "kind",
+          "entry"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "277810",
+        "name": "레인보우로보틱스",
+        "reasons": [
+          "공매도 과열"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      },
+      {
+        "code": "084670",
+        "name": "동양고속",
+        "reasons": [
+          "투자 주의"
+        ],
+        "sources": [
+          "kind"
+        ],
+        "status": "confirmed"
+      }
+    ]
   },
   {
     "date": "2026-11-26",
